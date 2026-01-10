@@ -1,0 +1,955 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Approval Matrix • Issue Tracker</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    /* Light page-specific styles to complement css/style.css */
+    .page { padding: 0 16px 24px; }
+    .section { background: #fff; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,.06); margin: 16px 0; overflow: hidden; }
+    .section h2 { margin: 0; padding: 12px 16px; background: #f3f0ff; color: #3f2d9e; font-size: 1rem; border-bottom: 1px solid #e9e6ff; display:flex; align-items:center; justify-content:space-between; gap: 12px; }
+    .section-body { padding: 12px 16px; }
+    .table-wrap { width: 100%; overflow: auto; }
+    table { width: 100%; border-collapse: separate; border-spacing: 0; }
+    thead th { position: sticky; top: 0; background: #efeafe; color: #3f2d9e; text-align: left; padding: 10px; font-weight: 600; border-bottom: 1px solid #e2defa; }
+    tbody td { padding: 10px; border-bottom: 1px solid #f0f0f5; }
+    .pill { border-radius: 999px; padding: 6px 12px; border: 1px solid transparent; cursor: pointer; }
+    .pill.primary { background:#6c5ce7; color:#fff; border-color:#6c5ce7; }
+    .pill.secondary { background:#ecebff; color:#3f2d9e; border:1px solid #c8c3ff; }
+    .toolbar { display:flex; gap: 8px; align-items:center; }
+    .search { display:flex; gap:6px; align-items:center; }
+    .search input { padding:8px 10px; border:1px solid #d8d8e5; border-radius:6px; }
+    .badge { background:#efeafe; color:#3f2d9e; border:1px solid #ded9ff; border-radius:999px; padding:2px 8px; font-size:.8rem; }
+    .meta { color:#666; font-size:.85rem; }
+    .actions { display:flex; gap:8px; flex-wrap: wrap; }
+    @media (max-width: 900px){ .toolbar{flex-direction:column; align-items:flex-start;} }
+
+    /* Modal + overlay */
+    .overlay { position: fixed; inset: 0; background: rgba(5,5,30,.45); display:none; align-items:center; justify-content:center; padding: 16px; z-index: 1000; }
+    .overlay.show { display:flex; }
+    .dialog { width: min(680px, 100%); max-height: 75vh; background:#fff; border-radius:12px; box-shadow: 0 10px 30px rgba(0,0,0,.2); overflow:hidden; display:flex; flex-direction:column; }
+    .dialog header { padding: 14px 16px; background:#f7f6ff; border-bottom:1px solid #ece9ff; color:#3f2d9e; font-weight:600; display:flex; align-items:center; justify-content:space-between; }
+    .dialog .body { padding:16px; display:flex; flex-direction:column; gap:12px; overflow:auto; flex:1 1 auto; min-height:0; }
+    .dialog .footer { padding:12px 16px; background:#faf9ff; border-top:1px solid #ece9ff; display:flex; gap:8px; justify-content:flex-end; }
+    .dialog .field { display:flex; flex-direction:column; gap:6px; }
+    .dialog input[type="text"], .dialog select { padding:10px 12px; border:1px solid #d8d8e5; border-radius:8px; }
+    .dialog .muted { color:#666; font-size:.9rem; }
+
+    /* Approval matrix builder */
+    /* Switch flow-chart to vertical (top -> bottom) */
+    .levels { display:flex; flex-direction: column; align-items:flex-start; gap:16px; overflow:auto; padding-right:6px; }
+    .level-node { position:relative; background:#ffffff; border:1px solid #e6e3ff; border-radius:10px; padding:10px; box-shadow: 0 1px 3px rgba(0,0,0,.05); min-width: 0; width: 100%; max-width: 520px; }
+    .level-node h4 { margin: 0 0 8px 0; font-size:.95rem; color:#3f2d9e; }
+    .level-node .remove { position:absolute; top:6px; right:6px; border:none; background:transparent; color:#b00020; cursor:pointer; font-weight:700; }
+    .arrow { width:2px; height:40px; background: linear-gradient(180deg, #c8c3ff 60%, transparent 60%); background-size: 2px 10px; background-repeat: repeat-y; position:relative; margin: 0 0 0 12px; }
+    .arrow::after { content:''; position:absolute; left:50%; transform: translateX(-50%); bottom:-6px; border:6px solid transparent; border-top-color:#c8c3ff; }
+    .add-level { border:1px dashed #b7b2ff; background:#f7f6ff; color:#3f2d9e; border-radius:10px; padding:10px 12px; cursor:pointer; }
+    .inline { display:flex; align-items:center; gap:8px; }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <h1>Approval Matrix</h1>
+  </header>
+
+  <main class="page" aria-label="Approval Matrix">
+    <section class="section" aria-labelledby="matrix-title">
+      <h2 id="matrix-title">
+        Processes
+        <span class="toolbar">
+          <span class="search" role="search">
+            <input id="search-input" type="search" placeholder="Search processes..." aria-label="Search processes" />
+          </span>
+          <button id="create-process" class="pill secondary" type="button" title="Create a new process">Create Process</button>
+        </span>
+      </h2>
+      <div class="section-body table-wrap">
+        <table aria-label="Approval processes table">
+          <thead>
+            <tr>
+              <th scope="col">Process</th>
+              <th scope="col">Active Issues</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="proc-tbody"></tbody>
+        </table>
+      </div>
+      <div class="section-body">
+        <small class="meta">Saved approval processes will show up here. Use the search to quickly find a process.</small>
+      </div>
+    </section>
+
+    <!-- New: Separate table to manage Approval Matrices -->
+    <section class="section" aria-labelledby="matrices-title">
+      <h2 id="matrices-title">
+        Approval Matrices
+        <span class="toolbar">
+          <span class="search" role="search">
+            <input id="mat-search-input" type="search" placeholder="Search matrices..." aria-label="Search approval matrices" />
+          </span>
+          <button id="new-matrix" class="pill primary" type="button" title="Create a new approval matrix">+ New Matrix</button>
+        </span>
+      </h2>
+      <div class="section-body table-wrap">
+        <table aria-label="Approval matrices table">
+          <thead>
+            <tr>
+              <th scope="col">Name</th>
+              <th scope="col">Levels</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="mat-tbody"></tbody>
+        </table>
+      </div>
+      <div class="section-body">
+        <small class="meta">Create matrices once and reuse them across multiple processes. Use the search to quickly find a matrix.</small>
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <small>This is a mock UI. Data is client-side only.</small>
+  </footer>
+
+  <!-- Create Process Modal -->
+  <div id="cp-overlay" class="overlay" role="dialog" aria-modal="true" aria-labelledby="cp-title">
+    <div class="dialog" role="document">
+      <header>
+        <span id="cp-title">Create New Process</span>
+        <button id="cp-close" class="pill secondary" type="button" aria-label="Close">Close</button>
+      </header>
+      <div class="body">
+        <!-- Step 1: Intro -->
+        <div id="cp-step-1" class="cp-step">
+          <p class="muted">You are about to create a new process and attach an approval matrix.</p>
+          <ul>
+            <li>Step 1: Start the creation</li>
+            <li>Step 2: Provide a name for the process</li>
+            <li>Step 3: Select Invoice Sub-Status, Primary Status, and Broad Status</li>
+            <li>Step 4: Select an approval matrix to use for this process</li>
+          </ul>
+        </div>
+
+        <!-- Step 2: Process name -->
+        <div id="cp-step-2" class="cp-step hidden">
+          <div class="field">
+            <label for="cp-name">Process Name</label>
+            <input id="cp-name" type="text" placeholder="e.g., Invoice Delay Resolution" />
+            <div class="muted">Give your process a clear, descriptive name.</div>
+          </div>
+        </div>
+
+        <!-- Step 3: Status selections -->
+        <div id="cp-step-3" class="cp-step hidden">
+          <div class="field">
+            <label for="cp-invoice-sub-status">Invoice Sub-Status</label>
+            <select id="cp-invoice-sub-status"></select>
+          </div>
+          <div class="field">
+            <label for="cp-primary-status">Primary Status</label>
+            <select id="cp-primary-status"></select>
+          </div>
+          <div class="field">
+            <label for="cp-broad-status">Broad Status</label>
+            <select id="cp-broad-status"></select>
+          </div>
+          <div class="muted">These status selections help categorize and drive workflows for this process.</div>
+        </div>
+
+        <!-- Step 4: Select Approval Matrix -->
+        <div id="cp-step-4" class="cp-step hidden">
+          <div class="field">
+            <label for="cp-matrix-select">Approval Matrix</label>
+            <select id="cp-matrix-select"></select>
+            <div class="muted">Select a reusable approval matrix. You can create and reuse matrices across multiple processes.</div>
+          </div>
+          <div class="inline">
+            <button id="manage-matrices" class="pill secondary" type="button">Manage Matrices</button>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <button id="cp-back" class="pill secondary" type="button">Back</button>
+        <button id="cp-next" class="pill primary" type="button">Next</button>
+        <button id="cp-save" class="pill primary hidden" type="button">Save Process</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- View Process Modal -->
+  <div id="vp-overlay" class="overlay" role="dialog" aria-modal="true" aria-labelledby="vp-title">
+    <div class="dialog" role="document">
+      <header>
+        <span id="vp-title">Process Details</span>
+        <button id="vp-close" class="pill secondary" type="button" aria-label="Close">Close</button>
+      </header>
+      <div class="body">
+        <div class="field">
+          <label>Process</label>
+          <div id="vp-name" class="inline"></div>
+        </div>
+        <div class="inline" style="gap:12px; flex-wrap:wrap;">
+          <div class="badge" id="vp-id">ID:</div>
+          <div class="badge" id="vp-sla">SLA:</div>
+          <div class="badge" id="vp-active">Active Issues:</div>
+        </div>
+        <div class="field">
+          <label>Statuses</label>
+          <div class="inline" style="gap:12px; flex-wrap:wrap;">
+            <div class="badge" id="vp-invoice-sub">Invoice Sub-Status:</div>
+            <div class="badge" id="vp-primary">Primary Status:</div>
+            <div class="badge" id="vp-broad">Broad Status:</div>
+          </div>
+        </div>
+        <div class="field">
+          <label>Approval Levels</label>
+          <div id="vp-levels" class="levels" aria-label="Approval flow chart (read-only)"></div>
+        </div>
+      </div>
+      <div class="footer">
+        <button id="vp-close-2" class="pill secondary" type="button">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- View Matrix Modal -->
+  <div id="vm-overlay" class="overlay" role="dialog" aria-modal="true" aria-labelledby="vm-title">
+    <div class="dialog" role="document">
+      <header>
+        <span id="vm-title">Matrix Details</span>
+        <button id="vm-close" class="pill secondary" type="button" aria-label="Close">Close</button>
+      </header>
+      <div class="body">
+        <div class="field">
+          <label>Matrix</label>
+          <div id="vm-name" class="inline"></div>
+        </div>
+        <div class="field">
+          <label>Levels</label>
+          <div id="vm-levels" class="levels" aria-label="Approval matrix levels (read-only)"></div>
+        </div>
+      </div>
+      <div class="footer">
+        <button id="vm-close-2" class="pill secondary" type="button">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const PROC_KEY = 'approval_processes';
+    const REQ_KEY = 'approval_requests';
+
+    function loadProcesses(){
+      try {
+        const j = JSON.parse(localStorage.getItem(PROC_KEY) || '[]');
+        return Array.isArray(j) ? j : [];
+      } catch(_) {
+        return [];
+      }
+    }
+    function saveProcesses(list){
+      localStorage.setItem(PROC_KEY, JSON.stringify(list || []));
+    }
+    function loadApprovalRequests(){
+      try {
+        const j = JSON.parse(localStorage.getItem(REQ_KEY) || '[]');
+        return Array.isArray(j) ? j : [];
+      } catch(_) {
+        return [];
+      }
+    }
+    function getActiveCounts(){
+      const counts = {};
+      const reqs = loadApprovalRequests();
+      reqs.forEach(r => {
+        if (!r || r.status !== 'pending') return;
+        const pid = r.processId || '';
+        if (!pid) return;
+        counts[pid] = (counts[pid] || 0) + 1;
+      });
+      return counts;
+    }
+
+    // --- Mock data for processes (will reference reusable approval matrices) ---
+    const defaultProcesses = [
+      {
+        id: 'PROC_INV_DELAY',
+        process: 'Invoice Delay Resolution',
+        invoiceSubStatus: 'Pending Verification',
+        primaryStatus: 'In Progress',
+        broadStatus: 'Amber',
+        slaHours: 48,
+        matrixId: null,
+        activeIssues: 6
+      },
+      {
+        id: 'PROC_PO_APPROVAL',
+        process: 'PO Approval Follow-up',
+        invoiceSubStatus: 'Verified',
+        primaryStatus: 'Open',
+        broadStatus: 'Green',
+        slaHours: 72,
+        matrixId: null,
+        activeIssues: 3
+      },
+      {
+        id: 'PROC_DELIVERY_CHALLAN',
+        process: 'Delivery Challan Collection',
+        invoiceSubStatus: 'Invoice Received',
+        primaryStatus: 'Waiting on Vendor',
+        broadStatus: 'Red',
+        slaHours: 24,
+        matrixId: null,
+        activeIssues: 9
+      }
+    ];
+
+    let processes = loadProcesses();
+    if (processes.length === 0) {
+      processes = defaultProcesses.slice();
+      saveProcesses(processes);
+    }
+
+    function renderRows(list) {
+      const tbody = document.getElementById('proc-tbody');
+      tbody.innerHTML = '';
+      const counts = getActiveCounts();
+      list.forEach(p => {
+        const tr = document.createElement('tr');
+        tr.dataset.id = p.id;
+        const active = counts[p.id] != null ? counts[p.id] : (p.activeIssues != null ? p.activeIssues : '-');
+        tr.innerHTML = `
+          <td>
+            <div>${p.process}</div>
+            <div class="meta">ID: <span class="badge">${p.id}</span></div>
+          </td>
+          <td>${active}</td>
+          <td>
+            <div class="actions">
+              <button class="pill secondary" data-action="view" type="button" title="View details" aria-label="View ${p.process}">View</button>
+              <button class="pill secondary" data-action="edit" type="button" title="Edit matrix" aria-label="Edit ${p.process}">Edit</button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function applySearch() {
+      const q = (document.getElementById('search-input').value || '').toLowerCase();
+      if (!q) { renderRows(processes); return; }
+      const filtered = processes.filter(p => {
+        const hay = [p.process, p.id]
+          .filter(Boolean).join(' ').toLowerCase();
+        return hay.includes(q);
+      });
+      renderRows(filtered);
+    }
+
+    // Wire up
+    document.getElementById('search-input').addEventListener('input', applySearch);
+    // Create Process: open modal and guide through steps
+    const createBtn = document.getElementById('create-process');
+    const overlay = document.getElementById('cp-overlay');
+    const viewOverlay = document.getElementById('vp-overlay');
+    const cpClose = document.getElementById('cp-close');
+    const step1 = document.getElementById('cp-step-1');
+    const step2 = document.getElementById('cp-step-2');
+    const step3 = document.getElementById('cp-step-3');
+    const step4 = document.getElementById('cp-step-4');
+    const cpBack = document.getElementById('cp-back');
+    const cpNext = document.getElementById('cp-next');
+    const cpSave = document.getElementById('cp-save');
+    const cpName = document.getElementById('cp-name');
+    const levelsWrap = document.getElementById('levels');
+    const addLevelBtn = document.getElementById('add-level');
+    const cpTitle = document.getElementById('cp-title');
+    const selInvoiceSub = document.getElementById('cp-invoice-sub-status');
+    const selPrimary = document.getElementById('cp-primary-status');
+    const selBroad = document.getElementById('cp-broad-status');
+
+    const vpClose = document.getElementById('vp-close');
+    const vpClose2 = document.getElementById('vp-close-2');
+    const vpName = document.getElementById('vp-name');
+    const vpId = document.getElementById('vp-id');
+    const vpSla = document.getElementById('vp-sla');
+    const vpActive = document.getElementById('vp-active');
+    const vpLevels = document.getElementById('vp-levels');
+    const matrixSelect = document.getElementById('cp-matrix-select');
+    const manageMatricesBtn = document.getElementById('manage-matrices');
+    const vpInvoiceSub = document.getElementById('vp-invoice-sub');
+    const vpPrimary = document.getElementById('vp-primary');
+    const vpBroad = document.getElementById('vp-broad');
+
+    // Matrices table elements
+    const matSearchInput = document.getElementById('mat-search-input');
+    const matTbody = document.getElementById('mat-tbody');
+    const newMatrixBtn = document.getElementById('new-matrix');
+
+    // View Matrix modal elements
+    const vmOverlay = document.getElementById('vm-overlay');
+    const vmClose = document.getElementById('vm-close');
+    const vmClose2 = document.getElementById('vm-close-2');
+    const vmName = document.getElementById('vm-name');
+    const vmLevels = document.getElementById('vm-levels');
+
+    const users = [
+      { name: 'Anoop Sharma', email: 'anoop.sharma@example.com' },
+      { name: 'Priya Verma', email: 'priya.verma@example.com' },
+      { name: 'Rohit Malhotra', email: 'rohit.m@example.com' },
+      { name: 'Rahul Jain', email: 'rahul.jain@example.com' },
+      { name: 'Neha Gupta', email: 'neha.gupta@example.com' },
+      { name: 'Sanjay Rao', email: 'sanjay.rao@example.com' },
+      { name: 'Arjun Patel', email: 'arjun.patel@example.com' },
+      { name: 'Meera Iyer', email: 'meera.iyer@example.com' },
+      { name: 'Compliance Team', email: 'compliance@example.com' }
+    ];
+
+    const INVOICE_SUB_STATUSES = [
+      'Invoice Received', 'Pending Verification', 'Verified', 'Disputed', 'On Hold', 'Resolved'
+    ];
+    const PRIMARY_STATUSES = [
+      'Open', 'In Progress', 'Waiting on Vendor', 'Waiting on Customer', 'Closed'
+    ];
+    const BROAD_STATUSES = [
+      'Green', 'Amber', 'Red'
+    ];
+
+    // Matrices store and helpers
+    const MAT_KEY = 'approval_matrices';
+    function loadMatrices(){
+      try { const j = JSON.parse(localStorage.getItem(MAT_KEY) || '[]'); return Array.isArray(j)? j: []; } catch(e){ return []; }
+    }
+    function saveMatrices(mats){ localStorage.setItem(MAT_KEY, JSON.stringify(mats||[])); }
+    function genMatrixId(name){
+      if(!name) return 'MATRIX_' + Math.random().toString(36).slice(2,8).toUpperCase();
+      const slug = name.trim().toUpperCase().replace(/[^A-Z0-9]+/g,'_').replace(/^_|_$/g,'');
+      return 'MATRIX_' + (slug || Math.random().toString(36).slice(2,6).toUpperCase());
+    }
+
+    let matrices = loadMatrices();
+
+    // Seed matrices from initial sample processes (first run only)
+    if (matrices.length === 0) {
+      const seeds = [
+        { name: 'Invoice Delay Default', levels: [
+          { level: 1, ownerName: 'Anoop Sharma', ownerEmail: 'anoop.sharma@example.com' },
+          { level: 2, ownerName: 'Priya Verma', ownerEmail: 'priya.verma@example.com' },
+          { level: 3, ownerName: 'Rohit Malhotra', ownerEmail: 'rohit.m@example.com' }
+        ]},
+        { name: 'PO Approval Default', levels: [
+          { level: 1, ownerName: 'Rahul Jain', ownerEmail: 'rahul.jain@example.com' },
+          { level: 2, ownerName: 'Neha Gupta', ownerEmail: 'neha.gupta@example.com' },
+          { level: 3, ownerName: 'Sanjay Rao', ownerEmail: 'sanjay.rao@example.com' }
+        ]},
+        { name: 'Delivery Challan Default', levels: [
+          { level: 1, ownerName: 'Arjun Patel', ownerEmail: 'arjun.patel@example.com' },
+          { level: 2, ownerName: 'Meera Iyer', ownerEmail: 'meera.iyer@example.com' },
+          { level: 3, ownerName: 'Compliance Team', ownerEmail: 'compliance@example.com' }
+        ]}
+      ];
+      matrices = seeds.map(s => ({ id: genMatrixId(s.name), name: s.name, levels: s.levels }));
+      saveMatrices(matrices);
+    }
+
+    // Map sample processes to matrices by heuristic
+    processes.forEach(p => {
+      if (!p.matrixId) {
+        const hint = (p.process||'').toLowerCase();
+        const found = matrices.find(m => hint.includes('po approval') ? m.name.includes('PO Approval') : hint.includes('delivery challan') ? m.name.includes('Delivery Challan') : m.name.includes('Invoice Delay'));
+        p.matrixId = found ? found.id : matrices[0]?.id || null;
+      }
+    });
+    saveProcesses(processes);
+
+    let cpState = { step: 1, name: '',
+      statuses: { invoiceSubStatus: '', primaryStatus: '', broadStatus: '' },
+      matrixId: '', mode: 'create', editIndex: -1 };
+
+    function populateStatusSelects() {
+      if (selInvoiceSub && selInvoiceSub.options.length === 0) {
+        const make = (el, arr, placeholder) => {
+          el.innerHTML = '';
+          const ph = document.createElement('option');
+          ph.value = '';
+          ph.textContent = placeholder;
+          ph.disabled = true; ph.selected = true;
+          el.appendChild(ph);
+          arr.forEach(v=>{
+            const o = document.createElement('option');
+            o.value = v; o.textContent = v; el.appendChild(o);
+          });
+        };
+        make(selInvoiceSub, INVOICE_SUB_STATUSES, 'Select invoice sub-status');
+        make(selPrimary, PRIMARY_STATUSES, 'Select primary status');
+        make(selBroad, BROAD_STATUSES, 'Select broad status');
+      }
+      // set current values
+      if (cpState.statuses) {
+        if (selInvoiceSub) selInvoiceSub.value = cpState.statuses.invoiceSubStatus || '';
+        if (selPrimary) selPrimary.value = cpState.statuses.primaryStatus || '';
+        if (selBroad) selBroad.value = cpState.statuses.broadStatus || '';
+      }
+    }
+
+    function showStep(n){
+      cpState.step = n;
+      [step1, step2, step3, step4].forEach((el,i)=>{
+        if(!el) return;
+        const idx = i+1;
+        if(idx===n){ el.classList.remove('hidden'); } else { el.classList.add('hidden'); }
+      });
+      cpBack.disabled = n===1;
+      cpNext.classList.toggle('hidden', n===4);
+      cpSave.classList.toggle('hidden', n!==4);
+      if(n===2){ setTimeout(()=>cpName?.focus(), 0); }
+      if(n===3){ populateStatusSelects(); }
+      if(n===4){ populateMatrixSelect(); }
+    }
+
+    function openModal(){
+      cpState = { step: 1, name: '', statuses: { invoiceSubStatus: '', primaryStatus: '', broadStatus: '' }, matrixId: '', mode: 'create', editIndex: -1 };
+      cpTitle.textContent = 'Create New Process';
+      cpSave.textContent = 'Save Process';
+      cpName.value = '';
+      overlay.classList.add('show');
+      showStep(1);
+    }
+    function closeModal(){ overlay.classList.remove('show'); }
+
+    function openEdit(index){
+      const p = processes[index];
+      if(!p) return;
+      cpState = { step: 2, name: p.process, statuses: { invoiceSubStatus: p.invoiceSubStatus || '', primaryStatus: p.primaryStatus || '', broadStatus: p.broadStatus || '' }, matrixId: p.matrixId || '', mode: 'edit', editIndex: index };
+      cpTitle.textContent = 'Edit Process';
+      cpSave.textContent = 'Save Changes';
+      cpName.value = p.process || '';
+      overlay.classList.add('show');
+      showStep(3);
+      populateStatusSelects();
+      // Jump to step 4 by default for selecting matrix
+      showStep(4);
+    }
+
+    function openView(index){
+      const p = processes[index];
+      if(!p) return;
+      vpName.textContent = p.process || '';
+      vpId.textContent = `ID: ${p.id || '-'}`;
+      vpSla.textContent = `SLA: ${p.slaHours != null ? p.slaHours + 'h' : '-'}`;
+      vpActive.textContent = `Active Issues: ${p.activeIssues != null ? p.activeIssues : '-'}`;
+      vpInvoiceSub.textContent = `Invoice Sub-Status: ${p.invoiceSubStatus || '-'}`;
+      vpPrimary.textContent = `Primary Status: ${p.primaryStatus || '-'}`;
+      vpBroad.textContent = `Broad Status: ${p.broadStatus || '-'}`;
+      vpLevels.innerHTML = '';
+      let levelsToShow = [];
+      if (p.matrixId) {
+        const m = matrices.find(mm => mm.id === p.matrixId);
+        levelsToShow = m?.levels || [];
+      }
+      if (levelsToShow.length) {
+        levelsToShow.forEach((l, idx) => {
+          const node = document.createElement('div');
+          node.className = 'level-node';
+          node.innerHTML = `
+            <h4>Level ${idx+1}</h4>
+            <div class="muted">${l.ownerName || ''}</div>
+            <div class="muted">${l.ownerEmail || ''}</div>
+          `;
+          vpLevels.appendChild(node);
+          if(idx < levelsToShow.length - 1){
+            const a = document.createElement('div');
+            a.className = 'arrow';
+            vpLevels.appendChild(a);
+          }
+        });
+      } else {
+        const none = document.createElement('div');
+        none.className = 'muted';
+        none.textContent = 'No approval matrix selected.';
+        vpLevels.appendChild(none);
+      }
+      viewOverlay.classList.add('show');
+    }
+
+    // Populate matrix dropdown
+    function populateMatrixSelect(){
+      if (!matrixSelect) return;
+      matrixSelect.innerHTML = '';
+      const ph = document.createElement('option');
+      ph.value = '';
+      ph.textContent = 'Select approval matrix';
+      ph.disabled = true; ph.selected = true;
+      matrixSelect.appendChild(ph);
+      matrices.forEach(m => {
+        const o = document.createElement('option');
+        o.value = m.id; o.textContent = m.name;
+        matrixSelect.appendChild(o);
+      });
+      if (cpState.matrixId) { matrixSelect.value = cpState.matrixId; }
+    }
+
+    // --- Matrices table rendering & search ---
+    function renderMatrices(list){
+      if (!matTbody) return;
+      matTbody.innerHTML = '';
+      (list || []).forEach(m => {
+        const tr = document.createElement('tr');
+        tr.dataset.id = m.id;
+        const count = (m.levels || []).length;
+        tr.innerHTML = `
+          <td>
+            <div>${m.name}</div>
+            <div class="meta">ID: <span class="badge">${m.id}</span></div>
+          </td>
+          <td>${count}</td>
+          <td>
+            <div class="actions">
+              <button class="pill secondary" data-action="view-m" type="button" title="View matrix" aria-label="View ${m.name}">View</button>
+              <button class="pill secondary" data-action="edit-m" type="button" title="Edit matrix" aria-label="Edit ${m.name}">Edit</button>
+              <button class="pill secondary" data-action="delete-m" type="button" title="Delete matrix" aria-label="Delete ${m.name}">Delete</button>
+            </div>
+          </td>
+        `;
+        matTbody.appendChild(tr);
+      });
+      if ((list || []).length === 0) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td colspan="3"><span class="meta">No matrices found. Click "+ New Matrix" to create one.</span></td>`;
+        matTbody.appendChild(tr);
+      }
+    }
+
+    function applyMatricesSearch(){
+      if (!matSearchInput) return;
+      const q = (matSearchInput.value || '').toLowerCase();
+      if (!q) { renderMatrices(matrices); return; }
+      const filtered = matrices.filter(m => {
+        const hay = [m.name, m.id].filter(Boolean).join(' ').toLowerCase();
+        return hay.includes(q);
+      });
+      renderMatrices(filtered);
+    }
+
+    function genProcessId(name){
+      if(!name) return 'PROC_' + Math.random().toString(36).slice(2,8).toUpperCase();
+      const slug = name.trim().toUpperCase().replace(/[^A-Z0-9]+/g,'_').replace(/^_|_$/g,'');
+      return 'PROC_' + (slug || Math.random().toString(36).slice(2,6).toUpperCase());
+    }
+
+    function saveProcess(){
+      const name = cpName.value.trim();
+      if(!name){ alert('Please provide a process name.'); showStep(2); return; }
+      // ensure statuses captured
+      if (selInvoiceSub && selPrimary && selBroad) {
+        cpState.statuses.invoiceSubStatus = selInvoiceSub.value || cpState.statuses.invoiceSubStatus || '';
+        cpState.statuses.primaryStatus = selPrimary.value || cpState.statuses.primaryStatus || '';
+        cpState.statuses.broadStatus = selBroad.value || cpState.statuses.broadStatus || '';
+      }
+      if(!(cpState.statuses.invoiceSubStatus && cpState.statuses.primaryStatus && cpState.statuses.broadStatus)){
+        alert('Please select Invoice Sub-Status, Primary Status, and Broad Status.');
+        showStep(3); return;
+      }
+      const chosen = matrixSelect?.value || cpState.matrixId || '';
+      if(!chosen){ alert('Please select an approval matrix.'); showStep(4); return; }
+      if(cpState.mode === 'edit' && cpState.editIndex > -1){
+        const existing = processes[cpState.editIndex];
+        if(existing){
+          processes[cpState.editIndex] = {
+            ...existing,
+            process: name,
+            invoiceSubStatus: cpState.statuses.invoiceSubStatus,
+            primaryStatus: cpState.statuses.primaryStatus,
+            broadStatus: cpState.statuses.broadStatus,
+            matrixId: chosen
+          };
+        }
+      } else {
+        const id = genProcessId(name);
+        processes.push({ id, process: name, invoiceSubStatus: cpState.statuses.invoiceSubStatus, primaryStatus: cpState.statuses.primaryStatus, broadStatus: cpState.statuses.broadStatus, slaHours: 24, matrixId: chosen, activeIssues: 0 });
+      }
+      renderRows(processes);
+      saveProcesses(processes);
+      closeModal();
+    }
+
+    if (createBtn) createBtn.addEventListener('click', openModal);
+    if (cpClose) cpClose.addEventListener('click', closeModal);
+    if (overlay) overlay.addEventListener('click', (e)=>{ if(e.target===overlay) closeModal(); });
+    if (viewOverlay) viewOverlay.addEventListener('click', (e)=>{ if(e.target===viewOverlay) viewOverlay.classList.remove('show'); });
+    if (vpClose) vpClose.addEventListener('click', ()=> viewOverlay.classList.remove('show'));
+    if (vpClose2) vpClose2.addEventListener('click', ()=> viewOverlay.classList.remove('show'));
+    if (vmClose) vmClose.addEventListener('click', ()=> vmOverlay.classList.remove('show'));
+    if (vmClose2) vmClose2.addEventListener('click', ()=> vmOverlay.classList.remove('show'));
+    if (cpBack) cpBack.addEventListener('click', ()=>{
+      if(cpState.step>1) showStep(cpState.step-1);
+    });
+    if (cpNext) cpNext.addEventListener('click', ()=>{
+      if(cpState.step===1){ showStep(2); return; }
+      if(cpState.step===2){
+        if(!cpName.value.trim()){ alert('Please enter a process name.'); return; }
+        populateStatusSelects();
+        showStep(3);
+        return;
+      }
+      if(cpState.step===3){
+        const inv = selInvoiceSub?.value || '';
+        const pri = selPrimary?.value || '';
+        const br = selBroad?.value || '';
+        if(!(inv && pri && br)) { alert('Please select all three statuses.'); return; }
+        cpState.statuses = { invoiceSubStatus: inv, primaryStatus: pri, broadStatus: br };
+        showStep(4);
+        return;
+      }
+    });
+    if (cpSave) cpSave.addEventListener('click', saveProcess);
+
+    // Matrices table: search & new
+    if (matSearchInput) matSearchInput.addEventListener('input', applyMatricesSearch);
+    if (newMatrixBtn) newMatrixBtn.addEventListener('click', ()=>{
+      // open matrix manager in create mode
+      if (typeof openMm === 'function') { openMm(); }
+    });
+
+    // --- Approval Matrix Manager Modal ---
+    const mmOverlay = document.createElement('div');
+    mmOverlay.id = 'mm-overlay';
+    mmOverlay.className = 'overlay';
+    mmOverlay.setAttribute('role','dialog');
+    mmOverlay.setAttribute('aria-modal','true');
+    mmOverlay.innerHTML = `
+      <div class="dialog" role="document">
+        <header>
+          <span id="mm-title">Manage Approval Matrices</span>
+          <button id="mm-close" class="pill secondary" type="button" aria-label="Close">Close</button>
+        </header>
+        <div class="body">
+          <div class="field">
+            <label for="mm-name">Matrix Name</label>
+            <input id="mm-name" type="text" placeholder="e.g., Standard 3-Level Approval" />
+          </div>
+          <div class="field">
+            <label>Levels</label>
+            <div id="mm-levels" class="levels" aria-label="Approval flow chart (matrix)"></div>
+            <div><button id="mm-add-level" class="add-level" type="button">+ Add Level</button></div>
+          </div>
+          <div class="field">
+            <label for="mm-list">Existing Matrices</label>
+            <select id="mm-list"></select>
+            <div class="inline">
+              <button id="mm-load" class="pill secondary" type="button">Load</button>
+              <button id="mm-delete" class="pill secondary" type="button">Delete</button>
+            </div>
+          </div>
+          <div class="muted">Create a matrix once and reuse it for multiple processes.</div>
+        </div>
+        <div class="footer">
+          <button id="mm-save" class="pill primary" type="button">Save Matrix</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(mmOverlay);
+
+    const mmClose = mmOverlay.querySelector('#mm-close');
+    const mmLevels = mmOverlay.querySelector('#mm-levels');
+    const mmAddLevel = mmOverlay.querySelector('#mm-add-level');
+    const mmSave = mmOverlay.querySelector('#mm-save');
+    const mmName = mmOverlay.querySelector('#mm-name');
+    const mmList = mmOverlay.querySelector('#mm-list');
+    const mmLoad = mmOverlay.querySelector('#mm-load');
+    const mmDelete = mmOverlay.querySelector('#mm-delete');
+
+    let mmState = { id: '', name: '', levels: [] };
+
+    function renderMmLevels(){
+      mmLevels.innerHTML = '';
+      mmState.levels.forEach((lvl, idx) => {
+        const node = document.createElement('div');
+        node.className = 'level-node';
+        node.innerHTML = `
+          <button class="remove" type="button" title="Remove level">×</button>
+          <h4>Level ${idx+1}</h4>
+          <div class="field">
+            <label>Approver</label>
+            <select class="approver"></select>
+          </div>
+        `;
+        const select = node.querySelector('select.approver');
+        users.forEach(u=>{
+          const opt = document.createElement('option');
+          opt.value = u.email;
+          opt.textContent = `${u.name} (${u.email})`;
+          select.appendChild(opt);
+        });
+        if(lvl?.ownerEmail){ select.value = lvl.ownerEmail; }
+        node.querySelector('button.remove').addEventListener('click', ()=>{
+          mmState.levels.splice(idx,1);
+          renderMmLevels();
+        });
+        select.addEventListener('change', (e)=>{
+          const email = e.target.value;
+          const u = users.find(x=>x.email===email);
+          mmState.levels[idx] = { level: idx+1, ownerName: u?.name || '', ownerEmail: email };
+        });
+        mmLevels.appendChild(node);
+        if(idx < mmState.levels.length-1){
+          const a = document.createElement('div');
+          a.className = 'arrow';
+          mmLevels.appendChild(a);
+        }
+      });
+      if(mmState.levels.length===0){
+        const hint = document.createElement('div');
+        hint.className = 'muted';
+        hint.textContent = 'No levels yet. Click "+ Add Level" to add the first approver.';
+        mmLevels.appendChild(hint);
+      }
+    }
+
+    function refreshMmList(){
+      mmList.innerHTML = '';
+      matrices.forEach(m => {
+        const o = document.createElement('option');
+        o.value = m.id; o.textContent = m.name;
+        mmList.appendChild(o);
+      });
+    }
+
+    function openMm(){
+      mmState = { id: '', name: '', levels: [] };
+      mmName.value = '';
+      renderMmLevels();
+      refreshMmList();
+      mmOverlay.classList.add('show');
+    }
+
+    function closeMm(){ mmOverlay.classList.remove('show'); }
+
+    if (manageMatricesBtn) manageMatricesBtn.addEventListener('click', openMm);
+    if (mmClose) mmClose.addEventListener('click', closeMm);
+    if (mmOverlay) mmOverlay.addEventListener('click', (e)=>{ if(e.target===mmOverlay) closeMm(); });
+    if (mmAddLevel) mmAddLevel.addEventListener('click', ()=>{ const def = users[0]; mmState.levels.push({ level: mmState.levels.length+1, ownerName: def?.name||'', ownerEmail: def?.email||'' }); renderMmLevels(); });
+    if (mmSave) mmSave.addEventListener('click', ()=>{
+      const name = (mmName.value||'').trim();
+      if(!name){ alert('Please provide a matrix name.'); return; }
+      if(mmState.levels.length===0){ alert('Please add at least one level.'); return; }
+      let mat;
+      if(mmState.id){
+        const idx = matrices.findIndex(m => m.id === mmState.id);
+        if(idx>=0){ matrices[idx] = { id: mmState.id, name, levels: mmState.levels.map((l,i)=>({ level:i+1, ownerName:l.ownerName, ownerEmail:l.ownerEmail })) }; }
+        mat = matrices[idx];
+      } else {
+        const id = genMatrixId(name);
+        mat = { id, name, levels: mmState.levels.map((l,i)=>({ level:i+1, ownerName:l.ownerName, ownerEmail:l.ownerEmail })) };
+        matrices.push(mat);
+      }
+      saveMatrices(matrices);
+      refreshMmList();
+      populateMatrixSelect();
+      renderMatrices(matrices);
+      if (matrixSelect) matrixSelect.value = mat.id;
+      cpState.matrixId = mat.id;
+      alert('Matrix saved.');
+    });
+    if (mmLoad) mmLoad.addEventListener('click', ()=>{
+      const id = mmList.value; if(!id) return;
+      const m = matrices.find(x=>x.id===id); if(!m) return;
+      mmState = { id: m.id, name: m.name, levels: (m.levels||[]).map((l,i)=>({ level:i+1, ownerName:l.ownerName, ownerEmail:l.ownerEmail })) };
+      mmName.value = mmState.name;
+      renderMmLevels();
+    });
+    if (mmDelete) mmDelete.addEventListener('click', ()=>{
+      const id = mmList.value; if(!id) return;
+      if(!confirm('Delete the selected matrix?')) return;
+      matrices = matrices.filter(m=>m.id!==id);
+      saveMatrices(matrices);
+      refreshMmList();
+      populateMatrixSelect();
+      renderMatrices(matrices);
+      alert('Matrix deleted.');
+    });
+
+    // Initial render
+    renderRows(processes);
+    renderMatrices(matrices);
+
+    // Actions: View / Edit via delegation
+    const procTbody = document.getElementById('proc-tbody');
+    if (procTbody) {
+      procTbody.addEventListener('click', (e)=>{
+        const btn = e.target.closest('button[data-action]');
+        if(!btn) return;
+        const tr = btn.closest('tr');
+        const pid = tr?.dataset.id;
+        if(!pid) return;
+        const idx = processes.findIndex(p=>p.id===pid);
+        if(idx < 0) return;
+        const action = btn.dataset.action;
+        if(action === 'view') { openView(idx); }
+        else if(action === 'edit') { openEdit(idx); }
+      });
+    }
+
+    // Matrices table actions
+    if (matTbody) {
+      matTbody.addEventListener('click', (e)=>{
+        const btn = e.target.closest('button[data-action]');
+        if(!btn) return;
+        const tr = btn.closest('tr');
+        const mid = tr?.dataset.id;
+        if(!mid) return;
+        const action = btn.dataset.action;
+        if (action === 'view-m') {
+          const m = matrices.find(x=>x.id===mid); if(!m) return;
+          vmName.textContent = m.name || '';
+          vmLevels.innerHTML = '';
+          const lvls = m.levels || [];
+          if (lvls.length === 0) {
+            const none = document.createElement('div');
+            none.className = 'muted';
+            none.textContent = 'No levels defined.';
+            vmLevels.appendChild(none);
+          } else {
+            lvls.forEach((l, idx) => {
+              const node = document.createElement('div');
+              node.className = 'level-node';
+              node.innerHTML = `
+                <h4>Level ${idx+1}</h4>
+                <div class="muted">${l.ownerName || ''}</div>
+                <div class="muted">${l.ownerEmail || ''}</div>
+              `;
+              vmLevels.appendChild(node);
+              if (idx < lvls.length - 1) {
+                const a = document.createElement('div');
+                a.className = 'arrow';
+                vmLevels.appendChild(a);
+              }
+            });
+          }
+          vmOverlay.classList.add('show');
+        } else if (action === 'edit-m') {
+          const m = matrices.find(x=>x.id===mid); if(!m) return;
+          // Load into matrix manager and open
+          mmState = { id: m.id, name: m.name, levels: (m.levels||[]).map((l,i)=>({ level:i+1, ownerName:l.ownerName, ownerEmail:l.ownerEmail })) };
+          mmName.value = mmState.name;
+          renderMmLevels();
+          refreshMmList();
+          if (typeof openMm === 'function') { mmOverlay.classList.add('show'); }
+        } else if (action === 'delete-m') {
+          if(!confirm('Delete this matrix?')) return;
+          matrices = matrices.filter(x=>x.id!==mid);
+          saveMatrices(matrices);
+          renderMatrices(matrices);
+          refreshMmList();
+          populateMatrixSelect();
+          alert('Matrix deleted.');
+        }
+      });
+    }
+  </script>
+</body>
+</html>

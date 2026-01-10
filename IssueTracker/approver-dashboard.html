@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Inebura Approvals Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/approver.css">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.png">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="header">
+      <div class="brand">
+        <h1>Inebura</h1>
+        <span>Approvals</span>
+      </div>
+      <div class="header-actions">
+        <nav class="nav">
+          <a href="index.html">Issue Tracker</a>
+          <a href="escalationMatrix.html">Escalation Matrix</a>
+        </nav>
+        <div class="user-menu">
+          <button id="user-toggle" class="user-toggle" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="user-panel">
+            <span id="user-avatar" class="user-avatar" aria-hidden="true">UA</span>
+            <span id="user-label">Select approver</span>
+            <span class="user-caret" aria-hidden="true">v</span>
+          </button>
+          <div id="user-panel" class="user-panel" role="menu">
+            <label for="user-select">Approver</label>
+            <select id="user-select"></select>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="main">
+      <section class="hero">
+        <h2>Approval Queue</h2>
+        <p>Review approval requests tied to the escalation matrix and take action with remarks and documents.</p>
+      </section>
+
+      <section class="metrics">
+        <div class="metric-card">
+          <div class="metric-label">Open to approve</div>
+          <div id="metric-open" class="metric-value">0</div>
+          <div class="metric-note">Pending at your level</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Approvals this month</div>
+          <div id="metric-approved" class="metric-value">0</div>
+          <div class="metric-note">Completed approvals</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Rejections this month</div>
+          <div id="metric-rejected" class="metric-value">0</div>
+          <div class="metric-note">Returned requests</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Total requests</div>
+          <div id="metric-total" class="metric-value">0</div>
+          <div class="metric-note">All visible requests</div>
+        </div>
+      </section>
+
+      <section class="card chart-card">
+        <div class="chart-head">
+          <h3>Approval status split</h3>
+          <button id="refresh-btn" class="btn btn--ghost" type="button">Refresh</button>
+        </div>
+        <div class="chart-body">
+          <div id="status-pie" class="pie" role="img" aria-label="Status split pie chart"></div>
+          <div class="legend">
+            <div><span class="swatch swatch--pending"></span>Pending <span id="legend-pending">0</span></div>
+            <div><span class="swatch swatch--approved"></span>Approved <span id="legend-approved">0</span></div>
+            <div><span class="swatch swatch--rejected"></span>Rejected <span id="legend-rejected">0</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="table-wrap">
+          <table aria-label="Approval requests">
+            <thead>
+              <tr>
+                <th scope="col">Request</th>
+                <th scope="col">Issue</th>
+                <th scope="col">Invoice</th>
+                <th scope="col">Process</th>
+                <th scope="col">Level</th>
+                <th scope="col">Status</th>
+                <th scope="col">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="request-tbody"></tbody>
+          </table>
+        </div>
+        <div id="request-empty" class="notice" style="display:none;">No approval requests match your filters.</div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <small>Data syncs across Issue Tracker, Escalation Matrix, and this approval queue via local storage.</small>
+    </footer>
+  </div>
+
+  <script src="js/approver-dashboard.js"></script>
+</body>
+</html>

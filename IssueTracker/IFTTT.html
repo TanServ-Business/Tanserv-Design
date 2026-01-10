@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Invoice Rule Chain (Grouped IF → THEN, Draggable)</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f5fb;
+      color: #202124;
+    }
+
+    .wrapper {
+      max-width: 980px;
+      margin: 30px auto;
+      padding: 0 20px 40px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 5px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #555;
+      margin-bottom: 25px;
+      font-size: 0.95rem;
+    }
+
+    .box {
+      background: #fff;
+      padding: 18px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+      margin-bottom: 20px;
+    }
+
+    .box h2 {
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+
+    .box small {
+      color: #777;
+      font-size: 0.8rem;
+    }
+
+    .scope-row {
+      margin: 8px 0 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .scope-row label {
+      margin: 0;
+      text-transform: none;
+      letter-spacing: 0;
+      font-size: 0.85rem;
+      color: #444;
+    }
+
+    .scope-row select {
+      max-width: 220px;
+      padding: 6px 8px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 0.9rem;
+    }
+
+    #rows-container {
+      margin-top: 6px;
+    }
+
+    .rule-row {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid #dde1f0;
+      background: #f8f9ff;
+      margin-top: 8px;
+      cursor: move; /* draggable hint */
+    }
+
+    .rule-row.dragging {
+      opacity: 0.6;
+    }
+
+    .kind-chip {
+      font-size: 0.72rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      padding: 4px 8px;
+      border-radius: 999px;
+      margin-top: 4px;
+      white-space: nowrap;
+    }
+
+    .kind-if {
+      background: #e3f2fd;
+      color: #1e88e5;
+    }
+
+    .kind-then {
+      background: #ede7f6;
+      color: #5e35b1;
+    }
+
+    .row-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .row-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .row-title {
+      font-size: 0.85rem;
+      font-weight: bold;
+      color: #4a4f63;
+    }
+
+    .remove-row-btn {
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-size: 0.95rem;
+      color: #888;
+      padding: 0 4px;
+    }
+
+    .remove-row-btn:hover {
+      color: #d32f2f;
+    }
+
+    .field-row-if {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.7fr) minmax(0, 1.1fr);
+      gap: 6px;
+      align-items: center;
+    }
+
+    .field-row-then {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.2fr) minmax(0, 1.2fr);
+      gap: 6px;
+      align-items: center;
+    }
+
+    select,
+    input {
+      width: 100%;
+      padding: 7px 8px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 0.88rem;
+    }
+
+    select:disabled,
+    input:disabled {
+      background: #eee;
+      cursor: not-allowed;
+    }
+
+    .row-hint {
+      font-size: 0.75rem;
+      color: #777;
+    }
+
+    .actions-row {
+      margin-top: 10px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .add-btn {
+      padding: 7px 12px;
+      font-size: 0.85rem;
+      border-radius: 999px;
+      border: 1px dashed #5c6bc0;
+      background: #f4f5ff;
+      color: #5c6bc0;
+      cursor: pointer;
+    }
+
+    .add-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .hint {
+      font-size: 0.8rem;
+      color: #777;
+      margin-top: 6px;
+    }
+
+    .then-divider {
+      text-align: center;
+      font-weight: bold;
+      margin: 10px 0 18px;
+      font-size: 1rem;
+      color: #777;
+    }
+
+    .summary {
+      background: #fff;
+      padding: 15px 18px;
+      border-radius: 12px;
+      margin-top: 15px;
+      font-size: 0.95rem;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+
+    .summary ol {
+      margin: 6px 0 6px 20px;
+      padding: 0;
+    }
+
+    .summary li {
+      margin: 4px 0;
+    }
+
+    .orphan-block {
+      margin-top: 6px;
+      font-size: 0.85rem;
+      color: #b23a00;
+    }
+
+    .controls {
+      margin-top: 14px;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 10px;
+    }
+
+    button.save-btn {
+      padding: 9px 18px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      background: #5c6bc0;
+      color: #fff;
+      font-weight: bold;
+      font-size: 0.95rem;
+      box-shadow: 0 4px 10px rgba(92,107,192,0.4);
+    }
+
+    button.save-btn:disabled {
+      background: #999;
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+
+    .saved {
+      font-size: 0.85rem;
+      color: green;
+      font-weight: bold;
+    }
+
+    @media (max-width: 720px) {
+      .field-row-if,
+      .field-row-then {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <h1>Invoice Rule Chain (Grouped IF → THEN, Draggable)</h1>
+    <p class="subtitle">
+      Add multiple IF rows, then a THEN row. Drag rows to reorder. Each THEN uses all valid IFs above it since the previous THEN.
+    </p>
+
+    <div class="box">
+      <h2>Rule Configuration</h2>
+      <small>Scope + stacked IF / THEN rows. Drag to reorder. Contiguous IFs above a THEN are grouped.</small>
+
+      <div class="scope-row">
+        <label for="rule-scope">Rule scope:</label>
+        <select id="rule-scope">
+          <option value="" selected disabled>Select scope</option>
+          <option value="customer">Customer level</option>
+          <option value="invoice">Invoice level</option>
+        </select>
+      </div>
+
+      <div id="rows-container"></div>
+
+      <div class="actions-row">
+        <button id="add-if-btn" class="add-btn">+ Add IF condition row</button>
+        <button id="add-then-btn" class="add-btn">+ Add THEN action row</button>
+      </div>
+
+      <div class="hint">
+        Example: add IF rows for “Post-due”, “PTP”, “Due date + 7 days”, then ONE THEN row to send a Post-due email.
+        Next, add more IF rows and another THEN to escalate. Drag to re-order logic.
+      </div>
+    </div>
+
+    <div class="then-divider">WORKFLOW SUMMARY</div>
+
+    <div class="summary" id="summary">
+      Select scope, configure your first IF, then add a THEN row to complete the first rule.
+    </div>
+
+    <div class="controls">
+      <button id="save-btn" class="save-btn" disabled>Save Rule Chain (Dummy)</button>
+      <div id="saved-text" class="saved"></div>
+    </div>
+  </div>
+
+  <script>
+    // === IF side config ===
+    const conditionTypes = [
+      { value: "bucket", label: "Invoice bucket (Pre-due / Post-due)" },
+      { value: "status", label: "Invoice status (PTP / Collected / etc.)" },
+      { value: "days_after_due", label: "Days after Due Date" },
+      { value: "reminder_count", label: "Reminder count sent" },
+      { value: "amount", label: "Invoice amount" }
+    ];
+
+    const conditionConfig = {
+      bucket: {
+        label: "Invoice bucket",
+        operatorOptions: ["="],
+        valueType: "select",
+        valueOptions: ["Pre-due", "Post-due"]
+      },
+      status: {
+        label: "Invoice status",
+        operatorOptions: ["="],
+        valueType: "select",
+        valueOptions: ["Open", "PTP", "Collected", "Disputed", "Broken PTP"]
+      },
+      days_after_due: {
+        label: "Days after Due Date",
+        operatorOptions: [">", ">=", "=", "<", "<="],
+        valueType: "number"
+      },
+      reminder_count: {
+        label: "Reminder count sent",
+        operatorOptions: ["=", ">=", "<="],
+        valueType: "number"
+      },
+      amount: {
+        label: "Invoice amount",
+        operatorOptions: [">", ">=", "=", "<", "<="],
+        valueType: "number"
+      }
+    };
+
+    // === THEN side config ===
+    const actionTypes = [
+      { value: "send_email", label: "Send email" },
+      { value: "create_task", label: "Create follow-up task" },
+      { value: "add_note", label: "Add note on invoice" }
+    ];
+
+    const actionConfig = {
+      send_email: {
+        label: "Send email",
+        templateOptions: [
+          "Pre-due reminder email",
+          "Post-due reminder email",
+          "Broken PTP follow-up email",
+          "Escalation to FPR",
+          "Escalation to SPR",
+          "Final legal notice email"
+        ],
+        targetOptions: [
+          "Customer",
+          "FPR",
+          "SPR",
+          "Manager",
+          "AR Team DL"
+        ]
+      },
+      create_task: {
+        label: "Create follow-up task",
+        templateOptions: [
+          "Call customer",
+          "Review dispute with customer",
+          "Confirm new PTP date",
+          "Verify payment in bank"
+        ],
+        targetOptions: [
+          "Assigned collector",
+          "Team lead"
+        ]
+      },
+      add_note: {
+        label: "Add note on invoice",
+        freeText: true
+      }
+    };
+
+    const MAX_ROWS = 12;
+
+    const rowsContainer = document.getElementById("rows-container");
+    const addIfBtn = document.getElementById("add-if-btn");
+    const addThenBtn = document.getElementById("add-then-btn");
+    const summary = document.getElementById("summary");
+    const saveBtn = document.getElementById("save-btn");
+    const savedText = document.getElementById("saved-text");
+    const scopeSelect = document.getElementById("rule-scope");
+
+    let rowCounter = 0;
+    let dragSrcEl = null;
+
+    function createSelect(optionsArr, placeholderText) {
+      const select = document.createElement("select");
+      const placeholder = document.createElement("option");
+      placeholder.value = "";
+      placeholder.textContent = placeholderText;
+      placeholder.disabled = true;
+      placeholder.selected = true;
+      select.appendChild(placeholder);
+
+      optionsArr.forEach(item => {
+        const opt = document.createElement("option");
+        if (typeof item === "string") {
+          opt.value = item;
+          opt.textContent = item;
+        } else {
+          opt.value = item.value;
+          opt.textContent = item.label;
+        }
+        select.appendChild(opt);
+      });
+
+      return select;
+    }
+
+    // --- Drag & Drop handlers ---
+    function attachDragHandlers(row) {
+      row.draggable = true;
+      row.addEventListener("dragstart", handleDragStart);
+      row.addEventListener("dragover", handleDragOver);
+      row.addEventListener("drop", handleDrop);
+      row.addEventListener("dragend", handleDragEnd);
+    }
+
+    function handleDragStart(e) {
+      dragSrcEl = this;
+      this.classList.add("dragging");
+      e.dataTransfer.effectAllowed = "move";
+    }
+
+    function handleDragOver(e) {
+      e.preventDefault(); // allow drop
+      e.dataTransfer.dropEffect = "move";
+    }
+
+    function handleDrop(e) {
+      e.preventDefault();
+      if (!dragSrcEl || dragSrcEl === this) return;
+
+      const rows = Array.from(rowsContainer.children);
+      const rect = this.getBoundingClientRect();
+      const offset = e.clientY - rect.top;
+      const shouldInsertAfter = offset > rect.height / 2;
+
+      if (shouldInsertAfter) {
+        if (this.nextSibling) {
+          rowsContainer.insertBefore(dragSrcEl, this.nextSibling);
+        } else {
+          rowsContainer.appendChild(dragSrcEl);
+        }
+      } else {
+        rowsContainer.insertBefore(dragSrcEl, this);
+      }
+
+      renumberRows();
+      updateAddButtonsState();
+      updateSummary();
+    }
+
+    function handleDragEnd() {
+      this.classList.remove("dragging");
+      dragSrcEl = null;
+    }
+
+    // ---- IF row ----
+    function addIfRow(initialType) {
+      if (rowsContainer.children.length >= MAX_ROWS) return;
+      rowCounter++;
+
+      const row = document.createElement("div");
+      row.className = "rule-row";
+      row.dataset.kind = "if";
+
+      attachDragHandlers(row);
+
+      const chip = document.createElement("div");
+      chip.className = "kind-chip kind-if";
+      chip.textContent = "IF";
+
+      const main = document.createElement("div");
+      main.className = "row-main";
+
+      const header = document.createElement("div");
+      header.className = "row-header";
+      const title = document.createElement("div");
+      title.className = "row-title";
+      title.textContent = `Condition #${rowCounter}`;
+      const removeBtn = document.createElement("button");
+      removeBtn.className = "remove-row-btn";
+      removeBtn.innerHTML = "✕";
+      removeBtn.title = "Remove this IF row";
+
+      removeBtn.addEventListener("click", () => {
+        row.remove();
+        renumberRows();
+        updateAddButtonsState();
+        updateSummary();
+      });
+
+      header.appendChild(title);
+      header.appendChild(removeBtn);
+
+      const fields = document.createElement("div");
+      fields.className = "field-row-if";
+
+      const typeSelect = createSelect(conditionTypes, "Condition type");
+      const opSelect = createSelect(
+        [">", ">=", "=", "<", "<="].map(o => ({ value: o, label: o })),
+        "Op"
+      );
+      const valueInput = document.createElement("input");
+      valueInput.placeholder = "Value";
+      row.condValueRef = valueInput;
+
+      typeSelect.addEventListener("change", () => {
+        applyConditionConfig(typeSelect, opSelect, row);
+        updateSummary();
+      });
+      opSelect.addEventListener("change", updateSummary);
+      valueInput.addEventListener("input", updateSummary);
+
+      fields.appendChild(typeSelect);
+      fields.appendChild(opSelect);
+      fields.appendChild(valueInput);
+
+      const hint = document.createElement("div");
+      hint.className = "row-hint";
+      hint.textContent = "Example: bucket = Post-due, status = PTP, days after due date >= 7, etc.";
+
+      main.appendChild(header);
+      main.appendChild(fields);
+      main.appendChild(hint);
+
+      row.appendChild(chip);
+      row.appendChild(main);
+
+      rowsContainer.appendChild(row);
+      updateAddButtonsState();
+
+      if (initialType) {
+        typeSelect.value = initialType;
+        typeSelect.dispatchEvent(new Event("change"));
+      }
+
+      updateSummary();
+    }
+
+    function applyConditionConfig(typeSelect, opSelect, row) {
+      const type = typeSelect.value;
+      const config = conditionConfig[type];
+
+      opSelect.innerHTML = "";
+      let valueField = row.condValueRef;
+
+      if (!config) {
+        opSelect.disabled = true;
+        if (valueField) valueField.disabled = true;
+        return;
+      }
+
+      const ops = config.operatorOptions || ["="];
+      const newOpSelect = createSelect(
+        ops.map(o => ({ value: o, label: o })),
+        "Op"
+      );
+      opSelect.innerHTML = newOpSelect.innerHTML;
+      opSelect.disabled = ops.length === 0;
+
+      if (config.valueType === "select") {
+        const select = createSelect(config.valueOptions, "Value");
+        if (valueField) valueField.replaceWith(select);
+        row.condValueRef = select;
+        select.addEventListener("change", updateSummary);
+      } else {
+        const input = document.createElement("input");
+        input.placeholder = "Value";
+        input.type = config.valueType === "number" ? "number" : "text";
+        if (valueField) valueField.replaceWith(input);
+        row.condValueRef = input;
+        input.addEventListener("input", updateSummary);
+      }
+    }
+
+    // ---- THEN row ----
+    function addThenRow(initialActionType) {
+      if (rowsContainer.children.length >= MAX_ROWS) return;
+      rowCounter++;
+
+      const row = document.createElement("div");
+      row.className = "rule-row";
+      row.dataset.kind = "then";
+
+      attachDragHandlers(row);
+
+      const chip = document.createElement("div");
+      chip.className = "kind-chip kind-then";
+      chip.textContent = "THEN";
+
+      const main = document.createElement("div");
+      main.className = "row-main";
+
+      const header = document.createElement("div");
+      header.className = "row-header";
+      const title = document.createElement("div");
+      title.className = "row-title";
+      title.textContent = `Action #${rowCounter}`;
+      const removeBtn = document.createElement("button");
+      removeBtn.className = "remove-row-btn";
+      removeBtn.innerHTML = "✕";
+      removeBtn.title = "Remove this THEN row";
+
+      removeBtn.addEventListener("click", () => {
+        row.remove();
+        renumberRows();
+        updateAddButtonsState();
+        updateSummary();
+      });
+
+      header.appendChild(title);
+      header.appendChild(removeBtn);
+
+      const fields = document.createElement("div");
+      fields.className = "field-row-then";
+
+      const actionTypeSelect = createSelect(actionTypes, "Action type");
+      const detail1 = document.createElement("select");
+      const detail2 = document.createElement("select");
+
+      detail1.appendChild(new Option("Details", "", true, true));
+      detail1.options[0].disabled = true;
+      detail1.disabled = true;
+
+      detail2.appendChild(new Option("Target / Extra", "", true, true));
+      detail2.options[0].disabled = true;
+      detail2.disabled = true;
+
+      actionTypeSelect.addEventListener("change", () => {
+        applyActionConfig(actionTypeSelect, detail1, detail2, row);
+        updateSummary();
+      });
+
+      detail1.addEventListener("change", updateSummary);
+      detail2.addEventListener("change", updateSummary);
+
+      fields.appendChild(actionTypeSelect);
+      fields.appendChild(detail1);
+      fields.appendChild(detail2);
+
+      const hint = document.createElement("div");
+      hint.className = "row-hint";
+      hint.textContent = "Example: send Post-due email, escalate to FPR/SPR, create call task, add note, etc.";
+
+      main.appendChild(header);
+      main.appendChild(fields);
+      main.appendChild(hint);
+
+      row.appendChild(chip);
+      row.appendChild(main);
+
+      rowsContainer.appendChild(row);
+      updateAddButtonsState();
+
+      if (initialActionType) {
+        actionTypeSelect.value = initialActionType;
+        actionTypeSelect.dispatchEvent(new Event("change"));
+      }
+
+      updateSummary();
+    }
+
+    function applyActionConfig(typeSelect, detail1, detail2, row) {
+      const type = typeSelect.value;
+      const config = actionConfig[type];
+
+      detail1.innerHTML = "";
+      detail2.innerHTML = "";
+      detail1.disabled = true;
+      detail2.disabled = true;
+
+      if (!config) return;
+
+      if (config.freeText) {
+        const input = document.createElement("input");
+        input.placeholder = "Note text / comment";
+        input.type = "text";
+        input.addEventListener("input", updateSummary);
+
+        detail1.replaceWith(input);
+        row.actionDetail1Ref = input;
+
+        const dummy = document.createElement("input");
+        dummy.disabled = true;
+        dummy.placeholder = "N/A";
+        detail2.replaceWith(dummy);
+        row.actionDetail2Ref = dummy;
+      } else {
+        const templateSelect = createSelect(
+          config.templateOptions,
+          "Template"
+        );
+        const targetSelect = createSelect(
+          config.targetOptions,
+          "Target"
+        );
+
+        detail1.replaceWith(templateSelect);
+        detail2.replaceWith(targetSelect);
+
+        templateSelect.addEventListener("change", updateSummary);
+        targetSelect.addEventListener("change", updateSummary);
+
+        row.actionDetail1Ref = templateSelect;
+        row.actionDetail2Ref = targetSelect;
+      }
+    }
+
+    function renumberRows() {
+      const rows = rowsContainer.querySelectorAll(".rule-row");
+      let index = 1;
+      rows.forEach(r => {
+        const title = r.querySelector(".row-title");
+        const kind = r.dataset.kind;
+        if (title) {
+          title.textContent =
+            (kind === "if" ? "Condition" : "Action") + " #" + index;
+        }
+        index++;
+      });
+    }
+
+    function updateAddButtonsState() {
+      const total = rowsContainer.children.length;
+      addIfBtn.disabled = total >= MAX_ROWS;
+      addThenBtn.disabled = total >= MAX_ROWS;
+    }
+
+    function getConditionFromRow(row) {
+      const selects = row.querySelectorAll("select");
+      if (!selects.length) return null;
+      const typeSelect = selects[0];
+      const opSelect = selects[1];
+      const config = conditionConfig[typeSelect.value];
+      const valueControl = row.condValueRef || selects[2];
+
+      if (!config) return null;
+
+      const value =
+        valueControl && valueControl.tagName === "SELECT"
+          ? valueControl.value
+          : valueControl && valueControl.value;
+
+      if (!value) return null;
+
+      const op = opSelect ? (opSelect.value || "=") : "=";
+
+      return {
+        label: config.label,
+        operator: op,
+        value
+      };
+    }
+
+    function getActionFromRow(row) {
+      const actionTypeSelect = row.querySelector("select");
+      if (!actionTypeSelect) return null;
+      const cfg = actionConfig[actionTypeSelect.value];
+      if (!cfg) return null;
+
+      const allControls = row.querySelectorAll("select, input");
+      let d1 = row.actionDetail1Ref || allControls[1];
+      let d2 = row.actionDetail2Ref || allControls[2];
+
+      const val1 =
+        d1 && d1.tagName === "SELECT" ? d1.value : d1 && d1.value;
+      const val2 =
+        d2 && d2.tagName === "SELECT" ? d2.value : d2 && d2.value;
+
+      if (cfg.freeText) {
+        if (!val1) return null;
+        return {
+          label: cfg.label,
+          type: "freeText",
+          detail: val1
+        };
+      } else {
+        if (!val1 || !val2) return null;
+        return {
+          label: cfg.label,
+          type: "templated",
+          template: val1,
+          target: val2
+        };
+      }
+    }
+
+    function updateSummary() {
+      const scopeValue = scopeSelect.value;
+      let scopeText = "";
+      if (scopeValue === "customer") scopeText = "Customer level";
+      else if (scopeValue === "invoice") scopeText = "Invoice level";
+
+      const rows = Array.from(rowsContainer.querySelectorAll(".rule-row"));
+
+      let rules = [];
+      let currentConditions = [];
+
+      rows.forEach(row => {
+        const kind = row.dataset.kind;
+
+        if (kind === "if") {
+          const cond = getConditionFromRow(row);
+          if (cond) currentConditions.push(cond);
+        } else if (kind === "then") {
+          const act = getActionFromRow(row);
+          if (act && currentConditions.length > 0) {
+            rules.push({
+              conditions: [...currentConditions],
+              action: act
+            });
+            currentConditions = [];
+          }
+        }
+      });
+
+      let html = "";
+
+      if (!scopeText && rules.length === 0) {
+        summary.textContent =
+          "Select scope, configure your first IF, then add a THEN row to complete the first rule.";
+        saveBtn.disabled = true;
+        savedText.textContent = "";
+        return;
+      }
+
+      if (scopeText) {
+        html += `<b>Rule scope:</b> ${scopeText}<br/><br/>`;
+      }
+
+      if (rules.length === 0) {
+        html += "No fully configured IF → THEN groups yet.";
+      } else {
+        html += "<b>Rule chain:</b><ol>";
+        rules.forEach(rule => {
+          html += "<li>";
+          html += "<b>IF</b> ";
+          html += rule.conditions
+            .map(
+              c =>
+                `<span><b>${c.label}</b> ${c.operator} <b>${c.value}</b></span>`
+            )
+            .join(" <b>AND</b> ");
+          html += " <b>THEN</b> ";
+          if (rule.action.type === "freeText") {
+            html += `<b>${rule.action.label}</b>: “${rule.action.detail}”`;
+          } else {
+            html += `<b>${rule.action.label}</b>: use <b>${rule.action.template}</b> to <b>${rule.action.target}</b>`;
+          }
+          html += "</li>";
+        });
+        html += "</ol>";
+      }
+
+      if (currentConditions.length > 0) {
+        html += `<div class="orphan-block">
+          Note: you currently have IF rows at the end without a THEN. Add a THEN row below them to convert into a rule.
+        </div>`;
+      }
+
+      summary.innerHTML = html;
+
+      const isValid = !!scopeValue && rules.length > 0;
+      saveBtn.disabled = !isValid;
+      if (!isValid) savedText.textContent = "";
+    }
+
+    // Wiring
+    addIfBtn.addEventListener("click", () => addIfRow());
+    addThenBtn.addEventListener("click", () => addThenRow());
+    scopeSelect.addEventListener("change", updateSummary);
+
+    saveBtn.addEventListener("click", () => {
+      savedText.textContent = "Rule chain saved (UI only – no backend yet).";
+    });
+
+    function bootstrap() {
+      // Default: only ONE IF row, no THEN row
+      addIfRow("bucket");
+    }
+
+    bootstrap();
+  </script>
+</body>
+</html>

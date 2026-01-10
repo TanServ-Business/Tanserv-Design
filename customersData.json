@@ -1,0 +1,596 @@
+[
+  {
+    "id": "c1",
+    "name": "Apollo Pharmachy Pvt. Ltd.",
+    "code": "CUST-001",
+    "city": "Mumbai",
+    "region": "West",
+    "contacts": [
+      {
+        "firstName": "Ravi",
+        "lastName": "Sharma",
+        "email": "finance@apollopharmacy.com",
+        "phonePrimary": "+91 98xxxxxx21",
+        "phoneSecondary": "+91 98xxxxxx22",
+        "gender": "Male",
+        "department": "Finance",
+        "useEmailForCommunication": true
+      },
+      {
+        "firstName": "Anita",
+        "lastName": "Nair",
+        "email": "collections@apollopharmacy.com",
+        "phonePrimary": "+91 98xxxxxx23",
+        "phoneSecondary": "",
+        "gender": "Female",
+        "department": "Collections",
+        "useEmailForCommunication": false
+      }
+    ],
+    "billToAddress": "1st Floor, APOLLO PHARMACY Towers, Andheri East",
+    "shipToAddress": "Warehouse 3, MIDC Andheri East",
+    "pincode": "400069",
+    "state": "Maharashtra",
+    "creditPeriod": "30 Days",
+    "agentName": "Aditi Sharma",
+    "managerName": "Rohit Mehra",
+    "kamName": "Neha Kapoor",
+    "kasName": "Arjun Rao",
+    "businessUnit": "Diagnostics",
+    "industry": "Healthcare",
+    "product": "Imaging Systems",
+    "grnDate": "14 Nov 2025",
+    "grnNumber": "GRN-10291",
+    "documents": [
+      {
+        "name": "Invoice",
+        "type": "invoice",
+        "updated": "12 Nov 2025"
+      },
+      {
+        "name": "Delivery Challan",
+        "type": "invoice",
+        "updated": "12 Nov 2025"
+      },
+      {
+        "name": "Payment Receipt",
+        "type": "invoice",
+        "updated": "13 Nov 2025"
+      },
+      {
+        "name": "Purchase Order",
+        "type": "client",
+        "updated": "01 Oct 2025"
+      },
+      {
+        "name": "Agreement",
+        "type": "client",
+        "updated": "15 Sep 2025"
+      },
+      {
+        "name": "Contract",
+        "type": "client",
+        "updated": "20 Sep 2025"
+      }
+    ],
+    "totalInvoiceAmount": 1565400,
+    "netDueAmount": 1280000,
+    "mtdCollection": 490000,
+    "cnAdvPdcAmount": 45000,
+    "invoices": [
+      {
+        "invoiceNo": "INV-10291",
+        "invoiceAmount": 124000,
+        "invoiceStatus": "Submitted and tracking",
+        "invoiceDate": "12 Oct 2025",
+        "amountForMonth": 124000,
+        "netDueAmount": 98000,
+        "dueDate": "05 Nov 2025",
+        "primaryStatus": "Follow-up",
+        "status": "Overdue",
+        "targetForMonth": 85000,
+        "unreadEmailCount": 3
+      },
+      {
+        "invoiceNo": "INV-10270",
+        "invoiceAmount": 86400,
+        "invoiceStatus": "Submitted and tracking",
+        "invoiceDate": "01 Nov 2025",
+        "amountForMonth": 50000,
+        "netDueAmount": 86400,
+        "dueDate": "16 Nov 2025",
+        "primaryStatus": "Reminder",
+        "status": "Pre-Due",
+        "targetForMonth": 50000,
+        "unreadEmailCount": 0
+      },
+      {
+        "invoiceNo": "INV-10211",
+        "invoiceAmount": 210000,
+        "invoiceStatus": "Not submitted and untouched",
+        "invoiceDate": "22 Sep 2025",
+        "amountForMonth": 0,
+        "netDueAmount": 210000,
+        "dueDate": "06 Oct 2025",
+        "primaryStatus": "Dispute",
+        "status": "Dispute",
+        "targetForMonth": 0,
+        "unreadEmailCount": 2
+      },
+      {
+        "invoiceNo": "INV-10308",
+        "invoiceAmount": 95000,
+        "invoiceStatus": "Externally Submitted and tracking",
+        "invoiceDate": "04 Nov 2025",
+        "amountForMonth": 95000,
+        "netDueAmount": 42000,
+        "dueDate": "12 Nov 2025",
+        "primaryStatus": "PTP",
+        "status": "PTP",
+        "targetForMonth": 42000,
+        "unreadEmailCount": 1
+      },
+      {
+        "invoiceNo": "INV-10188",
+        "invoiceAmount": 76000,
+        "invoiceStatus": "Submitted and tracking",
+        "invoiceDate": "10 Nov 2025",
+        "amountForMonth": 30000,
+        "netDueAmount": 76000,
+        "dueDate": "18 Nov 2025",
+        "primaryStatus": "Reminder",
+        "status": "Pre-Due",
+        "targetForMonth": 30000,
+        "unreadEmailCount": 0
+      },
+      {
+        "invoiceNo": "INV-10402",
+        "invoiceAmount": 152000,
+        "invoiceStatus": "Submitted and tracking",
+        "invoiceDate": "18 Nov 2025",
+        "amountForMonth": 152000,
+        "netDueAmount": 152000,
+        "dueDate": "02 Dec 2025",
+        "primaryStatus": "Reminder",
+        "status": "Pre-Due",
+        "targetForMonth": 70000,
+        "unreadEmailCount": 0
+      },
+      {
+        "invoiceNo": "INV-10418",
+        "invoiceAmount": 56000,
+        "invoiceStatus": "Not submitted and untouched",
+        "invoiceDate": "07 Oct 2025",
+        "amountForMonth": 0,
+        "netDueAmount": 56000,
+        "dueDate": "22 Oct 2025",
+        "primaryStatus": "Dispute",
+        "status": "Dispute",
+        "targetForMonth": 0,
+        "unreadEmailCount": 1
+      },
+      {
+        "invoiceNo": "INV-10433",
+        "invoiceAmount": 98000,
+        "invoiceStatus": "Submitted and tracking",
+        "invoiceDate": "25 Oct 2025",
+        "amountForMonth": 98000,
+        "netDueAmount": 45000,
+        "dueDate": "08 Nov 2025",
+        "primaryStatus": "Follow-up",
+        "status": "Overdue",
+        "targetForMonth": 45000,
+        "unreadEmailCount": 2
+      },
+      {
+        "invoiceNo": "INV-10457",
+        "invoiceAmount": 34000,
+        "invoiceStatus": "Submitted and tracking",
+        "invoiceDate": "28 Nov 2025",
+        "amountForMonth": 34000,
+        "netDueAmount": 34000,
+        "dueDate": "12 Dec 2025",
+        "primaryStatus": "PTP",
+        "status": "PTP",
+        "targetForMonth": 34000,
+        "unreadEmailCount": 0
+      },
+      {
+        "invoiceNo": "INV-10471",
+        "invoiceAmount": 215000,
+        "invoiceStatus": "Submitted and tracking",
+        "invoiceDate": "03 Nov 2025",
+        "amountForMonth": 215000,
+        "netDueAmount": 215000,
+        "dueDate": "17 Nov 2025",
+        "primaryStatus": "Escalation",
+        "status": "Overdue",
+        "targetForMonth": 120000,
+        "unreadEmailCount": 4
+      },
+      {
+        "invoiceNo": "INV-10489",
+        "invoiceAmount": 76000,
+        "invoiceStatus": "Submitted and closed",
+        "invoiceDate": "14 Oct 2025",
+        "amountForMonth": 76000,
+        "netDueAmount": 20000,
+        "dueDate": "28 Oct 2025",
+        "primaryStatus": "Reminder",
+        "status": "Pre-Due",
+        "targetForMonth": 20000,
+        "unreadEmailCount": 0
+      }
+    ]
+  },
+  {
+    "id": "c2",
+    "name": "BlueWave",
+    "code": "CUST-014",
+    "city": "Delhi",
+    "region": "North",
+    "contacts": [
+      {
+        "firstName": "Asha",
+        "lastName": "Kapoor",
+        "email": "accounts@bluewave.in",
+        "phonePrimary": "+91 97xxxxxx54",
+        "phoneSecondary": "",
+        "gender": "Female",
+        "department": "Accounts",
+        "useEmailForCommunication": true
+      },
+      {
+        "firstName": "Nikhil",
+        "lastName": "Verma",
+        "email": "ops@bluewave.in",
+        "phonePrimary": "+91 97xxxxxx55",
+        "phoneSecondary": "+91 97xxxxxx56",
+        "gender": "Male",
+        "department": "Operations",
+        "useEmailForCommunication": false
+      }
+    ],
+    "billToAddress": "BlueWave House, Connaught Place",
+    "shipToAddress": "BlueWave DC, Okhla Phase 2",
+    "pincode": "110001",
+    "state": "Delhi",
+    "creditPeriod": "45 Days",
+    "agentName": "Karan Singh",
+    "managerName": "Isha Verma",
+    "kamName": "Riya Malhotra",
+    "kasName": "Vikram Iyer",
+    "businessUnit": "Consumer Health",
+    "industry": "Retail",
+    "product": "Cold Chain Units",
+    "grnDate": "20 Nov 2025",
+    "grnNumber": "GRN-22011",
+    "documents": [
+      {
+        "name": "Invoice",
+        "type": "invoice",
+        "updated": "18 Nov 2025"
+      },
+      {
+        "name": "Delivery Challan",
+        "type": "invoice",
+        "updated": "18 Nov 2025"
+      },
+      {
+        "name": "Payment Receipt",
+        "type": "invoice",
+        "updated": "19 Nov 2025"
+      },
+      {
+        "name": "Purchase Order",
+        "type": "client",
+        "updated": "05 Oct 2025"
+      },
+      {
+        "name": "Agreement",
+        "type": "client",
+        "updated": "11 Sep 2025"
+      },
+      {
+        "name": "Contract",
+        "type": "client",
+        "updated": "22 Sep 2025"
+      }
+    ],
+    "totalInvoiceAmount": 802500,
+    "netDueAmount": 620000,
+    "mtdCollection": 110000,
+    "cnAdvPdcAmount": 28000,
+    "invoices": [
+      {
+        "invoiceNo": "INV-22011",
+        "invoiceAmount": 54000,
+        "invoiceStatus": "Submitted and tracking",
+        "invoiceDate": "20 Oct 2025",
+        "amountForMonth": 54000,
+        "netDueAmount": 54000,
+        "dueDate": "08 Nov 2025",
+        "primaryStatus": "Follow-up",
+        "status": "Overdue",
+        "targetForMonth": 30000,
+        "unreadEmailCount": 0
+      },
+      {
+        "invoiceNo": "INV-22018",
+        "invoiceAmount": 88000,
+        "invoiceStatus": "Submitted and tracking",
+        "invoiceDate": "30 Oct 2025",
+        "amountForMonth": 50000,
+        "netDueAmount": 66000,
+        "dueDate": "14 Nov 2025",
+        "primaryStatus": "PTP",
+        "status": "PTP",
+        "targetForMonth": 66000,
+        "unreadEmailCount": 5
+      },
+      {
+        "invoiceNo": "INV-22027",
+        "invoiceAmount": 123000,
+        "invoiceStatus": "Submitted and tracking",
+        "invoiceDate": "05 Nov 2025",
+        "amountForMonth": 123000,
+        "netDueAmount": 123000,
+        "dueDate": "19 Nov 2025",
+        "primaryStatus": "Reminder",
+        "status": "Pre-Due",
+        "targetForMonth": 90000,
+        "unreadEmailCount": 0
+      },
+      {
+        "invoiceNo": "INV-22045",
+        "invoiceAmount": 67000,
+        "invoiceStatus": "Submitted and tracking",
+        "invoiceDate": "12 Nov 2025",
+        "amountForMonth": 67000,
+        "netDueAmount": 67000,
+        "dueDate": "27 Nov 2025",
+        "primaryStatus": "Follow-up",
+        "status": "Pre-Due",
+        "targetForMonth": 40000,
+        "unreadEmailCount": 1
+      },
+      {
+        "invoiceNo": "INV-22059",
+        "invoiceAmount": 94000,
+        "invoiceStatus": "Not submitted and untouched",
+        "invoiceDate": "18 Sep 2025",
+        "amountForMonth": 0,
+        "netDueAmount": 94000,
+        "dueDate": "03 Oct 2025",
+        "primaryStatus": "Dispute",
+        "status": "Dispute",
+        "targetForMonth": 0,
+        "unreadEmailCount": 0
+      },
+      {
+        "invoiceNo": "INV-22063",
+        "invoiceAmount": 120000,
+        "invoiceStatus": "Submitted and tracking",
+        "invoiceDate": "22 Oct 2025",
+        "amountForMonth": 120000,
+        "netDueAmount": 120000,
+        "dueDate": "06 Nov 2025",
+        "primaryStatus": "Reminder",
+        "status": "Overdue",
+        "targetForMonth": 60000,
+        "unreadEmailCount": 3
+      },
+      {
+        "invoiceNo": "INV-22075",
+        "invoiceAmount": 51000,
+        "invoiceStatus": "Submitted and tracking",
+        "invoiceDate": "02 Nov 2025",
+        "amountForMonth": 51000,
+        "netDueAmount": 31000,
+        "dueDate": "17 Nov 2025",
+        "primaryStatus": "PTP",
+        "status": "PTP",
+        "targetForMonth": 31000,
+        "unreadEmailCount": 0
+      },
+      {
+        "invoiceNo": "INV-22088",
+        "invoiceAmount": 86000,
+        "invoiceStatus": "Submitted and closed",
+        "invoiceDate": "06 Oct 2025",
+        "amountForMonth": 86000,
+        "netDueAmount": 86000,
+        "dueDate": "21 Oct 2025",
+        "primaryStatus": "Follow-up",
+        "status": "Overdue",
+        "targetForMonth": 50000,
+        "unreadEmailCount": 2
+      }
+    ]
+  },
+  {
+    "id": "c3",
+    "name": "Sunrise Pvt",
+    "code": "CUST-033",
+    "city": "Bengaluru",
+    "region": "South",
+    "contacts": [
+      {
+        "firstName": "Sujata",
+        "lastName": "Rao",
+        "email": "finance@sunrisepvt.com",
+        "phonePrimary": "+91 96xxxxxx87",
+        "phoneSecondary": "",
+        "gender": "Female",
+        "department": "Finance",
+        "useEmailForCommunication": true
+      },
+      {
+        "firstName": "Prakash",
+        "lastName": "Das",
+        "email": "collections@sunrisepvt.com",
+        "phonePrimary": "+91 96xxxxxx88",
+        "phoneSecondary": "+91 96xxxxxx89",
+        "gender": "Male",
+        "department": "Collections",
+        "useEmailForCommunication": false
+      }
+    ],
+    "billToAddress": "Sunrise Plaza, MG Road",
+    "shipToAddress": "Sunrise Warehouse, Whitefield",
+    "pincode": "560001",
+    "state": "Karnataka",
+    "creditPeriod": "60 Days",
+    "agentName": "Sahil Joshi",
+    "managerName": "Meera Nair",
+    "kamName": "Anil Thomas",
+    "kasName": "Dev Patel",
+    "businessUnit": "Industrial",
+    "industry": "Manufacturing",
+    "product": "Process Control",
+    "grnDate": "18 Nov 2025",
+    "grnNumber": "GRN-77102",
+    "documents": [
+      {
+        "name": "Invoice",
+        "type": "invoice",
+        "updated": "10 Nov 2025"
+      },
+      {
+        "name": "Delivery Challan",
+        "type": "invoice",
+        "updated": "10 Nov 2025"
+      },
+      {
+        "name": "Payment Receipt",
+        "type": "invoice",
+        "updated": "11 Nov 2025"
+      },
+      {
+        "name": "Purchase Order",
+        "type": "client",
+        "updated": "28 Sep 2025"
+      },
+      {
+        "name": "Agreement",
+        "type": "client",
+        "updated": "14 Sep 2025"
+      },
+      {
+        "name": "Contract",
+        "type": "client",
+        "updated": "20 Sep 2025"
+      }
+    ],
+    "totalInvoiceAmount": 2412000,
+    "netDueAmount": 1840000,
+    "mtdCollection": 60000,
+    "cnAdvPdcAmount": 52000,
+    "invoices": [
+      {
+        "invoiceNo": "INV-77102",
+        "invoiceAmount": 310000,
+        "invoiceStatus": "Submitted and tracking",
+        "invoiceDate": "01 Sep 2025",
+        "amountForMonth": 0,
+        "netDueAmount": 310000,
+        "dueDate": "19 Sep 2025",
+        "primaryStatus": "Escalation",
+        "status": "Overdue",
+        "targetForMonth": 120000,
+        "unreadEmailCount": 1
+      },
+      {
+        "invoiceNo": "INV-77118",
+        "invoiceAmount": 205000,
+        "invoiceStatus": "Not submitted and untouched",
+        "invoiceDate": "10 Sep 2025",
+        "amountForMonth": 0,
+        "netDueAmount": 205000,
+        "dueDate": "11 Oct 2025",
+        "primaryStatus": "Dispute",
+        "status": "Dispute",
+        "targetForMonth": 0,
+        "unreadEmailCount": 0
+      },
+      {
+        "invoiceNo": "INV-77133",
+        "invoiceAmount": 98000,
+        "invoiceStatus": "Submitted and tracking",
+        "invoiceDate": "15 Oct 2025",
+        "amountForMonth": 98000,
+        "netDueAmount": 98000,
+        "dueDate": "02 Nov 2025",
+        "primaryStatus": "Follow-up",
+        "status": "Overdue",
+        "targetForMonth": 50000,
+        "unreadEmailCount": 0
+      },
+      {
+        "invoiceNo": "INV-77150",
+        "invoiceAmount": 144000,
+        "invoiceStatus": "Submitted and tracking",
+        "invoiceDate": "20 Oct 2025",
+        "amountForMonth": 144000,
+        "netDueAmount": 144000,
+        "dueDate": "04 Nov 2025",
+        "primaryStatus": "Reminder",
+        "status": "Pre-Due",
+        "targetForMonth": 70000,
+        "unreadEmailCount": 0
+      },
+      {
+        "invoiceNo": "INV-77166",
+        "invoiceAmount": 67000,
+        "invoiceStatus": "Submitted and tracking",
+        "invoiceDate": "28 Nov 2025",
+        "amountForMonth": 67000,
+        "netDueAmount": 67000,
+        "dueDate": "12 Dec 2025",
+        "primaryStatus": "PTP",
+        "status": "PTP",
+        "targetForMonth": 67000,
+        "unreadEmailCount": 0
+      },
+      {
+        "invoiceNo": "INV-77179",
+        "invoiceAmount": 198000,
+        "invoiceStatus": "Submitted and tracking",
+        "invoiceDate": "11 Sep 2025",
+        "amountForMonth": 0,
+        "netDueAmount": 198000,
+        "dueDate": "26 Sep 2025",
+        "primaryStatus": "Escalation",
+        "status": "Overdue",
+        "targetForMonth": 90000,
+        "unreadEmailCount": 2
+      },
+      {
+        "invoiceNo": "INV-77195",
+        "invoiceAmount": 52000,
+        "invoiceStatus": "Not submitted and untouched",
+        "invoiceDate": "05 Oct 2025",
+        "amountForMonth": 0,
+        "netDueAmount": 52000,
+        "dueDate": "20 Oct 2025",
+        "primaryStatus": "Dispute",
+        "status": "Dispute",
+        "targetForMonth": 0,
+        "unreadEmailCount": 0
+      },
+      {
+        "invoiceNo": "INV-77208",
+        "invoiceAmount": 87000,
+        "invoiceStatus": "Submitted and closed",
+        "invoiceDate": "14 Nov 2025",
+        "amountForMonth": 87000,
+        "netDueAmount": 87000,
+        "dueDate": "29 Nov 2025",
+        "primaryStatus": "Follow-up",
+        "status": "Pre-Due",
+        "targetForMonth": 50000,
+        "unreadEmailCount": 1
+      }
+    ]
+  }
+]

@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inebura Ops UI | Prototype</title>
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .right .tabPanel[data-tab="invoice"] {
+      font-size: 12px;
+      color: #111827;
+    }
+
+    .right .tabPanel[data-tab="invoice"] .invoicePaneTitle {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #6b7280;
+      margin-bottom: 6px;
+    }
+
+    .right .tabPanel[data-tab="invoice"] .invoiceDetailsBlock .kv {
+      font-size: 12px;
+      padding: 4px 0;
+    }
+
+    .right .tabPanel[data-tab="invoice"] .invoiceDetailsBlock .kv span {
+      color: #6b7280;
+    }
+
+    .right .tabPanel[data-tab="invoice"] .invoiceDetailsBlock .kv strong {
+      font-weight: 600;
+    }
+
+    .right .tabPanel[data-tab="invoice"].detailsHidden .invoiceDetailsBlock {
+      display: none;
+    }
+
+    .right .tabPanel[data-tab="invoice"] .invoiceStickyDock {
+      position: static;
+      margin-top: 12px;
+      padding-top: 0;
+      background: transparent;
+      border-top: none;
+    }
+
+    .right .tabPanel[data-tab="invoice"] .accordion-button {
+      font-size: 12px;
+      padding: 8px 10px;
+      background: #f4f7fb;
+    }
+
+    .right .tabPanel[data-tab="invoice"] .accordion-button:focus {
+      box-shadow: none;
+    }
+
+    .right .tabPanel[data-tab="invoice"] .accordion-button:not(.collapsed) {
+      color: #1f2937;
+      background: #eef3ff;
+      box-shadow: inset 0 -1px 0 #dbe3ff;
+    }
+
+    .right .tabPanel[data-tab="invoice"] .accordion-body {
+      padding: 8px 0 10px;
+    }
+
+    .remarksList {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 8px 12px;
+    }
+
+    .remarkItem {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-left: 3px solid #94a3b8;
+      border-radius: 10px;
+      padding: 8px 10px;
+    }
+
+    .remarkItem.remark-manager {
+      border-left-color: #2563eb;
+      background: #eff6ff;
+    }
+
+    .remarkItem.remark-client {
+      border-left-color: #0f766e;
+      background: #ecfdf3;
+    }
+
+    .remarkText {
+      font-weight: 600;
+      font-size: 12px;
+      color: #111827;
+    }
+
+    .remarkMeta {
+      font-size: 10.5px;
+      color: #6b7280;
+      margin-top: 4px;
+    }
+
+    .activityTrail {
+      position: relative;
+      padding: 6px 12px 8px 18px;
+    }
+
+    .activityTrail::before {
+      content: "";
+      position: absolute;
+      left: 14px;
+      top: 10px;
+      bottom: 12px;
+      width: 2px;
+      background: linear-gradient(180deg, #cbd5f5 0%, #e2e8f0 60%, #e2e8f0 100%);
+    }
+
+    .activityEvent {
+      position: relative;
+      margin: 10px 0;
+      padding: 8px 10px 8px 24px;
+      border-radius: 12px;
+      background: #f7f8fb;
+      border: 1px solid #e4e9f2;
+    }
+
+    .activityEvent summary {
+      list-style: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    .activityEvent summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .activityEvent summary::marker {
+      content: "";
+    }
+
+    .activityEvent::before {
+      content: "";
+      position: absolute;
+      left: -6px;
+      top: 14px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--event-color, #64748b);
+      box-shadow: 0 0 0 3px #ffffff, 0 0 0 5px var(--event-soft, #cbd5f5);
+    }
+
+    .eventTitle {
+      font-weight: 600;
+      font-size: 12px;
+      color: #0f172a;
+    }
+
+    .eventMeta {
+      font-size: 10.5px;
+      color: #6b7280;
+    }
+
+    .eventTemplate {
+      font-size: 10.5px;
+      color: #64748b;
+      margin-top: 2px;
+    }
+
+    .eventBadge {
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: var(--event-badge-bg, #eef2ff);
+      color: var(--event-badge-text, #1e3a8a);
+      border: 1px solid var(--event-badge-border, #c7d2fe);
+      white-space: nowrap;
+    }
+
+    .activityEvent[open] {
+      background: #ffffff;
+      border-color: #d7e3f5;
+      box-shadow: 0 8px 16px rgba(15, 23, 42, 0.08);
+    }
+
+    .activityEvent .eventBody {
+      margin-top: 6px;
+      font-size: 11px;
+      color: #4b5563;
+    }
+
+    .activityDetailLine {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 2px 0;
+    }
+
+    .activityLabel {
+      color: #6b7280;
+      font-size: 10.5px;
+      flex: 1;
+    }
+
+    .activityValue {
+      color: #111827;
+      font-size: 10.5px;
+      font-weight: 600;
+      text-align: right;
+      flex: 1;
+    }
+
+    .eventSubject {
+      font-weight: 600;
+      color: #111827;
+      margin-top: 4px;
+    }
+
+    .eventBodyText {
+      margin-top: 4px;
+    }
+
+    .readMoreBtn {
+      margin-top: 6px;
+      padding: 0;
+      border: none;
+      background: transparent;
+      color: #2563eb;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .readMoreBtn:hover {
+      text-decoration: underline;
+    }
+
+    .notificationBody {
+      white-space: pre-line;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 8px;
+      font-size: 12px;
+      color: #111827;
+    }
+
+    .notificationAttachments {
+      font-size: 12px;
+      color: #4b5563;
+    }
+
+    .event-invoice-update {
+      --event-color: #2563eb;
+      --event-soft: #bfdbfe;
+      --event-badge-bg: #e0ecff;
+      --event-badge-text: #1e3a8a;
+      --event-badge-border: #bfdbfe;
+    }
+
+    .event-push {
+      --event-color: #f97316;
+      --event-soft: #fed7aa;
+      --event-badge-bg: #fff7ed;
+      --event-badge-text: #9a3412;
+      --event-badge-border: #fed7aa;
+    }
+
+    .event-issue {
+      --event-color: #7c3aed;
+      --event-soft: #ddd6fe;
+      --event-badge-bg: #f5f3ff;
+      --event-badge-text: #5b21b6;
+      --event-badge-border: #ddd6fe;
+    }
+  </style>
+  <script defer src="app.js"></script>
+</head>
+<body>
+
+<header>
+  <div class="headerLeft">
+    <div class="headerMenu">
+      <button class="iconBtn menuBtn" type="button" id="headerMenuBtn" aria-label="Open menu">
+        <i class="bi bi-list" aria-hidden="true"></i>
+      </button>
+    </div>
+    <div class="brand">
+      <span class="logoInebura">Inebura</span>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="relationship">
+      <div class="relLogo" id="relationshipLogo">PH</div>
+      <span class="relName" id="relationshipName">Philips</span>
+    </div>
+  </div>
+
+  <div class="headerRight">
+    <select id="tenantSelect" class="tenantSelect">
+      <option value="apollo">Apollo</option>
+      <option value="bikanerwala">Bikanerwala</option>
+      <option value="global_ar">Global AR</option>
+    </select>
+
+    <div class="notificationBellWrap">
+      <button class="iconBtn notificationBell" type="button" id="notificationBellBtn" aria-label="Notifications">
+        <span class="iconWrap">
+          <i class="bi bi-bell-fill" aria-hidden="true"></i>
+          <span class="badgeCount hidden" id="notificationBellCount">0</span>
+        </span>
+      </button>
+      <div class="notificationPopup hidden" id="notificationPopup" role="dialog" aria-label="Notifications">
+        <div class="notificationPopupHeader">Notifications</div>
+        <div class="notificationPopupList" id="notificationPopupList"></div>
+      </div>
+    </div>
+    <select id="userSelect" class="tenantSelect userSelect" aria-label="Select user"></select>
+  </div>
+</header>
+
+<div class="sideNavOverlay" id="sideNavOverlay" aria-hidden="true">
+  <nav class="sideNav" id="sideNav" aria-label="Main">
+    <div class="sideNavHeader">
+      <span class="sideNavTitle">Menu</span>
+      <button class="iconBtn sideNavClose" type="button" id="sideNavClose" aria-label="Close menu">
+        <i class="bi bi-x-lg" aria-hidden="true"></i>
+      </button>
+    </div>
+    <button class="sideNavItem" type="button" data-module="visit">Visit Module</button>
+    <button class="sideNavItem" type="button" data-module="visit-review">Visit Module Review</button>
+    <button class="sideNavItem" type="button" data-module="landing">Landing Page</button>
+    <button class="sideNavItem" type="button" data-module="landing-manager">Landing Page - Manager</button>
+  </nav>
+</div>
+
+<div class="layout">
+
+  <!-- LEFT PANEL : CUSTOMERS (FROZEN) -->
+  <aside class="panel customersPanel">
+    <div class="panelHeader">
+      <h3>Customers</h3>
+    </div>
+
+    <div class="customerSort">
+      <select id="customerSortSelect" class="form-select form-select-sm">
+        <option value="">Sort by...</option>
+        <option value="totalInvoice_desc">Total Invoice: High to Low</option>
+        <option value="totalInvoice_asc">Total Invoice: Low to High</option>
+        <option value="mtdCollection_desc">MTD Collections: High to Low</option>
+        <option value="mtdCollection_asc">MTD Collections: Low to High</option>
+        <option value="netDue_desc">Total Net Due: High to Low</option>
+        <option value="netDue_asc">Total Net Due: Low to High</option>
+      </select>
+    </div>
+
+    <input id="customerSearch" class="searchBox" placeholder="Search customer by name or code..." />
+
+    <div id="customerCards" class="cards">
+      <!-- Rendered by JS -->
+    </div>
+  </aside>
+
+  <!-- CENTER PANEL : PLAYGROUND -->
+  <main class="panel center">
+
+    <!-- Customer Summary -->
+    <div class="customerSummary">
+      <div class="customerSummaryLeft">
+        <h2 id="centerCustomerName">APOLLO PHARMACY <span class="badge" id="centerCustomerCode">CUST-001</span></h2>
+
+        <div class="customerMetaRow">
+          <div class="metaItem">
+            <span class="metaLabel">City</span>
+            <strong class="metaValue" id="centerCustomerCity">Mumbai</strong>
+          </div>
+          <div class="metaItem">
+            <span class="metaLabel">Open Invoices</span>
+            <strong class="metaValue" id="centerOpenInvoices">0</strong>
+          </div>
+          <div class="metaItem statClickable" id="centerIssueCountBtn" role="button" tabindex="0" aria-label="Open issue tracker">
+            <span class="metaLabel">Issue Count</span>
+            <strong class="metaValue" id="centerIssueCount">0</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="summaryStats">
+        <div class="stat statClickable" id="centerCnAdvPdcStat" role="button" tabindex="0" aria-haspopup="dialog">
+          <span>CN/ADV/PDC</span>
+          <strong id="centerCustomerCnAdvPdc">0</strong>
+        </div>
+        <div class="stat statClickable" id="centerTargetSummaryBtn" role="button" tabindex="0" aria-haspopup="dialog">
+          <span>Target</span>
+          <strong id="centerCustomerTarget">0</strong>
+        </div>
+        <div class="stat">
+          <span>Total Net Due</span>
+          <strong id="centerTotalOutstanding">?0</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Invoice Card: Filters + Bulk + Table in ONE card -->
+    <div class="tableCard">
+
+      <div class="tableCardHeader">
+        <div class="filtersRow d-flex flex-wrap gap-2 align-items-center">
+          <div class="btn-group">
+            <button
+              id="filterInvoiceStatusBtn"
+              type="button"
+              class="btn btn-primary btn-sm dropdown-toggle"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+              title="Filter - Invoice Status"
+            >
+              <i class="bi bi-funnel-fill me-1" aria-hidden="true"></i>
+              Invoice Status
+              <span class="ms-1 badge bg-light text-dark" data-role="filter-value">All</span>
+            </button>
+            <ul class="dropdown-menu" id="filterInvoiceStatusMenu" data-filter="invoiceStatus"></ul>
+          </div>
+
+          <div class="btn-group">
+            <button
+              id="filterPrimaryStatusBtn"
+              type="button"
+              class="btn btn-success btn-sm dropdown-toggle"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+              title="Filter - Primary Status"
+            >
+              <i class="bi bi-funnel-fill me-1" aria-hidden="true"></i>
+              Primary Status
+              <span class="ms-1 badge bg-light text-dark" data-role="filter-value">All</span>
+            </button>
+            <ul class="dropdown-menu" id="filterPrimaryStatusMenu" data-filter="primaryStatus"></ul>
+          </div>
+
+          <div class="btn-group">
+            <button
+              id="filterStatusBtn"
+              type="button"
+              class="btn btn-outline-danger btn-sm dropdown-toggle"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+              title="Filter - Status"
+            >
+              <i class="bi bi-funnel-fill me-1" aria-hidden="true"></i>
+              Status
+              <span class="ms-1 badge bg-light text-dark" data-role="filter-value">All</span>
+            </button>
+            <ul class="dropdown-menu" id="filterStatusMenu" data-filter="status"></ul>
+          </div>
+
+          <div class="form-check form-switch ms-auto mb-0">
+            <input class="form-check-input" type="checkbox" role="switch" id="filterUnreadEmail" />
+            <label class="form-check-label" for="filterUnreadEmail">Unread Email</label>
+          </div>
+
+          <button class="btn btn-outline-secondary btn-sm" type="button" id="filterClearBtn">
+            Clear filters
+          </button>
+        </div>
+
+        <div id="bulkBar" class="bulkBar hidden">
+          <div class="bulkLeft">
+            <strong id="bulkCount">0</strong>
+            <span>selected</span>
+          </div>
+
+          <div class="bulkActions">
+            <button class="btnSmall" id="bulkSendEmail" type="button">Send emails</button>
+            <button class="btnSmallPrimary" id="bulkNewActivity" type="button">New activity</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="tableWrap compactTable">
+        <table class="invoiceTable">
+          <thead>
+            <tr>
+              <th class="colChk cellCenter">
+                <input type="checkbox" id="selectAllInvoices" title="Select all" />
+              </th>
+
+              <th class="colIcon cellCenter" title="Email"><i class="bi bi-envelope-fill" aria-hidden="true"></i></th>
+              <th class="colIcon cellCenter" title="Target for the month"><i class="bi bi-bullseye" aria-hidden="true"></i></th>
+
+              <th class="colInv">Invoice</th>
+              <th class="colAmtRight">Inv Amt</th>
+              <th class="colDate">Inv Dt</th>
+              <th class="colAmtRight">Month Amt</th>
+              <th class="colAmtRight">Net Due</th>
+              <th class="colDate">Due Dt</th>
+              <th class="colShort">Primary</th>
+              <th class="colStatus">Status</th>
+
+              <th class="colActions cellCenter">Actions</th>
+            </tr>
+          </thead>
+
+          <tbody id="invoiceTableBody">
+            <!-- Rendered by JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <div id="invoicePagination" class="tablePagination hidden"></div>
+    </div>
+
+    <!-- Floating row menu (NOT clipped by table) -->
+  <div id="rowActionMenu" class="menuFloating hidden" role="menu" aria-label="Row actions">
+    <button class="menuItem" type="button" data-menu-action="remarks">Remarks</button>
+    <button class="menuItem" type="button" data-menu-action="trail">Show activity Trail</button>
+  </div>
+
+  <div class="modal fade" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="notificationModalLabel">Push Notification</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="kv"><span>Send to</span><strong id="notificationSendTo">-</strong></div>
+          <div class="kv"><span>CC</span><strong id="notificationCc">-</strong></div>
+          <div class="kv"><span>From</span><strong id="notificationFrom">-</strong></div>
+          <div class="kv"><span>Subject</span><strong id="notificationSubject">-</strong></div>
+          <div class="kv"><span>Mail body</span></div>
+          <div class="notificationBody" id="notificationBody">-</div>
+          <div class="kv"><span>Attachments</span><strong id="notificationAttachments" class="notificationAttachments">-</strong></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="targetCommitmentsModal" tabindex="-1" aria-labelledby="targetCommitmentsLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="targetCommitmentsLabel">Weekly Commitments</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="commitmentList">
+            <div class="commitmentRow"><span>Week 1</span><strong>Rs. 50,000</strong></div>
+            <div class="commitmentRow"><span>Week 2</span><strong>Rs. 90,000</strong></div>
+            <div class="commitmentRow"><span>Week 3</span><strong>Rs. 12,000</strong></div>
+            <div class="commitmentRow"><span>Week 4</span><strong>Rs. 29,999</strong></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="targetSummaryModal" tabindex="-1" aria-labelledby="targetSummaryLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="targetSummaryLabel">Target Summary</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="targetSummaryGrid">
+            <div class="targetSummaryCard">
+              <span>Total committed target</span>
+              <strong id="targetSummaryCommitted">Rs. 0</strong>
+            </div>
+            <div class="targetSummaryCard">
+              <span>Total MTD collection</span>
+              <strong id="targetSummaryMtd">Rs. 0</strong>
+            </div>
+          </div>
+
+          <div class="targetSplitWrap">
+            <div class="targetSplitChart" id="targetSplitChart" role="img" aria-label="Collected amount split">
+              <div class="targetSplitChartInner">
+                <div class="targetSplitPct" id="targetSplitPct">0%</div>
+                <div class="targetSplitLabel" id="targetSplitLabel">Collected share</div>
+              </div>
+            </div>
+            <div class="targetSplitLegend">
+              <div class="targetSplitLegendItem">
+                <span class="legendSwatch committed"></span>
+                <div>
+                  <div class="legendTitle">Committed collection</div>
+                  <strong id="targetSummaryCommittedCollected">Rs. 0</strong>
+                </div>
+              </div>
+              <div class="targetSplitLegendItem">
+                <span class="legendSwatch nonCommitted"></span>
+                <div>
+                  <div class="legendTitle">Non committed collection</div>
+                  <strong id="targetSummaryNonCommittedCollected">Rs. 0</strong>
+                </div>
+              </div>
+              <div class="targetSplitLegendItem">
+                <span class="legendSwatch pending"></span>
+                <div>
+                  <div class="legendTitle">Pending collection</div>
+                  <strong id="targetSummaryPendingCollected">Rs. 0</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="cnAdvPdcModal" tabindex="-1" aria-labelledby="cnAdvPdcLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="cnAdvPdcLabel">CN/ADV/PDC Adjustments</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="table-responsive">
+            <table class="table table-sm cnAdvTable">
+              <thead>
+                <tr>
+                  <th><button type="button" class="cnAdvSort" data-sort-key="adjustmentId">Adjustment ID</button></th>
+                  <th><button type="button" class="cnAdvSort" data-sort-key="adjustmentType">Adjustment Type</button></th>
+                  <th><button type="button" class="cnAdvSort" data-sort-key="originalAmount">Original Amount</button></th>
+                  <th><button type="button" class="cnAdvSort" data-sort-key="remainingAmount">Remaining Amount</button></th>
+                  <th><button type="button" class="cnAdvSort" data-sort-key="createdDate">Created Date</button></th>
+                  <th><button type="button" class="cnAdvSort" data-sort-key="lastUsedDate">Last Used Date</button></th>
+                </tr>
+              </thead>
+              <tbody id="cnAdvPdcTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="miscCollectionModal" tabindex="-1" aria-labelledby="miscCollectionLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="miscCollectionLabel">Collection details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="miscCollectionBody"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="emailPanel hidden" id="emailPanel">
+    <div class="emailPanelHeader">
+      <span class="dispositionTitle">Email Panel</span>
+      <div class="emailHeaderActions">
+        <button class="emailNewBtn" type="button" id="emailNewBtn">New email</button>
+        <button class="dispositionClose emailCloseBtn" type="button" id="emailPanelCloseBtn" aria-label="Close">
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="emailSplit">
+      <div class="emailPane emailMailboxPane">
+        <div class="emailMailbox">
+          <div class="emailSectionTitle">Mail box</div>
+          <div class="emailMailboxList">
+            <button class="active" data-email-tab="inbox">Inbox</button>
+            <button data-email-tab="sent">Sent mail</button>
+            <button data-email-tab="system">System Generate</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="emailPane emailListPane">
+        <div class="emailListSection">
+          <div class="emailSectionTitle">Emails</div>
+          <div class="emailTabPane active" data-email-tab="inbox">
+            <div class="emailList">
+            <div class="emailItem" data-from="Collections Team &lt;collections@inebura.com&gt;" data-to="Ops Agent &lt;ops@inebura.com&gt;" data-cc="Ravi Sharma &lt;ravi@apollopharmacy.com&gt;" data-subject="PTP missed for APOLLO PHARMACY" data-body="Hello APOLLO PHARMACY,\\n\\nOur records show the PTP for INV-10291 was missed. Please share the revised payment date.\\n\\nRegards,\\nCollections Team" data-attachments="Invoice_INV-10291.pdf|PTP_Reminder.pdf">
+              <div class="emailMeta">
+                <span class="emailLabel">From</span>
+                <span class="emailValue">Collections Team</span>
+              </div>
+              <div class="emailMeta">
+                <span class="emailLabel">To</span>
+                <span class="emailValue">Ops Agent</span>
+              </div>
+              <div class="emailSubject">PTP missed for APOLLO PHARMACY</div>
+            </div>
+            <div class="emailItem" data-from="Ops Manager &lt;manager@inebura.com&gt;" data-to="Ops Agent &lt;ops@inebura.com&gt;" data-cc="-" data-subject="Follow-up cadence approved" data-body="Proceed with reminder emails every 2 days until payment.\n\nApproved by Ops Manager." data-attachments="-">
+              <div class="emailMeta">
+                <span class="emailLabel">From</span>
+                <span class="emailValue">Ops Manager</span>
+              </div>
+              <div class="emailMeta">
+                <span class="emailLabel">To</span>
+                <span class="emailValue">Ops Agent</span>
+              </div>
+              <div class="emailSubject">Follow-up cadence approved</div>
+            </div>
+            <div class="emailItem" data-from="Client - Finance &lt;finance@apollopharmacy.com&gt;" data-to="Ops Agent &lt;ops@inebura.com&gt;" data-cc="Anita Nair &lt;collections@apollopharmacy.com&gt;" data-subject="Re: Due date change request" data-body="Sharing updated PO copy. Please revise due date accordingly.\\n\\nThanks,\\nFinance Team" data-attachments="PO_Update.pdf">
+              <div class="emailMeta">
+                <span class="emailLabel">From</span>
+                <span class="emailValue">Client - Finance</span>
+              </div>
+              <div class="emailMeta">
+                <span class="emailLabel">To</span>
+                <span class="emailValue">Ops Agent</span>
+              </div>
+              <div class="emailSubject">Re: Due date change request</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="emailTabPane" data-email-tab="sent">
+          <div class="emailList">
+            <div class="emailItem" data-from="Ops Agent &lt;ops@inebura.com&gt;" data-to="Client - Finance &lt;finance@apollopharmacy.com&gt;" data-cc="-" data-subject="Payment reminder for INV-10270" data-body="Gentle reminder to process payment by the due date.\\n\\nRegards,\\nOps Agent" data-attachments="Invoice_INV-10270.pdf">
+              <div class="emailMeta">
+                <span class="emailLabel">To</span>
+                <span class="emailValue">Client - Finance</span>
+              </div>
+              <div class="emailMeta">
+                <span class="emailLabel">From</span>
+                <span class="emailValue">Ops Agent</span>
+              </div>
+              <div class="emailSubject">Payment reminder for INV-10270</div>
+            </div>
+            <div class="emailItem" data-from="Ops Agent &lt;ops@inebura.com&gt;" data-to="Client - Finance &lt;finance@apollopharmacy.com&gt;" data-cc="-" data-subject="Invoice copy shared" data-body="Attached the latest invoice copy for your records.\\n\\nRegards,\\nOps Agent" data-attachments="Invoice_INV-10308.pdf">
+              <div class="emailMeta">
+                <span class="emailLabel">To</span>
+                <span class="emailValue">Client - Finance</span>
+              </div>
+              <div class="emailMeta">
+                <span class="emailLabel">From</span>
+                <span class="emailValue">Ops Agent</span>
+              </div>
+              <div class="emailSubject">Invoice copy shared</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="emailTabPane" data-email-tab="system">
+          <div class="emailList">
+            <div class="emailItem" data-from="System &lt;no-reply@inebura.com&gt;" data-to="Ops Agent &lt;ops@inebura.com&gt;" data-cc="Client - Finance &lt;finance@apollopharmacy.com&gt;" data-subject="Auto-reminder: PTP missed" data-body="System generated reminder for PTP missed.\\n\\nThis notification was sent to all relevant contacts." data-attachments="PTP_Missed_Notice.pdf">
+              <div class="emailMeta">
+                <span class="emailLabel">From</span>
+                <span class="emailValue">System</span>
+              </div>
+              <div class="emailMeta">
+                <span class="emailLabel">To</span>
+                <span class="emailValue">Ops Agent</span>
+              </div>
+              <div class="emailSubject">Auto-reminder: PTP missed</div>
+            </div>
+            <div class="emailItem" data-from="System &lt;no-reply@inebura.com&gt;" data-to="Ops Agent &lt;ops@inebura.com&gt;" data-cc="Ops Manager &lt;manager@inebura.com&gt;" data-subject="Auto-escalation triggered" data-body="Invoice escalated due to overdue threshold reached.\\n\\nPlease review and take action." data-attachments="Escalation_Report.pdf">
+              <div class="emailMeta">
+                <span class="emailLabel">From</span>
+                <span class="emailValue">System</span>
+              </div>
+              <div class="emailMeta">
+                <span class="emailLabel">To</span>
+                <span class="emailValue">Ops Agent</span>
+              </div>
+              <div class="emailSubject">Auto-escalation triggered</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      </div>
+
+      <div class="emailPane emailDetailPane">
+        <div class="emailDetailEmpty" id="emailDetailEmpty">Select an email to view details.</div>
+        <div class="emailDetailContent hidden" id="emailDetailContent">
+          <div class="kv"><span>From</span><strong id="emailDetailFrom">-</strong></div>
+          <div class="kv"><span>To</span><strong id="emailDetailTo">-</strong></div>
+          <div class="kv"><span>CC</span><strong id="emailDetailCc">-</strong></div>
+          <div class="kv"><span>Subject</span><strong id="emailDetailSubject">-</strong></div>
+          <div class="notificationBody" id="emailDetailBody">-</div>
+          <div class="kv"><span>Attachments</span><strong id="emailDetailAttachments" class="notificationAttachments">-</strong></div>
+        </div>
+        <div class="emailCompose hidden" id="emailComposePanel">
+          <div class="emailComposeRow">
+            <label for="emailComposeTo">To</label>
+            <div class="emailComposeField">
+              <input type="text" id="emailComposeTo" placeholder="customer@company.com" />
+              <div class="emailSuggestionBox hidden" id="emailToSuggestions" data-target="emailComposeTo"></div>
+            </div>
+          </div>
+          <div class="emailComposeRow">
+            <label for="emailComposeCc">CC</label>
+            <div class="emailComposeField">
+              <input type="text" id="emailComposeCc" placeholder="finance@company.com" />
+              <div class="emailSuggestionBox hidden" id="emailCcSuggestions" data-target="emailComposeCc"></div>
+            </div>
+          </div>
+          <div class="emailComposeRow">
+            <label for="emailComposeFrom">From</label>
+            <input type="text" id="emailComposeFrom" value="ops@inebura.com" />
+          </div>
+          <div class="emailComposeRow emailComposeTemplates">
+            <label>Templates</label>
+            <div class="emailTemplateList">
+              <button class="emailTemplatePill emailTemplateCustomer" type="button" data-template-type="customer" data-template-subject="Payment reminder" data-template-body="Hello,\\n\\nThis is a friendly reminder that your payment is due. Please confirm the payment date.\\n\\nThank you.">Payment reminder</button>
+              <button class="emailTemplatePill emailTemplateCustomer" type="button" data-template-type="customer" data-template-subject="PTP confirmation" data-template-body="Hello,\\n\\nThanks for confirming the promise to pay date. We will follow up on the agreed date.\\n\\nRegards,\\nCollections">PTP confirmation</button>
+              <button class="emailTemplatePill emailTemplateCustomer" type="button" data-template-type="customer" data-template-subject="Overdue notice" data-template-body="Hello,\\n\\nYour invoice is overdue. Please share an immediate update on the payment status.\\n\\nRegards,\\nCollections">Overdue notice</button>
+              <button class="emailTemplatePill emailTemplateCustomer" type="button" data-template-type="customer" data-template-subject="Statement request" data-template-body="Hello,\\n\\nPlease share your latest account statement to reconcile the outstanding invoices.\\n\\nThanks.">Statement request</button>
+              <button class="emailTemplatePill emailTemplateClient" type="button" data-template-type="client" data-template-subject="Internal update" data-template-body="Hi Team,\\n\\nSharing the latest follow-up update for the invoice.\\n\\nRegards.">Internal update</button>
+              <button class="emailTemplatePill emailTemplateClient" type="button" data-template-type="client" data-template-subject="Escalation notice" data-template-body="Hi Team,\\n\\nEscalation triggered due to no response from the customer. Please advise next steps.\\n\\nThanks.">Escalation notice</button>
+              <button class="emailTemplatePill emailTemplateClient" type="button" data-template-type="client" data-template-subject="Collection summary" data-template-body="Hi Team,\\n\\nSharing the collection summary and next follow-up date.\\n\\nRegards.">Collection summary</button>
+              <button class="emailTemplatePill emailTemplateClient" type="button" data-template-type="client" data-template-subject="Dispute follow-up" data-template-body="Hi Team,\\n\\nDispute has been raised. Awaiting customer documentation.\\n\\nRegards.">Dispute follow-up</button>
+              <button class="emailTemplatePill emailTemplateClient" type="button" data-template-type="client" data-template-subject="Credit note update" data-template-body="Hi Team,\\n\\nCredit note update received. Please revise the outstanding amount accordingly.\\n\\nThanks.">Credit note update</button>
+            </div>
+          </div>
+          <div class="emailComposeRow">
+            <label for="emailComposeSubject">Subject</label>
+            <input type="text" id="emailComposeSubject" placeholder="Subject" />
+          </div>
+          <div class="emailComposeRow emailComposeBodyRow">
+            <label for="emailComposeBody">Body</label>
+            <textarea id="emailComposeBody" rows="6" placeholder="Write your email..."></textarea>
+          </div>
+          <div class="emailComposeRow">
+            <label for="emailComposeAttachments">Attachments</label>
+            <input type="text" id="emailComposeAttachments" placeholder="Invoice_INV-10291.pdf" />
+          </div>
+          <div class="emailComposeActions">
+            <button class="emailSendBtn" type="button" id="emailSendBtn">Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <!-- Disposition (unchanged) -->
+    <div class="disposition hidden" id="dispositionPanel">
+      <h3>
+        <span class="dispositionTitle">Update Disposition</span>
+        <button class="dispositionClose" type="button" id="dispositionCloseBtn">Close</button>
+      </h3>
+
+      <div class="dispositionInvoices hidden" id="dispositionInvoiceWrap">
+        <span>Invoices</span>
+        <div class="dispositionInvoiceList" id="dispositionInvoiceList"></div>
+      </div>
+
+      <div class="grid2">
+        <div>
+          <label>Activity type</label>
+          <select id="activityTypeSelect">
+            <option>Visited</option>
+            <option>Emailed</option>
+            <option>Called</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Broad Status</label>
+          <select id="broadStatusSelect">
+            <option>Red Flag</option>
+            <option>External Dependency</option>
+            <option>Collection Done</option>
+            <option>Work in Progress</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Primary status</label>
+          <select id="primaryStatusSelect">
+            <option>Follow-up</option>
+            <option>Reminder</option>
+            <option>Dispute</option>
+            <option>PTP</option>
+            <option>Escalation</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Sub Status</label>
+          <select id="subStatusSelect">
+            <option>Collection</option>
+            <option>PTP Set</option>
+            <option>No Response</option>
+            <option>Dispute Raised</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="collectionFields" class="collectionFields hidden">
+        <div class="collectionFieldsTitle">Collection details</div>
+        <div class="collectionTotals">
+          <div class="collectionTotalItem">
+            <span>Total outstanding</span>
+            <strong id="collectionOutstandingAmount">Rs. 0</strong>
+          </div>
+          <div class="collectionTotalItem">
+            <span>Total collected</span>
+            <strong id="collectionTotalAmount">Rs. 0</strong>
+          </div>
+        </div>
+        <div id="collectionError" class="collectionError hidden"></div>
+        <div class="grid2">
+          <div>
+            <label>Instrument mode</label>
+            <select id="collectionInstrumentMode">
+              <option>NEFT</option>
+              <option>RTGS</option>
+              <option>Cheque</option>
+              <option>Demand Draft</option>
+              <option>Miscellenious</option>
+            </select>
+          </div>
+          <div class="collectionSingleFields">
+            <label>Instrument ref no</label>
+            <input type="text" id="collectionInstrumentRef" placeholder="Reference number" />
+          </div>
+        </div>
+        <div class="grid2 collectionSingleFields">
+          <div>
+            <label>Bank</label>
+            <input type="text" id="collectionBank" placeholder="Bank name" />
+          </div>
+          <div>
+            <label>Transfer date</label>
+            <input type="date" id="collectionTransferDate" />
+          </div>
+        </div>
+        <div class="grid2 collectionSingleFields">
+          <div>
+            <label>Amount</label>
+            <input type="number" id="collectionAmount" min="0" step="0.01" placeholder="0" />
+          </div>
+          <div>
+            <label>TDS</label>
+            <input type="number" id="collectionTds" min="0" step="0.01" placeholder="0" />
+          </div>
+        </div>
+        <div class="grid2 collectionSingleFields">
+          <div>
+            <label>LD</label>
+            <input type="number" id="collectionLd" min="0" step="0.01" placeholder="0" />
+          </div>
+          <div></div>
+        </div>
+        <div id="collectionMiscFields" class="collectionMiscFields hidden">
+          <div class="collectionMiscHeader">
+            <span>Multiple collection modes</span>
+            <button type="button" id="addMiscModeBtn">Add mode</button>
+          </div>
+          <div id="collectionMiscList" class="collectionMiscList"></div>
+        </div>
+      </div>
+
+      <label>Remarks</label>
+      <textarea id="activityRemarks" placeholder="Enter notes..."></textarea>
+
+      <div class="actions">
+        <button class="btn primary" id="submitActivityBtn" type="button">Submit activity</button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- RIGHT PANEL : INSIGHTS -->
+  <aside class="panel right">
+    <div class="tabsRow" id="insightTabs">
+      <button class="tabBtn active" type="button" data-tab="customer">Customer Summary</button>
+      <button class="tabBtn" type="button" data-tab="invoice">Invoice Summary</button>
+      <button class="tabBtn" type="button" data-tab="docs">Document viewer</button>
+      <button class="tabBtn" type="button" data-tab="todo">To do <span class="notifyCount tabBadge" id="todoTabCount">0</span></button>
+      <button class="tabBtn" type="button" data-tab="notes">Notes</button>
+    </div>
+
+    <div class="tabBody">
+      <div class="tabPanel active" data-tab="customer">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <h4 class="mb-0">Customer Contact Info</h4>
+          <button class="btn btn-outline-primary btn-sm" type="button" id="addCustomerContactBtn">Add contact</button>
+        </div>
+        <div id="customerContacts" class="accordion"></div>
+
+        <hr />
+
+        <h4>Outstanding Amount Details</h4>
+        <table class="outstandingTable">
+          <tbody>
+            <tr>
+              <td>Amount for the month</td>
+              <td class="amountCell" id="customerAmountForMonth">Rs. 0</td>
+            </tr>
+            <tr>
+              <td>MTD collection</td>
+              <td class="amountCell amountGreen" id="customerMtdCollection">Rs. 0</td>
+            </tr>
+            <tr>
+              <td>Cn/Adv/PDC</td>
+              <td class="amountCell amountRed" id="customerCnAdvPdc">Rs. 0</td>
+            </tr>
+            <tr>
+              <td colspan="2"><div class="outstandingDivider"></div></td>
+            </tr>
+            <tr class="outstandingTotal">
+              <td>Total Net Due</td>
+              <td class="amountCell" id="customerNetDueAmount">Rs. 0</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <hr />
+
+        <h4>Customer Details</h4>
+        <div class="kv kv-right"><span>Bill To Address</span><strong id="customerBillToAddress">-</strong></div>
+        <div class="kv"><span>Ship To Address</span><strong id="customerShipToAddress">-</strong></div>
+        <div class="kv"><span>City</span><strong id="customerCity">-</strong></div>
+        <div class="kv"><span>Pincode</span><strong id="customerPincode">-</strong></div>
+        <div class="kv"><span>State</span><strong id="customerState">-</strong></div>
+        <div class="kv"><span>Region</span><strong id="customerRegion">-</strong></div>
+      </div>
+
+      <div class="tabPanel" data-tab="invoice">
+        <div class="invoiceDetailsBlock" id="invoiceDetailsBlock">
+          <div class="invoiceHeaderRow">
+            <h4 class="invoicePaneTitle">Invoice Details</h4>
+            <span class="invoiceStatusPill is-neutral" id="invoiceSubmissionStatus">-</span>
+          </div>
+          <div class="invoiceInfoGrid">
+            <div class="infoCard">
+              <div class="infoCardTitle">Ownership</div>
+              <div class="kv"><span>Agent</span><strong id="invoiceAgent">-</strong></div>
+              <div class="kv"><span>Manager</span><strong id="invoiceManager">-</strong></div>
+              <div class="kv"><span>KAM</span><strong id="invoiceKam">-</strong></div>
+              <div class="kv"><span>KAS</span><strong id="invoiceKas">-</strong></div>
+            </div>
+            <div class="infoCard">
+              <div class="infoCardTitle">Location</div>
+              <div class="kv kv-right"><span>Address</span><strong id="invoiceAddress">-</strong></div>
+              <div class="kv"><span>City</span><strong id="invoiceCity">-</strong></div>
+              <div class="kv"><span>Pincode</span><strong id="invoicePincode">-</strong></div>
+              <div class="kv"><span>State</span><strong id="invoiceState">-</strong></div>
+            </div>
+            <div class="infoCard">
+              <div class="infoCardTitle">Invoice Info</div>
+              <div class="kv"><span>Credit Period</span><strong id="invoiceCreditPeriod">-</strong></div>
+              <div class="kv"><span>GRN Date</span><strong id="invoiceGrnDate">-</strong></div>
+              <div class="kv"><span>GRN Number</span><strong id="invoiceGrnNumber">-</strong></div>
+              <div class="kv"><span>Product</span><strong id="invoiceProduct">-</strong></div>
+              <div class="kv"><span>PO number</span><strong id="invoicePoNumber">-</strong></div>
+              <div class="kv"><span>Sales Order Number</span><strong id="invoiceSalesOrderNumber">-</strong></div>
+              <div class="kv"><span>Business Unit</span><strong id="invoiceBusinessUnit">-</strong></div>
+              <div class="kv"><span>Industry</span><strong id="invoiceIndustry">-</strong></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="invoiceStickyDock">
+          <div class="accordion mb-2" id="invoiceRemarksAccordion">
+            <div class="accordion-item" id="invoiceRemarksPanel">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#invoiceRemarksCollapse" aria-expanded="false" aria-controls="invoiceRemarksCollapse">
+                  Remarks
+                </button>
+              </h2>
+              <div id="invoiceRemarksCollapse" class="accordion-collapse collapse">
+                <div class="accordion-body">
+                  <div class="remarksList">
+                    <div class="remarkItem remark-manager">
+                      <div class="remarkText">Asked client to confirm receipt of updated invoice copy.</div>
+                      <div class="remarkMeta">Ravi Sharma (Manager) - 07 Nov 2025, 11:32 AM</div>
+                    </div>
+                    <div class="remarkItem remark-client">
+                      <div class="remarkText">Customer requested revised due date based on PO delay.</div>
+                      <div class="remarkMeta">Anita Nair (Client) - 05 Nov 2025, 04:10 PM</div>
+                    </div>
+                    <div class="remarkItem remark-manager">
+                      <div class="remarkText">Manager approved reminder email cadence for this account.</div>
+                      <div class="remarkMeta">Ops Manager (Supervisor) - 03 Nov 2025, 09:05 AM</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion" id="invoiceActivityAccordion">
+            <div class="accordion-item" id="invoiceActivityTrailPanel">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#invoiceActivityCollapse" aria-expanded="false" aria-controls="invoiceActivityCollapse">
+                  Activity Trail
+                </button>
+              </h2>
+              <div id="invoiceActivityCollapse" class="accordion-collapse collapse">
+                <div class="accordion-body">
+                  <div class="activityTrail" id="activityTrailList">
+                    <details class="activityEvent event-invoice-update">
+                      <summary>
+                        <div>
+                          <div class="eventTitle">Invoice update</div>
+                          <div class="eventMeta">Status change - Primary: Follow-up - Updated by Ops</div>
+                        </div>
+                        <span class="eventBadge">Status updated</span>
+                      </summary>
+                      <div class="eventBody">
+                        Invoice marked as Submitted and tracking. Notes updated with next follow-up date.
+                      </div>
+                    </details>
+                    <details class="activityEvent event-push">
+                      <summary>
+                        <div>
+                          <div class="eventTitle">Push notification</div>
+                          <div class="eventTemplate">PTP missed</div>
+                        </div>
+                        <span class="eventBadge">Notification sent</span>
+                      </summary>
+                      <div class="eventBody">
+                        <div class="eventSubject" id="pushNotificationSubject">Subject: PTP missed for -</div>
+                        <button class="readMoreBtn notificationReadMore" type="button" data-template="PTP missed">Read more</button>
+                      </div>
+                    </details>
+                    <details class="activityEvent event-issue">
+                      <summary>
+                        <div>
+                          <div class="eventTitle">Issue tracker update</div>
+                          <div class="eventMeta">Dispute logged - Ticket updated</div>
+                        </div>
+                        <span class="eventBadge">Ticket updated</span>
+                      </summary>
+                      <div class="eventBody">
+                        Ticket ID: IT-771. Status moved to Under review and assigned to Supervisor.
+                      </div>
+                    </details>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tabPanel" data-tab="docs">
+        <div class="docsHeader">
+          <h4>Documents</h4>
+          <button class="docsClipBtn" type="button" id="docsClipBtn" aria-label="All documents">
+            <i class="bi bi-paperclip" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="docsFilterRow">
+          <label class="docsFilterLabel" for="docsInvoiceSelect">Document Type</label>
+          <select id="docsInvoiceSelect" class="form-select form-select-sm"></select>
+        </div>
+        <div id="docsPicker" class="docsPicker hidden">
+          <div class="docsPickerHeader">All documents</div>
+          <div id="docsPickerList" class="docsPickerList"></div>
+        </div>
+        <div id="docsList" class="docsList"></div>
+      </div>
+
+      <div class="tabPanel" data-tab="todo">
+        <div class="todoPanel" id="todoPanel">
+          <div class="todoHeader">
+            <div>
+              <h4>To do list</h4>
+              <p>Assign tasks and track follow-ups.</p>
+            </div>
+            <span class="todoCountPill" id="todoCountPill">0</span>
+          </div>
+
+          <div class="todoList" id="todoList"></div>
+
+          <button class="todoCompletedToggle" type="button" id="todoCompletedToggle">0 completed tasks</button>
+
+          <div class="todoComposer todoComposerSticky">
+            <div class="todoComposerRow">
+              <input type="text" id="todoInput" placeholder="Add a task..." />
+              <button class="todoGhostBtn" type="button" data-action="toggle-extras" aria-label="Task details">
+                <i class="bi bi-info-circle" aria-hidden="true"></i>
+              </button>
+              <button class="todoAddBtn" type="button" id="todoAddBtn">Add</button>
+            </div>
+            <div class="todoExtras hidden" id="todoExtras">
+              <div class="todoField">
+                <label for="todoDueDate">Due date</label>
+                <input type="date" id="todoDueDate" />
+              </div>
+              <div class="todoField">
+                <label for="todoDueTime">Due time</label>
+                <input type="time" id="todoDueTime" />
+              </div>
+              <div class="todoField">
+                <label for="todoInvoiceSelect">Invoice</label>
+                <select id="todoInvoiceSelect"></select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tabPanel" data-tab="notes">
+        <h4>Notes</h4>
+        <div class="kv"><span>Notes &amp; reminders</span><strong>-</strong></div>
+        <textarea class="notesTextarea" placeholder="Add a quick note..."></textarea>
+      </div>
+    </div>
+  </aside>
+
+</div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    (() => {
+      const invoiceTab = document.querySelector('.tabPanel[data-tab="invoice"]');
+      const collapses = [
+        document.getElementById("invoiceRemarksCollapse"),
+        document.getElementById("invoiceActivityCollapse")
+      ].filter(Boolean);
+
+      if (!invoiceTab || collapses.length === 0) return;
+
+      const syncInvoiceDetails = () => {
+        const isOpen = collapses.some((collapse) => collapse.classList.contains("show"));
+        invoiceTab.classList.toggle("detailsHidden", isOpen);
+      };
+
+      collapses.forEach((collapse) => {
+        collapse.addEventListener("shown.bs.collapse", syncInvoiceDetails);
+        collapse.addEventListener("hidden.bs.collapse", syncInvoiceDetails);
+      });
+
+      syncInvoiceDetails();
+    })();
+  </script>
+</body>
+</html>
+
+

@@ -1,0 +1,2211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inebura UI Elements</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    body {
+      background: #f4f6f9;
+      font-family: Calibri, "Segoe UI", Arial, sans-serif;
+    }
+
+    .ui-container {
+      max-width: 1200px;
+      margin: 24px auto 48px;
+      padding: 0 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .ui-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .ui-header h1 {
+      font-size: 22px;
+      margin: 0;
+      color: #111827;
+    }
+
+    .ui-section {
+      background: #ffffff;
+      border: 1px solid #e2e8f4;
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(12px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    @keyframes pulseGlow {
+      0% { box-shadow: 0 0 0 0 rgba(92, 37, 141, 0.2); }
+      70% { box-shadow: 0 0 0 12px rgba(92, 37, 141, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(92, 37, 141, 0); }
+    }
+
+    .animateFade {
+      animation: fadeIn 0.35s ease;
+    }
+
+    .animateUp {
+      animation: slideUp 0.35s ease;
+    }
+
+    .animatePulse {
+      animation: pulseGlow 1.4s ease infinite;
+    }
+
+    .ui-section h2 {
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #64748b;
+      margin: 0 0 12px;
+    }
+
+    .ui-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+    }
+
+    .btnPrimary {
+      background: #4b1f73;
+      color: #ffffff;
+      border: 1px solid #3b1759;
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-weight: 700;
+    }
+
+    .btnSecondary {
+      background: #ffffff;
+      color: var(--brand-dark);
+      border: 1px solid var(--brand-border);
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-weight: 700;
+    }
+
+    .btnGhost {
+      background: transparent;
+      color: #0f172a;
+      border: 1px dashed #cbd5f5;
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-weight: 600;
+    }
+
+    .btnCTA {
+      background: linear-gradient(135deg, #5c258d 0%, #7c3aed 100%);
+      color: #ffffff;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 14px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      box-shadow: 0 10px 22px rgba(92, 37, 141, 0.25);
+    }
+
+    .btnDanger {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-weight: 700;
+    }
+
+    .pillRow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .filterRow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .tableFilters {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .tableFilters .filterRow {
+      align-items: center;
+    }
+
+    .tableFilterSearch {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--brand-border);
+      background: #ffffff;
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-size: 12px;
+      color: #64748b;
+      min-width: 220px;
+    }
+
+    .tableFilterSearch i {
+      color: var(--brand);
+    }
+
+    .tableFilterSearch input {
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: 12px;
+      color: #0f172a;
+      width: 170px;
+    }
+
+    .tableFilterSearch:focus-within {
+      border-color: var(--brand);
+      box-shadow: 0 0 0 2px rgba(var(--brand-rgb), 0.14);
+    }
+
+    .filterDropdown {
+      position: relative;
+    }
+
+    .filterDropdown summary {
+      list-style: none;
+      cursor: pointer;
+      border: 1px solid #e2e8f4;
+      background: #ffffff;
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #111827;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .filterDropdown summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .filterBadge {
+      background: #f1f5f9;
+      border: 1px solid #e2e8f4;
+      color: #334155;
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .filterMenu {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      min-width: 200px;
+      background: #ffffff;
+      border: 1px solid #e2e8f4;
+      border-radius: 12px;
+      padding: 6px;
+      box-shadow: 0 16px 32px rgba(15, 23, 42, 0.12);
+      display: none;
+      z-index: 50;
+    }
+
+    .filterDropdown[open] .filterMenu {
+      display: block;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .filterItem {
+      width: 100%;
+      border: none;
+      background: transparent;
+      text-align: left;
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      color: #111827;
+      cursor: pointer;
+    }
+
+    .filterItem:hover {
+      background: #f8fafc;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .pillFilter {
+      background: #f1f5f9;
+      color: #334155;
+      border: 1px solid #e2e8f4;
+    }
+
+    .pillActive {
+      background: var(--brand);
+      color: #ffffff;
+      border: 1px solid var(--brand-dark);
+    }
+
+    .pillApproved {
+      background: #dcfce7;
+      color: #166534;
+      border: 1px solid #86efac;
+    }
+
+    .pillPending {
+      background: #fef9c3;
+      color: #a16207;
+      border: 1px solid #fde68a;
+    }
+
+    .pillRejected {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+
+    .pillInfo {
+      background: #e0f2fe;
+      color: #0c4a6e;
+      border: 1px solid #bae6fd;
+    }
+
+    .cardPrimary {
+      background: #f3f0ff;
+      border: 1px solid #e2e8f4;
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .cardSecondary {
+      background: #ffffff;
+      border: 1px solid #e2e8f4;
+      border-radius: 14px;
+      padding: 14px;
+    }
+
+    .cardTitle {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #64748b;
+      margin-bottom: 6px;
+    }
+
+    .cardValue {
+      font-size: 20px;
+      font-weight: 700;
+      color: #111827;
+    }
+
+    .ui-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    .ui-table th,
+    .ui-table td {
+      padding: 10px 8px;
+      border-bottom: 1px dashed #e2e8f4;
+      text-align: left;
+    }
+
+    .ui-table th {
+      background: linear-gradient(180deg, var(--brand) 0%, var(--brand-dark) 100%);
+      color: #ffffff;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-size: 11px;
+      border-bottom: 2px solid var(--brand-dark);
+    }
+
+    .formRow {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+    }
+
+    .formField {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .formField label {
+      font-size: 12px;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      font-weight: 600;
+    }
+
+    .formField input,
+    .formField select,
+    .formField textarea {
+      border: 1px solid #e2e8f4;
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 13px;
+    }
+
+    .inputGroup {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .inputGroup input {
+      flex: 1;
+    }
+
+    .inputWithIcon {
+      position: relative;
+      flex: 1;
+    }
+
+    .inputWithIcon input {
+      width: 100%;
+      padding-right: 38px;
+    }
+
+    .toggleBtn {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      border: none;
+      background: transparent;
+      color: #64748b;
+      cursor: pointer;
+      padding: 4px;
+    }
+
+    .autoFillRow {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .autoFillHint {
+      font-size: 11px;
+      color: #94a3b8;
+    }
+
+    .suggestionBox {
+      border: 1px solid #e2e8f4;
+      border-radius: 12px;
+      background: #ffffff;
+      box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+      max-height: 180px;
+      overflow: auto;
+      padding: 6px;
+      display: none;
+    }
+
+    .suggestionItem {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 6px 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 12px;
+      color: #0f172a;
+    }
+
+    .suggestionItem:hover {
+      background: #f8fafc;
+    }
+
+    .suggestionCode {
+      font-size: 11px;
+      color: #64748b;
+    }
+
+    .inputWithClear {
+      position: relative;
+    }
+
+    .inputWithClear input {
+      width: 100%;
+      padding-right: 34px;
+    }
+
+    .clearBtn {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      border: none;
+      background: transparent;
+      color: #94a3b8;
+      cursor: pointer;
+      padding: 4px;
+      display: none;
+    }
+
+    .clearBtn.visible {
+      display: inline-flex;
+    }
+
+    .searchWidget {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid #e2e8f4;
+      border-radius: 999px;
+      padding: 6px 10px;
+      background: #ffffff;
+    }
+
+    .searchWidget input {
+      border: none;
+      outline: none;
+      font-size: 12px;
+      width: 0;
+      opacity: 0;
+      padding: 0;
+      transition: width 0.2s ease, opacity 0.2s ease;
+    }
+
+    .searchWidget.open input {
+      width: 180px;
+      opacity: 1;
+      padding: 0 4px;
+    }
+
+    .searchWidgetBtn {
+      border: none;
+      background: transparent;
+      color: #64748b;
+      cursor: pointer;
+      padding: 4px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .fieldError {
+      font-size: 11px;
+      color: #b91c1c;
+      display: none;
+    }
+
+    .formField.invalid input,
+    .formField.invalid select,
+    .formField.invalid textarea {
+      border-color: #fca5a5;
+      box-shadow: 0 0 0 2px rgba(248, 113, 113, 0.2);
+    }
+
+    .formField.invalid input {
+      background: #fff1f2;
+      border-color: #b91c1c;
+    }
+
+    .formField.invalid .fieldError {
+      display: block;
+    }
+
+    .tableWrap {
+      overflow-x: auto;
+    }
+
+    .tablePagination {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-top: 12px;
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    .paginationControls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .pageBtn {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      border: 1px solid #e2e8f4;
+      background: #ffffff;
+      color: #111827;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .pageBtn.active {
+      background: var(--brand);
+      color: #ffffff;
+      border-color: var(--brand-dark);
+    }
+
+    .pageBtn.disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+
+    .progressStack {
+      display: grid;
+      gap: 10px;
+    }
+
+    .progressLabel {
+      font-size: 12px;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .progressTrack {
+      height: 10px;
+      border-radius: 999px;
+      background: #eef2f7;
+      overflow: hidden;
+      border: 1px solid #e2e8f4;
+    }
+
+    .progressFill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #5c258d 0%, #7c3aed 100%);
+      width: 0;
+    }
+
+    .progressFill.success {
+      background: linear-gradient(90deg, #16a34a 0%, #22c55e 100%);
+    }
+
+    .progressFill.warning {
+      background: linear-gradient(90deg, #f59e0b 0%, #f97316 100%);
+    }
+
+    .badgeRow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .notifyBadge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid #e2e8f4;
+      border-radius: 12px;
+      padding: 8px 12px;
+      background: #ffffff;
+      font-size: 12px;
+      font-weight: 600;
+      color: #0f172a;
+    }
+
+    .notifyDot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: #ef4444;
+      box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.15);
+    }
+
+    .notifyCount {
+      min-width: 24px;
+      text-align: center;
+      border-radius: 999px;
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+      padding: 2px 8px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .expandCard {
+      border: 1px solid #e2e8f4;
+      border-radius: 12px;
+      padding: 10px 12px;
+      background: #ffffff;
+    }
+
+    .expandCard summary {
+      list-style: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-weight: 600;
+      font-size: 13px;
+      color: #0f172a;
+    }
+
+    .expandCard summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .expandCard p {
+      margin: 8px 0 0;
+      color: #64748b;
+      font-size: 12px;
+    }
+
+    .dropzone {
+      border: 2px dashed #cbd5f5;
+      border-radius: 14px;
+      padding: 18px;
+      text-align: center;
+      color: #64748b;
+      background: #f8fafc;
+      font-size: 12px;
+    }
+
+    .dropzone strong {
+      display: block;
+      color: #0f172a;
+      margin-bottom: 4px;
+    }
+
+    .loaderRow {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .spinner {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 3px solid #e2e8f4;
+      border-top-color: var(--brand);
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .skeletonLine {
+      height: 10px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #eef2f7 25%, #f8fafc 37%, #eef2f7 63%);
+      background-size: 400% 100%;
+      animation: shimmer 1.2s ease infinite;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: 100% 0; }
+      100% { background-position: 0 0; }
+    }
+
+    .toggleRow {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .toggleSwitch {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      color: #0f172a;
+    }
+
+    .toggleSwitch input {
+      appearance: none;
+      width: 44px;
+      height: 24px;
+      border-radius: 999px;
+      border: 1px solid #cbd5f5;
+      background: #e2e8f4;
+      position: relative;
+      cursor: pointer;
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+
+    .toggleSwitch input::after {
+      content: "";
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #ffffff;
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.15);
+      transition: transform 0.2s ease;
+    }
+
+    .toggleSwitch input:checked {
+      background: var(--brand);
+      border-color: var(--brand-dark);
+    }
+
+    .toggleSwitch input:checked::after {
+      transform: translateX(20px);
+    }
+
+    .radioGroup,
+    .checkboxGroup {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 12px;
+      color: #0f172a;
+    }
+
+    .badgeSoft {
+      background: #eef2ff;
+      color: #4338ca;
+      border: 1px solid #c7d2fe;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .tabsRow {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .tabBtn {
+      border: 1px solid #e2e8f4;
+      background: #ffffff;
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .tabBtn.active {
+      background: var(--brand);
+      color: #ffffff;
+      border-color: var(--brand-dark);
+    }
+
+    .tabPanel {
+      display: none;
+      margin-top: 10px;
+      font-size: 12px;
+      color: #475569;
+    }
+
+    .tabPanel.active {
+      display: block;
+    }
+
+    .toastControls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .toastHint {
+      font-size: 12px;
+      color: #94a3b8;
+      margin-top: 8px;
+    }
+
+    .toastStage {
+      position: relative;
+      margin-top: 12px;
+      min-height: 160px;
+      border-radius: 14px;
+      border: 1px dashed #cbd5f5;
+      background: #f8fafc;
+      padding: 12px;
+    }
+
+    .toastDock {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: min(280px, 100%);
+      pointer-events: none;
+    }
+
+    .toastDock .toast {
+      pointer-events: auto;
+    }
+
+    .toastEmpty {
+      font-size: 12px;
+      color: #94a3b8;
+    }
+
+    .notifyDock {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      z-index: 500;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: min(320px, 92vw);
+      pointer-events: none;
+    }
+
+    .notifyPopup {
+      pointer-events: auto;
+      background: #ffffff;
+      border: 1px solid #fecaca;
+      border-radius: 14px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      box-shadow: 0 20px 34px rgba(15, 23, 42, 0.18);
+    }
+
+    .notifyPopup.error {
+      border-color: #fecaca;
+      background: #fff1f2;
+      color: #7f1d1d;
+    }
+
+    .notifyPopup.success {
+      border-color: #bbf7d0;
+      background: #f0fdf4;
+      color: #166534;
+    }
+
+    .notifyPopup.warning {
+      border-color: #fde68a;
+      background: #fffbeb;
+      color: #92400e;
+    }
+
+    .notifyPopup strong {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+
+    .notifyPopup span {
+      font-size: 12px;
+      color: inherit;
+    }
+
+    .notifyClose {
+      margin-left: auto;
+      border: none;
+      background: transparent;
+      color: inherit;
+      cursor: pointer;
+    }
+
+    .toast {
+      position: relative;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      border-radius: 12px;
+      border: 1px solid #e2e8f4;
+      background: #ffffff;
+      padding: 10px 12px 10px 14px;
+      font-size: 12px;
+      color: #0f172a;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+    }
+
+    .toast::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: var(--toast-accent, #6366f1);
+      border-radius: 12px 0 0 12px;
+    }
+
+    .toastMeta {
+      font-size: 10.5px;
+      color: #64748b;
+      margin-top: 2px;
+    }
+
+    .toastDismiss {
+      margin-left: auto;
+      border: none;
+      background: transparent;
+      color: inherit;
+      cursor: pointer;
+    }
+
+    .toast.success {
+      --toast-accent: #22c55e;
+      border-color: #bbf7d0;
+      background: #f0fdf4;
+      color: #166534;
+    }
+
+    .toast.warning {
+      --toast-accent: #f59e0b;
+      border-color: #fde68a;
+      background: #fffbeb;
+      color: #92400e;
+    }
+
+    .toast.info {
+      --toast-accent: #2563eb;
+      border-color: #bfdbfe;
+      background: #eff6ff;
+      color: #1e3a8a;
+    }
+
+    .modalOverlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 200;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .modalOverlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modalCard {
+      background: #ffffff;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 520px;
+      box-shadow: 0 24px 50px rgba(15, 23, 42, 0.2);
+      overflow: hidden;
+      transform: translateY(12px);
+      opacity: 0;
+      transition: transform 0.25s ease, opacity 0.25s ease;
+    }
+
+    .modalOverlay.open .modalCard {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .modalHeader {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      border-bottom: 1px solid #e2e8f4;
+    }
+
+    .modalHeader h3 {
+      margin: 0;
+      font-size: 16px;
+      color: #111827;
+    }
+
+    .closeBtn {
+      border: 1px solid #e2e8f4;
+      background: #ffffff;
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .modalBody {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      color: #475569;
+      font-size: 13px;
+    }
+
+    .modalFooter {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      padding: 12px 16px;
+      border-top: 1px solid #e2e8f4;
+      background: #f8fafc;
+    }
+
+    .modalNotice {
+      display: none;
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: #ecfdf3;
+      border: 1px solid #bbf7d0;
+      color: #166534;
+      font-weight: 600;
+      font-size: 12px;
+    }
+
+    .modalNotice.show {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .modalCard.errorModal {
+      border: 1px solid #fecaca;
+    }
+
+    .errorHeader {
+      background: #fee2e2;
+    }
+
+    .errorHeader h3 {
+      color: #991b1b;
+    }
+
+    .errorBody {
+      color: #7f1d1d;
+    }
+
+    .errorList {
+      margin: 8px 0 0;
+      padding-left: 18px;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="ui-container">
+    <div class="ui-header">
+      <h1>UI Elements Library</h1>
+      <button class="btnCTA" type="button">Primary CTA</button>
+    </div>
+
+    <section class="ui-section">
+      <h2>Error Notifications</h2>
+      <div class="pillRow">
+        <button class="btnDanger" type="button" id="errorNotifyBtn">Show Error Notification</button>
+        <button class="btnPrimary" type="button" id="successNotifyBtn">Show Success Notification</button>
+        <button class="btnSecondary" type="button" id="warningNotifyBtn">Show Warning Notification</button>
+        <span style="font-size:12px; color:#64748b;">Appears as a top-right popup.</span>
+      </div>
+    </section>
+
+    <section class="ui-section">
+      <h2>Buttons</h2>
+      <div class="pillRow">
+        <button class="btnPrimary animatePulse" type="button">Primary Button</button>
+        <button class="btnSecondary" type="button">Secondary Button</button>
+        <button class="btnGhost" type="button">Ghost Button</button>
+        <button class="btnDanger" type="button">Danger Button</button>
+        <button class="btnCTA" type="button">CTA Button</button>
+      </div>
+    </section>
+
+    <section class="ui-section">
+      <h2>Dropdowns & Inputs</h2>
+      <div class="formRow">
+        <div class="formField">
+          <label for="sampleSelect">Dropdown</label>
+          <select id="sampleSelect">
+            <option>Option One</option>
+            <option>Option Two</option>
+            <option>Option Three</option>
+          </select>
+        </div>
+        <div class="formField">
+          <label for="sampleSearch">Search Customer</label>
+          <div class="inputWithClear">
+            <input id="sampleSearch" type="text" placeholder="Search customer..." autocomplete="off" />
+            <button class="clearBtn" type="button" id="sampleSearchClear" aria-label="Clear search">
+              <i class="bi bi-x-lg" aria-hidden="true"></i>
+            </button>
+          </div>
+          <div class="suggestionBox" id="sampleSearchSuggestions"></div>
+        </div>
+        <div class="formField">
+          <label for="widgetSearchInput">Search Widget</label>
+          <div class="searchWidget" id="searchWidget">
+            <button class="searchWidgetBtn" type="button" id="searchWidgetBtn" aria-label="Open search">
+              <i class="bi bi-search" aria-hidden="true"></i>
+            </button>
+            <input id="widgetSearchInput" type="text" placeholder="Search..." autocomplete="off" />
+          </div>
+          <div class="suggestionBox" id="widgetSearchSuggestions"></div>
+        </div>
+        <div class="formField">
+          <label for="sampleDate">Date</label>
+          <input id="sampleDate" type="date" />
+        </div>
+        <div class="formField">
+          <label for="sampleText">Text Input</label>
+          <input id="sampleText" type="text" placeholder="Enter value" />
+        </div>
+        <div class="formField">
+          <label for="sampleTextarea">Textarea</label>
+          <textarea id="sampleTextarea" rows="3" placeholder="Enter remarks..."></textarea>
+        </div>
+      </div>
+    </section>
+
+    <section class="ui-section">
+      <h2>Two-Column Form</h2>
+      <div class="formRow">
+        <div class="formField">
+          <label for="formUsername">Username</label>
+          <input id="formUsername" type="text" placeholder="enter username" />
+          <span class="fieldError">Username is required.</span>
+        </div>
+        <div class="formField">
+          <label for="formEmail">Email</label>
+          <input id="formEmail" type="email" placeholder="name@company.com" />
+          <span class="fieldError">Enter a valid email address.</span>
+        </div>
+        <div class="formField">
+          <label for="formPhone">Phone</label>
+          <input id="formPhone" type="tel" placeholder="10-digit number" />
+          <span class="fieldError">Enter a valid phone number.</span>
+        </div>
+        <div class="formField">
+          <label for="formAmount">Amount</label>
+          <input id="formAmount" type="number" min="0" step="0.01" placeholder="0.00" />
+          <span class="fieldError">Amount must be greater than 0.</span>
+        </div>
+        <div class="formField">
+          <label for="formDate">Date</label>
+          <input id="formDate" type="date" />
+          <span class="fieldError">Select a valid date.</span>
+        </div>
+        <div class="formField">
+          <label for="formRole">Role</label>
+          <select id="formRole">
+            <option>Agent</option>
+            <option>Manager</option>
+            <option>Supervisor</option>
+          </select>
+          <span class="fieldError">Select a role.</span>
+        </div>
+        <div class="formField">
+          <label for="formStatus">Status</label>
+          <select id="formStatus">
+            <option>Active</option>
+            <option>On Hold</option>
+            <option>Disabled</option>
+          </select>
+          <span class="fieldError">Select a status.</span>
+        </div>
+        <div class="formField">
+          <label for="formPassword">Password</label>
+          <div class="inputGroup">
+            <div class="inputWithIcon">
+              <input id="formPassword" type="password" placeholder="Enter password" />
+              <button class="toggleBtn" type="button" id="passwordToggleBtn" aria-label="Show password">
+                <i class="bi bi-eye" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+          <span class="fieldError">Password must be 8+ chars.</span>
+        </div>
+        <div class="formField">
+          <label for="formConfirm">Confirm Password</label>
+          <div class="inputGroup">
+            <div class="inputWithIcon">
+              <input id="formConfirm" type="password" placeholder="Re-enter password" />
+              <button class="toggleBtn" type="button" id="confirmToggleBtn" aria-label="Show confirm password">
+                <i class="bi bi-eye" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+          <span class="fieldError">Passwords must match.</span>
+        </div>
+        <div class="formField">
+          <label for="formNotes">Notes</label>
+          <textarea id="formNotes" rows="3" placeholder="Add remarks..."></textarea>
+        </div>
+      </div>
+      <div class="autoFillRow">
+        <button class="btnPrimary" type="button" id="autoFillBtn">Auto-fill</button>
+        <button class="btnSecondary" type="button">Save Draft</button>
+        <button class="btnCTA" type="button" id="formSubmitBtn">Submit</button>
+        <span class="autoFillHint">Auto-fill will populate sample values.</span>
+      </div>
+    </section>
+
+    <section class="ui-section">
+      <h2>Filter & Status Pills</h2>
+      <div class="pillRow">
+        <span class="pill pillFilter">All</span>
+        <span class="pill pillFilter">Overdue</span>
+        <span class="pill pillFilter">Pre-Due</span>
+        <span class="pill pillFilter pillActive">Dispute</span>
+        <span class="pill pillApproved">Approved</span>
+        <span class="pill pillPending">Pending</span>
+        <span class="pill pillRejected">Rejected</span>
+        <span class="pill pillInfo">Info</span>
+      </div>
+    </section>
+
+    <section class="ui-section">
+      <h2>Dropdown Filters</h2>
+      <div class="filterRow">
+        <details class="filterDropdown" data-filter>
+          <summary>Invoice Status <span class="filterBadge">All</span></summary>
+          <div class="filterMenu">
+            <button class="filterItem" type="button" data-filter-value="All">All</button>
+            <button class="filterItem" type="button" data-filter-value="Submitted">Submitted</button>
+            <button class="filterItem" type="button" data-filter-value="Not Submitted">Not Submitted</button>
+            <button class="filterItem" type="button" data-filter-value="Externally Submitted">Externally Submitted</button>
+          </div>
+        </details>
+        <details class="filterDropdown" data-filter>
+          <summary>Primary Status <span class="filterBadge">Follow-up</span></summary>
+          <div class="filterMenu">
+            <button class="filterItem" type="button" data-filter-value="Follow-up">Follow-up</button>
+            <button class="filterItem" type="button" data-filter-value="Reminder">Reminder</button>
+            <button class="filterItem" type="button" data-filter-value="Dispute">Dispute</button>
+            <button class="filterItem" type="button" data-filter-value="PTP">PTP</button>
+          </div>
+        </details>
+        <details class="filterDropdown" data-filter>
+          <summary>Day <span class="filterBadge">Today</span></summary>
+          <div class="filterMenu">
+            <button class="filterItem" type="button" data-filter-value="Today">Today</button>
+            <button class="filterItem" type="button" data-filter-value="Tomorrow">Tomorrow</button>
+            <button class="filterItem" type="button" data-filter-value="This Week">This Week</button>
+            <button class="filterItem" type="button" data-filter-value="Next Week">Next Week</button>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <section class="ui-section">
+      <h2>Expand / Collapse</h2>
+      <div class="ui-grid">
+        <details class="expandCard">
+          <summary>
+            Invoice Aging Details
+            <i class="bi bi-chevron-down" aria-hidden="true"></i>
+          </summary>
+          <p>Breakdown of aging buckets for the selected customer.</p>
+        </details>
+        <details class="expandCard">
+          <summary>
+            Agent Remarks
+            <i class="bi bi-chevron-down" aria-hidden="true"></i>
+          </summary>
+          <p>Latest notes and follow-up logs appear here.</p>
+        </details>
+      </div>
+    </section>
+
+    <section class="ui-section">
+      <h2>File Upload</h2>
+      <div class="dropzone">
+        <strong>Drop files to upload</strong>
+        <span>PDF, XLSX, or PNG up to 10MB</span>
+        <div style="margin-top:10px;">
+          <input type="file" multiple />
+        </div>
+      </div>
+    </section>
+
+    <section class="ui-section">
+      <h2>Data Loaders</h2>
+      <div class="loaderRow">
+        <div class="spinner" aria-label="Loading"></div>
+        <span>Loading customer data...</span>
+        <span class="badgeSoft">Syncing</span>
+      </div>
+      <div style="margin-top:12px; display:grid; gap:8px;">
+        <div class="skeletonLine" style="width: 100%;"></div>
+        <div class="skeletonLine" style="width: 70%;"></div>
+        <div class="skeletonLine" style="width: 90%;"></div>
+      </div>
+    </section>
+
+    <section class="ui-section">
+      <h2>CRM Controls</h2>
+      <div class="formRow">
+        <div class="formField">
+          <label>Toggle Switches</label>
+          <div class="toggleRow">
+            <label class="toggleSwitch">
+              <input type="checkbox" checked />
+              <span>Auto reminders</span>
+            </label>
+            <label class="toggleSwitch">
+              <input type="checkbox" />
+              <span>Escalation alerts</span>
+            </label>
+          </div>
+        </div>
+        <div class="formField">
+          <label>Radio Group</label>
+          <div class="radioGroup">
+            <label><input type="radio" name="priority" checked /> High priority</label>
+            <label><input type="radio" name="priority" /> Normal priority</label>
+            <label><input type="radio" name="priority" /> Low priority</label>
+          </div>
+        </div>
+        <div class="formField">
+          <label>Checkbox Group</label>
+          <div class="checkboxGroup">
+            <label><input type="checkbox" checked /> Email</label>
+            <label><input type="checkbox" /> SMS</label>
+            <label><input type="checkbox" /> WhatsApp</label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="ui-section">
+      <h2>Tabs</h2>
+      <div class="tabsRow" data-tabs>
+        <button class="tabBtn active" type="button" data-tab-target="tabSummary">Summary</button>
+        <button class="tabBtn" type="button" data-tab-target="tabActivity">Activity</button>
+        <button class="tabBtn" type="button" data-tab-target="tabNotes">Notes</button>
+      </div>
+      <div class="tabPanel active" id="tabSummary">Snapshot of portfolio metrics and open items.</div>
+      <div class="tabPanel" id="tabActivity">Recent follow-ups, reminders, and escalations.</div>
+      <div class="tabPanel" id="tabNotes">Internal notes and manager remarks.</div>
+    </section>
+
+    <section class="ui-section">
+      <h2>Primary Cards</h2>
+      <div class="ui-grid">
+        <div class="cardPrimary">
+          <div class="cardTitle">Total Portfolio</div>
+          <div class="cardValue">Rs. 6,77,50,000</div>
+        </div>
+        <div class="cardPrimary">
+          <div class="cardTitle">Target (MTD)</div>
+          <div class="cardValue">Rs. 29,40,000</div>
+        </div>
+        <div class="cardPrimary">
+          <div class="cardTitle">Achievement</div>
+          <div class="cardValue">Rs. 23,40,000</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="ui-section">
+      <h2>Secondary Cards</h2>
+      <div class="ui-grid">
+        <div class="cardSecondary">
+          <div class="cardTitle">Open Issues</div>
+          <div class="cardValue">13</div>
+        </div>
+        <div class="cardSecondary">
+          <div class="cardTitle">Pending Visit Approvals</div>
+          <div class="cardValue">5</div>
+        </div>
+        <div class="cardSecondary">
+          <div class="cardTitle">Unique Visits</div>
+          <div class="cardValue">42</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="ui-section">
+      <h2>Pop-up Modals</h2>
+      <div class="pillRow">
+        <button class="btnPrimary" type="button" data-modal-open="basicModal">Open Basic Modal</button>
+        <button class="btnSecondary" type="button" data-modal-open="confirmModal">Open Confirm Modal</button>
+        <button class="btnDanger" type="button" data-modal-open="errorModal">Open Error Modal</button>
+      </div>
+    </section>
+
+    <section class="ui-section">
+      <h2>Tables</h2>
+      <div class="tableFilters">
+        <div class="filterRow">
+          <div class="tableFilterSearch">
+            <i class="bi bi-search" aria-hidden="true"></i>
+            <input type="text" placeholder="Search customer or invoice" aria-label="Search table" />
+          </div>
+          <details class="filterDropdown" data-filter>
+            <summary>Status <span class="filterBadge">All</span></summary>
+            <div class="filterMenu">
+              <button class="filterItem" type="button" data-filter-value="All">All</button>
+              <button class="filterItem" type="button" data-filter-value="Approved">Approved</button>
+              <button class="filterItem" type="button" data-filter-value="Pending">Pending</button>
+              <button class="filterItem" type="button" data-filter-value="Rejected">Rejected</button>
+            </div>
+          </details>
+          <details class="filterDropdown" data-filter>
+            <summary>Amount <span class="filterBadge">Any</span></summary>
+            <div class="filterMenu">
+              <button class="filterItem" type="button" data-filter-value="Any">Any</button>
+              <button class="filterItem" type="button" data-filter-value="Above 1L">Above 1L</button>
+              <button class="filterItem" type="button" data-filter-value="50k - 1L">50k - 1L</button>
+              <button class="filterItem" type="button" data-filter-value="Below 50k">Below 50k</button>
+            </div>
+          </details>
+          <details class="filterDropdown" data-filter>
+            <summary>Invoice Date <span class="filterBadge">This Month</span></summary>
+            <div class="filterMenu">
+              <button class="filterItem" type="button" data-filter-value="This Month">This Month</button>
+              <button class="filterItem" type="button" data-filter-value="Last Month">Last Month</button>
+              <button class="filterItem" type="button" data-filter-value="Last 90 Days">Last 90 Days</button>
+              <button class="filterItem" type="button" data-filter-value="This Year">This Year</button>
+            </div>
+          </details>
+          <button class="btnSecondary" type="button">Reset</button>
+        </div>
+      </div>
+      <div class="tableWrap">
+        <table class="ui-table">
+          <thead>
+            <tr>
+              <th>Customer</th>
+              <th>Invoice</th>
+              <th>Amount</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Apollo Pharmacy</td>
+              <td>INV-10291</td>
+              <td>Rs. 1,24,000</td>
+              <td><span class="pill pillPending">Pending</span></td>
+              <td><button class="btnSecondary" type="button">Review</button></td>
+            </tr>
+            <tr>
+              <td>BlueWave Retail</td>
+              <td>INV-10418</td>
+              <td>Rs. 56,000</td>
+              <td><span class="pill pillApproved">Approved</span></td>
+              <td><button class="btnSecondary" type="button">Review</button></td>
+            </tr>
+            <tr>
+              <td>Sunrise Pvt Ltd</td>
+              <td>INV-10308</td>
+              <td>Rs. 95,000</td>
+              <td><span class="pill pillRejected">Rejected</span></td>
+              <td><button class="btnSecondary" type="button">Review</button></td>
+            </tr>
+            <tr>
+              <td>GreenLeaf Organics</td>
+              <td>INV-10457</td>
+              <td>Rs. 34,000</td>
+              <td><span class="pill pillApproved">Approved</span></td>
+              <td><button class="btnSecondary" type="button">Review</button></td>
+            </tr>
+            <tr>
+              <td>Summit Electronics</td>
+              <td>INV-10502</td>
+              <td>Rs. 1,52,000</td>
+              <td><span class="pill pillPending">Pending</span></td>
+              <td><button class="btnSecondary" type="button">Review</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tablePagination">
+        <span>Showing 1–5 of 24</span>
+        <div class="paginationControls">
+          <button class="pageBtn disabled" type="button" aria-label="Previous page">
+            <i class="bi bi-chevron-left"></i>
+          </button>
+          <button class="pageBtn active" type="button">1</button>
+          <button class="pageBtn" type="button">2</button>
+          <button class="pageBtn" type="button">3</button>
+          <button class="pageBtn" type="button" aria-label="Next page">
+            <i class="bi bi-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="ui-section">
+      <h2>Progress Bars</h2>
+      <div class="progressStack">
+        <div>
+          <div class="progressLabel">Collection Progress (65%)</div>
+          <div class="progressTrack">
+            <div class="progressFill" style="width: 65%;"></div>
+          </div>
+        </div>
+        <div>
+          <div class="progressLabel">Approval Completion (82%)</div>
+          <div class="progressTrack">
+            <div class="progressFill success" style="width: 82%;"></div>
+          </div>
+        </div>
+        <div>
+          <div class="progressLabel">Pending Follow-ups (40%)</div>
+          <div class="progressTrack">
+            <div class="progressFill warning" style="width: 40%;"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="ui-section">
+      <h2>Notification Badges</h2>
+      <div class="badgeRow">
+        <div class="notifyBadge">
+          <span class="notifyDot"></span>
+          <span>New Alerts</span>
+          <span class="notifyCount">6</span>
+        </div>
+        <div class="notifyBadge">
+          <i class="bi bi-bell-fill" aria-hidden="true"></i>
+          <span>Notifications</span>
+          <span class="notifyCount">12</span>
+        </div>
+        <div class="notifyBadge">
+          <i class="bi bi-envelope-fill" aria-hidden="true"></i>
+          <span>Unread Emails</span>
+          <span class="notifyCount">4</span>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="notifyDock" id="notifyDock" aria-live="polite" aria-atomic="true"></div>
+
+  <div class="modalOverlay" id="basicModal" aria-hidden="true">
+    <div class="modalCard">
+      <div class="modalHeader">
+        <h3>Basic Modal</h3>
+        <button class="closeBtn" type="button" data-modal-close aria-label="Close modal">
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
+        </button>
+      </div>
+      <div class="modalBody">
+        <strong>Quick details</strong>
+        <span>This is a simple modal with a description and action buttons.</span>
+        <span class="pill pillInfo">Status: Draft</span>
+        <div class="modalNotice" data-notice>Saved successfully</div>
+      </div>
+      <div class="modalFooter">
+        <button class="btnSecondary" type="button" data-modal-close>Close</button>
+        <button class="btnPrimary" type="button" data-modal-action="save">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modalOverlay" id="confirmModal" aria-hidden="true">
+    <div class="modalCard">
+      <div class="modalHeader">
+        <h3>Confirm Action</h3>
+        <button class="closeBtn" type="button" data-modal-close aria-label="Close modal">
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
+        </button>
+      </div>
+      <div class="modalBody">
+        <span>Are you sure you want to submit this update?</span>
+        <span class="pill pillPending">Pending Approval</span>
+        <div class="modalNotice" data-notice>Confirmed</div>
+      </div>
+      <div class="modalFooter">
+        <button class="btnSecondary" type="button" data-modal-close>Cancel</button>
+        <button class="btnCTA" type="button" data-modal-action="confirm">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modalOverlay" id="errorModal" aria-hidden="true">
+    <div class="modalCard errorModal">
+      <div class="modalHeader errorHeader">
+        <h3>Error</h3>
+        <button class="closeBtn" type="button" data-modal-close aria-label="Close modal">
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
+        </button>
+      </div>
+      <div class="modalBody errorBody">
+        <strong>Unable to save changes</strong>
+        <span>Please fix the following and retry:</span>
+        <ul class="errorList">
+          <li>Missing invoice reference number.</li>
+          <li>Amount exceeds the remaining balance.</li>
+          <li>Upload a valid supporting document.</li>
+        </ul>
+      </div>
+      <div class="modalFooter">
+        <button class="btnSecondary" type="button" data-modal-close>Close</button>
+        <button class="btnDanger" type="button">Retry</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      const openButtons = document.querySelectorAll("[data-modal-open]");
+      const closeButtons = document.querySelectorAll("[data-modal-close]");
+
+      openButtons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const targetId = btn.getAttribute("data-modal-open");
+          const modal = document.getElementById(targetId);
+          if (!modal) return;
+          modal.classList.add("open");
+          modal.setAttribute("aria-hidden", "false");
+        });
+      });
+
+      closeButtons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const modal = btn.closest(".modalOverlay");
+          if (!modal) return;
+          modal.classList.remove("open");
+          modal.setAttribute("aria-hidden", "true");
+        });
+      });
+
+      const actionButtons = document.querySelectorAll("[data-modal-action]");
+      actionButtons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const modal = btn.closest(".modalOverlay");
+          if (!modal) return;
+          const notice = modal.querySelector("[data-notice]");
+          if (notice) {
+            notice.classList.add("show");
+          }
+          setTimeout(() => {
+            if (notice) notice.classList.remove("show");
+            modal.classList.remove("open");
+            modal.setAttribute("aria-hidden", "true");
+          }, 900);
+        });
+      });
+
+      document.querySelectorAll(".modalOverlay").forEach((overlay) => {
+        overlay.addEventListener("click", (event) => {
+          if (event.target !== overlay) return;
+          overlay.classList.remove("open");
+          overlay.setAttribute("aria-hidden", "true");
+        });
+      });
+
+      document.querySelectorAll("[data-filter]").forEach((dropdown) => {
+        dropdown.addEventListener("click", (event) => {
+          const item = event.target.closest("[data-filter-value]");
+          if (!item) return;
+          const badge = dropdown.querySelector(".filterBadge");
+          if (badge) badge.textContent = item.getAttribute("data-filter-value") || "All";
+          dropdown.removeAttribute("open");
+        });
+      });
+
+      document.querySelectorAll("[data-tabs]").forEach((tabGroup) => {
+        tabGroup.addEventListener("click", (event) => {
+          const btn = event.target.closest("[data-tab-target]");
+          if (!btn) return;
+          const targetId = btn.getAttribute("data-tab-target");
+          if (!targetId) return;
+          tabGroup.querySelectorAll(".tabBtn").forEach(tab => tab.classList.remove("active"));
+          btn.classList.add("active");
+          document.querySelectorAll(".tabPanel").forEach(panel => {
+            panel.classList.toggle("active", panel.id === targetId);
+          });
+        });
+      });
+
+      const toastDock = document.getElementById("toastDock");
+      const toastEmpty = document.getElementById("toastEmpty");
+      const toastSuccessBtn = document.getElementById("toastSuccessBtn");
+      const toastWarningBtn = document.getElementById("toastWarningBtn");
+      const toastInfoBtn = document.getElementById("toastInfoBtn");
+      const toastClearBtn = document.getElementById("toastClearBtn");
+
+      const toastConfig = {
+        success: { icon: "bi-check-circle-fill", title: "Payment confirmed", meta: "Just now" },
+        warning: { icon: "bi-exclamation-triangle-fill", title: "5 approvals pending", meta: "2 mins ago" },
+        info: { icon: "bi-info-circle-fill", title: "Report generated", meta: "Today, 11:20 AM" }
+      };
+
+      const showToast = (type) => {
+        if (!toastDock) return;
+        const config = toastConfig[type];
+        if (!config) return;
+        const toast = document.createElement("div");
+        toast.className = `toast ${type} animateUp`;
+        toast.innerHTML = `
+          <i class="bi ${config.icon}" aria-hidden="true"></i>
+          <div>
+            <strong>${config.title}</strong>
+            <div class="toastMeta">${config.meta}</div>
+          </div>
+          <button class="toastDismiss" type="button" aria-label="Dismiss">
+            <i class="bi bi-x-lg" aria-hidden="true"></i>
+          </button>
+        `;
+        const dismissBtn = toast.querySelector(".toastDismiss");
+        if (dismissBtn) {
+          dismissBtn.addEventListener("click", () => {
+            toast.remove();
+            if (toastEmpty && !toastDock.querySelector(".toast")) toastEmpty.style.display = "block";
+          });
+        }
+        toastDock.prepend(toast);
+        if (toastEmpty) toastEmpty.style.display = "none";
+        setTimeout(() => {
+          if (!toast.isConnected) return;
+          toast.remove();
+          if (toastEmpty && !toastDock.querySelector(".toast")) toastEmpty.style.display = "block";
+        }, 3200);
+      };
+
+      if (toastSuccessBtn) toastSuccessBtn.addEventListener("click", () => showToast("success"));
+      if (toastWarningBtn) toastWarningBtn.addEventListener("click", () => showToast("warning"));
+      if (toastInfoBtn) toastInfoBtn.addEventListener("click", () => showToast("info"));
+      if (toastClearBtn && toastDock) {
+        toastClearBtn.addEventListener("click", () => {
+          toastDock.querySelectorAll(".toast").forEach(toast => toast.remove());
+          if (toastEmpty) toastEmpty.style.display = "block";
+        });
+      }
+
+      const notifyDock = document.getElementById("notifyDock");
+      const errorNotifyBtn = document.getElementById("errorNotifyBtn");
+      const successNotifyBtn = document.getElementById("successNotifyBtn");
+      const warningNotifyBtn = document.getElementById("warningNotifyBtn");
+      if (errorNotifyBtn && notifyDock) {
+        errorNotifyBtn.addEventListener("click", () => {
+          const popup = document.createElement("div");
+          popup.className = "notifyPopup error animateUp";
+          popup.innerHTML = `
+            <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
+            <div>
+              <strong>Upload failed</strong>
+              <span>Document type not supported. Please upload PDF or XLSX.</span>
+            </div>
+            <button class="notifyClose" type="button" aria-label="Dismiss">
+              <i class="bi bi-x-lg" aria-hidden="true"></i>
+            </button>
+          `;
+          const closeBtn = popup.querySelector(".notifyClose");
+          if (closeBtn) {
+            closeBtn.addEventListener("click", () => {
+              popup.remove();
+            });
+          }
+          notifyDock.prepend(popup);
+          setTimeout(() => {
+            if (!popup.isConnected) return;
+            popup.remove();
+          }, 4000);
+        });
+      }
+
+      if (successNotifyBtn && notifyDock) {
+        successNotifyBtn.addEventListener("click", () => {
+          const popup = document.createElement("div");
+          popup.className = "notifyPopup success animateUp";
+          popup.innerHTML = `
+            <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+            <div>
+              <strong>Upload complete</strong>
+              <span>All documents were successfully added.</span>
+            </div>
+            <button class="notifyClose" type="button" aria-label="Dismiss">
+              <i class="bi bi-x-lg" aria-hidden="true"></i>
+            </button>
+          `;
+          const closeBtn = popup.querySelector(".notifyClose");
+          if (closeBtn) {
+            closeBtn.addEventListener("click", () => {
+              popup.remove();
+            });
+          }
+          notifyDock.prepend(popup);
+          setTimeout(() => {
+            if (!popup.isConnected) return;
+            popup.remove();
+          }, 4000);
+        });
+      }
+
+      if (warningNotifyBtn && notifyDock) {
+        warningNotifyBtn.addEventListener("click", () => {
+          const popup = document.createElement("div");
+          popup.className = "notifyPopup warning animateUp";
+          popup.innerHTML = `
+            <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
+            <div>
+              <strong>Fill all required fields</strong>
+              <span>Complete the highlighted inputs before submitting.</span>
+            </div>
+            <button class="notifyClose" type="button" aria-label="Dismiss">
+              <i class="bi bi-x-lg" aria-hidden="true"></i>
+            </button>
+          `;
+          const closeBtn = popup.querySelector(".notifyClose");
+          if (closeBtn) {
+            closeBtn.addEventListener("click", () => {
+              popup.remove();
+            });
+          }
+          notifyDock.prepend(popup);
+          setTimeout(() => {
+            if (!popup.isConnected) return;
+            popup.remove();
+          }, 4000);
+        });
+      }
+
+      const passwordToggleBtn = document.getElementById("passwordToggleBtn");
+      const formPassword = document.getElementById("formPassword");
+      if (passwordToggleBtn && formPassword) {
+        passwordToggleBtn.addEventListener("click", () => {
+          const isHidden = formPassword.type === "password";
+          formPassword.type = isHidden ? "text" : "password";
+          passwordToggleBtn.innerHTML = isHidden
+            ? '<i class="bi bi-eye-slash" aria-hidden="true"></i>'
+            : '<i class="bi bi-eye" aria-hidden="true"></i>';
+        });
+      }
+
+      const confirmToggleBtn = document.getElementById("confirmToggleBtn");
+      const formConfirm = document.getElementById("formConfirm");
+      if (confirmToggleBtn && formConfirm) {
+        confirmToggleBtn.addEventListener("click", () => {
+          const isHidden = formConfirm.type === "password";
+          formConfirm.type = isHidden ? "text" : "password";
+          confirmToggleBtn.innerHTML = isHidden
+            ? '<i class="bi bi-eye-slash" aria-hidden="true"></i>'
+            : '<i class="bi bi-eye" aria-hidden="true"></i>';
+        });
+      }
+
+      const autoFillBtn = document.getElementById("autoFillBtn");
+      if (autoFillBtn) {
+        autoFillBtn.addEventListener("click", () => {
+          const values = {
+            formUsername: "manish.kumar",
+            formEmail: "manish.kumar@inebura.com",
+            formPhone: "9876543210",
+            formAmount: "12500",
+            formDate: new Date().toISOString().slice(0, 10),
+            formRole: "Manager",
+            formStatus: "Active",
+            formPassword: "Inebura@123",
+            formConfirm: "Inebura@123",
+            formNotes: "Auto-filled sample data for CRM form."
+          };
+          Object.entries(values).forEach(([id, value]) => {
+            const field = document.getElementById(id);
+            if (field) field.value = value;
+          });
+        });
+      }
+
+      let formSubmitted = false;
+      const validationRules = {
+        formUsername: { required: true, test: (val) => val.trim().length > 0 },
+        formEmail: { required: true, test: (val) => /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(val) },
+        formPhone: { required: true, test: (val) => (val || "").replace(/\\D/g, "").length === 10 },
+        formAmount: { required: true, test: (val) => Number(val) > 0 },
+        formDate: { required: true, test: (val) => Boolean(val) },
+        formRole: { required: true, test: (val) => Boolean(val) },
+        formStatus: { required: true, test: (val) => Boolean(val) },
+        formPassword: { required: true, test: (val) => val.length >= 8 },
+        formConfirm: { required: true, test: (val) => val === (document.getElementById("formPassword")?.value || "") }
+      };
+
+      const validateField = (id, forceRequired = false) => {
+        const field = document.getElementById(id);
+        const rule = validationRules[id];
+        if (!field || !rule) return true;
+        const wrapper = field.closest(".formField");
+        const value = field.value || "";
+        const shouldRequire = forceRequired || formSubmitted;
+        if (!shouldRequire && value.trim() === "") {
+          if (wrapper) wrapper.classList.remove("invalid");
+          return true;
+        }
+        const valid = rule.test(value);
+        if (wrapper) wrapper.classList.toggle("invalid", !valid);
+        return valid;
+      };
+
+      Object.keys(validationRules).forEach((id) => {
+        const field = document.getElementById(id);
+        if (!field) return;
+        field.addEventListener("blur", () => {
+          validateField(id, false);
+        });
+        field.addEventListener("input", () => {
+          if (field.value.trim() === "" && !formSubmitted) {
+            field.closest(".formField")?.classList.remove("invalid");
+            return;
+          }
+          if (field.closest(".formField")?.classList.contains("invalid")) {
+            validateField(id, false);
+          }
+        });
+      });
+
+      const formSubmitBtn = document.getElementById("formSubmitBtn");
+      if (formSubmitBtn) {
+        formSubmitBtn.addEventListener("click", () => {
+          formSubmitted = true;
+          let isValid = true;
+          Object.keys(validationRules).forEach((id) => {
+            if (!validateField(id, true)) isValid = false;
+          });
+          if (!notifyDock) return;
+          const popup = document.createElement("div");
+          popup.className = `notifyPopup ${isValid ? "success" : "error"} animateUp`;
+          popup.innerHTML = isValid
+            ? `
+              <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+              <div>
+                <strong>Form submitted</strong>
+                <span>All fields look good.</span>
+              </div>
+              <button class="notifyClose" type="button" aria-label="Dismiss">
+                <i class="bi bi-x-lg" aria-hidden="true"></i>
+              </button>
+            `
+            : `
+              <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
+              <div>
+                <strong>Fix the highlighted fields</strong>
+                <span>Please review the form and try again.</span>
+              </div>
+              <button class="notifyClose" type="button" aria-label="Dismiss">
+                <i class="bi bi-x-lg" aria-hidden="true"></i>
+              </button>
+            `;
+          const closeBtn = popup.querySelector(".notifyClose");
+          if (closeBtn) closeBtn.addEventListener("click", () => popup.remove());
+          notifyDock.prepend(popup);
+          setTimeout(() => {
+            if (!popup.isConnected) return;
+            popup.remove();
+          }, 3500);
+        });
+      }
+
+      if (formPassword) {
+        formPassword.addEventListener("input", () => {
+          if (document.getElementById("formConfirm")?.value.trim()) {
+            validateField("formConfirm", false);
+          }
+        });
+      }
+
+      const sampleSearch = document.getElementById("sampleSearch");
+      const sampleSearchSuggestions = document.getElementById("sampleSearchSuggestions");
+      const sampleSearchClear = document.getElementById("sampleSearchClear");
+      const searchWidget = document.getElementById("searchWidget");
+      const searchWidgetBtn = document.getElementById("searchWidgetBtn");
+      const widgetSearchInput = document.getElementById("widgetSearchInput");
+      const widgetSearchSuggestions = document.getElementById("widgetSearchSuggestions");
+      const sampleCustomers = [
+        { name: "Apollo Pharmacy", code: "CUST-001" },
+        { name: "BlueWave Retail", code: "CUST-014" },
+        { name: "Sunrise Pvt Ltd", code: "CUST-033" },
+        { name: "Nimbus Retail", code: "CUST-047" },
+        { name: "Orion Supplies", code: "CUST-058" },
+        { name: "Crescent Distributors", code: "CUST-072" },
+        { name: "Lighthouse Medicals", code: "CUST-081" },
+        { name: "Summit Electronics", code: "CUST-094" },
+        { name: "Heritage Textiles", code: "CUST-107" }
+      ];
+
+      const renderSuggestions = (query) => {
+        if (!sampleSearchSuggestions) return;
+        const trimmed = query.trim().toLowerCase();
+        if (!trimmed) {
+          sampleSearchSuggestions.style.display = "none";
+          sampleSearchSuggestions.innerHTML = "";
+          if (sampleSearchClear) sampleSearchClear.classList.remove("visible");
+          return;
+        }
+        const matches = sampleCustomers.filter(item =>
+          item.name.toLowerCase().includes(trimmed) ||
+          item.code.toLowerCase().includes(trimmed)
+        );
+        if (!matches.length) {
+          sampleSearchSuggestions.innerHTML = `<div style="padding:6px 8px; font-size:12px; color:#94a3b8;">No matches found.</div>`;
+          sampleSearchSuggestions.style.display = "block";
+          if (sampleSearchClear) sampleSearchClear.classList.add("visible");
+          return;
+        }
+        sampleSearchSuggestions.innerHTML = matches.map(item => `
+          <div class="suggestionItem" data-name="${item.name}">
+            <span>${item.name}</span>
+            <span class="suggestionCode">${item.code}</span>
+          </div>
+        `).join("");
+        sampleSearchSuggestions.style.display = "block";
+        if (sampleSearchClear) sampleSearchClear.classList.add("visible");
+      };
+
+      if (sampleSearch) {
+        sampleSearch.addEventListener("input", () => {
+          renderSuggestions(sampleSearch.value);
+        });
+        sampleSearch.addEventListener("focus", () => {
+          renderSuggestions(sampleSearch.value);
+        });
+      }
+
+      if (sampleSearchClear) {
+        sampleSearchClear.addEventListener("click", () => {
+          if (!sampleSearch) return;
+          sampleSearch.value = "";
+          sampleSearch.focus();
+          if (sampleSearchSuggestions) {
+            sampleSearchSuggestions.style.display = "none";
+            sampleSearchSuggestions.innerHTML = "";
+          }
+          sampleSearchClear.classList.remove("visible");
+        });
+      }
+
+      if (sampleSearchSuggestions) {
+        sampleSearchSuggestions.addEventListener("click", (event) => {
+          const item = event.target.closest(".suggestionItem");
+          if (!item || !sampleSearch) return;
+          sampleSearch.value = item.getAttribute("data-name") || "";
+          sampleSearchSuggestions.style.display = "none";
+          if (sampleSearchClear) sampleSearchClear.classList.add("visible");
+        });
+      }
+
+      document.addEventListener("click", (event) => {
+        if (!sampleSearch || !sampleSearchSuggestions) return;
+        if (sampleSearch.contains(event.target) || sampleSearchSuggestions.contains(event.target)) return;
+        sampleSearchSuggestions.style.display = "none";
+      });
+
+      const renderWidgetSuggestions = (query) => {
+        if (!widgetSearchSuggestions) return;
+        const trimmed = query.trim().toLowerCase();
+        if (!trimmed) {
+          widgetSearchSuggestions.style.display = "none";
+          widgetSearchSuggestions.innerHTML = "";
+          return;
+        }
+        const matches = sampleCustomers.filter(item =>
+          item.name.toLowerCase().includes(trimmed) ||
+          item.code.toLowerCase().includes(trimmed)
+        );
+        if (!matches.length) {
+          widgetSearchSuggestions.innerHTML = `<div style="padding:6px 8px; font-size:12px; color:#94a3b8;">No matches found.</div>`;
+          widgetSearchSuggestions.style.display = "block";
+          return;
+        }
+        widgetSearchSuggestions.innerHTML = matches.map(item => `
+          <div class="suggestionItem" data-name="${item.name}">
+            <span>${item.name}</span>
+            <span class="suggestionCode">${item.code}</span>
+          </div>
+        `).join("");
+        widgetSearchSuggestions.style.display = "block";
+      };
+
+      const toggleSearchWidget = (open) => {
+        if (!searchWidget || !widgetSearchInput || !searchWidgetBtn) return;
+        searchWidget.classList.toggle("open", open);
+        searchWidgetBtn.innerHTML = open
+          ? '<i class="bi bi-x-lg" aria-hidden="true"></i>'
+          : '<i class="bi bi-search" aria-hidden="true"></i>';
+        searchWidgetBtn.setAttribute("aria-label", open ? "Close search" : "Open search");
+        if (open) {
+          widgetSearchInput.focus();
+        } else {
+          widgetSearchInput.value = "";
+          if (widgetSearchSuggestions) {
+            widgetSearchSuggestions.style.display = "none";
+            widgetSearchSuggestions.innerHTML = "";
+          }
+        }
+      };
+
+      if (searchWidgetBtn) {
+        searchWidgetBtn.addEventListener("click", () => {
+          const isOpen = searchWidget?.classList.contains("open");
+          toggleSearchWidget(!isOpen);
+        });
+      }
+
+      if (widgetSearchInput) {
+        widgetSearchInput.addEventListener("input", () => {
+          renderWidgetSuggestions(widgetSearchInput.value);
+        });
+        widgetSearchInput.addEventListener("focus", () => {
+          renderWidgetSuggestions(widgetSearchInput.value);
+        });
+      }
+
+      if (widgetSearchSuggestions) {
+        widgetSearchSuggestions.addEventListener("click", (event) => {
+          const item = event.target.closest(".suggestionItem");
+          if (!item || !widgetSearchInput) return;
+          widgetSearchInput.value = item.getAttribute("data-name") || "";
+          widgetSearchSuggestions.style.display = "none";
+        });
+      }
+
+      document.addEventListener("click", (event) => {
+        if (!searchWidget || !widgetSearchInput || !widgetSearchSuggestions || !searchWidgetBtn) return;
+        if (searchWidget.contains(event.target) || widgetSearchSuggestions.contains(event.target)) return;
+        if (searchWidget.classList.contains("open")) {
+          widgetSearchSuggestions.style.display = "none";
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

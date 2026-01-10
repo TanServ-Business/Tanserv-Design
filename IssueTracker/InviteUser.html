@@ -1,0 +1,508 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Customer Summary & Activity • Issue Tracker</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    /* Page-specific light styles that compliment css/style.css without overriding broadly */
+    .page { padding: 0 16px 24px; }
+    .section { background: #fff; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,.06); margin: 16px 0; overflow: hidden; }
+    .section h2 { margin: 0; padding: 12px 16px; background: #f3f0ff; color: #3f2d9e; font-size: 1rem; border-bottom: 1px solid #e9e6ff; }
+    .section-body { padding: 12px 16px; }
+    .form-grid { display: grid; grid-template-columns: repeat(4, minmax(180px, 1fr)); gap: 12px; align-items: end; }
+    .form-grid label { display: block; font-size: .85rem; color: #555; margin-bottom: 4px; }
+    .form-grid input, .form-grid select { width: 100%; padding: 8px 10px; border: 1px solid #d8d8e5; border-radius: 6px; }
+    .pill.primary { background: #6c5ce7; color: #fff; border: none; padding: 8px 14px; border-radius: 999px; cursor: pointer; }
+    .pill.secondary { background: #ecebff; color: #3f2d9e; border: 1px solid #c8c3ff; padding: 8px 14px; border-radius: 999px; cursor: pointer; }
+    .table-wrap { width: 100%; overflow: auto; }
+    table { width: 100%; border-collapse: separate; border-spacing: 0; }
+    thead th { position: sticky; top: 0; background: #efeafe; color: #3f2d9e; text-align: left; padding: 10px; font-weight: 600; border-bottom: 1px solid #e2defa; }
+    tbody td { padding: 10px; border-bottom: 1px solid #f0f0f5; }
+    tr.row-click { cursor: pointer; }
+    tr.row-click:hover { background: #faf9ff; }
+    .icon-cell { display: flex; gap: 8px; }
+    .icon-btn { width: 26px; height: 26px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; border: 1px solid #ddd; color: #555; background: #fff; cursor: default; }
+    .split { display: grid; grid-template-columns: 1.2fr .8fr; gap: 16px; }
+    .meta { font-size: .82rem; color: #666; }
+    .stack { display: grid; gap: 8px; }
+    #dcr-add-issue{width:5%}
+    .stack select, .stack textarea, .stack input { width: 100%; padding: 8px 10px; border: 1px solid #d8d8e5; border-radius: 6px; }
+    .right-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px; }
+    .chips { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chip { background: #efeafe; color: #3f2d9e; border: 1px solid #ded9ff; padding: 2px 10px; border-radius: 999px; font-size: .8rem; }
+    .row-inline { display: flex; gap: 8px; align-items: center; }
+    .owner-grid { display: grid; grid-template-columns: minmax(200px, 1fr) minmax(180px, 0.7fr); gap: 12px; align-items: end; }
+    .owner-actions { display: grid; gap: 6px; justify-items: start; }
+    .muted { color: #666; font-size: .85rem; }
+    @media (max-width: 960px){
+      .form-grid{grid-template-columns: 1fr 1fr};
+      .split{grid-template-columns: 1fr;}
+      .owner-grid{grid-template-columns: 1fr;}
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <h1>Customer Summary & Activity</h1>
+  </header>
+
+  <main class="page" aria-label="Customer summary and activity">
+
+    <!-- Customer Summary -->
+    <section class="section" aria-labelledby="customer-summary-title">
+      <h2 id="customer-summary-title">Customer Summary</h2>
+      <div class="section-body table-wrap">
+        <table aria-label="Customer summary table">
+          <thead>
+          <tr>
+            <th scope="col">Customer Info</th>
+            <th scope="col">Customer Code</th>
+            <th scope="col">Customer Name</th>
+            <th scope="col">Invoice Total</th>
+            <th scope="col">Net Due Amount</th>
+            <th scope="col">Target</th>
+            <th scope="col">MTD Collection</th>
+            <th scope="col">City</th>
+            <th scope="col">Issues to be Solved</th>
+          </tr>
+          </thead>
+          <tbody id="customer-tbody"></tbody>
+        </table>
+      </div>
+      <div class="section-body">
+        <small class="meta">Tip: Click a customer row to load invoices below.</small>
+      </div>
+    </section>
+
+    <!-- Invoices & Activity -->
+    <section class="section" aria-labelledby="customer-invoices-title">
+      <h2 id="customer-invoices-title">Customer Invoices & Activity</h2>
+      <div class="section-body split">
+        <!-- Left: invoices list -->
+        <div>
+          <div class="chips" aria-hidden="true">
+            <span class="chip">A</span>
+            <span class="chip">I</span>
+            <span class="chip">T</span>
+            <span class="chip">R</span>
+            <span class="chip">A</span>
+            <span class="chip">D</span>
+            <span class="chip">E</span>
+          </div>
+          <div class="table-wrap" style="margin-top:8px">
+            <table aria-label="Invoices of selected customer">
+              <thead>
+              <tr>
+                <th scope="col">Customer Name</th>
+                <th scope="col">Customer Code</th>
+                <th scope="col">Invoice No</th>
+                <th scope="col">Invoice Status</th>
+                <th scope="col">Invoice Date</th>
+              </tr>
+              </thead>
+              <tbody id="invoice-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Right: activity panel -->
+        <div>
+          <div class="stack">
+            <div>
+              <label for="activity-type" class="meta">Activity Type</label>
+              <select id="activity-type">
+                <option value="emailed">Emailed</option>
+                <option value="called">Called</option>
+                <option value="followup">Follow-up</option>
+              </select>
+            </div>
+            <div>
+              <label for="sub-status" class="meta">Sub Status</label>
+              <select id="sub-status">
+                <option>Submitted & Tracking</option>
+                <option>Follow-up Pending</option>
+                <option>Dispute Raised</option>
+                <option>Delivery challan required</option>
+                <option>Re-issue Invoice</option>
+              </select>
+            </div>
+            <div>
+              <label for="broad-status" class="meta">Broad Status</label>
+              <select id="broad-status">
+                <option>Open</option>
+                <option>In Progress</option>
+                <option>Closed</option>
+              </select>
+            </div>
+            <div>
+              <label for="primary-status" class="meta">Primary Status</label>
+              <select id="primary-status">
+                <option>Submitted & Tracking</option>
+                <option>Awaiting Client</option>
+                <option>Resolved</option>
+              </select>
+            </div>
+            <!-- Conditional controls when Sub Status = Delivery challan required -->
+            <div id="dcr-extra" class="stack" style="display:none;">
+              <div>
+                <label class="meta row-inline" for="dcr-add-issue">
+                  <input id="dcr-add-issue" type="checkbox" checked />
+                  <span>Add this to issue tracker</span>
+                </label>
+              </div>
+              <div class="owner-grid">
+                <div>
+                  <label for="action-owner" class="meta">Action Owner</label>
+                  <select id="action-owner"></select>
+                </div>
+                <div class="owner-actions">
+                  <button id="invite-owner" class="pill secondary" type="button">Invite Action Owner</button>
+                  <span id="invite-owner-msg" class="meta" aria-live="polite"></span>
+                </div>
+              </div>
+              <div>
+                <label for="approval-process" class="meta">Approval Process</label>
+                <select id="approval-process"></select>
+              </div>
+            </div>
+
+
+            <!-- Email entry above remarks (hidden by default; revealed when "Invite Action Owner" is clicked) -->
+            <div id="activity-email-row" style="display:none;">
+              <label for="activity-email" class="meta">Email</label>
+              <input id="activity-email" type="email" placeholder="name@example.com" />
+            </div>
+
+            <div>
+              <label for="activity-remarks" class="meta">Activity Remarks</label>
+              <textarea id="activity-remarks" rows="4" placeholder="Type remarks for selected invoice(s)..."></textarea>
+            </div>
+            <div class="right-actions">
+              <button id="save-activity" class="pill primary" type="button">Save</button>
+              <button id="new-activity" class="pill secondary" type="button">New Activity</button>
+              <button id="clear-custom-issues" class="pill secondary" type="button">Clear Custom Issues</button>
+              <span id="save-msg" class="meta" aria-live="polite"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <small>Mock UI • Screenshot reference: img/Screenshot 2025-11-17 132357.png</small>
+  </footer>
+
+  <script>
+    // --- Mock data ---
+    const customers = [
+      { code: 'CUST11010', name: 'Afterpay Ltd', invoiceTotal: 3948202, netDue: 3903202, target: 1250626, mtd: 45000, city: 'Goa', issues: 2 },
+      { code: 'CUST11002', name: 'AGL Energy Ltd', invoiceTotal: 985000, netDue: 985000, target: 0, mtd: 0, city: 'Hyderabad', issues: 6 },
+      { code: 'CUST11007', name: 'Amcor Plc', invoiceTotal: 3565546, netDue: 3525546, target: 713109, mtd: 40000, city: 'Goa', issues: 2 },
+      { code: 'CUST11004', name: 'Ampol Ltd', invoiceTotal: 3752521, netDue: 3752521, target: 0, mtd: 0, city: 'Mumbai', issues: 2 },
+      { code: 'CUST11008', name: 'Ansell Ltd', invoiceTotal: 3876471, netDue: 3876471, target: 0, mtd: 0, city: 'Delhi', issues: 3 }
+    ];
+
+    const invoicesByCustomer = {
+      'CUST11010': [
+        { inv: 'INVS11125', status: 'Submitted & Tracking', date: '2025-06-04' },
+        { inv: 'INVS11131', status: 'Submitted & Tracking', date: '2025-06-04' },
+        { inv: 'INVS11130', status: 'Submitted & Tracking', date: '2025-06-04' },
+        { inv: 'INVS11128', status: 'Submitted & Tracking', date: '2025-06-04' }
+      ],
+      'CUST11002': [ { inv: 'INVS21101', status: 'Dispute Raised', date: '2025-05-18' } ],
+      'CUST11007': [ { inv: 'INVS31190', status: 'Follow-up Pending', date: '2025-05-29' } ],
+      'CUST11004': [ { inv: 'INVS41177', status: 'Submitted & Tracking', date: '2025-05-15' } ],
+      'CUST11008': [ { inv: 'INVS51112', status: 'Submitted & Tracking', date: '2025-04-22' } ]
+    };
+
+    // --- Helpers ---
+    const rupee = n => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(n);
+    // Track an invited email for cases where the owner is NOT in the dropdown
+    let invitedOwnerEmail = '';
+
+    // Mock action owners (do not include placeholder here)
+    const actionOwners = [
+      { id: 'own1', name: 'Rahul Sharma', email: 'rahul.sharma@example.com' },
+      { id: 'own2', name: 'Priya Verma', email: 'priya.verma@example.com' },
+      { id: 'own3', name: 'Arjun Patel', email: 'arjun.patel@example.com' }
+    ];
+    const APPROVAL_PROC_KEY = 'approval_processes';
+
+    function renderCustomers(){
+      const tbody = document.getElementById('customer-tbody');
+      tbody.innerHTML = '';
+      for (const c of customers){
+        const tr = document.createElement('tr');
+        tr.className = 'row-click';
+        tr.dataset.code = c.code;
+        tr.innerHTML = `
+          <td>
+            <span class="icon-cell" aria-label="icons">
+              <span class="icon-btn" title="Info" aria-hidden="true">i</span>
+              <span class="icon-btn" title="Contact" aria-hidden="true">@</span>
+              <span class="icon-btn" title="Attachment" aria-hidden="true">📎</span>
+            </span>
+          </td>
+          <td>${c.code}</td>
+          <td>${c.name}</td>
+          <td>${rupee(c.invoiceTotal)}</td>
+          <td>${rupee(c.netDue)}</td>
+          <td>${rupee(c.target)}</td>
+          <td>${rupee(c.mtd)}</td>
+          <td>${c.city}</td>
+          <td>${c.issues}</td>
+        `;
+        tr.addEventListener('click', () => loadInvoices(c));
+        tbody.appendChild(tr);
+      }
+    }
+
+    function loadInvoices(customer){
+      const tbody = document.getElementById('invoice-tbody');
+      tbody.innerHTML = '';
+      const list = invoicesByCustomer[customer.code] || [];
+      for (const inv of list){
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${customer.name}</td>
+          <td>${customer.code}</td>
+          <td>${inv.inv}</td>
+          <td>${inv.status}</td>
+          <td>${inv.date}</td>
+        `;
+        tbody.appendChild(tr);
+      }
+    }
+
+    // Note: Invite/create user form was removed per requirements.
+
+    // Activity buttons (Save -> add to shared issue list via localStorage)
+    document.getElementById('save-activity').addEventListener('click', () => {
+      const saveMsg = document.getElementById('save-msg');
+      const activityType = document.getElementById('activity-type').value;
+      const sub = document.getElementById('sub-status').value;
+      const broad = document.getElementById('broad-status').value;
+      const primary = document.getElementById('primary-status').value;
+      const remarks = (document.getElementById('activity-remarks').value || '').trim();
+      const emailInputEl = document.getElementById('activity-email');
+      const now = new Date();
+
+      // Respect the DCR checkbox when visible
+      const isDcr = (sub === 'Delivery challan required');
+      const addToIssueTracker = isDcr ? !!document.getElementById('dcr-add-issue').checked : true;
+      const ownerSel = document.getElementById('action-owner');
+      const typedInviteEmail = (emailInputEl && emailInputEl.value || invitedOwnerEmail || '').trim();
+      const processSel = document.getElementById('approval-process');
+      // Prefer the explicitly invited email (for owners not in the dropdown). If not present, fall back to a selected owner.
+      let ownerName = '';
+      if (typedInviteEmail) {
+        ownerName = typedInviteEmail;
+      } else if (ownerSel && ownerSel.selectedIndex > 0) {
+        ownerName = ownerSel.options[ownerSel.selectedIndex].text;
+      }
+      let approvalProcessId = '';
+      let approvalProcessName = '';
+      if (processSel && processSel.selectedIndex > 0) {
+        approvalProcessId = processSel.value;
+        approvalProcessName = processSel.options[processSel.selectedIndex].text;
+      }
+
+      if (!addToIssueTracker) {
+        if (saveMsg) { saveMsg.textContent = 'Saved locally. Issue not added to tracker (checkbox disabled).'; setTimeout(()=>saveMsg.textContent='', 3000); }
+        return;
+      }
+
+      // Build issue object compatible with index.html app
+      const issue = {
+        id: `ISS_MAN_${now.getTime()}`,
+        title: sub || 'Manual Issue',
+        status: 'Open',
+        created: now.toISOString().slice(0,10),
+        description: remarks || `Issue created from Activity panel (${activityType}).`,
+        activityType: activityType,
+        primaryStatus: primary,
+        broadStatus: broad,
+        subStatus: sub,
+        stage: 1,
+        actionOwner: ownerName,
+        approvalProcessId,
+        approvalProcessName,
+        actionTrail: [
+          { who: 'You', what: 'created issue from Activity page', type: 'create', when: now.toISOString(), remark: remarks }
+        ]
+      };
+
+      // Persist to localStorage under key 'customIssues'
+      let list = [];
+      try {
+        const raw = localStorage.getItem('customIssues');
+        if (raw) { const arr = JSON.parse(raw); if (Array.isArray(arr)) list = arr; }
+      } catch(_) { list = []; }
+      list.push(issue);
+      try { localStorage.setItem('customIssues', JSON.stringify(list)); } catch(_e) {}
+
+      if (saveMsg) {
+        saveMsg.textContent = 'Issue added. Open/refresh the Issue Tracker page to see it.';
+        setTimeout(()=>{ saveMsg.textContent = ''; }, 3500);
+      }
+    });
+    document.getElementById('new-activity').addEventListener('click', () => {
+      document.getElementById('activity-remarks').value = '';
+      document.getElementById('activity-type').selectedIndex = 0;
+      document.getElementById('sub-status').selectedIndex = 0;
+      document.getElementById('broad-status').selectedIndex = 0;
+      document.getElementById('primary-status').selectedIndex = 0;
+      // Reset conditional UI
+      document.getElementById('dcr-extra').style.display = 'none';
+      document.getElementById('dcr-add-issue').checked = true;
+      const ownerSel = document.getElementById('action-owner');
+      if (ownerSel) ownerSel.selectedIndex = 0;
+      const processSel = document.getElementById('approval-process');
+      if (processSel) processSel.selectedIndex = 0;
+      const inviteMsg = document.getElementById('invite-owner-msg');
+      if (inviteMsg) inviteMsg.textContent = '';
+      // Hide email row and clear value
+      const emailRow = document.getElementById('activity-email-row');
+      const emailInput = document.getElementById('activity-email');
+      if (emailRow) emailRow.style.display = 'none';
+      if (emailInput) emailInput.value = '';
+      invitedOwnerEmail = '';
+    });
+
+    document.getElementById('clear-custom-issues').addEventListener('click', () => {
+      const saveMsg = document.getElementById('save-msg');
+      try { localStorage.removeItem('customIssues'); } catch (_e) {}
+      if (saveMsg) {
+        saveMsg.textContent = 'Custom issues cleared. Refresh Issue Tracker to update INV_CUSTOM.';
+        setTimeout(() => { saveMsg.textContent = ''; }, 3500);
+      }
+    });
+
+    // Init
+    renderCustomers();
+    // Preload first customer's invoices
+    loadInvoices(customers[0]);
+
+    // Populate action owner list
+    (function initOwners(){
+      const sel = document.getElementById('action-owner');
+      if (!sel) return;
+      sel.innerHTML = '';
+      // Add a disabled, selected placeholder so no real owner is preselected
+      const placeholder = document.createElement('option');
+      placeholder.value = '';
+      placeholder.textContent = 'Select owner';
+      placeholder.disabled = true;
+      placeholder.selected = true;
+      sel.appendChild(placeholder);
+      // Add real owners
+      for (const ow of actionOwners){
+        const opt = document.createElement('option');
+        opt.value = ow.id;
+        // Only append email if present
+        opt.textContent = ow.email ? `${ow.name} (${ow.email})` : ow.name;
+        sel.appendChild(opt);
+      }
+    })();
+
+    (function initApprovalProcesses(){
+      const sel = document.getElementById('approval-process');
+      if (!sel) return;
+      sel.innerHTML = '';
+      const placeholder = document.createElement('option');
+      placeholder.value = '';
+      placeholder.textContent = 'Select process';
+      placeholder.disabled = true;
+      placeholder.selected = true;
+      sel.appendChild(placeholder);
+      let processes = [];
+      try {
+        const raw = localStorage.getItem(APPROVAL_PROC_KEY);
+        const parsed = JSON.parse(raw || '[]');
+        if (Array.isArray(parsed)) processes = parsed;
+      } catch (_) {
+        processes = [];
+      }
+      processes.forEach(process => {
+        if (!process || !process.id) return;
+        const opt = document.createElement('option');
+        opt.value = process.id;
+        opt.textContent = process.process || process.id;
+        sel.appendChild(opt);
+      });
+    })();
+
+    // Toggle extra controls when sub-status is Delivery challan required
+    (function setupSubStatusWatcher(){
+      const subSel = document.getElementById('sub-status');
+      const extra = document.getElementById('dcr-extra');
+      const emailRow = document.getElementById('activity-email-row');
+      const emailInput = document.getElementById('activity-email');
+      const update = () => {
+        const show = subSel.value === 'Delivery challan required';
+        extra.style.display = show ? '' : 'none';
+        if (!show){
+          // Also hide email row when DCR block is hidden
+          if (emailRow) emailRow.style.display = 'none';
+          if (emailInput) emailInput.value = '';
+          const inviteMsg = document.getElementById('invite-owner-msg');
+          if (inviteMsg) inviteMsg.textContent = '';
+          invitedOwnerEmail = '';
+        }
+      };
+      subSel.addEventListener('change', update);
+      update();
+    })();
+
+    // Invite action owner (no popup): first click reveals email field (prefilled if an existing owner is selected);
+    // second click validates input and simulates sending an invite. Supports inviting owners NOT in the dropdown.
+    (function setupInviteOwner(){
+      const btn = document.getElementById('invite-owner');
+      const sel = document.getElementById('action-owner');
+      const out = document.getElementById('invite-owner-msg');
+      const emailRow = document.getElementById('activity-email-row');
+      const emailInput = document.getElementById('activity-email');
+      if (!btn) return;
+      const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      btn.addEventListener('click', () => {
+        const currentId = sel && sel.value;
+        const owner = actionOwners.find(o => o.id === currentId);
+
+        const isHidden = emailRow.style.display === 'none' || (emailRow.style.display === '' && emailRow.offsetParent === null);
+        if (isHidden){
+          // Reveal and, if an existing owner is chosen, prefill their email. Otherwise leave blank for new invitee.
+          emailRow.style.display = '';
+          emailInput.value = owner && owner.email ? owner.email : '';
+          emailInput.focus();
+          out.textContent = owner ? 'Edit email if needed, then click Invite again to send.' : 'Enter email of the action owner (not in list), then click Invite again to send.';
+          setTimeout(() => { out.textContent = ''; }, 4000);
+          return;
+        }
+
+        // Send using the visible input value
+        const email = (emailInput.value || '').trim();
+        if (!email){
+          out.textContent = 'Please enter an email address.';
+          setTimeout(() => { out.textContent = ''; }, 3000);
+          return;
+        }
+        if (!emailRe.test(email)){
+          out.textContent = 'Invalid email address. Please try again.';
+          setTimeout(() => { out.textContent = ''; }, 3500);
+          return;
+        }
+        // Simulate sending invite and remember this email for Save action
+        invitedOwnerEmail = email;
+        const nameLabel = owner ? owner.name + ' ' : '';
+        out.textContent = `Invite sent to ${nameLabel}<${email}>`;
+        setTimeout(() => {
+          out.textContent = '';
+        }, 3000);
+      });
+    })();
+  </script>
+</body>
+</html>

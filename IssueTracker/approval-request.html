@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Approval Request - Inebura</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/approver.css">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.png">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="header">
+      <div class="brand">
+        <h1>Inebura</h1>
+        <span>Approval</span>
+      </div>
+      <nav class="nav">
+        <a href="approver-dashboard.html">Approvals Dashboard</a>
+        <a href="index.html">Issue Tracker</a>
+      </nav>
+    </header>
+
+    <main class="main">
+      <section class="hero">
+        <h2>Approval Request</h2>
+        <p id="request-subtitle">Review the issue and provide your decision with remarks and documents.</p>
+      </section>
+
+      <section class="approval-grid">
+        <div class="card stack">
+          <div id="request-meta" class="stack"></div>
+        </div>
+
+        <div class="card stack">
+          <h3>Escalation Matrix</h3>
+          <div id="matrix-levels" class="levels"></div>
+          <div id="viewer-note" class="notice" style="display:none;"></div>
+        </div>
+      </section>
+
+      <section id="decision-card" class="card stack">
+        <h3>Decision</h3>
+        <div class="field">
+          <label for="remark">Remarks (required)</label>
+          <textarea id="remark" rows="4" placeholder="Add your approval or rejection remark..."></textarea>
+        </div>
+        <div class="field">
+          <label for="documents">Attach documents</label>
+          <input id="documents" type="file" multiple>
+        </div>
+        <div class="controls">
+          <button id="approve-btn" class="btn btn--approve" type="button">Approve</button>
+          <button id="reject-btn" class="btn btn--reject" type="button">Reject</button>
+          <a class="btn btn--ghost" href="approver-dashboard.html">Back to dashboard</a>
+        </div>
+        <div id="action-msg" class="notice" style="display:none;"></div>
+      </section>
+
+      <section class="card stack">
+        <h3>Approval Trail</h3>
+        <div id="trail" class="stack"></div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <small>Remarks are mandatory for approval or rejection.</small>
+    </footer>
+  </div>
+
+  <script src="js/approval-request.js"></script>
+</body>
+</html>

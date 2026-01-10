@@ -1,0 +1,1658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inebura Ops UI - Visit Module</title>
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .visitMain {
+      max-width: none;
+      margin: 0;
+      padding: 24px 28px 40px;
+      width: 100%;
+    }
+
+    .visitHeader {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .visitHeader h1 {
+      font-size: 22px;
+      margin: 0;
+      color: #111827;
+    }
+
+    .visitHeader p {
+      margin: 4px 0 0;
+      color: #64748b;
+      font-size: 13px;
+    }
+
+    .visitClock {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+      background: #ffffff;
+      border: 1px solid #e2e8f4;
+      border-radius: 12px;
+      padding: 8px 12px;
+      min-width: 160px;
+    }
+
+    .visitClock span {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #94a3b8;
+    }
+
+    .visitClock strong {
+      font-size: 16px;
+      color: #111827;
+    }
+
+    .visitLayout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr);
+      gap: 16px;
+      align-items: start;
+      margin-bottom: 20px;
+    }
+
+    .visitSidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .visitStats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .visitSidebar .planSection {
+      margin-top: 0;
+    }
+
+    .visitCard {
+      background: #ffffff;
+      border: 1px solid #e2e8f4;
+      border-radius: 14px;
+      padding: 14px 16px;
+      box-shadow: 0 10px 20px rgba(15, 23, 42, 0.04);
+    }
+
+    .visitCard span {
+      display: block;
+      color: #64748b;
+      font-size: 12px;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .visitCard strong {
+      font-size: 20px;
+      color: #111827;
+    }
+
+    .calendarSection {
+      margin-bottom: 0;
+    }
+
+    .calendarCard {
+      background: #ffffff;
+      border: 1px solid #e2e8f4;
+      border-radius: 18px;
+      padding: 16px;
+      width: 100%;
+      box-shadow: 0 12px 26px rgba(15, 23, 42, 0.06);
+    }
+
+    .calendarHeader {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .calendarTitle {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .calendarTitle strong {
+      font-size: 18px;
+      color: #111827;
+    }
+
+    .calendarTitle span {
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    .calendarActions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .calendarActions .form-control,
+    .calendarActions .form-select {
+      border-radius: 10px;
+      min-width: 180px;
+    }
+
+    .calendarNavBtn {
+      border: 1px solid #e2e8f4;
+      background: #f8fafc;
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .calendarWeekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      margin-bottom: 6px;
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #94a3b8;
+      letter-spacing: 0.04em;
+    }
+
+    .calendarGrid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+    }
+
+    .calendarDay {
+      border: 1px solid #dbe3f0;
+      border-radius: 12px;
+      padding: 8px;
+      min-height: 88px;
+      background: #f7f7f778;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      cursor: pointer;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .calendarDay:hover {
+      border-color: var(--brand-border);
+      box-shadow: 0 6px 16px rgba(92, 37, 141, 0.08);
+    }
+
+    .calendarDay.is-empty {
+      background: transparent;
+      border: 1px dashed #e2e8f4;
+      cursor: default;
+      box-shadow: none;
+    }
+
+    .calendarDay.selected {
+      border-color: var(--brand);
+      box-shadow: 0 0 0 2px rgba(92, 37, 141, 0.15);
+    }
+
+    .calendarDay.holiday {
+      background: #eff6ff;
+      border-color: #c7d2fe;
+    }
+
+    .calendarDay.onLeave {
+      background: #ffdcdc;
+      border-color: #991b1b;
+    }
+
+
+    .calendarDay.submittedApproved {
+      background: #dcfce7;
+      border-color: #86efac;
+    }
+
+    .calendarDay.submittedPending {
+      background: #fef9c3;
+      border-color: #f59e0b;
+    }
+
+    .calendarDay.rejected {
+      background: #fd8d28;
+      border-color: #ce5400;
+    }
+
+    .calendarDay.today:not(.submittedApproved):not(.submittedPending):not(.rejected):not(.onLeave):not(.holiday) {
+      border-color: #c4b5fd;
+      background: #ede9fe;
+      box-shadow: 0 0 0 2px rgba(196, 181, 253, 0.35);
+    }
+
+    .calendarDay.selected.today:not(.submittedApproved):not(.submittedPending):not(.rejected):not(.onLeave):not(.holiday) {
+      box-shadow: 0 0 0 2px rgba(92, 37, 141, 0.2), 0 0 0 4px rgba(196, 181, 253, 0.35);
+    }
+
+    .dayTop {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .dayNumber {
+      font-weight: 700;
+      font-size: 13px;
+      color: #111827;
+    }
+
+    .planBtn {
+      border: 1px solid var(--brand-border);
+      background: var(--brand-lighter);
+      color: var(--brand-dark);
+      font-size: 10px;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 999px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+    }
+
+    .planBtn.isSubmitWindow {
+      background: var(--brand);
+      color: #ffffff;
+      border-color: var(--brand-dark);
+    }
+
+    .dayLabels {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .customerTag {
+      font-size: 10.5px;
+      font-weight: 600;
+      padding: 3px 6px;
+      border-radius: 8px;
+      background: var(--brand);
+      color: #ffffff;
+      border: 1px solid var(--brand-dark);
+      width: fit-content;
+    }
+
+    .holidayTag {
+      background: #dbeafe;
+      color: #1e40af;
+      border-color: #bfdbfe;
+    }
+
+    .onLeaveTag {
+      background: #c61d1d;
+      color: #ffc8c8;
+    }
+
+
+    .planSection {
+      margin-top: 12px;
+    }
+
+    .planCard {
+      background: #ffffff;
+      border: 1px solid #e2e8f4;
+      border-radius: 16px;
+      padding: 16px;
+      width: 100%;
+      box-shadow: 0 12px 24px rgba(15, 23, 42, 0.05);
+      overflow-x: auto;
+    }
+
+    .planHeader {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .planHeader h2 {
+      margin: 0;
+      font-size: 16px;
+      color: #111827;
+    }
+
+    .planTable {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+    }
+
+    .planTable th,
+    .planTable td {
+      padding: 10px 8px;
+      border-bottom: 1px dashed #e2e8f4;
+      text-align: left;
+    }
+
+    .planTable th {
+      color: #64748b;
+      font-weight: 700;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .planStatus {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .status-approved {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .status-rejected {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .status-pending {
+      background: #e0f2fe;
+      color: #0c4a6e;
+    }
+
+    .planModalOverlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 70;
+    }
+
+    .planModal {
+      background: #ffffff;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 980px;
+      max-height: 90vh;
+      overflow: auto;
+      box-shadow: 0 24px 50px rgba(15, 23, 42, 0.2);
+    }
+
+    .planModalHeader {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px 18px;
+      border-bottom: 1px solid #e2e8f4;
+    }
+
+    .planModalHeader h3 {
+      margin: 0;
+      font-size: 18px;
+      color: #111827;
+    }
+
+    .planModalHeader p {
+      margin: 6px 0 0;
+      color: #64748b;
+      font-size: 12px;
+    }
+
+    .planModalBody {
+      padding: 16px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .planModalFooter {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      padding: 14px 18px;
+      border-top: 1px solid #e2e8f4;
+      background: #f8fafc;
+    }
+
+    .planFieldRow {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .planFieldRow label {
+      font-size: 12px;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      font-weight: 600;
+    }
+
+    .planFieldRow label input[type="checkbox"] {
+      margin-right: 8px;
+      accent-color: var(--brand);
+    }
+
+    .planFieldRow select,
+    .planFieldRow textarea,
+    .planFieldRow input {
+      border: 1px solid #e2e8f4;
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 13px;
+      background: #ffffff;
+    }
+
+    .callingNotice {
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: #e0f2fe;
+      color: #0c4a6e;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .visitTableCard {
+      border: 1px solid #e2e8f4;
+      border-radius: 12px;
+      padding: 10px;
+      background: #ffffff;
+    }
+
+    .visitTableCard h4 {
+      margin: 0 0 8px 0;
+      font-size: 13px;
+      color: #111827;
+    }
+
+    .planTableSmall {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    .planTableSmall th,
+    .planTableSmall td {
+      padding: 6px 4px;
+      border-bottom: 1px dashed #e2e8f4;
+      text-align: left;
+    }
+
+    .planTableSmall th {
+      font-size: 10px;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .searchResults {
+      border: 1px solid #e2e8f4;
+      border-radius: 12px;
+      background: #ffffff;
+      max-height: 180px;
+      overflow: auto;
+      padding: 6px;
+    }
+
+    .searchItem {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 6px 8px;
+      border-radius: 10px;
+    }
+
+    .searchItem + .searchItem {
+      margin-top: 4px;
+    }
+
+    .searchItem:hover {
+      background: #f8fafc;
+    }
+
+    .searchItemName {
+      font-size: 12px;
+      font-weight: 600;
+      color: #111827;
+    }
+
+    .searchItemCode {
+      font-size: 11px;
+      color: #64748b;
+    }
+
+    .planBtnSmall {
+      border: 1px solid var(--brand-border);
+      background: var(--brand-lighter);
+      color: var(--brand-dark);
+      border-radius: 8px;
+      padding: 4px 8px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .planRemoveBtn {
+      border: 1px solid #fecaca;
+      background: #fee2e2;
+      color: #991b1b;
+      border-radius: 8px;
+      padding: 4px 8px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .planReasonSelect {
+      width: 100%;
+      border: 1px solid #e2e8f4;
+      border-radius: 8px;
+      padding: 6px 8px;
+      font-size: 12px;
+    }
+
+    .planError {
+      color: #b91c1c;
+      background: #fee2e2;
+      border: 1px solid #fecaca;
+      padding: 8px 10px;
+      border-radius: 10px;
+      font-size: 12px;
+    }
+
+    @media (max-width: 1100px) {
+      .visitLayout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .visitHeader {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .calendarActions {
+        flex-wrap: wrap;
+        justify-content: flex-start;
+      }
+
+      .calendarCard,
+      .planCard {
+        padding: 12px;
+      }
+
+      .calendarDay {
+        min-height: 76px;
+      }
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="headerLeft">
+    <div class="headerMenu">
+      <button class="iconBtn menuBtn" type="button" id="headerMenuBtn" aria-label="Open menu">
+        <i class="bi bi-list" aria-hidden="true"></i>
+      </button>
+    </div>
+    <div class="brand">
+      <span class="logoInebura">Inebura</span>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="relationship">
+      <div class="relLogo" id="relationshipLogo">PH</div>
+      <span class="relName" id="relationshipName">Philips</span>
+    </div>
+  </div>
+
+  <div class="headerRight">
+    <select id="tenantSelect" class="tenantSelect">
+      <option value="apollo">Apollo</option>
+      <option value="bikanerwala">Bikanerwala</option>
+      <option value="global_ar">Global AR</option>
+    </select>
+
+    <span class="iconBtn" title="Notifications"><i class="bi bi-bell-fill" aria-hidden="true"></i></span>
+    <select id="userSelect" class="tenantSelect userSelect" aria-label="Select user"></select>
+  </div>
+</header>
+
+<div class="sideNavOverlay" id="sideNavOverlay" aria-hidden="true">
+  <nav class="sideNav" id="sideNav" aria-label="Main">
+    <div class="sideNavHeader">
+      <span class="sideNavTitle">Menu</span>
+      <button class="iconBtn sideNavClose" type="button" id="sideNavClose" aria-label="Close menu">
+        <i class="bi bi-x-lg" aria-hidden="true"></i>
+      </button>
+    </div>
+    <button class="sideNavItem" type="button" data-module="visit">Visit Module</button>
+    <button class="sideNavItem" type="button" data-module="visit-review">Visit Module Review</button>
+    <button class="sideNavItem" type="button" data-module="landing">Landing Page</button>
+    <button class="sideNavItem" type="button" data-module="landing-manager">Landing Page - Manager</button>
+  </nav>
+</div>
+
+<main class="visitMain">
+  <div class="visitHeader">
+    <div>
+      <h1>Visit Planner</h1>
+      <p>Plan visits, track approvals, and review daily schedules.</p>
+    </div>
+    <div class="visitClock">
+      <span>Local Time</span>
+      <strong id="visitClock">--:--:-- --</strong>
+    </div>
+  </div>
+
+  <section class="visitStats">
+    <div class="visitCard">
+      <span>On Time Planning %</span>
+      <strong id="statOnTime">0%</strong>
+    </div>
+    <div class="visitCard">
+      <span>Approved / Rejected Plans</span>
+      <strong id="statApproval">0 / 0</strong>
+    </div>
+    <div class="visitCard">
+      <span>Most Visited Customer</span>
+      <strong id="statTopCustomer">-</strong>
+    </div>
+  </section>
+
+  <div class="visitLayout">
+    <div class="visitPrimary">
+      <section class="calendarSection">
+        <div class="calendarCard">
+          <div class="calendarHeader">
+            <div class="calendarTitle">
+              <strong id="calendarMonth">Month</strong>
+              <span>Select a day to see planned visits.</span>
+            </div>
+            <div class="calendarActions">
+              <input id="calendarCustomerFilter" class="form-control form-control-sm" type="text" placeholder="Search customer for calendar..." />
+              <select id="calendarViewSelect" class="form-select form-select-sm">
+                <option value="month">Month view</option>
+                <option value="week">Weekly view</option>
+                <option value="workweek">Work week</option>
+              </select>
+              <button class="calendarNavBtn" type="button" id="prevMonthBtn" aria-label="Previous month">
+                <i class="bi bi-chevron-left" aria-hidden="true"></i>
+              </button>
+              <button class="calendarNavBtn" type="button" id="nextMonthBtn" aria-label="Next month">
+                <i class="bi bi-chevron-right" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+          <div class="calendarWeekdays" id="calendarWeekdays">
+            <div>Sun</div>
+            <div>Mon</div>
+            <div>Tue</div>
+            <div>Wed</div>
+            <div>Thu</div>
+            <div>Fri</div>
+            <div>Sat</div>
+          </div>
+          <div class="calendarGrid" id="calendarGrid"></div>
+        </div>
+      </section>
+    </div>
+    <aside class="visitSidebar">
+      <section class="planSection">
+        <div class="planCard">
+          <div class="planHeader">
+            <h2>Plans for <span id="selectedDateLabel">-</span></h2>
+          </div>
+          <table class="planTable">
+            <thead>
+              <tr>
+                <th>Customer name</th>
+                <th>Customer code</th>
+                <th>Reason for visit</th>
+                <th>Agent</th>
+                <th>Manager</th>
+                <th>KAM</th>
+                <th>KAS</th>
+                <th>Manager remark</th>
+              </tr>
+            </thead>
+            <tbody id="planTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </aside>
+  </div>
+</main>
+
+<div class="planModalOverlay hidden" id="planModalOverlay" aria-hidden="true">
+  <div class="planModal" role="dialog" aria-modal="true" aria-labelledby="planModalTitle">
+    <div class="planModalHeader">
+      <div>
+        <h3 id="planModalTitle">Plan for <span id="planDateLabel">-</span></h3>
+        <p>Daily planning window: 9:30 AM - 2:30 PM.</p>
+      </div>
+      <button class="iconBtn" type="button" id="planModalClose" aria-label="Close planning dialog">
+        <i class="bi bi-x-lg" aria-hidden="true"></i>
+      </button>
+    </div>
+    <div class="planModalBody">
+      <div class="planFieldRow">
+        <label for="planTypeSelect">Plan type</label>
+        <select id="planTypeSelect">
+          <option value="visit">Visit</option>
+          <option value="calling">Calling</option>
+          <option value="both">Both</option>
+          <option value="leave">Leave</option>
+        </select>
+      </div>
+      <div class="planFieldRow">
+        <label>
+          <input type="checkbox" id="simulateSubmitToggle" />
+          Simulate submit window (demo)
+        </label>
+      </div>
+
+      <div class="planFieldRow hidden" id="shortfallWrap">
+        <label for="shortfallReason">Shortfall reason (required after 2:30 PM)</label>
+        <textarea id="shortfallReason" rows="2" placeholder="Explain the shortfall..."></textarea>
+      </div>
+
+      <div class="planFieldRow hidden" id="leaveWrap">
+        <label for="leaveReason">Leave reason (required)</label>
+        <textarea id="leaveReason" rows="2" placeholder="Add leave reason..."></textarea>
+      </div>
+
+      <div class="callingNotice hidden" id="callingNotice">
+        <i class="bi bi-telephone-fill" aria-hidden="true"></i>
+        Calling planned for this day.
+      </div>
+
+      <div id="visitSection">
+        <div class="planFieldRow">
+          <label for="customerSearchInput">Search customer</label>
+          <input id="customerSearchInput" type="text" placeholder="Search by customer name or code..." />
+        </div>
+        <div class="searchResults" id="customerSearchResults"></div>
+        <div class="visitTableCard">
+          <h4>Selected visits</h4>
+          <table class="planTableSmall">
+            <thead>
+              <tr>
+                <th>Customer</th>
+                <th>Reason</th>
+                <th>Agent</th>
+                <th>Manager</th>
+                <th>KAM</th>
+                <th>KAS</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="selectedCustomersBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="planError hidden" id="planError"></div>
+    </div>
+    <div class="planModalFooter">
+      <button class="btn btn-success hidden" type="button" id="planModalSubmit">Submit plan</button>
+      <button class="btn btn-light" type="button" id="planModalCancel">Cancel</button>
+      <button class="btn btn-primary" type="button" id="planModalSave">Save plan</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  (() => {
+    const monthNames = [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ];
+
+    const pad = (value) => String(value).padStart(2, "0");
+    const makeDateKey = (year, month, day) => `${year}-${pad(month + 1)}-${pad(day)}`;
+
+    const today = new Date();
+    let currentYear = today.getFullYear();
+    let currentMonth = today.getMonth();
+    let selectedDateKey = makeDateKey(currentYear, currentMonth, today.getDate());
+
+    const samplePlans = {};
+    const sampleLabels = {};
+    const seededMonths = new Set();
+    const planStateByDate = {};
+
+    const seedPlansForMonth = (year, month) => {
+      const monthKey = `${year}-${pad(month + 1)}`;
+      if (seededMonths.has(monthKey)) return;
+      seededMonths.add(monthKey);
+
+      const addPlan = (day, plan) => {
+        const key = makeDateKey(year, month, day);
+        if (!samplePlans[key]) samplePlans[key] = [];
+        samplePlans[key].push(plan);
+      };
+
+      addPlan(3, { customer: "Apollo Pharmacy", code: "CUST-001", reason: "Onsite audit", agent: "Aditi Sharma", manager: "Mukesh Mishra", kam: "Neha Kapoor", kas: "Arjun Rao", status: "Approved", onTime: true });
+      addPlan(5, { customer: "BlueWave", code: "CUST-014", reason: "Collections follow-up", agent: "Manish Kumar", manager: "Mukesh Mishra", kam: "Riya Malhotra", kas: "Vikram Iyer", status: "Pending", onTime: false });
+      addPlan(8, { customer: "Sunrise Pvt", code: "CUST-033", reason: "Dispute resolution", agent: "Palak Choudhary", manager: "Mukesh Mishra", kam: "Anil Thomas", kas: "Dev Patel", status: "Approved", onTime: true });
+      addPlan(12, { customer: "Apollo Pharmacy", code: "CUST-001", reason: "Credit review", agent: "Abhishek Sharma", manager: "Mukesh Mishra", kam: "Neha Kapoor", kas: "Arjun Rao", status: "Rejected", onTime: false });
+      addPlan(24, { customer: "Sunrise Pvt", code: "CUST-033", reason: "PTP confirmation", agent: "Sakshi Sharma", manager: "Mukesh Mishra", kam: "Anil Thomas", kas: "Dev Patel", status: "Pending", onTime: true });
+
+      sampleLabels[makeDateKey(year, month, 3)] = [
+        { label: "Apollo Pharmacy", type: "customer" }
+      ];
+      sampleLabels[makeDateKey(year, month, 5)] = [
+        { label: "BlueWave", type: "customer" }
+      ];
+      sampleLabels[makeDateKey(year, month, 8)] = [
+        { label: "Sunrise Pvt", type: "customer" }
+      ];
+      sampleLabels[makeDateKey(year, month, 12)] = [
+        { label: "Apollo Pharmacy", type: "customer" }
+      ];
+      sampleLabels[makeDateKey(year, month, 15)] = [
+        { label: "On Leave", type: "leave" }
+      ];
+      sampleLabels[makeDateKey(year, month, 24)] = [
+        { label: "Sunrise Pvt", type: "customer" }
+      ];
+
+      [3, 5, 8, 12, 18, 24].forEach((day) => {
+        const key = makeDateKey(year, month, day);
+        if (!planStateByDate[key]) planStateByDate[key] = "submitted";
+      });
+    };
+
+    seedPlansForMonth(currentYear, currentMonth);
+
+    const calendarGrid = document.getElementById("calendarGrid");
+    const calendarMonthEl = document.getElementById("calendarMonth");
+    const selectedDateLabel = document.getElementById("selectedDateLabel");
+    const planTableBody = document.getElementById("planTableBody");
+    const clockEl = document.getElementById("visitClock");
+    const statOnTime = document.getElementById("statOnTime");
+    const statApproval = document.getElementById("statApproval");
+    const statTopCustomer = document.getElementById("statTopCustomer");
+    const planModalOverlay = document.getElementById("planModalOverlay");
+    const planModalClose = document.getElementById("planModalClose");
+    const planModalCancel = document.getElementById("planModalCancel");
+    const planModalSave = document.getElementById("planModalSave");
+    const planModalSubmit = document.getElementById("planModalSubmit");
+    const planDateLabel = document.getElementById("planDateLabel");
+    const planTypeSelect = document.getElementById("planTypeSelect");
+    const simulateSubmitToggle = document.getElementById("simulateSubmitToggle");
+    const shortfallWrap = document.getElementById("shortfallWrap");
+    const shortfallReason = document.getElementById("shortfallReason");
+    const leaveWrap = document.getElementById("leaveWrap");
+    const leaveReason = document.getElementById("leaveReason");
+    const callingNotice = document.getElementById("callingNotice");
+    const visitSection = document.getElementById("visitSection");
+    const customerSearchInput = document.getElementById("customerSearchInput");
+    const customerSearchResults = document.getElementById("customerSearchResults");
+    const selectedCustomersBody = document.getElementById("selectedCustomersBody");
+    const planError = document.getElementById("planError");
+    const calendarWeekdaysEl = document.getElementById("calendarWeekdays");
+    const calendarViewSelect = document.getElementById("calendarViewSelect");
+    const calendarCustomerFilter = document.getElementById("calendarCustomerFilter");
+    const menuBtn = document.getElementById("headerMenuBtn");
+    const sideNavOverlay = document.getElementById("sideNavOverlay");
+    const sideNav = document.getElementById("sideNav");
+    const sideNavClose = document.getElementById("sideNavClose");
+
+    const formatReadableDate = (dateKey) => {
+      if (!dateKey || dateKey === "-") return "-";
+      const [year, month, day] = dateKey.split("-").map(Number);
+      const date = new Date(year, month - 1, day);
+      return `${monthNames[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+    };
+
+    const isHolidayDate = (dateKey) => {
+      if (!dateKey || dateKey === "-") return false;
+      const [year, month, day] = dateKey.split("-").map(Number);
+      const date = new Date(year, month - 1, day);
+      const isSunday = date.getDay() === 0;
+      const isRepublicDay = date.getMonth() === 0 && date.getDate() === 26;
+      return isSunday || isRepublicDay;
+    };
+
+    const customerDirectory = [
+      { customer: "Apollo Pharmacy", code: "CUST-001", agent: "Aditi Sharma", manager: "Mukesh Mishra", kam: "Neha Kapoor", kas: "Arjun Rao" },
+      { customer: "BlueWave", code: "CUST-014", agent: "Manish Kumar", manager: "Mukesh Mishra", kam: "Riya Malhotra", kas: "Vikram Iyer" },
+      { customer: "Sunrise Pvt", code: "CUST-033", agent: "Palak Choudhary", manager: "Mukesh Mishra", kam: "Anil Thomas", kas: "Dev Patel" }
+    ];
+    const visitReasons = ["Collection follow up", "Invoice Submission", "BC", "TDS"];
+
+    const leaveReasonsByDate = {};
+    const shortfallReasonsByDate = {};
+    let currentPlanDateKey = null;
+    let selectedCustomers = new Map();
+
+    const updateStats = () => {
+      const prefix = `${currentYear}-${pad(currentMonth + 1)}-`;
+      const monthPlans = Object.entries(samplePlans)
+        .filter(([dateKey]) => dateKey.startsWith(prefix))
+        .flatMap(([, plans]) => plans);
+      const total = monthPlans.length;
+      const onTime = monthPlans.filter(plan => plan.onTime).length;
+      const pct = total ? Math.round((onTime / total) * 100) : 0;
+      const approved = monthPlans.filter(plan => plan.status === "Approved").length;
+      const rejected = monthPlans.filter(plan => plan.status === "Rejected").length;
+
+      if (statOnTime) statOnTime.textContent = `${pct}%`;
+      if (statApproval) statApproval.textContent = `${approved} / ${rejected}`;
+      if (statTopCustomer) {
+        if (!monthPlans.length) {
+          statTopCustomer.textContent = "-";
+        } else {
+          const counts = new Map();
+          monthPlans.forEach((plan) => {
+            if (!plan.customer) return;
+            counts.set(plan.customer, (counts.get(plan.customer) || 0) + 1);
+          });
+          let topCustomer = "-";
+          let topCount = 0;
+          counts.forEach((count, customer) => {
+            if (count > topCount) {
+              topCount = count;
+              topCustomer = customer;
+            }
+          });
+          statTopCustomer.textContent = topCustomer;
+        }
+      }
+    };
+
+    const isAfterCutoffTime = (date) => {
+      const hour = date.getHours();
+      const minute = date.getMinutes();
+      return hour > 14 || (hour === 14 && minute >= 30);
+    };
+
+    const isBeforeStartTime = (date) => {
+      const hour = date.getHours();
+      const minute = date.getMinutes();
+      return hour < 9 || (hour === 9 && minute < 30);
+    };
+
+    const getDateKey = (date) => makeDateKey(date.getFullYear(), date.getMonth(), date.getDate());
+
+    const shouldRequireShortfall = (dateKey) => {
+      if (!dateKey) return false;
+      const now = new Date();
+      if (dateKey !== getDateKey(now)) return false;
+      return isAfterCutoffTime(now);
+    };
+
+    const shouldShowSubmitButton = (dateKey, planType) => {
+      if (!dateKey || planType === "leave") return false;
+      const now = new Date();
+      const todayKey = getDateKey(now);
+      const tomorrow = new Date(now);
+      tomorrow.setDate(now.getDate() + 1);
+      const tomorrowKey = getDateKey(tomorrow);
+      if (dateKey === todayKey) return isBeforeStartTime(now);
+      if (dateKey === tomorrowKey) return isAfterCutoffTime(now);
+      return false;
+    };
+
+    const updateShortfallVisibility = () => {
+      if (!shortfallWrap || !shortfallReason) return;
+      if (shouldRequireShortfall(currentPlanDateKey)) {
+        shortfallWrap.classList.remove("hidden");
+      } else {
+        shortfallWrap.classList.add("hidden");
+        shortfallReason.value = "";
+      }
+    };
+
+    const renderSelectedCustomers = () => {
+      if (!selectedCustomersBody) return;
+      const rows = Array.from(selectedCustomers.values()).map(item => {
+        const optionsMarkup = [
+          `<option value="">Select reason</option>`,
+          ...visitReasons.map(reason => `
+            <option value="${reason}" ${item.reason === reason ? "selected" : ""}>${reason}</option>
+          `)
+        ].join("");
+        return `
+          <tr>
+            <td>${item.customer}</td>
+            <td>
+              <select class="planReasonSelect" data-code="${item.code}">
+                ${optionsMarkup}
+              </select>
+            </td>
+            <td>${item.agent}</td>
+            <td>${item.manager}</td>
+            <td>${item.kam}</td>
+            <td>${item.kas}</td>
+            <td><button class="planRemoveBtn" type="button" data-action="remove" data-code="${item.code}">Remove</button></td>
+          </tr>
+        `;
+      });
+
+      selectedCustomersBody.innerHTML = rows.length
+        ? rows.join("")
+        : `<tr><td colspan="7" style="color:#94a3b8;">No customers selected.</td></tr>`;
+    };
+
+    const renderSearchResults = () => {
+      if (!customerSearchResults) return;
+      const query = (customerSearchInput?.value || "").trim().toLowerCase();
+      const results = customerDirectory.filter(item => {
+        if (selectedCustomers.has(item.code)) return false;
+        if (!query) return true;
+        return item.customer.toLowerCase().includes(query) || item.code.toLowerCase().includes(query);
+      });
+
+      if (results.length === 0) {
+        customerSearchResults.innerHTML = `<div class="searchItem"><span class="searchItemCode">No matches.</span></div>`;
+        return;
+      }
+
+      customerSearchResults.innerHTML = results.map(item => `
+        <div class="searchItem">
+          <div>
+            <div class="searchItemName">${item.customer}</div>
+            <div class="searchItemCode">${item.code}</div>
+          </div>
+          <button class="planBtnSmall" type="button" data-action="add" data-code="${item.code}">Add</button>
+        </div>
+      `).join("");
+    };
+
+    const updatePlanTypeUI = () => {
+      const type = planTypeSelect ? planTypeSelect.value : "visit";
+      if (visitSection) visitSection.classList.toggle("hidden", !(type === "visit" || type === "both"));
+      if (callingNotice) callingNotice.classList.toggle("hidden", !(type === "calling" || type === "both"));
+      if (leaveWrap) leaveWrap.classList.toggle("hidden", type !== "leave");
+      if (planModalSubmit) {
+        const simulate = simulateSubmitToggle ? simulateSubmitToggle.checked : false;
+        const showSubmit = type !== "leave" && (simulate || shouldShowSubmitButton(currentPlanDateKey, type));
+        planModalSubmit.classList.toggle("hidden", !showSubmit);
+      }
+    };
+
+    const openPlanModal = (dateKey) => {
+      if (!planModalOverlay) return;
+      currentPlanDateKey = dateKey;
+      if (planDateLabel) planDateLabel.textContent = formatReadableDate(dateKey);
+
+      const labels = sampleLabels[dateKey] || [];
+      const hasLeave = labels.some(entry => typeof entry === "object" && entry.type === "leave");
+      const hasCalling = labels.some(entry => typeof entry === "object" && entry.type === "call");
+      const visits = samplePlans[dateKey] || [];
+
+      let planType = "visit";
+      if (hasLeave) planType = "leave";
+      else if (hasCalling && visits.length > 0) planType = "both";
+      else if (hasCalling) planType = "calling";
+      else if (visits.length > 0) planType = "visit";
+
+      if (planTypeSelect) planTypeSelect.value = planType;
+
+      selectedCustomers = new Map();
+      visits.forEach((plan) => {
+        selectedCustomers.set(plan.code, { ...plan });
+      });
+
+      if (leaveReason) leaveReason.value = leaveReasonsByDate[dateKey] || "";
+      if (shortfallReason) shortfallReason.value = shortfallReasonsByDate[dateKey] || "";
+      if (customerSearchInput) customerSearchInput.value = "";
+
+      if (planError) {
+        planError.textContent = "";
+        planError.classList.add("hidden");
+      }
+
+      updatePlanTypeUI();
+      updateShortfallVisibility();
+      renderSearchResults();
+      renderSelectedCustomers();
+
+      planModalOverlay.classList.remove("hidden");
+      planModalOverlay.setAttribute("aria-hidden", "false");
+    };
+
+    const closePlanModal = () => {
+      if (!planModalOverlay) return;
+      planModalOverlay.classList.add("hidden");
+      planModalOverlay.setAttribute("aria-hidden", "true");
+    };
+
+    const renderPlanTable = (dateKey) => {
+      selectedDateLabel.textContent = formatReadableDate(dateKey);
+      const plans = samplePlans[dateKey] || [];
+      const isHoliday = isHolidayDate(dateKey);
+      const filteredPlans = isHoliday ? [] : plans;
+
+      if (!filteredPlans.length) {
+        const message = isHoliday
+          ? "Holiday - no visits scheduled."
+          : "No visits scheduled for this day.";
+        planTableBody.innerHTML = `
+          <tr>
+            <td colspan="8" style="color:#94a3b8;">${message}</td>
+          </tr>
+        `;
+        return;
+      }
+
+      planTableBody.innerHTML = filteredPlans.map(plan => `
+        <tr>
+          <td>${plan.customer}</td>
+          <td>${plan.code}</td>
+          <td>${plan.reason}</td>
+          <td>${plan.agent}</td>
+          <td>${plan.manager}</td>
+          <td>${plan.kam}</td>
+          <td>${plan.kas}</td>
+          <td>${plan.managerRemark ? plan.managerRemark : "-"}</td>
+        </tr>
+      `).join("");
+    };
+
+    const selectDate = (dateKey) => {
+      selectedDateKey = dateKey;
+      renderCalendar();
+      renderPlanTable(dateKey);
+    };
+
+    const updateClock = () => {
+      if (!clockEl) return;
+      const now = new Date();
+      let hours = now.getHours();
+      const minutes = pad(now.getMinutes());
+      const seconds = pad(now.getSeconds());
+      const period = hours >= 12 ? "PM" : "AM";
+      hours = hours % 12;
+      hours = hours === 0 ? 12 : hours;
+      clockEl.textContent = `${pad(hours)}:${minutes}:${seconds} ${period}`;
+      if (planModalOverlay && !planModalOverlay.classList.contains("hidden")) {
+        updateShortfallVisibility();
+        updatePlanTypeUI();
+      }
+    };
+
+    const openSideNav = () => {
+      if (!sideNavOverlay) return;
+      sideNavOverlay.classList.add("open");
+      sideNavOverlay.setAttribute("aria-hidden", "false");
+    };
+
+    const closeSideNav = () => {
+      if (!sideNavOverlay) return;
+      sideNavOverlay.classList.remove("open");
+      sideNavOverlay.setAttribute("aria-hidden", "true");
+    };
+
+    const toggleSideNav = () => {
+      if (!sideNavOverlay) return;
+      if (sideNavOverlay.classList.contains("open")) closeSideNav();
+      else openSideNav();
+    };
+
+    const renderCalendar = () => {
+      const viewMode = calendarViewSelect ? calendarViewSelect.value : "month";
+      const filterValue = (calendarCustomerFilter?.value || "").trim().toLowerCase();
+
+      let baseDate = new Date();
+      if (selectedDateKey) {
+        const [year, month, day] = selectedDateKey.split("-").map(Number);
+        if (!Number.isNaN(year) && !Number.isNaN(month) && !Number.isNaN(day)) {
+          baseDate = new Date(year, month - 1, day);
+        }
+      }
+
+      const now = new Date();
+      const todayKey = getDateKey(now);
+      const tomorrow = new Date(now);
+      tomorrow.setDate(now.getDate() + 1);
+      const tomorrowKey = getDateKey(tomorrow);
+      const submitWindowToday = isBeforeStartTime(now);
+      const submitWindowTomorrow = isAfterCutoffTime(now);
+
+      const weekdayLabels = viewMode === "workweek"
+        ? ["Mon", "Tue", "Wed", "Thu", "Fri"]
+        : ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+      if (calendarWeekdaysEl) {
+        calendarWeekdaysEl.innerHTML = weekdayLabels.map(label => `<div>${label}</div>`).join("");
+        calendarWeekdaysEl.style.gridTemplateColumns = `repeat(${weekdayLabels.length}, 1fr)`;
+      }
+      calendarGrid.style.gridTemplateColumns = `repeat(${weekdayLabels.length}, 1fr)`;
+
+      calendarMonthEl.textContent = `${monthNames[baseDate.getMonth()]} ${baseDate.getFullYear()}`;
+      calendarGrid.innerHTML = "";
+
+      const renderDayCell = (dayDate) => {
+        const dateKey = makeDateKey(dayDate.getFullYear(), dayDate.getMonth(), dayDate.getDate());
+        const weekday = dayDate.getDay();
+        const isSunday = weekday === 0;
+        const isRepublicDay = dayDate.getMonth() === 0 && dayDate.getDate() === 26;
+        const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        const isPastDay = dayDate < todayStart;
+
+        const dayEl = document.createElement("div");
+        dayEl.className = "calendarDay";
+        if (dateKey === selectedDateKey) dayEl.classList.add("selected");
+        if (dateKey === todayKey) dayEl.classList.add("today");
+
+        const showPlanBtn = !(isSunday || isRepublicDay || isPastDay);
+        const isSubmitWindowDay = (dateKey === todayKey && submitWindowToday)
+          || (dateKey === tomorrowKey && submitWindowTomorrow);
+        const isDarkPlanBtn = dateKey === todayKey || isSubmitWindowDay;
+        dayEl.innerHTML = `
+          <div class="dayTop">
+            <span class="dayNumber">${dayDate.getDate()}</span>
+            ${showPlanBtn ? `<button class="planBtn ${isDarkPlanBtn ? "isSubmitWindow" : ""}" type="button" data-date="${dateKey}">Plan</button>` : ""}
+          </div>
+          <div class="dayLabels"></div>
+        `;
+
+        const labelWrap = dayEl.querySelector(".dayLabels");
+        const labels = sampleLabels[dateKey] || [];
+        const hasLeave = labels.some(entry => typeof entry === "object" && entry.type === "leave");
+        const planState = planStateByDate[dateKey];
+        const isHoliday = isSunday || isRepublicDay;
+        const allowCustomerOnHoliday = isHoliday && planState === "submitted";
+        const hasMatchingCustomer = filterValue
+          ? labels.some(entry => typeof entry === "object"
+            && entry.type === "customer"
+            && entry.label.toLowerCase().includes(filterValue))
+          : true;
+
+        if (isHoliday) {
+          dayEl.classList.add("holiday");
+        }
+        if (hasLeave) {
+          dayEl.classList.add("onLeave");
+        }
+        if (!hasLeave && !isSunday && !isRepublicDay && planState === "submitted") {
+          const plans = samplePlans[dateKey] || [];
+          const hasRejected = plans.some(plan => String(plan.status || "").toLowerCase() === "rejected");
+          const hasApproved = plans.some(plan => String(plan.status || "").toLowerCase() === "approved");
+          const hasPending = plans.some(plan => String(plan.status || "").toLowerCase() === "pending");
+          if (hasRejected) dayEl.classList.add("rejected");
+          else if (hasApproved) dayEl.classList.add("submittedApproved");
+          else if (hasPending) dayEl.classList.add("submittedPending");
+        }
+
+        if (!filterValue || hasMatchingCustomer) {
+          if (isSunday) {
+            const holiday = document.createElement("span");
+            holiday.className = "customerTag holidayTag";
+            holiday.textContent = "Holiday";
+            labelWrap.appendChild(holiday);
+          }
+          if (isRepublicDay) {
+            const holiday = document.createElement("span");
+            holiday.className = "customerTag holidayTag";
+            holiday.textContent = "Republic Day";
+            labelWrap.appendChild(holiday);
+          }
+        }
+
+        if (!filterValue || hasMatchingCustomer) {
+          labels.forEach((entry) => {
+            const label = typeof entry === "string" ? entry : entry.label;
+            const type = typeof entry === "string" ? "customer" : entry.type;
+            if (isHoliday && type === "customer" && !allowCustomerOnHoliday) return;
+            if (filterValue && type === "customer" && !label.toLowerCase().includes(filterValue)) return;
+            if (filterValue && type !== "customer") return;
+            const tag = document.createElement("span");
+            tag.className = "customerTag";
+            if (type === "leave") tag.classList.add("onLeaveTag");
+            tag.textContent = label;
+            labelWrap.appendChild(tag);
+          });
+        }
+
+        dayEl.addEventListener("click", (event) => {
+          if (event.target && event.target.classList.contains("planBtn")) return;
+          selectDate(dateKey);
+        });
+
+        const planBtn = dayEl.querySelector(".planBtn");
+        if (planBtn) {
+          planBtn.addEventListener("click", (event) => {
+            event.stopPropagation();
+            selectDate(dateKey);
+            openPlanModal(dateKey);
+          });
+        }
+
+        calendarGrid.appendChild(dayEl);
+      };
+
+      if (viewMode === "month") {
+        const firstDay = new Date(baseDate.getFullYear(), baseDate.getMonth(), 1);
+        const startOffset = firstDay.getDay();
+        const daysInMonth = new Date(baseDate.getFullYear(), baseDate.getMonth() + 1, 0).getDate();
+
+        for (let i = 0; i < startOffset; i += 1) {
+          const empty = document.createElement("div");
+          empty.className = "calendarDay is-empty";
+          calendarGrid.appendChild(empty);
+        }
+
+        for (let day = 1; day <= daysInMonth; day += 1) {
+          renderDayCell(new Date(baseDate.getFullYear(), baseDate.getMonth(), day));
+        }
+        return;
+      }
+
+      const weekStart = new Date(baseDate);
+      const currentDay = weekStart.getDay();
+      if (viewMode === "workweek") {
+        const diff = currentDay === 0 ? -6 : 1 - currentDay;
+        weekStart.setDate(weekStart.getDate() + diff);
+      } else {
+        weekStart.setDate(weekStart.getDate() - currentDay);
+      }
+
+      const totalDays = viewMode === "workweek" ? 5 : 7;
+      for (let i = 0; i < totalDays; i += 1) {
+        const date = new Date(weekStart);
+        date.setDate(weekStart.getDate() + i);
+        renderDayCell(date);
+      }
+    };
+
+    const savePlan = (isSubmit) => {
+      if (!currentPlanDateKey) return;
+      const dateKey = currentPlanDateKey;
+      const type = planTypeSelect ? planTypeSelect.value : "visit";
+      const needsShortfall = shouldRequireShortfall(dateKey);
+      const errors = [];
+
+      if (needsShortfall && shortfallReason && shortfallReason.value.trim() === "") {
+        errors.push("Shortfall reason is required after 2:30 PM.");
+      }
+      if (type === "leave" && (!leaveReason || leaveReason.value.trim() === "")) {
+        errors.push("Leave reason is required.");
+      }
+      if (type === "visit" || type === "both") {
+        if (selectedCustomers.size === 0) {
+          errors.push("Select at least one customer for a visit.");
+        } else {
+          const missing = Array.from(selectedCustomers.values())
+            .find(item => !String(item.reason || "").trim());
+          if (missing) errors.push("Reason for visit is required for each customer.");
+        }
+      }
+
+      if (errors.length > 0) {
+        if (planError) {
+          planError.textContent = errors[0];
+          planError.classList.remove("hidden");
+        }
+        return;
+      }
+
+      if (planError) {
+        planError.textContent = "";
+        planError.classList.add("hidden");
+      }
+
+      const labels = [];
+      let visits = [];
+
+      if (type === "visit" || type === "both") {
+        const onTime = !needsShortfall;
+        visits = Array.from(selectedCustomers.values()).map(item => ({
+          customer: item.customer,
+          code: item.code,
+          reason: String(item.reason || "").trim(),
+          agent: item.agent,
+          manager: item.manager,
+          kam: item.kam,
+          kas: item.kas,
+          status: item.status || "Pending",
+          onTime,
+          planType: type
+        }));
+        visits.forEach(item => labels.push({ label: item.customer, type: "customer" }));
+      }
+
+      if (type === "calling" || type === "both") {
+        labels.push({ label: "Calling", type: "call" });
+      }
+
+      if (type === "leave") {
+        labels.push({ label: "On Leave", type: "leave" });
+        if (leaveReason) leaveReasonsByDate[dateKey] = leaveReason.value.trim();
+        visits = [];
+      } else if (leaveReason) {
+        leaveReason.value = "";
+        delete leaveReasonsByDate[dateKey];
+      }
+
+      if (needsShortfall && shortfallReason) {
+        shortfallReasonsByDate[dateKey] = shortfallReason.value.trim();
+      } else {
+        delete shortfallReasonsByDate[dateKey];
+      }
+
+      samplePlans[dateKey] = visits;
+      sampleLabels[dateKey] = labels;
+      planStateByDate[dateKey] = isSubmit ? "submitted" : "draft";
+
+      updateStats();
+      renderCalendar();
+      renderPlanTable(dateKey);
+      closePlanModal();
+    };
+
+    if (planTypeSelect) {
+      planTypeSelect.addEventListener("change", updatePlanTypeUI);
+    }
+
+    if (simulateSubmitToggle) {
+      simulateSubmitToggle.addEventListener("change", updatePlanTypeUI);
+    }
+
+    if (customerSearchInput) {
+      customerSearchInput.addEventListener("input", renderSearchResults);
+    }
+
+    if (customerSearchResults) {
+      customerSearchResults.addEventListener("click", (event) => {
+        const btn = event.target.closest("button[data-action='add']");
+        if (!btn) return;
+        const code = btn.getAttribute("data-code");
+        const customer = customerDirectory.find(item => item.code === code);
+        if (!customer) return;
+        selectedCustomers.set(code, { ...customer, reason: "" });
+        renderSearchResults();
+        renderSelectedCustomers();
+      });
+    }
+
+    if (selectedCustomersBody) {
+      selectedCustomersBody.addEventListener("click", (event) => {
+        const btn = event.target.closest("button[data-action='remove']");
+        if (!btn) return;
+        const code = btn.getAttribute("data-code");
+        if (code) selectedCustomers.delete(code);
+        renderSearchResults();
+        renderSelectedCustomers();
+      });
+
+      selectedCustomersBody.addEventListener("change", (event) => {
+        const select = event.target.closest(".planReasonSelect");
+        if (!select) return;
+        const code = select.getAttribute("data-code");
+        if (!code) return;
+        const entry = selectedCustomers.get(code);
+        if (entry) entry.reason = select.value;
+      });
+    }
+
+    if (planModalClose) planModalClose.addEventListener("click", closePlanModal);
+    if (planModalCancel) planModalCancel.addEventListener("click", closePlanModal);
+    if (planModalSave) planModalSave.addEventListener("click", () => savePlan(false));
+    if (planModalSubmit) planModalSubmit.addEventListener("click", () => savePlan(true));
+
+    if (menuBtn) menuBtn.addEventListener("click", toggleSideNav);
+    if (sideNavClose) sideNavClose.addEventListener("click", closeSideNav);
+    if (sideNavOverlay) {
+      sideNavOverlay.addEventListener("click", (event) => {
+        if (event.target === sideNavOverlay) closeSideNav();
+      });
+    }
+    if (sideNav) {
+      sideNav.addEventListener("click", (event) => {
+        const item = event.target.closest(".sideNavItem[data-module]");
+        if (!item) return;
+        const moduleKey = item.getAttribute("data-module");
+        if (moduleKey === "visit") window.location.href = "visitmodule.html";
+        if (moduleKey === "visit-review") window.location.href = "visitmoduleReview.html";
+        if (moduleKey === "landing") window.location.href = "index.html";
+        if (moduleKey === "landing-manager") window.location.href = "LPmanager.html";
+      });
+    }
+
+    if (calendarViewSelect) {
+      calendarViewSelect.addEventListener("change", renderCalendar);
+    }
+    if (calendarCustomerFilter) {
+      calendarCustomerFilter.addEventListener("input", renderCalendar);
+    }
+
+    document.getElementById("prevMonthBtn").addEventListener("click", () => {
+      currentMonth -= 1;
+      if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear -= 1;
+      }
+      selectedDateKey = makeDateKey(currentYear, currentMonth, 1);
+      seedPlansForMonth(currentYear, currentMonth);
+      updateStats();
+      renderCalendar();
+      renderPlanTable(selectedDateKey);
+    });
+
+    document.getElementById("nextMonthBtn").addEventListener("click", () => {
+      currentMonth += 1;
+      if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear += 1;
+      }
+      selectedDateKey = makeDateKey(currentYear, currentMonth, 1);
+      seedPlansForMonth(currentYear, currentMonth);
+      updateStats();
+      renderCalendar();
+      renderPlanTable(selectedDateKey);
+    });
+
+    const headerUserDirectory = {
+      agents: [
+        "Aditi Sharma",
+        "Manish Kumar",
+        "Palak Choudhary",
+        "Abhishek Sharma",
+        "Sakshi Sharma"
+      ],
+      managers: ["Mukesh Mishra"]
+    };
+
+    const updateUserMenuVisibility = (role) => {
+      const reviewItem = document.querySelector('[data-module="visit-review"]');
+      if (reviewItem) reviewItem.style.display = role === "agent" ? "none" : "";
+    };
+
+    const initUserSelect = () => {
+      const userSelect = document.getElementById("userSelect");
+      if (!userSelect) return;
+
+      userSelect.innerHTML = "";
+
+      const addGroup = (label, users) => {
+        const group = document.createElement("optgroup");
+        group.label = label;
+        users.forEach((name) => {
+          const option = document.createElement("option");
+          option.value = name;
+          option.textContent = name;
+          group.appendChild(option);
+        });
+        userSelect.appendChild(group);
+      };
+
+      addGroup("Agents", headerUserDirectory.agents);
+      addGroup("Managers", headerUserDirectory.managers);
+
+      const allUsers = [...headerUserDirectory.agents, ...headerUserDirectory.managers];
+      const storedName = localStorage.getItem("activeUserName");
+      const fallbackName = headerUserDirectory.agents[0];
+      const selectedName = allUsers.includes(storedName) ? storedName : fallbackName;
+
+      userSelect.value = selectedName;
+      const role = headerUserDirectory.managers.includes(selectedName) ? "manager" : "agent";
+      localStorage.setItem("activeUserName", selectedName);
+      localStorage.setItem("activeUserRole", role);
+      updateUserMenuVisibility(role);
+
+      userSelect.addEventListener("change", () => {
+        const name = userSelect.value;
+        const nextRole = headerUserDirectory.managers.includes(name) ? "manager" : "agent";
+        localStorage.setItem("activeUserName", name);
+        localStorage.setItem("activeUserRole", nextRole);
+        updateUserMenuVisibility(nextRole);
+      });
+    };
+
+    initUserSelect();
+    updateStats();
+    renderCalendar();
+    renderPlanTable(selectedDateKey);
+    updateClock();
+    setInterval(updateClock, 1000);
+  })();
+</script>
+
+</body>
+</html>

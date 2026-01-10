@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Welcome to Inebura</title>
+  <meta name="description" content="Inebura onboarding for new invited users">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/user-screen.css">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.png">
+</head>
+<body>
+  <div class="ambient" aria-hidden="true">
+    <span class="glow glow--one"></span>
+    <span class="glow glow--two"></span>
+  </div>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-name">Inebura</span>
+      <span class="badge">Invite</span>
+    </div>
+    <div class="topbar-meta">Need help? onboarding@inebura.com</div>
+  </header>
+
+  <main class="shell">
+    <section class="intro" style="--delay: 0.05s;">
+      <span class="badge">Invitation received</span>
+      <h1>Welcome to Inebura!</h1>
+      <p>
+        You have been invited to join the Inebura workspace. This screen is for users who do not exist in our system yet.
+        Complete the onboarding form to activate your profile and start tracking issues.
+      </p>
+      <div class="intro-card">
+        <strong>Before you start</strong>
+        <ul class="onboard-list">
+          <li><span class="onboard-dot"></span>Confirm your name and contact details.</li>
+          <li><span class="onboard-dot"></span>Email is locked to the invite for safety.</li>
+          <li><span class="onboard-dot"></span>Create a user ID for your dashboard login.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="form-card" style="--delay: 0.15s;">
+      <h2>Complete your profile</h2>
+      <p>Fill in the details below so we can enroll you into the system.</p>
+      <form id="onboarding-form" autocomplete="on">
+        <div class="form-grid">
+          <div class="field">
+            <label for="first-name">First name</label>
+            <input id="first-name" name="firstName" type="text" placeholder="Ava" autocomplete="given-name" required>
+          </div>
+          <div class="field">
+            <label for="last-name">Last name</label>
+            <input id="last-name" name="lastName" type="text" placeholder="Miller" autocomplete="family-name" required>
+          </div>
+          <div class="field">
+            <label for="email">Email (prefilled)</label>
+            <input id="email" name="email" type="email" value="invitee@inebura.com" readonly aria-readonly="true">
+          </div>
+          <div class="field">
+            <label for="phone">Phone number</label>
+            <input id="phone" name="phone" type="tel" placeholder="+91 90000 00000" autocomplete="tel" required>
+          </div>
+          <div class="field field--full">
+            <label for="user-id">User ID login</label>
+            <input id="user-id" name="userId" type="text" placeholder="ava.miller" autocomplete="username" required>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn--primary" type="submit">Submit</button>
+        </div>
+      </form>
+      <div id="rollout-status" class="status" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <small>By continuing you agree to receive onboarding updates from Inebura.</small>
+  </footer>
+
+  <div id="wa-modal" class="modal-overlay is-hidden" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="wa-title" tabindex="-1">
+      <h3 id="wa-title">WhatsApp enrollment</h3>
+      <p>
+        You have been enrolled for WhatsApp notification by admin. You will receive the updates on your WhatsApp from Inebura.
+        If you wish to roll out, click "Roll out" else, you can click on "Proceed".
+      </p>
+      <div class="modal-actions">
+        <button id="rollout-btn" class="btn btn--ghost" type="button">Roll out</button>
+        <button id="proceed-btn" class="btn btn--primary" type="button">Proceed</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/user-screen.js"></script>
+</body>
+</html>

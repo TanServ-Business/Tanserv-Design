@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Inebura Dashboard</title>
+  <meta name="description" content="Inebura issue dashboard with sample charts">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.png">
+</head>
+<body>
+  <div class="dash-bg" aria-hidden="true">
+    <span class="shape shape--one"></span>
+    <span class="shape shape--two"></span>
+  </div>
+
+  <header class="dash-header">
+    <div class="brand">
+      <span class="brand-name">Inebura</span>
+      <span class="brand-tag">Dashboard</span>
+    </div>
+    <div class="header-meta">
+      <span>Issue insights</span>
+      <span class="user-pill">New user</span>
+    </div>
+  </header>
+
+  <main class="dash-main">
+    <section class="hero">
+      <h1>Issue and approval overview</h1>
+      <p>Here is a quick look at issue progress and approval workload. Charts below use dummy data for now.</p>
+    </section>
+
+    <section class="stats" aria-label="Key issue stats">
+      <div class="stat-card stat-card--clickable" id="open-issues-card" role="button" tabindex="0" aria-label="Open issues list" style="--delay: 0.05s;">
+        <div class="stat-label">Open issues</div>
+        <div class="stat-value">128</div>
+        <div class="stat-note">+12 this week</div>
+      </div>
+      <div class="stat-card" style="--delay: 0.1s;">
+        <div class="stat-label">In progress</div>
+        <div class="stat-value">64</div>
+        <div class="stat-note">42 assigned</div>
+      </div>
+      <div class="stat-card" style="--delay: 0.15s;">
+        <div class="stat-label">Resolved</div>
+        <div class="stat-value">214</div>
+        <div class="stat-note">78 closed this month</div>
+      </div>
+      <div class="stat-card" style="--delay: 0.2s;">
+        <div class="stat-label">SLA risk</div>
+        <div class="stat-value">9</div>
+        <div class="stat-note">Needs attention</div>
+      </div>
+    </section>
+
+    <section class="stats stats--approvals" aria-label="Approval stats">
+      <div class="stat-card stat-card--clickable" id="open-approvals-card" role="button" tabindex="0" aria-label="Open approval requests list" style="--delay: 0.05s;">
+        <div class="stat-label">Open approval requests</div>
+        <div id="approval-open-count" class="stat-value">0</div>
+        <div class="stat-note">Pending in queue</div>
+      </div>
+      <div class="stat-card" style="--delay: 0.1s;">
+        <div class="stat-label">Approvals this month</div>
+        <div id="approval-approved-count" class="stat-value">0</div>
+        <div class="stat-note">Completed approvals</div>
+      </div>
+      <div class="stat-card" style="--delay: 0.15s;">
+        <div class="stat-label">Rejections this month</div>
+        <div id="approval-rejected-count" class="stat-value">0</div>
+        <div class="stat-note">Returned requests</div>
+      </div>
+      <div class="stat-card" style="--delay: 0.2s;">
+        <div class="stat-label">Total requests</div>
+        <div id="approval-total-count" class="stat-value">0</div>
+        <div class="stat-note">All approvals</div>
+      </div>
+    </section>
+
+    <section class="chart-grid" aria-label="Issue charts">
+      <article class="chart-card" style="--delay: 0.05s;">
+        <div class="chart-head">
+          <h3>Issue status split</h3>
+          <span class="chart-tag">Donut</span>
+        </div>
+        <div class="chart-body">
+          <div class="donut" role="img" aria-label="Donut chart of issue status" style="--c1: var(--accent); --c2: var(--sky); --c3: var(--rose); --p1: 62%; --p2: 84%;">
+            <div class="donut-center">
+              62%
+              <span>Open</span>
+            </div>
+          </div>
+          <ul class="legend">
+            <li><span class="swatch" style="--swatch: var(--accent)"></span>Open (128)</li>
+            <li><span class="swatch" style="--swatch: var(--sky)"></span>In progress (64)</li>
+            <li><span class="swatch" style="--swatch: var(--rose)"></span>Resolved (214)</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="chart-card" style="--delay: 0.1s;">
+        <div class="chart-head">
+          <h3>Issue source mix</h3>
+          <span class="chart-tag">Pie</span>
+        </div>
+        <div class="chart-body">
+          <div class="pie" role="img" aria-label="Pie chart of issue sources" style="--c1: var(--accent); --c2: var(--rose); --c3: var(--sky); --p1: 48%; --p2: 76%;"></div>
+          <ul class="legend">
+            <li><span class="swatch" style="--swatch: var(--accent)"></span>Email (48%)</li>
+            <li><span class="swatch" style="--swatch: var(--rose)"></span>Portal (28%)</li>
+            <li><span class="swatch" style="--swatch: var(--sky)"></span>WhatsApp (24%)</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="chart-card" style="--delay: 0.12s;">
+        <div class="chart-head">
+          <h3>Approval status split</h3>
+          <span class="chart-tag">Pie</span>
+        </div>
+        <div class="chart-body">
+          <div id="approval-status-pie" class="pie" role="img" aria-label="Pie chart of approval status" style="--c1: var(--accent); --c2: var(--sky); --c3: var(--rose); --p1: 40%; --p2: 70%;"></div>
+          <ul class="legend">
+            <li><span class="swatch" style="--swatch: var(--accent)"></span>Pending (<span id="approval-legend-pending">0</span>)</li>
+            <li><span class="swatch" style="--swatch: var(--sky)"></span>Approved (<span id="approval-legend-approved">0</span>)</li>
+            <li><span class="swatch" style="--swatch: var(--rose)"></span>Rejected (<span id="approval-legend-rejected">0</span>)</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="chart-card" style="--delay: 0.15s;">
+        <div class="chart-head">
+          <h3>Issues by category</h3>
+          <span class="chart-tag">Bar</span>
+        </div>
+        <div class="bar-chart" role="img" aria-label="Bar chart of issue categories">
+          <div class="bars">
+            <div class="bar" style="--value: 70; --delay: 0.1s;"><span>Billing</span></div>
+            <div class="bar bar--sun" style="--value: 58; --delay: 0.15s;"><span>Delivery</span></div>
+            <div class="bar bar--sky" style="--value: 46; --delay: 0.2s;"><span>Tax</span></div>
+            <div class="bar bar--rose" style="--value: 62; --delay: 0.25s;"><span>Portal</span></div>
+            <div class="bar" style="--value: 38; --delay: 0.3s;"><span>SLA</span></div>
+            <div class="bar bar--sun" style="--value: 28; --delay: 0.35s;"><span>Other</span></div>
+          </div>
+          <div class="axis">
+            <span>0</span>
+            <span>100</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="chart-card" style="--delay: 0.2s;">
+        <div class="chart-head">
+          <h3>Monthly issue volume</h3>
+          <span class="chart-tag">Bar</span>
+        </div>
+        <div class="bar-chart" role="img" aria-label="Bar chart of monthly volume">
+          <div class="bars">
+            <div class="bar bar--sky" style="--value: 40; --delay: 0.1s;"><span>Apr</span></div>
+            <div class="bar" style="--value: 52; --delay: 0.15s;"><span>May</span></div>
+            <div class="bar bar--sun" style="--value: 65; --delay: 0.2s;"><span>Jun</span></div>
+            <div class="bar bar--rose" style="--value: 58; --delay: 0.25s;"><span>Jul</span></div>
+            <div class="bar" style="--value: 72; --delay: 0.3s;"><span>Aug</span></div>
+            <div class="bar bar--sky" style="--value: 49; --delay: 0.35s;"><span>Sep</span></div>
+          </div>
+          <div class="axis">
+            <span>0</span>
+            <span>100</span>
+          </div>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <footer class="dashboard-footer">
+    <small>Sample metrics only. Connect live data when the backend is ready.</small>
+  </footer>
+
+  <script src="js/dashboard.js"></script>
+</body>
+</html>
