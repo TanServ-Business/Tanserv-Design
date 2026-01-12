@@ -182,6 +182,22 @@
 
     .primaryBtn:hover { background: var(--brand-dark); }
 
+    .defaultBtn {
+      border: 1px solid var(--border);
+      background: #ffffff;
+      color: var(--ink);
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .defaultBtn:hover {
+      border-color: var(--brand);
+      color: var(--brand-dark);
+    }
+
     .inputWithIcon {
       display: flex;
       align-items: center;
@@ -234,6 +250,76 @@
       display: none;
     }
 
+    @keyframes slideUp {
+      from { transform: translateY(12px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .animateUp {
+      animation: slideUp 0.35s ease;
+    }
+
+    .notifyDock {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      z-index: 500;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: min(320px, 92vw);
+      pointer-events: none;
+    }
+
+    .notifyPopup {
+      pointer-events: auto;
+      background: #ffffff;
+      border: 1px solid #fecaca;
+      border-radius: 14px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      box-shadow: 0 20px 34px rgba(15, 23, 42, 0.18);
+    }
+
+    .notifyPopup.error {
+      border-color: #fecaca;
+      background: #fff1f2;
+      color: #7f1d1d;
+    }
+
+    .notifyPopup.success {
+      border-color: #bbf7d0;
+      background: #f0fdf4;
+      color: #166534;
+    }
+
+    .notifyPopup.warning {
+      border-color: #fde68a;
+      background: #fffbeb;
+      color: #92400e;
+    }
+
+    .notifyPopup strong {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+
+    .notifyPopup span {
+      font-size: 12px;
+      color: inherit;
+    }
+
+    .notifyClose {
+      margin-left: auto;
+      border: none;
+      background: transparent;
+      color: inherit;
+      cursor: pointer;
+    }
+
     .otpRow {
       display: grid;
       grid-template-columns: repeat(6, 1fr);
@@ -256,6 +342,15 @@
       letter-spacing: 0.02em;
       box-shadow: 0 10px 22px rgba(92, 37, 141, 0.25);
       cursor: pointer;
+    }
+
+    .orDivider {
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 600;
     }
 
     .optionGrid {
@@ -369,9 +464,12 @@
           </div>
         </div>
         <div class="formMeta">
-          <button class="linkBtn" type="button">Forgot password?</button>
+          <button class="linkBtn" type="button" id="forgotPasswordBtn">Forgot password?</button>
+          <button class="linkBtn hidden" type="button" id="resendOtpBtn">Resend OTP</button>
         </div>
-        <button class="btnCTA" type="button">Login</button>
+        <button class="btnCTA" type="button" id="loginBtn">Login</button>
+        <div class="orDivider hidden" id="otpOrDivider">or</div>
+        <button class="defaultBtn hidden" type="button" id="passwordLoginBtn">Login with password</button>
       </div>
 
       <div class="optionGrid hasGap">
@@ -392,6 +490,8 @@
       </div>
     </section>
   </main>
+
+  <div class="notifyDock" id="notifyDock" aria-live="polite" aria-atomic="true"></div>
 
   <script>
     const togglePassword = document.getElementById("togglePassword");
@@ -430,29 +530,131 @@
     const otpField = document.getElementById("otpField");
     const otpLabel = document.getElementById("loginOtpLabel");
     const optionCards = document.querySelectorAll(".optionCard[data-mode]");
+    const forgotPasswordBtn = document.getElementById("forgotPasswordBtn");
+    const resendOtpBtn = document.getElementById("resendOtpBtn");
+    const passwordLoginBtn = document.getElementById("passwordLoginBtn");
+    const otpOrDivider = document.getElementById("otpOrDivider");
+    const loginBtn = document.getElementById("loginBtn");
+    const notifyDock = document.getElementById("notifyDock");
+
+    const mockUsers = [
+      {
+        username: "admin",
+        email: "admin@inebura.com",
+        phone: "9876543210",
+        password: "Admin@123",
+        otp: "123456"
+      }
+    ];
+
+    const systemStatus = {
+      loginAvailable: true,
+      otpServiceAvailable: true
+    };
+
+    const normalizeEmail = (value) => value.trim().toLowerCase();
+    const normalizePhone = (value) => value.replace(/\D/g, "");
+
+    const getOtpValue = () => {
+      return Array.from(document.querySelectorAll(".otpRow input"))
+        .map((input) => input.value.trim())
+        .join("");
+    };
+
+    const findUserByUsernameOrEmail = (value) => {
+      const identifier = value.trim();
+      if (!identifier) return null;
+      const lowered = identifier.toLowerCase();
+      return mockUsers.find((user) => (
+        user.username.toLowerCase() === lowered || user.email.toLowerCase() === lowered
+      )) || null;
+    };
+
+    const findUserByEmail = (value) => {
+      const email = normalizeEmail(value);
+      if (!email) return null;
+      return mockUsers.find((user) => user.email.toLowerCase() === email) || null;
+    };
+
+    const findUserByPhone = (value) => {
+      const phone = normalizePhone(value);
+      if (!phone) return null;
+      return mockUsers.find((user) => normalizePhone(user.phone) === phone) || null;
+    };
+
+    const notifyIcons = {
+      success: "bi-check-circle-fill",
+      warning: "bi-exclamation-circle-fill",
+      error: "bi-exclamation-triangle-fill"
+    };
+
+    const showNotify = (type, title, message) => {
+      if (!notifyDock) return;
+      const safeType = notifyIcons[type] ? type : "error";
+      const heading = title || (safeType === "success" ? "Success" : safeType === "warning" ? "Warning" : "Error");
+      const popup = document.createElement("div");
+      popup.className = `notifyPopup ${safeType} animateUp`;
+      popup.innerHTML = `
+        <i class="bi ${notifyIcons[safeType]}" aria-hidden="true"></i>
+        <div>
+          <strong>${heading}</strong>
+          <span>${message || ""}</span>
+        </div>
+        <button class="notifyClose" type="button" aria-label="Dismiss">
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
+        </button>
+      `;
+      const closeBtn = popup.querySelector(".notifyClose");
+      if (closeBtn) {
+        closeBtn.addEventListener("click", () => {
+          popup.remove();
+        });
+      }
+      notifyDock.prepend(popup);
+      setTimeout(() => {
+        if (!popup.isConnected) return;
+        popup.remove();
+      }, 4000);
+    };
+
+    let currentMode = "default";
 
     const setLoginMode = (mode) => {
-      optionCards.forEach(card => card.classList.toggle("active", card.getAttribute("data-mode") === mode));
-      if (mode === "email") {
+      const normalizedMode = mode === "email" || mode === "phone" ? mode : "default";
+      currentMode = normalizedMode;
+      optionCards.forEach(card => card.classList.toggle("active", card.getAttribute("data-mode") === normalizedMode));
+      if (normalizedMode === "email") {
         if (usernameLabel) usernameLabel.textContent = "Email";
         if (usernameInput) usernameInput.placeholder = "Enter email";
         if (otpLabel) otpLabel.textContent = "Email OTP";
         if (passwordField) passwordField.classList.add("hidden");
         if (otpField) otpField.classList.remove("hidden");
+        if (forgotPasswordBtn) forgotPasswordBtn.classList.add("hidden");
+        if (resendOtpBtn) resendOtpBtn.classList.remove("hidden");
+        if (passwordLoginBtn) passwordLoginBtn.classList.remove("hidden");
+        if (otpOrDivider) otpOrDivider.classList.remove("hidden");
         return;
       }
-      if (mode === "phone") {
+      if (normalizedMode === "phone") {
         if (usernameLabel) usernameLabel.textContent = "Phone Number";
         if (usernameInput) usernameInput.placeholder = "Enter phone number";
         if (otpLabel) otpLabel.textContent = "Phone OTP";
         if (passwordField) passwordField.classList.add("hidden");
         if (otpField) otpField.classList.remove("hidden");
+        if (forgotPasswordBtn) forgotPasswordBtn.classList.add("hidden");
+        if (resendOtpBtn) resendOtpBtn.classList.remove("hidden");
+        if (passwordLoginBtn) passwordLoginBtn.classList.remove("hidden");
+        if (otpOrDivider) otpOrDivider.classList.remove("hidden");
         return;
       }
       if (usernameLabel) usernameLabel.textContent = "Username or Email";
       if (usernameInput) usernameInput.placeholder = "Enter username or email";
       if (passwordField) passwordField.classList.remove("hidden");
       if (otpField) otpField.classList.add("hidden");
+      if (forgotPasswordBtn) forgotPasswordBtn.classList.remove("hidden");
+      if (resendOtpBtn) resendOtpBtn.classList.add("hidden");
+      if (passwordLoginBtn) passwordLoginBtn.classList.add("hidden");
+      if (otpOrDivider) otpOrDivider.classList.add("hidden");
       optionCards.forEach(card => card.classList.remove("active"));
     };
 
@@ -462,6 +664,75 @@
     document.querySelectorAll("[data-action='otp-phone']").forEach((btn) => {
       btn.addEventListener("click", () => setLoginMode("phone"));
     });
+    if (passwordLoginBtn) {
+      passwordLoginBtn.addEventListener("click", () => setLoginMode("default"));
+    }
+    if (loginBtn) {
+      loginBtn.addEventListener("click", () => {
+        if (!systemStatus.loginAvailable) {
+          showNotify("error", "Something went wrong", "Unable to login due to server side issue.");
+          return;
+        }
+
+        const identifier = usernameInput ? usernameInput.value : "";
+        if (currentMode === "email") {
+          const user = findUserByEmail(identifier);
+          if (!user) {
+            showNotify("warning", "User not found", "User not found.");
+            return;
+          }
+          const otpValue = getOtpValue();
+          if (otpValue !== user.otp) {
+            showNotify("warning", "Incorrect Password/OTP", "Incorrect password or OTP.");
+            return;
+          }
+          showNotify("success", "Login successful", "Email OTP verified successfully.");
+          return;
+        }
+
+        if (currentMode === "phone") {
+          const user = findUserByPhone(identifier);
+          if (!user) {
+            showNotify("warning", "User not found", "User not found.");
+            return;
+          }
+          const otpValue = getOtpValue();
+          if (otpValue !== user.otp) {
+            showNotify("warning", "Incorrect Password/OTP", "Incorrect password or OTP.");
+            return;
+          }
+          showNotify("success", "Login successful", "Phone OTP verified successfully.");
+          return;
+        }
+
+        const user = findUserByUsernameOrEmail(identifier);
+        if (!user) {
+          showNotify("warning", "User not found", "User not found.");
+          return;
+        }
+        const password = passwordInput ? passwordInput.value : "";
+        if (password !== user.password) {
+          showNotify("warning", "Incorrect Password/OTP", "Incorrect password or OTP.");
+          return;
+        }
+        showNotify("success", "Login successful", "Welcome back.");
+      });
+    }
+    if (resendOtpBtn) {
+      resendOtpBtn.addEventListener("click", () => {
+        if (!systemStatus.otpServiceAvailable) {
+          showNotify("error", "Unable to send OTP", "Try again after sometime.");
+          return;
+        }
+        const identifier = usernameInput ? usernameInput.value : "";
+        const user = currentMode === "email" ? findUserByEmail(identifier) : findUserByPhone(identifier);
+        if (!user) {
+          showNotify("warning", "User not found", "User not found.");
+          return;
+        }
+        showNotify("success", "OTP sent", "A new OTP has been sent.");
+      });
+    }
 
     setLoginMode("default");
   </script>
