@@ -11,62 +11,12 @@
 
   <link rel="stylesheet" href="styles.css" />
   <style>
-    .right .tabPanel[data-tab="invoice"] {
-      font-size: 12px;
-      color: #111827;
-    }
-
-    .right .tabPanel[data-tab="invoice"] .invoicePaneTitle {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: #6b7280;
-      margin-bottom: 6px;
-    }
-
-    .right .tabPanel[data-tab="invoice"] .invoiceDetailsBlock .kv {
-      font-size: 12px;
-      padding: 4px 0;
-    }
-
-    .right .tabPanel[data-tab="invoice"] .invoiceDetailsBlock .kv span {
-      color: #6b7280;
-    }
-
-    .right .tabPanel[data-tab="invoice"] .invoiceDetailsBlock .kv strong {
-      font-weight: 600;
-    }
-
     .right .tabPanel[data-tab="invoice"].detailsHidden .invoiceDetailsBlock {
       display: none;
     }
 
     .right .tabPanel[data-tab="invoice"] .invoiceStickyDock {
       position: static;
-      margin-top: 12px;
-      padding-top: 0;
-      background: transparent;
-      border-top: none;
-    }
-
-    .right .tabPanel[data-tab="invoice"] .accordion-button {
-      font-size: 12px;
-      padding: 8px 10px;
-      background: #f4f7fb;
-    }
-
-    .right .tabPanel[data-tab="invoice"] .accordion-button:focus {
-      box-shadow: none;
-    }
-
-    .right .tabPanel[data-tab="invoice"] .accordion-button:not(.collapsed) {
-      color: #1f2937;
-      background: #eef3ff;
-      box-shadow: inset 0 -1px 0 #dbe3ff;
-    }
-
-    .right .tabPanel[data-tab="invoice"] .accordion-body {
-      padding: 8px 0 10px;
     }
 
     .remarksList {
@@ -337,10 +287,20 @@
         <i class="bi bi-x-lg" aria-hidden="true"></i>
       </button>
     </div>
-    <button class="sideNavItem" type="button" data-module="visit">Visit Module</button>
-    <button class="sideNavItem" type="button" data-module="visit-review">Visit Module Review</button>
-    <button class="sideNavItem" type="button" data-module="landing">Landing Page</button>
-    <button class="sideNavItem" type="button" data-module="landing-manager">Landing Page - Manager</button>
+    <ul class="sideNavList" role="menu">
+      <li>
+        <a class="sideNavItem" role="menuitem" href="visitmodule.html" data-module="visit">Visit Module</a>
+      </li>
+      <li>
+        <a class="sideNavItem" role="menuitem" href="visitmoduleReview.html" data-module="visit-review">Visit Module Review</a>
+      </li>
+      <li>
+        <a class="sideNavItem" role="menuitem" href="index.html" data-module="landing">Landing Page</a>
+      </li>
+      <li>
+        <a class="sideNavItem" role="menuitem" href="LPmanager.html" data-module="landing-manager">Landing Page - Manager</a>
+      </li>
+    </ul>
   </nav>
 </div>
 
@@ -984,54 +944,56 @@
 
     <div class="tabBody">
       <div class="tabPanel active" data-tab="customer">
-        <div class="d-flex align-items-center justify-content-between mb-2">
-          <h4 class="mb-0">Customer Contact Info</h4>
-          <button class="btn btn-outline-primary btn-sm" type="button" id="addCustomerContactBtn">Add contact</button>
+        <div class="infoCard">
+          <div class="infoCardHeader">
+            <div class="infoCardTitle">Customer Contact Info</div>
+            <button class="btn btn-outline-primary btn-sm" type="button" id="addCustomerContactBtn">Add contact</button>
+          </div>
+          <div id="customerContacts" class="accordion"></div>
         </div>
-        <div id="customerContacts" class="accordion"></div>
 
-        <hr />
+        <div class="infoCard">
+          <div class="infoCardTitle">Outstanding Amount Details</div>
+          <table class="outstandingTable">
+            <tbody>
+              <tr>
+                <td>Amount for the month</td>
+                <td class="amountCell" id="customerAmountForMonth">Rs. 0</td>
+              </tr>
+              <tr>
+                <td>MTD collection</td>
+                <td class="amountCell amountGreen" id="customerMtdCollection">Rs. 0</td>
+              </tr>
+              <tr>
+                <td>Cn/Adv/PDC</td>
+                <td class="amountCell amountRed" id="customerCnAdvPdc">Rs. 0</td>
+              </tr>
+              <tr>
+                <td colspan="2"><div class="outstandingDivider"></div></td>
+              </tr>
+              <tr class="outstandingTotal">
+                <td>Total Net Due</td>
+                <td class="amountCell" id="customerNetDueAmount">Rs. 0</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
-        <h4>Outstanding Amount Details</h4>
-        <table class="outstandingTable">
-          <tbody>
-            <tr>
-              <td>Amount for the month</td>
-              <td class="amountCell" id="customerAmountForMonth">Rs. 0</td>
-            </tr>
-            <tr>
-              <td>MTD collection</td>
-              <td class="amountCell amountGreen" id="customerMtdCollection">Rs. 0</td>
-            </tr>
-            <tr>
-              <td>Cn/Adv/PDC</td>
-              <td class="amountCell amountRed" id="customerCnAdvPdc">Rs. 0</td>
-            </tr>
-            <tr>
-              <td colspan="2"><div class="outstandingDivider"></div></td>
-            </tr>
-            <tr class="outstandingTotal">
-              <td>Total Net Due</td>
-              <td class="amountCell" id="customerNetDueAmount">Rs. 0</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <hr />
-
-        <h4>Customer Details</h4>
-        <div class="kv kv-right"><span>Bill To Address</span><strong id="customerBillToAddress">-</strong></div>
-        <div class="kv"><span>Ship To Address</span><strong id="customerShipToAddress">-</strong></div>
-        <div class="kv"><span>City</span><strong id="customerCity">-</strong></div>
-        <div class="kv"><span>Pincode</span><strong id="customerPincode">-</strong></div>
-        <div class="kv"><span>State</span><strong id="customerState">-</strong></div>
-        <div class="kv"><span>Region</span><strong id="customerRegion">-</strong></div>
+        <div class="infoCard">
+          <div class="infoCardTitle">Customer Details</div>
+          <div class="kv kv-right"><span>Bill To Address</span><strong id="customerBillToAddress">-</strong></div>
+          <div class="kv"><span>Ship To Address</span><strong id="customerShipToAddress">-</strong></div>
+          <div class="kv"><span>City</span><strong id="customerCity">-</strong></div>
+          <div class="kv"><span>Pincode</span><strong id="customerPincode">-</strong></div>
+          <div class="kv"><span>State</span><strong id="customerState">-</strong></div>
+          <div class="kv"><span>Region</span><strong id="customerRegion">-</strong></div>
+        </div>
       </div>
 
       <div class="tabPanel" data-tab="invoice">
         <div class="invoiceDetailsBlock" id="invoiceDetailsBlock">
           <div class="invoiceHeaderRow">
-            <h4 class="invoicePaneTitle">Invoice Details</h4>
+            <h4 class="invoicePaneTitle mb-0">Invoice Details</h4>
             <span class="invoiceStatusPill is-neutral" id="invoiceSubmissionStatus">-</span>
           </div>
           <div class="invoiceInfoGrid">
@@ -1148,21 +1110,23 @@
       </div>
 
       <div class="tabPanel" data-tab="docs">
-        <div class="docsHeader">
-          <h4>Documents</h4>
-          <button class="docsClipBtn" type="button" id="docsClipBtn" aria-label="All documents">
-            <i class="bi bi-paperclip" aria-hidden="true"></i>
-          </button>
+        <div class="infoCard">
+          <div class="infoCardHeader">
+            <div class="infoCardTitle">Documents</div>
+            <button class="docsClipBtn" type="button" id="docsClipBtn" aria-label="All documents">
+              <i class="bi bi-paperclip" aria-hidden="true"></i>
+            </button>
+          </div>
+          <div class="docsFilterRow">
+            <label class="docsFilterLabel" for="docsInvoiceSelect">Document Type</label>
+            <select id="docsInvoiceSelect" class="form-select form-select-sm"></select>
+          </div>
+          <div id="docsPicker" class="docsPicker hidden">
+            <div class="docsPickerHeader">All documents</div>
+            <div id="docsPickerList" class="docsPickerList"></div>
+          </div>
+          <div id="docsList" class="docsList"></div>
         </div>
-        <div class="docsFilterRow">
-          <label class="docsFilterLabel" for="docsInvoiceSelect">Document Type</label>
-          <select id="docsInvoiceSelect" class="form-select form-select-sm"></select>
-        </div>
-        <div id="docsPicker" class="docsPicker hidden">
-          <div class="docsPickerHeader">All documents</div>
-          <div id="docsPickerList" class="docsPickerList"></div>
-        </div>
-        <div id="docsList" class="docsList"></div>
       </div>
 
       <div class="tabPanel" data-tab="todo">

@@ -24,6 +24,23 @@ body {
   --bs-link-hover-color: var(--brand-dark);
 }
 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: inherit;
+  font-weight: 700;
+}
+
+h1 { font-size: 24px; font-weight: 800; }
+h2 { font-size: 20px; }
+h3 { font-size: 18px; }
+h4 { font-size: 14px; }
+h5 { font-size: 13px; }
+h6 { font-size: 12px; }
+
 /* ================= HEADER ================= */
 
 header {
@@ -256,6 +273,19 @@ button.notifyBadge {
   margin-bottom: 18px;
 }
 
+.sideNavList {
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.sideNavList li {
+  margin: 0;
+}
+
 .sideNavTitle {
   font-weight: 800;
   font-size: 16px;
@@ -274,20 +304,30 @@ button.notifyBadge {
 }
 
 .sideNavItem {
+  display: block;
   width: 100%;
-  border: 1px solid #e2e8f4;
-  background: #f8fafc;
-  padding: 10px 12px;
-  border-radius: 10px;
+  border: none;
+  background: transparent;
+  padding: 8px 6px;
+  border-radius: 0;
   text-align: left;
   font-weight: 600;
-  color: #111827;
+  color: #1f2937;
   cursor: pointer;
+  text-decoration: none;
 }
 
 .sideNavItem:hover {
-  border-color: var(--brand-border);
-  background: var(--brand-lighter);
+  color: var(--brand);
+}
+
+.sideNavItem:visited {
+  color: #1f2937;
+}
+
+.sideNavItem:focus-visible {
+  outline: 2px solid rgba(var(--brand-rgb), 0.35);
+  outline-offset: 2px;
 }
 
 .divider {
@@ -2014,9 +2054,20 @@ textarea { min-height: 70px; resize: vertical; }
 }
 
 .tabPanel { display: none; }
-.tabPanel.active { display: block; }
+.tabPanel.active {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
 
-.tabBody h4 { margin: 0 0 8px 0; }
+.tabBody h4 {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.tabBody h4.mb-0 { margin: 0; }
 
 .kv {
   display: flex;
@@ -2048,22 +2099,38 @@ textarea { min-height: 70px; resize: vertical; }
   padding: 10px;
 }
 
+.infoCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
 .infoCardTitle {
   font-size: 11px;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: #6b7280;
-  margin-bottom: 6px;
 }
 
 .infoCard .kv {
-  padding: 4px 0;
+  padding: 8px 0;
   border-bottom: 1px dashed #e7ebf5;
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .infoCard .kv:last-child {
   border-bottom: none;
+}
+
+.invoicePaneTitle {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #6b7280;
 }
 
 .invoiceHeaderRow {
