@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fintech Sidebar Design</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+        :root {
+            --bg-body: #f8fafc;
+            --bg-sidebar: #ffffff;
+            --primary: #4f46e5;
+            --primary-glow: rgba(79, 70, 229, 0.15);
+            --accent: #0ea5e9;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --hover-bg: #f1f5f9;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --sidebar-width: 280px;
+            --sidebar-width-collapsed: 80px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* Sidebar Container */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+            position: fixed;
+            left: 0;
+            top: 0;
+            transition: var(--transition);
+            z-index: 50;
+            box-shadow: 4px 0 24px rgba(0,0,0,0.02);
+        }
+
+        .sidebar.collapsed {
+            width: var(--sidebar-width-collapsed);
+            padding: 1.5rem 1rem;
+        }
+
+        /* Sidebar Toggle Button */
+        .toggle-btn {
+            position: absolute;
+            right: -12px;
+            top: 48px;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--text-muted);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: var(--transition);
+        }
+        
+        .sidebar.collapsed .toggle-btn {
+            transform: rotate(180deg);
+        }
+
+        /* Elements to hide on collapse */
+        .sidebar.collapsed .logo-text,
+        .sidebar.collapsed .link-content span,
+        .sidebar.collapsed .chevron,
+        .sidebar.collapsed .badge,
+        .sidebar.collapsed .user-info {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+            display: none;
+        }
+
+        .sidebar.collapsed .logo-container {
+            justify-content: center;
+            padding: 0;
+        }
+
+        .sidebar.collapsed .nav-link {
+            justify-content: center;
+            padding: 0.875rem 0;
+        }
+
+        .sidebar.collapsed .submenu {
+            display: none;
+        }
+
+        .sidebar.collapsed .user-profile {
+            padding: 0.75rem;
+            justify-content: center;
+        }
+        
+        .sidebar.collapsed .user-profile i {
+            display: none;
+        }
+
+        /* Logo Area */
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 3rem;
+            padding: 0 0.5rem;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            box-shadow: 0 8px 16px var(--primary-glow);
+        }
+
+        .logo-text {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Navigation */
+        .nav-menu {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            flex: 1;
+        }
+
+        .menu-item {
+            position: relative;
+        }
+
+        /* Main Link Style */
+        .nav-link {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.875rem 1rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: 12px;
+            transition: var(--transition);
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+
+        .nav-link:hover {
+            background: var(--hover-bg);
+            color: var(--text-main);
+        }
+
+        .nav-link.active {
+            background: rgba(79, 70, 229, 0.1);
+            color: white;
+            border-color: rgba(79, 70, 229, 0.2);
+        }
+
+        .link-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+        }
+
+        .nav-link i {
+            font-size: 1.25rem;
+        }
+
+        .chevron {
+            font-size: 0.875rem;
+            transition: var(--transition);
+        }
+
+        .menu-item.open .chevron {
+            transform: rotate(180deg);
+        }
+
+        /* Submenu */
+        .submenu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            margin-left: 2.25rem;
+            border-left: 1px solid var(--border);
+            padding-left: 0.5rem;
+        }
+
+        .menu-item.open .submenu {
+            max-height: 200px; /* Adjust based on content */
+            margin-top: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .submenu-link {
+            display: block;
+            padding: 0.6rem 1rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: var(--transition);
+            border-radius: 8px;
+        }
+
+        .submenu-link:hover {
+            color: var(--accent);
+            background: var(--hover-bg);
+        }
+
+        .submenu-link.active {
+            color: var(--accent);
+        }
+
+        /* Badge */
+        .badge {
+            background: var(--primary);
+            color: white;
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        /* User Profile at Bottom */
+        .user-profile {
+            margin-top: auto;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 1rem;
+            background: var(--hover-bg);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .user-profile:hover {
+            border-color: var(--text-muted);
+            background: rgba(255,255,255,0.08);
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--text-muted);
+            background-image: url('https://i.pravatar.cc/150?u=tanserv');
+            background-size: cover;
+        }
+
+        .user-info h4 {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .user-info p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Content Area Placeholder */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 3rem;
+            flex: 1;
+            transition: var(--transition);
+        }
+
+        .main-content.expanded {
+            margin-left: var(--sidebar-width-collapsed);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(to right, #0f172a, #64748b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="toggle-btn" id="toggleBtn">
+            <i class="ph-bold ph-caret-left"></i>
+        </div>
+
+        <div class="logo-container">
+            <div class="logo-icon">
+                <i class="ph-bold ph-chart-polar"></i>
+            </div>
+            <div class="logo-text">Inebura</div>
+        </div>
+
+        <ul class="nav-menu">
+            <li class="menu-item">
+                <a href="#" class="nav-link">
+                    <div class="link-content">
+                        <i class="ph ph-squares-four"></i>
+                        <span>Dashboard</span>
+                    </div>
+                </a>
+            </li>
+
+            <li class="menu-item">
+                <a href="#" class="nav-link active">
+                    <div class="link-content">
+                        <i class="ph ph-wallet"></i>
+                        <span>Accounts</span>
+                    </div>
+                    <i class="ph-bold ph-caret-down chevron"></i>
+                </a>
+                <div class="submenu">
+                    <a href="#" class="submenu-link active">Overview</a>
+                    <a href="#" class="submenu-link">Transactions</a>
+                    <a href="#" class="submenu-link">Statements</a>
+                </div>
+            </li>
+
+            <li class="menu-item">
+                <a href="#" class="nav-link">
+                    <div class="link-content">
+                        <i class="ph ph-arrows-left-right"></i>
+                        <span>Transfers</span>
+                    </div>
+                    <span class="badge">3</span>
+                </a>
+            </li>
+
+            <li class="menu-item">
+                <a href="#" class="nav-link">
+                    <div class="link-content">
+                        <i class="ph ph-chart-line-up"></i>
+                        <span>Analytics</span>
+                    </div>
+                    <i class="ph-bold ph-caret-down chevron"></i>
+                </a>
+                <div class="submenu">
+                    <a href="#" class="submenu-link">Performance</a>
+                    <a href="#" class="submenu-link">Reports</a>
+                </div>
+            </li>
+
+            <li class="menu-item">
+                <a href="#" class="nav-link">
+                    <div class="link-content">
+                        <i class="ph ph-credit-card"></i>
+                        <span>Cards</span>
+                    </div>
+                </a>
+            </li>
+        </ul>
+
+        <div class="user-profile">
+            <div class="avatar"></div>
+            <div class="user-info">
+                <h4>Jane Doe</h4>
+                <p>Premium Member</p>
+            </div>
+            <i class="ph-bold ph-sign-out" style="margin-left: auto; color: var(--text-muted);"></i>
+        </div>
+    </aside>
+
+    <main class="main-content" id="mainContent">
+        <h1>Welcome Back, Jane</h1>
+        <p style="color: var(--text-muted); font-size: 1.1rem; max-width: 600px; line-height: 1.6;">
+            Your financial dashboard is ready. Manage your accounts, track transactions, and view your latest analytics here.
+        </p>
+    </main>
+
+    <script>
+        // Toggle Submenu Logic
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                // If the link has a chevron, it's a submenu toggle
+                if (this.querySelector('.chevron')) {
+                    e.preventDefault();
+                    // Toggle the 'open' class on the parent menu-item
+                    const menuItem = this.closest('.menu-item');
+                    menuItem.classList.toggle('open');
+                }
+            });
+        });
+
+        // Set 'Accounts' menu open by default for demo
+        document.querySelectorAll('.menu-item')[1].classList.add('open');
+
+        // Sidebar Collapse Logic
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const toggleBtn = document.getElementById('toggleBtn');
+
+        toggleBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('expanded');
+        });
+    </script>
+</body>
+</html>

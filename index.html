@@ -16,7 +16,57 @@
     }
 
     .right .tabPanel[data-tab="invoice"] .invoiceStickyDock {
+      position: sticky;
+      bottom: 0;
+      margin-top: 12px;
+      padding: 8px;
+      background: rgb(255 255 255 / 98%);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-top: 1px solid #e2e8f4;
+      box-shadow: 1px 0px 25px rgba(15, 23, 42, 0.42);
+      z-index: 2;
+      max-height: 45vh;
+      overflow-y: auto;
+      border-radius: 10px;
+    }
+
+    .right .tabPanel[data-tab="invoice"].detailsHidden .invoiceStickyDock {
       position: static;
+      margin-top: 0;
+      padding: 0;
+      background: transparent;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      border-top: none;
+      box-shadow: none;
+      border-radius: 0;
+      max-height: none;
+      overflow: visible;
+    }
+
+    .right .tabPanel[data-tab="invoice"].detailsHidden .accordion-item {
+      border: none;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .right .tabPanel[data-tab="invoice"].detailsHidden .accordion-button {
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    .right .tabPanel[data-tab="invoice"].detailsHidden .accordion-button:not(.collapsed) {
+      background: transparent;
+      color: inherit;
+    }
+
+    .right .tabPanel[data-tab="invoice"].detailsHidden .accordion-body {
+      padding-left: 0;
+      padding-right: 0;
     }
 
     .remarksList {
@@ -282,23 +332,40 @@
 <div class="sideNavOverlay" id="sideNavOverlay" aria-hidden="true">
   <nav class="sideNav" id="sideNav" aria-label="Main">
     <div class="sideNavHeader">
-      <span class="sideNavTitle">Menu</span>
+      <div class="sideNavBrand">
+        <span class="sideNavBrandIcon">I</span>
+        <span class="sideNavBrandName">Inebura</span>
+      </div>
       <button class="iconBtn sideNavClose" type="button" id="sideNavClose" aria-label="Close menu">
         <i class="bi bi-x-lg" aria-hidden="true"></i>
       </button>
     </div>
-    <ul class="sideNavList" role="menu">
-      <li>
-        <a class="sideNavItem" role="menuitem" href="visitmodule.html" data-module="visit">Visit Module</a>
+    <ul class="nav-menu" role="menu">
+      <li class="menu-item">
+        <a class="nav-link" href="#" data-toggle="submenu" aria-expanded="false">
+          <span class="link-content">
+            <i class="bi bi-geo-alt" aria-hidden="true"></i>
+            <span>Visit</span>
+          </span>
+          <i class="bi bi-chevron-down chevron" aria-hidden="true"></i>
+        </a>
+        <div class="submenu">
+          <a class="submenu-link" href="visitmodule.html" data-module="visit">Visit Module</a>
+          <a class="submenu-link" href="visitmoduleReview.html" data-module="visit-review">Visit Module Review</a>
+        </div>
       </li>
-      <li>
-        <a class="sideNavItem" role="menuitem" href="visitmoduleReview.html" data-module="visit-review">Visit Module Review</a>
-      </li>
-      <li>
-        <a class="sideNavItem" role="menuitem" href="index.html" data-module="landing">Landing Page</a>
-      </li>
-      <li>
-        <a class="sideNavItem" role="menuitem" href="LPmanager.html" data-module="landing-manager">Landing Page - Manager</a>
+      <li class="menu-item">
+        <a class="nav-link" href="#" data-toggle="submenu" aria-expanded="false">
+          <span class="link-content">
+            <i class="bi bi-window" aria-hidden="true"></i>
+            <span>Landing</span>
+          </span>
+          <i class="bi bi-chevron-down chevron" aria-hidden="true"></i>
+        </a>
+        <div class="submenu">
+          <a class="submenu-link" href="index.html" data-module="landing">Landing Page</a>
+          <a class="submenu-link" href="LPmanager.html" data-module="landing-manager">Landing Page - Manager</a>
+        </div>
       </li>
     </ul>
   </nav>
@@ -1205,5 +1272,3 @@
   </script>
 </body>
 </html>
-
-

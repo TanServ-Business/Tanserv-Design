@@ -3577,7 +3577,17 @@ function wireSideNavEvents() {
   }
   if (sideNav) {
     sideNav.addEventListener("click", (event) => {
-      const item = event.target.closest(".sideNavItem[data-module]");
+      const toggle = event.target.closest(".nav-link[data-toggle=\"submenu\"]");
+      if (toggle) {
+        event.preventDefault();
+        const menuItem = toggle.closest(".menu-item");
+        if (!menuItem) return;
+        const isOpen = menuItem.classList.toggle("open");
+        toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+        return;
+      }
+
+      const item = event.target.closest(".nav-link[data-module], .submenu-link[data-module]");
       if (!item) return;
       const moduleKey = item.getAttribute("data-module");
       const destinations = {

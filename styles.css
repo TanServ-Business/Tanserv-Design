@@ -1,10 +1,15 @@
 * { box-sizing: border-box; }
 
+html, body {
+  height: 100%;
+}
+
 body {
   margin: 0;
   font-family: Arial, Helvetica, sans-serif;
   background: #f4f6f9;
   color: #222;
+  overflow: hidden;
 }
 
 :root {
@@ -273,20 +278,27 @@ button.notifyBadge {
   margin-bottom: 18px;
 }
 
-.sideNavList {
-  list-style: none;
-  margin: 0;
-  padding: 4px 0;
+.sideNavBrand {
   display: flex;
-  flex-direction: column;
-  gap: 0;
+  align-items: center;
+  gap: 10px;
 }
 
-.sideNavList li {
-  margin: 0;
+.sideNavBrandIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: var(--brand);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 14px;
+  box-shadow: 0 6px 14px rgba(var(--brand-rgb), 0.25);
 }
 
-.sideNavTitle {
+.sideNavBrandName {
   font-weight: 800;
   font-size: 16px;
   color: #111827;
@@ -303,29 +315,129 @@ button.notifyBadge {
   justify-content: center;
 }
 
-.sideNavItem {
-  display: block;
-  width: 100%;
-  border: none;
+.sideNav .nav-menu {
+  list-style: none;
+  margin: 0;
+  padding: 2px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
   background: transparent;
-  padding: 8px 6px;
+  border: none;
   border-radius: 0;
-  text-align: left;
-  font-weight: 600;
-  color: #1f2937;
-  cursor: pointer;
+}
+
+.sideNav .menu-item {
+  position: relative;
+}
+
+.sideNav .nav-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  color: #64748b;
   text-decoration: none;
+  border-radius: 8px;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  border: 1px solid transparent;
 }
 
-.sideNavItem:hover {
-  color: var(--brand);
+.sideNav .nav-link:hover {
+  background: #f1f5f9;
+  color: #0f172a;
 }
 
-.sideNavItem:visited {
-  color: #1f2937;
+.sideNav .nav-link.active {
+  background: var(--brand-lighter);
+  color: var(--brand-dark);
+  border-color: var(--brand-border);
 }
 
-.sideNavItem:focus-visible {
+.sideNav .sideNavItem {
+  width: 100%;
+  text-align: left;
+  border: 1px solid transparent;
+  background: transparent;
+  padding: 10px 12px;
+  border-radius: 12px;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.sideNav .sideNavItem:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.sideNav .link-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+}
+
+.sideNav .nav-link i {
+  font-size: 16px;
+}
+
+.sideNav .navBadge {
+  background: var(--brand);
+  color: #ffffff;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+.sideNav .chevron {
+  font-size: 12px;
+  color: #94a3b8;
+  transition: transform 0.2s ease;
+}
+
+.sideNav .menu-item.open .chevron {
+  transform: rotate(180deg);
+}
+
+.sideNav .submenu {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.25s ease;
+  margin-left: 28px;
+  border-left: 1px dashed #e2e8f4;
+  padding-left: 8px;
+}
+
+.sideNav .menu-item.open .submenu {
+  max-height: 200px;
+  margin-top: 6px;
+  margin-bottom: 6px;
+}
+
+.sideNav .submenu-link {
+  display: block;
+  padding: 6px 8px;
+  color: #64748b;
+  text-decoration: none;
+  font-size: 12px;
+  border-radius: 8px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.sideNav .submenu-link:hover {
+  color: var(--brand-dark);
+  background: #f1f5f9;
+}
+
+.sideNav .submenu-link.active {
+  color: var(--brand-dark);
+}
+
+.sideNav .nav-link:focus-visible,
+.sideNav .submenu-link:focus-visible {
   outline: 2px solid rgba(var(--brand-rgb), 0.35);
   outline-offset: 2px;
 }
