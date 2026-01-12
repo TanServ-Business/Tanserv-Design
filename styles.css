@@ -1191,10 +1191,10 @@ button.notifyBadge {
   border-top-right-radius: 14px;
 }
 
-.unreadToggleBtn {
+.notifyToggle {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   border: 1px solid var(--brand-border);
   border-radius: 999px;
   padding: 6px 12px;
@@ -1206,18 +1206,24 @@ button.notifyBadge {
   transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
 
-.unreadToggleBtn:hover {
+.notifyToggle:hover {
   transform: translateY(-1px);
   box-shadow: 0 6px 14px rgba(92, 37, 141, 0.15);
 }
 
-.unreadToggleBtn[aria-pressed="false"] {
+.notifyToggle[aria-pressed="false"] {
   background: #ffffff;
   color: #475569;
   border-color: #e2e8f4;
 }
 
-.unreadToggleBtn .unreadToggleCount {
+.notifyToggleLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.notifyToggle .notifyCount {
   min-width: 22px;
   text-align: center;
   border-radius: 999px;
@@ -1229,7 +1235,7 @@ button.notifyBadge {
   font-weight: 800;
 }
 
-.unreadToggleBtn[aria-pressed="false"] .unreadToggleCount {
+.notifyToggle[aria-pressed="false"] .notifyCount {
   background: #e2e8f0;
   color: #475569;
   border-color: #d8e0eb;
@@ -1991,6 +1997,68 @@ textarea { min-height: 70px; resize: vertical; }
 
 .emailDetailPane .notificationBody {
   font-size: 11px;
+}
+
+.emailDetailHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-bottom: 6px;
+  border-bottom: 1px dashed #e2e8f4;
+  margin-bottom: 8px;
+}
+
+.emailDetailSubjectRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.emailDetailSubject {
+  font-size: 13px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.emailDetailActions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.emailActionIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: #f1f5f9;
+  cursor: pointer;
+}
+
+.emailDetailMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.emailDetailLine {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+}
+
+.emailDetailLabel {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 10px;
+  color: #94a3b8;
+  min-width: 40px;
 }
 
 .commitmentList {

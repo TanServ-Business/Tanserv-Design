@@ -2559,6 +2559,37 @@ function wireEmailPanelEvents() {
     if (composeAttachments) composeAttachments.value = "";
   };
 
+  const getDetailText = (id) => {
+    const el = document.getElementById(id);
+    if (!el) return "";
+    const value = String(el.textContent || "").trim();
+    return value === "-" ? "" : value;
+  };
+
+  const openReplyAll = () => {
+    if (!composePanel) return;
+    const from = getDetailText("emailDetailFrom");
+    const to = getDetailText("emailDetailTo");
+    const cc = getDetailText("emailDetailCc");
+    const subject = getDetailText("emailDetailSubject");
+    const body = getDetailText("emailDetailBody");
+
+    resetCompose();
+    showCompose();
+
+    if (composeTo) composeTo.value = from || to;
+    if (composeCc) {
+      const ccValues = [to, cc].filter(Boolean);
+      composeCc.value = ccValues.join(", ");
+    }
+    if (composeSubject) {
+      composeSubject.value = subject ? (subject.startsWith("Re:") ? subject : `Re: ${subject}`) : "";
+    }
+    if (composeBody && body) {
+      composeBody.value = `\n\n--- Original message ---\n${body}`;
+    }
+  };
+
   const getContactSuggestions = () => {
     const customer = customersData.find(c => c.id === selectedCustomerId);
     const contacts = Array.isArray(customer?.contacts) ? customer.contacts : [];
@@ -2645,6 +2676,12 @@ function wireEmailPanelEvents() {
   });
 
   document.addEventListener("click", (e) => {
+    const replyAll = e.target.closest(".emailActionIcon[data-email-action='reply-all']");
+    if (replyAll) {
+      openReplyAll();
+      return;
+    }
+
     const suggestionItem = e.target.closest(".emailSuggestionItem");
     if (suggestionItem) {
       const box = suggestionItem.closest(".emailSuggestionBox");
@@ -3731,7 +3768,8 @@ function wireSideNavEvents() {
         "visit": "visitmodule.html",
         "visit-review": "visitmoduleReview.html",
         "landing": "index.html",
-        "landing-manager": "LPmanager.html"
+        "landing-manager": "LPmanager.html",
+        "landing-backend": "LPbackend.html"
       };
       const target = destinations[moduleKey];
       if (target) window.location.href = target;
