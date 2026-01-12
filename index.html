@@ -20,16 +20,18 @@
       bottom: 0;
       margin-top: 12px;
       padding: 8px;
-      background: rgb(255 255 255 / 98%);
-      backdrop-filter: blur(16px);
+      background: rgb(255 255 255 / 0%);
+      backdrop-filter: blur(2px);
       -webkit-backdrop-filter: blur(16px);
-      border-top: 1px solid #e2e8f4;
+      border-top: 1.5px solid #e2e8f4;
       box-shadow: 1px 0px 25px rgba(15, 23, 42, 0.42);
       z-index: 2;
       max-height: 45vh;
       overflow-y: auto;
       border-radius: 10px;
     }
+
+    
 
     .right .tabPanel[data-tab="invoice"].detailsHidden .invoiceStickyDock {
       position: static;
@@ -67,6 +69,13 @@
     .right .tabPanel[data-tab="invoice"].detailsHidden .accordion-body {
       padding-left: 0;
       padding-right: 0;
+    }
+
+    .right .tabPanel[data-tab="invoice"] .accordion-collapse.show .remarksList,
+    .right .tabPanel[data-tab="invoice"] .accordion-collapse.show .activityTrail {
+      border: 1px solid #e2e8f4;
+      border-radius: 12px;
+      background: #ffffff;
     }
 
     .remarksList {
@@ -375,11 +384,14 @@
 
   <!-- LEFT PANEL : CUSTOMERS (FROZEN) -->
   <aside class="panel customersPanel">
-    <div class="panelHeader">
-      <h3>Customers</h3>
+    <div class="leftTabsRow hidden" id="leftPanelTabs">
+      <button class="leftTabBtn active" type="button" data-left-tab="customers">Customers</button>
+      <button class="leftTabBtn" type="button" data-left-tab="agents">Agents</button>
     </div>
-
-    <div class="customerSort">
+    <div class="panelHeader">
+      <h3 id="leftPanelTitle">Customers</h3>
+    </div>
+    <div class="customerSort" id="customerSortWrap">
       <select id="customerSortSelect" class="form-select form-select-sm">
         <option value="">Sort by...</option>
         <option value="totalInvoice_desc">Total Invoice: High to Low</option>
@@ -396,6 +408,8 @@
     <div id="customerCards" class="cards">
       <!-- Rendered by JS -->
     </div>
+
+    <div id="agentCards" class="cards hidden"></div>
   </aside>
 
   <!-- CENTER PANEL : PLAYGROUND -->
@@ -491,10 +505,11 @@
             <ul class="dropdown-menu" id="filterStatusMenu" data-filter="status"></ul>
           </div>
 
-          <div class="form-check form-switch ms-auto mb-0">
-            <input class="form-check-input" type="checkbox" role="switch" id="filterUnreadEmail" />
-            <label class="form-check-label" for="filterUnreadEmail">Unread Email</label>
-          </div>
+          <button class="unreadToggleBtn ms-auto" type="button" id="filterUnreadEmail" aria-pressed="false">
+            <i class="bi bi-envelope-fill" aria-hidden="true"></i>
+            <span>Unread Email</span>
+            <span class="unreadToggleCount" id="unreadEmailCount">0</span>
+          </button>
 
           <button class="btn btn-outline-secondary btn-sm" type="button" id="filterClearBtn">
             Clear filters
@@ -1050,7 +1065,7 @@
         <div class="infoCard">
           <div class="infoCardTitle">Customer Details</div>
           <div class="kv kv-right"><span>Bill To Address</span><strong id="customerBillToAddress">-</strong></div>
-          <div class="kv"><span>Ship To Address</span><strong id="customerShipToAddress">-</strong></div>
+          <div class="kv kv-right"><span>Ship To Address</span><strong id="customerShipToAddress">-</strong></div>
           <div class="kv"><span>City</span><strong id="customerCity">-</strong></div>
           <div class="kv"><span>Pincode</span><strong id="customerPincode">-</strong></div>
           <div class="kv"><span>State</span><strong id="customerState">-</strong></div>

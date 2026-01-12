@@ -9,6 +9,14 @@ const tenantBrandMap = {
 
 const urlParams = new URLSearchParams(window.location.search);
 const isManagerView = urlParams.get("role") === "manager";
+const managerAgentData = [
+  { name: "Aditi Sharma", portfolio: 15250000, target: 650000 },
+  { name: "Manish Kumar", portfolio: 13500000, target: 600000 },
+  { name: "Palak Choudhary", portfolio: 12850000, target: 550000 },
+  { name: "Abhishek Sharma", portfolio: 14200000, target: 620000 },
+  { name: "Sakshi Sharma", portfolio: 11950000, target: 520000 }
+];
+const initialAgentParam = urlParams.get("agent");
 const todoStorageKey = "ineburaTodoTasks";
 const remarksStorageKey = "ineburaRemarksByInvoice";
 const managerNotificationsKey = "ineburaManagerNotifications";
@@ -1318,10 +1326,34 @@ function getInvoiceSalesOrder(invoice) {
   return invoice.salesOrder ? String(invoice.salesOrder) : `SO-${invoice.invoiceNo}`;
 }
 
-function getBaseFilteredInvoices() {
-  const unreadChk = document.getElementById("filterUnreadEmail");
+function isUnreadFilterActive() {
+  const el = document.getElementById("filterUnreadEmail");
+  if (!el) return false;
+  if ("checked" in el) return !!el.checked;
+  return el.getAttribute("aria-pressed") === "true";
+}
 
-  filterState.unreadOnly = unreadChk ? unreadChk.checked : false;
+function setUnreadFilterActive(isActive) {
+  const el = document.getElementById("filterUnreadEmail");
+  if (!el) return;
+  if ("checked" in el) {
+    el.checked = isActive;
+    return;
+  }
+  el.setAttribute("aria-pressed", isActive ? "true" : "false");
+}
+
+function updateUnreadEmailToggleCount() {
+  const countEl = document.getElementById("unreadEmailCount");
+  if (!countEl) return;
+  const total = (currentInvoicesAll || []).reduce((sum, inv) => {
+    return sum + Number(inv.unreadEmailCount || 0);
+  }, 0);
+  countEl.textContent = String(total);
+}
+
+function getBaseFilteredInvoices() {
+  filterState.unreadOnly = isUnreadFilterActive();
 
   const fInvStatus = filterState.invoiceStatus;
   const fPrimary = filterState.primaryStatus;
@@ -1734,6 +1766,8 @@ function setActiveTab(tabKey) {
 // Global state for table filtering + selection
 // ===============================
 let selectedCustomerId = customersData[0]?.id || null;
+let activeLeftTab = "customers";
+let activeAgentName = initialAgentParam || null;
 let currentInvoicesAll = [];
 let currentInvoicesFiltered = [];
 let currentInvoicesBaseFiltered = [];
@@ -1833,6 +1867,90 @@ function renderCustomers(customers, selectedId) {
   if (customers.length === 0) {
     wrap.innerHTML = `<div style="padding:10px; color:#667085; font-size:13px;">No customers match your search.</div>`;
   }
+}
+
+function renderAgents(agents, selectedName) {
+  const wrap = document.getElementById("agentCards");
+  if (!wrap) return;
+
+  wrap.innerHTML = "";
+
+  agents.forEach(agent => {
+    const card = document.createElement("div");
+    card.className = `agentCard ${agent.name === selectedName ? "active" : ""}`;
+    card.setAttribute("data-agent", agent.name);
+
+    card.innerHTML = `
+      <div class="agentCardHeader">
+        <div class="agentCardName">${agent.name}</div>
+        <div class="agentCardValue">Target Rs.${formatINR(agent.target)}</div>
+      </div>
+      <div class="agentCardMeta">Portfolio Rs.${formatINR(agent.portfolio)}</div>
+    `;
+
+    card.addEventListener("click", () => selectAgent(agent.name));
+    wrap.appendChild(card);
+  });
+
+  if (agents.length === 0) {
+    wrap.innerHTML = `<div style="padding:10px; color:#667085; font-size:13px;">No agents available.</div>`;
+  }
+}
+
+function selectAgent(agentName) {
+  activeAgentName = agentName;
+  renderAgents(managerAgentData, activeAgentName);
+
+  const agentCustomers = customersData.filter(c => c.agentName === agentName);
+  if (agentCustomers.length === 0) return;
+  selectCustomer(agentCustomers[0].id);
+}
+
+function setLeftPanelTab(tabKey) {
+  activeLeftTab = tabKey;
+  const title = document.getElementById("leftPanelTitle");
+  const tabsWrap = document.getElementById("leftPanelTabs");
+  const sortWrap = document.getElementById("customerSortWrap");
+  const search = document.getElementById("customerSearch");
+  const customerCards = document.getElementById("customerCards");
+  const agentCards = document.getElementById("agentCards");
+
+  if (title) title.textContent = tabKey === "agents" ? "Agents" : "Customers";
+  if (sortWrap) sortWrap.classList.toggle("hidden", tabKey === "agents");
+  if (search) search.classList.toggle("hidden", tabKey === "agents");
+  if (customerCards) customerCards.classList.toggle("hidden", tabKey === "agents");
+  if (agentCards) agentCards.classList.toggle("hidden", tabKey !== "agents");
+
+  if (tabsWrap) {
+    tabsWrap.querySelectorAll(".leftTabBtn").forEach((btn) => {
+      const key = btn.getAttribute("data-left-tab");
+      btn.classList.toggle("active", key === tabKey);
+    });
+  }
+
+  if (tabKey === "agents") {
+    renderAgents(managerAgentData, activeAgentName);
+  }
+}
+
+function wireLeftPanelTabs() {
+  const tabsWrap = document.getElementById("leftPanelTabs");
+  if (!tabsWrap || !isManagerView) return;
+
+  tabsWrap.classList.remove("hidden");
+
+  tabsWrap.addEventListener("click", (event) => {
+    const btn = event.target.closest(".leftTabBtn[data-left-tab]");
+    if (!btn) return;
+    setLeftPanelTab(btn.getAttribute("data-left-tab"));
+  });
+
+  if (initialAgentParam) {
+    const match = managerAgentData.find(agent => agent.name === initialAgentParam);
+    if (match) activeAgentName = match.name;
+  }
+
+  setLeftPanelTab("customers");
 }
 
 // ===============================
@@ -1981,6 +2099,7 @@ function applyFiltersAndRender() {
   }
   syncSelectAllCheckbox();
   updateBulkBar();
+  updateUnreadEmailToggleCount();
 }
 
 // ===============================
@@ -2144,6 +2263,23 @@ function openCnAdvPdcModal() {
   }
 }
 
+function wireIssueCountNavigation() {
+  const issueBtn = document.getElementById("centerIssueCountBtn");
+  if (!issueBtn) return;
+
+  const goToIssueTracker = () => {
+    window.location.href = "IssueTracker/index.html";
+  };
+
+  issueBtn.addEventListener("click", goToIssueTracker);
+  issueBtn.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      goToIssueTracker();
+    }
+  });
+}
+
 // ===============================
 // Selection + Bulk
 // ===============================
@@ -2214,9 +2350,8 @@ function selectCustomer(customerId) {
     resetDispositionState();
     renderTodoInvoiceOptions();
 
-    const unreadChk = document.getElementById("filterUnreadEmail");
-
-    if (unreadChk) unreadChk.checked = false;
+    setUnreadFilterActive(false);
+    updateUnreadEmailToggleCount();
 
     applyFiltersAndRender();
   }
@@ -2253,7 +2388,7 @@ function getFilteredCustomers() {
 // Wire events
 // ===============================
 function wireFilterEvents() {
-  const unreadChk = document.getElementById("filterUnreadEmail");
+  const unreadToggle = document.getElementById("filterUnreadEmail");
   const clearBtn = document.getElementById("filterClearBtn");
 
   Object.keys(filterConfig).forEach(key => {
@@ -2274,8 +2409,10 @@ function wireFilterEvents() {
     });
   });
 
-  if (unreadChk) {
-    unreadChk.addEventListener("change", () => {
+  if (unreadToggle) {
+    unreadToggle.addEventListener("click", () => {
+      const nextState = !isUnreadFilterActive();
+      setUnreadFilterActive(nextState);
       currentPage = 1;
       closeFloatingMenu();
       applyFiltersAndRender();
@@ -2289,7 +2426,7 @@ function wireFilterEvents() {
       filterState.status = "__ALL__";
       currentPage = 1;
 
-      if (unreadChk) unreadChk.checked = false;
+      setUnreadFilterActive(false);
 
       updateFilterButton("invoiceStatus");
       updateFilterButton("primaryStatus");
@@ -3623,6 +3760,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  wireLeftPanelTabs();
+
   wireTabEvents();
   wireContactEvents();
   wireDispositionEvents();
@@ -3630,6 +3769,7 @@ document.addEventListener("DOMContentLoaded", () => {
   wireEmailPanelEvents();
   wireDocsEvents();
   wireFilterEvents();
+  wireIssueCountNavigation();
   wirePaginationEvents();
   wireInvoiceTableEvents();
   wireBulkEvents();

@@ -148,6 +148,36 @@
       font-size: 12px;
     }
 
+    .selectedAgentPill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--brand-light);
+      border: 1px solid var(--brand-border);
+      color: var(--brand-dark);
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+      margin: 0 0 12px;
+    }
+
+    .selectedAgentPill.hidden {
+      display: none;
+    }
+
+    .selectedAgentPill button {
+      border: none;
+      background: transparent;
+      color: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1;
+      padding: 0;
+      cursor: pointer;
+    }
+
     .viewInvoiceBtn {
       border: 1px solid var(--brand-border);
       background: var(--brand);
@@ -219,13 +249,14 @@
       width: 100%;
       border-collapse: collapse;
       font-size: 12px;
+      table-layout: fixed;
     }
 
     .agentTable th,
     .agentTable td {
       padding: 10px 8px;
       border-bottom: 1px dashed #e2e8f4;
-      text-align: left;
+      text-align: center;
     }
 
     .agentTable th {
@@ -233,6 +264,11 @@
       font-size: 11px;
       color: #64748b;
       font-weight: 700;
+    }
+
+    .agentTable th:first-child,
+    .agentTable td:first-child {
+      text-align: left;
     }
 
     .agentTable tbody tr.active {
@@ -313,6 +349,13 @@
       text-align: left;
     }
 
+    .actionBtn.actionBtnSecondary {
+      text-align: center;
+      background: #ffffff;
+      border-color: var(--brand);
+      color: var(--brand-dark);
+    }
+
     .actionBtn + .actionBtn {
       margin-top: 8px;
     }
@@ -380,15 +423,42 @@
 <div class="sideNavOverlay" id="sideNavOverlay" aria-hidden="true">
   <nav class="sideNav" id="sideNav" aria-label="Main">
     <div class="sideNavHeader">
-      <span class="sideNavTitle">Menu</span>
+      <div class="sideNavBrand">
+        <span class="sideNavBrandIcon">I</span>
+        <span class="sideNavBrandName">Inebura</span>
+      </div>
       <button class="iconBtn sideNavClose" type="button" id="sideNavClose" aria-label="Close menu">
         <i class="bi bi-x-lg" aria-hidden="true"></i>
       </button>
     </div>
-    <button class="sideNavItem" type="button" data-module="visit">Visit Module</button>
-    <button class="sideNavItem" type="button" data-module="visit-review">Visit Module Review</button>
-    <button class="sideNavItem" type="button" data-module="landing">Landing Page</button>
-    <button class="sideNavItem" type="button" data-module="landing-manager">Landing Page - Manager</button>
+    <ul class="nav-menu" role="menu">
+      <li class="menu-item">
+        <a class="nav-link" href="#" data-toggle="submenu" aria-expanded="false">
+          <span class="link-content">
+            <i class="bi bi-geo-alt" aria-hidden="true"></i>
+            <span>Visit</span>
+          </span>
+          <i class="bi bi-chevron-down chevron" aria-hidden="true"></i>
+        </a>
+        <div class="submenu">
+          <a class="submenu-link" href="visitmodule.html" data-module="visit">Visit Module</a>
+          <a class="submenu-link" href="visitmoduleReview.html" data-module="visit-review">Visit Module Review</a>
+        </div>
+      </li>
+      <li class="menu-item">
+        <a class="nav-link" href="#" data-toggle="submenu" aria-expanded="false">
+          <span class="link-content">
+            <i class="bi bi-window" aria-hidden="true"></i>
+            <span>Landing</span>
+          </span>
+          <i class="bi bi-chevron-down chevron" aria-hidden="true"></i>
+        </a>
+        <div class="submenu">
+          <a class="submenu-link" href="index.html" data-module="landing">Landing Page</a>
+          <a class="submenu-link" href="LPmanager.html" data-module="landing-manager">Landing Page - Manager</a>
+        </div>
+      </li>
+    </ul>
   </nav>
 </div>
 
@@ -412,23 +482,18 @@
       </div>
 
       <div class="panelCard">
-        <div class="panelTitle">Agents</div>
-        <div class="agentList" id="agentList"></div>
-      </div>
-
-      <div class="panelCard">
         <div class="panelTitle">Issue Tracker</div>
         <div class="issueList">
           <div class="issueItem">
-            <span>Overdue escalations</span>
+            <span>Further Action Required</span>
             <span class="issueCount">6</span>
           </div>
           <div class="issueItem">
-            <span>PTP breaches</span>
+            <span>Material Delivery Issues</span>
             <span class="issueCount">4</span>
           </div>
           <div class="issueItem">
-            <span>Dispute follow-ups</span>
+            <span>Further Document Required</span>
             <span class="issueCount">3</span>
           </div>
         </div>
@@ -439,8 +504,12 @@
       <div class="summaryHeader">
         <div>
           <h2>Agent Summary</h2>
-          <p id="selectedAgentLabel">Select an agent to view details.</p>
+          <p id="selectedAgentLabel">Team summary (all agents).</p>
         </div>
+      </div>
+      <div class="selectedAgentPill hidden" id="selectedAgentPill">
+        <span id="selectedAgentName">-</span>
+        <button type="button" id="selectedAgentClearBtn" aria-label="Clear agent filter">×</button>
       </div>
       <div class="summaryCards" id="summaryCards"></div>
       <div class="panelTitle">Agent Portfolio</div>
@@ -451,12 +520,9 @@
             <th>Total Portfolio</th>
             <th>Target (MTD)</th>
             <th>Achievement</th>
-            <th>Avg Visits</th>
-            <th>PTP Today</th>
-            <th>Untouched Cases</th>
-            <th>Aging &gt;30 Days</th>
-            <th>Callbacks</th>
-            <th>New Billing</th>
+            <th>Untouched Amount</th>
+            <th>Aging &gt;30 Days Amount</th>
+            <th>New Billing Amount</th>
             <th>Action</th>
           </tr>
         </thead>
@@ -515,7 +581,12 @@
       { name: "Palak Choudhary", portfolio: 12850000, target: 550000, achievement: 470000, avgVisit: 11, ptpToday: 2, untouched: 22, aging30: 16, callbacks: 1, newBilling: 3 },
       { name: "Abhishek Sharma", portfolio: 14200000, target: 620000, achievement: 530000, avgVisit: 13, ptpToday: 5, untouched: 19, aging30: 20, callbacks: 4, newBilling: 5 },
       { name: "Sakshi Sharma", portfolio: 11950000, target: 520000, achievement: 410000, avgVisit: 10, ptpToday: 1, untouched: 26, aging30: 14, callbacks: 2, newBilling: 2 }
-    ];
+    ].map((agent) => ({
+      ...agent,
+      untouchedAmount: Math.round(agent.portfolio * 0.01 + agent.untouched * 45000),
+      aging30Amount: Math.round(agent.portfolio * 0.008 + agent.aging30 * 38000),
+      newBillingAmount: Math.round(agent.target * 0.1 + agent.newBilling * 120000)
+    }));
 
     let activeAgent = null;
 
@@ -532,6 +603,9 @@
     const managerTarget = document.getElementById("managerTarget");
     const managerNetDue = document.getElementById("managerNetDue");
     const selectedAgentLabel = document.getElementById("selectedAgentLabel");
+    const selectedAgentPill = document.getElementById("selectedAgentPill");
+    const selectedAgentName = document.getElementById("selectedAgentName");
+    const selectedAgentClearBtn = document.getElementById("selectedAgentClearBtn");
     const agentTableBody = document.getElementById("agentTableBody");
     const agentList = document.getElementById("agentList");
     const visitReviewBtn = document.getElementById("visitReviewBtn");
@@ -644,15 +718,23 @@
       const summarySource = activeAgent || totals;
       if (selectedAgentLabel) {
         selectedAgentLabel.textContent = activeAgent
-          ? `Selected agent: ${activeAgent.name}`
+          ? ""
           : "Team summary (all agents).";
+      }
+      if (selectedAgentPill && selectedAgentName) {
+        if (activeAgent) {
+          selectedAgentName.textContent = activeAgent.name;
+          selectedAgentPill.classList.remove("hidden");
+        } else {
+          selectedAgentPill.classList.add("hidden");
+        }
       }
       summaryCards.innerHTML = `
         <div class="summaryCard"><span>Avg Visits</span><strong>${summarySource.avgVisit}</strong></div>
         <div class="summaryCard"><span>PTP Today</span><strong>${summarySource.ptpToday}</strong></div>
+        <div class="summaryCard"><span>Callbacks Today</span><strong>${summarySource.callbacks}</strong></div>
         <div class="summaryCard"><span>Untouched Cases</span><strong>${summarySource.untouched}</strong></div>
         <div class="summaryCard"><span>Aging &gt;30 days</span><strong>${summarySource.aging30}</strong></div>
-        <div class="summaryCard"><span>Callbacks Today</span><strong>${summarySource.callbacks}</strong></div>
         <div class="summaryCard"><span>New Billing</span><strong>${summarySource.newBilling}</strong></div>
       `;
       renderAgentList();
@@ -676,13 +758,10 @@
           <td>${formatAmount(agent.portfolio)}</td>
           <td>${formatAmount(agent.target)}</td>
           <td>${formatAmount(agent.achievement)}</td>
-          <td>${agent.avgVisit}</td>
-          <td>${agent.ptpToday}</td>
-          <td>${agent.untouched}</td>
-          <td>${agent.aging30}</td>
-          <td>${agent.callbacks}</td>
-          <td>${agent.newBilling}</td>
-          <td><button class="actionBtn" type="button" data-action="view-invoice" data-agent="${agent.name}">View Invoice</button></td>
+          <td>${formatAmount(agent.untouchedAmount)}</td>
+          <td>${formatAmount(agent.aging30Amount)}</td>
+          <td>${formatAmount(agent.newBillingAmount)}</td>
+          <td><button class="actionBtn actionBtnSecondary" type="button" data-action="view-invoice" data-agent="${agent.name}">View Invoice</button></td>
         </tr>
       `).join("");
     };
@@ -694,6 +773,14 @@
       renderSummary();
       renderTable();
       renderCustomerSummary(name);
+      renderAgentList();
+    };
+
+    const clearActiveAgent = () => {
+      activeAgent = null;
+      renderSummary();
+      renderTable();
+      renderCustomerSummary();
       renderAgentList();
     };
 
@@ -718,6 +805,12 @@
         const btn = event.target.closest(".agentCardBtn[data-agent]");
         if (!btn) return;
         setActiveAgent(btn.getAttribute("data-agent"));
+      });
+    }
+
+    if (selectedAgentClearBtn) {
+      selectedAgentClearBtn.addEventListener("click", () => {
+        clearActiveAgent();
       });
     }
 
@@ -1016,7 +1109,17 @@
     }
     if (sideNav) {
       sideNav.addEventListener("click", (event) => {
-        const item = event.target.closest(".sideNavItem[data-module]");
+        const toggle = event.target.closest(".nav-link[data-toggle=\"submenu\"]");
+        if (toggle) {
+          event.preventDefault();
+          const menuItem = toggle.closest(".menu-item");
+          if (!menuItem) return;
+          const isOpen = menuItem.classList.toggle("open");
+          toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+          return;
+        }
+
+        const item = event.target.closest(".nav-link[data-module], .submenu-link[data-module]");
         if (!item) return;
         const moduleKey = item.getAttribute("data-module");
         if (moduleKey === "visit") window.location.href = "visitmodule.html";

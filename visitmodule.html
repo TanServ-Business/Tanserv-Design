@@ -662,15 +662,42 @@
 <div class="sideNavOverlay" id="sideNavOverlay" aria-hidden="true">
   <nav class="sideNav" id="sideNav" aria-label="Main">
     <div class="sideNavHeader">
-      <span class="sideNavTitle">Menu</span>
+      <div class="sideNavBrand">
+        <span class="sideNavBrandIcon">I</span>
+        <span class="sideNavBrandName">Inebura</span>
+      </div>
       <button class="iconBtn sideNavClose" type="button" id="sideNavClose" aria-label="Close menu">
         <i class="bi bi-x-lg" aria-hidden="true"></i>
       </button>
     </div>
-    <button class="sideNavItem" type="button" data-module="visit">Visit Module</button>
-    <button class="sideNavItem" type="button" data-module="visit-review">Visit Module Review</button>
-    <button class="sideNavItem" type="button" data-module="landing">Landing Page</button>
-    <button class="sideNavItem" type="button" data-module="landing-manager">Landing Page - Manager</button>
+    <ul class="nav-menu" role="menu">
+      <li class="menu-item">
+        <a class="nav-link" href="#" data-toggle="submenu" aria-expanded="false">
+          <span class="link-content">
+            <i class="bi bi-geo-alt" aria-hidden="true"></i>
+            <span>Visit</span>
+          </span>
+          <i class="bi bi-chevron-down chevron" aria-hidden="true"></i>
+        </a>
+        <div class="submenu">
+          <a class="submenu-link" href="visitmodule.html" data-module="visit">Visit Module</a>
+          <a class="submenu-link" href="visitmoduleReview.html" data-module="visit-review">Visit Module Review</a>
+        </div>
+      </li>
+      <li class="menu-item">
+        <a class="nav-link" href="#" data-toggle="submenu" aria-expanded="false">
+          <span class="link-content">
+            <i class="bi bi-window" aria-hidden="true"></i>
+            <span>Landing</span>
+          </span>
+          <i class="bi bi-chevron-down chevron" aria-hidden="true"></i>
+        </a>
+        <div class="submenu">
+          <a class="submenu-link" href="index.html" data-module="landing">Landing Page</a>
+          <a class="submenu-link" href="LPmanager.html" data-module="landing-manager">Landing Page - Manager</a>
+        </div>
+      </li>
+    </ul>
   </nav>
 </div>
 
@@ -1545,7 +1572,17 @@
     }
     if (sideNav) {
       sideNav.addEventListener("click", (event) => {
-        const item = event.target.closest(".sideNavItem[data-module]");
+        const toggle = event.target.closest(".nav-link[data-toggle=\"submenu\"]");
+        if (toggle) {
+          event.preventDefault();
+          const menuItem = toggle.closest(".menu-item");
+          if (!menuItem) return;
+          const isOpen = menuItem.classList.toggle("open");
+          toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+          return;
+        }
+
+        const item = event.target.closest(".nav-link[data-module], .submenu-link[data-module]");
         if (!item) return;
         const moduleKey = item.getAttribute("data-module");
         if (moduleKey === "visit") window.location.href = "visitmodule.html";

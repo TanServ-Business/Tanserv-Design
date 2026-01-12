@@ -661,12 +661,10 @@
       const statusLower = status.toLowerCase();
       const statusClass = statusLower === 'open' ? 'pill--success' : (statusLower === 'resolved' || statusLower === 'closed' ? 'pill--closed' : 'pill--secondary');
       const subStatus = iss.subStatus || '';
-      // Move the status label above the issue card (top-right)
-      const topLabel = document.createElement('div');
-      topLabel.className = 'issue-label';
-      topLabel.innerHTML = `<span class="pill ${statusClass}">${status.toUpperCase()}</span>`;
-      li.appendChild(topLabel);
-      header.innerHTML = `<span>${iss.id.replace('ISS_', 'ISS_')}</span>`;
+      header.innerHTML = `
+        <span>${iss.id.replace('ISS_', 'ISS_')}</span>
+        <span class="pill ${statusClass} status-pill">${status.toUpperCase()}</span>
+      `;
 
       const body = document.createElement('div');
       body.className = 'card-body';
