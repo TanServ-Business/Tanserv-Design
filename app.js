@@ -2,10 +2,22 @@
 // Tenant - Relationship branding (prototype wiring)
 // ===============================
 const tenantBrandMap = {
-  apollo: { name: "Philips", badge: "PH" },
-  bikanerwala: { name: "Philips", badge: "PH" },
-  global_ar: { name: "Philips", badge: "PH" }
+  apollo: { name: "Apollo", badge: "AP" },
+  bikanerwala: { name: "Bikanerwala", badge: "BK" },
+  global_ar: { name: "Global AR", badge: "GA" }
 };
+
+const headerDirectoryContacts = {
+  internal: [
+    { name: "Rohit Mehra", email: "rohit.mehra@inebura.com", phone: "-" },
+    { name: "Mukesh Mishra", email: "mukesh.mishra@inebura.com", phone: "-" },
+    { name: "Ops Supervisor", email: "supervisor@inebura.com", phone: "-" },
+    { name: "Escalations Desk", email: "escalations@inebura.com", phone: "-" }
+  ]
+};
+
+let activeDirectoryFilter = "all";
+let directorySearchQuery = "";
 
 const urlParams = new URLSearchParams(window.location.search);
 const isManagerView = urlParams.get("role") === "manager";
@@ -2457,28 +2469,65 @@ function wireTabEvents() {
 
 function wireContactEvents() {
   const addBtn = document.getElementById("addCustomerContactBtn");
-  if (!addBtn) return;
+  const saveBtn = document.getElementById("directoryFormSaveBtn");
+  const cancelBtn = document.getElementById("directoryFormCancelBtn");
 
-  addBtn.addEventListener("click", () => {
-    const customer = customersData.find(c => c.id === selectedCustomerId);
-    if (!customer) return;
+  const openAddContactForm = () => {
+    openDirectoryPopup();
+    showDirectoryForm();
+  };
 
-    if (!Array.isArray(customer.contacts)) customer.contacts = [];
-
-    const newIndex = customer.contacts.length + 1;
-    customer.contacts.push({
-      firstName: "New",
-      lastName: `Contact ${newIndex}`,
-      email: "",
-      phonePrimary: "",
-      phoneSecondary: "",
-      gender: "",
-      department: "",
-      useEmailForCommunication: false
+  if (addBtn) {
+    addBtn.addEventListener("click", (event) => {
+      event.stopPropagation();
+      openAddContactForm();
     });
+  }
 
-    renderCustomerDetails(customer);
-    setActiveTab("customer");
+  if (cancelBtn) {
+    cancelBtn.addEventListener("click", () => {
+      showDirectoryListView();
+    });
+  }
+
+  if (!saveBtn) return;
+
+  saveBtn.addEventListener("click", () => {
+    const contactType = (document.getElementById("directoryContactType") || {}).value || "customer";
+    const customerQuery = (document.getElementById("directoryContactCompanySearch") || {}).value || "";
+    const normalizedQuery = customerQuery.trim().toLowerCase();
+    const targetCustomer = normalizedQuery
+      ? customersData.find((customer) => customer.name.toLowerCase() === normalizedQuery)
+      : customersData.find(c => c.id === selectedCustomerId);
+
+    const contactPayload = {
+      firstName: (document.getElementById("directoryContactFirstName") || {}).value || "",
+      lastName: (document.getElementById("directoryContactLastName") || {}).value || "",
+      email: (document.getElementById("directoryContactEmail") || {}).value || "",
+      phonePrimary: (document.getElementById("directoryContactPhonePrimary") || {}).value || "",
+      phoneSecondary: (document.getElementById("directoryContactPhoneSecondary") || {}).value || "",
+      gender: (document.getElementById("directoryContactGender") || {}).value || "",
+      department: (document.getElementById("directoryContactDepartment") || {}).value || "",
+      useEmailForCommunication: (document.getElementById("directoryContactUseEmail") || {}).checked || false
+    };
+
+    if (contactType === "internal" || contactType === "self") {
+      headerDirectoryContacts.internal.push({
+        name: [contactPayload.firstName, contactPayload.lastName].filter(Boolean).join(" ") || "New contact",
+        email: contactPayload.email || "-",
+        phone: contactPayload.phonePrimary || contactPayload.phoneSecondary || "-"
+      });
+    } else if (targetCustomer) {
+      if (!Array.isArray(targetCustomer.contacts)) targetCustomer.contacts = [];
+      targetCustomer.contacts.push(contactPayload);
+      renderCustomerDetails(targetCustomer);
+      setActiveTab("customer");
+    }
+
+    renderDirectoryList();
+    renderDirectoryAlphabet();
+    applyDirectoryFilters();
+    showDirectoryListView();
   });
 }
 
@@ -3660,18 +3709,397 @@ function wireNotificationEvents() {
 // ===============================
 // Init
 // ===============================
-function applyTenantBrand() {
-  const tenantSelect = document.getElementById("tenantSelect");
+function getDefaultTenantId() {
+  const ids = Object.keys(tenantBrandMap);
+  return ids.length > 0 ? ids[0] : "";
+}
+
+function applyTenantBrand(tenantId) {
   const relationshipName = document.getElementById("relationshipName");
   const relationshipLogo = document.getElementById("relationshipLogo");
+  const storedId = localStorage.getItem("activeTenantId");
+  const resolvedId = tenantBrandMap[tenantId]
+    ? tenantId
+    : (tenantBrandMap[storedId] ? storedId : getDefaultTenantId());
 
-  if (!tenantSelect) return;
-
-  const brand = tenantBrandMap[tenantSelect.value];
+  const brand = tenantBrandMap[resolvedId];
   if (!brand) return;
 
   if (relationshipName) relationshipName.textContent = brand.name;
   if (relationshipLogo) relationshipLogo.textContent = brand.badge;
+  localStorage.setItem("activeTenantId", resolvedId);
+
+  const list = document.getElementById("clientPickerList");
+  if (list) {
+    list.querySelectorAll("[data-client-id]").forEach((item) => {
+      const isActive = item.getAttribute("data-client-id") === resolvedId;
+      item.classList.toggle("active", isActive);
+      item.setAttribute("aria-pressed", isActive ? "true" : "false");
+    });
+  }
+}
+
+function renderClientPicker() {
+  const list = document.getElementById("clientPickerList");
+  if (!list) return;
+
+  list.innerHTML = "";
+  Object.entries(tenantBrandMap).forEach(([id, brand]) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "headerPopupItem";
+    button.setAttribute("data-client-id", id);
+    button.setAttribute("aria-pressed", "false");
+
+    const name = document.createElement("span");
+    name.textContent = brand.name;
+
+    const badge = document.createElement("span");
+    badge.className = "clientBadge";
+    badge.textContent = brand.badge;
+
+    button.appendChild(name);
+    button.appendChild(badge);
+    list.appendChild(button);
+  });
+}
+
+function renderDirectoryList() {
+  const list = document.getElementById("directoryList");
+  if (!list) return;
+
+  list.innerHTML = "";
+  const customerContacts = customersData.flatMap((customer) => (
+    (customer.contacts || []).map((contact) => {
+      const nameParts = [contact.firstName, contact.lastName].filter(Boolean);
+      const email = contact.email || "-";
+      const phone = contact.phonePrimary || contact.phoneSecondary || "-";
+      const metaParts = [`Company: ${customer.name}`, `Email: ${email}`, `Phone: ${phone}`];
+      return {
+        name: nameParts.join(" ") || customer.name,
+        meta: metaParts.join(" | "),
+        group: "customer",
+        tagLabel: "Customer",
+        tagClass: "tagCustomer"
+      };
+    })
+  ));
+
+  const internalContacts = headerDirectoryContacts.internal.map((entry) => ({
+    name: entry.name,
+    meta: [`Email: ${entry.email || "-"}`, `Phone: ${entry.phone || "-"}`].join(" | "),
+    group: "internal",
+    tagLabel: "Internal",
+    tagClass: "tagInternal"
+  }));
+
+  const entries = [...customerContacts, ...internalContacts].sort(
+    (a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" })
+  );
+
+  const buildEntry = (entry) => {
+    const row = document.createElement("div");
+    row.className = "directoryEntry";
+    row.setAttribute("data-directory-group", entry.group);
+
+    const nameValue = entry.name || "-";
+    const letter = nameValue.trim().charAt(0).toUpperCase();
+    row.setAttribute("data-letter", letter || "#");
+    row.setAttribute("data-directory-search", `${nameValue} ${entry.meta || ""}`.toLowerCase());
+
+    const body = document.createElement("div");
+    const title = document.createElement("div");
+    title.className = "directoryName";
+    title.textContent = nameValue;
+    body.appendChild(title);
+
+    if (entry.meta) {
+      const meta = document.createElement("div");
+      meta.className = "directoryMeta";
+      meta.textContent = entry.meta;
+      body.appendChild(meta);
+    }
+
+    const tag = document.createElement("span");
+    tag.className = `directoryTag ${entry.tagClass}`;
+    tag.textContent = entry.tagLabel;
+
+    row.appendChild(body);
+    row.appendChild(tag);
+    return row;
+  };
+
+  entries.forEach((entry) => {
+    list.appendChild(buildEntry(entry));
+  });
+}
+
+function renderDirectoryAlphabet() {
+  const alphabet = document.getElementById("directoryAlphabet");
+  if (!alphabet) return;
+
+  alphabet.innerHTML = "";
+  for (let i = 65; i <= 90; i += 1) {
+    const letter = String.fromCharCode(i);
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.textContent = letter;
+    btn.setAttribute("data-directory-letter", letter);
+    alphabet.appendChild(btn);
+  }
+}
+
+function updateDirectoryAlphabet() {
+  const alphabet = document.getElementById("directoryAlphabet");
+  if (!alphabet) return;
+
+  const visibleLetters = new Set();
+  document.querySelectorAll(".directoryEntry:not(.hidden)").forEach((entry) => {
+    const letter = entry.getAttribute("data-letter");
+    if (letter) visibleLetters.add(letter);
+  });
+
+  alphabet.querySelectorAll("[data-directory-letter]").forEach((btn) => {
+    const letter = btn.getAttribute("data-directory-letter");
+    const isAvailable = visibleLetters.has(letter);
+    btn.classList.toggle("is-disabled", !isAvailable);
+    btn.setAttribute("aria-disabled", isAvailable ? "false" : "true");
+  });
+}
+
+function applyDirectoryFilters() {
+  const query = directorySearchQuery.trim().toLowerCase();
+  document.querySelectorAll(".directoryEntry").forEach((entry) => {
+    const group = entry.getAttribute("data-directory-group");
+    const searchValue = entry.getAttribute("data-directory-search") || "";
+    const matchesFilter = activeDirectoryFilter === "all" || group === activeDirectoryFilter;
+    const matchesQuery = !query || searchValue.includes(query);
+    const shouldShow = matchesFilter && matchesQuery;
+    entry.classList.toggle("hidden", !shouldShow);
+  });
+
+  updateDirectoryAlphabet();
+}
+
+function setDirectoryFilter(filter) {
+  activeDirectoryFilter = filter || "all";
+  applyDirectoryFilters();
+}
+
+function showDirectoryForm() {
+  const popup = document.getElementById("directoryPopup");
+  const listView = document.getElementById("directoryListView");
+  const formView = document.getElementById("directoryFormView");
+  const form = document.getElementById("directoryContactForm");
+  if (!popup || !listView || !formView) return;
+  if (form) form.reset();
+  updateDirectoryContactTypeUI();
+  formView.classList.remove("hidden");
+  popup.classList.add("is-form");
+}
+
+function showDirectoryListView() {
+  const popup = document.getElementById("directoryPopup");
+  const listView = document.getElementById("directoryListView");
+  const formView = document.getElementById("directoryFormView");
+  if (!popup || !listView || !formView) return;
+  formView.classList.add("hidden");
+  popup.classList.remove("is-form");
+}
+
+function updateDirectoryContactTypeUI() {
+  const typeSelect = document.getElementById("directoryContactType");
+  const searchRow = document.getElementById("directoryContactSearchRow");
+  if (!typeSelect || !searchRow) return;
+  const value = typeSelect.value;
+  const shouldShow = value === "customer" || value === "internal";
+  searchRow.classList.toggle("hidden", !shouldShow);
+}
+
+function wireDirectoryContactType() {
+  const typeSelect = document.getElementById("directoryContactType");
+  if (!typeSelect) return;
+  typeSelect.addEventListener("change", updateDirectoryContactTypeUI);
+  updateDirectoryContactTypeUI();
+}
+
+function populateDirectoryContactCompanyList() {
+  const list = document.getElementById("directoryContactCompanyList");
+  if (!list) return;
+  list.innerHTML = "";
+  const names = customersData.map((customer) => customer.name).filter(Boolean);
+  const unique = Array.from(new Set(names)).sort((a, b) => a.localeCompare(b));
+  unique.forEach((name) => {
+    const option = document.createElement("option");
+    option.value = name;
+    list.appendChild(option);
+  });
+}
+
+function wireDirectoryFilters() {
+  const filterWrap = document.querySelector(".directoryFilters");
+  if (!filterWrap) return;
+
+  filterWrap.addEventListener("click", (event) => {
+    const btn = event.target.closest("[data-directory-filter]");
+    if (!btn) return;
+    const filter = btn.getAttribute("data-directory-filter");
+
+    filterWrap.querySelectorAll("[data-directory-filter]").forEach((item) => {
+      const isActive = item === btn;
+      item.classList.toggle("pillActive", isActive);
+      item.setAttribute("aria-pressed", isActive ? "true" : "false");
+    });
+
+    setDirectoryFilter(filter);
+  });
+}
+
+function wireDirectorySearch() {
+  const input = document.getElementById("directorySearch");
+  if (!input) return;
+
+  input.addEventListener("input", () => {
+    directorySearchQuery = input.value || "";
+    applyDirectoryFilters();
+  });
+}
+
+function wireDirectoryAlphabet() {
+  const alphabet = document.getElementById("directoryAlphabet");
+  const list = document.getElementById("directoryList");
+  if (!alphabet || !list) return;
+
+  alphabet.addEventListener("click", (event) => {
+    const btn = event.target.closest("[data-directory-letter]");
+    if (!btn || btn.classList.contains("is-disabled")) return;
+    const letter = btn.getAttribute("data-directory-letter");
+
+    const target = Array.from(list.querySelectorAll(".directoryEntry:not(.hidden)")).find(
+      (entry) => entry.getAttribute("data-letter") === letter
+    );
+    if (target) target.scrollIntoView({ block: "start", behavior: "smooth" });
+  });
+}
+
+function wireDirectoryAddContact() {
+  const addBtn = document.getElementById("directoryAddContactBtn");
+  if (!addBtn) return;
+
+  addBtn.addEventListener("click", (event) => {
+    event.stopPropagation();
+    showDirectoryForm();
+  });
+}
+
+function wireDirectoryClose() {
+  const closeBtn = document.getElementById("directoryCloseBtn");
+  const popup = document.getElementById("directoryPopup");
+  const btn = document.getElementById("directoryBtn");
+  if (!closeBtn || !popup || !btn) return;
+
+  closeBtn.addEventListener("click", (event) => {
+    event.stopPropagation();
+    closeHeaderPopup(popup, btn);
+  });
+}
+function closeHeaderPopup(popup, button) {
+  if (!popup) return;
+  popup.classList.add("hidden");
+  if (button) button.setAttribute("aria-expanded", "false");
+}
+
+function openDirectoryPopup() {
+  const popup = document.getElementById("directoryPopup");
+  const btn = document.getElementById("directoryBtn");
+  if (!popup || !btn) return;
+  closeHeaderPopups(popup);
+  if (typeof toggleNotificationPopup === "function") {
+    toggleNotificationPopup(false);
+  }
+  popup.classList.remove("hidden");
+  btn.setAttribute("aria-expanded", "true");
+  showDirectoryListView();
+}
+
+function closeHeaderPopups(exceptPopup) {
+  const clientPopup = document.getElementById("clientPickerPopup");
+  const clientBtn = document.getElementById("clientPickerBtn");
+  if (clientPopup && clientPopup !== exceptPopup) {
+    closeHeaderPopup(clientPopup, clientBtn);
+  }
+
+  const directoryPopup = document.getElementById("directoryPopup");
+  const directoryBtn = document.getElementById("directoryBtn");
+  if (directoryPopup && directoryPopup !== exceptPopup) {
+    closeHeaderPopup(directoryPopup, directoryBtn);
+  }
+}
+
+function toggleHeaderPopup(popup, button) {
+  if (!popup) return;
+  const shouldOpen = popup.classList.contains("hidden");
+
+  if (!shouldOpen) {
+    closeHeaderPopup(popup, button);
+    return;
+  }
+
+  closeHeaderPopups(popup);
+  if (typeof toggleNotificationPopup === "function") {
+    toggleNotificationPopup(false);
+  }
+  popup.classList.remove("hidden");
+  if (popup.id === "directoryPopup") {
+    showDirectoryListView();
+  }
+  if (button) button.setAttribute("aria-expanded", "true");
+}
+
+function wireHeaderPopupEvents() {
+  const clientBtn = document.getElementById("clientPickerBtn");
+  const clientPopup = document.getElementById("clientPickerPopup");
+  const clientWrap = document.getElementById("clientPickerWrap");
+
+  const directoryBtn = document.getElementById("directoryBtn");
+  const directoryPopup = document.getElementById("directoryPopup");
+  const directoryWrap = document.getElementById("directoryWrap");
+
+  if (clientBtn) {
+    clientBtn.addEventListener("click", (event) => {
+      event.stopPropagation();
+      toggleHeaderPopup(clientPopup, clientBtn);
+    });
+  }
+
+  if (directoryBtn) {
+    directoryBtn.addEventListener("click", (event) => {
+      event.stopPropagation();
+      openDirectoryPopup();
+    });
+  }
+
+  if (clientPopup) {
+    clientPopup.addEventListener("click", (event) => {
+      const item = event.target.closest("[data-client-id]");
+      if (!item) return;
+      applyTenantBrand(item.getAttribute("data-client-id"));
+      closeHeaderPopup(clientPopup, clientBtn);
+    });
+  }
+
+  document.addEventListener("click", (event) => {
+    if (event.target.closest("#addCustomerContactBtn")) {
+      return;
+    }
+    if (clientPopup && !clientPopup.classList.contains("hidden")) {
+      if (!clientWrap || !clientWrap.contains(event.target)) {
+        closeHeaderPopup(clientPopup, clientBtn);
+      }
+    }
+
+    // Directory popup stays open unless explicitly closed elsewhere.
+  });
 }
 
 function initUserSelect() {
@@ -3778,9 +4206,19 @@ function wireSideNavEvents() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  const tenantSelect = document.getElementById("tenantSelect");
-  if (tenantSelect) tenantSelect.addEventListener("change", applyTenantBrand);
+  renderClientPicker();
   applyTenantBrand();
+  renderDirectoryList();
+  renderDirectoryAlphabet();
+  setDirectoryFilter("all");
+  wireDirectoryFilters();
+  wireDirectorySearch();
+  wireDirectoryAlphabet();
+  wireDirectoryAddContact();
+  wireDirectoryClose();
+  wireDirectoryContactType();
+  populateDirectoryContactCompanyList();
+  wireHeaderPopupEvents();
   initUserSelect();
   wireSideNavEvents();
 
@@ -3824,6 +4262,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (notificationBellBtn) {
     notificationBellBtn.addEventListener("click", (event) => {
       event.stopPropagation();
+      closeHeaderPopups();
       toggleNotificationPopup();
     });
   }
