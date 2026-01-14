@@ -16,6 +16,62 @@ const headerDirectoryContacts = {
   ]
 };
 
+const userRoleLabels = {
+  agent: "Agent",
+  manager: "Manager",
+  agent_manager: "Agent cum manager",
+  supervisor: "Supervisor"
+};
+
+const userAvatarOptions = [
+  "assets/avatar/avatar_02_50x50.png",
+  "assets/avatar/avatar_03_50x50.png",
+  "assets/avatar/avatar_04_50x50.png",
+  "assets/avatar/avatar_05_50x50.png",
+  "assets/avatar/avatar_06_50x50.png",
+  "assets/avatar/avatar_07_50x50.png",
+  "assets/avatar/avatar_08_50x50.png",
+  "assets/avatar/avatar_11_50x50.png",
+  "assets/avatar/avatar_12_50x50.png",
+  "assets/avatar/avatar_13_50x50.png",
+  "assets/avatar/avatar_14_50x50.png",
+  "assets/avatar/avatar_15_50x50.png",
+  "assets/avatar/avatar_16_50x50.png",
+  "assets/avatar/avatar_17_50x50.png",
+  "assets/avatar/avatar_18_50x50.png",
+  "assets/avatar/avatar_19_50x50.png",
+  "assets/avatar/avatar_20_50x50.png",
+  "assets/avatar/avatar_21_50x50.png",
+  "assets/avatar/avatar_22_50x50.png",
+  "assets/avatar/avatar_23_50x50.png",
+  "assets/avatar/avatar_24_50x50.png",
+  "assets/avatar/avatar_25_50x50.png",
+  "assets/avatar/avatar_26_50x50.png",
+  "assets/avatar/avatar_27_50x50.png",
+  "assets/avatar/avatar_28_50x50.png",
+  "assets/avatar/avatar_29_50x50.png",
+  "assets/avatar/avatar_30_50x50.png",
+  "assets/avatar/avatar_31_50x50.png",
+  "assets/avatar/avatar_32_50x50.png",
+  "assets/avatar/avatar_33_50x50.png",
+  "assets/avatar/avatar_34_50x50.png",
+  "assets/avatar/avatar_35_50x50.png",
+  "assets/avatar/avatar_37_50x50.png",
+  "assets/avatar/avatar_38_50x50.png",
+  "assets/avatar/avatar_39_50x50.png",
+  "assets/avatar/avatar_40_50x50.png",
+  "assets/avatar/avatar_41_50x50.png",
+  "assets/avatar/avatar_42_50x50.png",
+  "assets/avatar/avatar_43_50x50.png",
+  "assets/avatar/avatar_44_50x50.png",
+  "assets/avatar/avatar_45_50x50.png",
+  "assets/avatar/avatar_46_50x50.png",
+  "assets/avatar/avatar_47_50x50.png",
+  "assets/avatar/avatar_48_50x50.png",
+  "assets/avatar/avatar_49_50x50.png",
+  "assets/avatar/avatar_50_50x50.png"
+];
+
 let activeDirectoryFilter = "all";
 let directorySearchQuery = "";
 
@@ -2280,7 +2336,7 @@ function wireIssueCountNavigation() {
   if (!issueBtn) return;
 
   const goToIssueTracker = () => {
-    window.location.href = "IssueTracker/index.html";
+    window.location.href = "bin/IssueTracker/index.html";
   };
 
   issueBtn.addEventListener("click", goToIssueTracker);
@@ -4003,6 +4059,230 @@ function wireDirectoryClose() {
     closeHeaderPopup(popup, btn);
   });
 }
+
+function buildDefaultUserProfile() {
+  const activeName = localStorage.getItem("activeUserName") || "Aditi Sharma";
+  const parts = activeName.split(" ").filter(Boolean);
+  const firstName = parts.shift() || "User";
+  const lastName = parts.join(" ");
+  const role = localStorage.getItem("activeUserRole") || "agent";
+  const loginId = activeName.trim().toLowerCase().replace(/\s+/g, ".");
+  return {
+    firstName,
+    lastName,
+    email: `${loginId}@inebura.com`,
+    phone: "+91 98xxxxxx21",
+    designation: role === "manager" ? "Collections Manager" : "Collections Agent",
+    department: "Collections",
+    loginId,
+    reportingTo: role === "manager" ? "Head of Ops" : "Rohit Mehra",
+    role,
+    avatarPath: ""
+  };
+}
+
+function getInitials(firstName, lastName) {
+  return [firstName, lastName]
+    .filter(Boolean)
+    .map((value) => value.trim().charAt(0).toUpperCase())
+    .join("")
+    .slice(0, 2);
+}
+
+function hashStringToIndex(value, size) {
+  if (!value || size === 0) return 0;
+  let hash = 0;
+  for (let i = 0; i < value.length; i += 1) {
+    hash = (hash << 5) - hash + value.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash) % size;
+}
+
+function ensureUserAvatar(profile) {
+  if (profile.photo || profile.avatarPath || userAvatarOptions.length === 0) {
+    return profile;
+  }
+  const seed = profile.loginId || `${profile.firstName || ""}${profile.lastName || ""}`.trim();
+  const index = hashStringToIndex(seed || "user", userAvatarOptions.length);
+  profile.avatarPath = userAvatarOptions[index];
+  saveUserProfile(profile);
+  return profile;
+}
+
+function setAvatarImage(element, initials, photo, fallbackImage) {
+  if (!element) return;
+  const imageSrc = photo || fallbackImage;
+  if (imageSrc) {
+    element.style.backgroundImage = `url(${imageSrc})`;
+    element.classList.add("has-photo");
+    element.textContent = "";
+  } else {
+    element.style.backgroundImage = "";
+    element.classList.remove("has-photo");
+    element.textContent = initials || "US";
+  }
+}
+
+function getUserProfile() {
+  const stored = localStorage.getItem("userProfile");
+  if (stored) {
+    try {
+      return ensureUserAvatar(JSON.parse(stored));
+    } catch (err) {
+      return ensureUserAvatar(buildDefaultUserProfile());
+    }
+  }
+  return ensureUserAvatar(buildDefaultUserProfile());
+}
+
+function saveUserProfile(profile) {
+  localStorage.setItem("userProfile", JSON.stringify(profile));
+  const fullName = [profile.firstName, profile.lastName].filter(Boolean).join(" ");
+  if (fullName) localStorage.setItem("activeUserName", fullName);
+  if (profile.role) localStorage.setItem("activeUserRole", profile.role);
+}
+
+function renderUserPopup() {
+  const profile = getUserProfile();
+  const fullName = [profile.firstName, profile.lastName].filter(Boolean).join(" ") || "User";
+  const avatar = document.getElementById("userPopupAvatar");
+  const headerAvatar = document.getElementById("headerUserAvatar");
+  const nameEl = document.getElementById("userPopupName");
+  const emailEl = document.getElementById("userPopupEmail");
+  const loginEl = document.getElementById("userPopupLoginId");
+  const roleValueEl = document.getElementById("userPopupRoleValue");
+
+  const initials = getInitials(profile.firstName, profile.lastName);
+  setAvatarImage(avatar, initials, profile.photo, profile.avatarPath);
+  setAvatarImage(headerAvatar, initials, profile.photo, profile.avatarPath);
+  if (nameEl) nameEl.textContent = fullName;
+  const roleLabel = userRoleLabels[profile.role] || profile.role || "Agent";
+  if (emailEl) emailEl.textContent = profile.email || "-";
+  if (loginEl) loginEl.textContent = profile.loginId || "-";
+  if (roleValueEl) roleValueEl.textContent = roleLabel;
+}
+
+function populateUserUpdateForm() {
+  const profile = getUserProfile();
+  const avatar = document.getElementById("userUpdateAvatar");
+  const photoInput = document.getElementById("userUpdatePhoto");
+  const initials = getInitials(profile.firstName, profile.lastName);
+  const formMap = {
+    userUpdateFirstName: profile.firstName,
+    userUpdateLastName: profile.lastName,
+    userUpdateEmail: profile.email,
+    userUpdatePhone: profile.phone,
+    userUpdateDesignation: profile.designation,
+    userUpdateDepartment: profile.department,
+    userUpdateLoginId: profile.loginId,
+    userUpdateReportingTo: profile.reportingTo
+  };
+
+  Object.entries(formMap).forEach(([id, value]) => {
+    const input = document.getElementById(id);
+    if (input) input.value = value || "";
+  });
+
+  if (photoInput) photoInput.value = "";
+  setAvatarImage(avatar, initials, profile.photo, profile.avatarPath);
+}
+
+function wireUserPopupEvents() {
+  const userBtn = document.getElementById("headerUserBtn");
+  const userPopup = document.getElementById("userPopup");
+  const userWrap = document.getElementById("userPopupWrap");
+  const updateModal = document.getElementById("userUpdateModal");
+  const updateSave = document.getElementById("userUpdateSaveBtn");
+  const updateTriggers = document.querySelectorAll("[data-user-update]");
+  const photoInput = document.getElementById("userUpdatePhoto");
+  const updateAvatar = document.getElementById("userUpdateAvatar");
+  let pendingPhotoData = null;
+
+  if (userBtn && userPopup) {
+    userBtn.addEventListener("click", (event) => {
+      event.stopPropagation();
+      const shouldOpen = userPopup.classList.contains("hidden");
+      if (shouldOpen) {
+        renderUserPopup();
+        userPopup.classList.remove("hidden");
+        userBtn.setAttribute("aria-expanded", "true");
+        closeHeaderPopups();
+        if (typeof toggleNotificationPopup === "function") {
+          toggleNotificationPopup(false);
+        }
+      } else {
+        userPopup.classList.add("hidden");
+        userBtn.setAttribute("aria-expanded", "false");
+      }
+    });
+  }
+
+  document.addEventListener("click", (event) => {
+    if (!userPopup || userPopup.classList.contains("hidden")) return;
+    if (userWrap && userWrap.contains(event.target)) return;
+    userPopup.classList.add("hidden");
+    if (userBtn) userBtn.setAttribute("aria-expanded", "false");
+  });
+
+  if (updateModal) {
+    updateTriggers.forEach((btn) => {
+      btn.addEventListener("click", (event) => {
+        event.stopPropagation();
+        pendingPhotoData = null;
+        populateUserUpdateForm();
+        const modal = bootstrap.Modal.getOrCreateInstance(updateModal);
+        modal.show();
+      });
+    });
+  }
+
+  if (photoInput && updateAvatar) {
+    photoInput.addEventListener("change", () => {
+      const file = photoInput.files && photoInput.files[0];
+      if (!file) {
+        const profile = getUserProfile();
+        const initials = getInitials(profile.firstName, profile.lastName);
+        setAvatarImage(updateAvatar, initials, profile.photo);
+        pendingPhotoData = null;
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        const profile = getUserProfile();
+        const initials = getInitials(profile.firstName, profile.lastName);
+        pendingPhotoData = reader.result;
+        setAvatarImage(updateAvatar, initials, pendingPhotoData, profile.avatarPath);
+        const headerAvatar = document.getElementById("headerUserAvatar");
+        setAvatarImage(headerAvatar, initials, pendingPhotoData, profile.avatarPath);
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  if (updateSave && updateModal) {
+    updateSave.addEventListener("click", () => {
+      const profile = getUserProfile();
+      profile.firstName = (document.getElementById("userUpdateFirstName") || {}).value || "";
+      profile.lastName = (document.getElementById("userUpdateLastName") || {}).value || "";
+      profile.email = (document.getElementById("userUpdateEmail") || {}).value || "";
+      profile.phone = (document.getElementById("userUpdatePhone") || {}).value || "";
+      profile.designation = (document.getElementById("userUpdateDesignation") || {}).value || "";
+      profile.department = (document.getElementById("userUpdateDepartment") || {}).value || "";
+      const finalizeSave = (photoData) => {
+        if (photoData) profile.photo = photoData;
+        saveUserProfile(profile);
+        renderUserPopup();
+        const modal = bootstrap.Modal.getInstance(updateModal);
+        if (modal) modal.hide();
+        pendingPhotoData = null;
+      };
+
+      finalizeSave(pendingPhotoData);
+    });
+  }
+}
+
 function closeHeaderPopup(popup, button) {
   if (!popup) return;
   popup.classList.add("hidden");
@@ -4193,11 +4473,11 @@ function wireSideNavEvents() {
       if (!item) return;
       const moduleKey = item.getAttribute("data-module");
       const destinations = {
-        "visit": "visitmodule.html",
-        "visit-review": "visitmoduleReview.html",
+        "visit": "pages/visitmodule.html",
+        "visit-review": "pages/visitmoduleReview.html",
         "landing": "index.html",
-        "landing-manager": "LPmanager.html",
-        "landing-backend": "LPbackend.html"
+        "landing-manager": "pages/LPmanager.html",
+        "landing-backend": "pages/LPbackend.html"
       };
       const target = destinations[moduleKey];
       if (target) window.location.href = target;
@@ -4219,6 +4499,8 @@ document.addEventListener("DOMContentLoaded", () => {
   wireDirectoryContactType();
   populateDirectoryContactCompanyList();
   wireHeaderPopupEvents();
+  wireUserPopupEvents();
+  renderUserPopup();
   initUserSelect();
   wireSideNavEvents();
 

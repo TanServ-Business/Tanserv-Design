@@ -53,8 +53,8 @@ header {
   align-items: center;
   justify-content: space-between;
   padding: 12px 20px;
-  background: var(--brand);
-  color: white;
+  background: #eedbff;
+  color: #1f2937;
 }
 
 .headerLeft, .headerRight {
@@ -122,14 +122,14 @@ button.notifyBadge {
   white-space: nowrap;
 }
 
-.logoInebura { font-weight: 800; letter-spacing: 0.3px; }
+.logoInebura {font-weight: 800;letter-spacing: 0.3px;width: 100px;}
 
 .headerMenu { display: flex; align-items: center; }
 
 .menuBtn {
-  border: 1px solid rgba(255,255,255,0.25);
+  border: none;
   background: transparent;
-  color: #ffffff;
+  color: #1f2937;
   width: 36px;
   height: 36px;
   border-radius: 10px;
@@ -143,7 +143,7 @@ button.notifyBadge {
 .menuBtn::after { display: none; }
 
 .menuBtn:hover {
-  background: rgba(255,255,255,0.15);
+  background: rgba(111, 66, 193, 0.12);
 }
 
 .menuBtn:focus {
@@ -151,14 +151,14 @@ button.notifyBadge {
 }
 
 .menuBtn:focus-visible {
-  outline: 2px solid rgba(255,255,255,0.6);
+  outline: 2px solid rgba(111, 66, 193, 0.45);
   outline-offset: 2px;
 }
 
 .notificationBell {
-  border: 1px solid rgba(255,255,255,0.25);
+  border: none;
   background: transparent;
-  color: #ffffff;
+  color: #1f2937;
   width: 34px;
   height: 34px;
   border-radius: 10px;
@@ -169,7 +169,7 @@ button.notifyBadge {
 }
 
 .notificationBell:hover {
-  background: rgba(255,255,255,0.15);
+  background: rgba(111, 66, 193, 0.12);
 }
 
 .notificationBellWrap {
@@ -179,9 +179,9 @@ button.notifyBadge {
 }
 
 .headerIconBtn {
-  border: 1px solid rgba(255,255,255,0.25);
+  border: none;
   background: transparent;
-  color: #ffffff;
+  color: #1f2937;
   width: 34px;
   height: 34px;
   border-radius: 10px;
@@ -191,8 +191,32 @@ button.notifyBadge {
   padding: 0;
 }
 
+.headerUserAvatarBtn {
+  padding: 0;
+}
+
+.headerUserAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: #f3f4f6;
+  border: none;
+  color: #0f172a;
+  font-weight: 800;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-size: cover;
+  background-position: center;
+}
+
+.headerUserAvatar.has-photo {
+  color: transparent;
+}
+
 .headerIconBtn:hover {
-  background: rgba(255,255,255,0.15);
+  background: rgba(111, 66, 193, 0.12);
 }
 
 .headerPopupWrap {
@@ -599,6 +623,190 @@ button.notifyBadge {
   box-shadow: 0 14px 30px rgba(15, 23, 42, 0.18);
   padding: 8px;
   z-index: 120;
+}
+
+.userPopup {
+  width: 280px;
+  padding: 14px;
+  background: #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.18);
+  overflow: hidden;
+}
+
+.userPopupHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.userAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  color: #1f2937;
+  font-weight: 800;
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-size: cover;
+  background-position: center;
+}
+
+.userPopupName {
+  font-size: 13px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.userPopupIdentity {
+  flex: 1;
+}
+
+.userPopupEmail {
+  font-size: 11px;
+  color: #64748b;
+}
+
+.userPopupMeta {
+  font-size: 10px;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.userPopupDot {
+  font-size: 12px;
+}
+
+.userPopupEdit {
+  border: none;
+  background: transparent;
+  color: #1d4ed8;
+  padding: 2px;
+  line-height: 1;
+}
+
+.userAvatar.has-photo {
+  color: transparent;
+}
+
+.userPopupActions {
+  display: grid;
+  gap: 6px;
+  padding-top: 10px;
+}
+
+.userPopupAction {
+  border: none;
+  background: transparent;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #1f2937;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+}
+
+.userPopupAction:hover {
+  background: #f3f4f6;
+}
+
+.userPopupLogout {
+  color: #b91c1c;
+  background: #fee2e2;
+}
+
+.userPopupLogout:hover {
+  background: #fecaca;
+}
+
+.userUpdateForm {
+  display: grid;
+  gap: 16px;
+  font-size: 12px;
+}
+
+.userUpdateHeader {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px;
+  border: 1px solid #e2e8f4;
+  border-radius: 16px;
+  background: #f8fafc;
+  font-size: 12px;
+}
+
+.userUpdateAvatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  background: #e2e8f4;
+  border: 1px solid #cbd5f5;
+  color: #1e293b;
+  font-weight: 800;
+  font-size: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-size: cover;
+  background-position: center;
+}
+
+.userUpdateAvatar.has-photo {
+  color: transparent;
+}
+
+.userUpdatePhotoFields {
+  display: grid;
+  gap: 6px;
+  flex: 1;
+}
+
+.userUpdateLabel {
+  font-size: 11px;
+  font-weight: 700;
+  color: #0f172a;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.userUpdatePhotoInput {
+  font-size: 12px;
+}
+
+.userUpdateHint {
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.userUpdateSectionTitle {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #64748b;
+}
+
+#userUpdateModal .form-label,
+#userUpdateModal .form-control,
+#userUpdateModal .form-select {
+  font-size: 12px;
+}
+
+#userUpdateModal .form-control,
+#userUpdateModal .form-select {
+  padding: 6px 10px;
 }
 
 .notificationPopupHeader {
