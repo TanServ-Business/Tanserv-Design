@@ -53,7 +53,7 @@ header {
   align-items: center;
   justify-content: space-between;
   padding: 12px 20px;
-  background: #eedbff;
+  background: #5c258d;
   color: #1f2937;
 }
 
@@ -122,14 +122,28 @@ button.notifyBadge {
   white-space: nowrap;
 }
 
-.logoInebura {font-weight: 800;letter-spacing: 0.3px;width: 100px;}
+.brand {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  border: 1px solid #e2e8f4;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.logoInebura {
+  width: 80px;
+  height: 25px;
+  object-fit: contain;
+}
 
 .headerMenu { display: flex; align-items: center; }
 
 .menuBtn {
   border: none;
   background: transparent;
-  color: #1f2937;
+  color: #ffffff;
   width: 36px;
   height: 36px;
   border-radius: 10px;
@@ -143,7 +157,7 @@ button.notifyBadge {
 .menuBtn::after { display: none; }
 
 .menuBtn:hover {
-  background: rgba(111, 66, 193, 0.12);
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .menuBtn:focus {
@@ -151,14 +165,14 @@ button.notifyBadge {
 }
 
 .menuBtn:focus-visible {
-  outline: 2px solid rgba(111, 66, 193, 0.45);
+  outline: 2px solid rgba(255, 255, 255, 0.7);
   outline-offset: 2px;
 }
 
 .notificationBell {
   border: none;
   background: transparent;
-  color: #1f2937;
+  color: #ffffff;
   width: 34px;
   height: 34px;
   border-radius: 10px;
@@ -169,7 +183,7 @@ button.notifyBadge {
 }
 
 .notificationBell:hover {
-  background: rgba(111, 66, 193, 0.12);
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .notificationBellWrap {
@@ -181,7 +195,7 @@ button.notifyBadge {
 .headerIconBtn {
   border: none;
   background: transparent;
-  color: #1f2937;
+  color: #ffffff;
   width: 34px;
   height: 34px;
   border-radius: 10px;
@@ -216,7 +230,7 @@ button.notifyBadge {
 }
 
 .headerIconBtn:hover {
-  background: rgba(111, 66, 193, 0.12);
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .headerPopupWrap {
@@ -1067,15 +1081,22 @@ button.notifyBadge {
 .relationship { display: flex; align-items: center; gap: 8px; }
 
 .relLogo {
-  width: 28px; height: 28px;
-  border-radius: 8px;
-  background: #fff;
-  color: var(--brand);
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  border-radius: 10px;
+  background: #ffffff;
+  border: 1px solid #e2e8f4;
+  color: var(--brand);
+  padding: 10px;
   font-weight: 900;
   font-size: 12px;
+}
+
+.relLogo img {
+  width: 80px;
+  height: 25px;
+  object-fit: contain;
 }
 
 .relName { font-weight: 700; }

@@ -2,7 +2,7 @@
 // Tenant - Relationship branding (prototype wiring)
 // ===============================
 const tenantBrandMap = {
-  apollo: { name: "Apollo", badge: "AP" },
+  apollo: { name: "Apollo", badge: "AP", logo: "assets/apollo-tyres-logo.svg" },
   bikanerwala: { name: "Bikanerwala", badge: "BK" },
   global_ar: { name: "Global AR", badge: "GA" }
 };
@@ -3771,7 +3771,6 @@ function getDefaultTenantId() {
 }
 
 function applyTenantBrand(tenantId) {
-  const relationshipName = document.getElementById("relationshipName");
   const relationshipLogo = document.getElementById("relationshipLogo");
   const storedId = localStorage.getItem("activeTenantId");
   const resolvedId = tenantBrandMap[tenantId]
@@ -3781,8 +3780,17 @@ function applyTenantBrand(tenantId) {
   const brand = tenantBrandMap[resolvedId];
   if (!brand) return;
 
-  if (relationshipName) relationshipName.textContent = brand.name;
-  if (relationshipLogo) relationshipLogo.textContent = brand.badge;
+  if (relationshipLogo) {
+    relationshipLogo.innerHTML = "";
+    if (brand.logo) {
+      const img = document.createElement("img");
+      img.src = brand.logo;
+      img.alt = `${brand.name} logo`;
+      relationshipLogo.appendChild(img);
+    } else {
+      relationshipLogo.textContent = brand.badge;
+    }
+  }
   localStorage.setItem("activeTenantId", resolvedId);
 
   const list = document.getElementById("clientPickerList");
