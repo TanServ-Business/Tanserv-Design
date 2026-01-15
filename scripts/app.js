@@ -90,6 +90,19 @@ const remarksStorageKey = "ineburaRemarksByInvoice";
 const managerNotificationsKey = "ineburaManagerNotifications";
 const pdcNotificationKey = "ineburaPdcNotifications";
 const pdcStorageKey = "ineburaPdcRecords";
+const notificationCenterKey = "ineburaNotificationCenter";
+
+const rootPath = (() => {
+  const raw = String(document.body.dataset.rootPath || "").trim();
+  return raw && !raw.endsWith("/") ? `${raw}/` : raw;
+})();
+
+const resolvePath = (path) => {
+  if (!path) return "";
+  if (/^(?:[a-z]+:)?\/\//i.test(path) || path.startsWith("/")) return path;
+  const cleaned = path.replace(/^\.\//, "");
+  return `${rootPath}${cleaned}`;
+};
 
 // ===============================
 // Dummy data: customers + invoices
@@ -932,6 +945,317 @@ function addManagerNotification(notification) {
   const list = loadManagerNotifications();
   list.unshift(notification);
   saveManagerNotifications(list);
+  addNotificationCenterItem({
+    id: notification.id,
+    type: notification.type || "manager",
+    title: "Manager update",
+    message: notification.message || "",
+    createdAt: notification.createdAt,
+    read: notification.read,
+    audience: ["manager"],
+    details: [
+      { label: "Invoice", value: notification.invoiceNo || "-" }
+    ]
+  });
+}
+
+function loadNotificationCenter() {
+  try {
+    const raw = localStorage.getItem(notificationCenterKey);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (err) {
+    console.warn("Unable to load notification center", err);
+    return [];
+  }
+}
+
+function saveNotificationCenter(list) {
+  try {
+    localStorage.setItem(notificationCenterKey, JSON.stringify(list));
+  } catch (err) {
+    console.warn("Unable to save notification center", err);
+  }
+}
+
+function addNotificationCenterItem(note) {
+  const list = loadNotificationCenter();
+  const payload = {
+    id: note.id || `note-${Date.now()}`,
+    type: note.type || "general",
+    title: note.title || "Notification",
+    message: note.message || "",
+    createdAt: note.createdAt || new Date().toISOString(),
+    scheduledFor: note.scheduledFor || "",
+    sentAt: note.sentAt || "",
+    read: Boolean(note.read),
+    audience: Array.isArray(note.audience) ? note.audience : (note.audience ? [note.audience] : ["all"]),
+    details: Array.isArray(note.details) ? note.details : [],
+    ctas: Array.isArray(note.ctas) ? note.ctas : [],
+    data: note.data || {}
+  };
+
+  const existingIndex = list.findIndex(item => item.id === payload.id);
+  if (existingIndex >= 0) {
+    list[existingIndex] = { ...list[existingIndex], ...payload };
+  } else {
+    list.unshift(payload);
+  }
+  saveNotificationCenter(list);
+  return payload;
+}
+
+function normalizeNotificationCenter() {
+  const list = loadNotificationCenter();
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  let changed = false;
+  const updated = list.map((note) => {
+    if (note.scheduledFor && !note.sentAt) {
+      const scheduledDate = new Date(note.scheduledFor);
+      if (!Number.isNaN(scheduledDate.getTime())) {
+        scheduledDate.setHours(0, 0, 0, 0);
+        if (scheduledDate.getTime() <= today.getTime()) {
+          note.sentAt = new Date().toISOString();
+          changed = true;
+        }
+      }
+    }
+    return note;
+  });
+  if (changed) saveNotificationCenter(updated);
+  return updated;
+}
+
+function getNotificationAudience() {
+  return isManagerView ? "manager" : "agent";
+}
+
+function getVisibleNotificationCenter() {
+  const audience = getNotificationAudience();
+  return normalizeNotificationCenter().filter((note) => {
+    if (note.scheduledFor && !note.sentAt) return false;
+    const audiences = Array.isArray(note.audience) ? note.audience : (note.audience ? [note.audience] : []);
+    if (audiences.length === 0) return true;
+    return audiences.includes("all") || audiences.includes(audience);
+  });
+}
+
+function markNotificationCenterRead() {
+  const list = loadNotificationCenter();
+  const visibleIds = new Set(getVisibleNotificationCenter().map(note => note.id));
+  const updated = list.map((note) => {
+    if (visibleIds.has(note.id)) return { ...note, read: true };
+    return note;
+  });
+  saveNotificationCenter(updated);
+}
+
+function syncLegacyNotificationsToCenter() {
+  const center = loadNotificationCenter();
+  const existingIds = new Set(center.map(note => note.id));
+  const additions = [];
+
+  loadManagerNotifications().forEach((note) => {
+    if (!note || existingIds.has(note.id)) return;
+    additions.push({
+      id: note.id,
+      type: note.type || "manager",
+      title: "Manager update",
+      message: note.message || "",
+      createdAt: note.createdAt,
+      read: note.read,
+      audience: ["manager"],
+      details: [
+        { label: "Invoice", value: note.invoiceNo || "-" }
+      ]
+    });
+  });
+
+  const pdcRecords = new Map(loadPdcRecords().map(record => [record.id, record]));
+  loadPdcNotifications().forEach((note) => {
+    if (!note || existingIds.has(note.id)) return;
+    const record = note.pdcId ? pdcRecords.get(note.pdcId) : null;
+    const recipients = String(note.recipients || "").toLowerCase();
+    const audience = [];
+    if (recipients.includes("agent")) audience.push("agent");
+    if (recipients.includes("pdc mgmt") || recipients.includes("ops")) audience.push("ops");
+    if (audience.length === 0) audience.push("agent", "ops");
+    additions.push({
+      id: note.id,
+      type: note.type === "bank-reminder" ? "pdc-reminder" : "pdc",
+      title: note.type === "bank-reminder" ? "PDC banking reminder" : "PDC update",
+      message: note.message || "",
+      createdAt: note.createdAt,
+      scheduledFor: note.scheduledFor || "",
+      sentAt: note.sentAt || "",
+      read: note.read,
+      audience,
+      details: [
+        { label: "Customer", value: record ? `${record.customerName || "-"} (${record.customerCode || "-"})` : "-" },
+        { label: "Invoice", value: record?.invoiceNo || "-" },
+        { label: "Cheque", value: record?.chequeNo || note.pdcId || "-" },
+        { label: "PDC date", value: record?.pdcDate || "-" },
+        { label: "Bank", value: record?.bank || "-" },
+        { label: "Amount", value: record?.amount ? `Rs. ${formatINR(record.amount)}` : "-" },
+        { label: "Status", value: note.status || record?.status || "-" }
+      ],
+      ctas: [
+        { label: "View PDC", action: "open-pdc" }
+      ]
+    });
+  });
+
+  try {
+    const rawTodos = localStorage.getItem(todoStorageKey);
+    const todoList = rawTodos ? JSON.parse(rawTodos) : [];
+    if (Array.isArray(todoList)) {
+      todoList.forEach((task) => {
+        const todoId = `todo-${task.id}`;
+        if (existingIds.has(todoId)) return;
+        additions.push({
+          id: todoId,
+          type: "todo",
+          title: "Todo reminder",
+          message: task.text || "Todo update",
+          createdAt: task.createdAt || new Date().toISOString(),
+          read: Boolean(task.completed),
+          audience: ["agent", "manager"],
+          details: [
+            { label: "Due", value: formatTodoDue(task) },
+            { label: "Customer", value: `${task.customerName || "-"} (${task.customerCode || "-"})` },
+            { label: "Invoice", value: task.invoice?.invoiceNo || "-" }
+          ],
+          ctas: [
+            { label: "Open todo", action: "open-todo" }
+          ]
+        });
+      });
+    }
+  } catch (err) {
+    console.warn("Unable to sync todo notifications", err);
+  }
+
+  if (additions.length > 0) {
+    saveNotificationCenter(additions.concat(center));
+  }
+}
+
+function seedNotificationCenter() {
+  const list = loadNotificationCenter();
+  const existingIds = new Set(list.map(item => item.id));
+  const customer = customersData[0];
+  const customerTwo = customersData[1];
+  const invoice = customer?.invoices?.[0];
+  const invoiceTwo = customerTwo?.invoices?.[1];
+  const now = new Date().toISOString();
+  const seeds = [
+    {
+      id: "seed-visit-approval",
+      type: "visit-approval",
+      title: "Visit approval pending",
+      message: "Visit request awaiting approval from manager.",
+      createdAt: now,
+      audience: ["manager"],
+      details: [
+        { label: "Customer", value: customer ? `${customer.name} (${customer.code})` : "-" },
+        { label: "Visit date", value: customer?.grnDate || "-" },
+        { label: "Location", value: customer?.city || "-" },
+        { label: "Requested by", value: customer?.agentName || "-" }
+      ],
+      ctas: [
+        { label: "Review visit", action: "link", href: "pages/visitmoduleReview.html" }
+      ]
+    },
+    {
+      id: "seed-visit-followup",
+      type: "visit-approval",
+      title: "Visit follow-up",
+      message: "Visit report is ready for review.",
+      createdAt: now,
+      audience: ["manager", "agent"],
+      details: [
+        { label: "Customer", value: customerTwo ? `${customerTwo.name} (${customerTwo.code})` : "-" },
+        { label: "Visit date", value: customerTwo?.grnDate || "-" },
+        { label: "Location", value: customerTwo?.city || "-" },
+        { label: "Requested by", value: customerTwo?.agentName || "-" }
+      ],
+      ctas: [
+        { label: "Open visit", action: "link", href: "pages/visitmodule.html" }
+      ]
+    },
+    {
+      id: "seed-email",
+      type: "email",
+      title: "New email received",
+      message: `Reply from ${customer?.name || "customer"} about ${invoice?.invoiceNo || "invoice"}.`,
+      createdAt: now,
+      audience: ["agent", "manager"],
+      details: [
+        { label: "From", value: customer?.contacts?.[0]?.email || "-" },
+        { label: "To", value: "ops@inebura.com" },
+        { label: "Subject", value: `Re: ${invoice?.invoiceNo || "-"}` }
+      ],
+      ctas: [
+        { label: "View email", action: "open-email", invoiceNo: invoice?.invoiceNo || "" }
+      ]
+    },
+    {
+      id: "seed-email-reminder",
+      type: "email",
+      title: "Email reminder",
+      message: `Payment reminder sent to ${customerTwo?.name || "customer"}.`,
+      createdAt: now,
+      audience: ["agent", "manager"],
+      details: [
+        { label: "From", value: "ops@inebura.com" },
+        { label: "To", value: customerTwo?.contacts?.[0]?.email || "-" },
+        { label: "Subject", value: `Payment reminder for ${invoiceTwo?.invoiceNo || "-"}` }
+      ],
+      ctas: [
+        { label: "View email", action: "open-email", invoiceNo: invoiceTwo?.invoiceNo || "" }
+      ]
+    },
+    {
+      id: "seed-commitment-approved",
+      type: "commitment-approved",
+      title: "Commitment approved",
+      message: "Commitment approved by finance team.",
+      createdAt: now,
+      audience: ["manager", "agent"],
+      details: [
+        { label: "Customer", value: customer ? `${customer.name} (${customer.code})` : "-" },
+        { label: "Invoice", value: invoice?.invoiceNo || "-" },
+        { label: "Amount", value: invoice?.netDueAmount ? `Rs. ${formatINR(invoice.netDueAmount)}` : "-" },
+        { label: "Commitment date", value: invoice?.dueDate || "-" }
+      ],
+      ctas: [
+        { label: "Open invoice", action: "open-invoice", invoiceNo: invoice?.invoiceNo || "" }
+      ]
+    },
+    {
+      id: "seed-todo",
+      type: "todo",
+      title: "Todo reminder",
+      message: "Follow up on pending documents.",
+      createdAt: now,
+      audience: ["agent", "manager"],
+      details: [
+        { label: "Due", value: invoice?.dueDate || "-" },
+        { label: "Customer", value: customer ? `${customer.name} (${customer.code})` : "-" },
+        { label: "Invoice", value: invoice?.invoiceNo || "-" }
+      ],
+      ctas: [
+        { label: "Open todo", action: "open-todo" }
+      ]
+    }
+  ];
+
+  const additions = seeds.filter(item => !existingIds.has(item.id));
+  if (additions.length > 0) {
+    saveNotificationCenter(additions.concat(list));
+  }
 }
 
 function loadPdcNotifications() {
@@ -1035,8 +1359,7 @@ function getAgentPdcNotifications() {
 }
 
 function getActiveBellNotifications() {
-  const list = isManagerView ? loadManagerNotifications() : getAgentPdcNotifications();
-  return list.filter(item => !item.scheduledFor || item.sentAt);
+  return getVisibleNotificationCenter();
 }
 
 function updateManagerNotificationBadge() {
@@ -1048,21 +1371,7 @@ function updateManagerNotificationBadge() {
 }
 
 function markManagerNotificationsRead() {
-  if (isManagerView) {
-    const list = loadManagerNotifications();
-    const updated = list.map((item) => ({ ...item, read: true }));
-    saveManagerNotifications(updated);
-    updateManagerNotificationBadge();
-    return;
-  }
-  const visibleIds = new Set(getAgentPdcNotifications().map(note => note.id));
-  const list = loadPdcNotifications();
-  const updated = list.map((item) => {
-    if (!visibleIds.has(item.id)) return item;
-    if (item.scheduledFor && !item.sentAt) return item;
-    return { ...item, read: true };
-  });
-  savePdcNotifications(updated);
+  markNotificationCenterRead();
   updateManagerNotificationBadge();
 }
 
@@ -1086,27 +1395,139 @@ function renderNotificationPopup() {
     listEl.innerHTML = `<div class="notificationEmpty">No notifications yet.</div>`;
     return;
   }
+  const typeLabelMap = {
+    pdc: "PDC",
+    "pdc-reminder": "PDC reminder",
+    "visit-approval": "Visit approval",
+    todo: "Todo",
+    email: "Email",
+    "commitment-approved": "Commitment",
+    "task-completed": "Task",
+    manager: "Manager"
+  };
+  const escapeAttr = (value) =>
+    String(value || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/\"/g, "&quot;");
+  const getDetailValue = (details, label) => {
+    const key = String(label || "").toLowerCase();
+    const match = (details || []).find(item => String(item.label || "").toLowerCase() === key);
+    return match ? String(match.value || "") : "";
+  };
+  const buildNotificationTitle = (note, details) => {
+    const type = String(note.type || "").toLowerCase();
+    const customer = getDetailValue(details, "Customer");
+    const invoice = getDetailValue(details, "Invoice");
+    const cheque = getDetailValue(details, "Cheque");
+    const subject = getDetailValue(details, "Subject");
+    const visitDate = getDetailValue(details, "Visit date");
 
-  const recordMap = isManagerView
-    ? new Map()
-    : new Map(loadPdcRecords().map(record => [record.id, record]));
+    if (type === "pdc" || type === "pdc-reminder") {
+      const base = type === "pdc-reminder" ? "PDC reminder" : "PDC update";
+      if (cheque && customer) return `${base} - ${cheque} - ${customer}`;
+      if (cheque) return `${base} - ${cheque}`;
+      if (invoice && customer) return `${base} - ${invoice} - ${customer}`;
+      if (invoice) return `${base} - ${invoice}`;
+      if (customer) return `${base} - ${customer}`;
+      return base;
+    }
+    if (type === "visit-approval") {
+      const base = "Visit approval";
+      if (customer && visitDate) return `${base} - ${customer} - ${visitDate}`;
+      if (customer) return `${base} - ${customer}`;
+      if (visitDate) return `${base} - ${visitDate}`;
+      return base;
+    }
+    if (type === "email") {
+      const base = "Email";
+      if (subject) return `${base} - ${subject}`;
+      if (invoice) return `${base} - ${invoice}`;
+      if (customer) return `${base} - ${customer}`;
+      return base;
+    }
+    if (type === "todo") {
+      const base = "Todo reminder";
+      if (customer && invoice) return `${base} - ${customer} - ${invoice}`;
+      if (customer) return `${base} - ${customer}`;
+      if (invoice) return `${base} - ${invoice}`;
+      return base;
+    }
+    if (type === "commitment-approved") {
+      const base = "Commitment approved";
+      if (invoice && customer) return `${base} - ${invoice} - ${customer}`;
+      if (invoice) return `${base} - ${invoice}`;
+      if (customer) return `${base} - ${customer}`;
+      return base;
+    }
+    if (type === "task-completed") {
+      const base = "Task completed";
+      if (invoice && customer) return `${base} - ${invoice} - ${customer}`;
+      if (invoice) return `${base} - ${invoice}`;
+      if (customer) return `${base} - ${customer}`;
+      return base;
+    }
+    if (type === "manager") {
+      const base = "Manager update";
+      if (invoice) return `${base} - ${invoice}`;
+      return base;
+    }
+    return String(note.title || "Update");
+  };
 
   listEl.innerHTML = notifications.map((note) => {
-    const message = safeText(note.message || "Notification");
+    const noteId = escapeAttr(note.id || "");
+    const message = safeText(note.message || "");
     const time = formatNotificationTime(note.sentAt || note.createdAt);
-    const record = isManagerView ? null : recordMap.get(note.pdcId);
-    const meta = isManagerView
-      ? (note.invoiceNo ? `Invoice ${safeText(note.invoiceNo)}` : "-")
-      : (record ? `PDC ${safeText(record.chequeNo || record.id)}` : (note.pdcId ? `PDC ${safeText(note.pdcId)}` : "-"));
-    const dataAttr = isManagerView ? "data-inv" : "data-pdc";
-    const dataVal = isManagerView ? safeText(note.invoiceNo || "") : safeText(note.pdcId || "");
+    const typeLabel = typeLabelMap[note.type] || "Update";
+    const typeClass = `tag-${String(note.type || "update").toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
+    const details = Array.isArray(note.details) ? note.details : [];
+    const title = safeText(buildNotificationTitle(note, details));
+    const invoiceValue = getDetailValue(details, "Invoice");
+    const detailHtml = details.map((detail) => `
+      <div class="notificationDetailRow">
+        <span>${safeText(detail.label)}</span>
+        <strong>${safeText(detail.value)}</strong>
+      </div>
+    `).join("");
+    const ctas = Array.isArray(note.ctas) ? note.ctas : [];
+    const defaultCta = ctas[0] || {};
+    const defaultAction = defaultCta.action
+      || (note.type === "visit-approval" ? "link"
+        : (note.type === "pdc" || note.type === "pdc-reminder") ? "open-pdc"
+          : note.type === "todo" ? "open-todo"
+            : note.type === "email" ? "open-email"
+              : note.type === "commitment-approved" ? "open-invoice"
+                : "");
+    const defaultHref = defaultCta.href
+      || (note.type === "visit-approval" ? "pages/visitmoduleReview.html" : "");
+    const defaultInv = defaultCta.invoiceNo || invoiceValue || "";
+    const ctaHtml = ctas.map((cta) => `
+      <button
+        class="notificationCta"
+        type="button"
+        data-action="${escapeAttr(cta.action || "")}"
+        data-href="${escapeAttr(cta.href || "")}"
+        data-inv="${escapeAttr(cta.invoiceNo || "")}"
+        data-note="${noteId}"
+      >${safeText(cta.label || "View")}</button>
+    `).join("");
+
     return `
-      <div class="notificationItem" ${dataAttr}="${dataVal}">
-        <div>${message}</div>
-        <div class="notificationMeta">
-          <span>${meta}</span>
-          <span>${time}</span>
+      <div class="notificationCard" data-note-id="${noteId}" data-action="${escapeAttr(defaultAction)}" data-href="${escapeAttr(defaultHref)}" data-inv="${escapeAttr(defaultInv)}">
+        <div class="notificationCardHeader">
+          <div>
+            <div class="notificationTitle">${title}</div>
+          </div>
+          <div class="notificationMetaRight">
+            <div class="notificationTag ${typeClass}">${safeText(typeLabel)}</div>
+            <div class="notificationTime">${time}</div>
+          </div>
         </div>
+        <div class="notificationCardBody">${message}</div>
+        ${detailHtml ? `<div class="notificationDetails">${detailHtml}</div>` : ""}
+        ${ctaHtml ? `<div class="notificationCtas">${ctaHtml}</div>` : ""}
       </div>
     `;
   }).join("");
@@ -1124,6 +1545,10 @@ function toggleNotificationPopup(forceOpen) {
     markManagerNotificationsRead();
   } else {
     popup.classList.add("hidden");
+    popup.classList.remove("expanded");
+    const expandBtn = document.getElementById("notificationExpandBtn");
+    const icon = expandBtn ? expandBtn.querySelector("i") : null;
+    if (icon) icon.className = "bi bi-arrows-angle-expand";
   }
 }
 
@@ -1177,6 +1602,24 @@ function addTodoTask({ text, dueDate, dueTime, customer, invoice, source }) {
   saveTodoTasksToStorage();
   renderTodoList();
   updateTodoBadge();
+
+  const task = todoTasks[0];
+  addNotificationCenterItem({
+    id: `todo-${task.id}`,
+    type: "todo",
+    title: "New todo",
+    message: task.text,
+    createdAt: task.createdAt,
+    audience: ["agent", "manager"],
+    details: [
+      { label: "Due", value: formatTodoDue(task) },
+      { label: "Customer", value: `${task.customerName} (${task.customerCode})` },
+      { label: "Invoice", value: task.invoice?.invoiceNo || "-" }
+    ],
+    ctas: [
+      { label: "Open todo", action: "open-todo" }
+    ]
+  });
 }
 
 function formatTodoDue(task) {
@@ -5069,6 +5512,9 @@ document.addEventListener("DOMContentLoaded", () => {
   renderUserPopup();
   initUserSelect();
   wireSideNavEvents();
+  syncLegacyNotificationsToCenter();
+  seedNotificationCenter();
+  updateManagerNotificationBadge();
 
   const search = document.getElementById("customerSearch");
   if (search) {
@@ -5115,15 +5561,59 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  const notificationExpandBtn = document.getElementById("notificationExpandBtn");
+  if (notificationExpandBtn) {
+    notificationExpandBtn.addEventListener("click", (event) => {
+      event.stopPropagation();
+      const popup = document.getElementById("notificationPopup");
+      if (!popup) return;
+      const isExpanded = popup.classList.toggle("expanded");
+      const icon = notificationExpandBtn.querySelector("i");
+      if (icon) {
+        icon.className = isExpanded ? "bi bi-arrows-angle-contract" : "bi bi-arrows-angle-expand";
+      }
+    });
+  }
+
   const notificationPopup = document.getElementById("notificationPopup");
   if (notificationPopup) {
     notificationPopup.addEventListener("click", (event) => {
-      const item = event.target.closest(".notificationItem");
-      if (!item) return;
-      const invNo = item.getAttribute("data-inv");
-      if (invNo && selectInvoiceByNo(invNo)) {
-        setActiveTab("invoice");
+      const runAction = (action, href, invNo) => {
+        if (action === "open-invoice" && invNo && selectInvoiceByNo(invNo)) {
+          setActiveTab("invoice");
+          return true;
+        }
+        if (action === "open-todo") {
+          setActiveTab("todo");
+          return true;
+        }
+        if (action === "open-email") {
+          openEmailPanel(invNo || "");
+          setActiveTab("invoice");
+          return true;
+        }
+        if (action === "open-pdc") {
+          const target = isManagerView ? "pages/PDCOps.html" : "pages/PDCagent.html";
+          window.location.href = resolvePath(target);
+          return true;
+        }
+        if (href) {
+          window.location.href = resolvePath(href);
+          return true;
+        }
+        return false;
+      };
+
+      const cta = event.target.closest(".notificationCta");
+      if (cta) {
+        runAction(cta.getAttribute("data-action"), cta.getAttribute("data-href"), cta.getAttribute("data-inv"));
+        return;
       }
+
+      if (notificationPopup.classList.contains("expanded")) return;
+      const card = event.target.closest(".notificationCard");
+      if (!card) return;
+      runAction(card.getAttribute("data-action"), card.getAttribute("data-href"), card.getAttribute("data-inv"));
     });
   }
 
@@ -5132,17 +5622,17 @@ document.addEventListener("DOMContentLoaded", () => {
     const wrap = document.querySelector(".notificationBellWrap");
     if (!popup || popup.classList.contains("hidden")) return;
     if (wrap && wrap.contains(event.target)) return;
-    popup.classList.add("hidden");
+    toggleNotificationPopup(false);
   });
 
-  window.addEventListener("storage", (event) => {
-    if (event.key === managerNotificationsKey || event.key === pdcNotificationKey) {
-      updateManagerNotificationBadge();
-      const popup = document.getElementById("notificationPopup");
-      if (popup && !popup.classList.contains("hidden")) {
-        renderNotificationPopup();
+    window.addEventListener("storage", (event) => {
+      if (event.key === notificationCenterKey || event.key === managerNotificationsKey || event.key === pdcNotificationKey) {
+        updateManagerNotificationBadge();
+        const popup = document.getElementById("notificationPopup");
+        if (popup && !popup.classList.contains("hidden")) {
+          renderNotificationPopup();
+        }
       }
-    }
     if (event.key === todoStorageKey) {
       loadTodoTasksFromStorage();
       renderTodoList();

@@ -174,7 +174,12 @@
         </span>
       </button>
       <div class="notificationPopup hidden" id="notificationPopup" role="dialog" aria-label="Notifications">
-        <div class="notificationPopupHeader">Notifications</div>
+        <div class="notificationPopupHeader">
+          <span>Notifications</span>
+          <button class="notificationExpandBtn" type="button" id="notificationExpandBtn" aria-label="Expand notifications">
+            <i class="bi bi-arrows-angle-expand" aria-hidden="true"></i>
+          </button>
+        </div>
         <div class="notificationPopupList" id="notificationPopupList"></div>
       </div>
     </div>

@@ -647,14 +647,16 @@ button.notifyBadge {
   right: 0;
   top: calc(100% + 8px);
   width: 280px;
-  max-height: 320px;
-  overflow: auto;
+  max-height: 420px;
+  overflow: hidden;
   background: #ffffff;
   border: 1px solid #e2e8f4;
   border-radius: 12px;
   box-shadow: 0 14px 30px rgba(15, 23, 42, 0.18);
   padding: 8px;
   z-index: 120;
+  display: flex;
+  flex-direction: column;
 }
 
 .userPopup {
@@ -847,12 +849,48 @@ button.notifyBadge {
   letter-spacing: 0.06em;
   color: #64748b;
   margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex: 0 0 auto;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #eef1f7;
+  background: #ffffff;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.notificationPopup.expanded {
+  width: min(520px, 92vw);
+  max-height: min(620px, 80vh);
+}
+
+.notificationExpandBtn {
+  border: 1px solid #e2e8f4;
+  background: #ffffff;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+}
+
+.notificationExpandBtn:hover {
+  border-color: var(--brand-border);
+  color: var(--brand-dark);
 }
 
 .notificationPopupList {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
+  overflow: auto;
+  flex: 1;
+  padding-top: 2px;
 }
 
 .inputWithClear {
@@ -1033,6 +1071,161 @@ button.notifyBadge {
   display: flex;
   justify-content: space-between;
   gap: 8px;
+}
+
+.notificationCard {
+  border: 1px solid #e2e8f4;
+  border-radius: 12px;
+  padding: 10px;
+  background: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.notificationCardHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.notificationMetaRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.notificationTitle {
+  font-size: 12px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.notificationTime {
+  font-size: 10px;
+  color: #94a3b8;
+  white-space: nowrap;
+}
+
+.notificationTag {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #e2e8f0;
+  color: #475569;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.notificationTag.tag-pdc {
+  background: #e0f2fe;
+  color: #075985;
+  border: 1px solid #bae6fd;
+}
+
+.notificationTag.tag-pdc-reminder {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.notificationTag.tag-visit-approval {
+  background: #ecfdf3;
+  color: #0f766e;
+  border: 1px solid #a7f3d0;
+}
+
+.notificationTag.tag-todo {
+  background: #fef9c3;
+  color: #854d0e;
+  border: 1px solid #fde047;
+}
+
+.notificationTag.tag-email {
+  background: #ede9fe;
+  color: #5b21b6;
+  border: 1px solid #c4b5fd;
+}
+
+.notificationTag.tag-commitment-approved {
+  background: #cffafe;
+  color: #0e7490;
+  border: 1px solid #a5f3fc;
+}
+
+.notificationTag.tag-manager {
+  background: #ffe4e6;
+  color: #9f1239;
+  border: 1px solid #fecdd3;
+}
+
+.notificationTag.tag-task-completed {
+  background: #e0f2fe;
+  color: #1e40af;
+  border: 1px solid #bfdbfe;
+}
+
+.notificationCardBody {
+  font-size: 12px;
+  color: #475569;
+  line-height: 1.4;
+}
+
+.notificationDetails {
+  border-top: 1px dashed #e2e8f4;
+  padding-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 11px;
+  color: #475569;
+}
+
+.notificationDetailRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.notificationDetailRow span {
+  color: #94a3b8;
+}
+
+.notificationDetailRow strong {
+  font-weight: 600;
+  color: #0f172a;
+  text-align: right;
+}
+
+.notificationCtas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.notificationCta {
+  border: 1px solid var(--brand-border);
+  background: var(--brand-lighter);
+  color: var(--brand-dark);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.notificationPopup:not(.expanded) .notificationDetails,
+.notificationPopup:not(.expanded) .notificationCtas {
+  display: none;
+}
+
+.notificationPopup:not(.expanded) .notificationCardBody {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .notificationEmpty {

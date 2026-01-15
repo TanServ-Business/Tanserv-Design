@@ -4,8 +4,21 @@
 
   const pdcStorageKey = "ineburaPdcRecords";
   const pdcNotificationKey = "ineburaPdcNotifications";
+  const notificationCenterKey = "ineburaNotificationCenter";
   const role = document.body.dataset.pdcRole || "agent";
   const userName = document.body.dataset.userName || localStorage.getItem("activeUserName") || "Agent";
+
+  const rootPath = (() => {
+    const raw = String(document.body.dataset.rootPath || "").trim();
+    return raw && !raw.endsWith("/") ? `${raw}/` : raw;
+  })();
+
+  const resolvePath = (path) => {
+    if (!path) return "";
+    if (/^(?:[a-z]+:)?\/\//i.test(path) || path.startsWith("/")) return path;
+    const cleaned = path.replace(/^\.\//, "");
+    return `${rootPath}${cleaned}`;
+  };
 
   const statusClassMap = {
     "PDC logged": "logged",
@@ -112,8 +125,124 @@
     }
   };
 
+  const loadNotificationCenter = () => {
+    try {
+      const raw = localStorage.getItem(notificationCenterKey);
+      if (!raw) return [];
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (err) {
+      console.warn("Unable to load notification center", err);
+      return [];
+    }
+  };
+
+  const saveNotificationCenter = (list) => {
+    try {
+      localStorage.setItem(notificationCenterKey, JSON.stringify(list));
+    } catch (err) {
+      console.warn("Unable to save notification center", err);
+    }
+  };
+
+  const addNotificationCenterItem = (note) => {
+    const list = loadNotificationCenter();
+    const payload = {
+      id: note.id || `note-${Date.now()}`,
+      type: note.type || "pdc",
+      title: note.title || "PDC update",
+      message: note.message || "",
+      createdAt: note.createdAt || new Date().toISOString(),
+      scheduledFor: note.scheduledFor || "",
+      sentAt: note.sentAt || "",
+      read: Boolean(note.read),
+      audience: Array.isArray(note.audience) ? note.audience : (note.audience ? [note.audience] : ["agent", "ops"]),
+      details: Array.isArray(note.details) ? note.details : [],
+      ctas: Array.isArray(note.ctas) ? note.ctas : [],
+      data: note.data || {}
+    };
+
+    const existingIndex = list.findIndex(item => item.id === payload.id);
+    if (existingIndex >= 0) {
+      list[existingIndex] = { ...list[existingIndex], ...payload };
+    } else {
+      list.unshift(payload);
+    }
+    saveNotificationCenter(list);
+  };
+
+  const normalizeNotificationCenter = () => {
+    const list = loadNotificationCenter();
+    const today = parseDateValue(new Date());
+    let changed = false;
+    const updated = list.map((note) => {
+      if (note.scheduledFor && !note.sentAt) {
+        const scheduledDate = parseDateValue(note.scheduledFor);
+        if (scheduledDate && today && scheduledDate.getTime() <= today.getTime()) {
+          note.sentAt = new Date().toISOString();
+          changed = true;
+        }
+      }
+      return note;
+    });
+    if (changed) saveNotificationCenter(updated);
+    return updated;
+  };
+
+  const getVisibleNotificationCenter = () => {
+    return normalizeNotificationCenter().filter((note) => {
+      if (note.scheduledFor && !note.sentAt) return false;
+      const audiences = Array.isArray(note.audience) ? note.audience : (note.audience ? [note.audience] : []);
+      if (audiences.length === 0) return true;
+      return audiences.includes("all") || audiences.includes(role);
+    });
+  };
+
+  const syncLegacyNotificationsToCenter = () => {
+    const center = loadNotificationCenter();
+    const existingIds = new Set(center.map(note => note.id));
+    const additions = [];
+    const recordMap = new Map(loadPdcRecords().map(record => [record.id, record]));
+    loadNotifications().forEach((note) => {
+      if (!note || existingIds.has(note.id)) return;
+      const record = note.pdcId ? recordMap.get(note.pdcId) : null;
+      const recipients = String(note.recipients || "").toLowerCase();
+      const audience = [];
+      if (recipients.includes("agent")) audience.push("agent");
+      if (recipients.includes("pdc mgmt") || recipients.includes("ops")) audience.push("ops");
+      if (audience.length === 0) audience.push("agent", "ops");
+      additions.push({
+        id: note.id,
+        type: note.type === "bank-reminder" ? "pdc-reminder" : "pdc",
+        title: note.type === "bank-reminder" ? "PDC banking reminder" : "PDC update",
+        message: note.message || "",
+        createdAt: note.createdAt,
+        scheduledFor: note.scheduledFor || "",
+        sentAt: note.sentAt || "",
+        read: note.read,
+        audience,
+        details: [
+          { label: "Customer", value: record ? `${record.customerName || "-"} (${record.customerCode || "-"})` : "-" },
+          { label: "Invoice", value: record?.invoiceNo || "-" },
+          { label: "Cheque", value: record?.chequeNo || note.pdcId || "-" },
+          { label: "PDC date", value: record?.pdcDate || "-" },
+          { label: "Bank", value: record?.bank || "-" },
+          { label: "Amount", value: record?.amount ? `Rs. ${formatINR(record.amount)}` : "-" },
+          { label: "Status", value: note.status || record?.status || "-" }
+        ],
+        ctas: [
+          { label: "View PDC", action: "open-pdc" }
+        ]
+      });
+    });
+    if (additions.length > 0) {
+      saveNotificationCenter(additions.concat(center));
+    }
+  };
+
   const addNotification = (note) => {
     const list = loadNotifications();
+    const record = note.pdcId ? loadPdcRecords().find(item => item.id === note.pdcId) : null;
     const payload = {
       id: note.id || `PDC-NOTE-${Date.now()}`,
       message: note.message || "PDC update",
@@ -128,6 +257,36 @@
     };
     list.unshift(payload);
     saveNotifications(list);
+
+    const recipients = String(payload.recipients || "").toLowerCase();
+    const audience = [];
+    if (recipients.includes("agent")) audience.push("agent");
+    if (recipients.includes("pdc mgmt") || recipients.includes("ops")) audience.push("ops");
+    if (audience.length === 0) audience.push("agent", "ops");
+
+    addNotificationCenterItem({
+      id: payload.id,
+      type: payload.type === "bank-reminder" ? "pdc-reminder" : "pdc",
+      title: payload.type === "bank-reminder" ? "PDC banking reminder" : "PDC update",
+      message: payload.message,
+      createdAt: payload.createdAt,
+      scheduledFor: payload.scheduledFor,
+      sentAt: payload.sentAt,
+      read: payload.read,
+      audience,
+      details: [
+        { label: "Customer", value: record ? `${record.customerName || "-"} (${record.customerCode || "-"})` : "-" },
+        { label: "Invoice", value: record?.invoiceNo || "-" },
+        { label: "Cheque", value: record?.chequeNo || payload.pdcId || "-" },
+        { label: "PDC date", value: record?.pdcDate || "-" },
+        { label: "Bank", value: record?.bank || "-" },
+        { label: "Amount", value: record?.amount ? `Rs. ${formatINR(record.amount)}` : "-" },
+        { label: "Status", value: payload.status || record?.status || "-" }
+      ],
+      ctas: [
+        { label: "View PDC", action: "open-pdc" }
+      ]
+    });
   };
 
   const normalizeNotifications = () => {
@@ -320,51 +479,156 @@
   const notificationCount = document.getElementById("notificationBellCount");
   let cachedRecords = [];
 
-  const updateBellNotificationBadge = (records) => {
+  const updateBellNotificationBadge = () => {
     if (!notificationCount) return;
-    const list = getVisibleNotifications(records).filter(shouldShowInBell);
+    const list = getVisibleNotificationCenter().filter(shouldShowInBell);
     const unread = list.filter(note => !note.read).length;
     notificationCount.textContent = String(unread);
     notificationCount.classList.toggle("hidden", unread === 0);
   };
 
-  const renderBellNotifications = (records) => {
+  const renderBellNotifications = () => {
     if (!notificationList) return;
-    const recordMap = new Map((records || []).map(record => [record.id, record]));
-    const list = getVisibleNotifications(records).filter(shouldShowInBell);
+    const list = getVisibleNotificationCenter().filter(shouldShowInBell);
     if (list.length === 0) {
       notificationList.innerHTML = `<div class="notificationEmpty">No notifications yet.</div>`;
       return;
     }
+
+    const typeLabelMap = {
+      pdc: "PDC",
+      "pdc-reminder": "PDC reminder",
+      todo: "Todo",
+      email: "Email",
+      "visit-approval": "Visit approval",
+      "commitment-approved": "Commitment"
+    };
+    const escapeAttr = (value) =>
+      String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/\"/g, "&quot;");
+    const getDetailValue = (details, label) => {
+      const key = String(label || "").toLowerCase();
+      const match = (details || []).find(item => String(item.label || "").toLowerCase() === key);
+      return match ? String(match.value || "") : "";
+    };
+    const buildNotificationTitle = (note, details) => {
+      const type = String(note.type || "").toLowerCase();
+      const customer = getDetailValue(details, "Customer");
+      const invoice = getDetailValue(details, "Invoice");
+      const cheque = getDetailValue(details, "Cheque");
+      const subject = getDetailValue(details, "Subject");
+      const visitDate = getDetailValue(details, "Visit date");
+
+      if (type === "pdc" || type === "pdc-reminder") {
+        const base = type === "pdc-reminder" ? "PDC reminder" : "PDC update";
+        if (cheque && customer) return `${base} - ${cheque} - ${customer}`;
+        if (cheque) return `${base} - ${cheque}`;
+        if (invoice && customer) return `${base} - ${invoice} - ${customer}`;
+        if (invoice) return `${base} - ${invoice}`;
+        if (customer) return `${base} - ${customer}`;
+        return base;
+      }
+      if (type === "visit-approval") {
+        const base = "Visit approval";
+        if (customer && visitDate) return `${base} - ${customer} - ${visitDate}`;
+        if (customer) return `${base} - ${customer}`;
+        if (visitDate) return `${base} - ${visitDate}`;
+        return base;
+      }
+      if (type === "email") {
+        const base = "Email";
+        if (subject) return `${base} - ${subject}`;
+        if (invoice) return `${base} - ${invoice}`;
+        if (customer) return `${base} - ${customer}`;
+        return base;
+      }
+      if (type === "todo") {
+        const base = "Todo reminder";
+        if (customer && invoice) return `${base} - ${customer} - ${invoice}`;
+        if (customer) return `${base} - ${customer}`;
+        if (invoice) return `${base} - ${invoice}`;
+        return base;
+      }
+      if (type === "commitment-approved") {
+        const base = "Commitment approved";
+        if (invoice && customer) return `${base} - ${invoice} - ${customer}`;
+        if (invoice) return `${base} - ${invoice}`;
+        if (customer) return `${base} - ${customer}`;
+        return base;
+      }
+      return String(note.title || "Update");
+    };
+
     notificationList.innerHTML = list.map((note) => {
-      const record = recordMap.get(note.pdcId);
-      const label = record
-        ? `PDC ${record.chequeNo || record.id}`
-        : (note.pdcId ? `PDC ${note.pdcId}` : "-");
+      const noteId = escapeAttr(note.id || "");
+      const message = escapeHtml(note.message || "");
       const time = formatDateTime(note.sentAt || note.createdAt);
+      const typeLabel = typeLabelMap[note.type] || "Update";
+      const typeClass = `tag-${String(note.type || "update").toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
+      const details = Array.isArray(note.details) ? note.details : [];
+      const title = escapeHtml(buildNotificationTitle(note, details));
+      const invoiceValue = getDetailValue(details, "Invoice");
+      const detailHtml = details.map((detail) => `
+        <div class="notificationDetailRow">
+          <span>${escapeHtml(detail.label)}</span>
+          <strong>${escapeHtml(detail.value)}</strong>
+        </div>
+      `).join("");
+      const ctas = Array.isArray(note.ctas) ? note.ctas : [];
+      const defaultCta = ctas[0] || {};
+      const defaultAction = defaultCta.action
+        || (note.type === "visit-approval" ? "link"
+          : (note.type === "pdc" || note.type === "pdc-reminder") ? "open-pdc"
+            : note.type === "todo" ? "open-todo"
+              : note.type === "email" ? "open-email"
+                : note.type === "commitment-approved" ? "open-invoice"
+                  : "");
+      const defaultHref = defaultCta.href
+        || (note.type === "visit-approval" ? "pages/visitmoduleReview.html" : "");
+      const defaultInv = defaultCta.invoiceNo || invoiceValue || "";
+      const ctaHtml = ctas.map((cta) => `
+        <button
+          class="notificationCta"
+          type="button"
+          data-action="${escapeAttr(cta.action || "")}"
+          data-href="${escapeAttr(cta.href || "")}"
+          data-inv="${escapeAttr(cta.invoiceNo || "")}"
+          data-note="${noteId}"
+        >${escapeHtml(cta.label || "View")}</button>
+      `).join("");
       return `
-        <div class="notificationItem" data-pdc="${note.pdcId || ""}">
-          <div>${escapeHtml(note.message)}</div>
-          <div class="notificationMeta">
-            <span>${escapeHtml(label)}</span>
-            <span>${escapeHtml(time)}</span>
+        <div class="notificationCard" data-note-id="${noteId}" data-action="${escapeAttr(defaultAction)}" data-href="${escapeAttr(defaultHref)}" data-inv="${escapeAttr(defaultInv)}">
+          <div class="notificationCardHeader">
+            <div>
+              <div class="notificationTitle">${title}</div>
+            </div>
+            <div class="notificationMetaRight">
+              <div class="notificationTag ${typeClass}">${escapeHtml(typeLabel)}</div>
+              <div class="notificationTime">${escapeHtml(time)}</div>
+            </div>
           </div>
+          <div class="notificationCardBody">${message}</div>
+          ${detailHtml ? `<div class="notificationDetails">${detailHtml}</div>` : ""}
+          ${ctaHtml ? `<div class="notificationCtas">${ctaHtml}</div>` : ""}
         </div>
       `;
     }).join("");
   };
 
-  const markVisibleNotificationsRead = (records) => {
-    const list = loadNotifications();
-    const visibleIds = new Set(getVisibleNotifications(records).filter(shouldShowInBell).map(note => note.id));
+  const markVisibleNotificationsRead = () => {
+    const list = loadNotificationCenter();
+    const visibleIds = new Set(getVisibleNotificationCenter().filter(shouldShowInBell).map(note => note.id));
     const updated = list.map((note) => {
       if (visibleIds.has(note.id)) {
         return { ...note, read: true };
       }
       return note;
     });
-    saveNotifications(updated);
-    updateBellNotificationBadge(records);
+    saveNotificationCenter(updated);
+    updateBellNotificationBadge();
   };
 
   const toggleNotificationPopup = (forceOpen) => {
@@ -373,11 +637,15 @@
       ? forceOpen
       : notificationPopup.classList.contains("hidden");
     if (shouldOpen) {
-      renderBellNotifications(cachedRecords);
+      renderBellNotifications();
       notificationPopup.classList.remove("hidden");
-      markVisibleNotificationsRead(cachedRecords);
+      markVisibleNotificationsRead();
     } else {
       notificationPopup.classList.add("hidden");
+      notificationPopup.classList.remove("expanded");
+      const expandBtn = document.getElementById("notificationExpandBtn");
+      const icon = expandBtn ? expandBtn.querySelector("i") : null;
+      if (icon) icon.className = "bi bi-arrows-angle-expand";
     }
   };
 
@@ -387,7 +655,7 @@
     renderCards(records);
     renderTable(records);
     renderActivityTrail(records);
-    updateBellNotificationBadge(records);
+    updateBellNotificationBadge();
     renderCollectInvoiceList(records);
     const metaEl = document.getElementById("pdcListMeta");
     if (metaEl) metaEl.textContent = `${records.length} entries`;
@@ -1130,10 +1398,10 @@
   }
 
   window.addEventListener("storage", (event) => {
-    if (event.key === pdcStorageKey || event.key === pdcNotificationKey) {
+    if (event.key === pdcStorageKey || event.key === pdcNotificationKey || event.key === notificationCenterKey) {
       renderAll();
       if (notificationPopup && !notificationPopup.classList.contains("hidden")) {
-        renderBellNotifications(cachedRecords);
+        renderBellNotifications();
       }
     }
   });
@@ -1145,13 +1413,59 @@
     });
   }
 
+  const notificationExpandBtn = document.getElementById("notificationExpandBtn");
+  if (notificationExpandBtn) {
+    notificationExpandBtn.addEventListener("click", (event) => {
+      event.stopPropagation();
+      if (!notificationPopup) return;
+      const isExpanded = notificationPopup.classList.toggle("expanded");
+      const icon = notificationExpandBtn.querySelector("i");
+      if (icon) {
+        icon.className = isExpanded ? "bi bi-arrows-angle-contract" : "bi bi-arrows-angle-expand";
+      }
+    });
+  }
+
   document.addEventListener("click", (event) => {
     if (!notificationPopup || notificationPopup.classList.contains("hidden")) return;
     const wrap = document.querySelector(".notificationBellWrap");
     if (wrap && wrap.contains(event.target)) return;
-    notificationPopup.classList.add("hidden");
+    toggleNotificationPopup(false);
   });
 
+  if (notificationPopup) {
+    notificationPopup.addEventListener("click", (event) => {
+      const runAction = (action, href, invNo) => {
+        if (action === "open-pdc") {
+          const target = role === "ops" ? "pages/PDCOps.html" : "pages/PDCagent.html";
+          window.location.href = resolvePath(target);
+          return true;
+        }
+        if (action === "open-invoice" || action === "open-email" || action === "open-todo") {
+          window.location.href = resolvePath("index.html");
+          return true;
+        }
+        if (href) {
+          window.location.href = resolvePath(href);
+          return true;
+        }
+        return false;
+      };
+
+      const cta = event.target.closest(".notificationCta");
+      if (cta) {
+        runAction(cta.getAttribute("data-action"), cta.getAttribute("data-href"), cta.getAttribute("data-inv"));
+        return;
+      }
+
+      if (notificationPopup.classList.contains("expanded")) return;
+      const card = event.target.closest(".notificationCard");
+      if (!card) return;
+      runAction(card.getAttribute("data-action"), card.getAttribute("data-href"), card.getAttribute("data-inv"));
+    });
+  }
+
   wireSideNavEvents();
+  syncLegacyNotificationsToCenter();
   renderAll();
 })();
