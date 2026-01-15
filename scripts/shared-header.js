@@ -286,4 +286,395 @@
     fragment.appendChild(container.firstChild);
   }
   mount.replaceWith(fragment);
+
+  const initSharedHeader = () => {
+    if (typeof window.wireHeaderPopupEvents === "function") return;
+
+    const hasPdcScript = Array.from(document.scripts).some((script) => (
+      /(?:^|\/)pdc\.js(?:\?|$)/i.test(script.src || "")
+    ));
+
+    const tenantBrandMap = {
+      apollo: { name: "Apollo", badge: "AP", logo: "assets/apollo-tyres-logo.svg" },
+      bikanerwala: { name: "Bikanerwala", badge: "BK" },
+      global_ar: { name: "Global AR", badge: "GA" }
+    };
+
+    const internalContacts = [
+      { name: "Rohit Mehra", email: "rohit.mehra@inebura.com", phone: "-" },
+      { name: "Mukesh Mishra", email: "mukesh.mishra@inebura.com", phone: "-" },
+      { name: "Ops Supervisor", email: "supervisor@inebura.com", phone: "-" },
+      { name: "Escalations Desk", email: "escalations@inebura.com", phone: "-" }
+    ];
+
+    const getDefaultTenantId = () => {
+      const ids = Object.keys(tenantBrandMap);
+      return ids.length > 0 ? ids[0] : "";
+    };
+
+    const applyTenantBrand = (tenantId) => {
+      const relationshipLogo = document.getElementById("relationshipLogo");
+      const storedId = localStorage.getItem("activeTenantId");
+      const resolvedId = tenantBrandMap[tenantId]
+        ? tenantId
+        : (tenantBrandMap[storedId] ? storedId : getDefaultTenantId());
+
+      const brand = tenantBrandMap[resolvedId];
+      if (!brand) return;
+
+      if (relationshipLogo) {
+        relationshipLogo.innerHTML = "";
+        if (brand.logo) {
+          const img = document.createElement("img");
+          img.src = resolvePath(brand.logo);
+          img.alt = `${brand.name} logo`;
+          relationshipLogo.appendChild(img);
+        } else {
+          relationshipLogo.textContent = brand.badge;
+        }
+      }
+      localStorage.setItem("activeTenantId", resolvedId);
+
+      const list = document.getElementById("clientPickerList");
+      if (list) {
+        list.querySelectorAll("[data-client-id]").forEach((item) => {
+          const isActive = item.getAttribute("data-client-id") === resolvedId;
+          item.classList.toggle("active", isActive);
+          item.setAttribute("aria-pressed", isActive ? "true" : "false");
+        });
+      }
+    };
+
+    const renderClientPicker = () => {
+      const list = document.getElementById("clientPickerList");
+      if (!list) return;
+      list.innerHTML = "";
+      Object.entries(tenantBrandMap).forEach(([id, brand]) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "headerPopupItem";
+        button.setAttribute("data-client-id", id);
+        button.setAttribute("aria-pressed", "false");
+
+        const name = document.createElement("span");
+        name.textContent = brand.name;
+
+        const badge = document.createElement("span");
+        badge.className = "clientBadge";
+        badge.textContent = brand.badge;
+
+        button.appendChild(name);
+        button.appendChild(badge);
+        list.appendChild(button);
+      });
+    };
+
+    const renderDirectoryList = () => {
+      const list = document.getElementById("directoryList");
+      if (!list) return;
+      list.innerHTML = "";
+      internalContacts.forEach((entry) => {
+        const row = document.createElement("div");
+        row.className = "directoryEntry";
+        const body = document.createElement("div");
+        const title = document.createElement("div");
+        title.className = "directoryName";
+        title.textContent = entry.name;
+        const meta = document.createElement("div");
+        meta.className = "directoryMeta";
+        meta.textContent = `Email: ${entry.email || "-"} | Phone: ${entry.phone || "-"}`;
+        const tag = document.createElement("span");
+        tag.className = "directoryTag tagInternal";
+        tag.textContent = "Internal";
+        body.appendChild(title);
+        body.appendChild(meta);
+        row.appendChild(body);
+        row.appendChild(tag);
+        list.appendChild(row);
+      });
+    };
+
+    const closePopup = (popup, button) => {
+      if (!popup) return;
+      popup.classList.add("hidden");
+      if (button) button.setAttribute("aria-expanded", "false");
+    };
+
+    const openPopup = (popup, button) => {
+      if (!popup) return;
+      popup.classList.remove("hidden");
+      if (button) button.setAttribute("aria-expanded", "true");
+    };
+
+    const closeHeaderPopups = (exceptPopup) => {
+      const clientPopup = document.getElementById("clientPickerPopup");
+      const clientBtn = document.getElementById("clientPickerBtn");
+      if (clientPopup && clientPopup !== exceptPopup) closePopup(clientPopup, clientBtn);
+
+      const directoryPopup = document.getElementById("directoryPopup");
+      const directoryBtn = document.getElementById("directoryBtn");
+      if (directoryPopup && directoryPopup !== exceptPopup) closePopup(directoryPopup, directoryBtn);
+    };
+
+    const wireHeaderPopups = () => {
+      const clientBtn = document.getElementById("clientPickerBtn");
+      const clientPopup = document.getElementById("clientPickerPopup");
+      const clientWrap = document.getElementById("clientPickerWrap");
+
+      const directoryBtn = document.getElementById("directoryBtn");
+      const directoryPopup = document.getElementById("directoryPopup");
+      const directoryWrap = document.getElementById("directoryWrap");
+      const directoryCloseBtn = document.getElementById("directoryCloseBtn");
+
+      if (clientBtn) {
+        clientBtn.addEventListener("click", (event) => {
+          event.stopPropagation();
+          const shouldOpen = clientPopup && clientPopup.classList.contains("hidden");
+          if (shouldOpen) {
+            closeHeaderPopups(clientPopup);
+            openPopup(clientPopup, clientBtn);
+          } else {
+            closePopup(clientPopup, clientBtn);
+          }
+        });
+      }
+
+      if (clientPopup) {
+        clientPopup.addEventListener("click", (event) => {
+          const item = event.target.closest("[data-client-id]");
+          if (!item) return;
+          applyTenantBrand(item.getAttribute("data-client-id"));
+          closePopup(clientPopup, clientBtn);
+        });
+      }
+
+      if (directoryBtn) {
+        directoryBtn.addEventListener("click", (event) => {
+          event.stopPropagation();
+          closeHeaderPopups(directoryPopup);
+          openPopup(directoryPopup, directoryBtn);
+        });
+      }
+      if (directoryCloseBtn) {
+        directoryCloseBtn.addEventListener("click", (event) => {
+          event.stopPropagation();
+          closePopup(directoryPopup, directoryBtn);
+        });
+      }
+
+      document.addEventListener("click", (event) => {
+        if (clientPopup && !clientPopup.classList.contains("hidden")) {
+          if (!clientWrap || !clientWrap.contains(event.target)) {
+            closePopup(clientPopup, clientBtn);
+          }
+        }
+        if (directoryPopup && !directoryPopup.classList.contains("hidden")) {
+          if (!directoryWrap || !directoryWrap.contains(event.target)) {
+            closePopup(directoryPopup, directoryBtn);
+          }
+        }
+      });
+    };
+
+    const renderUserPopup = () => {
+      const stored = localStorage.getItem("userProfile");
+      let profile = {};
+      if (stored) {
+        try {
+          profile = JSON.parse(stored);
+        } catch (err) {
+          profile = {};
+        }
+      }
+      const fullName = [profile.firstName, profile.lastName].filter(Boolean).join(" ") || "User";
+      const initials = fullName.split(/\s+/).map(part => part[0]).join("").slice(0, 2).toUpperCase();
+
+      const avatar = document.getElementById("userPopupAvatar");
+      const headerAvatar = document.getElementById("headerUserAvatar");
+      const nameEl = document.getElementById("userPopupName");
+      const emailEl = document.getElementById("userPopupEmail");
+      const loginEl = document.getElementById("userPopupLoginId");
+      const roleEl = document.getElementById("userPopupRoleValue");
+
+      if (avatar) avatar.textContent = initials || "US";
+      if (headerAvatar) headerAvatar.textContent = initials || "US";
+      if (nameEl) nameEl.textContent = fullName;
+      if (emailEl) emailEl.textContent = profile.email || "user@example.com";
+      if (loginEl) loginEl.textContent = profile.loginId || "-";
+      if (roleEl) roleEl.textContent = profile.role || "Agent";
+    };
+
+    const wireUserPopup = () => {
+      const userBtn = document.getElementById("headerUserBtn");
+      const userPopup = document.getElementById("userPopup");
+      const userWrap = document.getElementById("userPopupWrap");
+
+      if (userBtn && userPopup) {
+        userBtn.addEventListener("click", (event) => {
+          event.stopPropagation();
+          const shouldOpen = userPopup.classList.contains("hidden");
+          if (shouldOpen) {
+            renderUserPopup();
+            userPopup.classList.remove("hidden");
+            userBtn.setAttribute("aria-expanded", "true");
+            closeHeaderPopups();
+          } else {
+            userPopup.classList.add("hidden");
+            userBtn.setAttribute("aria-expanded", "false");
+          }
+        });
+      }
+
+      document.addEventListener("click", (event) => {
+        if (!userPopup || userPopup.classList.contains("hidden")) return;
+        if (userWrap && userWrap.contains(event.target)) return;
+        userPopup.classList.add("hidden");
+        if (userBtn) userBtn.setAttribute("aria-expanded", "false");
+      });
+    };
+
+    const wireSideNav = () => {
+      const menuBtn = document.getElementById("headerMenuBtn");
+      const overlay = document.getElementById("sideNavOverlay");
+      const closeBtn = document.getElementById("sideNavClose");
+      const sideNav = document.getElementById("sideNav");
+
+      const openSideNav = () => {
+        if (!overlay) return;
+        overlay.classList.add("open");
+        overlay.setAttribute("aria-hidden", "false");
+      };
+
+      const closeSideNav = () => {
+        if (!overlay) return;
+        overlay.classList.remove("open");
+        overlay.setAttribute("aria-hidden", "true");
+      };
+
+      if (menuBtn) menuBtn.addEventListener("click", openSideNav);
+      if (closeBtn) closeBtn.addEventListener("click", closeSideNav);
+      if (overlay) {
+        overlay.addEventListener("click", (event) => {
+          if (event.target === overlay) closeSideNav();
+        });
+      }
+      if (sideNav) {
+        sideNav.addEventListener("click", (event) => {
+          const toggle = event.target.closest(".nav-link[data-toggle=\"submenu\"]");
+          if (toggle) {
+            event.preventDefault();
+            const menuItem = toggle.closest(".menu-item");
+            if (!menuItem) return;
+            const isOpen = menuItem.classList.toggle("open");
+            toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+          }
+        });
+      }
+    };
+
+    const initNotifications = () => {
+      if (hasPdcScript) return;
+
+      const notificationCenterKey = "ineburaNotificationCenter";
+      const notificationBellBtn = document.getElementById("notificationBellBtn");
+      const notificationBellCount = document.getElementById("notificationBellCount");
+      const notificationPopup = document.getElementById("notificationPopup");
+      const notificationList = document.getElementById("notificationPopupList");
+      const notificationExpandBtn = document.getElementById("notificationExpandBtn");
+
+      const loadNotifications = () => {
+        const stored = localStorage.getItem(notificationCenterKey);
+        if (!stored) return [];
+        try {
+          const parsed = JSON.parse(stored);
+          return Array.isArray(parsed) ? parsed : [];
+        } catch (err) {
+          return [];
+        }
+      };
+
+      const updateNotificationBadge = () => {
+        if (!notificationBellCount) return;
+        const unreadCount = loadNotifications().filter(note => !note.read).length;
+        notificationBellCount.textContent = String(unreadCount);
+        notificationBellCount.classList.toggle("hidden", unreadCount === 0);
+      };
+
+      const renderNotificationPopup = () => {
+        if (!notificationList) return;
+        const notes = loadNotifications();
+        if (notes.length === 0) {
+          notificationList.innerHTML = "<div class=\"notificationEmpty\">No notifications yet.</div>";
+          return;
+        }
+        notificationList.innerHTML = notes.map((note) => (
+          `<div class=\"notificationCard\">
+            <div class=\"notificationCardHeader\">
+              <div class=\"notificationTitle\">${escapeHtml(note.title || "Update")}</div>
+              <div class=\"notificationTime\">${escapeHtml(note.createdAt || "-")}</div>
+            </div>
+            <div class=\"notificationCardBody\">${escapeHtml(note.message || "-")}</div>
+          </div>`
+        )).join("");
+      };
+
+      const toggleNotificationPopup = (forceOpen) => {
+        if (!notificationPopup) return;
+        const shouldOpen = typeof forceOpen === "boolean"
+          ? forceOpen
+          : notificationPopup.classList.contains("hidden");
+        if (shouldOpen) {
+          renderNotificationPopup();
+          notificationPopup.classList.remove("hidden");
+        } else {
+          notificationPopup.classList.add("hidden");
+          notificationPopup.classList.remove("expanded");
+          const icon = notificationExpandBtn ? notificationExpandBtn.querySelector("i") : null;
+          if (icon) icon.className = "bi bi-arrows-angle-expand";
+        }
+      };
+
+      if (notificationBellBtn) {
+        notificationBellBtn.addEventListener("click", (event) => {
+          event.stopPropagation();
+          toggleNotificationPopup();
+        });
+      }
+
+      if (notificationExpandBtn) {
+        notificationExpandBtn.addEventListener("click", (event) => {
+          event.stopPropagation();
+          if (!notificationPopup) return;
+          const isExpanded = notificationPopup.classList.toggle("expanded");
+          const icon = notificationExpandBtn.querySelector("i");
+          if (icon) {
+            icon.className = isExpanded ? "bi bi-arrows-angle-contract" : "bi bi-arrows-angle-expand";
+          }
+        });
+      }
+
+      document.addEventListener("click", (event) => {
+        if (!notificationPopup || notificationPopup.classList.contains("hidden")) return;
+        const wrap = document.querySelector(".notificationBellWrap");
+        if (wrap && wrap.contains(event.target)) return;
+        toggleNotificationPopup(false);
+      });
+
+      updateNotificationBadge();
+    };
+
+    renderClientPicker();
+    applyTenantBrand();
+    renderDirectoryList();
+    wireHeaderPopups();
+    wireUserPopup();
+    wireSideNav();
+    initNotifications();
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initSharedHeader);
+  } else {
+    initSharedHeader();
+  }
 })();
