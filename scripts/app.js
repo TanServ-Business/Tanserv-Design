@@ -3061,6 +3061,26 @@ function wireDispositionActivityEvents() {
   const miscModes = ["NEFT", "RTGS", "Cheque", "Demand Draft", "PDC", "CN", "Adv"];
   const miscAdjustmentModes = new Set(["PDC", "CN", "Adv"]);
   const adjustmentTypeMap = { PDC: "PDC", CN: "Credit Note", Adv: "Advance" };
+  const bankSuggestions = [
+    "State Bank of India",
+    "HDFC Bank",
+    "ICICI Bank",
+    "Axis Bank",
+    "Kotak Mahindra Bank",
+    "Punjab National Bank",
+    "Bank of Baroda",
+    "Canara Bank",
+    "Union Bank of India",
+    "IDFC First Bank",
+    "IndusInd Bank",
+    "Yes Bank",
+    "IDBI Bank",
+    "Federal Bank",
+    "RBL Bank",
+    "HSBC",
+    "Citibank",
+    "Standard Chartered"
+  ];
   const defaultSubStatus = "No Response";
   let pendingPdcSubmission = null;
 
@@ -3087,6 +3107,75 @@ function wireDispositionActivityEvents() {
     pdcError.textContent = "";
     pdcError.classList.add("hidden");
   };
+
+  const hideBankSuggestions = (box) => {
+    if (!box) return;
+    box.style.display = "none";
+    box.innerHTML = "";
+  };
+
+  const renderBankSuggestions = (input, box, clearBtn) => {
+    if (!box || !input) return;
+    const trimmed = String(input.value || "").trim().toLowerCase();
+    if (!trimmed) {
+      hideBankSuggestions(box);
+      if (clearBtn) clearBtn.classList.remove("visible");
+      return;
+    }
+    const matches = bankSuggestions.filter((name) =>
+      name.toLowerCase().includes(trimmed)
+    );
+    if (!matches.length) {
+      box.innerHTML = `<div style="padding:6px 8px; font-size:12px; color:#94a3b8;">No matches found.</div>`;
+      box.style.display = "block";
+      if (clearBtn) clearBtn.classList.add("visible");
+      return;
+    }
+    box.innerHTML = matches.map((name) => `
+      <div class="suggestionItem" data-name="${safeText(name)}">
+        <span>${safeText(name)}</span>
+      </div>
+    `).join("");
+    box.style.display = "block";
+    if (clearBtn) clearBtn.classList.add("visible");
+  };
+
+  const wireBankSuggestion = (input) => {
+    if (!input || input.dataset.bankSuggestBound) return;
+    const wrap = input.closest(".bankSuggest");
+    const box = wrap ? wrap.querySelector(".suggestionBox") : null;
+    const clearBtn = wrap ? wrap.querySelector(".clearBtn") : null;
+    if (!box) return;
+    input.dataset.bankSuggestBound = "true";
+
+    const show = () => renderBankSuggestions(input, box, clearBtn);
+    input.addEventListener("input", show);
+    input.addEventListener("focus", show);
+
+    if (clearBtn) {
+      clearBtn.addEventListener("click", () => {
+        input.value = "";
+        input.focus();
+        hideBankSuggestions(box);
+        clearBtn.classList.remove("visible");
+      });
+    }
+
+    box.addEventListener("click", (event) => {
+      const item = event.target.closest(".suggestionItem");
+      if (!item) return;
+      input.value = item.getAttribute("data-name") || "";
+      hideBankSuggestions(box);
+      if (clearBtn) clearBtn.classList.add("visible");
+    });
+  };
+
+  document.addEventListener("click", (event) => {
+    document.querySelectorAll(".bankSuggest").forEach((wrap) => {
+      if (wrap.contains(event.target)) return;
+      hideBankSuggestions(wrap.querySelector(".suggestionBox"));
+    });
+  });
 
   const updateCollectionTotals = () => {
     const invNo = dispositionInvoiceList && dispositionInvoiceList.length > 0
@@ -3232,7 +3321,15 @@ function wireDispositionActivityEvents() {
         </div>
         <div>
           <label>Bank</label>
-          <input type="text" class="miscBank" placeholder="Bank name" list="bankSuggestions" />
+          <div class="bankSuggest">
+            <div class="inputWithClear">
+              <input type="text" class="miscBank" placeholder="Bank name" autocomplete="off" />
+              <button class="clearBtn" type="button" aria-label="Clear search">
+                <i class="bi bi-x-lg" aria-hidden="true"></i>
+              </button>
+            </div>
+            <div class="suggestionBox"></div>
+          </div>
         </div>
         <div>
           <label>Transfer date</label>
@@ -3298,6 +3395,7 @@ function wireDispositionActivityEvents() {
     }
 
     miscList.appendChild(row);
+    wireBankSuggestion(row.querySelector(".miscBank"));
   };
 
   const updatePdcRowLabels = () => {
@@ -3331,7 +3429,15 @@ function wireDispositionActivityEvents() {
         </div>
         <div>
           <label>Bank</label>
-          <input type="text" class="pdcBank" placeholder="Bank name" list="bankSuggestions" />
+          <div class="bankSuggest">
+            <div class="inputWithClear">
+              <input type="text" class="pdcBank" placeholder="Bank name" autocomplete="off" />
+              <button class="clearBtn" type="button" aria-label="Clear search">
+                <i class="bi bi-x-lg" aria-hidden="true"></i>
+              </button>
+            </div>
+            <div class="suggestionBox"></div>
+          </div>
         </div>
         <div>
           <label>Amount</label>
@@ -3389,6 +3495,7 @@ function wireDispositionActivityEvents() {
     });
 
     pdcList.appendChild(row);
+    wireBankSuggestion(row.querySelector(".pdcBank"));
     updatePdcRowLabels();
   };
 
@@ -3487,6 +3594,8 @@ function wireDispositionActivityEvents() {
       createPdcRow(outstanding || "");
     }
   };
+
+  wireBankSuggestion(document.getElementById("collectionBank"));
 
   if (subStatusSelect) {
     subStatusSelect.addEventListener("change", () => {
@@ -3695,26 +3804,6 @@ function wireDispositionActivityEvents() {
     };
 
     const submitActivity = () => {
-      if (remarkText) {
-        const remarkPayload = {
-          text: remarkText,
-          authorRole: "agent",
-          authorLabel: "Agent",
-          timestamp,
-          createdAt: new Date().toISOString()
-        };
-        invoices.forEach((invNo) => {
-          addStoredRemark(invNo, remarkPayload);
-        });
-        renderStoredRemarks(invoices[0] || currentInvoiceNoForDocs);
-        if (remarksAccordion && window.bootstrap && window.bootstrap.Collapse) {
-          const collapse = window.bootstrap.Collapse.getOrCreateInstance(remarksAccordion, { toggle: false });
-          collapse.show();
-        } else if (remarksAccordion) {
-          remarksAccordion.classList.add("show");
-        }
-      }
-
       if (/@task\b/i.test(remarkText)) {
         const customer = customersData.find(c => c.id === selectedCustomerId);
         const invNo = dispositionInvoiceList && dispositionInvoiceList.length > 0

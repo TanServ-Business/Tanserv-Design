@@ -39,7 +39,7 @@
         <i class="bi bi-list" aria-hidden="true"></i>
       </button>
     </div>
-    <div class="brand"><a href="../index.html">
+    <div class="brand"><a href="${resolvePath("index.html")}">
       <img class="logoInebura" src="${resolvePath("assets/logo.png")}" alt="Inebura logo" /></a>
     </div>
 
