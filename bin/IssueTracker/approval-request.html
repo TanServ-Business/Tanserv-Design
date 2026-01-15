@@ -11,19 +11,12 @@
   <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" href="/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icon.png">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="../../css/shared-header.css">
 </head>
-<body>
+<body data-root-path="../../" data-relationship-name="Issue Tracker" data-relationship-badge="IT">
   <div class="app-shell">
-    <header class="header">
-      <div class="brand">
-        <h1>Inebura</h1>
-        <span>Approval</span>
-      </div>
-      <nav class="nav">
-        <a href="approver-dashboard.html">Approvals Dashboard</a>
-        <a href="index.html">Issue Tracker</a>
-      </nav>
-    </header>
+    <div data-shared-header></div>
 
     <main class="main">
       <section class="hero">
@@ -72,6 +65,7 @@
     </footer>
   </div>
 
-  <script src="js/approval-request.js"></script>
+    <script src="../../scripts/shared-header.js"></script>
+<script src="js/approval-request.js"></script>
 </body>
 </html>

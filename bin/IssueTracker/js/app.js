@@ -188,7 +188,7 @@
   const roleSelect = document.getElementById('role-select');
   const ROLE_STORAGE_KEY = 'issue_tracker_role';
   const ROLE_ACTIONS = {
-    agent: ['assign-btn', 'email-btn', 'approval-process-btn'],
+    agent: ['assign-btn', 'email-btn', 'approval-process-btn', 'close-btn'],
     manager: ['approve-btn', 'assign-btn', 'email-btn', 'approval-process-btn'],
     'action-owner': ['assign-btn', 'resolution-btn', 'close-btn']
   };

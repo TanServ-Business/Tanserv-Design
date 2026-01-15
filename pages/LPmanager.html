@@ -387,81 +387,9 @@
     }
   </style>
 </head>
-<body>
+<body data-root-path="../" data-relationship-name="Apollo" data-relationship-badge="AP" data-relationship-logo-src="assets/apollo-tyres-logo.svg">
 
-<header>
-  <div class="headerLeft">
-    <div class="headerMenu">
-      <button class="iconBtn menuBtn" type="button" id="headerMenuBtn" aria-label="Open menu">
-        <i class="bi bi-list" aria-hidden="true"></i>
-      </button>
-    </div>
-    <div class="brand">
-      <span class="logoInebura">Inebura</span>
-    </div>
-
-    <div class="divider"></div>
-
-    <div class="relationship">
-      <div class="relLogo" id="relationshipLogo">PH</div>
-      <span class="relName" id="relationshipName">Philips</span>
-    </div>
-  </div>
-
-  <div class="headerRight">
-    <select id="tenantSelect" class="tenantSelect">
-      <option value="apollo">Apollo</option>
-      <option value="bikanerwala">Bikanerwala</option>
-      <option value="global_ar">Global AR</option>
-    </select>
-
-    <span class="iconBtn" title="Notifications"><i class="bi bi-bell-fill" aria-hidden="true"></i></span>
-    <select id="userSelect" class="tenantSelect userSelect" aria-label="Select user"></select>
-  </div>
-</header>
-
-<div class="sideNavOverlay" id="sideNavOverlay" aria-hidden="true">
-  <nav class="sideNav" id="sideNav" aria-label="Main">
-    <div class="sideNavHeader">
-      <div class="sideNavBrand">
-        <span class="sideNavBrandIcon">I</span>
-        <span class="sideNavBrandName">Inebura</span>
-      </div>
-      <button class="iconBtn sideNavClose" type="button" id="sideNavClose" aria-label="Close menu">
-        <i class="bi bi-x-lg" aria-hidden="true"></i>
-      </button>
-    </div>
-    <ul class="nav-menu" role="menu">
-      <li class="menu-item">
-        <a class="nav-link" href="#" data-toggle="submenu" aria-expanded="false">
-          <span class="link-content">
-            <i class="bi bi-geo-alt" aria-hidden="true"></i>
-            <span>Visit</span>
-          </span>
-          <i class="bi bi-chevron-down chevron" aria-hidden="true"></i>
-        </a>
-        <div class="submenu">
-          <a class="submenu-link" href="visitmodule.html" data-module="visit">Visit Module</a>
-          <a class="submenu-link" href="visitmoduleReview.html" data-module="visit-review">Visit Module Review</a>
-        </div>
-      </li>
-      <li class="menu-item">
-        <a class="nav-link" href="#" data-toggle="submenu" aria-expanded="false">
-          <span class="link-content">
-            <i class="bi bi-window" aria-hidden="true"></i>
-            <span>Landing</span>
-          </span>
-          <i class="bi bi-chevron-down chevron" aria-hidden="true"></i>
-        </a>
-        <div class="submenu">
-          <a class="submenu-link" href="../index.html" data-module="landing">Landing Page</a>
-          <a class="submenu-link" href="LPmanager.html" data-module="landing-manager">Landing Page - Manager</a>
-          <a class="submenu-link" href="LPbackend.html" data-module="landing-backend">Landing Page - Backend</a>
-        </div>
-      </li>
-    </ul>
-  </nav>
-</div>
+<div data-shared-header></div>
 
 <main class="managerMain">
   <div class="managerHeader">
@@ -574,6 +502,7 @@
   </div>
 </main>
 
+  <script src="../scripts/shared-header.js"></script>
 <script>
   (() => {
     const agentData = [

@@ -1034,6 +1034,12 @@
       color: #92400e;
     }
 
+    .notifyPopup.general {
+      border-color: #cbd5f5;
+      background: #f8fafc;
+      color: #1e293b;
+    }
+
     .notifyPopup strong {
       display: block;
       font-size: 13px;
@@ -1232,6 +1238,28 @@
       padding-left: 18px;
       font-size: 12px;
     }
+
+    .modalCard.warningModal {
+      border: 1px solid #fde68a;
+    }
+
+    .warningHeader {
+      background: #fef3c7;
+    }
+
+    .warningHeader h3 {
+      color: #92400e;
+    }
+
+    .warningBody {
+      color: #92400e;
+    }
+
+    .warningList {
+      margin: 8px 0 0;
+      padding-left: 18px;
+      font-size: 12px;
+    }
   </style>
 </head>
 <body>
@@ -1247,6 +1275,7 @@
         <button class="btnDanger" type="button" id="errorNotifyBtn">Show Error Notification</button>
         <button class="btnPrimary" type="button" id="successNotifyBtn">Show Success Notification</button>
         <button class="btnSecondary" type="button" id="warningNotifyBtn">Show Warning Notification</button>
+        <button class="btnGhost" type="button" id="generalNotifyBtn">Show General Notification</button>
         <span style="font-size:12px; color:#64748b;">Appears as a top-right popup.</span>
       </div>
     </section>
@@ -1615,6 +1644,8 @@
       <div class="pillRow">
         <button class="btnPrimary" type="button" data-modal-open="basicModal">Open Basic Modal</button>
         <button class="btnSecondary" type="button" data-modal-open="confirmModal">Open Confirm Modal</button>
+        <button class="btnGhost" type="button" data-modal-open="yesNoModal">Open Yes/No Modal</button>
+        <button class="btnSecondary" type="button" data-modal-open="warningModal">Open Warning Modal</button>
         <button class="btnDanger" type="button" data-modal-open="errorModal">Open Error Modal</button>
       </div>
     </section>
@@ -1814,6 +1845,25 @@
     </div>
   </div>
 
+  <div class="modalOverlay" id="yesNoModal" aria-hidden="true">
+    <div class="modalCard">
+      <div class="modalHeader">
+        <h3>Quick Decision</h3>
+        <button class="closeBtn" type="button" data-modal-close aria-label="Close modal">
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
+        </button>
+      </div>
+      <div class="modalBody">
+        <span>Do you want to notify the team about this update?</span>
+        <div class="modalNotice" data-notice>Response saved</div>
+      </div>
+      <div class="modalFooter">
+        <button class="btnSecondary" type="button" data-modal-close>No</button>
+        <button class="btnPrimary" type="button" data-modal-action="yes">Yes</button>
+      </div>
+    </div>
+  </div>
+
   <div class="modalOverlay" id="errorModal" aria-hidden="true">
     <div class="modalCard errorModal">
       <div class="modalHeader errorHeader">
@@ -1834,6 +1884,30 @@
       <div class="modalFooter">
         <button class="btnSecondary" type="button" data-modal-close>Close</button>
         <button class="btnDanger" type="button">Retry</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modalOverlay" id="warningModal" aria-hidden="true">
+    <div class="modalCard warningModal">
+      <div class="modalHeader warningHeader">
+        <h3>Warning</h3>
+        <button class="closeBtn" type="button" data-modal-close aria-label="Close modal">
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
+        </button>
+      </div>
+      <div class="modalBody warningBody">
+        <strong>Action needed before proceeding</strong>
+        <span>Please review the following:</span>
+        <ul class="warningList">
+          <li>Confirm the PDC date and bank details.</li>
+          <li>Ensure courier information is accurate.</li>
+          <li>Upload the cheque image if available.</li>
+        </ul>
+      </div>
+      <div class="modalFooter">
+        <button class="btnSecondary" type="button" data-modal-close>Close</button>
+        <button class="btnPrimary" type="button">Proceed anyway</button>
       </div>
     </div>
   </div>
@@ -1970,6 +2044,7 @@
       const errorNotifyBtn = document.getElementById("errorNotifyBtn");
       const successNotifyBtn = document.getElementById("successNotifyBtn");
       const warningNotifyBtn = document.getElementById("warningNotifyBtn");
+      const generalNotifyBtn = document.getElementById("generalNotifyBtn");
       if (errorNotifyBtn && notifyDock) {
         errorNotifyBtn.addEventListener("click", () => {
           const popup = document.createElement("div");
@@ -2035,6 +2110,34 @@
             <div>
               <strong>Fill all required fields</strong>
               <span>Complete the highlighted inputs before submitting.</span>
+            </div>
+            <button class="notifyClose" type="button" aria-label="Dismiss">
+              <i class="bi bi-x-lg" aria-hidden="true"></i>
+            </button>
+          `;
+          const closeBtn = popup.querySelector(".notifyClose");
+          if (closeBtn) {
+            closeBtn.addEventListener("click", () => {
+              popup.remove();
+            });
+          }
+          notifyDock.prepend(popup);
+          setTimeout(() => {
+            if (!popup.isConnected) return;
+            popup.remove();
+          }, 4000);
+        });
+      }
+
+      if (generalNotifyBtn && notifyDock) {
+        generalNotifyBtn.addEventListener("click", () => {
+          const popup = document.createElement("div");
+          popup.className = "notifyPopup general animateUp";
+          popup.innerHTML = `
+            <i class="bi bi-info-circle-fill" aria-hidden="true"></i>
+            <div>
+              <strong>General update</strong>
+              <span>Reports are synced and ready to review.</span>
             </div>
             <button class="notifyClose" type="button" aria-label="Dismiss">
               <i class="bi bi-x-lg" aria-hidden="true"></i>

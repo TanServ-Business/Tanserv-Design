@@ -42,11 +42,11 @@
       .owner-grid{grid-template-columns: 1fr;}
     }
   </style>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="../../css/shared-header.css">
 </head>
-<body>
-  <header class="app-header">
-    <h1>Customer Summary & Activity</h1>
-  </header>
+<body data-root-path="../../" data-relationship-name="Issue Tracker" data-relationship-badge="IT">
+  <div data-shared-header></div>
 
   <main class="page" aria-label="Customer summary and activity">
 
@@ -195,7 +195,8 @@
     <small>Mock UI • Screenshot reference: img/Screenshot 2025-11-17 132357.png</small>
   </footer>
 
-  <script>
+    <script src="../../scripts/shared-header.js"></script>
+<script>
     // --- Mock data ---
     const customers = [
       { code: 'CUST11010', name: 'Afterpay Ltd', invoiceTotal: 3948202, netDue: 3903202, target: 1250626, mtd: 45000, city: 'Goa', issues: 2 },

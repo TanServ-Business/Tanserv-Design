@@ -12,23 +12,16 @@
   <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" href="/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icon.png">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="../../css/shared-header.css">
 </head>
-<body>
+<body data-root-path="../../" data-relationship-name="Issue Tracker" data-relationship-badge="IT">
   <div class="dash-bg" aria-hidden="true">
     <span class="shape shape--one"></span>
     <span class="shape shape--two"></span>
   </div>
 
-  <header class="dash-header">
-    <div class="brand">
-      <span class="brand-name">Inebura</span>
-      <span class="brand-tag">Dashboard</span>
-    </div>
-    <div class="header-meta">
-      <span>Issue insights</span>
-      <span class="user-pill">New user</span>
-    </div>
-  </header>
+  <div data-shared-header></div>
 
   <main class="dash-main">
     <section class="hero">
@@ -181,6 +174,7 @@
     <small>Sample metrics only. Connect live data when the backend is ready.</small>
   </footer>
 
-  <script src="js/dashboard.js"></script>
+    <script src="../../scripts/shared-header.js"></script>
+<script src="js/dashboard.js"></script>
 </body>
 </html>

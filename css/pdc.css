@@ -1,0 +1,444 @@
+body {
+  background: #f4f6f9;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(12px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.animateUp {
+  animation: slideUp 0.35s ease;
+}
+
+.pdcMain {
+  max-width: none;
+  margin: 0;
+  padding: 24px 28px 40px;
+  width: 100%;
+}
+
+.pdcHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.pdcHeader h1 {
+  font-size: 22px;
+  margin: 0;
+  color: #111827;
+}
+
+.pdcHeader p {
+  margin: 4px 0 0;
+  color: #64748b;
+  font-size: 12px;
+}
+
+.pdcRolePill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--brand-lighter);
+  border: 1px solid var(--brand-border);
+  color: var(--brand-dark);
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.pdcCards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.pdcCard {
+  background: #ffffff;
+  border: 1px solid #e2e8f4;
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.05);
+}
+
+.pdcCard.primary {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+.pdcCard.warning {
+  background: #fff7ed;
+  border-color: #fed7aa;
+}
+
+.pdcCardLabel {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #64748b;
+  display: block;
+}
+
+.pdcCardValue {
+  font-size: 18px;
+  font-weight: 800;
+  color: #111827;
+  margin-top: 6px;
+}
+
+.pdcCardAmount {
+  margin-top: 4px;
+  font-size: 12px;
+  color: #475569;
+}
+
+.pdcLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: 16px;
+  align-items: start;
+}
+
+.pdcPanel {
+  background: #ffffff;
+  border: 1px solid #e2e8f4;
+  border-radius: 16px;
+  padding: 14px;
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.05);
+}
+
+.pdcPanelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.pdcPanelHeader h2,
+.pdcPanelHeader h3 {
+  margin: 0;
+  font-size: 16px;
+  color: #111827;
+}
+
+.pdcPanelMeta {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.pdcTableWrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.pdcTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.pdcTable th,
+.pdcTable td {
+  padding: 9px 8px;
+  border-bottom: 1px solid #e2e8f4;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.pdcTable th {
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #64748b;
+}
+
+.pdcStatus {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+}
+
+.pdcStatus.logged {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.pdcStatus.dispatched {
+  background: #e0f2fe;
+  color: #075985;
+  border-color: #bae6fd;
+}
+
+.pdcStatus.received {
+  background: #dcfce7;
+  color: #166534;
+  border-color: #86efac;
+}
+
+.pdcStatus.incorrect {
+  background: #fef3c7;
+  color: #92400e;
+  border-color: #fde68a;
+}
+
+.pdcStatus.banked {
+  background: #ede9fe;
+  color: #4c1d95;
+  border-color: #c4b5fd;
+}
+
+.pdcStatus.cleared {
+  background: #d1fae5;
+  color: #047857;
+  border-color: #6ee7b7;
+}
+
+.pdcStatus.bounced {
+  background: #fee2e2;
+  color: #b91c1c;
+  border-color: #fecaca;
+}
+
+.pdcActionBtn {
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  color: #334155;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+.pdcActionBtn:hover {
+  border-color: var(--brand-border);
+  color: var(--brand-dark);
+  background: var(--brand-lighter);
+}
+
+.pdcNotifications {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pdcNotificationItem {
+  border: 1px solid #e2e8f4;
+  border-radius: 12px;
+  padding: 10px;
+  background: #f8fafc;
+  font-size: 12px;
+  color: #111827;
+}
+
+.pdcNotificationMeta {
+  font-size: 10.5px;
+  color: #64748b;
+  margin-top: 6px;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.notifyDock {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 500;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: min(320px, 92vw);
+  pointer-events: none;
+}
+
+.notifyPopup {
+  pointer-events: auto;
+  background: #ffffff;
+  border: 1px solid #fecaca;
+  border-radius: 14px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  box-shadow: 0 20px 34px rgba(15, 23, 42, 0.18);
+}
+
+.notifyPopup.success {
+  border-color: #bbf7d0;
+  background: #f0fdf4;
+  color: #166534;
+}
+
+.notifyPopup strong {
+  display: block;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.notifyPopup span {
+  font-size: 12px;
+  color: inherit;
+}
+
+.notifyClose {
+  margin-left: auto;
+  border: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.activityTrail {
+  position: relative;
+  padding: 6px 12px 8px 18px;
+}
+
+.activityTrail::before {
+  content: "";
+  position: absolute;
+  left: 14px;
+  top: 10px;
+  bottom: 12px;
+  width: 2px;
+  background: linear-gradient(180deg, #cbd5f5 0%, #e2e8f0 60%, #e2e8f0 100%);
+}
+
+.activityEvent {
+  position: relative;
+  margin: 10px 0;
+  padding: 8px 10px 8px 24px;
+  border-radius: 12px;
+  background: #f7f8fb;
+  border: 1px solid #e4e9f2;
+}
+
+.activityEvent summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.activityEvent summary::-webkit-details-marker {
+  display: none;
+}
+
+.activityEvent summary::marker {
+  content: "";
+}
+
+.activityEvent::before {
+  content: "";
+  position: absolute;
+  left: -6px;
+  top: 14px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--event-color, #64748b);
+  box-shadow: 0 0 0 3px #ffffff, 0 0 0 5px var(--event-soft, #cbd5f5);
+}
+
+.activityEvent[open] {
+  background: #ffffff;
+  border-color: #d7e3f5;
+  box-shadow: 0 8px 16px rgba(15, 23, 42, 0.08);
+}
+
+.activityEvent .eventBody {
+  margin-top: 6px;
+  font-size: 11px;
+  color: #4b5563;
+}
+
+.activityDetailLine {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 2px 0;
+}
+
+.activityLabel {
+  color: #6b7280;
+  font-size: 10.5px;
+  flex: 1;
+}
+
+.activityValue {
+  color: #111827;
+  font-size: 10.5px;
+  font-weight: 600;
+  text-align: right;
+  flex: 1;
+}
+
+.eventTitle {
+  font-weight: 600;
+  font-size: 12px;
+  color: #0f172a;
+}
+
+.eventMeta {
+  font-size: 10.5px;
+  color: #6b7280;
+}
+
+.eventBadge {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--event-badge-bg, #eef2ff);
+  color: var(--event-badge-text, #1e3a8a);
+  border: 1px solid var(--event-badge-border, #c7d2fe);
+  white-space: nowrap;
+}
+
+.event-pdc-update {
+  --event-color: #2563eb;
+  --event-soft: #bfdbfe;
+  --event-badge-bg: #e0ecff;
+  --event-badge-text: #1e3a8a;
+  --event-badge-border: #bfdbfe;
+}
+
+.event-pdc-reminder {
+  --event-color: #f97316;
+  --event-soft: #fed7aa;
+  --event-badge-bg: #fff7ed;
+  --event-badge-text: #9a3412;
+  --event-badge-border: #fed7aa;
+}
+
+.pdcEmptyState {
+  font-size: 12px;
+  color: #94a3b8;
+  text-align: center;
+  padding: 12px 6px;
+}
+
+@media (max-width: 1100px) {
+  .pdcLayout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .pdcHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

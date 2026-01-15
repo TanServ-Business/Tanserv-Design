@@ -12,20 +12,16 @@
   <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" href="/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icon.png">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="../../css/shared-header.css">
 </head>
-<body>
+<body data-root-path="../../" data-relationship-name="Issue Tracker" data-relationship-badge="IT">
   <div class="ambient" aria-hidden="true">
     <span class="glow glow--one"></span>
     <span class="glow glow--two"></span>
   </div>
 
-  <header class="topbar">
-    <div class="brand">
-      <span class="brand-name">Inebura</span>
-      <span class="badge">Invite</span>
-    </div>
-    <div class="topbar-meta">Need help? onboarding@inebura.com</div>
-  </header>
+  <div data-shared-header></div>
 
   <main class="shell">
     <section class="intro" style="--delay: 0.05s;">
@@ -97,6 +93,7 @@
     </div>
   </div>
 
-  <script src="js/user-screen.js"></script>
+    <script src="../../scripts/shared-header.js"></script>
+<script src="js/user-screen.js"></script>
 </body>
 </html>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inebura Ops UI - PDC Module (Ops)</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../css/styles.css" />
+  <link rel="stylesheet" href="../css/pdc.css" />
+</head>
+<body data-root-path="../" data-relationship-name="Apollo" data-relationship-badge="AP" data-relationship-logo-src="assets/apollo-tyres-logo.svg" data-pdc-role="ops">
+
+<div data-shared-header></div>
+
+<main class="pdcMain">
+  <div class="pdcHeader">
+    <div>
+      <h1>PDC Module - Ops</h1>
+      <p>Review all PDCs across agents, confirm receipts, and update lifecycle status.</p>
+    </div>
+    <span class="pdcRolePill">PDC Mgmt view</span>
+  </div>
+
+  <section class="pdcCards">
+    <div class="pdcCard primary">
+      <span class="pdcCardLabel">PDC to be banked today</span>
+      <div class="pdcCardValue" id="pdcBankTodayCount">0</div>
+      <div class="pdcCardAmount" id="pdcBankTodayAmount">Rs. 0</div>
+    </div>
+    <div class="pdcCard">
+      <span class="pdcCardLabel">Total PDC</span>
+      <div class="pdcCardValue" id="pdcTotalCount">0</div>
+      <div class="pdcCardAmount" id="pdcTotalAmount">Rs. 0</div>
+    </div>
+    <div class="pdcCard">
+      <span class="pdcCardLabel">PDC received</span>
+      <div class="pdcCardValue" id="pdcReceivedCount">0</div>
+      <div class="pdcCardAmount" id="pdcReceivedAmount">Rs. 0</div>
+    </div>
+    <div class="pdcCard">
+      <span class="pdcCardLabel">PDC banked</span>
+      <div class="pdcCardValue" id="pdcBankedCount">0</div>
+      <div class="pdcCardAmount" id="pdcBankedAmount">Rs. 0</div>
+    </div>
+    <div class="pdcCard">
+      <span class="pdcCardLabel">PDC bounced</span>
+      <div class="pdcCardValue" id="pdcBouncedCount">0</div>
+      <div class="pdcCardAmount" id="pdcBouncedAmount">Rs. 0</div>
+    </div>
+    <div class="pdcCard warning">
+      <span class="pdcCardLabel">PDC overdue</span>
+      <div class="pdcCardValue" id="pdcOverdueCount">0</div>
+      <div class="pdcCardAmount" id="pdcOverdueAmount">Rs. 0</div>
+    </div>
+  </section>
+
+  <section class="pdcLayout">
+    <div class="pdcPanel">
+      <div class="pdcPanelHeader">
+        <h2>All PDCs</h2>
+        <span class="pdcPanelMeta" id="pdcListMeta">0 entries</span>
+      </div>
+      <div class="pdcTableWrap">
+        <table class="pdcTable">
+          <thead>
+            <tr>
+              <th>Customer Code</th>
+              <th>Customer Name</th>
+              <th>PDC Cheque No</th>
+              <th>PDC Date</th>
+              <th>Bank</th>
+              <th>Amount</th>
+              <th>Image</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="pdcTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <aside class="pdcPanel">
+      <div class="pdcPanelHeader">
+        <h3>Activity trail</h3>
+        <span class="pdcPanelMeta">Latest updates</span>
+      </div>
+      <div id="pdcActivityTrail" class="activityTrail"></div>
+    </aside>
+  </section>
+</main>
+
+<div class="modal fade" id="pdcStatusModal" tabindex="-1" aria-labelledby="pdcStatusModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="pdcStatusModalLabel">Update PDC status</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="pdcStatusSelect" class="form-label">Status</label>
+          <select id="pdcStatusSelect" class="form-select">
+            <option>PDC logged</option>
+            <option>PDC dispatched</option>
+            <option>PDC received</option>
+            <option>PDC details incorrect</option>
+            <option>PDC banked</option>
+            <option>PDC cleared</option>
+            <option>PDC bounced</option>
+          </select>
+        </div>
+        <div class="mb-2">
+          <label for="pdcStatusRemark" class="form-label">Remarks (mandatory)</label>
+          <textarea id="pdcStatusRemark" class="form-control" rows="3" placeholder="Add remark..."></textarea>
+        </div>
+        <div class="text-danger small hidden" id="pdcStatusError">Remarks are required.</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="pdcStatusSaveBtn">Update status</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="notifyDock" id="notifyDock" aria-live="polite" aria-atomic="true"></div>
+
+<div class="modal fade" id="pdcImageModal" tabindex="-1" aria-labelledby="pdcImageModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="pdcImageModalLabel">Cheque image</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <img id="pdcImagePreview" alt="PDC cheque preview" style="width: 100%; border-radius: 12px; border: 1px solid #e2e8f4;" />
+        <div class="text-muted small mt-2" id="pdcImageCaption"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../scripts/shared-header.js"></script>
+<script src="../scripts/pdc.js"></script>
+</body>
+</html>

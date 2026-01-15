@@ -88,6 +88,8 @@ const initialAgentParam = urlParams.get("agent");
 const todoStorageKey = "ineburaTodoTasks";
 const remarksStorageKey = "ineburaRemarksByInvoice";
 const managerNotificationsKey = "ineburaManagerNotifications";
+const pdcNotificationKey = "ineburaPdcNotifications";
+const pdcStorageKey = "ineburaPdcRecords";
 
 // ===============================
 // Dummy data: customers + invoices
@@ -718,6 +720,7 @@ function statusPillClass(status) {
   if (s.includes("pre")) return "predue";
   if (s.includes("dispute")) return "dispute";
   if (s.includes("ptp")) return "ptp";
+  if (s.includes("pdc")) return "pdc";
   if (s.includes("collect")) return "collected";
   return "predue";
 }
@@ -931,19 +934,135 @@ function addManagerNotification(notification) {
   saveManagerNotifications(list);
 }
 
+function loadPdcNotifications() {
+  try {
+    const raw = localStorage.getItem(pdcNotificationKey);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (err) {
+    console.warn("Unable to load PDC notifications", err);
+    return [];
+  }
+}
+
+function savePdcNotifications(list) {
+  try {
+    localStorage.setItem(pdcNotificationKey, JSON.stringify(list));
+  } catch (err) {
+    console.warn("Unable to save PDC notifications", err);
+  }
+}
+
+function normalizePdcNotifications() {
+  const list = loadPdcNotifications();
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  let changed = false;
+  const updated = list.map((note) => {
+    if (note.scheduledFor && !note.sentAt) {
+      const scheduledDate = new Date(note.scheduledFor);
+      if (!Number.isNaN(scheduledDate.getTime())) {
+        scheduledDate.setHours(0, 0, 0, 0);
+        if (scheduledDate.getTime() <= today.getTime()) {
+          note.sentAt = new Date().toISOString();
+          changed = true;
+        }
+      }
+    }
+    return note;
+  });
+  if (changed) savePdcNotifications(updated);
+  return updated;
+}
+
+function loadPdcRecords() {
+  try {
+    const raw = localStorage.getItem(pdcStorageKey);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (err) {
+    console.warn("Unable to load PDC records", err);
+    return [];
+  }
+}
+
+function savePdcRecords(list) {
+  try {
+    localStorage.setItem(pdcStorageKey, JSON.stringify(list));
+  } catch (err) {
+    console.warn("Unable to save PDC records", err);
+  }
+}
+
+function addPdcRecords(records) {
+  if (!Array.isArray(records) || records.length === 0) return;
+  const list = loadPdcRecords();
+  list.unshift(...records);
+  savePdcRecords(list);
+}
+
+function createPdcRecordId() {
+  const seed = Date.now().toString(36).toUpperCase();
+  return `PDC-${seed.slice(-6)}`;
+}
+
+function getClearedPdcAdjustments(customer) {
+  if (!customer) return [];
+  const list = loadPdcRecords();
+  return list
+    .filter((pdc) => pdc.customerId === customer.id && pdc.status === "PDC cleared")
+    .map((pdc) => ({
+      adjustmentId: pdc.adjustmentId || pdc.id || pdc.chequeNo || "PDC",
+      adjustmentType: "PDC",
+      originalAmount: Number(pdc.amount || 0),
+      remainingAmount: Number(pdc.amount || 0),
+      createdDate: pdc.pdcDate || "-",
+      lastUsedDate: "-"
+    }));
+}
+
+function getAgentPdcNotifications() {
+  const userName = localStorage.getItem("activeUserName") || "";
+  const records = loadPdcRecords();
+  const recordMap = new Map(records.map(record => [record.id, record]));
+  return normalizePdcNotifications().filter((note) => {
+    const record = recordMap.get(note.pdcId);
+    if (!record) return false;
+    return record.createdBy === userName || record.agentName === userName;
+  });
+}
+
+function getActiveBellNotifications() {
+  const list = isManagerView ? loadManagerNotifications() : getAgentPdcNotifications();
+  return list.filter(item => !item.scheduledFor || item.sentAt);
+}
+
 function updateManagerNotificationBadge() {
-  if (!isManagerView) return;
   const countEl = document.getElementById("notificationBellCount");
   if (!countEl) return;
-  const unreadCount = loadManagerNotifications().filter(item => !item.read).length;
+  const unreadCount = getActiveBellNotifications().filter(item => !item.read).length;
   countEl.textContent = String(unreadCount);
   countEl.classList.toggle("hidden", unreadCount === 0);
 }
 
 function markManagerNotificationsRead() {
-  const list = loadManagerNotifications();
-  const updated = list.map((item) => ({ ...item, read: true }));
-  saveManagerNotifications(updated);
+  if (isManagerView) {
+    const list = loadManagerNotifications();
+    const updated = list.map((item) => ({ ...item, read: true }));
+    saveManagerNotifications(updated);
+    updateManagerNotificationBadge();
+    return;
+  }
+  const visibleIds = new Set(getAgentPdcNotifications().map(note => note.id));
+  const list = loadPdcNotifications();
+  const updated = list.map((item) => {
+    if (!visibleIds.has(item.id)) return item;
+    if (item.scheduledFor && !item.sentAt) return item;
+    return { ...item, read: true };
+  });
+  savePdcNotifications(updated);
   updateManagerNotificationBadge();
 }
 
@@ -962,21 +1081,30 @@ function formatNotificationTime(timestamp) {
 function renderNotificationPopup() {
   const listEl = document.getElementById("notificationPopupList");
   if (!listEl) return;
-  const notifications = loadManagerNotifications();
+  const notifications = getActiveBellNotifications();
   if (notifications.length === 0) {
     listEl.innerHTML = `<div class="notificationEmpty">No notifications yet.</div>`;
     return;
   }
 
+  const recordMap = isManagerView
+    ? new Map()
+    : new Map(loadPdcRecords().map(record => [record.id, record]));
+
   listEl.innerHTML = notifications.map((note) => {
     const message = safeText(note.message || "Notification");
-    const time = formatNotificationTime(note.createdAt);
-    const inv = note.invoiceNo ? `Invoice ${safeText(note.invoiceNo)}` : "-";
+    const time = formatNotificationTime(note.sentAt || note.createdAt);
+    const record = isManagerView ? null : recordMap.get(note.pdcId);
+    const meta = isManagerView
+      ? (note.invoiceNo ? `Invoice ${safeText(note.invoiceNo)}` : "-")
+      : (record ? `PDC ${safeText(record.chequeNo || record.id)}` : (note.pdcId ? `PDC ${safeText(note.pdcId)}` : "-"));
+    const dataAttr = isManagerView ? "data-inv" : "data-pdc";
+    const dataVal = isManagerView ? safeText(note.invoiceNo || "") : safeText(note.pdcId || "");
     return `
-      <div class="notificationItem" data-inv="${safeText(note.invoiceNo || "")}">
+      <div class="notificationItem" ${dataAttr}="${dataVal}">
         <div>${message}</div>
         <div class="notificationMeta">
-          <span>${inv}</span>
+          <span>${meta}</span>
           <span>${time}</span>
         </div>
       </div>
@@ -993,7 +1121,7 @@ function toggleNotificationPopup(forceOpen) {
   if (shouldOpen) {
     renderNotificationPopup();
     popup.classList.remove("hidden");
-    if (isManagerView) markManagerNotificationsRead();
+    markManagerNotificationsRead();
   } else {
     popup.classList.add("hidden");
   }
@@ -1185,8 +1313,9 @@ function getNotificationDetails(customer) {
 function getCnAdvPdcAdjustments(customer) {
   if (!customer) return cnAdvPdcFallbackAdjustments;
   const list = cnAdvPdcAdjustmentsByCustomer[customer.id];
-  if (Array.isArray(list) && list.length > 0) return list;
-  return cnAdvPdcFallbackAdjustments;
+  const baseList = Array.isArray(list) && list.length > 0 ? list : cnAdvPdcFallbackAdjustments;
+  const pdcAdjustments = getClearedPdcAdjustments(customer);
+  return baseList.concat(pdcAdjustments);
 }
 
 const cnAdvPdcSortConfig = {
@@ -1282,6 +1411,39 @@ function buildStatusUpdateEntry(data) {
       detailItems.push({ label: "Amount", value: safeText(data.amount) });
       detailItems.push({ label: "TDS", value: safeText(data.tds) });
       detailItems.push({ label: "LD", value: safeText(data.ld) });
+    }
+  }
+
+  if (data.subStatus === "PDC given") {
+    const pdcRows = Array.isArray(data.pdcRows) ? data.pdcRows : [];
+    const dispatch = data.dispatchDetails || {};
+    const dispatchParts = [
+      dispatch.courierName,
+      dispatch.dispatchMode,
+      dispatch.trackingNo,
+      dispatch.dispatchDate
+    ].filter(Boolean);
+    const dispatchText = dispatchParts.length > 0
+      ? dispatchParts.join(" / ")
+      : "-";
+
+    if (pdcRows.length > 0) {
+      detailItems.push({ label: "PDC count", value: String(pdcRows.length) });
+      detailItems.push({ label: "PDC Ops user", value: safeText(data.pdcOpsUser || "-") });
+      detailItems.push({ label: "Dispatch details", value: safeText(dispatchText) });
+      pdcRows.forEach((row, idx) => {
+        const base = [
+          row.chequeNo ? `Cheque ${row.chequeNo}` : "Cheque -",
+          row.pdcDate || "-",
+          row.bank || "-",
+          row.amount ? `Rs.${formatINR(row.amount)}` : "Rs.0"
+        ].join(" | ");
+        const imageText = row.imageName ? `Image: ${row.imageName}` : "Image: -";
+        detailItems.push({
+          label: `PDC ${idx + 1}`,
+          value: safeText(`${base} | ${imageText}`)
+        });
+      });
     }
   }
 
@@ -2883,10 +3045,24 @@ function wireDispositionActivityEvents() {
   const addMiscBtn = document.getElementById("addMiscModeBtn");
   const singleFields = document.querySelectorAll(".collectionSingleFields");
   const errorEl = document.getElementById("collectionError");
+  const pdcFields = document.getElementById("pdcFields");
+  const pdcList = document.getElementById("pdcList");
+  const addPdcBtn = document.getElementById("addPdcBtn");
+  const pdcError = document.getElementById("pdcError");
+  const pdcOpsUser = document.getElementById("pdcOpsUser");
+  const pdcCourierName = document.getElementById("pdcCourierName");
+  const pdcDispatchDate = document.getElementById("pdcDispatchDate");
+  const pdcTrackingNo = document.getElementById("pdcTrackingNo");
+  const pdcDispatchMode = document.getElementById("pdcDispatchMode");
+  const dispatchModalEl = document.getElementById("pdcDispatchConfirmModal");
+  const dispatchAddBtn = document.getElementById("pdcDispatchAddDetailBtn");
+  const dispatchProceedBtn = document.getElementById("pdcDispatchProceedBtn");
 
   const miscModes = ["NEFT", "RTGS", "Cheque", "Demand Draft", "PDC", "CN", "Adv"];
   const miscAdjustmentModes = new Set(["PDC", "CN", "Adv"]);
   const adjustmentTypeMap = { PDC: "PDC", CN: "Credit Note", Adv: "Advance" };
+  const defaultSubStatus = "No Response";
+  let pendingPdcSubmission = null;
 
   const showError = (message) => {
     if (!errorEl) return;
@@ -2898,6 +3074,18 @@ function wireDispositionActivityEvents() {
     if (!errorEl) return;
     errorEl.textContent = "";
     errorEl.classList.add("hidden");
+  };
+
+  const showPdcError = (message) => {
+    if (!pdcError) return;
+    pdcError.textContent = message;
+    pdcError.classList.remove("hidden");
+  };
+
+  const clearPdcError = () => {
+    if (!pdcError) return;
+    pdcError.textContent = "";
+    pdcError.classList.add("hidden");
   };
 
   const updateCollectionTotals = () => {
@@ -3044,7 +3232,7 @@ function wireDispositionActivityEvents() {
         </div>
         <div>
           <label>Bank</label>
-          <input type="text" class="miscBank" placeholder="Bank name" />
+          <input type="text" class="miscBank" placeholder="Bank name" list="bankSuggestions" />
         </div>
         <div>
           <label>Transfer date</label>
@@ -3112,6 +3300,127 @@ function wireDispositionActivityEvents() {
     miscList.appendChild(row);
   };
 
+  const updatePdcRowLabels = () => {
+    if (!pdcList) return;
+    const rows = Array.from(pdcList.querySelectorAll(".pdcRow"));
+    rows.forEach((row, idx) => {
+      const label = row.querySelector(".pdcRowHeader strong");
+      if (label) label.textContent = `PDC ${idx + 1}`;
+      const removeBtn = row.querySelector(".pdcRemoveBtn");
+      if (removeBtn) removeBtn.classList.toggle("hidden", rows.length === 1);
+    });
+  };
+
+  const createPdcRow = (prefillAmount) => {
+    if (!pdcList) return;
+    const row = document.createElement("div");
+    row.className = "pdcRow";
+    row.innerHTML = `
+      <div class="pdcRowHeader">
+        <strong>PDC</strong>
+        <button type="button" class="pdcRemoveBtn">Remove</button>
+      </div>
+      <div class="pdcGrid">
+        <div>
+          <label>PDC date</label>
+          <input type="date" class="pdcDate" />
+        </div>
+        <div>
+          <label>Cheque no</label>
+          <input type="text" class="pdcChequeNo" placeholder="Cheque number" />
+        </div>
+        <div>
+          <label>Bank</label>
+          <input type="text" class="pdcBank" placeholder="Bank name" list="bankSuggestions" />
+        </div>
+        <div>
+          <label>Amount</label>
+          <input type="number" class="pdcAmount" min="0" step="0.01" placeholder="0" />
+        </div>
+      </div>
+      <div class="pdcImageRow">
+        <label>PDC image (optional)</label>
+        <input type="file" class="pdcImage" accept=".jpg,.jpeg,.png,image/*" />
+      </div>
+    `;
+
+    const removeBtn = row.querySelector(".pdcRemoveBtn");
+    if (removeBtn) {
+      removeBtn.addEventListener("click", () => {
+        row.remove();
+        updatePdcRowLabels();
+      });
+    }
+
+    const amountInput = row.querySelector(".pdcAmount");
+    if (amountInput && Number(prefillAmount) > 0) {
+      amountInput.value = String(prefillAmount);
+    }
+
+    row.querySelectorAll("input").forEach((input) => {
+      const eventName = input.type === "file" ? "change" : "input";
+      input.addEventListener(eventName, (event) => {
+        clearPdcError();
+        if (input.type === "file") {
+          const file = event.target.files && event.target.files[0];
+          if (!file) {
+            row.dataset.imageName = "";
+            row.dataset.imageData = "";
+            return;
+          }
+          const name = file.name || "";
+          const isImageType = String(file.type || "").toLowerCase().startsWith("image/");
+          const isAllowedExt = /\.(jpe?g|png)$/i.test(name);
+          if (!isImageType && !isAllowedExt) {
+            showPdcError("Only JPG, JPEG, or PNG images are allowed.");
+            input.value = "";
+            row.dataset.imageName = "";
+            row.dataset.imageData = "";
+            return;
+          }
+          row.dataset.imageName = file.name || "";
+          const reader = new FileReader();
+          reader.onload = () => {
+            row.dataset.imageData = String(reader.result || "");
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    });
+
+    pdcList.appendChild(row);
+    updatePdcRowLabels();
+  };
+
+  const getPdcRowsData = () => {
+    if (!pdcList) return [];
+    return Array.from(pdcList.querySelectorAll(".pdcRow")).map((row) => ({
+      pdcDate: row.querySelector(".pdcDate")?.value || "",
+      chequeNo: row.querySelector(".pdcChequeNo")?.value || "",
+      bank: row.querySelector(".pdcBank")?.value || "",
+      amount: row.querySelector(".pdcAmount")?.value || "",
+      imageName: row.dataset.imageName || row.querySelector(".pdcImage")?.files?.[0]?.name || "",
+      imageData: row.dataset.imageData || ""
+    }));
+  };
+
+  const getDispatchDetails = () => ({
+    courierName: pdcCourierName?.value || "",
+    dispatchDate: pdcDispatchDate?.value || "",
+    trackingNo: pdcTrackingNo?.value || "",
+    dispatchMode: pdcDispatchMode?.value || ""
+  });
+
+  const hasDispatchDetails = (details) => {
+    if (!details) return false;
+    return Boolean(
+      details.courierName ||
+      details.dispatchDate ||
+      details.trackingNo ||
+      details.dispatchMode
+    );
+  };
+
   const getMiscRowsData = () => {
     if (!miscList) return [];
     return Array.from(miscList.querySelectorAll(".collectionMiscRow")).map((row) => ({
@@ -3134,6 +3443,21 @@ function wireDispositionActivityEvents() {
     return invoice ? Number(invoice.netDueAmount || 0) : 0;
   };
 
+  const updateInvoiceStatuses = (invoiceNos, status) => {
+    if (!Array.isArray(invoiceNos) || invoiceNos.length === 0) return;
+    invoiceNos.forEach((invNo) => {
+      const invoice = currentInvoicesAll.find(inv => inv.invoiceNo === invNo);
+      if (invoice) invoice.status = status;
+    });
+    populateFilters(currentInvoicesAll);
+    applyFiltersAndRender();
+    const activeInv = currentInvoiceNoForDocs || invoiceNos[0];
+    if (activeInv) {
+      const invoice = currentInvoicesAll.find(inv => inv.invoiceNo === activeInv);
+      if (invoice) renderInvoiceDetails(invoice);
+    }
+  };
+
   const toggleCollectionModeFields = () => {
     const isMisc = instrumentModeSelect?.value === "Miscellenious";
     singleFields.forEach(el => el.classList.toggle("hidden", isMisc));
@@ -3151,9 +3475,26 @@ function wireDispositionActivityEvents() {
     if (isCollection) updateCollectionTotals();
   };
 
+  const togglePdcFields = () => {
+    if (!subStatusSelect || !pdcFields) return;
+    const isPdc = subStatusSelect.value === "PDC given";
+    pdcFields.classList.toggle("hidden", !isPdc);
+    if (!isPdc) {
+      clearPdcError();
+    }
+    if (isPdc && pdcList && pdcList.children.length === 0) {
+      const outstanding = getOutstandingAmount();
+      createPdcRow(outstanding || "");
+    }
+  };
+
   if (subStatusSelect) {
-    subStatusSelect.addEventListener("change", toggleCollectionFields);
+    subStatusSelect.addEventListener("change", () => {
+      toggleCollectionFields();
+      togglePdcFields();
+    });
     toggleCollectionFields();
+    togglePdcFields();
   }
 
   if (instrumentModeSelect) {
@@ -3163,6 +3504,13 @@ function wireDispositionActivityEvents() {
 
   if (addMiscBtn) {
     addMiscBtn.addEventListener("click", () => createMiscRow("NEFT"));
+  }
+
+  if (addPdcBtn) {
+    addPdcBtn.addEventListener("click", () => {
+      clearPdcError();
+      createPdcRow("");
+    });
   }
 
   [amountEl, tdsEl, ldEl].forEach((el) => {
@@ -3179,6 +3527,39 @@ function wireDispositionActivityEvents() {
     if (!btn) return;
     openMiscDetailsModal(btn.getAttribute("data-details"));
   });
+
+  if (dispatchAddBtn) {
+    dispatchAddBtn.addEventListener("click", () => {
+      pendingPdcSubmission = null;
+      if (dispatchModalEl) {
+        dispatchModalEl.classList.remove("open");
+        dispatchModalEl.setAttribute("aria-hidden", "true");
+      }
+    });
+  }
+
+  if (dispatchProceedBtn) {
+    dispatchProceedBtn.addEventListener("click", () => {
+      const pending = pendingPdcSubmission;
+      pendingPdcSubmission = null;
+      if (dispatchModalEl) {
+        dispatchModalEl.classList.remove("open");
+        dispatchModalEl.setAttribute("aria-hidden", "true");
+      }
+      if (pending) pending();
+    });
+  }
+
+  if (dispatchModalEl) {
+    dispatchModalEl.addEventListener("click", (event) => {
+      const closeBtn = event.target.closest("[data-modal-close]");
+      if (closeBtn || event.target === dispatchModalEl) {
+        pendingPdcSubmission = null;
+        dispatchModalEl.classList.remove("open");
+        dispatchModalEl.setAttribute("aria-hidden", "true");
+      }
+    });
+  }
 
   if (!submitBtn) return;
 
@@ -3246,11 +3627,17 @@ function wireDispositionActivityEvents() {
 
     if (!trail) return;
     clearError();
-    const isCollection = getValue("subStatusSelect") === "Collection";
+    clearPdcError();
+    const subStatus = getValue("subStatusSelect");
+    const isCollection = subStatus === "Collection";
+    const isPdcGiven = subStatus === "PDC given";
     const instrumentMode = getValue("collectionInstrumentMode");
     const isMisc = instrumentMode === "Miscellenious";
     const outstanding = getOutstandingAmount();
     const miscRows = isMisc ? getMiscRowsData() : [];
+    const pdcRows = isPdcGiven ? getPdcRowsData() : [];
+    const pdcOpsUserName = pdcOpsUser?.value || "";
+    const dispatchDetails = isPdcGiven ? getDispatchDetails() : null;
 
     let totalCollected = 0;
     if (isCollection) {
@@ -3267,11 +3654,29 @@ function wireDispositionActivityEvents() {
 
     if (!validateCollection(true)) return;
 
+    if (isPdcGiven) {
+      if (!pdcOpsUserName) {
+        showPdcError("Select a PDC Ops user.");
+        return;
+      }
+      if (pdcRows.length === 0) {
+        showPdcError("Add at least one PDC.");
+        return;
+      }
+      const hasMissing = pdcRows.some((row) =>
+        !row.pdcDate || !row.chequeNo || !row.bank || !row.amount
+      );
+      if (hasMissing) {
+        showPdcError("Complete PDC date, cheque no, bank, and amount for each PDC.");
+        return;
+      }
+    }
+
     const data = {
       activityType: getValue("activityTypeSelect"),
       broadStatus: getValue("broadStatusSelect"),
       primaryStatus: getValue("primaryStatusSelect"),
-      subStatus: getValue("subStatusSelect"),
+      subStatus,
       remarks: remarkText,
       invoices,
       instrumentMode,
@@ -3282,86 +3687,144 @@ function wireDispositionActivityEvents() {
       tds: getValue("collectionTds"),
       ld: getValue("collectionLd"),
       miscRows,
+      pdcRows,
+      pdcOpsUser: pdcOpsUserName,
+      dispatchDetails,
       totalCollected,
       outstanding
     };
 
-    if (remarkText) {
-      const remarkPayload = {
-        text: remarkText,
-        authorRole: "agent",
-        authorLabel: "Agent",
-        timestamp,
-        createdAt: new Date().toISOString()
-      };
-      invoices.forEach((invNo) => {
-        addStoredRemark(invNo, remarkPayload);
-      });
-      renderStoredRemarks(invoices[0] || currentInvoiceNoForDocs);
-      if (remarksAccordion && window.bootstrap && window.bootstrap.Collapse) {
-        const collapse = window.bootstrap.Collapse.getOrCreateInstance(remarksAccordion, { toggle: false });
+    const submitActivity = () => {
+      if (remarkText) {
+        const remarkPayload = {
+          text: remarkText,
+          authorRole: "agent",
+          authorLabel: "Agent",
+          timestamp,
+          createdAt: new Date().toISOString()
+        };
+        invoices.forEach((invNo) => {
+          addStoredRemark(invNo, remarkPayload);
+        });
+        renderStoredRemarks(invoices[0] || currentInvoiceNoForDocs);
+        if (remarksAccordion && window.bootstrap && window.bootstrap.Collapse) {
+          const collapse = window.bootstrap.Collapse.getOrCreateInstance(remarksAccordion, { toggle: false });
+          collapse.show();
+        } else if (remarksAccordion) {
+          remarksAccordion.classList.add("show");
+        }
+      }
+
+      if (/@task\b/i.test(remarkText)) {
+        const customer = customersData.find(c => c.id === selectedCustomerId);
+        const invNo = dispositionInvoiceList && dispositionInvoiceList.length > 0
+          ? dispositionInvoiceList[0]
+          : currentInvoiceNoForDocs;
+        const invoice = invNo ? currentInvoicesAll.find(inv => inv.invoiceNo === invNo) : null;
+        const cleanedText = remarkText.replace(/@task\b/gi, "").trim() || "Follow-up task";
+        addTodoTask({
+          text: cleanedText,
+          dueDate: "",
+          dueTime: "",
+          customer,
+          invoice,
+          source: "remark"
+        });
+      }
+
+      if (isPdcGiven) {
+        const customer = customersData.find(c => c.id === selectedCustomerId);
+        const createdBy = localStorage.getItem("activeUserName") || customer?.agentName || "Agent";
+        const dispatched = hasDispatchDetails(dispatchDetails);
+        const pdcRecords = pdcRows.map((row) => {
+          const id = createPdcRecordId();
+          return {
+            id,
+            adjustmentId: id,
+            invoiceNo: invoices[0] || "",
+            invoiceNos: invoices,
+            customerId: customer?.id || "",
+            customerCode: customer?.code || "",
+            customerName: customer?.name || "",
+            agentName: customer?.agentName || createdBy,
+            chequeNo: row.chequeNo,
+            pdcDate: row.pdcDate,
+            bank: row.bank,
+            amount: Number(row.amount || 0),
+            imageName: row.imageName || "",
+            imageData: row.imageData || "",
+            status: dispatched ? "PDC dispatched" : "PDC logged",
+            pdcOpsUser: pdcOpsUserName,
+            dispatch: {
+              courierName: dispatchDetails?.courierName || "",
+              dispatchDate: dispatchDetails?.dispatchDate || "",
+              trackingNo: dispatchDetails?.trackingNo || "",
+              dispatchMode: dispatchDetails?.dispatchMode || ""
+            },
+            createdAt: new Date().toISOString(),
+            createdBy
+          };
+        });
+        addPdcRecords(pdcRecords);
+        updateInvoiceStatuses(invoices, "PDC given");
+      }
+
+      const entry = buildStatusUpdateEntry(data);
+      trail.prepend(entry);
+
+      if (activityCollapse && window.bootstrap && window.bootstrap.Collapse) {
+        const collapse = window.bootstrap.Collapse.getOrCreateInstance(activityCollapse, { toggle: false });
         collapse.show();
-      } else if (remarksAccordion) {
-        remarksAccordion.classList.add("show");
+      } else if (activityCollapse) {
+        activityCollapse.classList.add("show");
+      }
+
+      setActiveTab("invoice");
+
+      const resetSelect = (id, value) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (value !== undefined) el.value = value;
+        else el.selectedIndex = 0;
+      };
+
+      resetSelect("activityTypeSelect");
+      resetSelect("broadStatusSelect");
+      resetSelect("primaryStatusSelect");
+      resetSelect("subStatusSelect", defaultSubStatus);
+
+      ["activityRemarks", "collectionInstrumentRef", "collectionBank", "collectionTransferDate", "collectionAmount", "collectionTds", "collectionLd", "pdcOpsUser", "pdcCourierName", "pdcDispatchDate", "pdcTrackingNo", "pdcDispatchMode"]
+        .forEach((id) => {
+          const el = document.getElementById(id);
+          if (el) el.value = "";
+        });
+
+      if (instrumentModeSelect) {
+        instrumentModeSelect.value = "NEFT";
+      }
+      if (miscList) {
+        miscList.innerHTML = "";
+      }
+      if (pdcList) {
+        pdcList.innerHTML = "";
+      }
+      clearPdcError();
+
+      toggleCollectionModeFields();
+      toggleCollectionFields();
+      togglePdcFields();
+    };
+
+    if (isPdcGiven && !hasDispatchDetails(dispatchDetails)) {
+      if (dispatchModalEl) {
+        pendingPdcSubmission = submitActivity;
+        dispatchModalEl.classList.add("open");
+        dispatchModalEl.setAttribute("aria-hidden", "false");
+        return;
       }
     }
 
-    if (/@task\b/i.test(remarkText)) {
-      const customer = customersData.find(c => c.id === selectedCustomerId);
-      const invNo = dispositionInvoiceList && dispositionInvoiceList.length > 0
-        ? dispositionInvoiceList[0]
-        : currentInvoiceNoForDocs;
-      const invoice = invNo ? currentInvoicesAll.find(inv => inv.invoiceNo === invNo) : null;
-      const cleanedText = remarkText.replace(/@task\b/gi, "").trim() || "Follow-up task";
-      addTodoTask({
-        text: cleanedText,
-        dueDate: "",
-        dueTime: "",
-        customer,
-        invoice,
-        source: "remark"
-      });
-    }
-
-    const entry = buildStatusUpdateEntry(data);
-    trail.prepend(entry);
-
-    if (activityCollapse && window.bootstrap && window.bootstrap.Collapse) {
-      const collapse = window.bootstrap.Collapse.getOrCreateInstance(activityCollapse, { toggle: false });
-      collapse.show();
-    } else if (activityCollapse) {
-      activityCollapse.classList.add("show");
-    }
-
-    setActiveTab("invoice");
-
-    const resetSelect = (id, value) => {
-      const el = document.getElementById(id);
-      if (!el) return;
-      if (value !== undefined) el.value = value;
-      else el.selectedIndex = 0;
-    };
-
-    resetSelect("activityTypeSelect");
-    resetSelect("broadStatusSelect");
-    resetSelect("primaryStatusSelect");
-    resetSelect("subStatusSelect");
-
-    ["activityRemarks", "collectionInstrumentRef", "collectionBank", "collectionTransferDate", "collectionAmount", "collectionTds", "collectionLd"]
-      .forEach((id) => {
-        const el = document.getElementById(id);
-        if (el) el.value = "";
-      });
-
-    if (instrumentModeSelect) {
-      instrumentModeSelect.value = "NEFT";
-    }
-    if (miscList) {
-      miscList.innerHTML = "";
-    }
-
-    toggleCollectionModeFields();
-    toggleCollectionFields();
+    submitActivity();
   });
 }
 
@@ -3772,6 +4235,7 @@ function getDefaultTenantId() {
 
 function applyTenantBrand(tenantId) {
   const relationshipLogo = document.getElementById("relationshipLogo");
+  const relationshipName = document.getElementById("relationshipName");
   const storedId = localStorage.getItem("activeTenantId");
   const resolvedId = tenantBrandMap[tenantId]
     ? tenantId
@@ -3790,6 +4254,9 @@ function applyTenantBrand(tenantId) {
     } else {
       relationshipLogo.textContent = brand.badge;
     }
+  }
+  if (relationshipName) {
+    relationshipName.textContent = brand.name;
   }
   localStorage.setItem("activeTenantId", resolvedId);
 
@@ -4485,7 +4952,9 @@ function wireSideNavEvents() {
         "visit-review": "pages/visitmoduleReview.html",
         "landing": "index.html",
         "landing-manager": "pages/LPmanager.html",
-        "landing-backend": "pages/LPbackend.html"
+        "landing-backend": "pages/LPbackend.html",
+        "pdc-agent": "pages/PDCagent.html",
+        "pdc-ops": "pages/PDCOps.html"
       };
       const target = destinations[moduleKey];
       if (target) window.location.href = target;
@@ -4578,7 +5047,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   window.addEventListener("storage", (event) => {
-    if (event.key === managerNotificationsKey) {
+    if (event.key === managerNotificationsKey || event.key === pdcNotificationKey) {
       updateManagerNotificationBadge();
       const popup = document.getElementById("notificationPopup");
       if (popup && !popup.classList.contains("hidden")) {
