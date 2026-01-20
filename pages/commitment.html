@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inebura Ops UI - Commitment Module</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../css/styles.css" />
+  <style>
+    .commitmentMain {
+      max-width: none;
+      margin: 0;
+      padding: 24px 28px 40px;
+      width: 100%;
+      height: calc(100vh - 52px);
+      overflow: auto;
+      background: #f5f3fb;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .commitmentHeader {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .commitmentHeader h1 {
+      font-size: 22px;
+      margin: 0;
+      color: #111827;
+    }
+
+    .commitmentHeader p {
+      margin: 6px 0 0;
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    .commitmentPortfolio {
+      min-width: 220px;
+      text-align: right;
+      background: #ffffff;
+      border: 1px solid #e2e8f4;
+      border-radius: 14px;
+      padding: 10px 12px;
+      box-shadow: 0 10px 18px rgba(15, 23, 42, 0.06);
+    }
+
+    .commitmentPortfolio span {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #64748b;
+      display: block;
+    }
+
+    .commitmentPortfolio strong {
+      display: block;
+      margin-top: 4px;
+      font-size: 16px;
+      font-weight: 800;
+      color: #111827;
+    }
+
+    .commitmentPortfolio small {
+      display: block;
+      margin-top: 6px;
+      font-size: 11px;
+      color: #6b7280;
+    }
+
+    .commitmentCard {
+      background: #ffffff;
+      border: 1px solid #e2e8f4;
+      border-radius: 18px;
+      padding: 14px;
+      box-shadow: 0 12px 24px rgba(15, 23, 42, 0.06);
+    }
+
+    .commitmentToolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .commitmentToolbarLeft {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .commitmentPrimaryBtn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: none;
+      background: var(--brand);
+      color: #ffffff;
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .commitmentSecondaryBtn {
+      border: 1px solid var(--brand-border);
+      background: var(--brand-lighter);
+      color: var(--brand-dark);
+      padding: 7px 12px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .commitmentFilters {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .commitmentField {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #64748b;
+    }
+
+    .commitmentField select {
+      min-width: 200px;
+      border: 1px solid #d7c3ea;
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 12px;
+      background: #ffffff;
+    }
+
+    .commitmentStatusLine {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: #f6f0ff;
+      border: 1px solid #eadcf7;
+      font-size: 11px;
+      color: #6b7280;
+    }
+
+    .statusDot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: #f59e0b;
+      box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.18);
+    }
+
+    .commitmentActions {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: auto;
+    }
+
+    .commitmentToolbarStatus {
+      font-size: 11px;
+      color: #64748b;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .commitmentToolbarStatus.is-success {
+      color: #1f7a4f;
+    }
+
+    .commitmentToolbarStatus.is-warning {
+      color: #b45309;
+    }
+
+    .commitmentActions .btnSmallPrimary[disabled] {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .commitmentSummary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .commitmentSummaryCard {
+      background: #f9f5ff;
+      border: 1px solid #eadcf7;
+      border-radius: 12px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    .commitmentSummaryCard strong {
+      font-size: 14px;
+      color: #111827;
+    }
+
+    .filterRow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .tableFilters {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .tableFilters .filterRow {
+      align-items: center;
+    }
+
+    .tableFilterSearch {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--brand-border);
+      background: #ffffff;
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-size: 12px;
+      color: #64748b;
+      min-width: 220px;
+    }
+
+    .tableFilterSearch i {
+      color: var(--brand);
+    }
+
+    .tableFilterSearch input {
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: 12px;
+      color: #0f172a;
+      width: 170px;
+    }
+
+    .tableFilterSearch:focus-within {
+      border-color: var(--brand);
+      box-shadow: 0 0 0 2px rgba(var(--brand-rgb), 0.14);
+    }
+
+    .filterDropdown {
+      position: relative;
+    }
+
+    .filterDropdown summary {
+      list-style: none;
+      cursor: pointer;
+      border: 1px solid #e2e8f4;
+      background: #ffffff;
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #111827;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .filterDropdown summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .filterBadge {
+      background: #f1f5f9;
+      border: 1px solid #e2e8f4;
+      color: #334155;
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .filterMenu {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      min-width: 200px;
+      background: #ffffff;
+      border: 1px solid #e2e8f4;
+      border-radius: 12px;
+      padding: 6px;
+      box-shadow: 0 16px 32px rgba(15, 23, 42, 0.12);
+      display: none;
+      z-index: 50;
+    }
+
+    .filterDropdown[open] .filterMenu {
+      display: block;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .filterActions {
+      margin-left: auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .filterItem {
+      width: 100%;
+      border: none;
+      background: transparent;
+      text-align: left;
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      color: #111827;
+      cursor: pointer;
+    }
+
+    .filterItem:hover {
+      background: #f8fafc;
+    }
+
+    .commitmentTable {
+      min-width: 1080px;
+    }
+
+    .commitmentTable .colCustomer { width: 170px; }
+    .commitmentTable .colCode { width: 140px; }
+    .commitmentTable .colWeek { width: 120px; }
+    .commitmentTable .colAmount { width: 170px; }
+    .commitmentTable .colStatus { width: 120px; }
+
+    .commitmentTable input[type="number"],
+    .commitmentTable select {
+      width: 100%;
+      border: 1px solid #d7c3ea;
+      border-radius: 8px;
+      padding: 6px 8px;
+      font-size: 12px;
+      background: #ffffff;
+    }
+
+    .commitmentAmountText {
+      font-size: 12px;
+      color: #111827;
+      font-weight: 600;
+      display: inline-block;
+      width: 100%;
+      text-align: right;
+    }
+
+    .commitmentTable tbody tr.rowEdited {
+      background: #fff7ed;
+    }
+
+    .approvalPill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      border: 1px solid #e2e8f4;
+      background: #f1f5f9;
+      color: #475569;
+    }
+
+    .approvalPill.pending {
+      background: #fef9c3;
+      color: #92400e;
+      border-color: #f59e0b;
+    }
+
+    .approvalPill.approved {
+      background: #dcfce7;
+      color: #166534;
+      border-color: #86efac;
+    }
+
+    .approvalPill.rejected {
+      background: #fee2e2;
+      color: #991b1b;
+      border-color: #fecaca;
+    }
+
+    .approvalPill.not-submitted {
+      background: #e2e8f0;
+      color: #475569;
+      border-color: #d8e0eb;
+    }
+
+    .commitmentFootnote {
+      margin-top: 12px;
+      font-size: 11px;
+      color: #6b7280;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    @media (max-width: 960px) {
+      .commitmentHeader {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .commitmentPortfolio {
+        width: 100%;
+        text-align: left;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .commitmentMain {
+        padding: 18px;
+      }
+
+      .commitmentToolbar {
+        align-items: stretch;
+      }
+
+      .commitmentActions {
+        width: 100%;
+        justify-content: flex-end;
+      }
+    }
+  </style>
+</head>
+<body data-root-path="../" data-relationship-name="Apollo" data-relationship-badge="AP" data-relationship-logo-src="assets/apollo-tyres-logo.svg">
+
+<div data-shared-header></div>
+
+<main class="commitmentMain">
+  <section class="commitmentHeader">
+    <div>
+      <h1>Commitment Module</h1>
+      <p>Capture month-wise collection commitments per invoice and planned collection week.</p>
+    </div>
+    <div class="commitmentPortfolio">
+      <span>Portfolio Value</span>
+      <strong id="commitmentPortfolioValue">Rs. 15,59,13,517</strong>
+    </div>
+  </section>
+
+  <section class="commitmentCard">
+
+    <div class="commitmentSummary">
+      <div class="commitmentSummaryCard">
+        <span>Total Invoice</span>
+        <strong id="commitmentSelectedCount">0</strong>
+      </div>
+      <div class="commitmentSummaryCard">
+        <span>Committed invoices</span>
+        <strong id="commitmentCommittedTotal">0</strong>
+      </div>
+      <div class="commitmentSummaryCard">
+        <span>Total Net Due</span>
+        <strong id="commitmentMonthlyTotal">Rs. 0.00</strong>
+      </div>
+      <div class="commitmentSummaryCard">
+        <span>Target amount committed</span>
+        <strong id="commitmentTargetTotal">Rs. 0.00</strong>
+      </div>
+    </div>
+
+    <div class="tableFilters">
+      <div class="filterRow">
+        <div class="tableFilterSearch">
+          <i class="bi bi-search" aria-hidden="true"></i>
+          <input type="text" id="commitmentSearch" placeholder="Search invoice no or customer name" />
+        </div>
+        <details class="filterDropdown" data-filter="invoiceValue">
+          <summary>Invoice Value <span class="filterBadge" data-filter-badge="invoiceValue">Any</span></summary>
+          <div class="filterMenu">
+            <button class="filterItem" type="button" data-filter-value="Any">Any</button>
+            <button class="filterItem" type="button" data-filter-value="Low to High">Low to High</button>
+            <button class="filterItem" type="button" data-filter-value="High to Low">High to Low</button>
+          </div>
+        </details>
+        <details class="filterDropdown" data-filter="dueDate">
+          <summary>Due Date <span class="filterBadge" data-filter-badge="dueDate">All</span></summary>
+          <div class="filterMenu">
+            <button class="filterItem" type="button" data-filter-value="All">All</button>
+            <button class="filterItem" type="button" data-filter-value="This Month">This Month</button>
+            <button class="filterItem" type="button" data-filter-value="Last Month">Last Month</button>
+            <button class="filterItem" type="button" data-filter-value="Last 90 Days">Last 90 Days</button>
+            <button class="filterItem" type="button" data-filter-value="This Year">This Year</button>
+          </div>
+        </details>
+        <div class="filterActions">
+          <button class="notifyToggle" id="commitmentShowCommittedBtn" type="button" aria-pressed="false">
+            <span class="notifyToggleLabel">
+              <i class="bi bi-check2-circle" aria-hidden="true"></i>
+              <span>Committed/Approved invoices</span>
+            </span>
+            <span class="notifyCount" id="commitmentCommittedCount">0</span>
+          </button>
+          <button class="btn btn-outline-secondary btn-sm" id="commitmentClearFilters" type="button">Clear filters</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="tableWrap">
+      <table class="invoiceTable commitmentTable">
+        <thead>
+          <tr>
+            <th class="colChk cellCenter">
+              <input type="checkbox" id="commitmentSelectAll" aria-label="Select all invoices" />
+            </th>
+            <th class="colCustomer">Customer Name</th>
+            <th class="colCode">Customer Code</th>
+            <th class="colInv">Invoice No</th>
+            <th class="colDate">Invoice Date</th>
+            <th class="colDate">Due Date</th>
+            <th class="colAmtRight colAmount">Invoice Value</th>
+            <th class="colAmtRight colAmount">Amount For The Month</th>
+            <th class="colStatus">Status</th>
+            <th class="colWeek">Week</th>
+            <th class="colAmtRight colAmount">Target Amount Committed</th>
+          </tr>
+        </thead>
+        <tbody id="commitmentTableBody"></tbody>
+      </table>
+    </div>
+
+    <div class="commitmentFootnote">
+      <i class="bi bi-info-circle" aria-hidden="true"></i>
+      Enter week and target amount for each invoice before submitting.
+    </div>
+    
+    <div class="commitmentToolbar">
+      <div class="commitmentToolbarStatus" id="commitmentStatusNote" role="status" aria-live="polite"></div>
+      <div class="commitmentActions">
+        <button class="btnSmall" id="commitmentDraftBtn" type="button">Save Draft</button>
+        <button class="btnSmallPrimary" id="commitmentSubmitBtn" type="button">Save And Submit</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="../scripts/shared-header.js"></script>
+<script>
+  (() => {
+    let commitmentData = [
+      {
+        customerName: "BluePeak Infotech",
+        customerCode: "BluePeakgt_002",
+        invoiceNo: "BlueP_0030",
+        invoiceDate: "12/9/2025",
+        invoiceValue: 890000,
+        dueDate: "18/11/2025",
+        amountForMonth: 890000
+      },
+      {
+        customerName: "BluePeak Infotech",
+        customerCode: "BluePeakgt_002",
+        invoiceNo: "BlueP_0011",
+        invoiceDate: "12/9/2025",
+        invoiceValue: 300000,
+        dueDate: "22/9/2025",
+        amountForMonth: 300000
+      },
+      {
+        customerName: "BluePeak Infotech",
+        customerCode: "BluePeakgt_002",
+        invoiceNo: "BlueP_0012",
+        invoiceDate: "12/9/2025",
+        invoiceValue: 300000,
+        dueDate: "31/3/2026",
+        amountForMonth: 300000
+      },
+      {
+        customerName: "BluePeak Infotech",
+        customerCode: "BluePeakgt_002",
+        invoiceNo: "BlueP_0013",
+        invoiceDate: "12/9/2025",
+        invoiceValue: 100000,
+        dueDate: "22/10/2025",
+        amountForMonth: 100000
+      },
+      {
+        customerName: "BluePeak Infotech",
+        customerCode: "BluePeakgt_002",
+        invoiceNo: "BlueP_0014",
+        invoiceDate: "12/9/2025",
+        invoiceValue: 3200000,
+        dueDate: "17/9/2025",
+        amountForMonth: 3200000
+      },
+      {
+        customerName: "BluePeak Infotech",
+        customerCode: "BluePeakgt_002",
+        invoiceNo: "BlueP_0015",
+        invoiceDate: "12/9/2025",
+        invoiceValue: 300000,
+        dueDate: "21/12/2025",
+        amountForMonth: 300000
+      }
+    ];
+
+    const weekOptions = ["Week 1", "Week 2", "Week 3", "Week 4"];
+    const tableBody = document.getElementById("commitmentTableBody");
+    const selectedCount = document.getElementById("commitmentSelectedCount");
+    const committedSummaryCount = document.getElementById("commitmentCommittedTotal");
+    const monthlyTotal = document.getElementById("commitmentMonthlyTotal");
+    const targetTotal = document.getElementById("commitmentTargetTotal");
+    const searchInput = document.getElementById("commitmentSearch");
+    const filterDropdowns = document.querySelectorAll(".filterDropdown[data-filter]");
+    const showCommittedBtn = document.getElementById("commitmentShowCommittedBtn");
+    const committedCountEl = document.getElementById("commitmentCommittedCount");
+    const clearFiltersBtn = document.getElementById("commitmentClearFilters");
+    const selectAll = document.getElementById("commitmentSelectAll");
+    const draftBtn = document.getElementById("commitmentDraftBtn");
+    const submitBtn = document.getElementById("commitmentSubmitBtn");
+    const statusNote = document.getElementById("commitmentStatusNote");
+    const agentName = localStorage.getItem("activeUserName") || "Devashish Agent1";
+
+    const rowState = new Map();
+    let currentRows = [];
+    const filterState = {
+      invoiceValue: "Any",
+      dueDate: "All"
+    };
+    const draftStorageKey = "ineburaCommitmentDraft";
+    const invoiceStorageKey = "ineburaInvoiceData";
+    const submitStorageKey = "ineburaCommitmentSubmissions";
+    const notificationCenterKey = "ineburaNotificationCenter";
+    const approvalSeenKey = "ineburaCommitmentStatusSeen";
+    let showCommittedOnly = false;
+
+    const loadStorage = (key) => {
+      if (!key) return null;
+      try {
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : null;
+      } catch (err) {
+        return null;
+      }
+    };
+
+    const storedInvoices = loadStorage(invoiceStorageKey);
+    if (Array.isArray(storedInvoices) && storedInvoices.length > 0) {
+      commitmentData = storedInvoices;
+    }
+
+    const storedDraft = loadStorage(draftStorageKey);
+    const storedStatusSeenRaw = loadStorage(approvalSeenKey);
+    const storedStatusSeen = storedStatusSeenRaw && typeof storedStatusSeenRaw === "object"
+      ? storedStatusSeenRaw
+      : {};
+    const storedItems = storedDraft?.items || {};
+
+    const getSubmissionItems = () => {
+      const submissionsRaw = loadStorage(submitStorageKey);
+      const submissions = Array.isArray(submissionsRaw) ? submissionsRaw : [];
+      const items = submissions.flatMap((submission) => submission.items || []);
+      return items.filter((item) => (item.agentName || "") === agentName);
+    };
+
+    const buildSubmissionMap = () => {
+      const map = new Map();
+      getSubmissionItems().forEach((item) => {
+        map.set(item.invoiceNo, item);
+      });
+      return map;
+    };
+
+    const updateApprovalNotifications = () => {
+      const items = getSubmissionItems();
+      if (!items.length) return;
+      const notificationsRaw = loadStorage(notificationCenterKey);
+      const notifications = Array.isArray(notificationsRaw) ? notificationsRaw : [];
+      let changed = false;
+      items.forEach((item) => {
+        const status = (item.approvalStatus || "pending").toLowerCase();
+        if (!["approved", "rejected"].includes(status)) return;
+        if (storedStatusSeen[item.invoiceNo] === status) return;
+        const title = status === "approved" ? "Commitment Approved" : "Commitment Rejected";
+        const remark = item.remark ? ` Remark: ${item.remark}` : "";
+        const statusLabel = status === "rejected" ? "rejected" : "approved";
+        notifications.unshift({
+          type: "commitment",
+          status,
+          title,
+          message: `${item.customerName || "Customer"} commitment ${statusLabel} for ${item.invoiceNo || "-"}.${remark}`,
+          invoiceNo: item.invoiceNo || "",
+          customerName: item.customerName || "",
+          week: item.week || "",
+          targetAmount: item.targetAmount || 0,
+          invoiceValue: item.invoiceValue || 0,
+          amountForMonth: item.amountForMonth || 0,
+          remark: item.remark || "",
+          dueDate: item.dueDate || "",
+          invoiceDate: item.invoiceDate || "",
+          createdAt: new Date().toLocaleString(),
+          read: false
+        });
+        storedStatusSeen[item.invoiceNo] = status;
+        changed = true;
+      });
+      if (changed) {
+        localStorage.setItem(notificationCenterKey, JSON.stringify(notifications));
+        localStorage.setItem(approvalSeenKey, JSON.stringify(storedStatusSeen));
+      }
+    };
+
+    const formatCurrency = (value) => (
+      `Rs. ${Number(value || 0).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+    );
+
+    const formatNumber = (value) => (
+      Number(value || 0).toLocaleString("en-IN")
+    );
+
+    const parseDisplayDate = (value) => {
+      if (!value) return null;
+      if (value.includes("/")) {
+        const [day, month, year] = value.split("/").map(Number);
+        if (!day || !month || !year) return null;
+        return new Date(year, month - 1, day);
+      }
+      const parts = String(value).trim().split(/\s+/);
+      if (parts.length < 3) return null;
+      const day = Number(parts[0]);
+      const monthLabel = parts[1].slice(0, 3).toLowerCase();
+      const year = Number(parts[2]);
+      const monthMap = {
+        jan: 1,
+        feb: 2,
+        mar: 3,
+        apr: 4,
+        may: 5,
+        jun: 6,
+        jul: 7,
+        aug: 8,
+        sep: 9,
+        oct: 10,
+        nov: 11,
+        dec: 12
+      };
+      const month = monthMap[monthLabel];
+      if (!day || !month || !year) return null;
+      return new Date(year, month - 1, day);
+    };
+
+    const normalizeDate = (value) => {
+      if (!value) return null;
+      return new Date(value.getFullYear(), value.getMonth(), value.getDate());
+    };
+
+    const getDateRange = (label) => {
+      const now = new Date();
+      const today = normalizeDate(now);
+      if (!today) return null;
+
+      if (label === "This Month") {
+        return {
+          from: new Date(today.getFullYear(), today.getMonth(), 1),
+          to: new Date(today.getFullYear(), today.getMonth() + 1, 0, 23, 59, 59, 999)
+        };
+      }
+      if (label === "Last Month") {
+        return {
+          from: new Date(today.getFullYear(), today.getMonth() - 1, 1),
+          to: new Date(today.getFullYear(), today.getMonth(), 0, 23, 59, 59, 999)
+        };
+      }
+      if (label === "Last 90 Days") {
+        const from = new Date(today);
+        from.setDate(from.getDate() - 90);
+        return { from, to: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999) };
+      }
+      if (label === "This Year") {
+        return {
+          from: new Date(today.getFullYear(), 0, 1),
+          to: new Date(today.getFullYear(), 11, 31, 23, 59, 59, 999)
+        };
+      }
+      return null;
+    };
+
+    const isCommitted = (state) => Boolean(state.week) && state.targetAmount > 0;
+
+    const getRowState = (row) => {
+      if (!rowState.has(row.invoiceNo)) {
+        const saved = storedItems[row.invoiceNo];
+        const storedTarget = Number(saved?.targetAmount) || 0;
+        const storedWeek = saved?.week || "";
+        const committed = Boolean(storedWeek) && storedTarget > 0;
+        rowState.set(row.invoiceNo, {
+          selected: committed || Boolean(saved?.selected),
+          week: storedWeek,
+          targetAmount: storedTarget,
+          initialWeek: "",
+          initialTarget: 0
+        });
+      }
+      return rowState.get(row.invoiceNo);
+    };
+
+    const buildWeekOptions = (selectedWeek) => (
+      ["<option value=\"\">Select Week</option>", ...weekOptions.map((week) => (
+        `<option value="${week}"${week === selectedWeek ? " selected" : ""}>${week}</option>`
+      ))].join("")
+    );
+
+    const applyFilters = () => {
+      let result = [...commitmentData];
+      const query = (searchInput?.value || "").trim().toLowerCase();
+      if (query) {
+        result = result.filter((row) => (
+          row.invoiceNo.toLowerCase().includes(query) ||
+          row.customerName.toLowerCase().includes(query)
+        ));
+      }
+
+      const dueFilter = filterState.dueDate;
+      if (dueFilter && dueFilter !== "All") {
+        const range = getDateRange(dueFilter);
+        if (range) {
+          result = result.filter((row) => {
+            const dueDate = parseDisplayDate(row.dueDate);
+            if (!dueDate) return false;
+            const normalized = normalizeDate(dueDate);
+            if (!normalized) return false;
+            if (range.from && normalized < range.from) return false;
+            if (range.to && normalized > range.to) return false;
+            return true;
+          });
+        }
+      }
+
+      const sortValue = filterState.invoiceValue;
+      if (sortValue === "Low to High") {
+        result.sort((a, b) => a.invoiceValue - b.invoiceValue);
+      }
+      if (sortValue === "High to Low") {
+        result.sort((a, b) => b.invoiceValue - a.invoiceValue);
+      }
+
+      if (showCommittedOnly) {
+        result = result.filter((row) => isCommitted(getRowState(row)));
+      }
+
+      return result;
+    };
+
+    const updateRowHighlight = (rowEl, state) => {
+      rowEl.classList.toggle("rowEdited", isCommitted(state));
+    };
+
+    const setStatus = (message, variant) => {
+      if (!statusNote) return;
+      statusNote.textContent = message || "";
+      statusNote.classList.remove("is-success", "is-warning");
+      if (variant === "success") statusNote.classList.add("is-success");
+      if (variant === "warning") statusNote.classList.add("is-warning");
+    };
+
+    const refreshSummary = () => {
+      const netDueSum = currentRows.reduce((sum, row) => sum + (row.invoiceValue || 0), 0);
+      const targetSum = currentRows.reduce((sum, row) => {
+        const state = getRowState(row);
+        if (!state || !isCommitted(state)) return sum;
+        return sum + (state.targetAmount || 0);
+      }, 0);
+      const committedCount = currentRows.reduce((count, row) => (
+        isCommitted(getRowState(row)) ? count + 1 : count
+      ), 0);
+
+      selectedCount.textContent = String(currentRows.length);
+      if (committedSummaryCount) committedSummaryCount.textContent = String(committedCount);
+      monthlyTotal.textContent = formatCurrency(netDueSum);
+      targetTotal.textContent = formatCurrency(targetSum);
+      updateCommittedButton();
+    };
+
+    const updateCommittedButton = () => {
+      if (!showCommittedBtn) return;
+      const committedCount = commitmentData.reduce((count, row) => (
+        isCommitted(getRowState(row)) ? count + 1 : count
+      ), 0);
+      if (committedCountEl) committedCountEl.textContent = String(committedCount);
+      showCommittedBtn.setAttribute("aria-pressed", showCommittedOnly ? "true" : "false");
+    };
+
+    const buildSnapshot = () => {
+      const items = {};
+      commitmentData.forEach((row) => {
+        const state = getRowState(row);
+        items[row.invoiceNo] = {
+          agentName,
+          week: state.week,
+          targetAmount: state.targetAmount,
+          selected: state.selected
+        };
+      });
+      return items;
+    };
+
+    const collectCommittedRows = () => (
+      commitmentData
+        .map((row) => ({ row, state: getRowState(row) }))
+        .filter(({ state }) => isCommitted(state))
+        .map(({ row, state }) => ({
+          agentName,
+          invoiceNo: row.invoiceNo,
+          customerName: row.customerName,
+          customerCode: row.customerCode,
+          invoiceValue: row.invoiceValue,
+          amountForMonth: row.amountForMonth,
+          invoiceDate: row.invoiceDate,
+          dueDate: row.dueDate,
+          week: state.week,
+          targetAmount: state.targetAmount
+        }))
+    );
+
+    const syncSelectAll = () => {
+      if (!selectAll) return;
+      if (currentRows.length === 0) {
+        selectAll.checked = false;
+        selectAll.indeterminate = false;
+        return;
+      }
+      const selectedCountValue = currentRows.filter((row) => getRowState(row)?.selected).length;
+      selectAll.checked = selectedCountValue === currentRows.length;
+      selectAll.indeterminate = selectedCountValue > 0 && selectedCountValue < currentRows.length;
+    };
+
+    const renderTable = () => {
+      const submissionMap = buildSubmissionMap();
+      currentRows = applyFilters();
+      tableBody.innerHTML = "";
+
+      currentRows.forEach((row) => {
+        const state = getRowState(row);
+        const submissionItem = submissionMap.get(row.invoiceNo);
+        let statusLabel = "Not submitted";
+        let statusClass = "not-submitted";
+        if (submissionItem) {
+          const rawStatus = (submissionItem.approvalStatus || "pending").toLowerCase();
+          if (rawStatus === "approved") {
+            statusLabel = "Approved";
+            statusClass = "approved";
+          } else if (rawStatus === "rejected") {
+            statusLabel = "Rejected";
+            statusClass = "rejected";
+          } else {
+            statusLabel = "Pending";
+            statusClass = "pending";
+          }
+        }
+        const tr = document.createElement("tr");
+        tr.dataset.invoiceNo = row.invoiceNo;
+        const inputValue = state.targetAmount > 0 ? state.targetAmount : "";
+        tr.innerHTML = `
+          <td class="cellCenter">
+            <input class="commitmentSelect" type="checkbox" aria-label="Select invoice ${row.invoiceNo}" ${state.selected ? "checked" : ""} />
+          </td>
+          <td>${row.customerName}</td>
+          <td>${row.customerCode}</td>
+          <td>${row.invoiceNo}</td>
+          <td>${row.invoiceDate}</td>
+          <td>${row.dueDate}</td>
+          <td class="colAmtRight colAmount">${formatCurrency(row.invoiceValue)}</td>
+        <td class="colAmtRight colAmount">
+          <span class="commitmentAmountText" data-value="${row.amountForMonth}">
+            ${formatCurrency(row.amountForMonth)}
+          </span>
+        </td>
+        <td><span class="approvalPill ${statusClass}">${statusLabel}</span></td>
+        <td>
+          <select class="commitmentWeek">
+            ${buildWeekOptions(state.week)}
+          </select>
+          </td>
+          <td class="colAmount">
+            <input
+              class="commitmentTargetInput"
+              type="number"
+              min="0"
+              max="${row.invoiceValue}"
+              step="0.01"
+              value="${inputValue}"
+              placeholder="${formatNumber(row.amountForMonth)}"
+            />
+          </td>
+        `;
+        updateRowHighlight(tr, state);
+        tableBody.appendChild(tr);
+      });
+
+      refreshSummary();
+      syncSelectAll();
+    };
+
+    tableBody.addEventListener("change", (event) => {
+      const rowEl = event.target.closest("tr");
+      if (!rowEl) return;
+      const invoiceNo = rowEl.dataset.invoiceNo;
+      const row = commitmentData.find((item) => item.invoiceNo === invoiceNo);
+      if (!row) return;
+      const state = getRowState(row);
+
+      if (event.target.classList.contains("commitmentSelect")) {
+        state.selected = event.target.checked;
+        if (isCommitted(state)) {
+          state.selected = true;
+          event.target.checked = true;
+        }
+        syncSelectAll();
+        return;
+      }
+
+      if (event.target.classList.contains("commitmentWeek")) {
+        state.week = event.target.value;
+        if (isCommitted(state)) {
+          state.selected = true;
+          const checkbox = rowEl.querySelector(".commitmentSelect");
+          if (checkbox) checkbox.checked = true;
+        } else {
+          state.selected = false;
+          const checkbox = rowEl.querySelector(".commitmentSelect");
+          if (checkbox) checkbox.checked = false;
+        }
+        updateRowHighlight(rowEl, state);
+        syncSelectAll();
+      }
+    });
+
+    tableBody.addEventListener("input", (event) => {
+      if (!event.target.classList.contains("commitmentTargetInput")) return;
+      const rowEl = event.target.closest("tr");
+      if (!rowEl) return;
+      const invoiceNo = rowEl.dataset.invoiceNo;
+      const row = commitmentData.find((item) => item.invoiceNo === invoiceNo);
+      if (!row) return;
+      const state = getRowState(row);
+      state.targetAmount = parseFloat(event.target.value) || 0;
+      if (isCommitted(state)) {
+        state.selected = true;
+        const checkbox = rowEl.querySelector(".commitmentSelect");
+        if (checkbox) checkbox.checked = true;
+      } else {
+        state.selected = false;
+        const checkbox = rowEl.querySelector(".commitmentSelect");
+        if (checkbox) checkbox.checked = false;
+      }
+      updateRowHighlight(rowEl, state);
+      refreshSummary();
+      syncSelectAll();
+    });
+
+    if (selectAll) {
+      selectAll.addEventListener("change", () => {
+        const checked = selectAll.checked;
+        currentRows.forEach((row) => {
+          const state = getRowState(row);
+          state.selected = checked;
+        });
+        tableBody.querySelectorAll(".commitmentSelect").forEach((checkbox) => {
+          checkbox.checked = checked;
+        });
+        syncSelectAll();
+      });
+    }
+
+    if (draftBtn) {
+      draftBtn.addEventListener("click", () => {
+        const payload = {
+          savedAt: new Date().toISOString(),
+          items: buildSnapshot()
+        };
+        localStorage.setItem(draftStorageKey, JSON.stringify(payload));
+        setStatus(`Draft saved at ${new Date().toLocaleString()}.`, "success");
+      });
+    }
+
+    if (submitBtn) {
+      submitBtn.addEventListener("click", () => {
+        const committedRows = collectCommittedRows();
+        if (committedRows.length === 0) {
+          setStatus("Enter week and target amount before submitting.", "warning");
+          return;
+        }
+        const existing = loadStorage(submitStorageKey);
+        const submissions = Array.isArray(existing) ? existing : [];
+        const newItems = [];
+
+        committedRows.forEach((item) => {
+          let updated = false;
+          submissions.forEach((submission) => {
+            (submission.items || []).forEach((existingItem, index) => {
+              if (existingItem.invoiceNo !== item.invoiceNo) return;
+              submission.items[index] = {
+                ...existingItem,
+                ...item,
+                approvalStatus: "pending",
+                remark: ""
+              };
+              submission.status = "pending";
+              updated = true;
+            });
+          });
+          if (!updated) {
+            newItems.push({ ...item, approvalStatus: "pending" });
+          }
+        });
+
+        if (newItems.length > 0) {
+          submissions.push({
+            id: `SUB-${Date.now()}`,
+            submittedAt: new Date().toISOString(),
+            status: "pending",
+            items: newItems
+          });
+        }
+        localStorage.setItem(submitStorageKey, JSON.stringify(submissions));
+        setStatus(`Submitted ${committedRows.length} commitments for manager approval.`, "success");
+      });
+    }
+
+    const updateFilterBadge = (key, value) => {
+      const badge = document.querySelector(`.filterBadge[data-filter-badge="${key}"]`);
+      if (badge) badge.textContent = value;
+    };
+
+    if (filterDropdowns.length > 0) {
+      filterDropdowns.forEach((dropdown) => {
+        dropdown.addEventListener("click", (event) => {
+          const item = event.target.closest("[data-filter-value]");
+          if (!item) return;
+          const value = item.getAttribute("data-filter-value") || "All";
+          const key = dropdown.getAttribute("data-filter");
+          if (!key) return;
+          filterState[key] = value;
+          updateFilterBadge(key, value);
+          dropdown.removeAttribute("open");
+          renderTable();
+        });
+      });
+    }
+
+    if (showCommittedBtn) {
+      showCommittedBtn.addEventListener("click", () => {
+        showCommittedOnly = !showCommittedOnly;
+        renderTable();
+      });
+    }
+
+    const handleFiltersChange = () => renderTable();
+    if (searchInput) searchInput.addEventListener("input", handleFiltersChange);
+    if (clearFiltersBtn) {
+      clearFiltersBtn.addEventListener("click", () => {
+        if (searchInput) searchInput.value = "";
+        filterState.invoiceValue = "Any";
+        filterState.dueDate = "All";
+        showCommittedOnly = false;
+        updateFilterBadge("invoiceValue", "Any");
+        updateFilterBadge("dueDate", "All");
+        renderTable();
+      });
+    }
+
+    updateApprovalNotifications();
+
+    if (storedDraft?.savedAt) {
+      setStatus(`Draft loaded from ${new Date(storedDraft.savedAt).toLocaleString()}.`, "success");
+    }
+
+    renderTable();
+  })();
+</script>
+</body>
+</html>

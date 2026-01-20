@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inebura Ops UI - Commitment Module (Manager)</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../css/styles.css" />
+  <style>
+    .commitmentMain {
+      max-width: none;
+      margin: 0;
+      padding: 24px 28px 40px;
+      width: 100%;
+      height: calc(100vh - 52px);
+      overflow: auto;
+      background: #f5f3fb;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .commitmentHeader {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .commitmentHeader h1 {
+      font-size: 22px;
+      margin: 0;
+      color: #111827;
+    }
+
+    .commitmentHeader p {
+      margin: 6px 0 0;
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    .commitmentHeaderRight {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .commitmentRolePill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--brand-lighter);
+      border: 1px solid var(--brand-border);
+      color: var(--brand-dark);
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .commitmentCard {
+      background: #ffffff;
+      border: 1px solid #e2e8f4;
+      border-radius: 18px;
+      padding: 14px;
+      box-shadow: 0 12px 24px rgba(15, 23, 42, 0.06);
+    }
+
+    .commitmentSummary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .commitmentSummaryCard {
+      background: #f9f5ff;
+      border: 1px solid #eadcf7;
+      border-radius: 12px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    .commitmentSummaryCard strong {
+      font-size: 14px;
+      color: #111827;
+    }
+
+    .agentBadge {
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      background: #ffffff;
+      border: 1px solid #e2e8f4;
+      color: #1f2937;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .agentBadge.approved {
+      background: #dcfce7;
+      color: #166534;
+      border-color: #86efac;
+    }
+
+    .agentBadge.pending {
+      background: #fef9c3;
+      color: #92400e;
+      border-color: #f59e0b;
+    }
+
+    .agentBadge.rejected {
+      background: #fd8d28;
+      color: #7a2b00;
+      border-color: #ce5400;
+    }
+
+    .agentBadge.isActive {
+      box-shadow: 0 0 0 2px rgba(92, 37, 141, 0.2);
+    }
+
+    .agentSelectCard {
+      width: 100%;
+      border: 1px solid #e2e8f4;
+      border-radius: 14px;
+      padding: 12px;
+      margin-bottom: 12px;
+      background: #f8fafc;
+    }
+
+    .agentSelectHeader {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #64748b;
+      font-weight: 600;
+    }
+
+    .agentBadgeList {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .agentBadgeBtn {
+      padding: 0;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+    }
+
+    .reviewActions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      justify-content: space-between;
+    }
+
+    .reviewAgentName {
+      font-size: 12px;
+      color: #64748b;
+      font-weight: 600;
+    }
+
+    .reviewActionButtons {
+      display: flex;
+      gap: 8px;
+      margin-left: auto;
+      align-items: center;
+    }
+
+    .approvalPill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      border: 1px solid #e2e8f4;
+      background: #f1f5f9;
+      color: #475569;
+    }
+
+    .approvalPill.pending {
+      background: #fef9c3;
+      color: #92400e;
+      border-color: #f59e0b;
+    }
+
+    .approvalPill.approved {
+      background: #dcfce7;
+      color: #166534;
+      border-color: #86efac;
+    }
+
+    .approvalPill.rejected {
+      background: #fee2e2;
+      color: #991b1b;
+      border-color: #fecaca;
+    }
+
+    .filterRow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .tableFilters {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .tableFilters .filterRow {
+      align-items: center;
+    }
+
+    .tableFilterSearch {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--brand-border);
+      background: #ffffff;
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-size: 12px;
+      color: #64748b;
+      min-width: 220px;
+    }
+
+    .tableFilterSearch i {
+      color: var(--brand);
+    }
+
+    .tableFilterSearch input {
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: 12px;
+      color: #0f172a;
+      width: 170px;
+    }
+
+    .tableFilterSearch:focus-within {
+      border-color: var(--brand);
+      box-shadow: 0 0 0 2px rgba(var(--brand-rgb), 0.14);
+    }
+
+    .filterDropdown {
+      position: relative;
+    }
+
+    .filterDropdown summary {
+      list-style: none;
+      cursor: pointer;
+      border: 1px solid #e2e8f4;
+      background: #ffffff;
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #111827;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .filterDropdown summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .filterBadge {
+      background: #f1f5f9;
+      border: 1px solid #e2e8f4;
+      color: #334155;
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .filterMenu {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      min-width: 200px;
+      background: #ffffff;
+      border: 1px solid #e2e8f4;
+      border-radius: 12px;
+      padding: 6px;
+      box-shadow: 0 16px 32px rgba(15, 23, 42, 0.12);
+      display: none;
+      z-index: 50;
+    }
+
+    .filterDropdown[open] .filterMenu {
+      display: block;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .filterItem {
+      width: 100%;
+      border: none;
+      background: transparent;
+      text-align: left;
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      color: #111827;
+      cursor: pointer;
+    }
+
+    .filterItem:hover {
+      background: #f8fafc;
+    }
+
+    .commitmentTable {
+      min-width: 1080px;
+    }
+
+    .commitmentTable .colCustomer { width: 170px; }
+    .commitmentTable .colCode { width: 140px; }
+    .commitmentTable .colWeek { width: 120px; }
+    .commitmentTable .colAmount { width: 170px; }
+    .commitmentTable .colStatus { width: 110px; }
+
+    .commitmentAmountText {
+      font-size: 12px;
+      color: #111827;
+      font-weight: 600;
+      display: inline-block;
+      width: 100%;
+      text-align: left;
+    }
+
+    .commitmentTable input[type="number"],
+    .commitmentTable select {
+      width: 100%;
+      border: 1px solid #d7c3ea;
+      border-radius: 8px;
+      padding: 6px 8px;
+      font-size: 12px;
+      background: #ffffff;
+    }
+
+    .managerActionBar {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: flex-end;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .managerActionButtons {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+
+    .managerActionButtons .btnCTA,
+    .managerActionButtons .btnPrimary,
+    .managerActionButtons .btnDanger {
+      padding: 8px 12px;
+      font-size: 11px;
+      border-radius: 10px;
+    }
+
+    .managerCta {
+      font-size: 12px;
+    }
+
+    @media (max-width: 960px) {
+      .commitmentHeader {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body data-root-path="../" data-relationship-name="Apollo" data-relationship-badge="AP" data-relationship-logo-src="assets/apollo-tyres-logo.svg">
+
+<div data-shared-header></div>
+
+<main class="commitmentMain">
+  <section class="commitmentHeader">
+    <div>
+      <h1>Commitment Module</h1>
+      <p>Review and approve commitment plans submitted by your agents.</p>
+    </div>
+    <div class="commitmentHeaderRight">
+      <span class="commitmentRolePill">Manager view</span>
+    </div>
+  </section>
+
+  <section class="commitmentCard">
+    <div class="commitmentSummary">
+      <div class="commitmentSummaryCard">
+        <span>Total Invoice</span>
+        <strong id="managerTotalInvoices">0</strong>
+      </div>
+      <div class="commitmentSummaryCard">
+        <span>Committed invoices</span>
+        <strong id="managerCommittedCount">0</strong>
+      </div>
+      <div class="commitmentSummaryCard">
+        <span>Total Net Due</span>
+        <strong id="managerNetDue">Rs. 0.00</strong>
+      </div>
+      <div class="commitmentSummaryCard">
+        <span>Target amount committed</span>
+        <strong id="managerTargetCommitted">Rs. 0.00</strong>
+      </div>
+    </div>
+
+    <div class="agentSelectCard">
+      <div class="agentSelectHeader">
+        Agents
+        <span id="managerAgentMeta">0 agents</span>
+      </div>
+      <div class="agentBadgeList" id="managerAgentList"></div>
+    </div>
+
+    <div class="reviewActions">
+      <div class="reviewAgentName" id="managerActiveAgentLabel">Select an agent to review commitments.</div>
+      <div class="reviewActionButtons">
+      </div>
+    </div>
+
+    <div class="tableFilters">
+      <div class="filterRow">
+        <div class="tableFilterSearch">
+          <i class="bi bi-search" aria-hidden="true"></i>
+          <input type="text" id="managerCommitmentSearch" placeholder="Search invoice no or customer name" />
+        </div>
+        <details class="filterDropdown" data-filter="invoiceValue">
+          <summary>Invoice Value <span class="filterBadge" data-filter-badge="invoiceValue">Any</span></summary>
+          <div class="filterMenu">
+            <button class="filterItem" type="button" data-filter-value="Any">Any</button>
+            <button class="filterItem" type="button" data-filter-value="Low to High">Low to High</button>
+            <button class="filterItem" type="button" data-filter-value="High to Low">High to Low</button>
+          </div>
+        </details>
+        <details class="filterDropdown" data-filter="dueDate">
+          <summary>Due Date <span class="filterBadge" data-filter-badge="dueDate">All</span></summary>
+          <div class="filterMenu">
+            <button class="filterItem" type="button" data-filter-value="All">All</button>
+            <button class="filterItem" type="button" data-filter-value="This Month">This Month</button>
+            <button class="filterItem" type="button" data-filter-value="Last Month">Last Month</button>
+            <button class="filterItem" type="button" data-filter-value="Last 90 Days">Last 90 Days</button>
+            <button class="filterItem" type="button" data-filter-value="This Year">This Year</button>
+          </div>
+        </details>
+        <details class="filterDropdown" data-filter="approvalStatus">
+          <summary>Approval Status <span class="filterBadge" data-filter-badge="approvalStatus">All</span></summary>
+          <div class="filterMenu">
+            <button class="filterItem" type="button" data-filter-value="All">All</button>
+            <button class="filterItem" type="button" data-filter-value="Pending">Pending</button>
+            <button class="filterItem" type="button" data-filter-value="Approved">Approved</button>
+            <button class="filterItem" type="button" data-filter-value="Rejected">Rejected</button>
+          </div>
+        </details>
+        <button class="btn btn-outline-secondary btn-sm" id="managerClearFilters" type="button">Clear filters</button>
+      </div>
+    </div>
+
+    <div class="tableWrap">
+      <table class="invoiceTable commitmentTable">
+        <thead>
+          <tr>
+            <th class="colChk cellCenter">
+              <input type="checkbox" id="managerSelectAll" aria-label="Select all commitments" />
+            </th>
+            <th class="colCustomer">Customer Name</th>
+            <th class="colCode">Customer Code</th>
+            <th class="colInv">Invoice No</th>
+            <th class="colDate">Invoice Date</th>
+            <th class="colDate">Due Date</th>
+            <th class="colAmtRight colAmount">Invoice Value</th>
+            <th class="colAmtRight colAmount">Amount For The Month</th>
+            <th class="colStatus">Status</th>
+            <th class="colWeek">Week</th>
+            <th class="colAmtRight colAmount">Target Amount Committed</th>
+          </tr>
+        </thead>
+        <tbody id="managerCommitmentTableBody"></tbody>
+      </table>
+    </div>
+
+    <div class="managerActionBar">
+      <div class="managerActionButtons">
+        <button class="btnCTA managerCta" id="managerApproveAllBtn" type="button" disabled>Approve all</button>
+        <button class="btnPrimary hidden" id="managerApproveSelectedBtn" type="button" disabled>Approve selected</button>
+        <button class="btnDanger hidden" id="managerRejectSelectedBtn" type="button" disabled>Reject selected</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="../scripts/shared-header.js"></script>
+<script>
+  (() => {
+    const submitStorageKey = "ineburaCommitmentSubmissions";
+    const loadStorage = (key, fallback) => {
+      try {
+        const raw = localStorage.getItem(key);
+        if (!raw) return fallback;
+        return JSON.parse(raw);
+      } catch (err) {
+        return fallback;
+      }
+    };
+
+    const submissions = loadStorage(submitStorageKey, []);
+
+    const getUniqueItems = (items) => {
+      const map = new Map();
+      items.forEach((item) => {
+        if (!item?.invoiceNo) return;
+        map.set(item.invoiceNo, item);
+      });
+      return Array.from(map.values());
+    };
+
+    let allItems = getUniqueItems(submissions.flatMap((submission) => submission.items || []));
+    const agents = Array.from(new Set(allItems.map((item) => item.agentName || "Unknown Agent"))).sort((a, b) => a.localeCompare(b));
+
+    const totalInvoicesEl = document.getElementById("managerTotalInvoices");
+    const committedCountEl = document.getElementById("managerCommittedCount");
+    const netDueEl = document.getElementById("managerNetDue");
+    const targetCommittedEl = document.getElementById("managerTargetCommitted");
+    const agentListEl = document.getElementById("managerAgentList");
+    const agentMetaEl = document.getElementById("managerAgentMeta");
+    const activeAgentLabel = document.getElementById("managerActiveAgentLabel");
+    const approveAllBtn = document.getElementById("managerApproveAllBtn");
+    const approveSelectedBtn = document.getElementById("managerApproveSelectedBtn");
+    const rejectSelectedBtn = document.getElementById("managerRejectSelectedBtn");
+    const tableBody = document.getElementById("managerCommitmentTableBody");
+    const searchInput = document.getElementById("managerCommitmentSearch");
+    const filterDropdowns = document.querySelectorAll(".filterDropdown[data-filter]");
+    const clearFiltersBtn = document.getElementById("managerClearFilters");
+    const selectAll = document.getElementById("managerSelectAll");
+
+    const filterState = {
+      invoiceValue: "Any",
+      dueDate: "All",
+      approvalStatus: "All"
+    };
+
+    let activeAgent = agents[0] || "";
+    let currentRows = [];
+    const selectionState = new Map();
+    const weekOptions = ["Week 1", "Week 2", "Week 3", "Week 4"];
+
+    const formatCurrency = (value) => (
+      `Rs. ${Number(value || 0).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+    );
+
+    const parseDisplayDate = (value) => {
+      if (!value) return null;
+      const [day, month, year] = value.split("/").map(Number);
+      if (!day || !month || !year) return null;
+      return new Date(year, month - 1, day);
+    };
+
+    const normalizeDate = (value) => {
+      if (!value) return null;
+      return new Date(value.getFullYear(), value.getMonth(), value.getDate());
+    };
+
+    const getDateRange = (label) => {
+      const now = new Date();
+      const today = normalizeDate(now);
+      if (!today) return null;
+
+      if (label === "This Month") {
+        return {
+          from: new Date(today.getFullYear(), today.getMonth(), 1),
+          to: new Date(today.getFullYear(), today.getMonth() + 1, 0, 23, 59, 59, 999)
+        };
+      }
+      if (label === "Last Month") {
+        return {
+          from: new Date(today.getFullYear(), today.getMonth() - 1, 1),
+          to: new Date(today.getFullYear(), today.getMonth(), 0, 23, 59, 59, 999)
+        };
+      }
+      if (label === "Last 90 Days") {
+        const from = new Date(today);
+        from.setDate(from.getDate() - 90);
+        return { from, to: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999) };
+      }
+      if (label === "This Year") {
+        return {
+          from: new Date(today.getFullYear(), 0, 1),
+          to: new Date(today.getFullYear(), 11, 31, 23, 59, 59, 999)
+        };
+      }
+      return null;
+    };
+
+    const getInitials = (name) => (
+      name.split(/\s+/).filter(Boolean).map((part) => part[0]).join("").slice(0, 2).toUpperCase()
+    );
+
+    const getAgentStatus = (agent) => {
+      const rows = allItems.filter((item) => (item.agentName || "Unknown Agent") === agent);
+      if (!rows.length) return "pending";
+      const statuses = rows.map((item) => (item.approvalStatus || "pending"));
+      if (statuses.every((status) => status === "approved")) return "approved";
+      if (statuses.some((status) => status === "rejected")) return "rejected";
+      return "pending";
+    };
+
+    const getRowKey = (row) => `${row.agentName || "Unknown Agent"}::${row.invoiceNo}`;
+
+    const buildWeekOptions = (selectedWeek) => (
+      ["<option value=\"\">Select Week</option>", ...weekOptions.map((week) => (
+        `<option value="${week}"${week === selectedWeek ? " selected" : ""}>${week}</option>`
+      ))].join("")
+    );
+
+    const updateSummary = () => {
+      const totalInvoices = allItems.length;
+      const committedCount = allItems.reduce((count, item) => (
+        item.week && Number(item.targetAmount) > 0 ? count + 1 : count
+      ), 0);
+      const netDue = allItems.reduce((sum, item) => sum + (item.invoiceValue || 0), 0);
+      const targetCommitted = allItems.reduce((sum, item) => sum + (item.targetAmount || 0), 0);
+
+      if (totalInvoicesEl) totalInvoicesEl.textContent = String(totalInvoices);
+      if (committedCountEl) committedCountEl.textContent = String(committedCount);
+      if (netDueEl) netDueEl.textContent = formatCurrency(netDue);
+      if (targetCommittedEl) targetCommittedEl.textContent = formatCurrency(targetCommitted);
+    };
+
+    const updateSubmissionItem = (agent, invoiceNo, changes) => {
+      submissions.forEach((submission) => {
+        (submission.items || []).forEach((item) => {
+          if ((item.agentName || "Unknown Agent") !== agent) return;
+          if (item.invoiceNo !== invoiceNo) return;
+          Object.assign(item, changes);
+        });
+      });
+      localStorage.setItem(submitStorageKey, JSON.stringify(submissions));
+      allItems = getUniqueItems(submissions.flatMap((submission) => submission.items || []));
+      updateSummary();
+    };
+
+    const applyBulkUpdate = (rows, changes) => {
+      rows.forEach((row) => {
+        updateSubmissionItem(row.agentName || "Unknown Agent", row.invoiceNo, changes);
+      });
+    };
+
+    const getSelectedRows = () => (
+      currentRows.filter((row) => selectionState.get(getRowKey(row)))
+    );
+
+    const updateActionButtonsState = () => {
+      const hasAgent = Boolean(activeAgent);
+      const hasRows = getRowsForAgent().length > 0;
+      const hasSelection = getSelectedRows().length > 0;
+      if (approveAllBtn) {
+        approveAllBtn.disabled = !hasAgent || !hasRows;
+        approveAllBtn.classList.toggle("hidden", hasSelection);
+      }
+      if (approveSelectedBtn) {
+        approveSelectedBtn.disabled = !hasAgent || !hasSelection;
+        approveSelectedBtn.classList.toggle("hidden", !hasSelection);
+      }
+      if (rejectSelectedBtn) {
+        rejectSelectedBtn.disabled = !hasAgent || !hasSelection;
+        rejectSelectedBtn.classList.toggle("hidden", !hasSelection);
+      }
+    };
+
+    const renderAgentList = () => {
+      if (!agentListEl) return;
+      if (agentMetaEl) agentMetaEl.textContent = `${agents.length} agents`;
+      if (!agents.length) {
+        agentListEl.innerHTML = "<span style=\"color:#94a3b8; font-size:12px;\">No submissions yet.</span>";
+        return;
+      }
+      agentListEl.innerHTML = agents.map((agent) => {
+        const status = getAgentStatus(agent);
+        const isActive = agent === activeAgent;
+        return `
+          <button class="agentBadge agentBadgeBtn ${status} ${isActive ? "isActive" : ""}" type="button" data-agent="${agent}">
+            ${getInitials(agent)}
+          </button>
+        `;
+      }).join("");
+    };
+
+    const updateActiveAgentUI = () => {
+      if (activeAgentLabel) {
+        activeAgentLabel.textContent = activeAgent
+          ? `Reviewing commitments for ${activeAgent}.`
+          : "Select an agent to review commitments.";
+      }
+      updateActionButtonsState();
+    };
+
+    const getRowsForAgent = () => (
+      activeAgent
+        ? allItems.filter((item) => (item.agentName || "Unknown Agent") === activeAgent)
+        : []
+    );
+
+    const applyFilters = () => {
+      let result = [...getRowsForAgent()];
+      const query = (searchInput?.value || "").trim().toLowerCase();
+      if (query) {
+        result = result.filter((row) => (
+          (row.invoiceNo || "").toLowerCase().includes(query) ||
+          (row.customerName || "").toLowerCase().includes(query)
+        ));
+      }
+
+      const dueFilter = filterState.dueDate;
+      if (dueFilter && dueFilter !== "All") {
+        const range = getDateRange(dueFilter);
+        if (range) {
+          result = result.filter((row) => {
+            const dueDate = parseDisplayDate(row.dueDate);
+            if (!dueDate) return false;
+            const normalized = normalizeDate(dueDate);
+            if (!normalized) return false;
+            if (range.from && normalized < range.from) return false;
+            if (range.to && normalized > range.to) return false;
+            return true;
+          });
+        }
+      }
+
+      const approvalFilter = filterState.approvalStatus;
+      if (approvalFilter && approvalFilter !== "All") {
+        result = result.filter((row) => {
+          const status = row.approvalStatus || "pending";
+          return status.toLowerCase() === approvalFilter.toLowerCase();
+        });
+      }
+
+      const sortValue = filterState.invoiceValue;
+      if (sortValue === "Low to High") {
+        result.sort((a, b) => (a.invoiceValue || 0) - (b.invoiceValue || 0));
+      }
+      if (sortValue === "High to Low") {
+        result.sort((a, b) => (b.invoiceValue || 0) - (a.invoiceValue || 0));
+      }
+
+      return result;
+    };
+
+    const renderTable = () => {
+      if (!tableBody) return;
+      currentRows = applyFilters();
+      tableBody.innerHTML = "";
+      if (selectAll) {
+        selectAll.checked = false;
+        selectAll.indeterminate = false;
+      }
+
+      if (!activeAgent) {
+        tableBody.innerHTML = "<tr><td colspan=\"11\" style=\"color:#94a3b8;\">Select an agent to review commitments.</td></tr>";
+        return;
+      }
+
+      if (!currentRows.length) {
+        tableBody.innerHTML = "<tr><td colspan=\"11\" style=\"color:#94a3b8;\">No commitments found for this agent.</td></tr>";
+        return;
+      }
+
+      currentRows.forEach((row) => {
+        const rowKey = getRowKey(row);
+        const isSelected = selectionState.get(rowKey) || false;
+        const status = row.approvalStatus || "pending";
+        const tr = document.createElement("tr");
+        tr.dataset.invoiceNo = row.invoiceNo || "";
+        tr.dataset.agentName = row.agentName || "Unknown Agent";
+        tr.innerHTML = `
+          <td class="cellCenter">
+            <input class="managerSelect" type="checkbox" aria-label="Select invoice ${row.invoiceNo}" ${isSelected ? "checked" : ""} />
+          </td>
+          <td>${row.customerName || "-"}</td>
+          <td>${row.customerCode || "-"}</td>
+          <td>${row.invoiceNo || "-"}</td>
+          <td>${row.invoiceDate || "-"}</td>
+          <td>${row.dueDate || "-"}</td>
+          <td class="colAmtRight colAmount">${formatCurrency(row.invoiceValue)}</td>
+          <td class="colAmtRight colAmount">
+            <span class="commitmentAmountText">${formatCurrency(row.amountForMonth)}</span>
+          </td>
+          <td><span class="approvalPill ${status}">${status}</span></td>
+          <td>
+            <select class="managerWeekSelect">
+              ${buildWeekOptions(row.week || "")}
+            </select>
+          </td>
+          <td class="colAmtRight colAmount">
+            <input
+              class="managerTargetInput"
+              type="number"
+              min="0"
+              max="${row.invoiceValue || 0}"
+              step="0.01"
+              value="${row.targetAmount || 0}"
+            />
+          </td>
+        `;
+        tableBody.appendChild(tr);
+      });
+
+      if (selectAll && currentRows.length > 0) {
+        const selectedCount = currentRows.filter((row) => selectionState.get(getRowKey(row))).length;
+        selectAll.checked = selectedCount === currentRows.length;
+        selectAll.indeterminate = selectedCount > 0 && selectedCount < currentRows.length;
+      }
+      updateActionButtonsState();
+    };
+
+    const updateFilterBadge = (key, value) => {
+      const badge = document.querySelector(`.filterBadge[data-filter-badge="${key}"]`);
+      if (badge) badge.textContent = value;
+    };
+
+    if (filterDropdowns.length > 0) {
+      filterDropdowns.forEach((dropdown) => {
+        dropdown.addEventListener("click", (event) => {
+          const item = event.target.closest("[data-filter-value]");
+          if (!item) return;
+          const value = item.getAttribute("data-filter-value") || "All";
+          const key = dropdown.getAttribute("data-filter");
+          if (!key) return;
+          filterState[key] = value;
+          updateFilterBadge(key, value);
+          dropdown.removeAttribute("open");
+          renderTable();
+        });
+      });
+    }
+
+    if (searchInput) searchInput.addEventListener("input", renderTable);
+    if (clearFiltersBtn) {
+      clearFiltersBtn.addEventListener("click", () => {
+        if (searchInput) searchInput.value = "";
+        filterState.invoiceValue = "Any";
+        filterState.dueDate = "All";
+        filterState.approvalStatus = "All";
+        updateFilterBadge("invoiceValue", "Any");
+        updateFilterBadge("dueDate", "All");
+        updateFilterBadge("approvalStatus", "All");
+        renderTable();
+      });
+    }
+
+    if (agentListEl) {
+      agentListEl.addEventListener("click", (event) => {
+        const btn = event.target.closest("[data-agent]");
+        if (!btn) return;
+        activeAgent = btn.getAttribute("data-agent") || "";
+        renderAgentList();
+        updateActiveAgentUI();
+        renderTable();
+      });
+    }
+
+    if (tableBody) {
+      tableBody.addEventListener("change", (event) => {
+        const rowEl = event.target.closest("tr");
+        if (!rowEl) return;
+        const invoiceNo = rowEl.dataset.invoiceNo;
+        const agentName = rowEl.dataset.agentName || "Unknown Agent";
+        const rowKey = `${agentName}::${invoiceNo}`;
+
+        if (event.target.classList.contains("managerSelect")) {
+          selectionState.set(rowKey, event.target.checked);
+          updateActionButtonsState();
+          return;
+        }
+
+        if (event.target.classList.contains("managerWeekSelect")) {
+          const nextWeek = event.target.value;
+          updateSubmissionItem(agentName, invoiceNo, { week: nextWeek });
+          renderTable();
+          return;
+        }
+      });
+
+      tableBody.addEventListener("input", (event) => {
+        if (!event.target.classList.contains("managerTargetInput")) return;
+        const rowEl = event.target.closest("tr");
+        if (!rowEl) return;
+        const invoiceNo = rowEl.dataset.invoiceNo;
+        const agentName = rowEl.dataset.agentName || "Unknown Agent";
+        const nextValue = parseFloat(event.target.value) || 0;
+        updateSubmissionItem(agentName, invoiceNo, { targetAmount: nextValue });
+        renderTable();
+      });
+    }
+
+    if (selectAll) {
+      selectAll.addEventListener("change", () => {
+        const checked = selectAll.checked;
+        currentRows.forEach((row) => {
+          const rowKey = getRowKey(row);
+          selectionState.set(rowKey, checked);
+        });
+        tableBody.querySelectorAll(".managerSelect").forEach((checkbox) => {
+          checkbox.checked = checked;
+        });
+        updateActionButtonsState();
+      });
+    }
+
+    if (approveAllBtn) {
+      approveAllBtn.addEventListener("click", () => {
+        if (!activeAgent) return;
+        const rows = getRowsForAgent();
+        applyBulkUpdate(rows, { approvalStatus: "approved" });
+        renderAgentList();
+        updateActiveAgentUI();
+        renderTable();
+      });
+    }
+
+    if (approveSelectedBtn) {
+      approveSelectedBtn.addEventListener("click", () => {
+        if (!activeAgent) return;
+        const rows = getSelectedRows();
+        if (!rows.length) return;
+        applyBulkUpdate(rows, { approvalStatus: "approved" });
+        rows.forEach((row) => selectionState.set(getRowKey(row), false));
+        renderAgentList();
+        updateActiveAgentUI();
+        renderTable();
+      });
+    }
+
+    if (rejectSelectedBtn) {
+      rejectSelectedBtn.addEventListener("click", () => {
+        if (!activeAgent) return;
+        const rows = getSelectedRows();
+        if (!rows.length) return;
+        applyBulkUpdate(rows, { approvalStatus: "rejected" });
+        rows.forEach((row) => selectionState.set(getRowKey(row), false));
+        renderAgentList();
+        updateActiveAgentUI();
+        renderTable();
+      });
+    }
+
+    updateSummary();
+    renderAgentList();
+    updateActiveAgentUI();
+    renderTable();
+  })();
+</script>
+</body>
+</html>

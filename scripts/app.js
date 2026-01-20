@@ -5648,6 +5648,20 @@ document.addEventListener("DOMContentLoaded", () => {
     bulkNew.textContent = "Add remarks";
   }
 
+  const invoiceStorageKey = "ineburaInvoiceData";
+  const invoiceSnapshot = customersData.flatMap((customer) => (
+    (customer.invoices || []).map((invoice) => ({
+      customerName: customer.name,
+      customerCode: customer.code,
+      invoiceNo: invoice.invoiceNo,
+      invoiceDate: invoice.invoiceDate || "",
+      invoiceValue: Number(invoice.invoiceAmount) || 0,
+      dueDate: invoice.dueDate || "",
+      amountForMonth: Number(invoice.amountForMonth) || 0
+    }))
+  ));
+  localStorage.setItem(invoiceStorageKey, JSON.stringify(invoiceSnapshot));
+
   renderCustomers(getFilteredCustomers(), selectedCustomerId);
   const first = customersData.find(c => c.id === selectedCustomerId) || customersData[0];
   if (first) {

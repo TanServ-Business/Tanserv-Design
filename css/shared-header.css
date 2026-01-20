@@ -807,10 +807,147 @@ button.notifyBadge {
   margin-bottom: 6px;
 }
 
+.notificationHeaderActions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.notificationHeaderBtn {
+  border: 1px solid #e2e8f4;
+  background: #ffffff;
+  color: #64748b;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
+
+.notificationHeaderBtn:hover {
+  border-color: var(--brand-border);
+  color: var(--brand-dark);
+}
+
+.notificationHeaderBtn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 .notificationPopupList {
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+.notificationCard {
+  border: 1px solid #e2e8f4;
+  border-radius: 12px;
+  padding: 10px;
+  background: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.notificationCardHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.notificationTitle {
+  font-size: 12px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.notificationMetaRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.notificationTime {
+  font-size: 10px;
+  color: #94a3b8;
+  white-space: nowrap;
+}
+
+.notificationTag {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #e2e8f0;
+  color: #475569;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.notificationTag.tag-commitment {
+  background: #ede9fe;
+  color: #5b21b6;
+  border: 1px solid #ddd6fe;
+}
+
+.notificationCardBody {
+  font-size: 12px;
+  color: #475569;
+  line-height: 1.4;
+}
+
+.notificationDetails {
+  border-top: 1px dashed #e2e8f4;
+  padding-top: 6px;
+}
+
+.notificationDetailTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+
+.notificationDetailTable th {
+  text-align: left;
+  padding: 4px 0;
+  color: #94a3b8;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  width: 40%;
+}
+
+.notificationDetailTable td {
+  text-align: left;
+  padding: 4px 0;
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.notificationPopup:not(.expanded) .notificationDetails {
+  display: none;
+}
+
+.notificationMarkBtn {
+  border: 1px solid #e2e8f4;
+  background: #ffffff;
+  color: #475569;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
+
+.notificationMarkBtn:hover {
+  border-color: var(--brand-border);
+  color: var(--brand-dark);
 }
 
 .notificationItem {

@@ -176,9 +176,12 @@
       <div class="notificationPopup hidden" id="notificationPopup" role="dialog" aria-label="Notifications">
         <div class="notificationPopupHeader">
           <span>Notifications</span>
-          <button class="notificationExpandBtn" type="button" id="notificationExpandBtn" aria-label="Expand notifications">
-            <i class="bi bi-arrows-angle-expand" aria-hidden="true"></i>
-          </button>
+          <div class="notificationHeaderActions">
+            <button class="notificationHeaderBtn" type="button" id="notificationReadAllBtn">Read all</button>
+            <button class="notificationExpandBtn" type="button" id="notificationExpandBtn" aria-label="Expand notifications">
+              <i class="bi bi-arrows-angle-expand" aria-hidden="true"></i>
+            </button>
+          </div>
         </div>
         <div class="notificationPopupList" id="notificationPopupList"></div>
       </div>
@@ -272,6 +275,19 @@
         <div class="submenu">
           <a class="submenu-link" href="${resolvePath("pages/PDCagent.html")}" data-module="pdc-agent">PDC Module - Agent</a>
           <a class="submenu-link" href="${resolvePath("pages/PDCOps.html")}" data-module="pdc-ops">PDC Module - Ops</a>
+        </div>
+      </li>
+      <li class="menu-item">
+        <a class="nav-link" href="#" data-toggle="submenu" aria-expanded="false">
+          <span class="link-content">
+            <i class="bi bi-clipboard-check" aria-hidden="true"></i>
+            <span>Commitment</span>
+          </span>
+          <i class="bi bi-chevron-down chevron" aria-hidden="true"></i>
+        </a>
+        <div class="submenu">
+          <a class="submenu-link" href="${resolvePath("pages/commitment.html")}" data-module="commitment-agent">Commitment - Agent</a>
+          <a class="submenu-link" href="${resolvePath("pages/CommitmentManager.html")}" data-module="commitment-manager">Commitment - Manager</a>
         </div>
       </li>
     </ul>
@@ -581,6 +597,9 @@
       const notificationPopup = document.getElementById("notificationPopup");
       const notificationList = document.getElementById("notificationPopupList");
       const notificationExpandBtn = document.getElementById("notificationExpandBtn");
+      const notificationReadAllBtn = document.getElementById("notificationReadAllBtn");
+      const commitmentSubmitKey = "ineburaCommitmentSubmissions";
+      const commitmentSeenKey = "ineburaCommitmentStatusSeen";
 
       const loadNotifications = () => {
         const stored = localStorage.getItem(notificationCenterKey);
@@ -593,11 +612,96 @@
         }
       };
 
+      const formatCurrency = (value) => {
+        const numeric = Number(value);
+        if (!Number.isFinite(numeric)) return "-";
+        return `Rs. ${numeric.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      };
+
+      const buildCommitmentDetails = (note) => {
+        const rows = [
+          ["Invoice No", note.invoiceNo],
+          ["Customer", note.customerName],
+          ["Week", note.week],
+          ["Committed Amount", formatCurrency(note.targetAmount)]
+        ];
+        const content = rows.filter(([, value]) => value && value !== "-");
+        if (!content.length) return "";
+        return `
+          <div class="notificationDetails">
+            <table class="notificationDetailTable">
+              <tbody>
+                ${content.map(([label, value]) => (
+                  `<tr>
+                    <th>${escapeHtml(label)}</th>
+                    <td>${escapeHtml(String(value))}</td>
+                  </tr>`
+                )).join("")}
+              </tbody>
+            </table>
+          </div>
+        `;
+      };
+
+      const updateCommitmentNotifications = () => {
+        const agentName = localStorage.getItem("activeUserName") || "";
+        if (!agentName) return;
+        let submissions = [];
+        try {
+          const raw = localStorage.getItem(commitmentSubmitKey);
+          submissions = raw ? JSON.parse(raw) : [];
+        } catch (err) {
+          submissions = [];
+        }
+        if (!Array.isArray(submissions) || submissions.length === 0) return;
+
+        const items = submissions.flatMap((submission) => submission.items || []);
+        const agentItems = items.filter((item) => (item.agentName || "") === agentName);
+        if (!agentItems.length) return;
+
+        let seen = {};
+        try {
+          const rawSeen = localStorage.getItem(commitmentSeenKey);
+          seen = rawSeen ? JSON.parse(rawSeen) : {};
+        } catch (err) {
+          seen = {};
+        }
+        if (!seen || typeof seen !== "object") seen = {};
+
+        const notifications = loadNotifications();
+        let changed = false;
+        agentItems.forEach((item) => {
+          const status = String(item.approvalStatus || "pending").toLowerCase();
+          if (status !== "approved" && status !== "rejected") return;
+          if (seen[item.invoiceNo] === status) return;
+          const statusLabel = status === "rejected" ? "rejected" : "approved";
+          notifications.unshift({
+            type: "commitment",
+            status,
+            title: status === "approved" ? "Commitment Approved" : "Commitment Rejected",
+            message: `${item.customerName || "Customer"} commitment ${statusLabel} for ${item.invoiceNo || "-"}.`,
+            invoiceNo: item.invoiceNo || "",
+            customerName: item.customerName || "",
+            week: item.week || "",
+            targetAmount: item.targetAmount || 0,
+            createdAt: new Date().toLocaleString(),
+            read: false
+          });
+          seen[item.invoiceNo] = status;
+          changed = true;
+        });
+        if (changed) {
+          localStorage.setItem(notificationCenterKey, JSON.stringify(notifications));
+          localStorage.setItem(commitmentSeenKey, JSON.stringify(seen));
+        }
+      };
+
       const updateNotificationBadge = () => {
         if (!notificationBellCount) return;
         const unreadCount = loadNotifications().filter(note => !note.read).length;
         notificationBellCount.textContent = String(unreadCount);
         notificationBellCount.classList.toggle("hidden", unreadCount === 0);
+        if (notificationReadAllBtn) notificationReadAllBtn.disabled = unreadCount === 0;
       };
 
       const renderNotificationPopup = () => {
@@ -607,15 +711,32 @@
           notificationList.innerHTML = "<div class=\"notificationEmpty\">No notifications yet.</div>";
           return;
         }
-        notificationList.innerHTML = notes.map((note) => (
-          `<div class=\"notificationCard\">
-            <div class=\"notificationCardHeader\">
-              <div class=\"notificationTitle\">${escapeHtml(note.title || "Update")}</div>
-              <div class=\"notificationTime\">${escapeHtml(note.createdAt || "-")}</div>
-            </div>
-            <div class=\"notificationCardBody\">${escapeHtml(note.message || "-")}</div>
-          </div>`
-        )).join("");
+        notificationList.innerHTML = notes.map((note, index) => {
+          const markButton = note.read
+            ? ""
+            : `<button class=\"notificationMarkBtn\" type=\"button\" data-note-index=\"${index}\">Mark as read</button>`;
+          const isCommitment = note.type === "commitment";
+          const status = String(note.status || "").toLowerCase();
+          const statusLabel = status === "rejected" ? "rejected" : "approved";
+          const commitmentMessage = `${note.customerName || "Customer"} commitment ${statusLabel} for ${note.invoiceNo || "-"}`;
+          const cardMessage = isCommitment ? commitmentMessage : (note.message || "-");
+          const pill = isCommitment ? `<span class=\"notificationTag tag-commitment\">Commitment</span>` : "";
+          const details = isCommitment ? buildCommitmentDetails(note) : "";
+          return (
+            `<div class=\"notificationCard${note.read ? " isRead" : ""}\">
+              <div class=\"notificationCardHeader\">
+                <div class=\"notificationTitle\">${escapeHtml(note.title || "Update")}</div>
+                <div class=\"notificationMetaRight\">
+                  ${pill}
+                  <div class=\"notificationTime\">${escapeHtml(note.createdAt || "-")}</div>
+                  ${markButton}
+                </div>
+              </div>
+              <div class=\"notificationCardBody\">${escapeHtml(cardMessage)}</div>
+              ${details}
+            </div>`
+          );
+        }).join("");
       };
 
       const toggleNotificationPopup = (forceOpen) => {
@@ -653,6 +774,33 @@
         });
       }
 
+      if (notificationReadAllBtn) {
+        notificationReadAllBtn.addEventListener("click", (event) => {
+          event.stopPropagation();
+          const notes = loadNotifications();
+          if (!notes.length) return;
+          const updated = notes.map((note) => ({ ...note, read: true }));
+          localStorage.setItem(notificationCenterKey, JSON.stringify(updated));
+          updateNotificationBadge();
+          renderNotificationPopup();
+        });
+      }
+
+      if (notificationList) {
+        notificationList.addEventListener("click", (event) => {
+          const markBtn = event.target.closest(".notificationMarkBtn");
+          if (!markBtn) return;
+          const index = Number(markBtn.getAttribute("data-note-index"));
+          if (!Number.isInteger(index)) return;
+          const notes = loadNotifications();
+          if (!notes[index] || notes[index].read) return;
+          notes[index].read = true;
+          localStorage.setItem(notificationCenterKey, JSON.stringify(notes));
+          updateNotificationBadge();
+          renderNotificationPopup();
+        });
+      }
+
       document.addEventListener("click", (event) => {
         if (!notificationPopup || notificationPopup.classList.contains("hidden")) return;
         const wrap = document.querySelector(".notificationBellWrap");
@@ -660,6 +808,7 @@
         toggleNotificationPopup(false);
       });
 
+      updateCommitmentNotifications();
       updateNotificationBadge();
     };
 
