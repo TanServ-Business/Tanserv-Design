@@ -407,7 +407,7 @@
         <div class="panelTitle">Quick Actions</div>
         <button class="actionBtn" type="button" id="visitReviewBtn">Open Visit Review</button>
         <button class="actionBtn" type="button" id="issueTrackerBtn">Issue Tracker</button>
-        <button class="actionBtn disabled" type="button">Commitment Review (Soon)</button>
+        <button class="actionBtn" type="button" id="commitmentReviewBtn">Commitment Review</button>
       </div>
 
       <div class="panelCard">
@@ -540,6 +540,7 @@
     const agentList = document.getElementById("agentList");
     const visitReviewBtn = document.getElementById("visitReviewBtn");
     const issueTrackerBtn = document.getElementById("issueTrackerBtn");
+    const commitmentReviewBtn = document.getElementById("commitmentReviewBtn");
     const clockEl = document.getElementById("managerClock");
 
     const formatAmount = (value) => `Rs.${value.toLocaleString("en-IN")}`;
@@ -754,6 +755,12 @@
     if (issueTrackerBtn) {
       issueTrackerBtn.addEventListener("click", () => {
         window.location.href = "../bin/IssueTracker/index.html";
+      });
+    }
+
+    if (commitmentReviewBtn) {
+      commitmentReviewBtn.addEventListener("click", () => {
+        window.location.href = "CommitmentManager.html";
       });
     }
 

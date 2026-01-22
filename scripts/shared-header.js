@@ -261,6 +261,7 @@
         <div class="submenu">
           <a class="submenu-link" href="${resolvePath("index.html")}" data-module="landing">Landing Page</a>
           <a class="submenu-link" href="${resolvePath("pages/LPmanager.html")}" data-module="landing-manager">Landing Page - Manager</a>
+          <a class="submenu-link" href="${resolvePath("pages/LPsupervisor.html")}" data-module="landing-supervisor">Landing Page - Supervisor</a>
           <a class="submenu-link" href="${resolvePath("pages/LPbackend.html")}" data-module="landing-backend">Landing Page - Backend</a>
         </div>
       </li>
@@ -583,6 +584,27 @@
             if (!menuItem) return;
             const isOpen = menuItem.classList.toggle("open");
             toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+            return;
+          }
+
+          const item = event.target.closest(".nav-link[data-module], .submenu-link[data-module]");
+          if (!item) return;
+          const moduleKey = item.getAttribute("data-module");
+          if (!moduleKey) return;
+          const destinations = {
+            visit: "pages/visitmodule.html",
+            "visit-review": "pages/visitmoduleReview.html",
+            landing: "index.html",
+            "landing-manager": "pages/LPmanager.html",
+            "landing-supervisor": "pages/LPsupervisor.html",
+            "landing-backend": "pages/LPbackend.html",
+            "pdc-agent": "pages/PDCagent.html",
+            "pdc-ops": "pages/PDCOps.html"
+          };
+          const target = destinations[moduleKey];
+          if (target) {
+            event.preventDefault();
+            window.location.href = resolvePath(target);
           }
         });
       }

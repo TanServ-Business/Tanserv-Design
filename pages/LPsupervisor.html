@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inebura Ops UI - Supervisor Landing</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../css/styles.css" />
+  <style>
+    .managerMain {
+      max-width: none;
+      margin: 0;
+      padding: 24px 28px 40px;
+      width: 100%;
+    }
+
+    .managerHeader {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .managerHeader h1 {
+      font-size: 22px;
+      margin: 0;
+      color: #111827;
+    }
+
+    .managerHeader p {
+      margin: 4px 0 0;
+      color: #64748b;
+      font-size: 13px;
+    }
+
+    .managerClock {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+      background: #ffffff;
+      border: 1px solid #e2e8f4;
+      border-radius: 12px;
+      padding: 8px 12px;
+      min-width: 160px;
+    }
+
+    .managerClock span {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #94a3b8;
+    }
+
+    .managerClock strong {
+      font-size: 16px;
+      color: #111827;
+    }
+
+    .managerLayout {
+      display: grid;
+      grid-template-columns: 320px minmax(0, 1fr);
+      gap: 16px;
+      align-items: start;
+    }
+
+    .managerLayout.todoOpen {
+      grid-template-columns: 320px minmax(0, 1fr) 320px;
+    }
+
+    .managerTodoPanel {
+      position: sticky;
+      top: 96px;
+      align-self: start;
+    }
+
+
+    .panelCard {
+      background: #ffffff;
+      border: 1px solid #e2e8f4;
+      border-radius: 16px;
+      padding: 14px;
+      box-shadow: 0 12px 24px rgba(15, 23, 42, 0.05);
+    }
+
+    .panelTitle {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #64748b;
+      margin-bottom: 10px;
+    }
+
+    .agentList {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .agentCardBtn {
+      border: 1px solid #e2e8f4;
+      border-radius: 12px;
+      padding: 10px 12px;
+      background: #f8fafc;
+      text-align: left;
+      cursor: pointer;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .agentCardBtn.active {
+      border-color: var(--brand);
+      box-shadow: 0 8px 16px rgba(92, 37, 141, 0.12);
+      background: #ffffff;
+    }
+
+    .agentCardBtn span {
+      display: block;
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    .agentCardBtn strong {
+      font-size: 14px;
+      color: #111827;
+    }
+
+    .summaryHeader {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .summaryHeader h2 {
+      margin: 0;
+      font-size: 18px;
+      color: #111827;
+    }
+
+    .summaryHeader p {
+      margin: 4px 0 0;
+      color: #64748b;
+      font-size: 12px;
+    }
+
+    .selectedAgentPill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--brand-light);
+      border: 1px solid var(--brand-border);
+      color: var(--brand-dark);
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+      margin: 0 0 12px;
+    }
+
+    .selectedAgentPill.hidden {
+      display: none;
+    }
+
+    .selectedAgentPill button {
+      border: none;
+      background: transparent;
+      color: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1;
+      padding: 0;
+      cursor: pointer;
+    }
+
+    .viewInvoiceBtn {
+      border: 1px solid var(--brand-border);
+      background: var(--brand);
+      color: #ffffff;
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-weight: 700;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .summaryCards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .globalCards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .globalCard {
+      border: 1px solid #e2e8f4;
+      border-radius: 12px;
+      padding: 12px 14px;
+      background: #f3f0ff;
+    }
+
+    .globalCard span {
+      display: block;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #6b7280;
+      margin-bottom: 6px;
+    }
+
+    .globalCard strong {
+      font-size: 17px;
+      color: #111827;
+    }
+
+    .summaryCard {
+      border: 1px solid #e2e8f4;
+      border-radius: 12px;
+      padding: 10px 12px;
+      background: #f8fafc;
+    }
+
+    .summaryCard span {
+      display: block;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #94a3b8;
+      margin-bottom: 6px;
+    }
+
+    .summaryCard strong {
+      font-size: 16px;
+      color: #111827;
+    }
+
+    .agentTable {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      table-layout: fixed;
+    }
+
+    .agentTable th,
+    .agentTable td {
+      padding: 10px 8px;
+      border-bottom: 1px dashed #e2e8f4;
+      text-align: center;
+    }
+
+    .agentTable th {
+      text-transform: uppercase;
+      font-size: 11px;
+      color: #64748b;
+      font-weight: 700;
+    }
+
+    .agentTable th:first-child,
+    .agentTable td:first-child {
+      text-align: left;
+    }
+
+    .agentTable tbody tr.active {
+      background: #f3f0ff;
+    }
+
+    .agentTable tbody tr {
+      cursor: pointer;
+    }
+
+    .agentTable tbody tr:hover {
+      background: #f8fafc;
+    }
+
+    .managerSidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .managerSidebar .customerSummary {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .managerSidebar .summaryStats {
+      justify-content: flex-start;
+      width: 100%;
+    }
+
+    .managerSidebar .stat {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .issueList {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .issueItem {
+      border: 1px solid #e2e8f4;
+      background: #f8fafc;
+      border-radius: 12px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 12px;
+      color: #111827;
+    }
+
+    .issueItem strong {
+      font-size: 13px;
+    }
+
+    .issueCount {
+      background: #fff7ed;
+      color: #c2410c;
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-weight: 700;
+      font-size: 11px;
+      border: 1px solid #fed7aa;
+    }
+
+    .actionBtn {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid #e2e8f4;
+      background: #ffffff;
+      font-weight: 700;
+      font-size: 12px;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .actionBtn.actionBtnSecondary {
+      text-align: center;
+      background: #ffffff;
+      border-color: var(--brand);
+      color: var(--brand-dark);
+    }
+
+    .actionBtn + .actionBtn {
+      margin-top: 8px;
+    }
+
+    .actionBtn.disabled {
+      background: #f8fafc;
+      color: #94a3b8;
+      cursor: default;
+    }
+
+    @media (max-width: 1200px) {
+      .managerLayout {
+        grid-template-columns: 1fr;
+      }
+
+      .managerLayout.todoOpen {
+        grid-template-columns: 1fr;
+      }
+
+      .managerTodoPanel {
+        position: static;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .managerLayout {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body data-root-path="../" data-relationship-name="Apollo" data-relationship-badge="AP" data-relationship-logo-src="assets/apollo-tyres-logo.svg">
+
+<div data-shared-header></div>
+
+<main class="managerMain">
+  <div class="managerHeader">
+    <div>
+      <h1>Supervisor Dashboard</h1>
+      <p>Monitor manager performance and drill into manager portfolios.</p>
+    </div>
+  </div>
+
+  <div class="globalCards" id="globalCards"></div>
+
+  <div class="managerLayout">
+    <aside class="managerSidebar">
+      <div class="panelCard actionPanel">
+        <div class="panelTitle">Quick Actions</div>
+        <button class="actionBtn" type="button" id="visitReviewBtn">Open Visit Review</button>
+        <button class="actionBtn" type="button" id="issueTrackerBtn">Issue Tracker</button>
+        <button class="actionBtn" type="button" id="commitmentReviewBtn">Commitment Review</button>
+      </div>
+
+      <div class="panelCard">
+        <div class="panelTitle">Issue Tracker</div>
+        <div class="issueList">
+          <div class="issueItem">
+            <span>Further Action Required</span>
+            <span class="issueCount">6</span>
+          </div>
+          <div class="issueItem">
+            <span>Material Delivery Issues</span>
+            <span class="issueCount">4</span>
+          </div>
+          <div class="issueItem">
+            <span>Further Document Required</span>
+            <span class="issueCount">3</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <section class="panelCard">
+      <div class="summaryHeader">
+        <div>
+          <h2>Manager Summary</h2>
+          <p id="selectedAgentLabel">Team summary (all managers).</p>
+        </div>
+      </div>
+      <div class="selectedAgentPill hidden" id="selectedAgentPill">
+        <span id="selectedAgentName">-</span>
+        <button type="button" id="selectedAgentClearBtn" aria-label="Clear manager filter">×</button>
+      </div>
+      <div class="summaryCards" id="summaryCards"></div>
+      <div class="panelTitle">Manager Portfolio</div>
+      <table class="agentTable">
+        <thead>
+          <tr>
+            <th>Manager</th>
+            <th>Total Portfolio</th>
+            <th>Target (MTD)</th>
+            <th>Achievement</th>
+            <th>Untouched Amount</th>
+            <th>Aging &gt;30 Days Amount</th>
+            <th>New Billing Amount</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="agentTableBody"></tbody>
+      </table>
+    </section>
+
+    <aside class="panelCard managerTodoPanel hidden" id="managerTodoPanel">
+      <div class="todoPanel">
+        <div class="todoHeader">
+          <div>
+            <h4>To do list</h4>
+            <p>Track tasks and follow-ups.</p>
+          </div>
+          <span class="todoCountPill" id="todoCountPill">0</span>
+        </div>
+
+        <div class="todoList" id="todoList"></div>
+
+        <button class="todoCompletedToggle" type="button" id="todoCompletedToggle">0 completed tasks</button>
+
+        <div class="todoComposer todoComposerSticky">
+          <div class="todoComposerRow">
+            <input type="text" id="todoInput" placeholder="Add a task..." />
+            <button class="todoGhostBtn" type="button" data-action="toggle-extras" aria-label="Task details">
+              <i class="bi bi-info-circle" aria-hidden="true"></i>
+            </button>
+            <button class="todoAddBtn" type="button" id="todoAddBtn">Add</button>
+          </div>
+          <div class="todoExtras hidden" id="todoExtras">
+            <div class="todoField">
+              <label for="todoDueDate">Due date</label>
+              <input type="date" id="todoDueDate" />
+            </div>
+            <div class="todoField">
+              <label for="todoDueTime">Due time</label>
+              <input type="time" id="todoDueTime" />
+            </div>
+            <div class="todoField">
+              <label for="todoInvoiceInput">Invoice</label>
+              <input type="text" id="todoInvoiceInput" placeholder="Invoice number (optional)" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+</main>
+
+  <script src="../scripts/shared-header.js"></script>
+<script>
+  (() => {
+    const agentData = [
+      { name: "Mukesh Mishra", portfolio: 26850000, target: 1250000, achievement: 910000, avgVisit: 10, ptpToday: 4, untouched: 18, aging30: 16, callbacks: 3, newBilling: 5 },
+      { name: "Neha Kapoor", portfolio: 24000000, target: 1120000, achievement: 840000, avgVisit: 9, ptpToday: 3, untouched: 22, aging30: 14, callbacks: 2, newBilling: 4 },
+      { name: "Riya Malhotra", portfolio: 22500000, target: 1060000, achievement: 780000, avgVisit: 8, ptpToday: 2, untouched: 20, aging30: 12, callbacks: 2, newBilling: 3 },
+      { name: "Anil Thomas", portfolio: 25750000, target: 1180000, achievement: 870000, avgVisit: 11, ptpToday: 5, untouched: 17, aging30: 15, callbacks: 4, newBilling: 6 },
+      { name: "Dev Patel", portfolio: 23200000, target: 1100000, achievement: 820000, avgVisit: 9, ptpToday: 3, untouched: 19, aging30: 13, callbacks: 3, newBilling: 4 }
+    ].map((agent) => ({
+      ...agent,
+      untouchedAmount: Math.round(agent.portfolio * 0.01 + agent.untouched * 45000),
+      aging30Amount: Math.round(agent.portfolio * 0.008 + agent.aging30 * 38000),
+      newBillingAmount: Math.round(agent.target * 0.1 + agent.newBilling * 120000)
+    }));
+
+    let activeAgent = null;
+
+    const globalCards = document.getElementById("globalCards");
+    const summaryCards = document.getElementById("summaryCards");
+    const managerCustomerName = document.getElementById("managerCustomerName");
+    const managerCustomerCode = document.getElementById("managerCustomerCode");
+    const managerCustomerCount = document.getElementById("managerCustomerCount");
+    const managerOpenInvoices = document.getElementById("managerOpenInvoices");
+    const managerIssueCount = document.getElementById("managerIssueCount");
+    const managerAmountForMonth = document.getElementById("managerAmountForMonth");
+    const managerMtdCollection = document.getElementById("managerMtdCollection");
+    const managerCnAdvPdc = document.getElementById("managerCnAdvPdc");
+    const managerTarget = document.getElementById("managerTarget");
+    const managerNetDue = document.getElementById("managerNetDue");
+    const selectedAgentLabel = document.getElementById("selectedAgentLabel");
+    const selectedAgentPill = document.getElementById("selectedAgentPill");
+    const selectedAgentName = document.getElementById("selectedAgentName");
+    const selectedAgentClearBtn = document.getElementById("selectedAgentClearBtn");
+    const agentTableBody = document.getElementById("agentTableBody");
+    const agentList = document.getElementById("agentList");
+    const visitReviewBtn = document.getElementById("visitReviewBtn");
+    const issueTrackerBtn = document.getElementById("issueTrackerBtn");
+    const commitmentReviewBtn = document.getElementById("commitmentReviewBtn");
+    const clockEl = document.getElementById("managerClock");
+
+    const formatAmount = (value) => `Rs.${value.toLocaleString("en-IN")}`;
+
+    const getTotals = () => agentData.reduce((total, agent) => ({
+      portfolio: total.portfolio + agent.portfolio,
+      target: total.target + agent.target,
+      achievement: total.achievement + agent.achievement,
+      avgVisit: total.avgVisit + agent.avgVisit,
+      ptpToday: total.ptpToday + agent.ptpToday,
+      untouched: total.untouched + agent.untouched,
+      aging30: total.aging30 + agent.aging30,
+      callbacks: total.callbacks + agent.callbacks,
+      newBilling: total.newBilling + agent.newBilling
+    }), {
+      portfolio: 0,
+      target: 0,
+      achievement: 0,
+      avgVisit: 0,
+      ptpToday: 0,
+      untouched: 0,
+      aging30: 0,
+      callbacks: 0,
+      newBilling: 0
+    });
+
+    const buildCustomerSummary = () => {
+      const byAgent = {};
+      agentData.forEach((agent, index) => {
+        const customers = 5 + index * 2;
+        const openInvoices = customers * 6;
+        const issueCount = 2 + index;
+        const amountForMonth = Math.round(agent.target * 1.3);
+        const mtdCollection = agent.achievement;
+        const cnAdvPdc = Math.round(agent.target * 0.08);
+        const netDue = Math.max(agent.portfolio - agent.achievement, 0);
+        byAgent[agent.name] = {
+          customers,
+          openInvoices,
+          issueCount,
+          amountForMonth,
+          mtdCollection,
+          cnAdvPdc,
+          netDue,
+          target: agent.target
+        };
+      });
+      const overall = Object.values(byAgent).reduce((acc, entry) => ({
+        customers: acc.customers + entry.customers,
+        openInvoices: acc.openInvoices + entry.openInvoices,
+        issueCount: acc.issueCount + entry.issueCount,
+        amountForMonth: acc.amountForMonth + entry.amountForMonth,
+        mtdCollection: acc.mtdCollection + entry.mtdCollection,
+        cnAdvPdc: acc.cnAdvPdc + entry.cnAdvPdc,
+        netDue: acc.netDue + entry.netDue,
+        target: acc.target + entry.target
+      }), {
+        customers: 0,
+        openInvoices: 0,
+        issueCount: 0,
+        amountForMonth: 0,
+        mtdCollection: 0,
+        cnAdvPdc: 0,
+        netDue: 0,
+        target: 0
+      });
+      return { overall, byAgent };
+    };
+
+    const customerSummary = buildCustomerSummary();
+
+    const renderCustomerSummary = (agentName) => {
+      const summary = agentName && customerSummary.byAgent[agentName]
+        ? customerSummary.byAgent[agentName]
+        : customerSummary.overall;
+      const label = agentName ? agentName : "All Customers";
+      if (managerCustomerName) managerCustomerName.textContent = label;
+      if (managerCustomerCode) managerCustomerCode.textContent = agentName ? "CUST" : "ALL";
+      if (managerCustomerCount) managerCustomerCount.textContent = summary.customers;
+      if (managerOpenInvoices) managerOpenInvoices.textContent = summary.openInvoices;
+      if (managerIssueCount) managerIssueCount.textContent = summary.issueCount;
+      if (managerAmountForMonth) managerAmountForMonth.textContent = formatAmount(summary.amountForMonth);
+      if (managerMtdCollection) managerMtdCollection.textContent = formatAmount(summary.mtdCollection);
+      if (managerCnAdvPdc) managerCnAdvPdc.textContent = formatAmount(summary.cnAdvPdc);
+      if (managerTarget) managerTarget.textContent = formatAmount(summary.target);
+      if (managerNetDue) managerNetDue.textContent = formatAmount(summary.netDue);
+    };
+
+    const renderGlobalCards = () => {
+      if (!globalCards) return;
+      const totals = getTotals();
+      const openIssues = 13;
+      const totalInvoices = 248;
+      globalCards.innerHTML = `
+        <div class="globalCard"><span>Total Portfolio</span><strong>${formatAmount(totals.portfolio)}</strong></div>
+        <div class="globalCard"><span>Total Target (MTD)</span><strong>${formatAmount(totals.target)}</strong></div>
+        <div class="globalCard"><span>Total Achievement</span><strong>${formatAmount(totals.achievement)}</strong></div>
+        <div class="globalCard"><span>Open Issues</span><strong>${openIssues}</strong></div>
+        <div class="globalCard"><span>Total Invoices</span><strong>${totalInvoices}</strong></div>
+      `;
+    };
+
+    const renderSummary = () => {
+      if (!summaryCards) return;
+      const totals = getTotals();
+      const summarySource = activeAgent || totals;
+      if (selectedAgentLabel) {
+        selectedAgentLabel.textContent = activeAgent
+          ? ""
+          : "Team summary (all managers).";
+      }
+      if (selectedAgentPill && selectedAgentName) {
+        if (activeAgent) {
+          selectedAgentName.textContent = activeAgent.name;
+          selectedAgentPill.classList.remove("hidden");
+        } else {
+          selectedAgentPill.classList.add("hidden");
+        }
+      }
+      summaryCards.innerHTML = `
+        <div class="summaryCard"><span>Avg Visits</span><strong>${summarySource.avgVisit}</strong></div>
+        <div class="summaryCard"><span>PTP Today</span><strong>${summarySource.ptpToday}</strong></div>
+        <div class="summaryCard"><span>Callbacks Today</span><strong>${summarySource.callbacks}</strong></div>
+        <div class="summaryCard"><span>Untouched Cases</span><strong>${summarySource.untouched}</strong></div>
+        <div class="summaryCard"><span>Aging &gt;30 days</span><strong>${summarySource.aging30}</strong></div>
+        <div class="summaryCard"><span>New Billing</span><strong>${summarySource.newBilling}</strong></div>
+      `;
+      renderAgentList();
+    };
+
+    const renderAgentList = () => {
+      if (!agentList) return;
+      agentList.innerHTML = agentData.map((agent) => `
+        <button class="agentCardBtn ${activeAgent && agent.name === activeAgent.name ? "active" : ""}" type="button" data-agent="${agent.name}">
+          <strong>${agent.name}</strong>
+          <span>Target ${formatAmount(agent.target)}</span>
+        </button>
+      `).join("");
+    };
+
+    const renderTable = () => {
+      if (!agentTableBody) return;
+      agentTableBody.innerHTML = agentData.map((agent) => `
+        <tr class="${activeAgent && agent.name === activeAgent.name ? "active" : ""}" data-agent="${agent.name}">
+          <td>${agent.name}</td>
+          <td>${formatAmount(agent.portfolio)}</td>
+          <td>${formatAmount(agent.target)}</td>
+          <td>${formatAmount(agent.achievement)}</td>
+          <td>${formatAmount(agent.untouchedAmount)}</td>
+          <td>${formatAmount(agent.aging30Amount)}</td>
+          <td>${formatAmount(agent.newBillingAmount)}</td>
+          <td><button class="actionBtn actionBtnSecondary" type="button" data-action="view-details" data-agent="${agent.name}">View Details</button></td>
+        </tr>
+      `).join("");
+    };
+
+    const setActiveAgent = (name) => {
+      const match = agentData.find(agent => agent.name === name);
+      if (!match) return;
+      activeAgent = match;
+      renderSummary();
+      renderTable();
+      renderCustomerSummary(name);
+      renderAgentList();
+    };
+
+    const clearActiveAgent = () => {
+      activeAgent = null;
+      renderSummary();
+      renderTable();
+      renderCustomerSummary();
+      renderAgentList();
+    };
+
+    if (agentTableBody) {
+      agentTableBody.addEventListener("click", (event) => {
+        const actionBtn = event.target.closest("button[data-action]");
+        if (actionBtn) {
+          const agentName = actionBtn.getAttribute("data-agent");
+          if (!agentName) return;
+          const name = encodeURIComponent(agentName);
+          window.location.href = "LPmanager.html";
+          return;
+        }
+        const row = event.target.closest("tr[data-agent]");
+        if (!row) return;
+        setActiveAgent(row.getAttribute("data-agent"));
+      });
+    }
+
+    if (agentList) {
+      agentList.addEventListener("click", (event) => {
+        const btn = event.target.closest(".agentCardBtn[data-agent]");
+        if (!btn) return;
+        setActiveAgent(btn.getAttribute("data-agent"));
+      });
+    }
+
+    if (selectedAgentClearBtn) {
+      selectedAgentClearBtn.addEventListener("click", () => {
+        clearActiveAgent();
+      });
+    }
+
+
+    if (visitReviewBtn) {
+      visitReviewBtn.addEventListener("click", () => {
+        window.location.href = "visitmoduleReview.html";
+      });
+    }
+
+    if (issueTrackerBtn) {
+      issueTrackerBtn.addEventListener("click", () => {
+        window.location.href = "../bin/IssueTracker/index.html";
+      });
+    }
+
+    if (commitmentReviewBtn) {
+      commitmentReviewBtn.addEventListener("click", () => {
+        window.location.href = "CommitmentManager.html";
+      });
+    }
+
+    const headerUserDirectory = {
+      agents: [
+        "Aditi Sharma",
+        "Manish Kumar",
+        "Palak Choudhary",
+        "Abhishek Sharma",
+        "Sakshi Sharma"
+      ],
+      managers: ["Mukesh Mishra"]
+    };
+
+    const updateUserMenuVisibility = (role) => {
+      const reviewItem = document.querySelector('[data-module="visit-review"]');
+      if (reviewItem) reviewItem.style.display = role === "agent" ? "none" : "";
+    };
+
+    const initUserSelect = () => {
+      const userSelect = document.getElementById("userSelect");
+      if (!userSelect) return;
+
+      userSelect.innerHTML = "";
+
+      const addGroup = (label, users) => {
+        const group = document.createElement("optgroup");
+        group.label = label;
+        users.forEach((name) => {
+          const option = document.createElement("option");
+          option.value = name;
+          option.textContent = name;
+          group.appendChild(option);
+        });
+        userSelect.appendChild(group);
+      };
+
+      addGroup("Agents", headerUserDirectory.agents);
+      addGroup("Managers", headerUserDirectory.managers);
+
+      const allUsers = [...headerUserDirectory.agents, ...headerUserDirectory.managers];
+      const storedName = localStorage.getItem("activeUserName");
+      const fallbackName = headerUserDirectory.managers[0];
+      const selectedName = allUsers.includes(storedName) ? storedName : fallbackName;
+
+      userSelect.value = selectedName;
+      const role = headerUserDirectory.managers.includes(selectedName) ? "manager" : "agent";
+      localStorage.setItem("activeUserName", selectedName);
+      localStorage.setItem("activeUserRole", role);
+      updateUserMenuVisibility(role);
+
+      userSelect.addEventListener("change", () => {
+        const name = userSelect.value;
+        const nextRole = headerUserDirectory.managers.includes(name) ? "manager" : "agent";
+        localStorage.setItem("activeUserName", name);
+        localStorage.setItem("activeUserRole", nextRole);
+        updateUserMenuVisibility(nextRole);
+      });
+    };
+
+    initUserSelect();
+
+    const todoHeaderBtn = document.getElementById("todoHeaderBtn");
+    const todoPanel = document.getElementById("managerTodoPanel");
+    const todoList = document.getElementById("todoList");
+    const todoAddBtn = document.getElementById("todoAddBtn");
+    const todoInput = document.getElementById("todoInput");
+    const todoDueDate = document.getElementById("todoDueDate");
+    const todoDueTime = document.getElementById("todoDueTime");
+    const todoInvoiceInput = document.getElementById("todoInvoiceInput");
+    const todoExtras = document.getElementById("todoExtras");
+    const todoCountPill = document.getElementById("todoCountPill");
+    const todoCompletedToggle = document.getElementById("todoCompletedToggle");
+    const managerLayout = document.querySelector(".managerLayout");
+
+    let todoTasks = [];
+    let todoTaskCounter = 0;
+    let todoShowCompleted = false;
+
+    const getCompletedTodoCount = () => todoTasks.filter(task => task.completed).length;
+
+    const updateTodoCompletedToggle = () => {
+      if (!todoCompletedToggle) return;
+      const count = getCompletedTodoCount();
+      todoCompletedToggle.textContent = count === 1 ? "1 completed task" : `${count} completed tasks`;
+      todoCompletedToggle.classList.toggle("is-open", todoShowCompleted);
+    };
+
+    const updateTodoBadge = () => {
+      const count = todoTasks.filter(task => !task.completed).length;
+      if (todoCountPill) todoCountPill.textContent = String(count);
+      updateTodoCompletedToggle();
+    };
+
+    const renderTodoList = () => {
+      if (!todoList) return;
+      if (todoTasks.length === 0) {
+        todoList.innerHTML = `<div class="todoEmpty">No tasks yet.</div>`;
+        return;
+      }
+      const buildTaskRow = (task) => {
+        const dueLine = task.dueDate || task.dueTime
+          ? `Due ${task.dueDate || "-"} ${task.dueTime || ""}`.trim()
+          : "No due time";
+        const invoiceLine = task.invoiceNo
+          ? `<span class="todoInvoiceLink"><i class="bi bi-link-45deg" aria-hidden="true"></i>${task.invoiceNo}</span>`
+          : "Invoice: -";
+        const isComplete = Boolean(task.completed);
+        const checkedAttr = isComplete ? "checked" : "";
+        const itemClass = isComplete ? "todoItem is-complete" : "todoItem";
+        const label = isComplete ? "Mark task pending" : "Mark task done";
+        return `
+          <div class="${itemClass}" data-task-id="${task.id}">
+            <input class="todoCheck" type="checkbox" data-action="complete" aria-label="${label}" ${checkedAttr} />
+            <div>
+              <div class="todoTitle">${task.text}</div>
+              <div class="todoMeta">${dueLine}</div>
+              <div class="todoMeta">${invoiceLine}</div>
+            </div>
+            <div class="todoActions"></div>
+          </div>
+        `;
+      };
+
+      const pendingTasks = todoTasks.filter(task => !task.completed);
+      const completedTasks = todoTasks.filter(task => task.completed);
+
+      const renderSection = (title, tasks, emptyText) => {
+        const body = tasks.length
+          ? tasks.map(buildTaskRow).join("")
+          : `<div class="todoEmpty">${emptyText}</div>`;
+        return `
+          <div class="todoSection">
+            <div class="todoSectionHeader">${title}</div>
+            <div class="todoSectionList">${body}</div>
+          </div>
+        `;
+      };
+
+      todoList.innerHTML = `
+        ${renderSection("Pending", pendingTasks, "No pending tasks.")}
+        ${todoShowCompleted ? renderSection("Completed", completedTasks, "No completed tasks yet.") : ""}
+      `;
+    };
+    const addTodoTask = ({ text, dueDate, dueTime, invoiceNo }) => {
+      if (!text) return;
+      todoTaskCounter += 1;
+      todoTasks.unshift({
+        id: `task-${todoTaskCounter}`,
+        text,
+        dueDate: dueDate || "",
+        dueTime: dueTime || "",
+        invoiceNo: invoiceNo || "",
+        completed: false,
+        completedAt: ""
+      });
+      renderTodoList();
+      updateTodoBadge();
+    };
+
+    if (todoHeaderBtn && todoPanel && managerLayout) {
+      todoHeaderBtn.addEventListener("click", () => {
+        const isHidden = todoPanel.classList.contains("hidden");
+        todoPanel.classList.toggle("hidden", !isHidden);
+        managerLayout.classList.toggle("todoOpen", isHidden);
+      });
+    }
+
+    const showExtras = (focusId) => {
+      if (!todoExtras) return;
+      if (todoExtras.classList.contains("hidden")) {
+        todoExtras.classList.remove("hidden");
+      }
+      if (focusId) {
+        const el = document.getElementById(focusId);
+        if (el) el.focus();
+      }
+    };
+
+    if (todoPanel) {
+      todoPanel.addEventListener("click", (event) => {
+        const btn = event.target.closest("button[data-action]");
+        if (!btn) return;
+        const action = btn.getAttribute("data-action");
+        if (action === "toggle-extras") {
+          if (!todoExtras) return;
+          const willShow = todoExtras.classList.contains("hidden");
+          todoExtras.classList.toggle("hidden", !willShow);
+          if (willShow) {
+            const el = document.getElementById("todoDueDate");
+            if (el) el.focus();
+          }
+        }
+      });
+    }
+
+    if (todoCompletedToggle) {
+      todoCompletedToggle.addEventListener("click", () => {
+        todoShowCompleted = !todoShowCompleted;
+        renderTodoList();
+        updateTodoCompletedToggle();
+      });
+    }
+
+    if (todoAddBtn) {
+      todoAddBtn.addEventListener("click", () => {
+        const text = todoInput ? todoInput.value.trim() : "";
+        if (!text) return;
+        addTodoTask({
+          text,
+          dueDate: todoDueDate ? todoDueDate.value : "",
+          dueTime: todoDueTime ? todoDueTime.value : "",
+          invoiceNo: todoInvoiceInput ? todoInvoiceInput.value.trim() : ""
+        });
+        if (todoInput) todoInput.value = "";
+        if (todoDueDate) todoDueDate.value = "";
+        if (todoDueTime) todoDueTime.value = "";
+        if (todoInvoiceInput) todoInvoiceInput.value = "";
+      });
+    }
+
+    if (todoList) {
+      todoList.addEventListener("change", (event) => {
+        const chk = event.target.closest("input[data-action='complete']");
+        if (!chk) return;
+        const item = event.target.closest(".todoItem");
+        const taskId = item ? item.getAttribute("data-task-id") : "";
+        if (!taskId) return;
+        const task = todoTasks.find(entry => entry.id === taskId);
+        if (task) {
+          task.completed = chk.checked;
+          task.completedAt = task.completed ? new Date().toISOString() : "";
+        }
+        renderTodoList();
+        updateTodoBadge();
+      });
+    }
+    renderTodoList();
+    updateTodoBadge();
+
+    const updateClock = () => {
+      if (!clockEl) return;
+      const now = new Date();
+      let hours = now.getHours();
+      const minutes = String(now.getMinutes()).padStart(2, "0");
+      const seconds = String(now.getSeconds()).padStart(2, "0");
+      const period = hours >= 12 ? "PM" : "AM";
+      hours = hours % 12 || 12;
+      clockEl.textContent = `${hours}:${minutes}:${seconds} ${period}`;
+    };
+
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    renderGlobalCards();
+    renderSummary();
+    renderTable();
+    renderCustomerSummary();
+
+  })();
+</script>
+</body>
+</html>
+
+
+
