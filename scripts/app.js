@@ -2025,18 +2025,70 @@ function updateUnreadEmailToggleCount() {
   countEl.textContent = String(total);
 }
 
+function parseInvoiceDateValue(value) {
+  if (!value) return null;
+  if (value instanceof Date) return value;
+  const raw = String(value).trim();
+  if (!raw) return null;
+  const parsed = Date.parse(raw);
+  if (!Number.isNaN(parsed)) return new Date(parsed);
+
+  const parts = raw.split(/\s+/);
+  if (parts.length !== 3) return null;
+  const day = Number(parts[0]);
+  const monthKey = parts[1].slice(0, 3).toLowerCase();
+  const year = Number(parts[2]);
+  const monthMap = {
+    jan: 0,
+    feb: 1,
+    mar: 2,
+    apr: 3,
+    may: 4,
+    jun: 5,
+    jul: 6,
+    aug: 7,
+    sep: 8,
+    sept: 8,
+    oct: 9,
+    nov: 10,
+    dec: 11
+  };
+  const month = monthMap[monthKey];
+  if (!Number.isFinite(day) || month == null || !Number.isFinite(year)) return null;
+  return new Date(year, month, day);
+}
+
 function getBaseFilteredInvoices() {
   filterState.unreadOnly = isUnreadFilterActive();
 
   const fInvStatus = filterState.invoiceStatus;
   const fPrimary = filterState.primaryStatus;
   const fStatus = filterState.status;
+  const fNetDue = filterState.netDue;
   const fUnreadOnly = filterState.unreadOnly;
+
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
 
   return (currentInvoicesAll || []).filter(inv => {
     if (fInvStatus !== "__ALL__" && String(inv.invoiceStatus) !== fInvStatus) return false;
     if (fPrimary !== "__ALL__" && String(inv.primaryStatus) !== fPrimary) return false;
     if (fStatus !== "__ALL__" && String(inv.status) !== fStatus) return false;
+    if (fNetDue !== "__ALL__") {
+      const dueDate = parseInvoiceDateValue(inv.dueDate);
+      if (!dueDate) return false;
+      const due = new Date(dueDate.getFullYear(), dueDate.getMonth(), dueDate.getDate());
+
+      if (fNetDue === "Not Due" && due <= today) return false;
+      if (fNetDue === "Due this month") {
+        if (due.getFullYear() !== today.getFullYear() || due.getMonth() !== today.getMonth()) return false;
+      }
+      if (fNetDue === "Due next month") {
+        if (due.getFullYear() !== nextMonth.getFullYear() || due.getMonth() !== nextMonth.getMonth()) return false;
+      }
+      if (fNetDue === "All due invoices" && due > today) return false;
+    }
     if (fUnreadOnly && Number(inv.unreadEmailCount || 0) <= 0) return false;
     return true;
   });
@@ -2367,17 +2419,19 @@ function setDocSelected(customerId, docKey, selected) {
 }
 
 function renderDocsInvoiceSelect(customer) {
-  const select = document.getElementById("docsInvoiceSelect");
-  if (!select || !customer) return;
+  const btn = document.getElementById("docsFilterBtn");
+  const menu = document.getElementById("docsFilterMenu");
+  if (!btn || !menu || !customer) return;
 
   const current = currentDocsScope || "customer";
+  const valueLabel = current === "invoice" ? "Invoice level" : "Customer level";
+  const badge = btn.querySelector("[data-role='filter-value']");
+  if (badge) badge.textContent = valueLabel;
 
-  select.innerHTML = `
-    <option value="customer">Customer level documents</option>
-    <option value="invoice">Invoice level documents</option>
-  `;
-
-  select.value = current;
+  menu.querySelectorAll("[data-value]").forEach((item) => {
+    const itemValue = item.getAttribute("data-value") || "";
+    item.classList.toggle("active", itemValue === current);
+  });
 }
 
 function renderDocsPicker(customer) {
@@ -2461,13 +2515,15 @@ const filterState = {
   invoiceStatus: "__ALL__",
   primaryStatus: "__ALL__",
   status: "__ALL__",
+  netDue: "__ALL__",
   unreadOnly: false
 };
 
 const filterOptions = {
   invoiceStatus: [],
   primaryStatus: [],
-  status: []
+  status: [],
+  netDue: []
 };
 
 const filterConfig = {
@@ -2485,8 +2541,20 @@ const filterConfig = {
     label: "Status",
     buttonId: "filterStatusBtn",
     menuId: "filterStatusMenu"
+  },
+  netDue: {
+    label: "Net Due",
+    buttonId: "filterNetDueBtn",
+    menuId: "filterNetDueMenu"
   }
 };
+
+const netDueFilterOptions = [
+  "Not Due",
+  "Due this month",
+  "Due next month",
+  "All due invoices"
+];
 
 const customerSortMap = {
   totalInvoice: (a, b) => Number(a.totalInvoiceAmount || 0) - Number(b.totalInvoiceAmount || 0),
@@ -2683,18 +2751,22 @@ function populateFilters(invoices) {
   filterOptions.invoiceStatus = invoiceStatuses;
   filterOptions.primaryStatus = primaryStatuses;
   filterOptions.status = statuses;
+  filterOptions.netDue = netDueFilterOptions;
 
   if (!invoiceStatuses.includes(filterState.invoiceStatus)) filterState.invoiceStatus = "__ALL__";
   if (!primaryStatuses.includes(filterState.primaryStatus)) filterState.primaryStatus = "__ALL__";
   if (!statuses.includes(filterState.status)) filterState.status = "__ALL__";
+  if (!netDueFilterOptions.includes(filterState.netDue)) filterState.netDue = "__ALL__";
 
   renderFilterMenu("invoiceStatus");
   renderFilterMenu("primaryStatus");
   renderFilterMenu("status");
+  renderFilterMenu("netDue");
 
   updateFilterButton("invoiceStatus");
   updateFilterButton("primaryStatus");
   updateFilterButton("status");
+  updateFilterButton("netDue");
 }
 
 // ===============================
@@ -3011,6 +3083,7 @@ function selectCustomer(customerId) {
     filterState.invoiceStatus = "__ALL__";
     filterState.primaryStatus = "__ALL__";
     filterState.status = "__ALL__";
+    filterState.netDue = "__ALL__";
     populateFilters(currentInvoicesAll);
 
     renderCustomerDetails(selected);
@@ -3097,6 +3170,7 @@ function wireFilterEvents() {
       filterState.invoiceStatus = "__ALL__";
       filterState.primaryStatus = "__ALL__";
       filterState.status = "__ALL__";
+      filterState.netDue = "__ALL__";
       currentPage = 1;
 
       setUnreadFilterActive(false);
@@ -3104,9 +3178,11 @@ function wireFilterEvents() {
       updateFilterButton("invoiceStatus");
       updateFilterButton("primaryStatus");
       updateFilterButton("status");
+      updateFilterButton("netDue");
       updateMenuActive("invoiceStatus");
       updateMenuActive("primaryStatus");
       updateMenuActive("status");
+      updateMenuActive("netDue");
 
       closeFloatingMenu();
       applyFiltersAndRender();
@@ -4361,13 +4437,16 @@ function wireDispositionActivityEvents() {
 }
 
 function wireDocsEvents() {
-  const select = document.getElementById("docsInvoiceSelect");
+  const menu = document.getElementById("docsFilterMenu");
   const clipBtn = document.getElementById("docsClipBtn");
   const picker = document.getElementById("docsPicker");
 
-  if (select) {
-    select.addEventListener("change", () => {
-      currentDocsScope = select.value === "invoice" ? "invoice" : "customer";
+  if (menu) {
+    menu.addEventListener("click", (e) => {
+      const item = e.target.closest("[data-value]");
+      if (!item) return;
+      currentDocsScope = item.getAttribute("data-value") === "invoice" ? "invoice" : "customer";
+      renderDocsInvoiceSelect(customersData.find(c => c.id === selectedCustomerId));
       const customer = customersData.find(c => c.id === selectedCustomerId);
       if (customer) renderDocsList(customer);
     });

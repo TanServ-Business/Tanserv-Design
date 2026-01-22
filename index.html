@@ -512,19 +512,18 @@
     <div class="tableCard">
 
       <div class="tableCardHeader">
-        <div class="filtersRow d-flex flex-wrap gap-2 align-items-center">
+        <div class="filtersRow d-flex flex-wrap align-items-center">
           <div class="btn-group">
             <button
               id="filterInvoiceStatusBtn"
               type="button"
-              class="btn btn-primary btn-sm dropdown-toggle"
+              class="filterBtn dropdown-toggle"
               data-bs-toggle="dropdown"
               aria-expanded="false"
               title="Filter - Invoice Status"
             >
-              <i class="bi bi-funnel-fill me-1" aria-hidden="true"></i>
               Invoice Status
-              <span class="ms-1 badge bg-light text-dark" data-role="filter-value">All</span>
+              <span class="filterBadge" data-role="filter-value">All</span>
             </button>
             <ul class="dropdown-menu" id="filterInvoiceStatusMenu" data-filter="invoiceStatus"></ul>
           </div>
@@ -533,14 +532,13 @@
             <button
               id="filterPrimaryStatusBtn"
               type="button"
-              class="btn btn-success btn-sm dropdown-toggle"
+              class="filterBtn dropdown-toggle"
               data-bs-toggle="dropdown"
               aria-expanded="false"
               title="Filter - Primary Status"
             >
-              <i class="bi bi-funnel-fill me-1" aria-hidden="true"></i>
               Primary Status
-              <span class="ms-1 badge bg-light text-dark" data-role="filter-value">All</span>
+              <span class="filterBadge" data-role="filter-value">All</span>
             </button>
             <ul class="dropdown-menu" id="filterPrimaryStatusMenu" data-filter="primaryStatus"></ul>
           </div>
@@ -549,16 +547,30 @@
             <button
               id="filterStatusBtn"
               type="button"
-              class="btn btn-outline-danger btn-sm dropdown-toggle"
+              class="filterBtn dropdown-toggle"
               data-bs-toggle="dropdown"
               aria-expanded="false"
               title="Filter - Status"
             >
-              <i class="bi bi-funnel-fill me-1" aria-hidden="true"></i>
               Status
-              <span class="ms-1 badge bg-light text-dark" data-role="filter-value">All</span>
+              <span class="filterBadge" data-role="filter-value">All</span>
             </button>
             <ul class="dropdown-menu" id="filterStatusMenu" data-filter="status"></ul>
+          </div>
+
+          <div class="btn-group">
+            <button
+              id="filterNetDueBtn"
+              type="button"
+              class="filterBtn dropdown-toggle"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+              title="Filter - Net Due"
+            >
+              Net Due
+              <span class="filterBadge" data-role="filter-value">All</span>
+            </button>
+            <ul class="dropdown-menu" id="filterNetDueMenu" data-filter="netDue"></ul>
           </div>
 
           <button class="notifyToggle ms-auto" type="button" id="filterUnreadEmail" aria-pressed="false">
@@ -569,7 +581,7 @@
             <span class="notifyCount" id="unreadEmailCount">0</span>
           </button>
 
-          <button class="btn btn-outline-secondary btn-sm" type="button" id="filterClearBtn">
+          <button class="filterBtn filterBtnClear" type="button" id="filterClearBtn">
             Clear filters
           </button>
         </div>
@@ -1415,16 +1427,35 @@
       </div>
 
       <div class="tabPanel" data-tab="docs">
-        <h4>DOCUMENTS</h4>
+        <div class="docsHeader">
+          <h4>DOCUMENTS</h4>
+          <button class="docsClipBtn" type="button" id="docsClipBtn" aria-label="All documents">
+            <i class="bi bi-paperclip" aria-hidden="true"></i>
+          </button>
+        </div>
         <div class="infoCard">
-          <div class="docsHeader">
-            <button class="docsClipBtn" type="button" id="docsClipBtn" aria-label="All documents">
-              <i class="bi bi-paperclip" aria-hidden="true"></i>
-            </button>
-          </div>
           <div class="docsFilterRow">
-            <label class="docsFilterLabel" for="docsInvoiceSelect">Document Type</label>
-            <select id="docsInvoiceSelect" class="form-select form-select-sm"></select>
+            <div class="btn-group">
+              <button
+                id="docsFilterBtn"
+                type="button"
+                class="filterBtn dropdown-toggle"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+                title="Document filter"
+              >
+                Document filter
+                <span class="filterBadge" data-role="filter-value">Customer level</span>
+              </button>
+              <ul class="dropdown-menu" id="docsFilterMenu">
+                <li>
+                  <button class="dropdown-item" type="button" data-value="customer">Customer level documents</button>
+                </li>
+                <li>
+                  <button class="dropdown-item" type="button" data-value="invoice">Invoice level documents</button>
+                </li>
+              </ul>
+            </div>
           </div>
           <div id="docsPicker" class="docsPicker hidden">
             <div class="docsPickerHeader">All documents</div>

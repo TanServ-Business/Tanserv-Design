@@ -2295,6 +2295,89 @@ button.notifyBadge {
   border-top-right-radius: 14px;
 }
 
+.filtersRow {
+  gap: 10px;
+}
+
+.filtersRow .filterBtn,
+.docsFilterRow .filterBtn {
+  border: 1px solid #e2e8f4;
+  background: #ffffff;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #111827;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.filtersRow .dropdown-toggle.filterBtn::after,
+.docsFilterRow .dropdown-toggle.filterBtn::after {
+  margin-left: 8px;
+  border-top-color: #94a3b8;
+}
+
+.filtersRow .filterBtn:hover,
+.filtersRow .filterBtn:focus,
+.filtersRow .filterBtn:focus-visible,
+.filtersRow .filterBtn.show,
+.docsFilterRow .filterBtn:hover,
+.docsFilterRow .filterBtn:focus,
+.docsFilterRow .filterBtn:focus-visible,
+.docsFilterRow .filterBtn.show {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 2px rgba(var(--brand-rgb), 0.14);
+}
+
+.filtersRow .filterBadge,
+.docsFilterRow .filterBadge {
+  background: #f1f5f9;
+  border: 1px solid #e2e8f4;
+  color: #334155;
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.filtersRow .dropdown-menu,
+.docsFilterRow .dropdown-menu {
+  border: 1px solid #e2e8f4;
+  border-radius: 12px;
+  padding: 6px;
+  box-shadow: 0 16px 32px rgba(15, 23, 42, 0.12);
+}
+
+.filtersRow .dropdown-item,
+.docsFilterRow .dropdown-item {
+  border-radius: 8px;
+  font-size: 12px;
+  padding: 8px 10px;
+  color: #111827;
+}
+
+.filtersRow .dropdown-item:hover,
+.filtersRow .dropdown-item:focus,
+.docsFilterRow .dropdown-item:hover,
+.docsFilterRow .dropdown-item:focus {
+  background: #f8fafc;
+  color: #111827;
+}
+
+.filtersRow .dropdown-item.active,
+.filtersRow .dropdown-item:active,
+.docsFilterRow .dropdown-item.active,
+.docsFilterRow .dropdown-item:active {
+  background: #f1f5f9;
+  color: #111827;
+}
+
 .notifyToggle {
   display: inline-flex;
   align-items: center;
@@ -3645,6 +3728,11 @@ textarea { min-height: 70px; resize: vertical; }
   align-items: center;
   justify-content: space-between;
   gap: 10px;
+  margin-bottom: 8px;
+}
+
+.docsHeader h4 {
+  margin: 0;
 }
 
 .docsClipBtn {
