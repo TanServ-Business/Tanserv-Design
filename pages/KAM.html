@@ -1,0 +1,1635 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inebura Ops UI - KAM Landing</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../css/styles.css" />
+  <style>
+    .managerMain {
+      max-width: none;
+      margin: 0;
+      padding: 24px 28px 40px;
+      width: 100%;
+    }
+
+    .managerHeader {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .managerHeader h1 {
+      font-size: 22px;
+      margin: 0;
+      color: #111827;
+    }
+
+    .managerHeader p {
+      margin: 4px 0 0;
+      color: #64748b;
+      font-size: 13px;
+    }
+
+    .managerClock {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+      background: #ffffff;
+      border: 1px solid #e2e8f4;
+      border-radius: 12px;
+      padding: 8px 12px;
+      min-width: 160px;
+    }
+
+    .managerClock span {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #94a3b8;
+    }
+
+    .managerClock strong {
+      font-size: 16px;
+      color: #111827;
+    }
+
+    .managerLayout {
+      display: grid;
+      grid-template-columns: 320px minmax(0, 1fr);
+      gap: 16px;
+      align-items: start;
+    }
+
+    .managerLayout.todoOpen {
+      grid-template-columns: 320px minmax(0, 1fr) 320px;
+    }
+
+    .managerTodoPanel {
+      position: sticky;
+      top: 96px;
+      align-self: start;
+    }
+
+
+    .panelCard {
+      background: #ffffff;
+      border: 1px solid #e2e8f4;
+      border-radius: 16px;
+      padding: 14px;
+      box-shadow: 0 12px 24px rgba(15, 23, 42, 0.05);
+    }
+
+    .panelTitle {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #64748b;
+      margin-bottom: 10px;
+    }
+
+
+    .agentList {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .agentCardBtn {
+      border: 1px solid #e2e8f4;
+      border-radius: 12px;
+      padding: 10px 12px;
+      background: #f8fafc;
+      text-align: left;
+      cursor: pointer;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .agentCardBtn.active {
+      border-color: var(--brand);
+      box-shadow: 0 8px 16px rgba(92, 37, 141, 0.12);
+      background: #ffffff;
+    }
+
+    .agentCardBtn span {
+      display: block;
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    .agentCardBtn strong {
+      font-size: 14px;
+      color: #111827;
+    }
+
+    .summaryHeader {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .summaryHeader h2 {
+      margin: 0;
+      font-size: 18px;
+      color: #111827;
+    }
+
+    .summaryHeader p {
+      margin: 4px 0 0;
+      color: #64748b;
+      font-size: 12px;
+    }
+
+    .summarySearch {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f4;
+      border-radius: 999px;
+      padding: 6px 12px;
+      min-width: 220px;
+    }
+
+    .summarySearch i {
+      color: #94a3b8;
+      font-size: 12px;
+    }
+
+    .summarySearchInput {
+      border: none;
+      background: transparent;
+      font-size: 12px;
+      color: #111827;
+      width: 100%;
+    }
+
+    .summarySearchInput:focus {
+      outline: none;
+      box-shadow: none;
+    }
+
+    .summaryFilters {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    @media (max-width: 900px) {
+      .summaryFilters {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .summarySearch {
+        width: 100%;
+      }
+
+      .summaryFilters .btn-group {
+        width: 100%;
+      }
+    }
+
+    .selectedAgentPill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--brand-light);
+      border: 1px solid var(--brand-border);
+      color: var(--brand-dark);
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+      margin: 0 0 12px;
+    }
+
+    .selectedAgentPill.hidden {
+      display: none;
+    }
+
+    .selectedAgentPill button {
+      border: none;
+      background: transparent;
+      color: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1;
+      padding: 0;
+      cursor: pointer;
+    }
+
+    .viewInvoiceBtn {
+      border: 1px solid var(--brand-border);
+      background: var(--brand);
+      color: #ffffff;
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-weight: 700;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .summaryCards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .globalCards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .globalCard {
+      border: 1px solid #e2e8f4;
+      border-radius: 12px;
+      padding: 12px 14px;
+      background: #f3f0ff;
+    }
+
+    .globalCard span {
+      display: block;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #6b7280;
+      margin-bottom: 6px;
+    }
+
+    .globalCard strong {
+      font-size: 17px;
+      color: #111827;
+    }
+
+    .summaryCard {
+      border: 1px solid #e2e8f4;
+      border-radius: 12px;
+      padding: 10px 12px;
+      background: #f8fafc;
+    }
+
+    .summaryCard span {
+      display: block;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #94a3b8;
+      margin-bottom: 6px;
+    }
+
+    .summaryCard strong {
+      font-size: 16px;
+      color: #111827;
+    }
+
+    .agentTable {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      table-layout: fixed;
+    }
+
+    .agentTable th,
+    .agentTable td {
+      padding: 10px 8px;
+      border-bottom: 1px dashed #e2e8f4;
+      text-align: center;
+    }
+
+    .agentTable th {
+      text-transform: uppercase;
+      font-size: 11px;
+      color: #64748b;
+      font-weight: 700;
+    }
+
+    .agentTable th:first-child,
+    .agentTable td:first-child {
+      text-align: left;
+    }
+
+    .agentTable tbody tr.active {
+      background: #f3f0ff;
+    }
+
+    .agentTable tbody tr {
+      cursor: pointer;
+    }
+
+    .agentTable tbody tr:hover {
+      background: #f8fafc;
+    }
+
+    .agentSubRow {
+      background: #eef2ff;
+    }
+
+    .agentSubRow.active {
+      background: #dbeafe;
+    }
+
+    .agentSubRow td:first-child {
+      padding-left: 18px;
+    }
+
+    .agentSubRow td:first-child::before {
+      content: "- ";
+      color: #94a3b8;
+      font-weight: 700;
+    }
+
+    .emptyState {
+      font-size: 12px;
+      color: #94a3b8;
+      padding: 8px 6px;
+    }
+
+    .managerSidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .managerSidebar .customerSummary {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .managerSidebar .summaryStats {
+      justify-content: flex-start;
+      width: 100%;
+    }
+
+    .managerSidebar .stat {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .issueList {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .issueItem {
+      border: 1px solid #e2e8f4;
+      background: #f8fafc;
+      border-radius: 12px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 12px;
+      color: #111827;
+    }
+
+    .issueItem strong {
+      font-size: 13px;
+    }
+
+    .issueCount {
+      background: #fff7ed;
+      color: #c2410c;
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-weight: 700;
+      font-size: 11px;
+      border: 1px solid #fed7aa;
+    }
+
+    .actionBtn {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid #e2e8f4;
+      background: #ffffff;
+      font-weight: 700;
+      font-size: 12px;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .actionBtn.actionBtnSecondary {
+      text-align: center;
+      background: #ffffff;
+      border-color: var(--brand);
+      color: var(--brand-dark);
+    }
+
+    .actionBtn + .actionBtn {
+      margin-top: 8px;
+    }
+
+    .actionBtn.disabled {
+      background: #f8fafc;
+      color: #94a3b8;
+      cursor: default;
+    }
+
+    @media (max-width: 1200px) {
+      .managerLayout {
+        grid-template-columns: 1fr;
+      }
+
+      .managerLayout.todoOpen {
+        grid-template-columns: 1fr;
+      }
+
+      .managerTodoPanel {
+        position: static;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .managerLayout {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body data-root-path="../" data-relationship-name="Apollo" data-relationship-badge="AP" data-relationship-logo-src="assets/apollo-tyres-logo.svg">
+
+<div data-shared-header></div>
+
+<main class="managerMain">
+  <div class="managerHeader">
+    <div>
+      <h1>KAM Dashboard</h1>
+      <p>Client-side key account view aligned with internal managers.</p>
+    </div>
+  </div>
+
+  <div class="globalCards" id="globalCards"></div>
+
+  <div class="managerLayout">
+    <aside class="managerSidebar">
+      <div class="panelCard actionPanel">
+        <div class="panelTitle">Quick Actions</div>
+        <button class="actionBtn" type="button" id="issueTrackerBtn">Issue Tracker</button>
+        <button class="actionBtn" type="button" id="approvalDashboardBtn">Approvals</button>
+        <button class="actionBtn" type="button" id="visitsBtn">Visits</button>
+      </div>
+
+      <div class="panelCard">
+        <div class="panelTitle">Issue Tracker</div>
+        <div class="issueList">
+          <div class="issueItem">
+            <span>Further Action Required</span>
+            <span class="issueCount">6</span>
+          </div>
+          <div class="issueItem">
+            <span>Material Delivery Issues</span>
+            <span class="issueCount">4</span>
+          </div>
+          <div class="issueItem">
+            <span>Further Document Required</span>
+            <span class="issueCount">3</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panelCard">
+        <div class="panelTitle">Approvals</div>
+        <div class="issueList" id="approvalList">
+          <div class="issueItem" data-approval="delivery-challan">
+            <span>Delivery Challan</span>
+            <span class="issueCount">2</span>
+          </div>
+          <div class="issueItem" data-approval="invoice-rebill">
+            <span>Invoice Rebill</span>
+            <span class="issueCount">1</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <section class="panelCard">
+      <div class="summaryHeader">
+        <div>
+          <h2 id="summaryTitle">Manager Summary</h2>
+          <p id="selectedAgentLabel">Team summary (all managers).</p>
+        </div>
+        <div class="summaryFilters filtersRow">
+          <div class="summarySearch">
+            <i class="bi bi-search" aria-hidden="true"></i>
+            <input type="text" id="managerSearchInput" class="summarySearchInput" placeholder="Search managers or agents" />
+          </div>
+          <div class="btn-group">
+            <button
+              id="kamSummaryModeBtn"
+              type="button"
+              class="filterBtn dropdown-toggle"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+              title="Filter - Summary"
+            >
+              Summary
+              <span class="filterBadge" data-role="filter-value">Manager</span>
+            </button>
+            <ul class="dropdown-menu" id="kamSummaryMenu" data-filter="summaryMode">
+              <li><button class="dropdown-item active" type="button" data-value="manager">Manager</button></li>
+              <li><button class="dropdown-item" type="button" data-value="customer">Customer</button></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="selectedAgentPill hidden" id="selectedAgentPill">
+        <span id="selectedAgentName">-</span>
+        <button type="button" id="selectedAgentClearBtn" aria-label="Clear selection">×</button>
+      </div>
+      <div class="summaryCards" id="summaryCards"></div>
+      <div class="panelTitle" id="primaryPanelTitle">Manager Portfolio</div>
+      <table class="agentTable">
+        <thead>
+          <tr>
+            <th id="primaryTableHeader">Manager</th>
+            <th>Total Portfolio</th>
+            <th>Target (MTD)</th>
+            <th>Achievement</th>
+            <th>Untouched Amount</th>
+            <th>Aging &gt;30 Days Amount</th>
+            <th>New Billing Amount</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="agentTableBody"></tbody>
+      </table>
+    </section>
+
+    <aside class="panelCard managerTodoPanel hidden" id="managerTodoPanel">
+      <div class="todoPanel">
+        <div class="todoHeader">
+          <div>
+            <h4>To do list</h4>
+            <p>Track tasks and follow-ups.</p>
+          </div>
+          <span class="todoCountPill" id="todoCountPill">0</span>
+        </div>
+
+        <div class="todoList" id="todoList"></div>
+
+        <button class="todoCompletedToggle" type="button" id="todoCompletedToggle">0 completed tasks</button>
+
+        <div class="todoComposer todoComposerSticky">
+          <div class="todoComposerRow">
+            <input type="text" id="todoInput" placeholder="Add a task..." />
+            <button class="todoGhostBtn" type="button" data-action="toggle-extras" aria-label="Task details">
+              <i class="bi bi-info-circle" aria-hidden="true"></i>
+            </button>
+            <button class="todoAddBtn" type="button" id="todoAddBtn">Add</button>
+          </div>
+          <div class="todoExtras hidden" id="todoExtras">
+            <div class="todoField">
+              <label for="todoDueDate">Due date</label>
+              <input type="date" id="todoDueDate" />
+            </div>
+            <div class="todoField">
+              <label for="todoDueTime">Due time</label>
+              <input type="time" id="todoDueTime" />
+            </div>
+            <div class="todoField">
+              <label for="todoInvoiceInput">Invoice</label>
+              <input type="text" id="todoInvoiceInput" placeholder="Invoice number (optional)" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+</main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../scripts/shared-header.js"></script>
+<script>
+  (() => {
+    const agentData = [
+      { name: "Rohit Mehra", portfolio: 18250000, target: 720000, achievement: 480000, avgVisit: 10, ptpToday: 4, untouched: 20, aging30: 16, callbacks: 2, newBilling: 5 },
+      { name: "Isha Verma", portfolio: 16500000, target: 680000, achievement: 520000, avgVisit: 9, ptpToday: 3, untouched: 18, aging30: 19, callbacks: 3, newBilling: 6 },
+      { name: "Meera Nair", portfolio: 15850000, target: 640000, achievement: 450000, avgVisit: 11, ptpToday: 2, untouched: 22, aging30: 14, callbacks: 2, newBilling: 4 },
+      { name: "Mukesh Mishra", portfolio: 17400000, target: 700000, achievement: 560000, avgVisit: 12, ptpToday: 5, untouched: 17, aging30: 18, callbacks: 4, newBilling: 6 },
+      { name: "Neha Kapoor", portfolio: 14950000, target: 610000, achievement: 430000, avgVisit: 8, ptpToday: 1, untouched: 24, aging30: 13, callbacks: 2, newBilling: 3 }
+    ].map((agent) => ({
+      ...agent,
+      untouchedAmount: Math.round(agent.portfolio * 0.01 + agent.untouched * 45000),
+      aging30Amount: Math.round(agent.portfolio * 0.008 + agent.aging30 * 38000),
+      newBillingAmount: Math.round(agent.target * 0.1 + agent.newBilling * 120000)
+    }));
+
+    const managerAgentsMap = {
+      "Rohit Mehra": [
+        { name: "Aditi Sharma", city: "Mumbai", phone: "+91 98xxxxxx21", portfolio: 5200000, target: 210000, achievement: 160000, avgVisit: 7, ptpToday: 2, untouched: 8, aging30: 6, callbacks: 1, newBilling: 2, openIssues: 2, lastVisit: "12 Nov 2025" },
+        { name: "Sakshi Sharma", city: "Mumbai", phone: "+91 98xxxxxx22", portfolio: 4300000, target: 180000, achievement: 140000, avgVisit: 6, ptpToday: 1, untouched: 9, aging30: 5, callbacks: 2, newBilling: 1, openIssues: 3, lastVisit: "09 Nov 2025" }
+      ],
+      "Isha Verma": [
+        { name: "Karan Singh", city: "Delhi", phone: "+91 97xxxxxx54", portfolio: 6100000, target: 240000, achievement: 190000, avgVisit: 8, ptpToday: 2, untouched: 7, aging30: 6, callbacks: 1, newBilling: 2, openIssues: 1, lastVisit: "14 Nov 2025" },
+        { name: "Vikram Iyer", city: "Delhi", phone: "+91 97xxxxxx55", portfolio: 4800000, target: 200000, achievement: 150000, avgVisit: 6, ptpToday: 1, untouched: 8, aging30: 5, callbacks: 2, newBilling: 2, openIssues: 2, lastVisit: "10 Nov 2025" }
+      ],
+      "Meera Nair": [
+        { name: "Sahil Joshi", city: "Bengaluru", phone: "+91 96xxxxxx87", portfolio: 5400000, target: 220000, achievement: 170000, avgVisit: 7, ptpToday: 2, untouched: 9, aging30: 6, callbacks: 2, newBilling: 2, openIssues: 2, lastVisit: "08 Nov 2025" },
+        { name: "Dev Patel", city: "Bengaluru", phone: "+91 96xxxxxx88", portfolio: 4600000, target: 190000, achievement: 135000, avgVisit: 6, ptpToday: 1, untouched: 10, aging30: 5, callbacks: 1, newBilling: 1, openIssues: 3, lastVisit: "07 Nov 2025" }
+      ],
+      "Mukesh Mishra": [
+        { name: "Palak Choudhary", city: "Pune", phone: "+91 99xxxxxx11", portfolio: 5000000, target: 210000, achievement: 155000, avgVisit: 7, ptpToday: 2, untouched: 8, aging30: 6, callbacks: 2, newBilling: 2, openIssues: 2, lastVisit: "11 Nov 2025" },
+        { name: "Abhishek Sharma", city: "Pune", phone: "+91 99xxxxxx12", portfolio: 4700000, target: 195000, achievement: 145000, avgVisit: 6, ptpToday: 1, untouched: 9, aging30: 5, callbacks: 1, newBilling: 2, openIssues: 1, lastVisit: "09 Nov 2025" }
+      ],
+      "Neha Kapoor": [
+        { name: "Riya Malhotra", city: "Chennai", phone: "+91 95xxxxxx33", portfolio: 4200000, target: 170000, achievement: 120000, avgVisit: 5, ptpToday: 1, untouched: 10, aging30: 4, callbacks: 1, newBilling: 1, openIssues: 2, lastVisit: "13 Nov 2025" },
+        { name: "Anil Thomas", city: "Chennai", phone: "+91 95xxxxxx34", portfolio: 3900000, target: 160000, achievement: 115000, avgVisit: 5, ptpToday: 1, untouched: 9, aging30: 4, callbacks: 2, newBilling: 1, openIssues: 3, lastVisit: "08 Nov 2025" }
+      ]
+    };
+
+    const customerData = [
+      { name: "Apollo Healthcare", code: "CUS-9001", portfolio: 12400000, target: 510000, achievement: 370000, untouched: 12, aging30: 8, newBilling: 4, visitsMonth: 6, committedPtp: 5, missedPtp: 1, avgPaymentDays: 34, invoicesOverdue: 12 },
+      { name: "Nexus Diagnostics", code: "CUS-9002", portfolio: 10850000, target: 480000, achievement: 320000, untouched: 10, aging30: 7, newBilling: 3, visitsMonth: 5, committedPtp: 4, missedPtp: 1, avgPaymentDays: 29, invoicesOverdue: 10 },
+      { name: "Evergreen Medical", code: "CUS-9003", portfolio: 13750000, target: 560000, achievement: 410000, untouched: 13, aging30: 9, newBilling: 5, visitsMonth: 7, committedPtp: 5, missedPtp: 2, avgPaymentDays: 41, invoicesOverdue: 14 },
+      { name: "Trinity Hospitals", code: "CUS-9004", portfolio: 9800000, target: 450000, achievement: 295000, untouched: 11, aging30: 6, newBilling: 2, visitsMonth: 4, committedPtp: 3, missedPtp: 1, avgPaymentDays: 26, invoicesOverdue: 9 },
+      { name: "Omega Pharma", code: "CUS-9005", portfolio: 12100000, target: 500000, achievement: 360000, untouched: 12, aging30: 8, newBilling: 4, visitsMonth: 6, committedPtp: 4, missedPtp: 1, avgPaymentDays: 33, invoicesOverdue: 11 }
+    ].map((customer) => ({
+      ...customer,
+      untouchedAmount: Math.round(customer.portfolio * 0.01 + customer.untouched * 45000),
+      aging30Amount: Math.round(customer.portfolio * 0.008 + customer.aging30 * 38000),
+      newBillingAmount: Math.round(customer.target * 0.1 + customer.newBilling * 120000)
+    }));
+
+    const customerAgentsMap = {
+      "Apollo Healthcare": [
+        { name: "Aditi Sharma", portfolio: 4200000, target: 170000, achievement: 120000, untouched: 4, aging30: 3, newBilling: 2, visitsMonth: 3, committedPtp: 2, missedPtp: 1, avgPaymentDays: 33, invoicesOverdue: 5 },
+        { name: "Sakshi Sharma", portfolio: 3800000, target: 150000, achievement: 110000, untouched: 5, aging30: 2, newBilling: 1, visitsMonth: 2, committedPtp: 2, missedPtp: 0, avgPaymentDays: 35, invoicesOverdue: 4 }
+      ],
+      "Nexus Diagnostics": [
+        { name: "Karan Singh", portfolio: 4100000, target: 165000, achievement: 105000, untouched: 4, aging30: 3, newBilling: 1, visitsMonth: 2, committedPtp: 2, missedPtp: 1, avgPaymentDays: 28, invoicesOverdue: 4 },
+        { name: "Vikram Iyer", portfolio: 3600000, target: 145000, achievement: 98000, untouched: 3, aging30: 2, newBilling: 2, visitsMonth: 3, committedPtp: 2, missedPtp: 0, avgPaymentDays: 30, invoicesOverdue: 3 }
+      ],
+      "Evergreen Medical": [
+        { name: "Sahil Joshi", portfolio: 4700000, target: 190000, achievement: 130000, untouched: 5, aging30: 4, newBilling: 2, visitsMonth: 3, committedPtp: 2, missedPtp: 1, avgPaymentDays: 42, invoicesOverdue: 5 },
+        { name: "Dev Patel", portfolio: 4200000, target: 170000, achievement: 120000, untouched: 4, aging30: 3, newBilling: 2, visitsMonth: 4, committedPtp: 3, missedPtp: 1, avgPaymentDays: 39, invoicesOverdue: 4 }
+      ],
+      "Trinity Hospitals": [
+        { name: "Palak Choudhary", portfolio: 3500000, target: 145000, achievement: 90000, untouched: 4, aging30: 2, newBilling: 1, visitsMonth: 2, committedPtp: 1, missedPtp: 0, avgPaymentDays: 27, invoicesOverdue: 3 },
+        { name: "Abhishek Sharma", portfolio: 3300000, target: 135000, achievement: 85000, untouched: 3, aging30: 2, newBilling: 1, visitsMonth: 2, committedPtp: 2, missedPtp: 1, avgPaymentDays: 25, invoicesOverdue: 3 }
+      ],
+      "Omega Pharma": [
+        { name: "Riya Malhotra", portfolio: 4000000, target: 165000, achievement: 115000, untouched: 4, aging30: 3, newBilling: 2, visitsMonth: 3, committedPtp: 2, missedPtp: 1, avgPaymentDays: 34, invoicesOverdue: 4 },
+        { name: "Anil Thomas", portfolio: 3600000, target: 150000, achievement: 105000, untouched: 4, aging30: 3, newBilling: 2, visitsMonth: 3, committedPtp: 2, missedPtp: 0, avgPaymentDays: 32, invoicesOverdue: 4 }
+      ]
+    };
+
+    let summaryMode = "manager";
+    let activeManager = null;
+    let activeSubAgent = null;
+    let expandedManagers = new Set();
+    let activeCustomer = null;
+    let activeCustomerAgent = null;
+    let expandedCustomers = new Set();
+
+    const globalCards = document.getElementById("globalCards");
+    const summaryCards = document.getElementById("summaryCards");
+    const summaryTitle = document.getElementById("summaryTitle");
+    const primaryPanelTitle = document.getElementById("primaryPanelTitle");
+    const primaryTableHeader = document.getElementById("primaryTableHeader");
+    const managerCustomerName = document.getElementById("managerCustomerName");
+    const managerCustomerCode = document.getElementById("managerCustomerCode");
+    const managerCustomerCount = document.getElementById("managerCustomerCount");
+    const managerOpenInvoices = document.getElementById("managerOpenInvoices");
+    const managerIssueCount = document.getElementById("managerIssueCount");
+    const managerAmountForMonth = document.getElementById("managerAmountForMonth");
+    const managerMtdCollection = document.getElementById("managerMtdCollection");
+    const managerCnAdvPdc = document.getElementById("managerCnAdvPdc");
+    const managerTarget = document.getElementById("managerTarget");
+    const managerNetDue = document.getElementById("managerNetDue");
+    const selectedAgentLabel = document.getElementById("selectedAgentLabel");
+    const selectedAgentPill = document.getElementById("selectedAgentPill");
+    const selectedAgentName = document.getElementById("selectedAgentName");
+    const selectedAgentClearBtn = document.getElementById("selectedAgentClearBtn");
+    const managerSearchInput = document.getElementById("managerSearchInput");
+    const summaryModeBtn = document.getElementById("kamSummaryModeBtn");
+    const summaryModeMenu = document.getElementById("kamSummaryMenu");
+    const summaryModeBadge = summaryModeBtn?.querySelector('[data-role="filter-value"]');
+    const agentTableBody = document.getElementById("agentTableBody");
+    const agentList = document.getElementById("agentList");
+    const issueTrackerBtn = document.getElementById("issueTrackerBtn");
+    const approvalDashboardBtn = document.getElementById("approvalDashboardBtn");
+    const approvalList = document.getElementById("approvalList");
+    const visitsBtn = document.getElementById("visitsBtn");
+    const clockEl = document.getElementById("managerClock");
+
+    if (summaryModeMenu) {
+      const activeItem = summaryModeMenu.querySelector(".dropdown-item.active");
+      if (activeItem) {
+        summaryMode = activeItem.getAttribute("data-value") === "customer" ? "customer" : "manager";
+        if (summaryModeBadge) summaryModeBadge.textContent = activeItem.textContent.trim();
+      }
+    }
+
+    const formatAmount = (value) => `Rs.${value.toLocaleString("en-IN")}`;
+    let managerSearchQuery = "";
+
+    const normalizeSearch = (value) => String(value || "").trim().toLowerCase();
+    const matchesManagerSearch = (manager) => manager.name.toLowerCase().includes(managerSearchQuery);
+    const matchesCustomerSearch = (customer) => {
+      const code = customer.code ? customer.code.toLowerCase() : "";
+      return customer.name.toLowerCase().includes(managerSearchQuery) || code.includes(managerSearchQuery);
+    };
+    const matchesAgentSearch = (agent) => agent.name.toLowerCase().includes(managerSearchQuery);
+
+    const getPrimaryLabel = () => (summaryMode === "customer" ? "Customer" : "Manager");
+    const getPrimaryPluralLabel = () => (summaryMode === "customer" ? "customers" : "managers");
+    const getPrimaryList = () => (summaryMode === "customer" ? customerData : agentData);
+    const getActivePrimary = () => (summaryMode === "customer" ? activeCustomer : activeManager);
+    const getActiveSubAgent = () => (summaryMode === "customer" ? activeCustomerAgent : activeSubAgent);
+    const getExpandedSet = () => (summaryMode === "customer" ? expandedCustomers : expandedManagers);
+
+    const updateSummaryModeLabels = () => {
+      const label = getPrimaryLabel();
+      if (summaryTitle) summaryTitle.textContent = `${label} Summary`;
+      if (primaryPanelTitle) primaryPanelTitle.textContent = `${label} Portfolio`;
+      if (primaryTableHeader) primaryTableHeader.textContent = label;
+      if (managerSearchInput) {
+        managerSearchInput.placeholder = `Search ${getPrimaryPluralLabel()} or agents`;
+      }
+      if (selectedAgentClearBtn) {
+        selectedAgentClearBtn.setAttribute("aria-label", `Clear ${label.toLowerCase()} filter`);
+      }
+    };
+
+    const getTotals = (list = agentData) => list.reduce((total, agent) => ({
+      portfolio: total.portfolio + agent.portfolio,
+      target: total.target + agent.target,
+      achievement: total.achievement + agent.achievement,
+      avgVisit: total.avgVisit + agent.avgVisit,
+      ptpToday: total.ptpToday + agent.ptpToday,
+      untouched: total.untouched + agent.untouched,
+      aging30: total.aging30 + agent.aging30,
+      callbacks: total.callbacks + agent.callbacks,
+      newBilling: total.newBilling + agent.newBilling
+    }), {
+      portfolio: 0,
+      target: 0,
+      achievement: 0,
+      avgVisit: 0,
+      ptpToday: 0,
+      untouched: 0,
+      aging30: 0,
+      callbacks: 0,
+      newBilling: 0
+    });
+
+    const getCustomerTotals = (list = customerData) => {
+      if (!list.length) {
+        return {
+          visitsMonth: 0,
+          committedPtp: 0,
+          missedPtp: 0,
+          avgPaymentDays: 0,
+          invoicesOverdue: 0,
+          newBilling: 0
+        };
+      }
+      const totals = list.reduce((total, customer) => ({
+        visitsMonth: total.visitsMonth + customer.visitsMonth,
+        committedPtp: total.committedPtp + customer.committedPtp,
+        missedPtp: total.missedPtp + customer.missedPtp,
+        avgPaymentDays: total.avgPaymentDays + customer.avgPaymentDays,
+        invoicesOverdue: total.invoicesOverdue + customer.invoicesOverdue,
+        newBilling: total.newBilling + customer.newBilling
+      }), {
+        visitsMonth: 0,
+        committedPtp: 0,
+        missedPtp: 0,
+        avgPaymentDays: 0,
+        invoicesOverdue: 0,
+        newBilling: 0
+      });
+      return {
+        ...totals,
+        avgPaymentDays: Math.round(totals.avgPaymentDays / list.length)
+      };
+    };
+
+    const buildCustomerSummary = (list = agentData) => {
+      const byAgent = {};
+      list.forEach((agent, index) => {
+        const customers = 5 + index * 2;
+        const openInvoices = customers * 6;
+        const issueCount = 2 + index;
+        const amountForMonth = Math.round(agent.target * 1.3);
+        const mtdCollection = agent.achievement;
+        const cnAdvPdc = Math.round(agent.target * 0.08);
+        const netDue = Math.max(agent.portfolio - agent.achievement, 0);
+        byAgent[agent.name] = {
+          customers,
+          openInvoices,
+          issueCount,
+          amountForMonth,
+          mtdCollection,
+          cnAdvPdc,
+          netDue,
+          target: agent.target
+        };
+      });
+      const overall = Object.values(byAgent).reduce((acc, entry) => ({
+        customers: acc.customers + entry.customers,
+        openInvoices: acc.openInvoices + entry.openInvoices,
+        issueCount: acc.issueCount + entry.issueCount,
+        amountForMonth: acc.amountForMonth + entry.amountForMonth,
+        mtdCollection: acc.mtdCollection + entry.mtdCollection,
+        cnAdvPdc: acc.cnAdvPdc + entry.cnAdvPdc,
+        netDue: acc.netDue + entry.netDue,
+        target: acc.target + entry.target
+      }), {
+        customers: 0,
+        openInvoices: 0,
+        issueCount: 0,
+        amountForMonth: 0,
+        mtdCollection: 0,
+        cnAdvPdc: 0,
+        netDue: 0,
+        target: 0
+      });
+      return { overall, byAgent };
+    };
+
+    const decorateAgentRow = (agent) => {
+      const untouchedAmount = agent.untouchedAmount
+        ?? Math.round(agent.portfolio * 0.01 + agent.untouched * 45000);
+      const aging30Amount = agent.aging30Amount
+        ?? Math.round(agent.portfolio * 0.008 + agent.aging30 * 38000);
+      const newBillingAmount = agent.newBillingAmount
+        ?? Math.round(agent.target * 0.1 + agent.newBilling * 120000);
+      return {
+        ...agent,
+        untouchedAmount,
+        aging30Amount,
+        newBillingAmount
+      };
+    };
+
+    const getManagerAgents = (managerName) => (
+      (managerAgentsMap[managerName] || []).map(decorateAgentRow)
+    );
+
+    const getCustomerAgents = (customerName) => (
+      (customerAgentsMap[customerName] || []).map(decorateAgentRow)
+    );
+
+    const matchesPrimarySearch = (primary) => (
+      summaryMode === "customer" ? matchesCustomerSearch(primary) : matchesManagerSearch(primary)
+    );
+
+    const getPrimaryAgents = (primaryName) => (
+      summaryMode === "customer" ? getCustomerAgents(primaryName) : getManagerAgents(primaryName)
+    );
+
+    const getMatchedAgentsForPrimary = (primaryName) => (
+      managerSearchQuery ? getPrimaryAgents(primaryName).filter(matchesAgentSearch) : getPrimaryAgents(primaryName)
+    );
+
+    const primaryMatchesSearch = (primary) => (
+      matchesPrimarySearch(primary) || (managerSearchQuery && getMatchedAgentsForPrimary(primary.name).length > 0)
+    );
+
+    const getFilteredPrimary = () => (
+      managerSearchQuery ? getPrimaryList().filter(primaryMatchesSearch) : getPrimaryList()
+    );
+
+    const renderCustomerSummary = () => {
+      if (!managerCustomerName && !managerCustomerCount) return;
+      const activePrimary = getActivePrimary();
+      const activeSub = getActiveSubAgent();
+      if (activeSub) {
+        const singleSummary = buildCustomerSummary([activeSub]).overall;
+        if (managerCustomerName) managerCustomerName.textContent = activeSub.name;
+        if (managerCustomerCode) managerCustomerCode.textContent = "AGT";
+        if (managerCustomerCount) managerCustomerCount.textContent = singleSummary.customers;
+        if (managerOpenInvoices) managerOpenInvoices.textContent = singleSummary.openInvoices;
+        if (managerIssueCount) managerIssueCount.textContent = singleSummary.issueCount;
+        if (managerAmountForMonth) managerAmountForMonth.textContent = formatAmount(singleSummary.amountForMonth);
+        if (managerMtdCollection) managerMtdCollection.textContent = formatAmount(singleSummary.mtdCollection);
+        if (managerCnAdvPdc) managerCnAdvPdc.textContent = formatAmount(singleSummary.cnAdvPdc);
+        if (managerTarget) managerTarget.textContent = formatAmount(singleSummary.target);
+        if (managerNetDue) managerNetDue.textContent = formatAmount(singleSummary.netDue);
+        return;
+      }
+
+      const filteredSummary = buildCustomerSummary(getFilteredPrimary());
+      const summary = activePrimary && filteredSummary.byAgent[activePrimary.name]
+        ? filteredSummary.byAgent[activePrimary.name]
+        : filteredSummary.overall;
+      const label = activePrimary ? activePrimary.name : `All ${getPrimaryPluralLabel()}`;
+      if (managerCustomerName) managerCustomerName.textContent = label;
+      if (managerCustomerCode) {
+        if (summaryMode === "customer" && activePrimary?.code) {
+          managerCustomerCode.textContent = activePrimary.code;
+        } else if (activePrimary) {
+          managerCustomerCode.textContent = "MGR";
+        } else {
+          managerCustomerCode.textContent = "ALL";
+        }
+      }
+      if (managerCustomerCount) managerCustomerCount.textContent = summary.customers;
+      if (managerOpenInvoices) managerOpenInvoices.textContent = summary.openInvoices;
+      if (managerIssueCount) managerIssueCount.textContent = summary.issueCount;
+      if (managerAmountForMonth) managerAmountForMonth.textContent = formatAmount(summary.amountForMonth);
+      if (managerMtdCollection) managerMtdCollection.textContent = formatAmount(summary.mtdCollection);
+      if (managerCnAdvPdc) managerCnAdvPdc.textContent = formatAmount(summary.cnAdvPdc);
+      if (managerTarget) managerTarget.textContent = formatAmount(summary.target);
+      if (managerNetDue) managerNetDue.textContent = formatAmount(summary.netDue);
+    };
+
+    const renderGlobalCards = () => {
+      if (!globalCards) return;
+      const totals = getTotals();
+      const openIssues = 13;
+      const pendingVisitApprovals = 5;
+      globalCards.innerHTML = `
+        <div class="globalCard"><span>Total Portfolio</span><strong>${formatAmount(totals.portfolio)}</strong></div>
+        <div class="globalCard"><span>Total Target (MTD)</span><strong>${formatAmount(totals.target)}</strong></div>
+        <div class="globalCard"><span>Total Achievement</span><strong>${formatAmount(totals.achievement)}</strong></div>
+        <div class="globalCard"><span>Open Issues</span><strong>${openIssues}</strong></div>
+        <div class="globalCard"><span>Pending Visit Approvals</span><strong>${pendingVisitApprovals}</strong></div>
+      `;
+    };
+
+    const renderSummary = () => {
+      if (!summaryCards) return;
+      const filteredPrimary = getFilteredPrimary();
+      const activePrimary = getActivePrimary();
+      const activeSub = getActiveSubAgent();
+      if (selectedAgentLabel) {
+        if (activeSub || activePrimary) {
+          selectedAgentLabel.textContent = "";
+        } else if (managerSearchQuery && filteredPrimary.length === 0) {
+          selectedAgentLabel.textContent = `No ${getPrimaryPluralLabel()} found.`;
+        } else if (managerSearchQuery) {
+          selectedAgentLabel.textContent = "Search results.";
+        } else {
+          selectedAgentLabel.textContent = `Team summary (all ${getPrimaryPluralLabel()}).`;
+        }
+      }
+      if (selectedAgentPill && selectedAgentName) {
+        if (activeSub) {
+          selectedAgentName.textContent = `Agent: ${activeSub.name}`;
+          selectedAgentPill.classList.remove("hidden");
+        } else if (activePrimary) {
+          selectedAgentName.textContent = `${getPrimaryLabel()}: ${activePrimary.name}`;
+          selectedAgentPill.classList.remove("hidden");
+        } else {
+          selectedAgentPill.classList.add("hidden");
+        }
+      }
+      if (summaryMode === "customer") {
+        const totals = getCustomerTotals(filteredPrimary);
+        const summarySource = activeSub || activePrimary || totals;
+        summaryCards.innerHTML = `
+          <div class="summaryCard"><span>Visits This Month</span><strong>${summarySource.visitsMonth}</strong></div>
+          <div class="summaryCard"><span>Commited PTP</span><strong>${summarySource.committedPtp}</strong></div>
+          <div class="summaryCard"><span>Missed PTP</span><strong>${summarySource.missedPtp}</strong></div>
+          <div class="summaryCard"><span>Avg Payment Days</span><strong>${summarySource.avgPaymentDays}</strong></div>
+          <div class="summaryCard"><span>Invoices Overdue</span><strong>${summarySource.invoicesOverdue}</strong></div>
+          <div class="summaryCard"><span>New Billing</span><strong>${summarySource.newBilling}</strong></div>
+        `;
+      } else {
+        const totals = getTotals(filteredPrimary);
+        const summarySource = activeSub || activePrimary || totals;
+        summaryCards.innerHTML = `
+          <div class="summaryCard"><span>Avg Visits</span><strong>${summarySource.avgVisit}</strong></div>
+          <div class="summaryCard"><span>PTP Today</span><strong>${summarySource.ptpToday}</strong></div>
+          <div class="summaryCard"><span>Callbacks Today</span><strong>${summarySource.callbacks}</strong></div>
+          <div class="summaryCard"><span>Untouched Cases</span><strong>${summarySource.untouched}</strong></div>
+          <div class="summaryCard"><span>Aging &gt;30 days</span><strong>${summarySource.aging30}</strong></div>
+          <div class="summaryCard"><span>New Billing</span><strong>${summarySource.newBilling}</strong></div>
+        `;
+      }
+      renderAgentList();
+    };
+
+    const renderAgentList = () => {
+      if (!agentList) return;
+      const filteredPrimary = getFilteredPrimary();
+      if (filteredPrimary.length === 0) {
+        agentList.innerHTML = `<div class="emptyState">No ${getPrimaryPluralLabel()} match the search.</div>`;
+        return;
+      }
+      const activePrimary = getActivePrimary();
+      agentList.innerHTML = filteredPrimary.map((primary) => `
+        <button class="agentCardBtn ${activePrimary && primary.name === activePrimary.name ? "active" : ""}" type="button" data-agent="${primary.name}">
+          <strong>${primary.name}</strong>
+          <span>Target ${formatAmount(primary.target)}</span>
+        </button>
+      `).join("");
+    };
+
+    const renderTable = () => {
+      if (!agentTableBody) return;
+      const filteredPrimary = getFilteredPrimary();
+      if (filteredPrimary.length === 0) {
+        agentTableBody.innerHTML = `<tr><td colspan="8" class="text-muted">No ${getPrimaryPluralLabel()} match the search.</td></tr>`;
+        return;
+      }
+      const activePrimary = getActivePrimary();
+      const activeSub = getActiveSubAgent();
+      const expandedSet = getExpandedSet();
+      const rows = [];
+      filteredPrimary.forEach((primary) => {
+        const primaryName = primary.name;
+        const shouldAutoExpand = managerSearchQuery
+          && !matchesPrimarySearch(primary)
+          && getMatchedAgentsForPrimary(primaryName).length > 0;
+        const isExpanded = expandedSet.has(primaryName) || shouldAutoExpand;
+        const primaryLabel = summaryMode === "customer" && primary.code
+          ? `${primary.name} <span class="text-muted">${primary.code}</span>`
+          : primary.name;
+        rows.push(`
+          <tr class="${activePrimary && primaryName === activePrimary.name ? "active" : ""}" data-agent="${primaryName}">
+            <td>${primaryLabel}</td>
+            <td>${formatAmount(primary.portfolio)}</td>
+            <td>${formatAmount(primary.target)}</td>
+            <td>${formatAmount(primary.achievement)}</td>
+            <td>${formatAmount(primary.untouchedAmount)}</td>
+            <td>${formatAmount(primary.aging30Amount)}</td>
+            <td>${formatAmount(primary.newBillingAmount)}</td>
+            <td><button class="actionBtn actionBtnSecondary" type="button" data-action="view-agent" data-agent="${primaryName}">${isExpanded ? "Hide Agent" : "View Agent"}</button></td>
+          </tr>
+        `);
+        if (isExpanded) {
+          const primaryNameMatches = matchesPrimarySearch(primary);
+          const agents = managerSearchQuery && !primaryNameMatches
+            ? getMatchedAgentsForPrimary(primaryName)
+            : getPrimaryAgents(primaryName);
+          if (agents.length === 0) {
+            rows.push(`<tr class="agentSubRow"><td colspan="8" class="text-muted">No agents mapped to this ${getPrimaryLabel().toLowerCase()}.</td></tr>`);
+          } else {
+            agents.forEach((agent) => {
+              const isActive = activeSub && agent.name === activeSub.name;
+              rows.push(`
+                <tr class="agentSubRow ${isActive ? "active" : ""}" data-agent="${agent.name}" data-primary="${primaryName}" data-agent-type="agent">
+                  <td>${agent.name}</td>
+                  <td>${formatAmount(agent.portfolio)}</td>
+                  <td>${formatAmount(agent.target)}</td>
+                  <td>${formatAmount(agent.achievement)}</td>
+                  <td>${formatAmount(agent.untouchedAmount)}</td>
+                  <td>${formatAmount(agent.aging30Amount)}</td>
+                  <td>${formatAmount(agent.newBillingAmount)}</td>
+                  <td><span class="text-muted">-</span></td>
+                </tr>
+              `);
+            });
+          }
+        }
+      });
+      agentTableBody.innerHTML = rows.join("");
+    };
+
+    const setActiveManager = (name) => {
+      const match = agentData.find(agent => agent.name === name);
+      if (!match) return;
+      activeManager = match;
+      activeSubAgent = null;
+      renderSummary();
+      renderTable();
+      renderCustomerSummary();
+      renderAgentList();
+    };
+
+    const setActiveSubAgent = (managerName, agentName) => {
+      const managerMatch = agentData.find(agent => agent.name === managerName);
+      const agents = getManagerAgents(managerName);
+      const agentMatch = agents.find(agent => agent.name === agentName);
+      if (!agentMatch) return;
+      activeManager = managerMatch || activeManager;
+      activeSubAgent = agentMatch;
+      renderSummary();
+      renderTable();
+      renderCustomerSummary();
+      renderAgentList();
+    };
+
+    const setActiveCustomer = (name) => {
+      const match = customerData.find(customer => customer.name === name);
+      if (!match) return;
+      activeCustomer = match;
+      activeCustomerAgent = null;
+      renderSummary();
+      renderTable();
+      renderCustomerSummary();
+      renderAgentList();
+    };
+
+    const setActiveCustomerAgent = (customerName, agentName) => {
+      const customerMatch = customerData.find(customer => customer.name === customerName);
+      const agents = getCustomerAgents(customerName);
+      const agentMatch = agents.find(agent => agent.name === agentName);
+      if (!agentMatch) return;
+      activeCustomer = customerMatch || activeCustomer;
+      activeCustomerAgent = agentMatch;
+      renderSummary();
+      renderTable();
+      renderCustomerSummary();
+      renderAgentList();
+    };
+
+    const clearActiveSelection = () => {
+      if (summaryMode === "customer") {
+        activeCustomer = null;
+        activeCustomerAgent = null;
+      } else {
+        activeManager = null;
+        activeSubAgent = null;
+      }
+      renderSummary();
+      renderTable();
+      renderCustomerSummary();
+      renderAgentList();
+    };
+
+    const updateSearch = () => {
+      const activePrimary = getActivePrimary();
+      const activeSub = getActiveSubAgent();
+      if (activeSub && managerSearchQuery && !matchesAgentSearch(activeSub)) {
+        if (summaryMode === "customer") {
+          activeCustomerAgent = null;
+        } else {
+          activeSubAgent = null;
+        }
+      }
+      if (activePrimary && !primaryMatchesSearch(activePrimary)) {
+        if (summaryMode === "customer") {
+          activeCustomer = null;
+          activeCustomerAgent = null;
+        } else {
+          activeManager = null;
+          activeSubAgent = null;
+        }
+      }
+      const expandedSet = getExpandedSet();
+      const filteredPrimary = getFilteredPrimary();
+      expandedSet.forEach((primaryName) => {
+        if (!filteredPrimary.some(item => item.name === primaryName)) {
+          expandedSet.delete(primaryName);
+          if (summaryMode === "customer" && activeCustomerAgent && primaryName === activeCustomer?.name) {
+            activeCustomerAgent = null;
+          }
+          if (summaryMode === "manager" && activeSubAgent && primaryName === activeManager?.name) {
+            activeSubAgent = null;
+          }
+        }
+      });
+      renderSummary();
+      renderTable();
+      renderCustomerSummary();
+      renderAgentList();
+    };
+
+    const setSummaryMode = (nextMode) => {
+      const normalized = nextMode === "customer" ? "customer" : "manager";
+      summaryMode = normalized;
+      if (summaryModeBadge) {
+        summaryModeBadge.textContent = normalized === "customer" ? "Customer" : "Manager";
+      }
+      if (summaryModeMenu) {
+        summaryModeMenu.querySelectorAll(".dropdown-item").forEach((item) => {
+          const isActive = item.getAttribute("data-value") === normalized;
+          item.classList.toggle("active", isActive);
+        });
+      }
+      updateSummaryModeLabels();
+      updateSearch();
+    };
+
+    if (agentTableBody) {
+      agentTableBody.addEventListener("click", (event) => {
+        const actionBtn = event.target.closest("button[data-action]");
+        if (actionBtn) {
+          const primaryName = actionBtn.getAttribute("data-agent");
+          if (!primaryName) return;
+          const action = actionBtn.getAttribute("data-action");
+          if (action === "view-agent") {
+            const expandedSet = getExpandedSet();
+            if (expandedSet.has(primaryName)) {
+              expandedSet.delete(primaryName);
+            } else {
+              expandedSet.add(primaryName);
+            }
+            if (summaryMode === "customer") {
+              setActiveCustomer(primaryName);
+            } else {
+              setActiveManager(primaryName);
+            }
+            return;
+          }
+          return;
+        }
+        const row = event.target.closest("tr[data-agent]");
+        if (!row) return;
+        const agentType = row.getAttribute("data-agent-type");
+        const agentName = row.getAttribute("data-agent");
+        if (agentType === "agent") {
+          const primaryName = row.getAttribute("data-primary");
+          if (!primaryName || !agentName) return;
+          getExpandedSet().add(primaryName);
+          if (summaryMode === "customer") {
+            setActiveCustomerAgent(primaryName, agentName);
+          } else {
+            setActiveSubAgent(primaryName, agentName);
+          }
+          return;
+        }
+        if (!agentName) return;
+        if (summaryMode === "customer") {
+          setActiveCustomer(agentName);
+        } else {
+          setActiveManager(agentName);
+        }
+      });
+    }
+
+    if (agentList) {
+      agentList.addEventListener("click", (event) => {
+        const btn = event.target.closest(".agentCardBtn[data-agent]");
+        if (!btn) return;
+        const primaryName = btn.getAttribute("data-agent");
+        if (!primaryName) return;
+        if (summaryMode === "customer") {
+          setActiveCustomer(primaryName);
+        } else {
+          setActiveManager(primaryName);
+        }
+      });
+    }
+
+    if (selectedAgentClearBtn) {
+      selectedAgentClearBtn.addEventListener("click", () => {
+        clearActiveSelection();
+      });
+    }
+
+    if (managerSearchInput) {
+      managerSearchInput.addEventListener("input", () => {
+        managerSearchQuery = normalizeSearch(managerSearchInput.value);
+        updateSearch();
+      });
+    }
+
+    if (summaryModeMenu) {
+      summaryModeMenu.addEventListener("click", (event) => {
+        const item = event.target.closest(".dropdown-item");
+        if (!item) return;
+        setSummaryMode(item.getAttribute("data-value"));
+      });
+    }
+
+
+    if (issueTrackerBtn) {
+      issueTrackerBtn.addEventListener("click", () => {
+        window.location.href = "../bin/IssueTracker/index.html";
+      });
+    }
+
+    if (approvalDashboardBtn) {
+      approvalDashboardBtn.addEventListener("click", () => {
+        window.location.href = "../bin/IssueTracker/approver-dashboard.html";
+      });
+    }
+
+    if (approvalList) {
+      approvalList.addEventListener("click", (event) => {
+        const item = event.target.closest("[data-approval]");
+        if (!item) return;
+        const type = item.getAttribute("data-approval");
+        if (!type) return;
+        window.location.href = `../bin/IssueTracker/approver-dashboard.html?type=${encodeURIComponent(type)}`;
+      });
+    }
+
+    if (visitsBtn) {
+      visitsBtn.addEventListener("click", () => {
+        window.location.href = "visitmodule.html";
+      });
+    }
+
+    const headerUserDirectory = {
+      agents: [
+        "Aditi Sharma",
+        "Manish Kumar",
+        "Palak Choudhary",
+        "Abhishek Sharma",
+        "Sakshi Sharma"
+      ],
+      managers: ["Mukesh Mishra"]
+    };
+
+    const updateUserMenuVisibility = (role) => {
+      const reviewItem = document.querySelector('[data-module="visit-review"]');
+      if (reviewItem) reviewItem.style.display = role === "agent" ? "none" : "";
+    };
+
+    const initUserSelect = () => {
+      const userSelect = document.getElementById("userSelect");
+      if (!userSelect) return;
+
+      userSelect.innerHTML = "";
+
+      const addGroup = (label, users) => {
+        const group = document.createElement("optgroup");
+        group.label = label;
+        users.forEach((name) => {
+          const option = document.createElement("option");
+          option.value = name;
+          option.textContent = name;
+          group.appendChild(option);
+        });
+        userSelect.appendChild(group);
+      };
+
+      addGroup("Agents", headerUserDirectory.agents);
+      addGroup("Managers", headerUserDirectory.managers);
+
+      const allUsers = [...headerUserDirectory.agents, ...headerUserDirectory.managers];
+      const storedName = localStorage.getItem("activeUserName");
+      const fallbackName = headerUserDirectory.managers[0];
+      const selectedName = allUsers.includes(storedName) ? storedName : fallbackName;
+
+      userSelect.value = selectedName;
+      const role = headerUserDirectory.managers.includes(selectedName) ? "manager" : "agent";
+      localStorage.setItem("activeUserName", selectedName);
+      localStorage.setItem("activeUserRole", role);
+      updateUserMenuVisibility(role);
+
+      userSelect.addEventListener("change", () => {
+        const name = userSelect.value;
+        const nextRole = headerUserDirectory.managers.includes(name) ? "manager" : "agent";
+        localStorage.setItem("activeUserName", name);
+        localStorage.setItem("activeUserRole", nextRole);
+        updateUserMenuVisibility(nextRole);
+      });
+    };
+
+    initUserSelect();
+
+    const todoHeaderBtn = document.getElementById("todoHeaderBtn");
+    const todoPanel = document.getElementById("managerTodoPanel");
+    const todoList = document.getElementById("todoList");
+    const todoAddBtn = document.getElementById("todoAddBtn");
+    const todoInput = document.getElementById("todoInput");
+    const todoDueDate = document.getElementById("todoDueDate");
+    const todoDueTime = document.getElementById("todoDueTime");
+    const todoInvoiceInput = document.getElementById("todoInvoiceInput");
+    const todoExtras = document.getElementById("todoExtras");
+    const todoCountPill = document.getElementById("todoCountPill");
+    const todoCompletedToggle = document.getElementById("todoCompletedToggle");
+    const managerLayout = document.querySelector(".managerLayout");
+
+    let todoTasks = [];
+    let todoTaskCounter = 0;
+    let todoShowCompleted = false;
+
+    const getCompletedTodoCount = () => todoTasks.filter(task => task.completed).length;
+
+    const updateTodoCompletedToggle = () => {
+      if (!todoCompletedToggle) return;
+      const count = getCompletedTodoCount();
+      todoCompletedToggle.textContent = count === 1 ? "1 completed task" : `${count} completed tasks`;
+      todoCompletedToggle.classList.toggle("is-open", todoShowCompleted);
+    };
+
+    const updateTodoBadge = () => {
+      const count = todoTasks.filter(task => !task.completed).length;
+      if (todoCountPill) todoCountPill.textContent = String(count);
+      updateTodoCompletedToggle();
+    };
+
+    const renderTodoList = () => {
+      if (!todoList) return;
+      if (todoTasks.length === 0) {
+        todoList.innerHTML = `<div class="todoEmpty">No tasks yet.</div>`;
+        return;
+      }
+      const buildTaskRow = (task) => {
+        const dueLine = task.dueDate || task.dueTime
+          ? `Due ${task.dueDate || "-"} ${task.dueTime || ""}`.trim()
+          : "No due time";
+        const invoiceLine = task.invoiceNo
+          ? `<span class="todoInvoiceLink"><i class="bi bi-link-45deg" aria-hidden="true"></i>${task.invoiceNo}</span>`
+          : "Invoice: -";
+        const isComplete = Boolean(task.completed);
+        const checkedAttr = isComplete ? "checked" : "";
+        const itemClass = isComplete ? "todoItem is-complete" : "todoItem";
+        const label = isComplete ? "Mark task pending" : "Mark task done";
+        return `
+          <div class="${itemClass}" data-task-id="${task.id}">
+            <input class="todoCheck" type="checkbox" data-action="complete" aria-label="${label}" ${checkedAttr} />
+            <div>
+              <div class="todoTitle">${task.text}</div>
+              <div class="todoMeta">${dueLine}</div>
+              <div class="todoMeta">${invoiceLine}</div>
+            </div>
+            <div class="todoActions"></div>
+          </div>
+        `;
+      };
+
+      const pendingTasks = todoTasks.filter(task => !task.completed);
+      const completedTasks = todoTasks.filter(task => task.completed);
+
+      const renderSection = (title, tasks, emptyText) => {
+        const body = tasks.length
+          ? tasks.map(buildTaskRow).join("")
+          : `<div class="todoEmpty">${emptyText}</div>`;
+        return `
+          <div class="todoSection">
+            <div class="todoSectionHeader">${title}</div>
+            <div class="todoSectionList">${body}</div>
+          </div>
+        `;
+      };
+
+      todoList.innerHTML = `
+        ${renderSection("Pending", pendingTasks, "No pending tasks.")}
+        ${todoShowCompleted ? renderSection("Completed", completedTasks, "No completed tasks yet.") : ""}
+      `;
+    };
+    const addTodoTask = ({ text, dueDate, dueTime, invoiceNo }) => {
+      if (!text) return;
+      todoTaskCounter += 1;
+      todoTasks.unshift({
+        id: `task-${todoTaskCounter}`,
+        text,
+        dueDate: dueDate || "",
+        dueTime: dueTime || "",
+        invoiceNo: invoiceNo || "",
+        completed: false,
+        completedAt: ""
+      });
+      renderTodoList();
+      updateTodoBadge();
+    };
+
+    if (todoHeaderBtn && todoPanel && managerLayout) {
+      todoHeaderBtn.addEventListener("click", () => {
+        const isHidden = todoPanel.classList.contains("hidden");
+        todoPanel.classList.toggle("hidden", !isHidden);
+        managerLayout.classList.toggle("todoOpen", isHidden);
+      });
+    }
+
+    const showExtras = (focusId) => {
+      if (!todoExtras) return;
+      if (todoExtras.classList.contains("hidden")) {
+        todoExtras.classList.remove("hidden");
+      }
+      if (focusId) {
+        const el = document.getElementById(focusId);
+        if (el) el.focus();
+      }
+    };
+
+    if (todoPanel) {
+      todoPanel.addEventListener("click", (event) => {
+        const btn = event.target.closest("button[data-action]");
+        if (!btn) return;
+        const action = btn.getAttribute("data-action");
+        if (action === "toggle-extras") {
+          if (!todoExtras) return;
+          const willShow = todoExtras.classList.contains("hidden");
+          todoExtras.classList.toggle("hidden", !willShow);
+          if (willShow) {
+            const el = document.getElementById("todoDueDate");
+            if (el) el.focus();
+          }
+        }
+      });
+    }
+
+    if (todoCompletedToggle) {
+      todoCompletedToggle.addEventListener("click", () => {
+        todoShowCompleted = !todoShowCompleted;
+        renderTodoList();
+        updateTodoCompletedToggle();
+      });
+    }
+
+    if (todoAddBtn) {
+      todoAddBtn.addEventListener("click", () => {
+        const text = todoInput ? todoInput.value.trim() : "";
+        if (!text) return;
+        addTodoTask({
+          text,
+          dueDate: todoDueDate ? todoDueDate.value : "",
+          dueTime: todoDueTime ? todoDueTime.value : "",
+          invoiceNo: todoInvoiceInput ? todoInvoiceInput.value.trim() : ""
+        });
+        if (todoInput) todoInput.value = "";
+        if (todoDueDate) todoDueDate.value = "";
+        if (todoDueTime) todoDueTime.value = "";
+        if (todoInvoiceInput) todoInvoiceInput.value = "";
+      });
+    }
+
+    if (todoList) {
+      todoList.addEventListener("change", (event) => {
+        const chk = event.target.closest("input[data-action='complete']");
+        if (!chk) return;
+        const item = event.target.closest(".todoItem");
+        const taskId = item ? item.getAttribute("data-task-id") : "";
+        if (!taskId) return;
+        const task = todoTasks.find(entry => entry.id === taskId);
+        if (task) {
+          task.completed = chk.checked;
+          task.completedAt = task.completed ? new Date().toISOString() : "";
+        }
+        renderTodoList();
+        updateTodoBadge();
+      });
+    }
+    renderTodoList();
+    updateTodoBadge();
+
+    const updateClock = () => {
+      if (!clockEl) return;
+      const now = new Date();
+      let hours = now.getHours();
+      const minutes = String(now.getMinutes()).padStart(2, "0");
+      const seconds = String(now.getSeconds()).padStart(2, "0");
+      const period = hours >= 12 ? "PM" : "AM";
+      hours = hours % 12 || 12;
+      clockEl.textContent = `${hours}:${minutes}:${seconds} ${period}`;
+    };
+
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    renderGlobalCards();
+    updateSummaryModeLabels();
+    renderSummary();
+    renderTable();
+    renderCustomerSummary();
+
+    const menuBtn = document.getElementById("headerMenuBtn");
+    const overlay = document.getElementById("sideNavOverlay");
+    const closeBtn = document.getElementById("sideNavClose");
+    const sideNav = document.getElementById("sideNav");
+
+    const openSideNav = () => {
+      if (!overlay) return;
+      overlay.classList.add("open");
+      overlay.setAttribute("aria-hidden", "false");
+    };
+
+    const closeSideNav = () => {
+      if (!overlay) return;
+      overlay.classList.remove("open");
+      overlay.setAttribute("aria-hidden", "true");
+    };
+
+    if (menuBtn) menuBtn.addEventListener("click", openSideNav);
+    if (closeBtn) closeBtn.addEventListener("click", closeSideNav);
+    if (overlay) {
+      overlay.addEventListener("click", (event) => {
+        if (event.target === overlay) closeSideNav();
+      });
+    }
+    if (sideNav) {
+      sideNav.addEventListener("click", (event) => {
+        const toggle = event.target.closest(".nav-link[data-toggle=\"submenu\"]");
+        if (toggle) {
+          event.preventDefault();
+          const menuItem = toggle.closest(".menu-item");
+          if (!menuItem) return;
+          const isOpen = menuItem.classList.toggle("open");
+          toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+          return;
+        }
+
+        const item = event.target.closest(".nav-link[data-module], .submenu-link[data-module]");
+        if (!item) return;
+        const moduleKey = item.getAttribute("data-module");
+        if (moduleKey === "visit") window.location.href = "visitmodule.html";
+        if (moduleKey === "visit-review") window.location.href = "visitmoduleReview.html";
+        if (moduleKey === "landing") window.location.href = "../index.html";
+        if (moduleKey === "landing-manager") window.location.href = "LPmanager.html";
+        if (moduleKey === "landing-backend") window.location.href = "LPbackend.html";
+      });
+    }
+  })();
+</script>
+</body>
+</html>
+
+
+

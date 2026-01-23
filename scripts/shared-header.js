@@ -262,6 +262,7 @@
           <a class="submenu-link" href="${resolvePath("index.html")}" data-module="landing">Landing Page</a>
           <a class="submenu-link" href="${resolvePath("pages/LPmanager.html")}" data-module="landing-manager">Landing Page - Manager</a>
           <a class="submenu-link" href="${resolvePath("pages/LPsupervisor.html")}" data-module="landing-supervisor">Landing Page - Supervisor</a>
+          <a class="submenu-link" href="${resolvePath("pages/KAM.html")}" data-module="landing-kam">Landing Page - KAM</a>
           <a class="submenu-link" href="${resolvePath("pages/LPbackend.html")}" data-module="landing-backend">Landing Page - Backend</a>
         </div>
       </li>
@@ -597,6 +598,7 @@
             landing: "index.html",
             "landing-manager": "pages/LPmanager.html",
             "landing-supervisor": "pages/LPsupervisor.html",
+            "landing-kam": "pages/KAM.html",
             "landing-backend": "pages/LPbackend.html",
             "pdc-agent": "pages/PDCagent.html",
             "pdc-ops": "pages/PDCOps.html"
