@@ -1086,7 +1086,7 @@
                   <td>${formatAmount(agent.untouchedAmount)}</td>
                   <td>${formatAmount(agent.aging30Amount)}</td>
                   <td>${formatAmount(agent.newBillingAmount)}</td>
-                  <td><span class="text-muted">-</span></td>
+                  <td><button class="actionBtn actionBtnSecondary" type="button" data-action="view-invoice" data-agent="${agent.name}">View Invoices</button></td>
                 </tr>
               `);
             });
@@ -1231,6 +1231,13 @@
             } else {
               setActiveManager(primaryName);
             }
+            return;
+          }
+          if (action === "view-invoice") {
+            const agentName = primaryName;
+            localStorage.setItem("activeUserName", agentName);
+            localStorage.setItem("activeUserRole", "agent");
+            window.location.href = "../index.html";
             return;
           }
           return;
