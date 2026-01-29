@@ -1,0 +1,511 @@
+.submissionMain {
+  max-width: none;
+  margin: 0;
+  padding: 24px 28px 40px;
+  width: 100%;
+}
+
+.submissionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.submissionHeader h1 {
+  font-size: 22px;
+  margin: 0;
+  color: #111827;
+}
+
+.submissionHeader p {
+  margin: 4px 0 0;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.submissionCards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.summaryCard {
+  border: 1px solid #e2e8f4;
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: #f8fafc;
+}
+
+.summaryCard span {
+  display: block;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #94a3b8;
+  margin-bottom: 6px;
+}
+
+.summaryCard strong {
+  font-size: 16px;
+  color: #111827;
+}
+
+.quickInfoSection {
+  margin-bottom: 16px;
+}
+
+.quickInfoList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+}
+
+.quickInfoItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid #e2e8f4;
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: #ffffff;
+  font-size: 12px;
+  color: #111827;
+}
+
+.quickInfoCount {
+  background: var(--brand-light);
+  color: var(--brand-dark);
+  border: 1px solid var(--brand-border);
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.submissionClock {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  background: #ffffff;
+  border: 1px solid #e2e8f4;
+  border-radius: 12px;
+  padding: 8px 12px;
+  min-width: 160px;
+}
+
+.submissionClock span {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #94a3b8;
+}
+
+.submissionClock strong {
+  font-size: 16px;
+  color: #111827;
+}
+
+.panelCard {
+  background: #ffffff;
+  border: 1px solid #e2e8f4;
+  border-radius: 16px;
+  padding: 14px;
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.05);
+}
+
+.panelTitle {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #64748b;
+  margin-bottom: 12px;
+}
+
+.submissionForm {
+  display: grid;
+  gap: 12px;
+  width: min(900px, 75%);
+  margin: 0 auto;
+}
+
+.formGrid {
+  display: grid;
+  gap: 10px 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.formField {
+  display: grid;
+  gap: 6px;
+}
+
+.formField--full {
+  grid-column: 1 / -1;
+}
+
+.formField label {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.formField input,
+.formField select,
+.formField textarea {
+  padding: 8px 10px;
+  border: 1px solid #e2e8f4;
+  border-radius: 10px;
+  font-size: 12px;
+  font-family: inherit;
+  background: #ffffff;
+}
+
+.formActions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.formMessage {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.tableWrap {
+  width: 100%;
+  overflow: auto;
+}
+
+.submissionTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  table-layout: fixed;
+}
+
+.submissionTable th,
+.submissionTable td {
+  padding: 10px 8px;
+  border-bottom: 1px dashed #e2e8f4;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.submissionTable th {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #64748b;
+}
+
+.submissionTable tbody tr:hover {
+  background: #f8fafc;
+}
+
+.rowActionBtn {
+  border: 1px solid #d7c3ea;
+  background: #ffffff;
+  color: #4b1f73;
+  border-radius: 10px;
+  padding: 6px 10px;
+  font-weight: 700;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.bulkActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: flex-end;
+  padding-top: 8px;
+  font-size: 12px;
+  color: #64748b;
+}
+
+.tableFilters {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.filtersRow {
+  justify-content: space-between;
+}
+
+.filtersLeft,
+.filtersRight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.filtersRight {
+  margin-left: auto;
+  justify-content: flex-end;
+}
+
+.filterSuggest {
+  position: relative;
+  min-width: 220px;
+}
+
+.filterSuggest .suggestionBox {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 20;
+}
+
+.dateRangePicker {
+  position: relative;
+  display: inline-flex;
+}
+
+.dateRangePopup {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 280px;
+  background: #ffffff;
+  border: 1px solid #e2e8f4;
+  border-radius: 12px;
+  box-shadow: 0 16px 32px rgba(15, 23, 42, 0.14);
+  padding: 10px;
+  display: none;
+  z-index: 30;
+}
+
+.dateRangePopup.open {
+  display: block;
+}
+
+.dateRangeHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.dateRangeMonth {
+  font-size: 12px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.dateRangeNavBtn {
+  border: 1px solid #e2e8f4;
+  background: #f8fafc;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #64748b;
+}
+
+.dateRangeWeekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  font-size: 10px;
+  text-transform: uppercase;
+  color: #94a3b8;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+
+.dateRangeGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.dateCell {
+  border: 1px solid #e2e8f4;
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 6px 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: #111827;
+  cursor: pointer;
+  text-align: center;
+}
+
+.dateCell.is-empty {
+  border: 1px dashed #e2e8f4;
+  background: transparent;
+  color: transparent;
+  cursor: default;
+}
+
+.dateCell.is-in-range {
+  background: var(--brand-lighter);
+  border-color: var(--brand-border);
+  color: var(--brand-dark);
+}
+
+.dateCell.is-start,
+.dateCell.is-end {
+  background: var(--brand);
+  border-color: var(--brand-dark);
+  color: #ffffff;
+}
+
+.dateCell.is-today {
+  border-color: #c4b5fd;
+}
+
+.dateRangeFooter {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.dateRangeMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dateRangeValues {
+  display: flex;
+  gap: 10px;
+  font-size: 11px;
+  color: #64748b;
+}
+
+.dateRangeValues strong {
+  color: #111827;
+  font-weight: 700;
+}
+
+.dateRangeActions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dateRangeHint {
+  font-size: 10px;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 700;
+}
+
+.dateRangeClear {
+  border: 1px dashed #cbd5f5;
+  background: #ffffff;
+  color: #475569;
+  border-radius: 8px;
+  padding: 4px 8px;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.dateRangeApply {
+  border: 1px solid var(--brand-dark);
+  background: var(--brand);
+  color: #ffffff;
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.dateRangeApply:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.filtersRow .filterInput {
+  min-width: 200px;
+  cursor: text;
+  font-weight: 600;
+}
+
+.filtersRow .filterInput::placeholder {
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+
+.bulkActions .btnPrimary {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+.submissionFormPanel {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px dashed #e2e8f4;
+}
+
+.submissionFormPanel .panelTitle {
+  width: min(900px, 75%);
+  margin: 0 auto 12px;
+}
+
+@media (max-width: 1100px) {
+  .submissionGrid {
+    grid-template-columns: 1fr;
+  }
+  .submissionClock {
+    align-items: flex-start;
+  }
+  .quickInfoSection {
+    position: static;
+  }
+}
+
+@media (max-width: 720px) {
+  .submissionMain {
+    padding: 20px;
+  }
+  .submissionHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .filtersRow {
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
+  .filtersRight {
+    margin-left: 0;
+    justify-content: flex-start;
+  }
+}
+.submissionGrid {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.quickInfoSection {
+  position: sticky;
+  top: 96px;
+  margin-bottom: 0;
+}
+.submissionPage {
+  overflow: auto;
+  min-height: 100vh;
+}

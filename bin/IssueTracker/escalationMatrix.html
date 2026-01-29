@@ -4,54 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Approval Matrix • Issue Tracker</title>
+  <link rel="stylesheet" href="../../css/styles.css" />
   <link rel="stylesheet" href="css/style.css" />
-  <style>
-    /* Light page-specific styles to complement css/style.css */
-    .page { padding: 0 16px 24px; }
-    .section { background: #fff; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,.06); margin: 16px 0; overflow: hidden; }
-    .section h2 { margin: 0; padding: 12px 16px; background: #f3f0ff; color: #3f2d9e; font-size: 1rem; border-bottom: 1px solid #e9e6ff; display:flex; align-items:center; justify-content:space-between; gap: 12px; }
-    .section-body { padding: 12px 16px; }
-    .table-wrap { width: 100%; overflow: auto; }
-    table { width: 100%; border-collapse: separate; border-spacing: 0; }
-    thead th { position: sticky; top: 0; background: #efeafe; color: #3f2d9e; text-align: left; padding: 10px; font-weight: 600; border-bottom: 1px solid #e2defa; }
-    tbody td { padding: 10px; border-bottom: 1px solid #f0f0f5; }
-    .pill { border-radius: 999px; padding: 6px 12px; border: 1px solid transparent; cursor: pointer; }
-    .pill.primary { background:#6c5ce7; color:#fff; border-color:#6c5ce7; }
-    .pill.secondary { background:#ecebff; color:#3f2d9e; border:1px solid #c8c3ff; }
-    .toolbar { display:flex; gap: 8px; align-items:center; }
-    .search { display:flex; gap:6px; align-items:center; }
-    .search input { padding:8px 10px; border:1px solid #d8d8e5; border-radius:6px; }
-    .badge { background:#efeafe; color:#3f2d9e; border:1px solid #ded9ff; border-radius:999px; padding:2px 8px; font-size:.8rem; }
-    .meta { color:#666; font-size:.85rem; }
-    .actions { display:flex; gap:8px; flex-wrap: wrap; }
-    @media (max-width: 900px){ .toolbar{flex-direction:column; align-items:flex-start;} }
-
-    /* Modal + overlay */
-    .overlay { position: fixed; inset: 0; background: rgba(5,5,30,.45); display:none; align-items:center; justify-content:center; padding: 16px; z-index: 1000; }
-    .overlay.show { display:flex; }
-    .dialog { width: min(680px, 100%); max-height: 75vh; background:#fff; border-radius:12px; box-shadow: 0 10px 30px rgba(0,0,0,.2); overflow:hidden; display:flex; flex-direction:column; }
-    .dialog header { padding: 14px 16px; background:#f7f6ff; border-bottom:1px solid #ece9ff; color:#3f2d9e; font-weight:600; display:flex; align-items:center; justify-content:space-between; }
-    .dialog .body { padding:16px; display:flex; flex-direction:column; gap:12px; overflow:auto; flex:1 1 auto; min-height:0; }
-    .dialog .footer { padding:12px 16px; background:#faf9ff; border-top:1px solid #ece9ff; display:flex; gap:8px; justify-content:flex-end; }
-    .dialog .field { display:flex; flex-direction:column; gap:6px; }
-    .dialog input[type="text"], .dialog select { padding:10px 12px; border:1px solid #d8d8e5; border-radius:8px; }
-    .dialog .muted { color:#666; font-size:.9rem; }
-
-    /* Approval matrix builder */
-    /* Switch flow-chart to vertical (top -> bottom) */
-    .levels { display:flex; flex-direction: column; align-items:flex-start; gap:16px; overflow:auto; padding-right:6px; }
-    .level-node { position:relative; background:#ffffff; border:1px solid #e6e3ff; border-radius:10px; padding:10px; box-shadow: 0 1px 3px rgba(0,0,0,.05); min-width: 0; width: 100%; max-width: 520px; }
-    .level-node h4 { margin: 0 0 8px 0; font-size:.95rem; color:#3f2d9e; }
-    .level-node .remove { position:absolute; top:6px; right:6px; border:none; background:transparent; color:#b00020; cursor:pointer; font-weight:700; }
-    .arrow { width:2px; height:40px; background: linear-gradient(180deg, #c8c3ff 60%, transparent 60%); background-size: 2px 10px; background-repeat: repeat-y; position:relative; margin: 0 0 0 12px; }
-    .arrow::after { content:''; position:absolute; left:50%; transform: translateX(-50%); bottom:-6px; border:6px solid transparent; border-top-color:#c8c3ff; }
-    .add-level { border:1px dashed #b7b2ff; background:#f7f6ff; color:#3f2d9e; border-radius:10px; padding:10px 12px; cursor:pointer; }
-    .inline { display:flex; align-items:center; gap:8px; }
-  </style>
+  
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <link rel="stylesheet" href="../../css/shared-header.css">
 </head>
-<body data-root-path="../../" data-relationship-name="Issue Tracker" data-relationship-badge="IT">
+<body class="it-page" data-root-path="../../" data-relationship-name="Issue Tracker" data-relationship-badge="IT">
   <div data-shared-header></div>
 
   <main class="page" aria-label="Approval Matrix">

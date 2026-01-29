@@ -1,15 +1,15 @@
 :root {
-  --ink: #1f1b24;
-  --muted: #6b6374;
-  --accent: #5c258d;
-  --accent-soft: #efe6f7;
-  --sun: #7d3fb3;
-  --sky: #9b6ad2;
-  --rose: #c3a1e8;
+  --ink: #0f172a;
+  --muted: #64748b;
+  --accent: var(--brand);
+  --accent-soft: var(--brand-light);
+  --sun: #f59e0b;
+  --sky: #38bdf8;
+  --rose: #f472b6;
   --panel: #ffffff;
-  --border: #e5e7eb;
-  --bg: #f7faf9;
-  --shadow: 0 22px 45px rgba(34, 16, 58, 0.14);
+  --border: #e2e8f4;
+  --bg: #f4f6f9;
+  --shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
 }
 
 * {
@@ -18,46 +18,17 @@
 
 body {
   margin: 0;
-  font-family: "Space Grotesk", "Segoe UI", sans-serif;
   color: var(--ink);
-  background:
-    radial-gradient(circle at 10% 20%, rgba(92, 37, 141, 0.16), transparent 45%),
-    radial-gradient(circle at 90% 10%, rgba(155, 106, 210, 0.2), transparent 45%),
-    linear-gradient(120deg, #f8f2ff 0%, #f5f0ff 55%, #f7f1ff 100%);
+  background: var(--bg);
   min-height: 100vh;
+  overflow: auto;
 }
 
 .dash-bg {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
+  display: none;
 }
 
-.shape {
-  position: absolute;
-  border-radius: 999px;
-  filter: blur(6px);
-  opacity: 0.4;
-  animation: float 14s ease-in-out infinite;
-}
-
-.shape--one {
-  width: 360px;
-  height: 360px;
-  top: -140px;
-  right: -120px;
-  background: radial-gradient(circle, rgba(92, 37, 141, 0.5), transparent 70%);
-}
-
-.shape--two {
-  width: 420px;
-  height: 420px;
-  bottom: -160px;
-  left: -140px;
-  background: radial-gradient(circle, rgba(155, 106, 210, 0.4), transparent 70%);
-  animation-delay: -5s;
-}
+.shape { display: none; }
 
 .dash-header {
   position: relative;
@@ -75,9 +46,10 @@ body {
 }
 
 .brand-name {
-  font-family: "Fraunces", "Georgia", serif;
   font-size: 1.5rem;
   letter-spacing: 0.02em;
+  font-weight: 800;
+  color: var(--ink);
 }
 
 .brand-tag {
@@ -87,7 +59,8 @@ body {
   padding: 0.2rem 0.6rem;
   border-radius: 999px;
   background: var(--accent-soft);
-  color: #0b4c43;
+  color: var(--brand-dark);
+  border: 1px solid var(--brand-border);
 }
 
 .header-meta {
@@ -124,8 +97,8 @@ body {
 
 .hero h1 {
   margin: 0;
-  font-family: "Fraunces", "Georgia", serif;
-  font-size: clamp(2rem, 3vw, 2.6rem);
+  font-size: clamp(1.6rem, 2.4vw, 2.2rem);
+  font-weight: 800;
 }
 
 .hero p {
@@ -143,8 +116,8 @@ body {
 .stat-card {
   background: var(--panel);
   border: 1px solid var(--border);
-  border-radius: 18px;
-  padding: 1.25rem;
+  border-radius: 14px;
+  padding: 1.1rem 1.2rem;
   box-shadow: var(--shadow);
   display: grid;
   gap: 0.5rem;
@@ -159,8 +132,8 @@ body {
 
 .stat-card--clickable:hover {
   transform: translateY(-2px);
-  border-color: rgba(92, 37, 141, 0.45);
-  box-shadow: 0 26px 50px rgba(34, 16, 58, 0.18);
+  border-color: var(--brand-border);
+  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.12);
 }
 
 .stat-card--clickable:focus-visible {
@@ -170,9 +143,9 @@ body {
 
 .stat-label {
   color: var(--muted);
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
 }
 
 .stat-value {
@@ -194,8 +167,8 @@ body {
 .chart-card {
   background: var(--panel);
   border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 1.5rem;
+  border-radius: 16px;
+  padding: 1.25rem;
   box-shadow: var(--shadow);
   display: grid;
   gap: 1rem;
@@ -218,8 +191,9 @@ body {
   font-size: 0.75rem;
   padding: 0.2rem 0.6rem;
   border-radius: 999px;
-  background: #f0e6fb;
-  color: #4a1b6e;
+  background: var(--accent-soft);
+  color: var(--brand-dark);
+  border: 1px solid var(--brand-border);
   text-transform: uppercase;
   letter-spacing: 0.12em;
 }

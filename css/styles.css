@@ -3878,3 +3878,15 @@ hr {
   border-top: 1px solid #e6e9ef;
   margin: 12px 0;
 }
+
+table thead {
+  background: #5c258d !important;
+}
+
+table thead th {
+  background: #5c258d !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.04em !important;
+}

@@ -962,7 +962,7 @@
         <div class="globalCard"><span>Total Target (MTD)</span><strong>${formatAmount(totals.target)}</strong></div>
         <div class="globalCard"><span>Total Achievement</span><strong>${formatAmount(totals.achievement)}</strong></div>
         <div class="globalCard"><span>Open Issues</span><strong>${openIssues}</strong></div>
-        <div class="globalCard"><span>Pending Visit Approvals</span><strong>${pendingVisitApprovals}</strong></div>
+        <div class="globalCard"><span>Pending Approvals</span><strong>${pendingVisitApprovals}</strong></div>
       `;
     };
 
@@ -1304,7 +1304,7 @@
 
     if (issueTrackerBtn) {
       issueTrackerBtn.addEventListener("click", () => {
-        window.location.href = "../bin/IssueTracker/index.html";
+        window.location.href = "issuetrackerLP.html";
       });
     }
 

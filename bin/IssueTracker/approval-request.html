@@ -4,9 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Approval Request - Inebura</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../css/styles.css">
   <link rel="stylesheet" href="css/approver.css">
   <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" href="/icon.svg" type="image/svg+xml">
@@ -14,7 +12,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <link rel="stylesheet" href="../../css/shared-header.css">
 </head>
-<body data-root-path="../../" data-relationship-name="Issue Tracker" data-relationship-badge="IT">
+<body class="it-page" data-root-path="../../" data-relationship-name="Issue Tracker" data-relationship-badge="IT">
   <div class="app-shell">
     <div data-shared-header></div>
 
@@ -36,27 +34,30 @@
         </div>
       </section>
 
-      <section id="decision-card" class="card stack">
-        <h3>Decision</h3>
-        <div class="field">
-          <label for="remark">Remarks (required)</label>
-          <textarea id="remark" rows="4" placeholder="Add your approval or rejection remark..."></textarea>
+      <section class="decision-trail-grid">
+        <div id="decision-card" class="card stack">
+          <h3>Decision</h3>
+          <div class="field">
+            <label for="remark">Remarks (required)</label>
+            <textarea id="remark" rows="4" placeholder="Add your approval or rejection remark..."></textarea>
+          </div>
+          <div class="field">
+            <label for="documents">Attach documents</label>
+            <input id="documents" type="file" multiple>
+          </div>
+          <div class="controls">
+            <button id="approve-btn" class="btn btn--approve" type="button" disabled>Approve</button>
+            <button id="reject-btn" class="btn btn--reject" type="button" disabled>Reject</button>
+            <a class="btn btn--ghost" id="back-to-dashboard" href="approver-dashboard.html">Back to dashboard</a>
+          </div>
+          <div class="meta" id="decision-disabled-note">Approvals are disabled. Remarks can be added for reference.</div>
+          <div id="action-msg" class="notice" style="display:none;"></div>
         </div>
-        <div class="field">
-          <label for="documents">Attach documents</label>
-          <input id="documents" type="file" multiple>
-        </div>
-        <div class="controls">
-          <button id="approve-btn" class="btn btn--approve" type="button">Approve</button>
-          <button id="reject-btn" class="btn btn--reject" type="button">Reject</button>
-          <a class="btn btn--ghost" href="approver-dashboard.html">Back to dashboard</a>
-        </div>
-        <div id="action-msg" class="notice" style="display:none;"></div>
-      </section>
 
-      <section class="card stack">
-        <h3>Approval Trail</h3>
-        <div id="trail" class="stack"></div>
+        <div class="card stack trail-card">
+          <h3>Approval Trail</h3>
+          <div id="trail" class="trailCompact"></div>
+        </div>
       </section>
     </main>
 

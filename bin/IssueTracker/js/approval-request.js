@@ -10,6 +10,7 @@
   const decisionCard = document.getElementById('decision-card');
   const approveBtn = document.getElementById('approve-btn');
   const rejectBtn = document.getElementById('reject-btn');
+  const backBtn = document.getElementById('back-to-dashboard');
   const actionMsg = document.getElementById('action-msg');
   const trailWrap = document.getElementById('trail');
 
@@ -51,27 +52,125 @@
     }
   }
 
-  function renderTrail(trail) {
+  function getLevelDurations(req, now) {
+    const levels = Array.isArray(req?.levels) ? req.levels : [];
+    if (!levels.length) return [];
+    const start = new Date(req.createdAt || req.updatedAt || Date.now());
+    const starts = Array(levels.length).fill(null);
+    const ends = Array(levels.length).fill(null);
+    starts[0] = start;
+
+    const trail = Array.isArray(req.trail) ? req.trail.slice() : [];
+    trail.sort((a, b) => new Date(a.at || 0) - new Date(b.at || 0));
+    trail.forEach(entry => {
+      const levelIndex = (entry.level || 1) - 1;
+      if (levelIndex < 0 || levelIndex >= levels.length) return;
+      const at = new Date(entry.at || Date.now());
+      if (!starts[levelIndex]) starts[levelIndex] = at;
+      ends[levelIndex] = at;
+      if (String(entry.action || '').toLowerCase() === 'approved' && levelIndex + 1 < levels.length) {
+        if (!starts[levelIndex + 1]) starts[levelIndex + 1] = at;
+      }
+    });
+
+    const currentIndex = (req.currentLevel || 1) - 1;
+    const isPending = String(req.status || 'pending').toLowerCase() === 'pending';
+    const results = [];
+
+    levels.forEach((lvl, idx) => {
+      if (!starts[idx]) return;
+      let end = ends[idx];
+      let isOpen = false;
+      if (!end && isPending && idx === currentIndex) {
+        end = now;
+        isOpen = true;
+      }
+      if (!end) return;
+      const diffDays = Math.max(0, Math.floor((end.getTime() - starts[idx].getTime()) / (1000 * 60 * 60 * 24)));
+      const label = lvl.ownerName ? `Level ${idx + 1} - ${lvl.ownerName}` : `Level ${idx + 1}`;
+      results.push({ label, days: diffDays, isOpen });
+    });
+
+    return results;
+  }
+
+  function renderTrail(req) {
     if (!trailWrap) return;
     trailWrap.innerHTML = '';
-    if (!trail || !trail.length) {
-      trailWrap.textContent = 'No actions yet.';
+    const now = new Date();
+    const durations = getLevelDurations(req || {}, now);
+    const durationMap = new Map();
+    durations.forEach(item => {
+      const levelMatch = item.label.match(/^Level\s+(\d+)/i);
+      if (!levelMatch) return;
+      durationMap.set(Number(levelMatch[1]), item);
+    });
+
+    const trail = Array.isArray(req?.trail) ? req.trail : [];
+    if (!trail.length) {
+      const empty = document.createElement('div');
+      empty.className = 'meta';
+      empty.textContent = 'No actions yet.';
+      trailWrap.appendChild(empty);
       return;
     }
+
     trail.slice().sort((a, b) => new Date(b.at || 0) - new Date(a.at || 0)).forEach(entry => {
       const block = document.createElement('div');
-      block.className = 'level';
-      const files = entry.files && entry.files.length ? `Documents: ${entry.files.join(', ')}` : 'Documents: None';
+      const action = String(entry.action || '').toLowerCase();
+      const statusLabel = action ? action.charAt(0).toUpperCase() + action.slice(1) : 'Update';
+      const levelIndex = Number(entry.level || 0);
+      const levelDuration = durationMap.get(levelIndex);
+      const showDuration = action === 'approved' || action === 'rejected';
+      const durationLine = showDuration && levelDuration
+        ? `<div class="trailOpenDays">Open days: ${levelDuration.days} day${levelDuration.days === 1 ? '' : 's'}</div>`
+        : '';
+      const dateObj = new Date(entry.at || Date.now());
+      const dateLine = dateObj.toLocaleDateString();
+      const timeLine = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const documents = entry.files && entry.files.length
+        ? entry.files.map(name => (
+          `<a class="trailDocLink" href="#" role="button">${name}</a>`
+        )).join('')
+        : '<span class="trailDocEmpty">No documents</span>';
+      const statusClass = action === 'approved'
+        ? 'trailItem--approved'
+        : action === 'rejected'
+          ? 'trailItem--rejected'
+          : action === 'submitted'
+            ? 'trailItem--submitted'
+            : 'trailItem--default';
+
       block.innerHTML = `
-        <div>
-          <strong>${entry.action || 'action'}</strong> - ${entry.by || 'Unknown'}
-          <div class="meta">${new Date(entry.at || Date.now()).toLocaleString()}</div>
-          <div class="meta">${files}</div>
-          <div class="meta">Remark: ${entry.remark || '-'}</div>
-        </div>
-        <div>Level ${entry.level || '-'}</div>
+        <details class="trailItem ${statusClass}">
+          <summary class="trailSummary">
+            <span class="trailDot" aria-hidden="true"></span>
+            <div class="trailText">
+              <div class="trailTitle">${statusLabel} <span class="trailBy">- ${entry.by || 'Unknown'}</span></div>
+              <div class="trailSubtitle">Level ${entry.level || '-'} · ${dateLine}</div>
+            </div>
+            <span class="trailStatusPill">${statusLabel}</span>
+          </summary>
+          <div class="trailBody">
+            ${durationLine}
+            <div class="trailMetaRow">
+              <span class="trailMetaLabel">Documents</span>
+              <div class="trailDocs">${documents}</div>
+            </div>
+            <div class="trailMetaRow">
+              <span class="trailMetaLabel">Remark</span>
+              <span class="trailRemark">${entry.remark || '-'}</span>
+            </div>
+            <div class="trailFooter">
+              <div class="trailDateFooter">
+                <span>${dateLine}</span>
+                <span>${timeLine}</span>
+              </div>
+            </div>
+          </div>
+        </details>
       `;
-      trailWrap.appendChild(block);
+      trailWrap.appendChild(block.firstElementChild);
     });
   }
 
@@ -117,7 +216,7 @@
   if (!req) {
     renderMeta({ id: requestId || '-', status: 'not found' });
     renderLevels([], 0);
-    renderTrail([]);
+    renderTrail({ trail: [] });
     setMessage('Approval request not found.', 'error');
     if (approveBtn) approveBtn.disabled = true;
     if (rejectBtn) rejectBtn.disabled = true;
@@ -132,10 +231,14 @@
     const currentOwner = getCurrentOwner();
     const canAct = req.status === 'pending' && currentOwner && viewerEmail && currentOwner.ownerEmail === viewerEmail;
     if (decisionCard) {
-      decisionCard.style.display = canAct ? '' : 'none';
+      decisionCard.style.display = '';
     }
-    if (approveBtn) approveBtn.disabled = !canAct;
-    if (rejectBtn) rejectBtn.disabled = !canAct;
+    if (approveBtn) approveBtn.disabled = true;
+    if (rejectBtn) rejectBtn.disabled = true;
+    if (backBtn) {
+      backBtn.setAttribute('aria-disabled', 'true');
+      backBtn.setAttribute('tabindex', '-1');
+    }
     if (viewerNote) {
       if (!canAct) {
         viewerNote.textContent = viewerEmail
@@ -151,8 +254,14 @@
 
   renderMeta(req);
   renderLevels(req.levels || [], req.currentLevel || 1);
-  renderTrail(req.trail || []);
+  renderTrail(req);
   updatePermissions();
+
+  if (backBtn) {
+    backBtn.addEventListener('click', (event) => {
+      event.preventDefault();
+    });
+  }
 
   function handleAction(action) {
     const remark = (remarkInput && remarkInput.value || '').trim();
@@ -196,7 +305,7 @@
     saveRequests(list);
     renderMeta(req);
     renderLevels(req.levels || [], req.currentLevel || 1);
-    renderTrail(req.trail || []);
+    renderTrail(req);
     if (remarkInput) remarkInput.value = '';
     if (docsInput) docsInput.value = '';
     updatePermissions();

@@ -10,14 +10,12 @@
   const userAvatar = document.getElementById('user-avatar');
 
   const metricOpen = document.getElementById('metric-open');
+  const metricAvgDays = document.getElementById('metric-avg-days');
   const metricApproved = document.getElementById('metric-approved');
   const metricRejected = document.getElementById('metric-rejected');
   const metricTotal = document.getElementById('metric-total');
-  const pieEl = document.getElementById('status-pie');
-  const legendPending = document.getElementById('legend-pending');
-  const legendApproved = document.getElementById('legend-approved');
-  const legendRejected = document.getElementById('legend-rejected');
-  const refreshBtn = document.getElementById('refresh-btn');
+  const quickInfoList = document.getElementById('approval-quick-info');
+  const vintageList = document.getElementById('approval-vintage-list');
   const tbody = document.getElementById('request-tbody');
   const emptyState = document.getElementById('request-empty');
 
@@ -123,6 +121,48 @@
     return false;
   }
 
+  function getLevelDurations(req, now) {
+    const levels = Array.isArray(req.levels) ? req.levels : [];
+    if (!levels.length) return [];
+    const start = new Date(req.createdAt || req.updatedAt || Date.now());
+    const starts = Array(levels.length).fill(null);
+    const ends = Array(levels.length).fill(null);
+    starts[0] = start;
+
+    const trail = Array.isArray(req.trail) ? req.trail.slice() : [];
+    trail.sort((a, b) => new Date(a.at || 0) - new Date(b.at || 0));
+    trail.forEach(entry => {
+      const levelIndex = (entry.level || 1) - 1;
+      if (levelIndex < 0 || levelIndex >= levels.length) return;
+      const at = new Date(entry.at || Date.now());
+      if (!starts[levelIndex]) starts[levelIndex] = at;
+      ends[levelIndex] = at;
+      if (String(entry.action || '').toLowerCase() === 'approved' && levelIndex + 1 < levels.length) {
+        if (!starts[levelIndex + 1]) starts[levelIndex + 1] = at;
+      }
+    });
+
+    const currentIndex = (req.currentLevel || 1) - 1;
+    const isPending = String(req.status || 'pending').toLowerCase() === 'pending';
+    const results = [];
+
+    levels.forEach((lvl, idx) => {
+      if (!starts[idx]) return;
+      let end = ends[idx];
+      let isOpen = false;
+      if (!end && isPending && idx === currentIndex) {
+        end = now;
+        isOpen = true;
+      }
+      if (!end) return;
+      const diffDays = Math.max(0, Math.floor((end.getTime() - starts[idx].getTime()) / (1000 * 60 * 60 * 24)));
+      const label = lvl.ownerName ? `Level ${idx + 1} - ${lvl.ownerName}` : `Level ${idx + 1}`;
+      results.push({ label, days: diffDays, isOpen });
+    });
+
+    return results;
+  }
+
   function render() {
     if (!tbody) return;
     const map = getApproverMap();
@@ -137,6 +177,14 @@
     }
     list.sort((a, b) => new Date(b.updatedAt || b.createdAt || 0) - new Date(a.updatedAt || a.createdAt || 0));
 
+    const now = new Date();
+    const getOpenDays = (req) => {
+      const start = new Date(req.createdAt || req.updatedAt || Date.now());
+      if (Number.isNaN(start.getTime())) return 0;
+      const diffMs = now.getTime() - start.getTime();
+      return Math.max(0, Math.floor(diffMs / (1000 * 60 * 60 * 24)));
+    };
+
     tbody.innerHTML = '';
     list.forEach(r => {
       const issue = r.issue || {};
@@ -145,12 +193,14 @@
       const currentOwner = Array.isArray(r.levels) ? r.levels[currentLevel - 1] : null;
       const myTurn = selected && r.status === 'pending' && currentOwner && currentOwner.ownerEmail === selected;
       const statusInfo = formatStatus(r.status);
+      const isPending = (r.status || 'pending').toLowerCase() === 'pending';
+      const openDays = isPending ? getOpenDays(r) : '-';
+      const levelDurations = getLevelDurations(r, now);
+      const tooltip = levelDurations.length
+        ? levelDurations.map(item => `${item.label}: ${item.days} day${item.days === 1 ? '' : 's'}${item.isOpen ? ' (open)' : ''}`).join('\n')
+        : '';
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td>
-          <strong>${r.id || '-'}</strong>
-          <div class="meta">${new Date(r.createdAt || Date.now()).toLocaleString()}</div>
-        </td>
         <td>
           <div>${issue.id || '-'}</div>
           <div class="meta">${issue.title || issue.subStatus || '-'}</div>
@@ -169,10 +219,15 @@
           ${myTurn ? '<div class="meta">My turn</div>' : ''}
         </td>
         <td><span class="${statusInfo.cls}">${statusInfo.label}</span></td>
+        <td class="open-days-cell">${openDays}</td>
         <td>
           <a class="btn btn--ghost" href="approval-request.html?id=${encodeURIComponent(r.id || '')}&user=${encodeURIComponent(selected || '')}">Review</a>
         </td>
       `;
+      if (tooltip) {
+        const openCell = tr.querySelector('.open-days-cell');
+        if (openCell) openCell.title = tooltip;
+      }
       tbody.appendChild(tr);
     });
 
@@ -183,7 +238,6 @@
         : 'Select an approver to see approval requests.';
     }
 
-    const now = new Date();
     const month = now.getMonth();
     const year = now.getFullYear();
 
@@ -193,12 +247,26 @@
     let openToApprove = 0;
     let approvedThisMonth = 0;
     let rejectedThisMonth = 0;
+    let pendingOpenDaysTotal = 0;
+    const vintageBuckets = [
+      { label: '0-2 days', min: 0, max: 2, count: 0 },
+      { label: '3-5 days', min: 3, max: 5, count: 0 },
+      { label: '6-10 days', min: 6, max: 10, count: 0 },
+      { label: '11-15 days', min: 11, max: 15, count: 0 },
+      { label: '16+ days', min: 16, max: Infinity, count: 0 }
+    ];
 
     list.forEach(r => {
       const status = (r.status || 'pending').toLowerCase();
       if (status === 'approved') approvedCount += 1;
       else if (status === 'rejected') rejectedCount += 1;
-      else pendingCount += 1;
+      else {
+        pendingCount += 1;
+        const openDays = getOpenDays(r);
+        pendingOpenDaysTotal += openDays;
+        const bucket = vintageBuckets.find(item => openDays >= item.min && openDays <= item.max);
+        if (bucket) bucket.count += 1;
+      }
 
       const currentLevel = r.currentLevel || 1;
       const currentOwner = Array.isArray(r.levels) ? r.levels[currentLevel - 1] : null;
@@ -218,22 +286,28 @@
     });
 
     if (metricOpen) metricOpen.textContent = openToApprove;
+    if (metricAvgDays) {
+      const avg = pendingCount ? pendingOpenDaysTotal / pendingCount : 0;
+      metricAvgDays.textContent = avg ? avg.toFixed(1) : '0';
+    }
     if (metricApproved) metricApproved.textContent = approvedThisMonth;
     if (metricRejected) metricRejected.textContent = rejectedThisMonth;
     if (metricTotal) metricTotal.textContent = list.length;
 
-    if (legendPending) legendPending.textContent = pendingCount;
-    if (legendApproved) legendApproved.textContent = approvedCount;
-    if (legendRejected) legendRejected.textContent = rejectedCount;
+    if (quickInfoList) {
+      quickInfoList.innerHTML = `
+        <li class="quick-info-item"><span>Pending</span><span class="quick-info-count">${pendingCount}</span></li>
+        <li class="quick-info-item"><span>Approved</span><span class="quick-info-count">${approvedCount}</span></li>
+        <li class="quick-info-item"><span>Rejected</span><span class="quick-info-count">${rejectedCount}</span></li>
+      `;
+    }
 
-    if (pieEl) {
-      const total = pendingCount + approvedCount + rejectedCount;
-      const pendingPct = total ? (pendingCount / total) * 100 : 0;
-      const approvedPct = total ? (approvedCount / total) * 100 : 0;
-      const p1 = pendingPct;
-      const p2 = pendingPct + approvedPct;
-      pieEl.style.setProperty('--p1', `${p1}%`);
-      pieEl.style.setProperty('--p2', `${p2}%`);
+    if (vintageList) {
+      vintageList.innerHTML = vintageBuckets
+        .map(bucket => (
+          `<li class="quick-info-item"><span>${bucket.label}</span><span class="quick-info-count">${bucket.count}</span></li>`
+        ))
+        .join('');
     }
   }
 
@@ -269,7 +343,6 @@
   }
   window.addEventListener('click', () => toggleUserPanel(false));
 
-  if (refreshBtn) refreshBtn.addEventListener('click', render);
   window.addEventListener('storage', (event) => {
     if (event.key === REQ_KEY || event.key === MAT_KEY || event.key === ACTIVE_USER_KEY) {
       buildUserOptions(getApproverMap());

@@ -3013,7 +3013,7 @@ function wireIssueCountNavigation() {
   if (!issueBtn) return;
 
   const goToIssueTracker = () => {
-    window.location.href = "bin/IssueTracker/index.html";
+    window.location.href = "pages/issuetrackerLP.html";
   };
 
   issueBtn.addEventListener("click", goToIssueTracker);

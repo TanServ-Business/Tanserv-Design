@@ -1,12 +1,13 @@
 :root {
-  --ink: #1f1b24;
-  --muted: #6b6374;
-  --accent: #5c258d;
-  --accent-dark: #3f135f;
-  --accent-soft: #f6f0fb;
-  --accent-border: #d9c8ee;
+  --ink: #0f172a;
+  --muted: #64748b;
+  --accent: var(--brand);
+  --accent-dark: var(--brand-dark);
+  --accent-soft: var(--brand-light);
+  --accent-border: var(--brand-border);
+  --border: #e2e8f4;
   --panel: #ffffff;
-  --shadow: 0 22px 45px rgba(34, 16, 58, 0.14);
+  --shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
   --success: #16a34a;
   --success-soft: #dcfce7;
   --danger: #dc2626;
@@ -21,13 +22,10 @@
 
 body {
   margin: 0;
-  font-family: "Space Grotesk", "Segoe UI", sans-serif;
   color: var(--ink);
-  background:
-    radial-gradient(circle at 12% 18%, rgba(92, 37, 141, 0.2), transparent 45%),
-    radial-gradient(circle at 88% 14%, rgba(92, 37, 141, 0.18), transparent 45%),
-    linear-gradient(120deg, #f8f2ff 0%, #f6f0fb 55%, #f7f1ff 100%);
+  background: #f4f6f9;
   min-height: 100vh;
+  overflow: auto;
 }
 
 .app-shell {
@@ -41,8 +39,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: var(--accent-soft);
-  border-bottom: 1px solid var(--accent-border);
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
 }
 
 .brand {
@@ -53,9 +51,9 @@ body {
 
 .brand h1 {
   margin: 0;
-  font-family: "Fraunces", "Georgia", serif;
   font-size: 1.5rem;
   color: var(--accent-dark);
+  font-weight: 800;
 }
 
 .brand span {
@@ -64,8 +62,9 @@ body {
   text-transform: uppercase;
   padding: 0.2rem 0.6rem;
   border-radius: 999px;
-  background: #efe6f7;
+  background: var(--accent-soft);
   color: var(--accent-dark);
+  border: 1px solid var(--accent-border);
 }
 
 .nav {
@@ -78,9 +77,9 @@ body {
   text-decoration: none;
   color: var(--accent-dark);
   padding: 0.4rem 0.75rem;
-  border-radius: 999px;
+  border-radius: 10px;
   background: #fff;
-  border: 1px solid var(--accent-border);
+  border: 1px solid var(--border);
 }
 
 .header-actions {
@@ -98,8 +97,8 @@ body {
   align-items: center;
   gap: 0.6rem;
   padding: 0.4rem 0.6rem;
-  border-radius: 999px;
-  border: 1px solid var(--accent-border);
+  border-radius: 10px;
+  border: 1px solid var(--border);
   background: #fff;
   cursor: pointer;
   font-size: 0.85rem;
@@ -109,7 +108,7 @@ body {
 .user-avatar {
   width: 28px;
   height: 28px;
-  border-radius: 50%;
+  border-radius: 10px;
   background: var(--accent);
   color: #fff;
   display: grid;
@@ -127,7 +126,7 @@ body {
   right: 0;
   top: calc(100% + 8px);
   background: #fff;
-  border: 1px solid var(--accent-border);
+  border: 1px solid var(--border);
   border-radius: 12px;
   box-shadow: var(--shadow);
   padding: 0.75rem;
@@ -153,6 +152,218 @@ body {
   gap: 1.5rem;
 }
 
+.decision-trail-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 3fr);
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.trail-card {
+  position: sticky;
+  top: 96px;
+  width: 100%;
+}
+
+.trailCompact {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-left: 24px;
+}
+
+.trailCompact::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 12px;
+  width: 2px;
+  background: #e2e8f4;
+}
+
+.trailItem {
+  position: relative;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: #f8fafc;
+  padding: 0.5rem 0.75rem;
+}
+
+.trailItem + .trailItem {
+  margin-top: 0.2rem;
+}
+
+.trailSummary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  position: relative;
+}
+
+.trailSummary::-webkit-details-marker {
+  display: none;
+}
+
+.trailDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  background: #ffffff;
+  flex: 0 0 10px;
+  position: absolute;
+  left: -29px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.trailText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.trailTitle {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.trailSubtitle {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.trailStatusPill {
+  margin-left: auto;
+  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.trailItem--approved {
+  color: #16a34a;
+}
+
+.trailItem--approved .trailStatusPill {
+  background: #dcfce7;
+  border-color: #86efac;
+  color: #166534;
+}
+
+.trailItem--rejected {
+  color: #f59e0b;
+}
+
+.trailItem--rejected .trailStatusPill {
+  background: #fef3c7;
+  border-color: #f59e0b;
+  color: #92400e;
+}
+
+.trailItem--submitted {
+  color: #2563eb;
+}
+
+.trailItem--submitted .trailStatusPill {
+  background: #dbeafe;
+  border-color: #93c5fd;
+  color: #1d4ed8;
+}
+
+.trailItem--default {
+  color: #6b7280;
+}
+
+.trailItem--default .trailStatusPill {
+  background: #e2e8f0;
+  border-color: #cbd5f5;
+  color: #475569;
+}
+
+.trailBody {
+  margin-top: 0.5rem;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.trailOpenDays {
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.trailMetaRow {
+  display: grid;
+  grid-template-columns: 80px minmax(0, 1fr);
+  gap: 8px;
+  font-size: 0.8rem;
+  color: var(--ink);
+}
+
+.trailMetaLabel {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.trailDocs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-width: 0;
+  word-break: break-word;
+}
+
+.trailDocLink {
+  font-size: 0.78rem;
+  color: var(--accent-dark);
+  text-decoration: underline;
+  font-weight: 600;
+}
+
+.trailDocLink:hover {
+  color: var(--accent);
+}
+
+.trailDocEmpty {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.trailRemark {
+  color: var(--ink);
+  font-weight: 600;
+  min-width: 0;
+  word-break: break-word;
+}
+
+.trailFooter {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.trailDateFooter {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.75rem;
+  color: var(--muted);
+  text-align: right;
+}
+
 .hero {
   display: grid;
   gap: 0.35rem;
@@ -160,8 +371,8 @@ body {
 
 .hero h2 {
   margin: 0;
-  font-family: "Fraunces", "Georgia", serif;
-  font-size: 2rem;
+  font-size: 1.6rem;
+  font-weight: 800;
 }
 
 .hero p {
@@ -171,8 +382,8 @@ body {
 
 .card {
   background: var(--panel);
-  border: 1px solid var(--accent-border);
-  border-radius: 18px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
   box-shadow: var(--shadow);
   padding: 1.25rem;
 }
@@ -201,12 +412,15 @@ label {
 
 select,
 input[type="text"],
+input[type="file"],
 textarea {
   padding: 0.65rem 0.8rem;
   border-radius: 10px;
-  border: 1px solid var(--accent-border);
+  border: 1px solid var(--border);
   font-family: inherit;
   font-size: 0.95rem;
+  background: #fff;
+  box-sizing: border-box;
 }
 
 .table-wrap {
@@ -216,14 +430,14 @@ textarea {
 
 .metrics {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
   gap: 1rem;
 }
 
 .metric-card {
   background: #fff;
-  border: 1px solid var(--accent-border);
-  border-radius: 18px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
   box-shadow: var(--shadow);
   padding: 1.1rem 1.2rem;
   display: grid;
@@ -233,7 +447,7 @@ textarea {
 .metric-label {
   font-size: 0.75rem;
   text-transform: uppercase;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.14em;
   color: var(--muted);
 }
 
@@ -310,13 +524,13 @@ thead th {
   text-align: left;
   font-size: 0.85rem;
   color: var(--accent-dark);
-  background: var(--accent-soft);
+  background: #f8fafc;
   padding: 0.75rem;
 }
 
 tbody td {
   padding: 0.75rem;
-  border-top: 1px solid #f1ebf8;
+  border-top: 1px solid var(--border);
   vertical-align: top;
 }
 
@@ -350,9 +564,9 @@ tbody td {
 
 .btn {
   border: none;
-  border-radius: 999px;
-  padding: 0.55rem 1.2rem;
-  font-weight: 600;
+  border-radius: 10px;
+  padding: 0.55rem 1rem;
+  font-weight: 700;
   cursor: pointer;
   font-size: 0.9rem;
 }
@@ -365,7 +579,7 @@ tbody td {
 .btn--ghost {
   background: #fff;
   color: var(--accent-dark);
-  border: 1px solid var(--accent-border);
+  border: 1px solid var(--border);
 }
 
 .btn--approve {
@@ -376,6 +590,13 @@ tbody td {
 .btn--reject {
   background: var(--danger);
   color: #fff;
+}
+
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
 .stack {
@@ -392,7 +613,7 @@ tbody td {
   padding: 0.6rem 0.75rem;
   border-radius: 12px;
   background: #fff;
-  border: 1px solid var(--accent-border);
+  border: 1px solid var(--border);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -401,7 +622,7 @@ tbody td {
 
 .level.is-current {
   border-color: var(--accent);
-  background: #efe6f7;
+  background: var(--accent-soft);
 }
 
 .notice {
@@ -417,6 +638,64 @@ tbody td {
   padding: 1rem 2.5rem 2rem;
   color: var(--muted);
   font-size: 0.85rem;
+}
+
+.panelTitle {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  margin-bottom: 0.75rem;
+  font-weight: 700;
+}
+
+.approver-grid {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.approver-sidebar {
+  display: grid;
+  gap: 1rem;
+  position: sticky;
+  top: 96px;
+  align-self: start;
+}
+
+.quick-info-panel {
+  position: static;
+}
+
+.quick-info-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.quick-info-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.45rem 0.6rem;
+  background: #ffffff;
+  font-size: 0.85rem;
+  color: var(--ink);
+}
+
+.quick-info-count {
+  background: var(--accent-soft);
+  color: var(--accent-dark);
+  border: 1px solid var(--accent-border);
+  border-radius: 999px;
+  padding: 0.1rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
 }
 
 @media (max-width: 900px) {
@@ -444,6 +723,22 @@ tbody td {
 
   .approval-grid {
     grid-template-columns: 1fr;
+  }
+
+  .decision-trail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .trail-card {
+    position: static;
+  }
+
+  .approver-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .approver-sidebar {
+    position: static;
   }
 }
 

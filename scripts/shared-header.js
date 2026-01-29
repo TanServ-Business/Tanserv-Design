@@ -31,6 +31,16 @@
     ? `<img src="${relationshipLogoSrc}" alt="${escapeHtml(relationshipLogoAlt)}" />`
     : escapeHtml(relationshipBadge);
 
+  const hasEmailPanel = Boolean(document.getElementById("emailPanel"));
+  const emailActionMarkup = hasEmailPanel
+    ? `
+          <button class="userPopupAction" type="button" id="userPopupEmailBtn">
+            <i class="bi bi-envelope-paper" aria-hidden="true"></i>
+            <span>Email Communication</span>
+          </button>
+        `
+    : "";
+
   const headerMarkup = `
 <header class="shared-header">
   <div class="headerLeft">
@@ -211,6 +221,7 @@
             <i class="bi bi-gear" aria-hidden="true"></i>
             <span>Account Settings</span>
           </button>
+          ${emailActionMarkup}
           <button class="userPopupAction" type="button">
             <i class="bi bi-key" aria-hidden="true"></i>
             <span>Change password</span>
@@ -263,8 +274,36 @@
           <a class="submenu-link" href="${resolvePath("pages/LPmanager.html")}" data-module="landing-manager">Landing Page - Manager</a>
           <a class="submenu-link" href="${resolvePath("pages/LPsupervisor.html")}" data-module="landing-supervisor">Landing Page - Supervisor</a>
           <a class="submenu-link" href="${resolvePath("pages/KAM.html")}" data-module="landing-kam">Landing Page - KAM</a>
+          <a class="submenu-link" href="${resolvePath("pages/KAS.html")}" data-module="landing-kas">Landing Page - KAS</a>
           <a class="submenu-link" href="${resolvePath("pages/LPbackend.html")}" data-module="landing-backend">Landing Page - Backend</a>
           <a class="submenu-link" href="${resolvePath("pages/LPmis.html")}" data-module="landing-mis">Landing Page - MIS</a>
+        </div>
+      </li>
+      <li class="menu-item">
+        <a class="nav-link" href="#" data-toggle="submenu" aria-expanded="false">
+          <span class="link-content">
+            <i class="bi bi-kanban" aria-hidden="true"></i>
+            <span>Issue Tracker</span>
+          </span>
+          <i class="bi bi-chevron-down chevron" aria-hidden="true"></i>
+        </a>
+        <div class="submenu">
+          <a class="submenu-link" href="${resolvePath("pages/issuetrackerLP.html")}" data-module="issue-tracker">Issue Tracker</a>
+          <a class="submenu-link" href="${resolvePath("bin/IssueTracker/escalationMatrix.html")}" data-module="issue-matrix">Escalation Matrix</a>
+          <a class="submenu-link" href="${resolvePath("bin/IssueTracker/approver-dashboard.html")}" data-module="issue-approver">Approver Dashboard</a>
+          <a class="submenu-link" href="${resolvePath("bin/IssueTracker/approval-request.html")}" data-module="issue-approval-request">Approval Request</a>
+        </div>
+      </li>
+      <li class="menu-item">
+        <a class="nav-link" href="#" data-toggle="submenu" aria-expanded="false">
+          <span class="link-content">
+            <i class="bi bi-cash-stack" aria-hidden="true"></i>
+            <span>AR Transactions</span>
+          </span>
+          <i class="bi bi-chevron-down chevron" aria-hidden="true"></i>
+        </a>
+        <div class="submenu">
+          <a class="submenu-link" href="${resolvePath("pages/submission.html")}" data-module="submission-module">Submission Module</a>
         </div>
       </li>
       <li class="menu-item">
@@ -527,6 +566,7 @@
       const userBtn = document.getElementById("headerUserBtn");
       const userPopup = document.getElementById("userPopup");
       const userWrap = document.getElementById("userPopupWrap");
+      const emailBtn = document.getElementById("userPopupEmailBtn");
 
       if (userBtn && userPopup) {
         userBtn.addEventListener("click", (event) => {
@@ -550,6 +590,19 @@
         userPopup.classList.add("hidden");
         if (userBtn) userBtn.setAttribute("aria-expanded", "false");
       });
+
+      if (emailBtn) {
+        emailBtn.addEventListener("click", (event) => {
+          event.stopPropagation();
+          if (typeof window.openEmailPanel === "function") {
+            window.openEmailPanel("");
+          }
+          if (userPopup) {
+            userPopup.classList.add("hidden");
+            if (userBtn) userBtn.setAttribute("aria-expanded", "false");
+          }
+        });
+      }
     };
 
     const wireSideNav = () => {
@@ -600,8 +653,14 @@
             "landing-manager": "pages/LPmanager.html",
             "landing-supervisor": "pages/LPsupervisor.html",
             "landing-kam": "pages/KAM.html",
+            "landing-kas": "pages/KAS.html",
             "landing-backend": "pages/LPbackend.html",
             "landing-mis": "pages/LPmis.html",
+            "issue-tracker": "pages/issuetrackerLP.html",
+            "issue-matrix": "bin/IssueTracker/escalationMatrix.html",
+            "issue-approver": "bin/IssueTracker/approver-dashboard.html",
+            "issue-approval-request": "bin/IssueTracker/approval-request.html",
+            "submission-module": "pages/submission.html",
             "pdc-agent": "pages/PDCagent.html",
             "pdc-ops": "pages/PDCOps.html"
           };

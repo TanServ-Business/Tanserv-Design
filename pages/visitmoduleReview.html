@@ -321,6 +321,11 @@
       gap: 6px;
     }
 
+    .dayLabels.agentRow {
+      flex-wrap: nowrap;
+      overflow: hidden;
+    }
+
     .agentBadge {
       width: 28px;
       height: 28px;
@@ -334,6 +339,7 @@
       font-size: 11px;
       font-weight: 700;
       text-transform: uppercase;
+      position: relative;
     }
 
     .agentBadge.approved {
@@ -356,6 +362,30 @@
 
     .agentBadge.isActive {
       box-shadow: 0 0 0 2px rgba(92, 37, 141, 0.2);
+    }
+
+    .agentBadge.moreAgents {
+      background: transparent;
+      color: var(--brand);
+      border: none;
+      border-radius: 0;
+      width: auto;
+      height: auto;
+      min-width: 0;
+      font-size: 11px;
+      padding: 0 2px;
+      white-space: nowrap;
+    }
+
+    .agentBadge.needsAction::after {
+      content: "";
+      position: absolute;
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--brand);
+      bottom: 0px;
+      right: 0px;
     }
 
     .agentSelectCard {
@@ -424,6 +454,13 @@
       justify-content: space-between;
     }
 
+    .reviewAgentMeta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
     .reviewAgentName {
       font-size: 12px;
       color: #64748b;
@@ -433,7 +470,6 @@
     .reviewActionButtons {
       display: flex;
       gap: 8px;
-      margin-left: auto;
     }
 
     .reviewSubmitBtn {
@@ -507,7 +543,9 @@
     }
 
     .statusBtn.active {
-      box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.08);
+      outline: 2px solid rgb(92 37 141);
+      outline-offset: 2px;
+      box-shadow: none;
     }
 
     .statusBtn:disabled {
@@ -1096,19 +1134,21 @@
           </div>
             <div class="agentBadgeList" id="reviewAgentList"></div>
           </div>
-          <div class="reviewActions" id="reviewActions">
+          <div class="reviewAgentMeta">
             <span class="reviewAgentName" id="reviewAgentName">Agent: -</span>
-            <div class="reviewActionButtons">
-              <button class="statusBtn pending" type="button" data-status="Pending">Pending</button>
-              <button class="statusBtn approved" type="button" data-status="Approved">Accepted</button>
-              <button class="statusBtn rejected" type="button" data-status="Rejected">Rejected</button>
-              <button class="btn btn-primary btn-sm reviewSubmitBtn" type="button" id="reviewSubmitBtn">Submit</button>
-            </div>
           </div>
           <div class="reviewRemarkRow">
             <label for="reviewRemark">Manager remark</label>
             <textarea id="reviewRemark" rows="2" placeholder="Add remark for the agent..."></textarea>
             <div class="reviewError hidden" id="reviewError"></div>
+          </div>
+          <div class="reviewActions" id="reviewActions">
+            <div class="reviewActionButtons">
+              <button class="statusBtn pending" type="button" data-status="Pending">Pending</button>
+              <button class="statusBtn approved" type="button" data-status="Approved">Accepted</button>
+              <button class="statusBtn rejected" type="button" data-status="Rejected">Rejected</button>
+            </div>
+            <button class="btn btn-primary btn-sm reviewSubmitBtn" type="button" id="reviewSubmitBtn">Submit</button>
           </div>
           <table class="planTable">
             <thead>
@@ -1306,6 +1346,7 @@
           const statusPool = ["Approved", "Pending", "Rejected"];
           const status = rand() > 0.6 ? statusPool[randIndex(statusPool)] : undefined;
           const planType = rand() > 0.8 ? "both" : "visit";
+          const needsManagerAction = !status && rand() > 0.65;
           addPlan(day, {
             customer: customerName,
             code: `CUST-${day}-${randIndex(customers) + 1}`,
@@ -1316,7 +1357,8 @@
             kas: kass[randIndex(kass)],
             onTime: rand() > 0.25,
             planType,
-            ...(status ? { status } : {})
+            ...(status ? { status } : {}),
+            ...(needsManagerAction ? { needsManagerAction: true } : {})
           });
         }
         markSubmitted(day);
@@ -1434,6 +1476,8 @@
       return normalized ? "pending" : "";
     };
 
+    const hasManagerActionFlag = (plans) => plans.some(plan => plan.needsManagerAction);
+
     const getPlansForAgent = (dateKey, agentName) => {
       const plans = samplePlans[dateKey] || [];
       if (!agentName) return plans;
@@ -1495,9 +1539,10 @@
       reviewAgentList.innerHTML = agents.map((agent) => {
         const plans = getPlansForAgent(selectedDateKey, agent);
         const statusClass = getStatusClass(getStatusForPlans(plans));
+        const needsAction = !statusClass && hasManagerActionFlag(plans);
         const isActive = agent === activeAgentName;
         return `
-          <button class="agentBadge agentBadgeBtn ${statusClass} ${isActive ? "isActive" : ""}" type="button" data-agent="${agent}" title="${agent}">
+          <button class="agentBadge agentBadgeBtn ${statusClass} ${needsAction ? "needsAction" : ""} ${isActive ? "isActive" : ""}" type="button" data-agent="${agent}" title="${agent}">
             ${getInitials(agent)}
           </button>
         `;
@@ -1587,10 +1632,13 @@
       const hasAgent = Boolean(activeAgentName);
       const plans = hasAgent ? getPlansForAgent(selectedDateKey, activeAgentName) : [];
       const status = pendingReviewStatus || "";
+      const normalizedStatus = String(status).toLowerCase();
       const isHoliday = isHolidayDate(selectedDateKey);
       reviewActions.querySelectorAll(".statusBtn").forEach((btn) => {
-        const btnStatus = btn.getAttribute("data-status");
-        btn.classList.toggle("active", hasAgent && status && btnStatus === status);
+        const btnStatus = btn.getAttribute("data-status") || "";
+        const isActive = hasAgent && status && btnStatus.toLowerCase() === normalizedStatus;
+        btn.classList.toggle("active", isActive);
+        btn.setAttribute("aria-pressed", isActive ? "true" : "false");
         btn.disabled = isHoliday || !hasAgent || plans.length === 0;
       });
       if (reviewSubmitBtn) {
@@ -2063,14 +2111,26 @@
               agentMap.get(plan.agent).push(plan);
             });
 
-            agentMap.forEach((agentPlansForDay, agent) => {
+            labelWrap.classList.add("agentRow");
+            const agentEntries = Array.from(agentMap.entries());
+            const maxAgents = 3;
+            agentEntries.slice(0, maxAgents).forEach(([agent, agentPlansForDay]) => {
               const badge = document.createElement("span");
               const statusClass = getStatusClass(getStatusForPlans(agentPlansForDay));
-              badge.className = `agentBadge ${statusClass}`.trim();
+              const needsAction = !statusClass && hasManagerActionFlag(agentPlansForDay);
+              badge.className = `agentBadge ${statusClass} ${needsAction ? "needsAction" : ""}`.trim();
               badge.title = agent;
               badge.textContent = getInitials(agent);
               labelWrap.appendChild(badge);
             });
+            const extraCount = agentEntries.length - maxAgents;
+            if (extraCount > 0) {
+              const moreBadge = document.createElement("span");
+              moreBadge.className = "agentBadge moreAgents";
+              moreBadge.title = `${extraCount} more agent${extraCount > 1 ? "s" : ""}`;
+              moreBadge.textContent = `+${extraCount}`;
+              labelWrap.appendChild(moreBadge);
+            }
           }
         } else {
           if (isSunday) {

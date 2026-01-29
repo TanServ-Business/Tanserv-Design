@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Inebura | Issue Tracker</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <link rel="stylesheet" href="../css/styles.css" />
+  <link rel="stylesheet" href="../bin/IssueTracker/css/style.css" />
+  <link rel="stylesheet" href="../css/issuetrackerLP.css" />
+  <link rel="stylesheet" href="../css/shared-header.css" />
+</head>
+<body class="issueTrackerPage" data-root-path="../" data-relationship-name="Issue Tracker" data-relationship-badge="IT">
+  <div data-shared-header></div>
+
+  <main class="managerMain issueTrackerMain">
+    <div class="managerHeader">
+      <div>
+        <h1>Issue Tracker</h1>
+        <p>Track invoice issues, approvals, and client assignments.</p>
+      </div>
+      <div class="managerClock">
+        <span>Updated</span>
+        <strong id="issueTrackerClock">--:--</strong>
+      </div>
+    </div>
+
+    <section class="summaryCards" aria-label="Issue tracker summary">
+      <div class="summaryCard"><span>Invoices with issues</span><strong id="statInvoiceCount">0</strong></div>
+      <div class="summaryCard"><span>Invoice value (issues)</span><strong id="statInvoiceAmount">Rs. 0</strong></div>
+      <div class="summaryCard"><span>Total issues</span><strong id="statTotalIssues">0</strong></div>
+      <div class="summaryCard"><span>Approval pending</span><strong id="statApprovalPending">0</strong></div>
+      <div class="summaryCard"><span>Assigned to client</span><strong id="statAssignedClient">0</strong></div>
+    </section>
+
+    <div class="issueLandingGrid">
+      <aside class="panelCard quickInfoPanel" aria-label="Quick issue info">
+        <div class="panelTitle">Quick info</div>
+        <ul id="issue-reason-list" class="reasonList" aria-label="Issue reasons"></ul>
+      </aside>
+
+      <section class="panelCard">
+        <div class="summaryHeader">
+          <div>
+            <h2>Invoices with issues</h2>
+            <p>Select an invoice to view issues and actions.</p>
+          </div>
+          <div class="invoiceSearch">
+            <input id="invoice-search-input" type="text" placeholder="Search invoice, customer, action owner, sub status, customer code" aria-label="Search invoices" />
+          </div>
+        </div>
+        <div class="tableWrap">
+          <table class="issueTable" aria-label="Invoices with issues">
+            <thead>
+              <tr>
+                <th>Customer Code</th>
+                <th>Customer Name</th>
+                <th>Invoice No</th>
+                <th>Invoice Value</th>
+                <th>Net Due</th>
+                <th>Action Owner</th>
+                <th>Issue Open Days</th>
+                <th>Sub Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="invoice-table-body"></tbody>
+          </table>
+        </div>
+        <div class="paginationRow">
+          <button class="pageBtn" type="button" id="invoice-page-prev">Previous</button>
+          <span id="invoice-page-info">Page 1 of 1</span>
+          <button class="pageBtn" type="button" id="invoice-page-next">Next</button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div id="add-issue-modal" class="modal-overlay hidden" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="add-issue-title">
+      <div class="modal-header">
+        <h3 id="add-issue-title">Add Issue</h3>
+        <button id="add-issue-close" class="modal-close" type="button" aria-label="Close">x</button>
+      </div>
+      <form id="add-issue-form" class="modal-body">
+        <div class="modal-field">
+          <label for="new-issue-broad" class="meta">Broad Status</label>
+          <select id="new-issue-broad" required></select>
+        </div>
+        <div class="modal-field">
+          <label for="new-issue-primary" class="meta">Primary Status</label>
+          <select id="new-issue-primary" required></select>
+        </div>
+        <div class="modal-field">
+          <label for="new-issue-sub" class="meta">Sub Status</label>
+          <select id="new-issue-sub" required></select>
+        </div>
+        <div class="modal-field">
+          <label for="new-issue-remark" class="meta">Agent Remark</label>
+          <textarea id="new-issue-remark" rows="3" placeholder="Add agent remark..." required></textarea>
+        </div>
+        <div class="modal-actions">
+          <button id="add-issue-cancel" type="button" class="pill">Cancel</button>
+          <button id="add-issue-submit" type="submit" class="pill pill--primary">Submit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="../scripts/shared-header.js"></script>
+  <script src="../bin/IssueTracker/js/app.js"></script>
+</body>
+</html>

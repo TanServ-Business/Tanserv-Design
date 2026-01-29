@@ -4,9 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Inebura Approvals Dashboard</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../css/styles.css">
   <link rel="stylesheet" href="css/approver.css">
   <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" href="/icon.svg" type="image/svg+xml">
@@ -14,7 +12,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <link rel="stylesheet" href="../../css/shared-header.css">
 </head>
-<body data-root-path="../../" data-relationship-name="Issue Tracker" data-relationship-badge="IT">
+<body class="it-page" data-root-path="../../" data-relationship-name="Issue Tracker" data-relationship-badge="IT">
   <div class="app-shell">
     <div data-shared-header></div>
 
@@ -29,6 +27,11 @@
           <div class="metric-label">Open to approve</div>
           <div id="metric-open" class="metric-value">0</div>
           <div class="metric-note">Pending at your level</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Avg approval days</div>
+          <div id="metric-avg-days" class="metric-value">0</div>
+          <div class="metric-note">Average open days</div>
         </div>
         <div class="metric-card">
           <div class="metric-label">Approvals this month</div>
@@ -47,39 +50,37 @@
         </div>
       </section>
 
-      <section class="card chart-card">
-        <div class="chart-head">
-          <h3>Approval status split</h3>
-          <button id="refresh-btn" class="btn btn--ghost" type="button">Refresh</button>
-        </div>
-        <div class="chart-body">
-          <div id="status-pie" class="pie" role="img" aria-label="Status split pie chart"></div>
-          <div class="legend">
-            <div><span class="swatch swatch--pending"></span>Pending <span id="legend-pending">0</span></div>
-            <div><span class="swatch swatch--approved"></span>Approved <span id="legend-approved">0</span></div>
-            <div><span class="swatch swatch--rejected"></span>Rejected <span id="legend-rejected">0</span></div>
+      <section class="approver-grid">
+        <aside class="approver-sidebar" aria-label="Approval insights">
+          <div class="card quick-info-panel">
+            <div class="panelTitle">Quick info</div>
+            <ul id="approval-quick-info" class="quick-info-list" aria-label="Approval status summary"></ul>
           </div>
-        </div>
-      </section>
+          <div class="card quick-info-panel">
+            <div class="panelTitle">Approval vintage portfolio</div>
+            <ul id="approval-vintage-list" class="quick-info-list" aria-label="Approval delay aging"></ul>
+          </div>
+        </aside>
 
-      <section class="card">
-        <div class="table-wrap">
-          <table aria-label="Approval requests">
-            <thead>
-              <tr>
-                <th scope="col">Request</th>
-                <th scope="col">Issue</th>
-                <th scope="col">Invoice</th>
-                <th scope="col">Process</th>
-                <th scope="col">Level</th>
-                <th scope="col">Status</th>
-                <th scope="col">Actions</th>
-              </tr>
-            </thead>
-            <tbody id="request-tbody"></tbody>
-          </table>
-        </div>
-        <div id="request-empty" class="notice" style="display:none;">No approval requests match your filters.</div>
+        <section class="card">
+          <div class="table-wrap">
+            <table aria-label="Approval requests">
+              <thead>
+                <tr>
+                  <th scope="col">Issue</th>
+                  <th scope="col">Invoice</th>
+                  <th scope="col">Process</th>
+                  <th scope="col">Level</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Open days</th>
+                  <th scope="col">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="request-tbody"></tbody>
+            </table>
+          </div>
+          <div id="request-empty" class="notice" style="display:none;">No approval requests match your filters.</div>
+        </section>
       </section>
     </main>
 

@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Inebura | Issue Tracker Detail</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <link rel="stylesheet" href="../css/styles.css" />
+  <link rel="stylesheet" href="../bin/IssueTracker/css/style.css" />
+  <link rel="stylesheet" href="../css/issuetrackerLP.css" />
+  <link rel="stylesheet" href="../css/shared-header.css" />
+</head>
+<body class="issueTrackerPage issueTrackerDetailPage" data-root-path="../" data-relationship-name="Issue Tracker" data-relationship-badge="IT">
+  <div data-shared-header></div>
+
+  <main class="managerMain issueTrackerMain" id="issue-detail-page">
+    <div class="managerHeader">
+      <div>
+        <h1>Issue Tracker</h1>
+        <p>Invoice issue detail and action workflow.</p>
+      </div>
+      <div class="managerClock">
+        <span>Updated</span>
+        <strong id="issueTrackerClock">--:--</strong>
+      </div>
+    </div>
+
+    <section class="panelCard issueWorkspace" aria-label="Issue workspace">
+      <div class="summaryHeader">
+        <div>
+          <h2 id="issue-panel-title">Issues</h2>
+          <p id="issue-panel-subtitle">Choose an invoice to load related issues.</p>
+        </div>
+        <a class="pill pill--secondary" href="issuetrackerLP.html">Back to list</a>
+      </div>
+
+      <div class="issueWorkspaceGrid">
+        <aside class="issueListPanel" aria-labelledby="issue-list-title">
+          <h3 id="issue-list-title">Issue cards</h3>
+          <ul id="issue-list" class="issueList" role="listbox" aria-label="Issues"></ul>
+        </aside>
+
+        <div class="issueDetailPanel">
+          <div id="detail-view" class="details" aria-live="polite">
+            <p>Select an issue to see details.</p>
+          </div>
+          <div id="action-launcher" class="action-launcher hidden">
+            <button id="new-action-btn" type="button" class="pill new-action-btn">+ New Action</button>
+          </div>
+          <aside id="action-panel" class="details details--actions hidden" aria-hidden="true">
+            <h3>Action</h3>
+            <div class="action-buttons">
+              <button id="approve-btn" type="button" class="pill pill--approve">Approve</button>
+              <button id="assign-btn" type="button" class="pill pill--warn">Assign to Client Action Owner</button>
+              <button id="email-btn" type="button" class="pill pill--secondary">Re-Send Email</button>
+              <button id="approval-process-btn" type="button" class="pill pill--secondary">Approval Process</button>
+              <button id="resolution-btn" type="button" class="pill pill--primary">Add Resolution</button>
+              <button id="close-btn" type="button" class="pill pill--close">Close</button>
+              <button id="reopen-btn" type="button" class="pill pill--reopen">Reopen</button>
+            </div>
+            <div id="assign-panel" class="assign-panel hidden" aria-hidden="true">
+              <label for="assign-owner" class="meta">Select Action Owner</label>
+              <div class="assign-row">
+                <select id="assign-owner" aria-label="Action Owner"></select>
+                <div class="assign-actions">
+                  <button id="assign-confirm" type="button" class="pill pill--primary">Assign</button>
+                  <button id="assign-cancel" type="button" class="pill">Cancel</button>
+                </div>
+              </div>
+              <label for="assign-remark" class="meta">Add Remark (required)</label>
+              <textarea id="assign-remark" rows="3" placeholder="Provide remark for assignment..."></textarea>
+            </div>
+            <div id="email-panel" class="email-panel hidden" aria-hidden="true">
+              <label for="email-type" class="meta">Email Type</label>
+              <div class="email-row">
+                <select id="email-type" aria-label="Email type">
+                  <option value="reminder" selected>Reminder email</option>
+                  <option value="escalate">Escalate email</option>
+                </select>
+              </div>
+              <div id="email-escalate-row" class="email-escalate-row hidden" aria-hidden="true">
+                <label for="email-recipients" class="meta">Escalate to (comma-separated emails)</label>
+                <input id="email-recipients" type="text" placeholder="name@example.com, manager@example.com" />
+              </div>
+              <label for="email-remark-text" class="meta">Add Remark (required)</label>
+              <textarea id="email-remark-text" rows="3" placeholder="Enter your remark..."></textarea>
+              <div class="trail-actions">
+                <button id="email-send" type="button" class="pill pill--primary">Send</button>
+                <button id="email-cancel" type="button" class="pill">Cancel</button>
+              </div>
+            </div>
+            <div id="resolution-panel" class="resolution-panel hidden" aria-hidden="true">
+              <label for="resolution-files" class="meta">Upload documents</label>
+              <input id="resolution-files" type="file" multiple />
+              <label for="resolution-text" class="meta">Resolution summary (required)</label>
+              <textarea id="resolution-text" rows="3" placeholder="Describe the resolution..."></textarea>
+              <label for="resolution-remark" class="meta">Remark (optional)</label>
+              <textarea id="resolution-remark" rows="3" placeholder="Add any extra context (optional)..."></textarea>
+              <div class="trail-actions">
+                <button id="resolution-submit" type="button" class="pill pill--primary">Submit Resolution</button>
+                <button id="resolution-cancel" type="button" class="pill">Cancel</button>
+              </div>
+            </div>
+            <div id="action-remark" class="action-remark hidden" aria-hidden="true">
+              <label for="action-remark-text" class="meta">Add Remark (required)</label>
+              <textarea id="action-remark-text" rows="3" placeholder="Enter your remark..."></textarea>
+              <div class="trail-actions">
+                <button id="action-remark-confirm" type="button" class="pill pill--primary">Confirm</button>
+                <button id="action-remark-cancel" type="button" class="pill">Cancel</button>
+              </div>
+            </div>
+            <div id="approval-process-panel" class="approval-process-panel hidden" aria-hidden="true">
+              <label for="approval-process" class="meta">Approval Process</label>
+              <select id="approval-process" aria-label="Approval process"></select>
+              <div class="meta">Select a process before approving.</div>
+              <label for="approval-process-remark" class="meta">Remark (optional)</label>
+              <textarea id="approval-process-remark" rows="3" placeholder="Add context for the selected process..."></textarea>
+              <div class="trail-actions">
+                <button id="approval-process-save" type="button" class="pill pill--primary">Save Process</button>
+              </div>
+            </div>
+            <form id="trail-form" class="trail-form">
+              <label for="trail-remark" class="meta">Add Remark</label>
+              <textarea id="trail-remark" rows="3" placeholder="Type a remark and press Add..."></textarea>
+              <label for="trail-files" class="meta">Attach documents</label>
+              <input id="trail-files" type="file" multiple>
+              <div class="trail-actions">
+                <button type="submit" class="pill pill--primary">Add</button>
+              </div>
+            </form>
+          </aside>
+          <aside id="action-trail" class="details details--trail" aria-live="polite">
+            <h3>Action Trail</h3>
+            <ul id="trail-list" class="trail-list"></ul>
+          </aside>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="add-issue-modal" class="modal-overlay hidden" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="add-issue-title">
+      <div class="modal-header">
+        <h3 id="add-issue-title">Add Issue</h3>
+        <button id="add-issue-close" class="modal-close" type="button" aria-label="Close">x</button>
+      </div>
+      <form id="add-issue-form" class="modal-body">
+        <div class="modal-field">
+          <label for="new-issue-broad" class="meta">Broad Status</label>
+          <select id="new-issue-broad" required></select>
+        </div>
+        <div class="modal-field">
+          <label for="new-issue-primary" class="meta">Primary Status</label>
+          <select id="new-issue-primary" required></select>
+        </div>
+        <div class="modal-field">
+          <label for="new-issue-sub" class="meta">Sub Status</label>
+          <select id="new-issue-sub" required></select>
+        </div>
+        <div class="modal-field">
+          <label for="new-issue-remark" class="meta">Agent Remark</label>
+          <textarea id="new-issue-remark" rows="3" placeholder="Add agent remark..." required></textarea>
+        </div>
+        <div class="modal-actions">
+          <button id="add-issue-cancel" type="button" class="pill">Cancel</button>
+          <button id="add-issue-submit" type="submit" class="pill pill--primary">Submit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <footer class="app-footer">
+    <small>Generated on <time id="generated-time"></time></small>
+  </footer>
+
+  <script src="../scripts/shared-header.js"></script>
+  <script src="../bin/IssueTracker/js/app.js"></script>
+</body>
+</html>

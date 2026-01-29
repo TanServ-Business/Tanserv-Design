@@ -5,6 +5,11 @@
   ];
 
   const companies = ['Acme Corp','Globex Inc','Initech'];
+  const companyCodes = {
+    'Acme Corp': 'CUST-001',
+    'Globex Inc': 'CUST-002',
+    'Initech': 'CUST-003'
+  };
   const regions = ['North','South','East','West','Central'];
   const activities = ['Emailed','Phone','Portal','Meeting'];
   const primaries = ['Material Delivery Issues','Awaiting PO','Invoice Dispute','Payment Processing','Clarification Needed'];
@@ -50,6 +55,8 @@
   const titles = ['Material Delivery Issue','Missing PO reference','Payment Verification','Address Mismatch','GST Mismatch','Quantity Dispute','Duplicate Invoice','Bank Details Clarification','Pending Approval','Awaiting Confirmation'];
   const agents = ['Anoop Sharma','Priya Verma','Rahul Jain','Neha Gupta','Rohit Malhotra','Devashish.Rattan'];
   const managers = ['Priya Verma','Rohit Malhotra','Sanjay Rao','Meera Iyer'];
+  const kams = ['Karthik Iyer', 'Leena Jose', 'Neha Kapoor', 'Riya Malhotra'];
+  const kass = ['Nisha Menon', 'Raghav Rao', 'Arjun Rao', 'Dev Patel'];
 
   // Sample data generator: 5-6 invoices x 2-3 issues each
   function generateData() {
@@ -60,8 +67,12 @@
     for (let i = 1; i <= numInvoices; i++) {
       const cust = companies[Math.floor(Math.random() * companies.length)];
       const invId = `INV_${String(i).padStart(4,'0')}`;
+      const customerCode = companyCodes[cust] || `CUST-${String(Math.max(1, companies.indexOf(cust) + 1)).padStart(3,'0')}`;
       const invDate = new Date(now.getFullYear(), now.getMonth(), Math.max(1, now.getDate() - (i % 15)));
       const total = Math.floor(Math.random() * 900000) + 50000;
+      const kam = kams[i % kams.length];
+      const kas = kass[i % kass.length];
+      const manager = managers[i % managers.length];
       const issues = [];
       const numIssues = 3 + Math.floor(Math.random() * 3); // 3 to 5
       for (let j = 1; j <= numIssues; j++) {
@@ -76,14 +87,14 @@
         const primary = primaries[(i + 2 * j) % primaries.length];
         const broad = broads[(i + 3 * j) % broads.length];
         const agent = agents[(i + j) % agents.length];
-        const manager = managers[(i + 2 * j) % managers.length];
+        const issueManager = managers[(i + 2 * j) % managers.length];
         const owner = agent;
         const dueAmt = Math.max(0, total - Math.floor(Math.random() * (total * 0.5)));
         const dueDate = new Date(invDate.getFullYear(), invDate.getMonth(), invDate.getDate() + 15 + (j % 10));
         const region = regions[(i + j) % regions.length];
         const id = `ISS_${String(i).padStart(4,'0')}_${String(j).padStart(2,'0')}`;
         const trail = [];
-        if (stage >= 1) trail.push({ who: manager, what: 'approved the issue', type: 'approval', when: new Date(created.getTime() + 2 * 3600 * 1000).toISOString() });
+        if (stage >= 1) trail.push({ who: issueManager, what: 'approved the issue', type: 'approval', when: new Date(created.getTime() + 2 * 3600 * 1000).toISOString() });
         if (stage >= 2) trail.push({ who: owner, what: `assigned to action owner (${owner})`, type: 'assignment', when: new Date(created.getTime() + 6 * 3600 * 1000).toISOString() });
         if (Math.random() < 0.5) trail.push({ who: owner, what: 'updated remark', type: 'remark', when: new Date(created.getTime() + 8 * 3600 * 1000).toISOString(), remark: 'Initial remark on issue.' });
         if (status === 'Resolved') trail.push({ who: owner, what: 'marked the issue as resolved', type: 'closure', when: new Date(created.getTime() + 24 * 3600 * 1000).toISOString() });
@@ -99,7 +110,7 @@
           subStatus: subStatuses[(i + j) % subStatuses.length],
           stage,
           agent,
-          manager,
+          manager: issueManager,
           fpr: `FPR-${100 + i * j}`,
           spr: `SPR-${200 + i * j}`,
           actionOwner: owner,
@@ -109,7 +120,7 @@
           actionTrail: trail
         });
       }
-      arr.push({ id: invId, customer: cust, date: invDate.toISOString().slice(0,10), total, issues });
+      arr.push({ id: invId, customer: cust, customerCode, date: invDate.toISOString().slice(0,10), total, issues, kam, kas, manager });
     }
     return arr;
   }
@@ -160,9 +171,13 @@
       const inv = {
         id: 'INV_CUSTOM',
         customer: 'Manual Entries',
+        customerCode: 'CUST-MANUAL',
         date: new Date().toISOString().slice(0,10),
         total: 0,
-        issues: normalized
+        issues: normalized,
+        kam: '-',
+        kas: '-',
+        manager: '-'
       };
       data.push(inv);
     }
@@ -171,9 +186,23 @@
   rebuildDataWithCustomIssues();
 
   const invoiceList = document.getElementById('invoice-list');
+  const invoiceTableBody = document.getElementById('invoice-table-body');
+  const invoiceSearchInput = document.getElementById('invoice-search-input');
+  const invoicePagePrev = document.getElementById('invoice-page-prev');
+  const invoicePageNext = document.getElementById('invoice-page-next');
+  const invoicePageInfo = document.getElementById('invoice-page-info');
   const issueList = document.getElementById('issue-list');
+  const issueReasonList = document.getElementById('issue-reason-list');
   const detailView = document.getElementById('detail-view');
   const generatedTimeEl = document.getElementById('generated-time');
+  const issuePanelTitle = document.getElementById('issue-panel-title');
+  const issuePanelSubtitle = document.getElementById('issue-panel-subtitle');
+  const statInvoiceCount = document.getElementById('statInvoiceCount');
+  const statInvoiceAmount = document.getElementById('statInvoiceAmount');
+  const statTotalIssues = document.getElementById('statTotalIssues');
+  const statApprovalPending = document.getElementById('statApprovalPending');
+  const statAssignedClient = document.getElementById('statAssignedClient');
+  const issueTrackerClock = document.getElementById('issueTrackerClock');
   const sortBtn = document.getElementById('invoice-sort-btn');
   const sortMenu = document.getElementById('invoice-sort-menu');
   const addIssueBtn = document.getElementById('add-issue-btn');
@@ -196,6 +225,10 @@
   let currentSort = 'none'; // 'valueDesc' | 'valueAsc' | 'daysDesc' | 'daysAsc' | 'none'
   let selectedInvoiceId = null;
   let selectedIssueId = null;
+  let invoiceSearchQuery = '';
+  let invoicePage = 1;
+  const invoicePageSize = 10;
+  const isDetailPage = document.body.classList.contains('issueTrackerDetailPage');
 
   // Utility: format dates and currency
   const fmtDate = (d) => new Date(d).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: '2-digit' });
@@ -334,6 +367,16 @@
       if (maxTime === null || t > maxTime) maxTime = t;
     });
     return maxTime !== null ? new Date(maxTime) : null;
+  }
+
+  function getInvoiceDueAmount(inv) {
+    let max = null;
+    (inv.issues || []).forEach(iss => {
+      const v = iss && iss.invoiceDueAmount;
+      if (typeof v !== 'number' || Number.isNaN(v)) return;
+      if (max === null || v > max) max = v;
+    });
+    return max;
   }
 
   const APPROVAL_REQ_KEY = 'approval_requests';
@@ -577,26 +620,160 @@
     }
     return arr;
   }
+
+  function normalizeSearch(value) {
+    return String(value || '').toLowerCase().trim();
+  }
+
+  function getInvoiceBaseList() {
+    return getSortedInvoices().filter(inv => (inv.issues || []).length > 0);
+  }
+
+  function getFilteredInvoices() {
+    const base = getInvoiceBaseList();
+    if (!invoiceSearchQuery) return base;
+    return base.filter(inv => {
+      const firstIssue = inv.issues && inv.issues[0] ? inv.issues[0] : null;
+      const haystack = [
+        inv.id,
+        inv.customer,
+        inv.customerCode,
+        firstIssue && firstIssue.actionOwner ? firstIssue.actionOwner : '',
+        firstIssue && firstIssue.subStatus ? firstIssue.subStatus : '',
+        computeInvoiceDaysOpen(inv)
+      ].join(' ').toLowerCase();
+      return haystack.includes(invoiceSearchQuery);
+    });
+  }
+
+  function getPagedInvoices() {
+    const filtered = getFilteredInvoices();
+    const totalPages = Math.max(1, Math.ceil(filtered.length / invoicePageSize));
+    if (invoicePage > totalPages) invoicePage = totalPages;
+    if (invoicePage < 1) invoicePage = 1;
+    const start = (invoicePage - 1) * invoicePageSize;
+    return {
+      items: filtered.slice(start, start + invoicePageSize),
+      total: filtered.length,
+      totalPages
+    };
+  }
+
+  function updatePaginationUI(totalPages, total) {
+    if (invoicePageInfo) {
+      invoicePageInfo.textContent = total
+        ? `Page ${invoicePage} of ${totalPages}`
+        : 'No results';
+    }
+    if (invoicePagePrev) invoicePagePrev.disabled = invoicePage <= 1;
+    if (invoicePageNext) invoicePageNext.disabled = invoicePage >= totalPages;
+  }
+
+  function openIssueDetail(invoiceId) {
+    if (isDetailPage) {
+      selectInvoice(invoiceId);
+      return;
+    }
+    const root = document.body.dataset.rootPath || '';
+    window.location.href = `${root}pages/issuetrackerdetail.html?invoice=${encodeURIComponent(invoiceId)}`;
+  }
   function renderInvoicesSortedAndPreserveSelection() {
+    if (invoiceTableBody) {
+      const paged = getPagedInvoices();
+      renderInvoices(paged.items);
+      updatePaginationUI(paged.totalPages, paged.total);
+      updateSummaryCards();
+      if (!isDetailPage) {
+        const filtered = getFilteredInvoices();
+        const allIssues = filtered.flatMap(inv => inv.issues || []);
+        renderIssueReasonCounts(allIssues);
+      }
+      return;
+    }
+
     const sorted = getSortedInvoices();
     renderInvoices(sorted);
-    // restore selection if exists; otherwise select first
+    updateSummaryCards();
+    if (!invoiceList && !invoiceTableBody) return;
+    if (isDetailPage) return;
     const idToSelect = selectedInvoiceId && sorted.some(x=>x.id===selectedInvoiceId)
       ? selectedInvoiceId
       : (sorted[0]?.id || null);
     if (idToSelect) {
-      // Avoid double-activating selection highlight by setting aria before calling select
-      const el = invoiceList.querySelector(`[data-id="${CSS.escape(idToSelect)}"]`);
-      if (el) el.setAttribute('aria-selected','true');
       selectInvoice(idToSelect);
     }
   }
 
   function clearSelected(list) {
+    if (!list) return;
     list.querySelectorAll('[aria-selected="true"]').forEach(el => el.setAttribute('aria-selected', 'false'));
   }
 
+  function updateSummaryCards() {
+    if (!statInvoiceCount && !statInvoiceAmount && !statTotalIssues && !statApprovalPending && !statAssignedClient) return;
+    const invoicesWithIssues = data.filter(inv => (inv.issues || []).length > 0);
+    const totalIssues = invoicesWithIssues.reduce((sum, inv) => sum + (inv.issues || []).length, 0);
+    const totalAmount = invoicesWithIssues.reduce((sum, inv) => sum + (inv.total || 0), 0);
+    const pendingApprovals = loadApprovalRequests().filter(req => req && req.status === 'pending').length;
+    const assignedToClient = invoicesWithIssues.reduce((sum, inv) => {
+      const count = (inv.issues || []).filter(iss => (iss.stage || 0) >= 2 && String(iss.status || '').toLowerCase() !== 'resolved').length;
+      return sum + count;
+    }, 0);
+    if (statInvoiceCount) statInvoiceCount.textContent = invoicesWithIssues.length;
+    if (statInvoiceAmount) statInvoiceAmount.textContent = fmtCurrency(totalAmount);
+    if (statTotalIssues) statTotalIssues.textContent = totalIssues;
+    if (statApprovalPending) statApprovalPending.textContent = pendingApprovals;
+    if (statAssignedClient) statAssignedClient.textContent = assignedToClient;
+  }
+
   function renderInvoices(invoices) {
+    if (invoiceTableBody) {
+      invoiceTableBody.innerHTML = '';
+      invoices.forEach((inv) => {
+        const tr = document.createElement('tr');
+        tr.setAttribute('data-id', inv.id);
+        tr.setAttribute('aria-selected', 'false');
+        tr.tabIndex = 0;
+        const dueAmount = getInvoiceDueAmount(inv);
+        const firstIssue = inv.issues && inv.issues[0] ? inv.issues[0] : null;
+        const actionOwner = firstIssue && firstIssue.actionOwner ? firstIssue.actionOwner : '-';
+        const subStatus = firstIssue && firstIssue.subStatus ? firstIssue.subStatus : '-';
+        const customerName = inv.customer || '-';
+        const customerCode = inv.customerCode || '-';
+        const issueOpenDays = computeInvoiceDaysOpen(inv);
+        tr.innerHTML = `
+          <td>${customerCode}</td>
+          <td>${customerName}</td>
+          <td>${inv.id}</td>
+          <td>${fmtCurrency(inv.total)}</td>
+          <td>${dueAmount != null ? fmtCurrency(dueAmount) : '-'}</td>
+          <td>${actionOwner}</td>
+          <td>${issueOpenDays}</td>
+          <td>${subStatus}</td>
+          <td><button class="btnSecondary viewIssueBtn" type="button">View issues</button></td>
+        `;
+        tr.addEventListener('click', () => {
+          selectInvoice(inv.id);
+        });
+        tr.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            selectInvoice(inv.id);
+          }
+        });
+        const viewBtn = tr.querySelector('.viewIssueBtn');
+        if (viewBtn) {
+          viewBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openIssueDetail(inv.id);
+          });
+        }
+        invoiceTableBody.appendChild(tr);
+      });
+      return;
+    }
+
+    if (!invoiceList) return;
     invoiceList.innerHTML = '';
     invoices.forEach((inv, idx) => {
       const li = document.createElement('li');
@@ -605,9 +782,7 @@
       li.setAttribute('tabindex', idx === 0 ? '0' : '-1');
       li.setAttribute('data-id', inv.id);
       li.setAttribute('aria-selected', 'false');
-      // Highest Days Open across issues (status-agnostic)
       const maxDaysOpen = computeInvoiceDaysOpen(inv);
-      // Derive invoice-level due date range display
       const dueDate = getInvoiceDueDate(inv);
       const dateDisplay = (dueDate && (new Date(dueDate).getTime() > new Date(inv.date).getTime()))
         ? fmtDateRange(inv.date, dueDate)
@@ -617,12 +792,12 @@
         <div>
           <div>${inv.id}</div>
           <div class="meta meta--stack">
-            <div class="meta-top">${dateDisplay} • ${fmtCurrency(inv.total)}</div>
+            <div class="meta-top">${dateDisplay} - ${fmtCurrency(inv.total)}</div>
             <div class="meta-bottom"></div>
           </div>
         </div>
         <div class="aside aside--labels">
-          <span class="chip chip--days" title="Highest days open among this invoice’s issues">Days: ${maxDaysOpen}</span>
+          <span class="chip chip--days" title="Highest days open among this invoice's issues">Days: ${maxDaysOpen}</span>
           <span class="chip chip--count" aria-label="Issue count"> Issue${inv.issues.length === 1 ? '' : 's'}: ${inv.issues.length} </span>
         </div>
       `;
@@ -633,6 +808,7 @@
   }
 
   function renderIssues(issues) {
+    if (!issueList) return;
     // Renders issues list/cards
     issueList.innerHTML = '';
     if (!issues || issues.length === 0) {
@@ -641,7 +817,7 @@
       empty.textContent = 'No issues for this invoice.';
       empty.setAttribute('aria-disabled', 'true');
       issueList.appendChild(empty);
-      detailView.innerHTML = '<p>Select an issue to see details.</p>';
+      if (detailView) detailView.innerHTML = '<p>Select an issue to see details.</p>';
       const trailList = document.getElementById('trail-list');
       if (trailList) trailList.innerHTML = '';
       return;
@@ -701,6 +877,30 @@
       });
       li.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectIssue(iss.id); } });
       issueList.appendChild(li);
+    });
+  }
+
+  function renderIssueReasonCounts(issues) {
+    if (!issueReasonList) return;
+    issueReasonList.innerHTML = '';
+    const counts = new Map();
+    (issues || []).forEach(iss => {
+      const reason = iss.subStatus || iss.primaryStatus || iss.title || 'Other';
+      counts.set(reason, (counts.get(reason) || 0) + 1);
+    });
+    const items = Array.from(counts.entries()).sort((a, b) => b[1] - a[1]).slice(0, 10);
+    if (!items.length) {
+      const empty = document.createElement('li');
+      empty.className = 'issueEmpty';
+      empty.textContent = 'No issue reasons available.';
+      issueReasonList.appendChild(empty);
+      return;
+    }
+    items.forEach(([reason, count]) => {
+      const li = document.createElement('li');
+      li.className = 'reasonItem';
+      li.innerHTML = `<span>${reason}</span><span class="reasonCount">${count}</span>`;
+      issueReasonList.appendChild(li);
     });
   }
 
@@ -813,6 +1013,7 @@
   }
 
   function renderDetails(invoice, issue) {
+    if (!detailView) return;
     if (!issue) {
       detailView.innerHTML = '<p>Select an issue to see details.</p>';
       const tl = document.getElementById('trail-list');
@@ -1525,16 +1726,32 @@
   function selectInvoice(id) {
     selectedInvoiceId = id;
     selectedIssueId = null;
-    // highlight selection
     clearSelected(invoiceList);
-    const el = invoiceList.querySelector(`[data-id="${CSS.escape(id)}"]`);
+    clearSelected(invoiceTableBody);
+    let el = null;
+    if (invoiceList) {
+      el = invoiceList.querySelector(`[data-id="${CSS.escape(id)}"]`);
+    }
+    if (!el && invoiceTableBody) {
+      el = invoiceTableBody.querySelector(`[data-id="${CSS.escape(id)}"]`);
+    }
     if (el) el.setAttribute('aria-selected', 'true');
 
     const invoice = data.find(d => d.id === id);
+    if (issuePanelTitle) {
+      issuePanelTitle.textContent = invoice ? `Issues for ${invoice.id}` : 'Issues';
+    }
+    if (issuePanelSubtitle) {
+      issuePanelSubtitle.textContent = invoice
+        ? `${invoice.customer} - ${fmtDate(invoice.date)} - ${fmtCurrency(invoice.total)}`
+        : 'Choose an invoice to load related issues.';
+    }
     const issues = invoice?.issues || [];
+    if (isDetailPage) {
+      renderIssueReasonCounts(issues);
+    }
     renderIssues(issues);
 
-    // Always auto-load the first issue's details if available
     if (issues.length > 0) {
       const firstIssue = issues[0];
       selectedIssueId = firstIssue.id;
@@ -1715,6 +1932,42 @@
   // Initialize
   initAddIssueOptions();
   renderInvoicesSortedAndPreserveSelection();
+  if (invoiceSearchInput) {
+    invoiceSearchInput.addEventListener('input', () => {
+      invoiceSearchQuery = normalizeSearch(invoiceSearchInput.value);
+      invoicePage = 1;
+      renderInvoicesSortedAndPreserveSelection();
+    });
+  }
+  if (invoicePagePrev) {
+    invoicePagePrev.addEventListener('click', () => {
+      invoicePage -= 1;
+      renderInvoicesSortedAndPreserveSelection();
+    });
+  }
+  if (invoicePageNext) {
+    invoicePageNext.addEventListener('click', () => {
+      invoicePage += 1;
+      renderInvoicesSortedAndPreserveSelection();
+    });
+  }
+  if (isDetailPage) {
+    const params = new URLSearchParams(window.location.search);
+    const invoiceParam = params.get('invoice');
+    if (invoiceParam) {
+      selectInvoice(invoiceParam);
+    } else {
+      renderIssueReasonCounts([]);
+    }
+  }
+  if (issueTrackerClock) {
+    const updateClock = () => {
+      const now = new Date();
+      issueTrackerClock.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    };
+    updateClock();
+    setInterval(updateClock, 60000);
+  }
 
   // Ensure details open when any issue card is clicked (event delegation safety)
   if (issueList) {
@@ -1733,11 +1986,6 @@
         }
       }
     });
-  }
-
-  // Preselect first invoice if none selected yet (after initial sorted render)
-  if (data.length && !selectedInvoiceId) {
-    selectInvoice(data[0].id);
   }
 
   // Generated time

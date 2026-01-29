@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Inebura | Submission Module</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="../css/styles.css" />
+  <link rel="stylesheet" href="../css/submission.css" />
+  <link rel="stylesheet" href="../css/shared-header.css" />
+</head>
+<body class="submissionPage" data-root-path="../" data-relationship-name="Submission Module" data-relationship-badge="SM">
+  <div data-shared-header></div>
+
+  <main class="submissionMain">
+    <div class="submissionHeader">
+      <div>
+        <h1>Submission Module</h1>
+        <p>Capture invoice submissions individually or in bulk.</p>
+      </div>
+      <div class="submissionClock">
+        <span>Updated</span>
+        <strong id="submissionClock">--:--</strong>
+      </div>
+    </div>
+
+    <section class="submissionCards" aria-label="Submission summary">
+      <div class="summaryCard"><span>Submitted invoices</span><strong id="cardSubmitted">0</strong></div>
+      <div class="summaryCard"><span>Non submitted invoices</span><strong id="cardNotSubmitted">0</strong></div>
+      <div class="summaryCard"><span>Externally submitted</span><strong id="cardExternallySubmitted">0</strong></div>
+      <div class="summaryCard"><span>Pending invoices</span><strong id="cardPending">0</strong></div>
+    </section>
+
+    <section class="submissionGrid">
+      <aside class="panelCard quickInfoSection" aria-label="Quick info">
+        <div class="panelTitle">Quick info</div>
+        <ul id="submissionQuickInfo" class="quickInfoList" aria-label="Submission channel summary"></ul>
+      </aside>
+
+      <section class="panelCard">
+        <div class="panelTitle">Invoices</div>
+        <div class="tableFilters">
+          <div class="filtersRow d-flex flex-wrap align-items-center">
+            <div class="filtersLeft">
+              <input id="invoiceSearch" class="filterBtn filterInput" type="text" placeholder="Search invoice no" />
+            </div>
+
+            <div class="filtersRight">
+              <div class="filterSuggest">
+                <div class="inputWithClear">
+                  <input
+                    id="customerSearch"
+                    class="filterBtn filterInput"
+                    type="text"
+                    placeholder="Customer code / name"
+                    autocomplete="off"
+                  />
+                  <button class="clearBtn" type="button" id="customerSearchClear" aria-label="Clear search">
+                    <i class="bi bi-x-lg" aria-hidden="true"></i>
+                  </button>
+                </div>
+                <div class="suggestionBox" id="customerSuggestions"></div>
+              </div>
+
+              <div class="btn-group">
+                <button
+                  id="submissionStatusBtn"
+                  type="button"
+                  class="filterBtn dropdown-toggle"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                  title="Filter - Submission Status"
+                >
+                  Submission Status
+                  <span class="filterBadge" data-role="filter-value">All</span>
+                </button>
+                <ul class="dropdown-menu" id="submissionStatusMenu">
+                  <li><button class="dropdown-item" type="button" data-value="All">All</button></li>
+                  <li><button class="dropdown-item" type="button" data-value="Not submitted">Not submitted</button></li>
+                  <li><button class="dropdown-item" type="button" data-value="Submitted">Submitted</button></li>
+                  <li><button class="dropdown-item" type="button" data-value="Externally submitted">Externally submitted</button></li>
+                </ul>
+              </div>
+
+              <div class="dateRangePicker" id="submissionDatePicker">
+                <button
+                  id="submissionDateBtn"
+                  class="filterBtn"
+                  type="button"
+                  aria-haspopup="dialog"
+                  aria-expanded="false"
+                >
+                  Submission date
+                  <span class="filterBadge" id="submissionDateBadge">All</span>
+                </button>
+                <div class="dateRangePopup" id="submissionDatePopup" role="dialog" aria-label="Select submission date range">
+                  <div class="dateRangeHeader">
+                    <button class="dateRangeNavBtn" type="button" id="submissionDatePrev" aria-label="Previous month">
+                      <i class="bi bi-chevron-left" aria-hidden="true"></i>
+                    </button>
+                    <div class="dateRangeMonth" id="submissionDateMonth">Month</div>
+                    <button class="dateRangeNavBtn" type="button" id="submissionDateNext" aria-label="Next month">
+                      <i class="bi bi-chevron-right" aria-hidden="true"></i>
+                    </button>
+                  </div>
+                  <div class="dateRangeWeekdays">
+                    <span>Sun</span>
+                    <span>Mon</span>
+                    <span>Tue</span>
+                    <span>Wed</span>
+                    <span>Thu</span>
+                    <span>Fri</span>
+                    <span>Sat</span>
+                  </div>
+                  <div class="dateRangeGrid" id="submissionDateGrid"></div>
+                  <div class="dateRangeFooter">
+                    <div class="dateRangeMeta">
+                      <span class="dateRangeHint" id="submissionDateHint">Select start date</span>
+                      <div class="dateRangeValues">
+                        <span>Start: <strong id="submissionDateStart">--</strong></span>
+                        <span>End: <strong id="submissionDateEnd">--</strong></span>
+                      </div>
+                    </div>
+                    <div class="dateRangeActions">
+                      <button class="dateRangeClear" id="submissionDateClear" type="button">Clear</button>
+                      <button class="dateRangeApply" id="submissionDateApply" type="button" disabled>Apply</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <button id="submissionClearFilters" class="filterBtn" type="button">Clear filters</button>
+            </div>
+          </div>
+        </div>
+        <div class="tableWrap">
+          <table class="submissionTable" aria-label="Submission invoices">
+            <thead>
+              <tr>
+                <th scope="col"><input id="selectAll" type="checkbox" aria-label="Select all invoices" /></th>
+                <th scope="col">Customer code</th>
+                <th scope="col">Customer name</th>
+                <th scope="col">Invoice no</th>
+                <th scope="col">Invoice status</th>
+                <th scope="col">Invoice value</th>
+                <th scope="col">Submission status</th>
+                <th scope="col">Submission date</th>
+                <th scope="col">Action</th>
+              </tr>
+            </thead>
+            <tbody id="submissionTableBody"></tbody>
+          </table>
+        </div>
+        <div class="bulkActions">
+          <span id="selectedCount">0 selected</span>
+          <button id="bulkSubmitBtn" class="btnPrimary hidden" type="button">Bulk submit</button>
+        </div>
+
+        <div id="submissionFormPanel" class="submissionFormPanel hidden">
+          <div class="panelTitle">Submission form</div>
+          <form id="submissionForm" class="submissionForm">
+            <div class="formGrid">
+              <div class="formField">
+                <label for="activityType">Activity type</label>
+                <select id="activityType" required>
+                  <option value="">Select activity</option>
+                  <option value="called">Called</option>
+                  <option value="emailed">Emailed</option>
+                  <option value="visited">Visited</option>
+                  <option value="no activity">No activity</option>
+                </select>
+              </div>
+              <div class="formField">
+                <label for="submissionStatus">Submission status</label>
+                <select id="submissionStatus" required>
+                  <option value="">Select status</option>
+                  <option value="Not submitted">Not submitted</option>
+                  <option value="Submitted">Submitted</option>
+                  <option value="Externally submitted">Externally submitted</option>
+                </select>
+              </div>
+              <div class="formField">
+                <label for="submissionSubStatus">Submission sub status</label>
+                <select id="submissionSubStatus" required>
+                  <option value="">Select sub status</option>
+                  <option value="Vendor portal">Vendor portal</option>
+                  <option value="Vendor helpdesk">Vendor helpdesk</option>
+                  <option value="Submitted to others">Submitted to others</option>
+                  <option value="Submitted to reception">Submitted to reception</option>
+                  <option value="Accepted by user">Accepted by user</option>
+                </select>
+              </div>
+              <div class="formField">
+                <label for="submissionType">Submission type</label>
+                <input id="submissionType" type="text" placeholder="e.g., Physical Submission, Emailed" />
+              </div>
+              <div class="formField">
+                <label for="invoiceType">Invoice type</label>
+                <input id="invoiceType" type="text" placeholder="e.g., Tax, Proforma" />
+              </div>
+              <div class="formField">
+                <label for="submissionDate">Submission date</label>
+                <input id="submissionDate" type="date" />
+              </div>
+              <div class="formField">
+                <label for="sentTo">Sent to / Received by</label>
+                <input id="sentTo" type="text" placeholder="Name or role" />
+              </div>
+              <div class="formField formField--full">
+                <label for="submissionRemarks">Remarks</label>
+                <textarea id="submissionRemarks" rows="3" placeholder="Add remarks..."></textarea>
+              </div>
+            </div>
+            <div class="formActions">
+              <button id="submitSelectedBtn" class="btnPrimary" type="button">Submit</button>
+              <button id="clearFormBtn" class="btnSecondary" type="button">Clear</button>
+              <button id="closeFormBtn" class="btnSecondary" type="button">Close</button>
+            </div>
+            <div id="formMessage" class="formMessage" aria-live="polite"></div>
+          </form>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script src="../scripts/shared-header.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../scripts/submission.js"></script>
+</body>
+</html>

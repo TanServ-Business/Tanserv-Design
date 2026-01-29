@@ -266,6 +266,46 @@
       margin-bottom: 14px;
     }
 
+    .reportGeneratorCard {
+      border: 1px solid #dbe4f3;
+      background: #f6f9ff;
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 18px;
+      box-shadow: 0 12px 24px rgba(15, 23, 42, 0.06);
+    }
+
+    .reportGeneratorHeader {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .reportGeneratorHeader h3 {
+      margin: 0;
+      font-size: 16px;
+      color: #0f172a;
+    }
+
+    .reportGeneratorHeader p {
+      margin: 2px 0 0;
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    .reportGeneratorCta {
+      padding: 8px 14px;
+      font-weight: 600;
+    }
+
+    .reportSubTitle {
+      margin-top: 16px;
+      font-size: 14px;
+      color: #334155;
+    }
+
     .reportListItem {
       border: 1px solid #e2e8f4;
       background: #f8fafc;
@@ -299,6 +339,91 @@
       align-items: center;
       gap: 8px;
     }
+
+    .scheduleForm {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .scheduleRow {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      width: 50%;
+    }
+
+    .scheduleDivider {
+      height: 1px;
+      background: #e2e8f4;
+    }
+
+    .scheduleConfig {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .scheduleConfig.hidden {
+      display: none !important;
+    }
+
+    .scheduleField label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 12px;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      font-weight: 600;
+    }
+
+    .scheduleField {
+      width: 100%;
+    }
+
+    .scheduleField input,
+    .scheduleField select {
+      border: 1px solid #e2e8f4;
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 13px;
+      width: 100%;
+    }
+
+    .scheduleActions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-top: 4px;
+    }
+
+    .scheduleDays {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .scheduleDayPill {
+      border: 1px solid #e2e8f4;
+      background: #ffffff;
+      color: #475569;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      min-width: 36px;
+      text-align: center;
+    }
+
+    .scheduleDayPill.active {
+      border-color: var(--brand);
+      background: var(--brand-light);
+      color: var(--brand-dark);
+    }
+
 
     .paginationControls {
       display: inline-flex;
@@ -481,6 +606,9 @@
       .managerLayout {
         grid-template-columns: 1fr;
       }
+      .scheduleRow {
+        width: 100%;
+      }
     }
   </style>
 </head>
@@ -502,50 +630,149 @@
     <aside class="managerSidebar">
       <div class="panelCard actionPanel">
         <div class="panelTitle">Quick Actions</div>
-        <button class="actionBtn" type="button">Reports</button>
-        <button class="actionBtn" type="button">Invoices</button>
-        <button class="actionBtn" type="button">Customer</button>
+        <button class="actionBtn" type="button" id="reportOverviewBtn">Reports</button>
+        <button class="actionBtn" type="button" id="invoiceOverviewBtn">Invoices</button>
+        <button class="actionBtn" type="button" id="customerOverviewBtn">Customer</button>
+        <button class="actionBtn" type="button" id="scheduleShareBtn">Schedule &amp; Share</button>
       </div>
     </aside>
 
     <section class="panelCard">
+      <div id="scheduleSharePanel" class="hidden">
+        <div class="summaryHeader">
+          <div>
+            <h2>Report Scheduling &amp; Sharing</h2>
+            <p>Create schedules and share reports with stakeholders.</p>
+          </div>
+        </div>
+        <form class="scheduleForm" id="scheduleForm">
+          <div class="scheduleRow">
+            <div class="scheduleField">
+              <label for="scheduleReport">Report name</label>
+              <select id="scheduleReport" required>
+                <option value="" selected disabled>Select report</option>
+                <option>Aging Report</option>
+                <option>Activity Tracker</option>
+                <option>ODM report</option>
+                <option>Visit report</option>
+              </select>
+            </div>
+            <div class="scheduleField">
+              <label for="scheduleFrequency">Frequency</label>
+              <select id="scheduleFrequency" required>
+                <option value="" selected disabled>Select frequency</option>
+                <option value="One-time">One-time</option>
+                <option value="Daily">Daily</option>
+                <option value="Weekly">Weekly</option>
+                <option value="Monthly">Monthly</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="scheduleConfig hidden" id="scheduleConfig">
+            <div class="scheduleRow">
+              <div class="scheduleField hidden" id="scheduleDateField">
+                <label for="scheduleDate">Date</label>
+                <input type="date" id="scheduleDate" />
+              </div>
+              <div class="scheduleField hidden" id="scheduleDayOfMonthField">
+                <label for="scheduleDayOfMonth">Day of Month</label>
+                <select id="scheduleDayOfMonth">
+                  <option value="" selected disabled>Select day</option>
+                </select>
+              </div>
+              <div class="scheduleField hidden" id="scheduleTimeField">
+                <label for="scheduleTime">Time</label>
+                <input type="time" id="scheduleTime" />
+              </div>
+            </div>
+            <div class="scheduleField hidden" id="scheduleWeekDaysField">
+              <label>Days</label>
+              <div class="scheduleDays" id="scheduleWeekDays">
+                <button class="scheduleDayPill" type="button" data-day="Mon">Mon</button>
+                <button class="scheduleDayPill" type="button" data-day="Tue">Tue</button>
+                <button class="scheduleDayPill" type="button" data-day="Wed">Wed</button>
+                <button class="scheduleDayPill" type="button" data-day="Thu">Thu</button>
+                <button class="scheduleDayPill" type="button" data-day="Fri">Fri</button>
+                <button class="scheduleDayPill" type="button" data-day="Sat">Sat</button>
+                <button class="scheduleDayPill" type="button" data-day="Sun">Sun</button>
+              </div>
+            </div>
+          </div>
+
+
+          <div class="scheduleRow">
+            <div class="scheduleField">
+              <label for="scheduleRecipients">User Email</label>
+              <input type="text" id="scheduleRecipients" placeholder="name@company.com" required />
+            </div>
+          </div>
+
+          <div class="scheduleActions">
+            <button class="btnSmallPrimary" type="submit" id="scheduleSubmitBtn">Create schedule</button>
+            <button class="btnSmall" type="button" id="scheduleClearBtn">Clear</button>
+          </div>
+        </form>
+
+        <div class="panelTitle">Schedule Log</div>
+        <table class="uploadTable">
+          <thead>
+            <tr>
+              <th>Report</th>
+              <th>Schedule</th>
+              <th>Recipients</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="scheduleTableBody"></tbody>
+        </table>
+      </div>
+      <div id="reportOverviewPanel">
       <div class="summaryHeader">
         <div>
           <h2>Report Overview</h2>
           <p>Monitor refresh cadence, coverage, and report readiness.</p>
         </div>
       </div>
-      <div class="panelTitle">Report Generator</div>
-      <div class="tableFilters">
-        <div class="filterRow">
-          <div class="tableFilterSearch">
-            <i class="bi bi-search" aria-hidden="true"></i>
-            <input type="text" id="reportListSearch" placeholder="Search report name" />
+      <div class="reportGeneratorCard">
+        <div class="reportGeneratorHeader">
+          <div>
+            <h3>Report Generator</h3>
+            <p>Select a report to generate and download the latest data.</p>
           </div>
-          <details class="filterDropdown" data-report-filter="status">
-            <summary>Status <span class="filterBadge" data-report-badge="status">All</span></summary>
-            <div class="filterMenu">
-              <button class="filterItem" type="button" data-filter-value="All">All</button>
-              <button class="filterItem" type="button" data-filter-value="Ready">Ready</button>
-              <button class="filterItem" type="button" data-filter-value="Processing">Processing</button>
-              <button class="filterItem" type="button" data-filter-value="Failed">Failed</button>
-            </div>
-          </details>
-          <details class="filterDropdown" data-report-filter="range">
-            <summary>Date Range <span class="filterBadge" data-report-badge="range">Last 30 days</span></summary>
-            <div class="filterMenu">
-              <button class="filterItem" type="button" data-filter-value="7">Last 7 days</button>
-              <button class="filterItem" type="button" data-filter-value="30">Last 30 days</button>
-              <button class="filterItem" type="button" data-filter-value="90">Last 90 days</button>
-              <button class="filterItem" type="button" data-filter-value="all">All time</button>
-            </div>
-          </details>
-          <button class="filterClearBtn" type="button" id="reportListClear">Clear</button>
         </div>
+        <div class="tableFilters">
+          <div class="filterRow">
+            <div class="tableFilterSearch">
+              <i class="bi bi-search" aria-hidden="true"></i>
+              <input type="text" id="reportListSearch" placeholder="Search report name" />
+            </div>
+            <details class="filterDropdown" data-report-filter="status">
+              <summary>Status <span class="filterBadge" data-report-badge="status">All</span></summary>
+              <div class="filterMenu">
+                <button class="filterItem" type="button" data-filter-value="All">All</button>
+                <button class="filterItem" type="button" data-filter-value="Ready">Ready</button>
+                <button class="filterItem" type="button" data-filter-value="Processing">Processing</button>
+                <button class="filterItem" type="button" data-filter-value="Failed">Failed</button>
+              </div>
+            </details>
+            <details class="filterDropdown" data-report-filter="range">
+              <summary>Date Range <span class="filterBadge" data-report-badge="range">Last 30 days</span></summary>
+              <div class="filterMenu">
+                <button class="filterItem" type="button" data-filter-value="7">Last 7 days</button>
+                <button class="filterItem" type="button" data-filter-value="30">Last 30 days</button>
+                <button class="filterItem" type="button" data-filter-value="90">Last 90 days</button>
+                <button class="filterItem" type="button" data-filter-value="all">All time</button>
+              </div>
+            </details>
+            <button class="filterClearBtn" type="button" id="reportListClear">Clear</button>
+          </div>
+        </div>
+        <div class="reportList" id="reportGeneratorList"></div>
       </div>
-      <div class="reportList" id="reportGeneratorList"></div>
 
-      <div class="panelTitle">Recent Reports</div>
+      <div class="panelTitle reportSubTitle">Recent Reports</div>
       <div class="tableFilters">
         <div class="filterRow">
           <div class="tableFilterSearch">
@@ -601,6 +828,141 @@
         <tbody id="reportTableBody"></tbody>
       </table>
       <div class="tablePagination hidden" id="reportPagination"></div>
+    </div>
+    <div id="invoiceOverviewPanel" class="hidden">
+      <div class="summaryHeader">
+        <div>
+          <h2>Invoice Overview</h2>
+          <p>Reference invoice submissions and update key details.</p>
+        </div>
+      </div>
+      <div class="tableFilters">
+        <div class="filterRow">
+          <div class="tableFilterSearch">
+            <i class="bi bi-search" aria-hidden="true"></i>
+            <input type="text" id="invoiceSearch" placeholder="Search invoice or customer name" />
+          </div>
+          <details class="filterDropdown" data-invoice-filter="status">
+            <summary>Status <span class="filterBadge" data-invoice-badge="status">All</span></summary>
+            <div class="filterMenu">
+              <button class="filterItem" type="button" data-filter-value="All">All</button>
+              <button class="filterItem" type="button" data-filter-value="Submitted">Submitted</button>
+              <button class="filterItem" type="button" data-filter-value="Pending">Pending</button>
+              <button class="filterItem" type="button" data-filter-value="Rejected">Rejected</button>
+            </div>
+          </details>
+          <details class="filterDropdown" data-invoice-filter="agent">
+            <summary>Agent <span class="filterBadge" data-invoice-badge="agent">All</span></summary>
+            <div class="filterMenu" id="invoiceAgentFilter"></div>
+          </details>
+          <details class="filterDropdown" data-invoice-filter="manager">
+            <summary>Manager <span class="filterBadge" data-invoice-badge="manager">All</span></summary>
+            <div class="filterMenu" id="invoiceManagerFilter"></div>
+          </details>
+          <details class="filterDropdown" data-invoice-filter="range">
+            <summary>Date Range <span class="filterBadge" data-invoice-badge="range">Last 30 days</span></summary>
+            <div class="filterMenu">
+              <button class="filterItem" type="button" data-filter-value="7">Last 7 days</button>
+              <button class="filterItem" type="button" data-filter-value="30">Last 30 days</button>
+              <button class="filterItem" type="button" data-filter-value="90">Last 90 days</button>
+              <button class="filterItem" type="button" data-filter-value="all">All time</button>
+            </div>
+          </details>
+          <details class="filterDropdown" data-invoice-filter="sort">
+            <summary>Sort <span class="filterBadge" data-invoice-badge="sort">Date (Newest)</span></summary>
+            <div class="filterMenu">
+              <button class="filterItem" type="button" data-filter-value="date-desc">Date (Newest)</button>
+              <button class="filterItem" type="button" data-filter-value="date-asc">Date (Oldest)</button>
+              <button class="filterItem" type="button" data-filter-value="value-desc">Value (High-Low)</button>
+              <button class="filterItem" type="button" data-filter-value="value-asc">Value (Low-High)</button>
+            </div>
+          </details>
+          <button class="filterClearBtn" type="button" id="invoiceFilterClear">Clear</button>
+        </div>
+      </div>
+      <table class="uploadTable">
+        <thead>
+          <tr>
+            <th>Invoice</th>
+            <th>Customer Code</th>
+            <th>Customer Name</th>
+            <th>Submission Status</th>
+            <th>Date of Invoice</th>
+            <th>Value</th>
+            <th>Due Date</th>
+            <th>Agent</th>
+            <th>Manager</th>
+            <th>Edit</th>
+          </tr>
+        </thead>
+        <tbody id="invoiceTableBody"></tbody>
+      </table>
+      <div class="tablePagination hidden" id="invoicePagination"></div>
+    </div>
+    <div id="customerOverviewPanel" class="hidden">
+      <div class="summaryHeader">
+        <div>
+          <h2>Customer Overview</h2>
+          <p>Track customer ownership, exposure, and overdue dues.</p>
+        </div>
+      </div>
+      <div class="tableFilters">
+        <div class="filterRow">
+          <div class="tableFilterSearch">
+            <i class="bi bi-search" aria-hidden="true"></i>
+            <input type="text" id="customerSearch" placeholder="Search customer code or name" />
+          </div>
+          <details class="filterDropdown" data-customer-filter="city">
+            <summary>City <span class="filterBadge" data-customer-badge="city">All</span></summary>
+            <div class="filterMenu" id="customerCityFilter"></div>
+          </details>
+          <details class="filterDropdown" data-customer-filter="agent">
+            <summary>Agent <span class="filterBadge" data-customer-badge="agent">All</span></summary>
+            <div class="filterMenu" id="customerAgentFilter"></div>
+          </details>
+          <details class="filterDropdown" data-customer-filter="manager">
+            <summary>Manager <span class="filterBadge" data-customer-badge="manager">All</span></summary>
+            <div class="filterMenu" id="customerManagerFilter"></div>
+          </details>
+          <details class="filterDropdown" data-customer-filter="kam">
+            <summary>KAM <span class="filterBadge" data-customer-badge="kam">All</span></summary>
+            <div class="filterMenu" id="customerKamFilter"></div>
+          </details>
+          <details class="filterDropdown" data-customer-filter="kas">
+            <summary>KAS <span class="filterBadge" data-customer-badge="kas">All</span></summary>
+            <div class="filterMenu" id="customerKasFilter"></div>
+          </details>
+          <details class="filterDropdown" data-customer-filter="sort">
+            <summary>Sort <span class="filterBadge" data-customer-badge="sort">Invoice Value (High-Low)</span></summary>
+            <div class="filterMenu">
+              <button class="filterItem" type="button" data-filter-value="value-desc">Invoice Value (High-Low)</button>
+              <button class="filterItem" type="button" data-filter-value="value-asc">Invoice Value (Low-High)</button>
+              <button class="filterItem" type="button" data-filter-value="due-desc">New Due (High-Low)</button>
+              <button class="filterItem" type="button" data-filter-value="due-asc">New Due (Low-High)</button>
+            </div>
+          </details>
+          <button class="filterClearBtn" type="button" id="customerFilterClear">Clear</button>
+        </div>
+      </div>
+      <table class="uploadTable">
+        <thead>
+          <tr>
+            <th>Customer Code</th>
+            <th>Customer Name</th>
+            <th>City</th>
+            <th>Agent</th>
+            <th>Manager</th>
+            <th>KAM</th>
+            <th>KAS</th>
+            <th>Total Invoice Value</th>
+            <th>Total New Due</th>
+            <th>Edit</th>
+          </tr>
+        </thead>
+        <tbody id="customerTableBody"></tbody>
+      </table>
+      <div class="tablePagination hidden" id="customerPagination"></div>
+    </div>
     </section>
   </div>
 </main>
@@ -620,6 +982,38 @@
     const globalCards = document.getElementById("globalCards");
     const reportTableBody = document.getElementById("reportTableBody");
     const reportPagination = document.getElementById("reportPagination");
+    const invoiceTableBody = document.getElementById("invoiceTableBody");
+    const invoicePagination = document.getElementById("invoicePagination");
+    const invoiceSearch = document.getElementById("invoiceSearch");
+    const invoiceFilterClear = document.getElementById("invoiceFilterClear");
+    const invoiceAgentFilter = document.getElementById("invoiceAgentFilter");
+    const invoiceManagerFilter = document.getElementById("invoiceManagerFilter");
+    const invoiceFilterDropdowns = document.querySelectorAll(".filterDropdown[data-invoice-filter]");
+    const invoiceFilterBadges = {
+      status: document.querySelector('[data-invoice-badge="status"]'),
+      agent: document.querySelector('[data-invoice-badge="agent"]'),
+      manager: document.querySelector('[data-invoice-badge="manager"]'),
+      range: document.querySelector('[data-invoice-badge="range"]'),
+      sort: document.querySelector('[data-invoice-badge="sort"]')
+    };
+    const customerTableBody = document.getElementById("customerTableBody");
+    const customerPagination = document.getElementById("customerPagination");
+    const customerSearch = document.getElementById("customerSearch");
+    const customerFilterClear = document.getElementById("customerFilterClear");
+    const customerCityFilter = document.getElementById("customerCityFilter");
+    const customerAgentFilter = document.getElementById("customerAgentFilter");
+    const customerManagerFilter = document.getElementById("customerManagerFilter");
+    const customerKamFilter = document.getElementById("customerKamFilter");
+    const customerKasFilter = document.getElementById("customerKasFilter");
+    const customerFilterDropdowns = document.querySelectorAll(".filterDropdown[data-customer-filter]");
+    const customerFilterBadges = {
+      city: document.querySelector('[data-customer-badge="city"]'),
+      agent: document.querySelector('[data-customer-badge="agent"]'),
+      manager: document.querySelector('[data-customer-badge="manager"]'),
+      kam: document.querySelector('[data-customer-badge="kam"]'),
+      kas: document.querySelector('[data-customer-badge="kas"]'),
+      sort: document.querySelector('[data-customer-badge="sort"]')
+    };
 
     const searchInput = document.getElementById("reportSearch");
     const filterDropdowns = document.querySelectorAll(".filterDropdown[data-filter]");
@@ -638,6 +1032,30 @@
       status: document.querySelector('[data-report-badge="status"]'),
       range: document.querySelector('[data-report-badge="range"]')
     };
+    const scheduleForm = document.getElementById("scheduleForm");
+    const scheduleReport = document.getElementById("scheduleReport");
+    const scheduleFrequency = document.getElementById("scheduleFrequency");
+    const scheduleConfig = document.getElementById("scheduleConfig");
+    const scheduleWeekDaysField = document.getElementById("scheduleWeekDaysField");
+    const scheduleWeekDays = document.getElementById("scheduleWeekDays");
+    const scheduleDateField = document.getElementById("scheduleDateField");
+    const scheduleDate = document.getElementById("scheduleDate");
+    const scheduleDayOfMonthField = document.getElementById("scheduleDayOfMonthField");
+    const scheduleDayOfMonth = document.getElementById("scheduleDayOfMonth");
+    const scheduleTime = document.getElementById("scheduleTime");
+    const scheduleTimeField = document.getElementById("scheduleTimeField");
+    const scheduleRecipients = document.getElementById("scheduleRecipients");
+    const scheduleSubmitBtn = document.getElementById("scheduleSubmitBtn");
+    const scheduleClearBtn = document.getElementById("scheduleClearBtn");
+    const scheduleTableBody = document.getElementById("scheduleTableBody");
+    const scheduleShareBtn = document.getElementById("scheduleShareBtn");
+    const reportOverviewBtn = document.getElementById("reportOverviewBtn");
+    const invoiceOverviewBtn = document.getElementById("invoiceOverviewBtn");
+    const customerOverviewBtn = document.getElementById("customerOverviewBtn");
+    const scheduleSharePanel = document.getElementById("scheduleSharePanel");
+    const reportOverviewPanel = document.getElementById("reportOverviewPanel");
+    const invoiceOverviewPanel = document.getElementById("invoiceOverviewPanel");
+    const customerOverviewPanel = document.getElementById("customerOverviewPanel");
 
     const formatCount = (value) => value.toLocaleString("en-IN");
     const formatDate = (dateStr) => new Date(dateStr).toLocaleDateString("en-IN", {
@@ -648,8 +1066,12 @@
 
     const getStatusClass = (status) => {
       if (status === "Ready") return "status-success";
+      if (status === "Submitted") return "status-success";
+      if (status === "Active") return "status-success";
       if (status === "Processing") return "status-processing";
+      if (status === "Pending") return "status-processing";
       if (status === "Failed") return "status-failed";
+      if (status === "Rejected") return "status-failed";
       if (status === "Partial") return "status-partial";
       return "";
     };
@@ -668,14 +1090,110 @@
       { name: "Visit report", status: "Failed", updated: "2026-01-06", owner: "Field Ops" }
     ];
 
+    const invoiceData = [
+      { id: "INV-10432", customerCode: "CUST-1003", customerName: "Apollo Tyres", status: "Submitted", invoiceDate: "2026-01-08", value: 86400, dueDate: "2026-02-08", agent: "Rahul Das", manager: "Aditi Rao" },
+      { id: "INV-10421", customerCode: "CUST-1003", customerName: "Apollo Tyres", status: "Pending", invoiceDate: "2026-01-05", value: 32500, dueDate: "2026-02-04", agent: "Meera Iyer", manager: "Aditi Rao" },
+      { id: "INV-10398", customerCode: "CUST-1003", customerName: "Apollo Tyres", status: "Rejected", invoiceDate: "2026-01-03", value: 48900, dueDate: "2026-02-02", agent: "Kunal Shah", manager: "Aditi Rao" },
+      { id: "INV-10376", customerCode: "CUST-1044", customerName: "Crescent Steel", status: "Submitted", invoiceDate: "2025-12-28", value: 92000, dueDate: "2026-01-27", agent: "Tanvi Sen", manager: "Aditi Rao" }
+    ];
+
+    const invoiceSeed = {
+      customers: [
+        { code: "CUST-1101", name: "Crescent Steel" },
+        { code: "CUST-1102", name: "Sundaram Motors" },
+        { code: "CUST-1103", name: "Noble Bearings" },
+        { code: "CUST-1104", name: "Helios Manufacturing" },
+        { code: "CUST-1105", name: "Eastline Traders" }
+      ],
+      agents: ["Rahul Das", "Meera Iyer", "Kunal Shah", "Tanvi Sen", "Ritika Bose", "Nikhil Jain"],
+      managers: ["Aditi Rao", "Pranav Menon", "Shalini Nair"],
+      statuses: ["Submitted", "Pending", "Rejected"]
+    };
+
+    for (let i = 1; i <= 30; i += 1) {
+      const customer = invoiceSeed.customers[i % invoiceSeed.customers.length];
+      const status = invoiceSeed.statuses[i % invoiceSeed.statuses.length];
+      const agent = invoiceSeed.agents[i % invoiceSeed.agents.length];
+      const manager = invoiceSeed.managers[i % invoiceSeed.managers.length];
+      const day = String((i % 28) + 1).padStart(2, "0");
+      invoiceData.push({
+        id: `INV-10${500 + i}`,
+        customerCode: customer.code,
+        customerName: customer.name,
+        status,
+        invoiceDate: `2026-01-${day}`,
+        value: 25000 + i * 1200,
+        dueDate: `2026-02-${day}`,
+        agent,
+        manager
+      });
+    }
+
+    const customerData = [
+      { code: "CUST-1003", name: "Apollo Tyres", city: "Chennai", agent: "Rahul Das", manager: "Aditi Rao", kam: "Karthik Iyer", kas: "Nisha Menon", totalValue: 256400, totalDue: 48200 },
+      { code: "CUST-1044", name: "Crescent Steel", city: "Pune", agent: "Tanvi Sen", manager: "Aditi Rao", kam: "Karthik Iyer", kas: "Nisha Menon", totalValue: 192000, totalDue: 15600 },
+      { code: "CUST-1101", name: "Sundaram Motors", city: "Bengaluru", agent: "Meera Iyer", manager: "Pranav Menon", kam: "Leena Jose", kas: "Raghav Rao", totalValue: 289500, totalDue: 33200 }
+    ];
+
+    const customerSeed = {
+      cities: ["Mumbai", "Delhi", "Hyderabad", "Chennai", "Pune", "Bengaluru"],
+      agents: ["Rahul Das", "Meera Iyer", "Kunal Shah", "Tanvi Sen", "Ritika Bose", "Nikhil Jain"],
+      managers: ["Aditi Rao", "Pranav Menon", "Shalini Nair"],
+      kams: ["Karthik Iyer", "Leena Jose", "Rohit Verma"],
+      kass: ["Nisha Menon", "Raghav Rao", "Aparna Singh"]
+    };
+
+    for (let i = 1; i <= 30; i += 1) {
+      customerData.push({
+        code: `CUST-${1200 + i}`,
+        name: `Customer Group ${i}`,
+        city: customerSeed.cities[i % customerSeed.cities.length],
+        agent: customerSeed.agents[i % customerSeed.agents.length],
+        manager: customerSeed.managers[i % customerSeed.managers.length],
+        kam: customerSeed.kams[i % customerSeed.kams.length],
+        kas: customerSeed.kass[i % customerSeed.kass.length],
+        totalValue: 150000 + i * 5200,
+        totalDue: 12000 + i * 800
+      });
+    }
+
+    const scheduleData = [
+      { id: "SCH-101", report: "Aging Report", frequency: "Weekly", days: ["Mon", "Thu"], date: "", dayOfMonth: "", time: "10:30", recipients: ["mis.lead@company.com"], status: "Active" },
+      { id: "SCH-102", report: "ODM report", frequency: "Monthly", days: [], date: "", dayOfMonth: "15", time: "15:00", recipients: ["finance@company.com", "ops@company.com"], status: "Active" }
+    ];
+    let editingScheduleId = null;
+
     const reportFilters = {
       query: "",
       status: "All",
       range: "30"
     };
 
+    const invoiceFilters = {
+      query: "",
+      status: "All",
+      agent: "All",
+      manager: "All",
+      range: "30",
+      sort: "date-desc"
+    };
+
+    const customerFilters = {
+      query: "",
+      city: "All",
+      agent: "All",
+      manager: "All",
+      kam: "All",
+      kas: "All",
+      sort: "value-desc"
+    };
+
     const reportPageSize = 5;
     let reportCurrentPage = 1;
+    const invoicePageSize = 5;
+    let invoiceCurrentPage = 1;
+    const customerPageSize = 5;
+    let customerCurrentPage = 1;
 
     const setFilterBadge = (key, label) => {
       const badge = filterBadges[key];
@@ -698,6 +1216,14 @@
     const withinReportRange = (dateStr) => {
       if (reportFilters.range === "all") return true;
       const days = Number(reportFilters.range || 30);
+      const cutoff = new Date();
+      cutoff.setDate(cutoff.getDate() - days);
+      return new Date(dateStr + "T00:00:00") >= cutoff;
+    };
+
+    const withinInvoiceRange = (dateStr) => {
+      if (invoiceFilters.range === "all") return true;
+      const days = Number(invoiceFilters.range || 30);
       const cutoff = new Date();
       cutoff.setDate(cutoff.getDate() - days);
       return new Date(dateStr + "T00:00:00") >= cutoff;
@@ -839,6 +1365,381 @@
       `).join("");
     };
 
+    const renderInvoiceTable = () => {
+      if (!invoiceTableBody) return;
+      const rows = getFilteredInvoices();
+      const totalRows = rows.length;
+      const totalPages = Math.max(1, Math.ceil(totalRows / invoicePageSize));
+      if (invoiceCurrentPage > totalPages) invoiceCurrentPage = totalPages;
+      const startIndex = (invoiceCurrentPage - 1) * invoicePageSize;
+      const pageRows = rows.slice(startIndex, startIndex + invoicePageSize);
+      if (!rows.length) {
+        invoiceTableBody.innerHTML = `
+          <tr>
+            <td colspan="10">No invoices available.</td>
+          </tr>
+        `;
+        renderInvoicePagination(0);
+        return;
+      }
+      invoiceTableBody.innerHTML = pageRows.map((row) => `
+        <tr>
+          <td>
+            <strong>${row.id}</strong>
+          </td>
+          <td>${row.customerCode}</td>
+          <td>${row.customerName}</td>
+          <td><span class="statusPill ${getStatusClass(row.status)}">${row.status}</span></td>
+          <td>${formatDate(row.invoiceDate)}</td>
+          <td>Rs. ${formatCount(row.value)}</td>
+          <td>${formatDate(row.dueDate)}</td>
+          <td>${row.agent}</td>
+          <td>${row.manager}</td>
+          <td>
+            <div class="actionIcons">
+              <button class="actionIconBtn" type="button" title="Edit invoice" aria-label="Edit invoice">
+                <i class="bi bi-pencil"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `).join("");
+      renderInvoicePagination(totalRows);
+    };
+
+    const renderInvoicePagination = (totalRows) => {
+      if (!invoicePagination) return;
+      if (totalRows <= invoicePageSize) {
+        invoicePagination.classList.add("hidden");
+        invoicePagination.innerHTML = "";
+        return;
+      }
+      const totalPages = Math.ceil(totalRows / invoicePageSize);
+      const start = (invoiceCurrentPage - 1) * invoicePageSize + 1;
+      const end = Math.min(totalRows, invoiceCurrentPage * invoicePageSize);
+      const pageButtons = Array.from({ length: totalPages }, (_, idx) => {
+        const page = idx + 1;
+        const isActive = page === invoiceCurrentPage;
+        return `<button class="pageBtn ${isActive ? "active" : ""}" type="button" data-page="${page}">${page}</button>`;
+      }).join("");
+      invoicePagination.classList.remove("hidden");
+      invoicePagination.innerHTML = `
+        <span class="paginationInfo">Showing ${start}-${end} of ${totalRows}</span>
+        <div class="paginationControls">
+          <button class="pageBtn ${invoiceCurrentPage === 1 ? "disabled" : ""}" type="button" data-page="prev" aria-label="Previous page">
+            <i class="bi bi-chevron-left"></i>
+          </button>
+          ${pageButtons}
+          <button class="pageBtn ${invoiceCurrentPage === totalPages ? "disabled" : ""}" type="button" data-page="next" aria-label="Next page">
+            <i class="bi bi-chevron-right"></i>
+          </button>
+        </div>
+      `;
+    };
+
+    const getFilteredCustomers = () => {
+      const query = customerFilters.query.toLowerCase();
+      const rows = customerData.filter((row) => {
+        if (customerFilters.city !== "All" && row.city !== customerFilters.city) return false;
+        if (customerFilters.agent !== "All" && row.agent !== customerFilters.agent) return false;
+        if (customerFilters.manager !== "All" && row.manager !== customerFilters.manager) return false;
+        if (customerFilters.kam !== "All" && row.kam !== customerFilters.kam) return false;
+        if (customerFilters.kas !== "All" && row.kas !== customerFilters.kas) return false;
+        if (query) {
+          const matchText = `${row.code} ${row.name}`.toLowerCase();
+          if (!matchText.includes(query)) return false;
+        }
+        return true;
+      });
+      const sortedRows = [...rows];
+      switch (customerFilters.sort) {
+        case "value-asc":
+          sortedRows.sort((a, b) => a.totalValue - b.totalValue);
+          break;
+        case "due-desc":
+          sortedRows.sort((a, b) => b.totalDue - a.totalDue);
+          break;
+        case "due-asc":
+          sortedRows.sort((a, b) => a.totalDue - b.totalDue);
+          break;
+        default:
+          sortedRows.sort((a, b) => b.totalValue - a.totalValue);
+      }
+      return sortedRows;
+    };
+
+    const renderCustomerTable = () => {
+      if (!customerTableBody) return;
+      const rows = getFilteredCustomers();
+      const totalRows = rows.length;
+      const totalPages = Math.max(1, Math.ceil(totalRows / customerPageSize));
+      if (customerCurrentPage > totalPages) customerCurrentPage = totalPages;
+      const startIndex = (customerCurrentPage - 1) * customerPageSize;
+      const pageRows = rows.slice(startIndex, startIndex + customerPageSize);
+      if (!rows.length) {
+        customerTableBody.innerHTML = `
+          <tr>
+            <td colspan="10">No customers available.</td>
+          </tr>
+        `;
+        renderCustomerPagination(0);
+        return;
+      }
+      customerTableBody.innerHTML = pageRows.map((row) => `
+        <tr>
+          <td>${row.code}</td>
+          <td>${row.name}</td>
+          <td>${row.city}</td>
+          <td>${row.agent}</td>
+          <td>${row.manager}</td>
+          <td>${row.kam}</td>
+          <td>${row.kas}</td>
+          <td>Rs. ${formatCount(row.totalValue)}</td>
+          <td>Rs. ${formatCount(row.totalDue)}</td>
+          <td>
+            <div class="actionIcons">
+              <button class="actionIconBtn" type="button" title="Edit customer" aria-label="Edit customer">
+                <i class="bi bi-pencil"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `).join("");
+      renderCustomerPagination(totalRows);
+    };
+
+    const renderCustomerPagination = (totalRows) => {
+      if (!customerPagination) return;
+      if (totalRows <= customerPageSize) {
+        customerPagination.classList.add("hidden");
+        customerPagination.innerHTML = "";
+        return;
+      }
+      const totalPages = Math.ceil(totalRows / customerPageSize);
+      const start = (customerCurrentPage - 1) * customerPageSize + 1;
+      const end = Math.min(totalRows, customerCurrentPage * customerPageSize);
+      const pageButtons = Array.from({ length: totalPages }, (_, idx) => {
+        const page = idx + 1;
+        const isActive = page === customerCurrentPage;
+        return `<button class="pageBtn ${isActive ? "active" : ""}" type="button" data-page="${page}">${page}</button>`;
+      }).join("");
+      customerPagination.classList.remove("hidden");
+      customerPagination.innerHTML = `
+        <span class="paginationInfo">Showing ${start}-${end} of ${totalRows}</span>
+        <div class="paginationControls">
+          <button class="pageBtn ${customerCurrentPage === 1 ? "disabled" : ""}" type="button" data-page="prev" aria-label="Previous page">
+            <i class="bi bi-chevron-left"></i>
+          </button>
+          ${pageButtons}
+          <button class="pageBtn ${customerCurrentPage === totalPages ? "disabled" : ""}" type="button" data-page="next" aria-label="Next page">
+            <i class="bi bi-chevron-right"></i>
+          </button>
+        </div>
+      `;
+    };
+
+    const getFilteredInvoices = () => {
+      const query = invoiceFilters.query.toLowerCase();
+      const rows = invoiceData.filter((row) => {
+        if (invoiceFilters.status !== "All" && row.status !== invoiceFilters.status) return false;
+        if (invoiceFilters.agent !== "All" && row.agent !== invoiceFilters.agent) return false;
+        if (invoiceFilters.manager !== "All" && row.manager !== invoiceFilters.manager) return false;
+        if (query) {
+          const matchText = `${row.id} ${row.customerName}`.toLowerCase();
+          if (!matchText.includes(query)) return false;
+        }
+        if (!withinInvoiceRange(row.invoiceDate)) return false;
+        return true;
+      });
+      const sortedRows = [...rows];
+      switch (invoiceFilters.sort) {
+        case "date-asc":
+          sortedRows.sort((a, b) => new Date(a.invoiceDate) - new Date(b.invoiceDate));
+          break;
+        case "value-desc":
+          sortedRows.sort((a, b) => b.value - a.value);
+          break;
+        case "value-asc":
+          sortedRows.sort((a, b) => a.value - b.value);
+          break;
+        default:
+          sortedRows.sort((a, b) => new Date(b.invoiceDate) - new Date(a.invoiceDate));
+      }
+      return sortedRows;
+    };
+
+    const setInvoiceFilterBadge = (key, label) => {
+      const badge = invoiceFilterBadges[key];
+      if (badge) badge.textContent = label;
+    };
+
+    const resetScheduleForm = () => {
+      if (scheduleForm) scheduleForm.reset();
+      editingScheduleId = null;
+      if (scheduleSubmitBtn) scheduleSubmitBtn.textContent = "Create schedule";
+      if (scheduleConfig) scheduleConfig.classList.add("hidden");
+      if (scheduleWeekDaysField) scheduleWeekDaysField.classList.add("hidden");
+      if (scheduleWeekDays) {
+        scheduleWeekDays.querySelectorAll(".scheduleDayPill").forEach((btn) => {
+          btn.classList.remove("active");
+        });
+      }
+      updateScheduleFieldVisibility();
+    };
+
+    const renderScheduleTable = () => {
+      if (!scheduleTableBody) return;
+      if (!scheduleData.length) {
+        scheduleTableBody.innerHTML = `
+          <tr>
+            <td colspan="5">No schedules created yet.</td>
+          </tr>
+        `;
+        return;
+      }
+      scheduleTableBody.innerHTML = scheduleData.map((row) => {
+        const daysLabel = row.frequency === "Weekly" && row.days?.length
+          ? ` (${row.days.join(", ")})`
+          : "";
+        const dateLabel = row.frequency === "One-time" && row.date
+          ? `${formatDate(row.date)}${row.time ? ` · ${row.time}` : ""}`
+          : row.frequency === "Monthly" && row.dayOfMonth
+            ? `Day ${row.dayOfMonth}${row.time ? ` · ${row.time}` : ""}`
+            : row.time || "-";
+        return `
+        <tr>
+          <td>${row.report}</td>
+          <td>${row.frequency}${daysLabel}<br/><span class="text-muted">${dateLabel}</span></td>
+          <td>${row.recipients.join(", ")}</td>
+          <td><span class="statusPill ${getStatusClass(row.status)}">${row.status}</span></td>
+          <td>
+            <div class="reportActions">
+              <button class="btnSmall" type="button" data-action="edit" data-id="${row.id}">Edit</button>
+              <button class="btnSmall" type="button" data-action="add-user" data-id="${row.id}">Add user</button>
+            </div>
+          </td>
+        </tr>
+      `;
+      }).join("");
+    };
+
+    const updateScheduleFieldVisibility = () => {
+      const frequency = scheduleFrequency ? scheduleFrequency.value : "";
+      const hasSelection = Boolean(frequency);
+
+      const showDate = hasSelection && frequency === "One-time";
+      const showWeekDays = hasSelection && frequency === "Weekly";
+      const showDayOfMonth = hasSelection && frequency === "Monthly";
+      const showTime = hasSelection && ["One-time", "Daily", "Weekly", "Monthly"].includes(frequency);
+
+      if (scheduleDateField) scheduleDateField.classList.toggle("hidden", !showDate);
+      if (scheduleWeekDaysField) scheduleWeekDaysField.classList.toggle("hidden", !showWeekDays);
+      if (scheduleDayOfMonthField) scheduleDayOfMonthField.classList.toggle("hidden", !showDayOfMonth);
+      if (scheduleTimeField) scheduleTimeField.classList.toggle("hidden", !showTime);
+      if (scheduleConfig) scheduleConfig.classList.toggle("hidden", !hasSelection);
+
+      if (scheduleDate) {
+        scheduleDate.required = showDate;
+        scheduleDate.disabled = !showDate;
+      }
+      if (scheduleDayOfMonth) {
+        scheduleDayOfMonth.required = showDayOfMonth;
+        scheduleDayOfMonth.disabled = !showDayOfMonth;
+      }
+      if (scheduleTime) {
+        scheduleTime.required = showTime;
+        scheduleTime.disabled = !showTime;
+      }
+
+      if (!showWeekDays && scheduleWeekDays) {
+        scheduleWeekDays.querySelectorAll(".scheduleDayPill").forEach((btn) => {
+          btn.classList.remove("active");
+        });
+      }
+      if (!showDate && scheduleDate) scheduleDate.value = "";
+      if (!showDayOfMonth && scheduleDayOfMonth) scheduleDayOfMonth.value = "";
+      if (!showTime && scheduleTime) scheduleTime.value = "";
+    };
+
+    const setActivePanel = (panelKey) => {
+      const showReports = panelKey === "reports";
+      const showSchedule = panelKey === "schedule";
+      const showInvoices = panelKey === "invoices";
+      const showCustomers = panelKey === "customers";
+      if (reportOverviewPanel) reportOverviewPanel.classList.toggle("hidden", !showReports);
+      if (scheduleSharePanel) scheduleSharePanel.classList.toggle("hidden", !showSchedule);
+      if (invoiceOverviewPanel) invoiceOverviewPanel.classList.toggle("hidden", !showInvoices);
+      if (customerOverviewPanel) customerOverviewPanel.classList.toggle("hidden", !showCustomers);
+    };
+
+    const setScheduleForm = (row) => {
+      if (!row) return;
+      if (scheduleReport) scheduleReport.value = row.report;
+      if (scheduleFrequency) scheduleFrequency.value = row.frequency || "One-time";
+      if (scheduleDate) scheduleDate.value = row.date;
+      if (scheduleDayOfMonth) scheduleDayOfMonth.value = row.dayOfMonth || "";
+      if (scheduleTime) scheduleTime.value = row.time;
+      if (scheduleRecipients) scheduleRecipients.value = row.recipients.join(", ");
+      if (scheduleSubmitBtn) scheduleSubmitBtn.textContent = "Update schedule";
+      if (scheduleWeekDays) {
+        const isWeekly = row.frequency === "Weekly";
+        scheduleWeekDays.querySelectorAll(".scheduleDayPill").forEach((btn) => {
+          const day = btn.getAttribute("data-day");
+          btn.classList.toggle("active", isWeekly && day && row.days?.includes(day));
+        });
+      }
+      updateScheduleFieldVisibility();
+      editingScheduleId = row.id;
+    };
+
+    const renderInvoiceFilterOptions = () => {
+      if (invoiceAgentFilter) {
+        const agents = ["All", ...new Set(invoiceData.map((row) => row.agent))];
+        invoiceAgentFilter.innerHTML = agents.map((agent) => (
+          `<button class="filterItem" type="button" data-filter-value="${agent}">${agent}</button>`
+        )).join("");
+      }
+      if (invoiceManagerFilter) {
+        const managers = ["All", ...new Set(invoiceData.map((row) => row.manager))];
+        invoiceManagerFilter.innerHTML = managers.map((manager) => (
+          `<button class="filterItem" type="button" data-filter-value="${manager}">${manager}</button>`
+        )).join("");
+      }
+    };
+
+    const renderCustomerFilterOptions = () => {
+      if (customerCityFilter) {
+        const cities = ["All", ...new Set(customerData.map((row) => row.city))];
+        customerCityFilter.innerHTML = cities.map((city) => (
+          `<button class="filterItem" type="button" data-filter-value="${city}">${city}</button>`
+        )).join("");
+      }
+      if (customerAgentFilter) {
+        const agents = ["All", ...new Set(customerData.map((row) => row.agent))];
+        customerAgentFilter.innerHTML = agents.map((agent) => (
+          `<button class="filterItem" type="button" data-filter-value="${agent}">${agent}</button>`
+        )).join("");
+      }
+      if (customerManagerFilter) {
+        const managers = ["All", ...new Set(customerData.map((row) => row.manager))];
+        customerManagerFilter.innerHTML = managers.map((manager) => (
+          `<button class="filterItem" type="button" data-filter-value="${manager}">${manager}</button>`
+        )).join("");
+      }
+      if (customerKamFilter) {
+        const kams = ["All", ...new Set(customerData.map((row) => row.kam))];
+        customerKamFilter.innerHTML = kams.map((kam) => (
+          `<button class="filterItem" type="button" data-filter-value="${kam}">${kam}</button>`
+        )).join("");
+      }
+      if (customerKasFilter) {
+        const kass = ["All", ...new Set(customerData.map((row) => row.kas))];
+        customerKasFilter.innerHTML = kass.map((kas) => (
+          `<button class="filterItem" type="button" data-filter-value="${kas}">${kas}</button>`
+        )).join("");
+      }
+    };
+
     const wireFilters = () => {
       if (searchInput) {
         searchInput.addEventListener("input", () => {
@@ -910,6 +1811,238 @@
       }
     };
 
+    const wireScheduleActions = () => {
+      if (scheduleDayOfMonth) {
+        scheduleDayOfMonth.innerHTML = "<option value=\"\" selected disabled>Select day</option>";
+        for (let i = 1; i <= 31; i += 1) {
+          const opt = document.createElement("option");
+          opt.value = String(i);
+          opt.textContent = String(i);
+          scheduleDayOfMonth.appendChild(opt);
+        }
+      }
+
+      if (scheduleReport) {
+        scheduleReport.addEventListener("change", () => {
+          updateScheduleFieldVisibility();
+        });
+      }
+
+      if (scheduleFrequency) {
+        scheduleFrequency.addEventListener("change", () => {
+          updateScheduleFieldVisibility();
+        });
+      }
+
+      if (scheduleWeekDays) {
+        scheduleWeekDays.addEventListener("click", (event) => {
+          const btn = event.target.closest(".scheduleDayPill");
+          if (!btn) return;
+          btn.classList.toggle("active");
+        });
+      }
+
+      if (scheduleForm) {
+        scheduleForm.addEventListener("submit", (event) => {
+          event.preventDefault();
+          if (!scheduleReport || !scheduleDate || !scheduleTime || !scheduleRecipients || !scheduleFrequency) return;
+          const report = scheduleReport.value;
+          const frequency = scheduleFrequency.value;
+          const date = scheduleDate.value;
+          const time = scheduleTime.value;
+          const recipients = scheduleRecipients.value
+            .split(",")
+            .map((entry) => entry.trim())
+            .filter(Boolean);
+          const days = scheduleWeekDays
+            ? Array.from(scheduleWeekDays.querySelectorAll(".scheduleDayPill.active")).map((btn) => btn.getAttribute("data-day")).filter(Boolean)
+            : [];
+          const dayOfMonth = scheduleDayOfMonth ? scheduleDayOfMonth.value : "";
+          const needsTime = ["One-time", "Daily", "Weekly", "Monthly"].includes(frequency);
+          if (!report || !frequency || recipients.length === 0) return;
+          if (frequency === "One-time" && !date) return;
+          if (frequency === "Weekly" && days.length === 0) return;
+          if (frequency === "Monthly" && !dayOfMonth) return;
+          if (needsTime && !time) return;
+
+          if (editingScheduleId) {
+            const target = scheduleData.find(item => item.id === editingScheduleId);
+            if (target) {
+              target.report = report;
+              target.frequency = frequency;
+              target.days = frequency === "Weekly" ? days : [];
+              target.date = frequency === "One-time" ? date : "";
+              target.dayOfMonth = frequency === "Monthly" ? dayOfMonth : "";
+              target.time = needsTime ? time : "";
+              target.recipients = recipients;
+              target.status = "Active";
+            }
+          } else {
+            scheduleData.unshift({
+              id: `SCH-${String(100 + scheduleData.length + 1).padStart(3, "0")}`,
+              report,
+              frequency,
+              days: frequency === "Weekly" ? days : [],
+              date: frequency === "One-time" ? date : "",
+              dayOfMonth: frequency === "Monthly" ? dayOfMonth : "",
+              time: needsTime ? time : "",
+              recipients,
+              status: "Active"
+            });
+          }
+          renderScheduleTable();
+          resetScheduleForm();
+        });
+      }
+
+      if (scheduleClearBtn) {
+        scheduleClearBtn.addEventListener("click", () => {
+          resetScheduleForm();
+        });
+      }
+
+      if (scheduleTableBody) {
+        scheduleTableBody.addEventListener("click", (event) => {
+          const btn = event.target.closest("button[data-action]");
+          if (!btn) return;
+          const action = btn.getAttribute("data-action");
+          const id = btn.getAttribute("data-id");
+          if (!id) return;
+          const row = scheduleData.find(item => item.id === id);
+          if (!row) return;
+          if (action === "edit") {
+            setScheduleForm(row);
+            return;
+          }
+          if (action === "add-user") {
+            const nextUser = prompt("Add recipient email");
+            if (!nextUser) return;
+            row.recipients.push(nextUser.trim());
+            renderScheduleTable();
+          }
+        });
+      }
+
+      if (scheduleShareBtn) {
+        scheduleShareBtn.addEventListener("click", () => {
+          resetScheduleForm();
+          setActivePanel("schedule");
+        });
+      }
+
+      if (reportOverviewBtn) {
+        reportOverviewBtn.addEventListener("click", () => {
+          setActivePanel("reports");
+        });
+      }
+
+      if (invoiceOverviewBtn) {
+        invoiceOverviewBtn.addEventListener("click", () => {
+          setActivePanel("invoices");
+        });
+      }
+
+      if (customerOverviewBtn) {
+        customerOverviewBtn.addEventListener("click", () => {
+          setActivePanel("customers");
+        });
+      }
+    };
+
+    const wireInvoiceFilters = () => {
+      if (invoiceSearch) {
+        invoiceSearch.addEventListener("input", () => {
+          invoiceFilters.query = invoiceSearch.value.trim();
+          invoiceCurrentPage = 1;
+          renderInvoiceTable();
+        });
+      }
+      invoiceFilterDropdowns.forEach((dropdown) => {
+        dropdown.addEventListener("click", (event) => {
+          const item = event.target.closest(".filterItem");
+          if (!item) return;
+          const key = dropdown.getAttribute("data-invoice-filter");
+          if (!key) return;
+          const value = item.getAttribute("data-filter-value") || "All";
+          if (key === "sort") {
+            invoiceFilters.sort = value;
+          } else {
+            invoiceFilters[key] = value;
+          }
+          setInvoiceFilterBadge(key, item.textContent.trim());
+          dropdown.removeAttribute("open");
+          invoiceCurrentPage = 1;
+          renderInvoiceTable();
+        });
+      });
+      if (invoiceFilterClear) {
+        invoiceFilterClear.addEventListener("click", () => {
+          invoiceFilters.query = "";
+          invoiceFilters.status = "All";
+          invoiceFilters.agent = "All";
+          invoiceFilters.manager = "All";
+          invoiceFilters.range = "30";
+          invoiceFilters.sort = "date-desc";
+          if (invoiceSearch) invoiceSearch.value = "";
+          setInvoiceFilterBadge("status", "All");
+          setInvoiceFilterBadge("agent", "All");
+          setInvoiceFilterBadge("manager", "All");
+          setInvoiceFilterBadge("range", "Last 30 days");
+          setInvoiceFilterBadge("sort", "Date (Newest)");
+          invoiceCurrentPage = 1;
+          renderInvoiceTable();
+        });
+      }
+    };
+
+    const wireCustomerFilters = () => {
+      if (customerSearch) {
+        customerSearch.addEventListener("input", () => {
+          customerFilters.query = customerSearch.value.trim();
+          customerCurrentPage = 1;
+          renderCustomerTable();
+        });
+      }
+      customerFilterDropdowns.forEach((dropdown) => {
+        dropdown.addEventListener("click", (event) => {
+          const item = event.target.closest(".filterItem");
+          if (!item) return;
+          const key = dropdown.getAttribute("data-customer-filter");
+          if (!key) return;
+          const value = item.getAttribute("data-filter-value") || "All";
+          if (key === "sort") {
+            customerFilters.sort = value;
+          } else {
+            customerFilters[key] = value;
+          }
+          setCustomerFilterBadge(key, item.textContent.trim());
+          dropdown.removeAttribute("open");
+          customerCurrentPage = 1;
+          renderCustomerTable();
+        });
+      });
+      if (customerFilterClear) {
+        customerFilterClear.addEventListener("click", () => {
+          customerFilters.query = "";
+          customerFilters.city = "All";
+          customerFilters.agent = "All";
+          customerFilters.manager = "All";
+          customerFilters.kam = "All";
+          customerFilters.kas = "All";
+          customerFilters.sort = "value-desc";
+          if (customerSearch) customerSearch.value = "";
+          setCustomerFilterBadge("city", "All");
+          setCustomerFilterBadge("agent", "All");
+          setCustomerFilterBadge("manager", "All");
+          setCustomerFilterBadge("kam", "All");
+          setCustomerFilterBadge("kas", "All");
+          setCustomerFilterBadge("sort", "Invoice Value (High-Low)");
+          customerCurrentPage = 1;
+          renderCustomerTable();
+        });
+      }
+    };
+
     const wireReportPagination = () => {
       if (!reportPagination) return;
       reportPagination.addEventListener("click", (event) => {
@@ -930,12 +2063,64 @@
       });
     };
 
+    const wireInvoicePagination = () => {
+      if (!invoicePagination) return;
+      invoicePagination.addEventListener("click", (event) => {
+        const btn = event.target.closest(".pageBtn[data-page]");
+        if (!btn || btn.classList.contains("disabled")) return;
+        const value = btn.getAttribute("data-page");
+        const totalRows = getFilteredInvoices().length;
+        const totalPages = Math.max(1, Math.ceil(totalRows / invoicePageSize));
+        if (value === "prev") {
+          invoiceCurrentPage = Math.max(1, invoiceCurrentPage - 1);
+        } else if (value === "next") {
+          invoiceCurrentPage = Math.min(totalPages, invoiceCurrentPage + 1);
+        } else {
+          const nextPage = Number(value);
+          if (!Number.isNaN(nextPage)) invoiceCurrentPage = nextPage;
+        }
+        renderInvoiceTable();
+      });
+    };
+
+    const wireCustomerPagination = () => {
+      if (!customerPagination) return;
+      customerPagination.addEventListener("click", (event) => {
+        const btn = event.target.closest(".pageBtn[data-page]");
+        if (!btn || btn.classList.contains("disabled")) return;
+        const value = btn.getAttribute("data-page");
+        const totalRows = getFilteredCustomers().length;
+        const totalPages = Math.max(1, Math.ceil(totalRows / customerPageSize));
+        if (value === "prev") {
+          customerCurrentPage = Math.max(1, customerCurrentPage - 1);
+        } else if (value === "next") {
+          customerCurrentPage = Math.min(totalPages, customerCurrentPage + 1);
+        } else {
+          const nextPage = Number(value);
+          if (!Number.isNaN(nextPage)) customerCurrentPage = nextPage;
+        }
+        renderCustomerTable();
+      });
+    };
+
     renderGlobalCards();
     renderTable();
     wireFilters();
     renderReportList();
     wireReportListFilters();
+    renderInvoiceTable();
+    renderInvoiceFilterOptions();
+    wireInvoiceFilters();
+    renderCustomerTable();
+    renderCustomerFilterOptions();
+    wireCustomerFilters();
+    renderScheduleTable();
+    wireScheduleActions();
     wireReportPagination();
+    wireInvoicePagination();
+    wireCustomerPagination();
+    updateScheduleFieldVisibility();
+    setActivePanel("reports");
 
     const menuBtn = document.getElementById("headerMenuBtn");
     const overlay = document.getElementById("sideNavOverlay");
