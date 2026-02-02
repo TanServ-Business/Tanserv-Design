@@ -19,9 +19,20 @@
         <h1>Issue Tracker</h1>
         <p>Track invoice issues, approvals, and client assignments.</p>
       </div>
-      <div class="managerClock">
-        <span>Updated</span>
-        <strong id="issueTrackerClock">--:--</strong>
+      <div class="managerHeaderControls">
+        <div class="role-select">
+          <label class="meta" for="role-select">Role</label>
+          <select id="role-select" aria-label="Select role">
+            <option value="agent">Agent</option>
+            <option value="manager">Manager</option>
+            <option value="action-owner">Action Owner</option>
+          </select>
+          <button id="clearIssueDataBtn" class="role-link" type="button">Clear data</button>
+        </div>
+        <div class="managerClock">
+          <span>Updated</span>
+          <strong id="issueTrackerClock">--:--</strong>
+        </div>
       </div>
     </div>
 
@@ -46,7 +57,8 @@
             <p>Select an invoice to view issues and actions.</p>
           </div>
           <div class="invoiceSearch">
-            <input id="invoice-search-input" type="text" placeholder="Search invoice, customer, action owner, sub status, customer code" aria-label="Search invoices" />
+            <input id="invoice-search-input" type="text" placeholder="Search invoice, customer, action owner, approval matrix, sub status, customer code" aria-label="Search invoices" />
+            <button id="toggle-closed-invoices" class="issueListToggle" type="button">Show closed invoices</button>
           </div>
         </div>
         <div class="tableWrap">
@@ -59,6 +71,7 @@
                 <th>Invoice Value</th>
                 <th>Net Due</th>
                 <th>Action Owner</th>
+                <th>Approval Matrix</th>
                 <th>Issue Open Days</th>
                 <th>Sub Status</th>
                 <th>Action</th>

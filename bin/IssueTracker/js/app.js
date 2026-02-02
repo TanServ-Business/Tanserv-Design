@@ -125,8 +125,25 @@
     return arr;
   }
 
+  const ISSUE_TRACKER_BASE_KEY = 'issueTrackerBaseData';
+  const ISSUE_TRACKER_TOTAL_KEY = 'issueTrackerTotalIssues';
+  const ISSUE_TRACKER_CLEARED_KEY = 'issueTrackerDataCleared';
+
+  function loadBaseData() {
+    try {
+      const cleared = localStorage.getItem(ISSUE_TRACKER_CLEARED_KEY);
+      if (cleared === '1') return [];
+      const raw = localStorage.getItem(ISSUE_TRACKER_BASE_KEY);
+      const parsed = JSON.parse(raw || 'null');
+      if (Array.isArray(parsed)) return parsed;
+    } catch (_) {}
+    const generated = generateData();
+    try { localStorage.setItem(ISSUE_TRACKER_BASE_KEY, JSON.stringify(generated)); } catch (_) {}
+    return generated;
+  }
+
   // Base data and dynamic custom issues from localStorage
-  const baseData = generateData();
+  let baseData = loadBaseData();
   let data = baseData.slice();
 
   function readCustomIssues() {
@@ -143,44 +160,73 @@
   function rebuildDataWithCustomIssues() {
     data = baseData.slice();
     const custom = readCustomIssues();
-    if (custom.length > 0) {
-      // Ensure required minimal shape for issues
-      const normalized = custom.map((iss, idx) => ({
-        id: iss.id || `ISS_MAN_${Date.now()}_${idx}`,
-        title: iss.title || (iss.subStatus ? String(iss.subStatus) : 'Manual Issue'),
-        status: iss.status || 'Open',
-        created: iss.created || new Date().toISOString().slice(0,10),
-        description: iss.description || 'Added manually from Activity page.',
-        activityType: iss.activityType || '-',
-        primaryStatus: iss.primaryStatus || '-',
-        broadStatus: iss.broadStatus || '-',
-        subStatus: iss.subStatus || '-',
-        stage: iss.stage != null ? iss.stage : 1,
-        agent: iss.agent || '-',
-        manager: iss.manager || '-',
-        fpr: iss.fpr || '',
-        spr: iss.spr || '',
-        actionOwner: iss.actionOwner || '',
-        approvalProcessId: iss.approvalProcessId || '',
-        approvalProcessName: iss.approvalProcessName || '',
-        invoiceDueAmount: iss.invoiceDueAmount != null ? iss.invoiceDueAmount : undefined,
-        invoiceDueDate: iss.invoiceDueDate || undefined,
-        region: iss.region || '',
-        actionTrail: Array.isArray(iss.actionTrail) ? iss.actionTrail : []
-      }));
-      const inv = {
-        id: 'INV_CUSTOM',
-        customer: 'Manual Entries',
-        customerCode: 'CUST-MANUAL',
-        date: new Date().toISOString().slice(0,10),
-        total: 0,
-        issues: normalized,
-        kam: '-',
-        kas: '-',
-        manager: '-'
-      };
-      data.push(inv);
-    }
+    if (custom.length === 0) return;
+
+    const invoiceMap = new Map();
+    data.forEach(inv => {
+      if (inv && inv.id) invoiceMap.set(inv.id, inv);
+    });
+
+    const normalized = custom.map((iss, idx) => ({
+      id: iss.id || `ISS_MAN_${Date.now()}_${idx}`,
+      title: iss.title || (iss.subStatus ? String(iss.subStatus) : 'Manual Issue'),
+      status: iss.status || 'Open',
+      created: iss.created || new Date().toISOString().slice(0,10),
+      createdAt: iss.createdAt || new Date().toISOString(),
+      description: iss.description || 'Added manually from Activity page.',
+      activityType: iss.activityType || '-',
+      primaryStatus: iss.primaryStatus || '-',
+      broadStatus: iss.broadStatus || '-',
+      subStatus: iss.subStatus || '-',
+      stage: iss.stage != null ? iss.stage : 1,
+      agent: iss.agent || '-',
+      manager: iss.manager || '-',
+      fpr: iss.fpr || '',
+      spr: iss.spr || '',
+      actionOwner: iss.actionOwner || '',
+      approvalProcessId: iss.approvalProcessId || '',
+      approvalProcessName: iss.approvalProcessName || '',
+      approvalMatrixId: iss.approvalMatrixId || '',
+      approvalMatrixName: iss.approvalMatrixName || '',
+      invoiceDueAmount: iss.invoiceDueAmount != null ? Number(iss.invoiceDueAmount) : undefined,
+      invoiceDueDate: iss.invoiceDueDate || undefined,
+      invoiceNo: iss.invoiceNo || iss.invoiceId || '',
+      invoiceDate: iss.invoiceDate || '',
+      invoiceTotal: iss.invoiceTotal != null ? Number(iss.invoiceTotal) : 0,
+      customerName: iss.customerName || '',
+      customerCode: iss.customerCode || '',
+      region: iss.region || '',
+      isCustom: iss.isCustom !== false,
+      actionTrail: Array.isArray(iss.actionTrail) ? iss.actionTrail : []
+    }));
+
+    normalized.forEach((issue) => {
+      const invoiceId = issue.invoiceNo || 'INV_MANUAL';
+      let invoice = invoiceMap.get(invoiceId);
+      if (!invoice) {
+        invoice = {
+          id: invoiceId,
+          customer: issue.customerName || 'Manual Entries',
+          customerCode: issue.customerCode || 'CUST-MANUAL',
+          date: issue.invoiceDate || new Date().toISOString().slice(0,10),
+          total: Number(issue.invoiceTotal || 0),
+          issues: [],
+          kam: '-',
+          kas: '-',
+          manager: issue.manager || '-'
+        };
+        data.unshift(invoice);
+        invoiceMap.set(invoiceId, invoice);
+      }
+      invoice.issues = invoice.issues || [];
+      invoice.issues.unshift(issue);
+      if (issue.customerName) invoice.customer = issue.customerName;
+      if (issue.customerCode) invoice.customerCode = issue.customerCode;
+      if (issue.invoiceDate) invoice.date = issue.invoiceDate;
+      if (Number(issue.invoiceTotal || 0) > 0) {
+        invoice.total = Number(issue.invoiceTotal || 0);
+      }
+    });
   }
 
   rebuildDataWithCustomIssues();
@@ -188,10 +234,14 @@
   const invoiceList = document.getElementById('invoice-list');
   const invoiceTableBody = document.getElementById('invoice-table-body');
   const invoiceSearchInput = document.getElementById('invoice-search-input');
+  const closedInvoiceToggle = document.getElementById('toggle-closed-invoices');
   const invoicePagePrev = document.getElementById('invoice-page-prev');
   const invoicePageNext = document.getElementById('invoice-page-next');
   const invoicePageInfo = document.getElementById('invoice-page-info');
   const issueList = document.getElementById('issue-list');
+  const archivedToggle = document.getElementById('toggle-archived-issues');
+  const archivedWrap = document.getElementById('archived-issues-wrap');
+  const archivedList = document.getElementById('archived-issue-list');
   const issueReasonList = document.getElementById('issue-reason-list');
   const detailView = document.getElementById('detail-view');
   const generatedTimeEl = document.getElementById('generated-time');
@@ -203,6 +253,7 @@
   const statApprovalPending = document.getElementById('statApprovalPending');
   const statAssignedClient = document.getElementById('statAssignedClient');
   const issueTrackerClock = document.getElementById('issueTrackerClock');
+  const clearIssuesBtn = document.getElementById('clearIssueDataBtn');
   const sortBtn = document.getElementById('invoice-sort-btn');
   const sortMenu = document.getElementById('invoice-sort-menu');
   const addIssueBtn = document.getElementById('add-issue-btn');
@@ -219,7 +270,7 @@
   const ROLE_ACTIONS = {
     agent: ['assign-btn', 'email-btn', 'approval-process-btn', 'close-btn'],
     manager: ['approve-btn', 'assign-btn', 'email-btn', 'approval-process-btn'],
-    'action-owner': ['assign-btn', 'resolution-btn', 'close-btn']
+    'action-owner': ['assign-btn', 'resolution-btn']
   };
   let currentRole = 'agent';
   let currentSort = 'none'; // 'valueDesc' | 'valueAsc' | 'daysDesc' | 'daysAsc' | 'none'
@@ -229,6 +280,8 @@
   let invoicePage = 1;
   const invoicePageSize = 10;
   const isDetailPage = document.body.classList.contains('issueTrackerDetailPage');
+  let archivedVisible = false;
+  let showClosedInvoices = false;
 
   // Utility: format dates and currency
   const fmtDate = (d) => new Date(d).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: '2-digit' });
@@ -310,7 +363,7 @@
 
   function getSelectedIssue() {
     const invoice = data.find(d => d.id === selectedInvoiceId);
-    return invoice?.issues.find(i => i.id === selectedIssueId) || null;
+    return getAllIssues(invoice).find(i => i.id === selectedIssueId) || null;
   }
 
   function setRole(role, options) {
@@ -356,10 +409,44 @@
     }
     return `${fmtShortDateEn(a)} - ${fmtShortDateEn(b)}`;
   }
+  function isIssueClosed(iss) {
+    const status = String(iss?.status || '').trim().toLowerCase();
+    return status === 'resolved' || status === 'closed';
+  }
+  function getActiveIssues(inv) {
+    const issues = Array.isArray(inv?.issues) ? inv.issues : [];
+    return issues.filter(iss => !isIssueClosed(iss));
+  }
+  function getAllIssues(inv) {
+    return Array.isArray(inv?.issues) ? inv.issues : [];
+  }
+  function getDisplayIssues(inv) {
+    return getActiveIssues(inv);
+  }
+  function getClosedIssues(inv) {
+    return getAllIssues(inv).filter(iss => isIssueClosed(iss));
+  }
+  function getPrimaryIssue(inv) {
+    const active = getDisplayIssues(inv);
+    if (active.length) return active[0];
+    const closed = getClosedIssues(inv);
+    return closed.length ? closed[0] : null;
+  }
+  function getInvoiceIssuesForMetrics(inv) {
+    const active = getDisplayIssues(inv);
+    if (active.length) return active;
+    if (showClosedInvoices) return getClosedIssues(inv);
+    return [];
+  }
+  function getFirstDisplayIssue(inv) {
+    const issues = getDisplayIssues(inv);
+    return issues.length ? issues[0] : null;
+  }
   // Derive an invoice-level due date as the latest issue due date (if any)
   function getInvoiceDueDate(inv) {
     let maxTime = null;
-    (inv.issues || []).forEach(iss => {
+    const issues = getInvoiceIssuesForMetrics(inv);
+    issues.forEach(iss => {
       const v = iss && iss.invoiceDueDate;
       if (!v) return;
       const t = new Date(v).getTime();
@@ -371,12 +458,40 @@
 
   function getInvoiceDueAmount(inv) {
     let max = null;
-    (inv.issues || []).forEach(iss => {
+    const issues = getInvoiceIssuesForMetrics(inv);
+    issues.forEach(iss => {
       const v = iss && iss.invoiceDueAmount;
       if (typeof v !== 'number' || Number.isNaN(v)) return;
       if (max === null || v > max) max = v;
     });
     return max;
+  }
+
+  function getApprovalMatrixName(issue) {
+    if (!issue) return '';
+    if (issue.approvalMatrixName) return issue.approvalMatrixName;
+    const processId = issue.approvalProcessId || '';
+    const processName = issue.approvalProcessName || '';
+    const processes = loadApprovalProcesses();
+    const matrices = loadApprovalMatrices();
+    let match = null;
+    if (processId) {
+      match = processes.find(p => p && p.id === processId);
+    }
+    if (!match && processName) {
+      match = processes.find(p => String(p?.process || '').trim() === String(processName).trim());
+    }
+    const matrixId = match?.matrixId || '';
+    const matrix = matrices.find(m => m && m.id === matrixId);
+    return matrix?.name || '';
+  }
+
+  function formatActionOwner(name) {
+    if (!name) return '';
+    return String(name)
+      .replace(/\s*<[^>]*@[^>]*>\s*/g, '')
+      .replace(/\s*\([^)]*@[^)]*\)\s*/g, '')
+      .trim();
   }
 
   const APPROVAL_REQ_KEY = 'approval_requests';
@@ -417,6 +532,24 @@
     try {
       localStorage.setItem(APPROVAL_REQ_KEY, JSON.stringify(list || []));
     } catch (_) {}
+  }
+
+  function clearIssueTrackerData() {
+    const confirmDelete = window.confirm('This will delete all issues and approval requests. Continue?');
+    if (!confirmDelete) return;
+    try { localStorage.setItem(ISSUE_TRACKER_BASE_KEY, JSON.stringify([])); } catch (_) {}
+    try { localStorage.setItem(ISSUE_TRACKER_TOTAL_KEY, '0'); } catch (_) {}
+    try { localStorage.setItem(ISSUE_TRACKER_CLEARED_KEY, '1'); } catch (_) {}
+    try { localStorage.removeItem('customIssues'); } catch (_) {}
+    try { localStorage.removeItem(APPROVAL_REQ_KEY); } catch (_) {}
+    try { localStorage.removeItem('ineburaActivityTrailByInvoice'); } catch (_) {}
+    baseData = loadBaseData();
+    rebuildDataWithCustomIssues();
+    renderInvoicesSortedAndPreserveSelection();
+    if (issueList) issueList.innerHTML = '';
+    if (issuePanelTitle) issuePanelTitle.textContent = 'Issues';
+    if (issuePanelSubtitle) issuePanelSubtitle.textContent = 'Choose an invoice to load related issues.';
+    if (detailView) detailView.innerHTML = '<p>Select an issue to see details.</p>';
   }
 
   function seedApprovalDataIfMissing() {
@@ -542,19 +675,22 @@
   }
 
   function syncApprovalTrail(issue) {
-    if (!issue) return;
+    if (!issue) return false;
     const entries = getApprovalTrailEntries(issue.id);
     if (!entries.length) return;
     issue.actionTrail = issue.actionTrail || [];
     const existing = new Set(issue.actionTrail.map(e => e.approvalKey).filter(Boolean));
     const existingSignatures = new Set(issue.actionTrail.map(e => `${e.when || ''}|${e.what || ''}`));
+    let added = false;
     entries.forEach(entry => {
       if (existing.has(entry.approvalKey)) return;
       if (existingSignatures.has(`${entry.when || ''}|${entry.what || ''}`)) return;
       issue.actionTrail.push(entry);
       existing.add(entry.approvalKey);
       existingSignatures.add(`${entry.when || ''}|${entry.what || ''}`);
+      added = true;
     });
+    return added;
   }
 
   function getInvoiceSnapshot(invoice, issue) {
@@ -583,6 +719,49 @@
     };
   }
 
+  function loadCustomIssues() {
+    try {
+      const raw = localStorage.getItem('customIssues');
+      const parsed = JSON.parse(raw || '[]');
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (_) {
+      return [];
+    }
+  }
+
+  function saveCustomIssues(list) {
+    try {
+      localStorage.setItem('customIssues', JSON.stringify(list || []));
+    } catch (_) {}
+  }
+
+  function persistCustomIssue(issue, invoice) {
+    if (!issue) return;
+    const custom = loadCustomIssues();
+    const idx = custom.findIndex(item => item && item.id === issue.id);
+    if (idx === -1) return;
+    const updated = {
+      ...custom[idx],
+      status: issue.status || custom[idx].status || '',
+      stage: issue.stage != null ? issue.stage : custom[idx].stage,
+      actionOwner: issue.actionOwner || custom[idx].actionOwner || '',
+      approvalProcessId: issue.approvalProcessId || custom[idx].approvalProcessId || '',
+      approvalProcessName: issue.approvalProcessName || custom[idx].approvalProcessName || '',
+      approvalMatrixId: issue.approvalMatrixId || custom[idx].approvalMatrixId || '',
+      approvalMatrixName: issue.approvalMatrixName || custom[idx].approvalMatrixName || '',
+      actionTrail: Array.isArray(issue.actionTrail) ? issue.actionTrail : custom[idx].actionTrail || []
+    };
+    if (invoice) {
+      updated.invoiceNo = updated.invoiceNo || invoice.id || '';
+      updated.invoiceDate = updated.invoiceDate || invoice.date || '';
+      if (invoice.total != null) updated.invoiceTotal = invoice.total;
+      updated.customerName = updated.customerName || invoice.customer || '';
+      updated.customerCode = updated.customerCode || invoice.customerCode || '';
+    }
+    custom[idx] = updated;
+    saveCustomIssues(custom);
+  }
+
   // ===== Sorting utilities for Invoices =====
   function daysBetween(d1, d2) {
     const ms = (new Date(d2)).setHours(0,0,0,0) - (new Date(d1)).setHours(0,0,0,0);
@@ -591,13 +770,14 @@
   function computeInvoiceDaysOpen(inv) {
     const today = new Date();
     let maxDays = 0;
-    (inv.issues || []).forEach(iss => {
-      const status = (iss.status || '').toLowerCase();
-      if (status === 'open') {
-        maxDays = Math.max(maxDays, daysBetween(iss.created, today));
-      }
+    let hasOpen = false;
+    const issues = getActiveIssues(inv);
+    issues.forEach(iss => {
+      hasOpen = true;
+      maxDays = Math.max(maxDays, daysBetween(iss.created, today));
     });
-    return maxDays; // 0 when no open issues
+    if (!hasOpen) return 0;
+    return maxDays + 1; // count today as day 1
   }
   function getSortedInvoices() {
     const arr = data.slice();
@@ -615,8 +795,16 @@
         arr.sort((a,b) => computeInvoiceDaysOpen(a) - computeInvoiceDaysOpen(b) || a.id.localeCompare(b.id));
         break;
       default:
-        // keep original order (by id) to be deterministic
-        arr.sort((a,b) => a.id.localeCompare(b.id));
+        // custom issues first, then latest issue date, then id for determinism
+        arr.sort((a,b) => {
+          const aCustom = hasCustomIssue(a) ? 1 : 0;
+          const bCustom = hasCustomIssue(b) ? 1 : 0;
+          if (aCustom !== bCustom) return bCustom - aCustom;
+          const aLatest = getLatestIssueTimestamp(a);
+          const bLatest = getLatestIssueTimestamp(b);
+          if (aLatest !== bLatest) return bLatest - aLatest;
+          return a.id.localeCompare(b.id);
+        });
     }
     return arr;
   }
@@ -626,20 +814,40 @@
   }
 
   function getInvoiceBaseList() {
-    return getSortedInvoices().filter(inv => (inv.issues || []).length > 0);
+    return getSortedInvoices().filter(inv => {
+      const issues = showClosedInvoices ? getAllIssues(inv) : getDisplayIssues(inv);
+      return issues.length > 0;
+    });
+  }
+
+  function hasCustomIssue(inv) {
+    return getActiveIssues(inv).some(iss => iss && iss.isCustom);
+  }
+
+  function getLatestIssueTimestamp(inv) {
+    let latest = 0;
+    getDisplayIssues(inv).forEach(iss => {
+      const raw = iss && (iss.createdAt || iss.created);
+      if (!raw) return;
+      const t = Date.parse(raw);
+      if (!Number.isNaN(t) && t > latest) latest = t;
+    });
+    return latest;
   }
 
   function getFilteredInvoices() {
     const base = getInvoiceBaseList();
     if (!invoiceSearchQuery) return base;
     return base.filter(inv => {
-      const firstIssue = inv.issues && inv.issues[0] ? inv.issues[0] : null;
+      const firstIssue = getPrimaryIssue(inv);
+      const matrixName = firstIssue ? getApprovalMatrixName(firstIssue) : '';
       const haystack = [
         inv.id,
         inv.customer,
         inv.customerCode,
         firstIssue && firstIssue.actionOwner ? firstIssue.actionOwner : '',
         firstIssue && firstIssue.subStatus ? firstIssue.subStatus : '',
+        matrixName || '',
         computeInvoiceDaysOpen(inv)
       ].join(' ').toLowerCase();
       return haystack.includes(invoiceSearchQuery);
@@ -685,20 +893,20 @@
       updateSummaryCards();
       if (!isDetailPage) {
         const filtered = getFilteredInvoices();
-        const allIssues = filtered.flatMap(inv => inv.issues || []);
+        const allIssues = filtered.flatMap(inv => getDisplayIssues(inv));
         renderIssueReasonCounts(allIssues);
       }
       return;
     }
 
-    const sorted = getSortedInvoices();
-    renderInvoices(sorted);
+    const filtered = getFilteredInvoices();
+    renderInvoices(filtered);
     updateSummaryCards();
     if (!invoiceList && !invoiceTableBody) return;
     if (isDetailPage) return;
-    const idToSelect = selectedInvoiceId && sorted.some(x=>x.id===selectedInvoiceId)
+    const idToSelect = selectedInvoiceId && filtered.some(x=>x.id===selectedInvoiceId)
       ? selectedInvoiceId
-      : (sorted[0]?.id || null);
+      : (filtered[0]?.id || null);
     if (idToSelect) {
       selectInvoice(idToSelect);
     }
@@ -711,12 +919,15 @@
 
   function updateSummaryCards() {
     if (!statInvoiceCount && !statInvoiceAmount && !statTotalIssues && !statApprovalPending && !statAssignedClient) return;
-    const invoicesWithIssues = data.filter(inv => (inv.issues || []).length > 0);
-    const totalIssues = invoicesWithIssues.reduce((sum, inv) => sum + (inv.issues || []).length, 0);
-    const totalAmount = invoicesWithIssues.reduce((sum, inv) => sum + (inv.total || 0), 0);
+    const invoicesWithIssues = data.map(inv => ({
+      inv,
+      activeIssues: getDisplayIssues(inv)
+    })).filter(entry => entry.activeIssues.length > 0);
+    const totalIssues = invoicesWithIssues.reduce((sum, entry) => sum + entry.activeIssues.length, 0);
+    const totalAmount = invoicesWithIssues.reduce((sum, entry) => sum + (entry.inv.total || 0), 0);
     const pendingApprovals = loadApprovalRequests().filter(req => req && req.status === 'pending').length;
-    const assignedToClient = invoicesWithIssues.reduce((sum, inv) => {
-      const count = (inv.issues || []).filter(iss => (iss.stage || 0) >= 2 && String(iss.status || '').toLowerCase() !== 'resolved').length;
+    const assignedToClient = invoicesWithIssues.reduce((sum, entry) => {
+      const count = entry.activeIssues.filter(iss => (iss.stage || 0) >= 2).length;
       return sum + count;
     }, 0);
     if (statInvoiceCount) statInvoiceCount.textContent = invoicesWithIssues.length;
@@ -724,6 +935,7 @@
     if (statTotalIssues) statTotalIssues.textContent = totalIssues;
     if (statApprovalPending) statApprovalPending.textContent = pendingApprovals;
     if (statAssignedClient) statAssignedClient.textContent = assignedToClient;
+    try { localStorage.setItem(ISSUE_TRACKER_TOTAL_KEY, String(totalIssues)); } catch (_) {}
   }
 
   function renderInvoices(invoices) {
@@ -734,20 +946,34 @@
         tr.setAttribute('data-id', inv.id);
         tr.setAttribute('aria-selected', 'false');
         tr.tabIndex = 0;
-        const dueAmount = getInvoiceDueAmount(inv);
-        const firstIssue = inv.issues && inv.issues[0] ? inv.issues[0] : null;
+        let dueAmount = getInvoiceDueAmount(inv);
+        const displayIssues = getDisplayIssues(inv);
+        const firstIssue = getPrimaryIssue(inv);
+        if (dueAmount == null && firstIssue && firstIssue.invoiceDueAmount != null) {
+          const parsed = Number(firstIssue.invoiceDueAmount);
+          dueAmount = Number.isFinite(parsed) ? parsed : dueAmount;
+        }
         const actionOwner = firstIssue && firstIssue.actionOwner ? firstIssue.actionOwner : '-';
+        const actionOwnerLabel = actionOwner === '-' ? '-' : (formatActionOwner(actionOwner) || '-');
+        const approvalMatrix = firstIssue ? (getApprovalMatrixName(firstIssue) || '-') : '-';
         const subStatus = firstIssue && firstIssue.subStatus ? firstIssue.subStatus : '-';
         const customerName = inv.customer || '-';
         const customerCode = inv.customerCode || '-';
         const issueOpenDays = computeInvoiceDaysOpen(inv);
+        const fallbackTotal = firstIssue && Number.isFinite(Number(firstIssue.invoiceTotal))
+          ? Number(firstIssue.invoiceTotal)
+          : null;
+        const totalValue = Number.isFinite(Number(inv.total)) && Number(inv.total) > 0
+          ? Number(inv.total)
+          : (fallbackTotal != null ? fallbackTotal : Number(inv.total || 0));
         tr.innerHTML = `
           <td>${customerCode}</td>
           <td>${customerName}</td>
           <td>${inv.id}</td>
-          <td>${fmtCurrency(inv.total)}</td>
+          <td>${fmtCurrency(totalValue)}</td>
           <td>${dueAmount != null ? fmtCurrency(dueAmount) : '-'}</td>
-          <td>${actionOwner}</td>
+          <td>${actionOwnerLabel}</td>
+          <td>${approvalMatrix}</td>
           <td>${issueOpenDays}</td>
           <td>${subStatus}</td>
           <td><button class="btnSecondary viewIssueBtn" type="button">View issues</button></td>
@@ -782,6 +1008,8 @@
       li.setAttribute('tabindex', idx === 0 ? '0' : '-1');
       li.setAttribute('data-id', inv.id);
       li.setAttribute('aria-selected', 'false');
+      const displayIssues = getDisplayIssues(inv);
+      const issueCount = displayIssues.length;
       const maxDaysOpen = computeInvoiceDaysOpen(inv);
       const dueDate = getInvoiceDueDate(inv);
       const dateDisplay = (dueDate && (new Date(dueDate).getTime() > new Date(inv.date).getTime()))
@@ -798,7 +1026,7 @@
         </div>
         <div class="aside aside--labels">
           <span class="chip chip--days" title="Highest days open among this invoice's issues">Days: ${maxDaysOpen}</span>
-          <span class="chip chip--count" aria-label="Issue count"> Issue${inv.issues.length === 1 ? '' : 's'}: ${inv.issues.length} </span>
+          <span class="chip chip--count" aria-label="Issue count"> Issue${issueCount === 1 ? '' : 's'}: ${issueCount} </span>
         </div>
       `;
       li.addEventListener('click', () => selectInvoice(inv.id));
@@ -811,7 +1039,8 @@
     if (!issueList) return;
     // Renders issues list/cards
     issueList.innerHTML = '';
-    if (!issues || issues.length === 0) {
+    const displayIssues = (issues || []).filter(iss => !isIssueClosed(iss));
+    if (!displayIssues.length) {
       const empty = document.createElement('li');
       empty.className = 'list-item';
       empty.textContent = 'No issues for this invoice.';
@@ -822,7 +1051,7 @@
       if (trailList) trailList.innerHTML = '';
       return;
     }
-    issues.forEach((iss, idx) => {
+    displayIssues.forEach((iss, idx) => {
       const li = document.createElement('li');
       li.className = 'issue-card';
       li.setAttribute('role', 'option');
@@ -880,11 +1109,84 @@
     });
   }
 
+  function renderArchivedIssues(invoice) {
+    if (!archivedList || !archivedWrap) return;
+    if (!archivedVisible) {
+      archivedWrap.classList.add('hidden');
+      archivedWrap.setAttribute('aria-hidden', 'true');
+      return;
+    }
+    const closedIssues = invoice ? getClosedIssues(invoice) : [];
+    archivedList.innerHTML = '';
+    if (!closedIssues.length) {
+      const empty = document.createElement('li');
+      empty.className = 'list-item';
+      empty.textContent = 'No closed issues.';
+      empty.setAttribute('aria-disabled', 'true');
+      archivedList.appendChild(empty);
+      archivedWrap.classList.remove('hidden');
+      archivedWrap.setAttribute('aria-hidden', 'false');
+      return;
+    }
+    closedIssues.forEach((iss, idx) => {
+      const li = document.createElement('li');
+      li.className = 'issue-card issue-card--archived';
+      li.setAttribute('role', 'option');
+      li.setAttribute('tabindex', idx === 0 ? '0' : '-1');
+      li.setAttribute('data-id', iss.id);
+      li.setAttribute('aria-selected', 'false');
+
+      const header = document.createElement('div');
+      header.className = 'card-header';
+      const status = (iss.status || 'Closed');
+      const statusClass = 'pill--closed';
+      header.innerHTML = `
+        <span>${iss.id.replace('ISS_', 'ISS_')}</span>
+        <span class="pill ${statusClass} status-pill">${status.toUpperCase()}</span>
+      `;
+
+      const body = document.createElement('div');
+      body.className = 'card-body';
+      body.innerHTML = `
+        <div class="select-row">
+          <div class="select-group">
+            <label>Primary Status</label>
+            <div class="static-value">${iss.primaryStatus}</div>
+          </div>
+          <div class="select-group">
+            <label>Sub Status</label>
+            <div class="static-value">${iss.subStatus}</div>
+          </div>
+          <div class="select-group">
+            <label>Remarks</label>
+            <div class="static-value">${iss.description || '-'}</div>
+          </div>
+        </div>
+      `;
+
+      li.appendChild(header);
+      li.appendChild(body);
+
+      li.addEventListener('click', () => {
+        selectIssue(iss.id);
+      });
+      li.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          selectIssue(iss.id);
+        }
+      });
+      archivedList.appendChild(li);
+    });
+    archivedWrap.classList.remove('hidden');
+    archivedWrap.setAttribute('aria-hidden', 'false');
+  }
+
   function renderIssueReasonCounts(issues) {
     if (!issueReasonList) return;
     issueReasonList.innerHTML = '';
     const counts = new Map();
-    (issues || []).forEach(iss => {
+    (issues || []).filter(iss => !isIssueClosed(iss)).forEach(iss => {
       const reason = iss.subStatus || iss.primaryStatus || iss.title || 'Other';
       counts.set(reason, (counts.get(reason) || 0) + 1);
     });
@@ -1005,9 +1307,14 @@
 
   // Helper: refresh issues list and preserve current selection
   function refreshIssueListFor(invoice, issueId) {
-    renderIssues(invoice?.issues || []);
+    const issues = invoice ? getDisplayIssues(invoice) : [];
+    renderIssues(issues);
+    renderArchivedIssues(invoice);
     if (issueId) {
-      const el = issueList.querySelector(`[data-id="${CSS.escape(issueId)}"]`);
+      let el = issueList ? issueList.querySelector(`[data-id="${CSS.escape(issueId)}"]`) : null;
+      if (!el && archivedList) {
+        el = archivedList.querySelector(`[data-id="${CSS.escape(issueId)}"]`);
+      }
       if (el) el.setAttribute('aria-selected', 'true');
     }
   }
@@ -1034,12 +1341,16 @@
       const levelText = approvalSummary.currentLevel ? ` (Level ${approvalSummary.currentLevel})` : '';
       approvalStatus = `${approvalSummary.status || 'pending'}${levelText}`;
     }
+    const invoiceTotal = (invoice && Number.isFinite(Number(invoice.total)) && Number(invoice.total) > 0)
+      ? Number(invoice.total)
+      : (issue && Number.isFinite(Number(issue.invoiceTotal)) ? Number(issue.invoiceTotal) : 0);
+    const invoiceDate = invoice?.date || issue?.invoiceDate || '';
     detailView.innerHTML = `
       <div class="detail-head">
         <div class="head-left">
           <h3>${invoice.id} - ${issue.id}</h3>
           <p class="meta">Status: ${issue.status} - Created: ${fmtDate(issue.created)}</p>
-          <p class="meta">Invoice: ${invoice.id} - ${invoice.customer} - ${fmtDate(invoice.date)} - ${fmtCurrency(invoice.total)}</p>
+          <p class="meta">Invoice: ${invoice.id} - ${invoice.customer} - ${invoiceDate ? fmtDate(invoiceDate) : '-'} - ${fmtCurrency(invoiceTotal)}</p>
         </div>
         <div class="head-right">
           ${issue.subStatus ? `<span class="pill pill--sub" title="${issue.subStatus}">${issue.subStatus}</span>` : ''}
@@ -1052,7 +1363,7 @@
         <div class="field"><span class="label">Manager</span><span class="value">${issue.manager || '-'}</span></div>
         <div class="field"><span class="label">FPR</span><span class="value">${issue.fpr || '-'}</span></div>
         <div class="field"><span class="label">SPR</span><span class="value">${issue.spr || '-'}</span></div>
-        <div class="field"><span class="label">Action Owner</span><span class="value">${issue.actionOwner || '-'}</span></div>
+        <div class="field"><span class="label">Action Owner</span><span class="value">${formatActionOwner(issue.actionOwner) || '-'}</span></div>
         <div class="field"><span class="label">Status</span><span class="value">${issue.status || '-'}</span></div>
         <div class="field"><span class="label">Approval Process</span><span class="value">${approvalProcessName}</span></div>
         <div class="field"><span class="label">Approval Status</span><span class="value">${approvalStatus}</span></div>
@@ -1079,11 +1390,26 @@
     }
 
     // Render action trail
-    syncApprovalTrail(issue);
+    const approvalAdded = syncApprovalTrail(issue);
+    if (approvalAdded && issue.isCustom) {
+      persistCustomIssue(issue, invoice);
+    }
     const trailList = document.getElementById('trail-list');
     if (trailList) {
       trailList.innerHTML = '';
-      const sortedTrail = (issue.actionTrail || []).slice().sort((a,b) => new Date(b.when) - new Date(a.when));
+      const sortedTrail = (issue.actionTrail || []).slice().sort((a,b) => {
+        const aTime = Date.parse(a?.when || '') || 0;
+        const bTime = Date.parse(b?.when || '') || 0;
+        if (aTime !== bTime) return bTime - aTime;
+        const aSeq = Number.isFinite(a?.sequence) ? a.sequence : null;
+        const bSeq = Number.isFinite(b?.sequence) ? b.sequence : null;
+        if (aSeq != null || bSeq != null) {
+          if (aSeq == null) return 1;
+          if (bSeq == null) return -1;
+          if (aSeq !== bSeq) return aSeq - bSeq;
+        }
+        return 0;
+      });
       sortedTrail.forEach(entry => {
         const li = document.createElement('li');
         const when = new Date(entry.when).toLocaleString();
@@ -1093,6 +1419,7 @@
         const remarkBox = entry.remark ? `<textarea class="trail-remark" readonly>${entry.remark}</textarea>` : '';
         const trailId = ensureTrailId(entry);
         const files = normalizeTrailFiles(entry);
+        const allowDocActions = type === 'resolution';
         const filesLine = files.length
           ? `<div class="trail-files">${files.map(file => {
               const status = (file.status || '').toLowerCase();
@@ -1104,12 +1431,17 @@
               const linkAttrs = file.url
                 ? `href="${file.url}" download="${file.name}"`
                 : 'href="#" data-doc-fallback="1"';
+              const actionButtons = allowDocActions && !isAccepted && !isRejected
+                ? `
+                    <button type="button" class="trail-file__btn trail-file__btn--accept" data-doc-action="accept" data-trail-id="${trailId}" data-file-id="${file.id}">Accept</button>
+                    <button type="button" class="trail-file__btn trail-file__btn--reject" data-doc-action="reject" data-trail-id="${trailId}" data-file-id="${file.id}">Reject</button>
+                  `
+                : '';
               return `
                 <div class="trail-file">
                   <a class="trail-file__link" ${linkAttrs}>${file.name}</a>
                   <div class="trail-file__actions">
-                    <button type="button" class="trail-file__btn trail-file__btn--accept ${isAccepted ? 'is-active' : ''}" data-doc-action="accept" data-trail-id="${trailId}" data-file-id="${file.id}">Accept</button>
-                    <button type="button" class="trail-file__btn trail-file__btn--reject ${isRejected ? 'is-active' : ''}" data-doc-action="reject" data-trail-id="${trailId}" data-file-id="${file.id}">Reject</button>
+                    ${actionButtons}
                     ${statusLabel}
                   </div>
                 </div>
@@ -1137,10 +1469,20 @@
           if (!trailId || !fileId || !action) return;
           const entry = (issue.actionTrail || []).find(item => item && item.trailId === trailId);
           if (!entry) return;
+          if (String(entry.type || '').toLowerCase() !== 'resolution') return;
           const files = normalizeTrailFiles(entry);
           const file = files.find(item => item.id === fileId);
           if (!file) return;
+          if (file.status) return;
+          const confirmText = action === 'accept'
+            ? 'Mark this document as accepted?'
+            : 'Mark this document as rejected?';
+          const confirmed = window.confirm(confirmText);
+          if (!confirmed) return;
           file.status = action === 'accept' ? 'accepted' : 'rejected';
+          if (issue.isCustom) {
+            persistCustomIssue(issue, invoice);
+          }
           renderDetails(invoice, issue);
           return;
         }
@@ -1175,6 +1517,9 @@
           }));
         }
         issue.actionTrail.push(entry);
+        if (issue.isCustom) {
+          persistCustomIssue(issue, invoice);
+        }
         input.value = '';
         if (fileInput) fileInput.value = '';
         renderDetails(invoice, issue);
@@ -1379,20 +1724,23 @@
           if (pendingAction.buttonEl) pendingAction.buttonEl.classList.add('is-active');
           try { window.alert('Mock: Email re-sent to ' + target); } catch(_e) {}
         } else if (pendingAction.type === 'closure') {
-          issue.status = 'Resolved';
+          issue.status = 'Closed';
           issue.stage = 3;
-          issue.actionTrail.push({ who: 'You', what: 'marked the issue as resolved', type: 'closure', when: nowIso, remark: text });
+          issue.actionTrail.push({ who: 'You', what: 'closed the issue', type: 'closure', when: nowIso, remark: text });
           if (pendingAction.buttonEl) pendingAction.buttonEl.classList.add('is-active');
         } else if (pendingAction.type === 'reopen') {
           issue.status = 'Open';
           // Reset stage to Approved (1) to indicate reopened workflow (not closed)
           issue.stage = 1;
           issue.actionTrail.push({ who: 'You', what: 'reopened the issue', type: 'reopen', when: nowIso, remark: text });
-          if (pendingAction.buttonEl) pendingAction.buttonEl.classList.add('is-active');
+        if (pendingAction.buttonEl) pendingAction.buttonEl.classList.add('is-active');
         }
         // Clear temporary highlight and close prompt
         clearHighlights();
         closeRemark();
+        if (issue.isCustom) {
+          persistCustomIssue(issue, invoice);
+        }
         refreshIssueListFor(invoice, issue.id);
         renderDetails(invoice, issue);
         // Re-render invoices to refresh Days Open chips and maintain current selection/sort
@@ -1449,6 +1797,9 @@
         issue.actionTrail = issue.actionTrail || [];
         issue.actionTrail.push({ who: 'You', what: `assigned to action owner (${name})`, type: 'assignment', when: new Date().toISOString(), remark: remarkText });
         issue.stage = Math.max(issue.stage || 0, 2);
+        if (issue.isCustom) {
+          persistCustomIssue(issue, invoice);
+        }
         if (assignPanel) { assignPanel.classList.add('hidden'); assignPanel.setAttribute('aria-hidden', 'true'); }
         if (form) form.classList.remove('hidden');
         clearHighlights();
@@ -1578,8 +1929,11 @@
           status: ''
         }));
         issue.actionTrail.push(entry);
-        issue.status = 'Resolved';
-        issue.stage = 3;
+        issue.status = 'Resolution Provided';
+        issue.stage = Math.max(issue.stage || 0, 2);
+        if (issue.isCustom) {
+          persistCustomIssue(issue, invoice);
+        }
         closeResolutionPanel();
         clearHighlights();
         if (resolutionBtn) resolutionBtn.classList.add('is-active');
@@ -1633,6 +1987,9 @@
           when: nowIso,
           remark
         });
+        if (issue.isCustom) {
+          persistCustomIssue(issue, invoice);
+        }
 
         if (approvalProcessPanel) { approvalProcessPanel.classList.add('hidden'); approvalProcessPanel.setAttribute('aria-hidden', 'true'); }
         if (form) form.classList.remove('hidden');
@@ -1699,6 +2056,9 @@
         const trailEntry = { who: 'You', what, type: 'email', when: nowIso, remark };
         if (kind === 'escalate') trailEntry.recipients = recipients;
         issue.actionTrail.push(trailEntry);
+        if (issue.isCustom) {
+          persistCustomIssue(issue, invoice);
+        }
         // close panel and refresh
         if (emailPanel) { emailPanel.classList.add('hidden'); emailPanel.setAttribute('aria-hidden','true'); }
         if (form) form.classList.remove('hidden');
@@ -1746,11 +2106,12 @@
         ? `${invoice.customer} - ${fmtDate(invoice.date)} - ${fmtCurrency(invoice.total)}`
         : 'Choose an invoice to load related issues.';
     }
-    const issues = invoice?.issues || [];
+    const issues = invoice ? getDisplayIssues(invoice) : [];
     if (isDetailPage) {
       renderIssueReasonCounts(issues);
     }
     renderIssues(issues);
+    renderArchivedIssues(invoice);
 
     if (issues.length > 0) {
       const firstIssue = issues[0];
@@ -1766,11 +2127,18 @@
   function selectIssue(id) {
     selectedIssueId = id;
     clearSelected(issueList);
-    const el = issueList.querySelector(`[data-id="${CSS.escape(id)}"]`);
+    clearSelected(archivedList);
+    let el = null;
+    if (issueList) {
+      el = issueList.querySelector(`[data-id="${CSS.escape(id)}"]`);
+    }
+    if (!el && archivedList) {
+      el = archivedList.querySelector(`[data-id="${CSS.escape(id)}"]`);
+    }
     if (el) el.setAttribute('aria-selected', 'true');
 
     const invoice = data.find(d => d.id === selectedInvoiceId);
-    const issue = invoice?.issues.find(i => i.id === id);
+    const issue = invoice ? getAllIssues(invoice).find(i => i.id === id) : null;
     renderDetails(invoice, issue);
   }
 
@@ -1932,6 +2300,25 @@
   // Initialize
   initAddIssueOptions();
   renderInvoicesSortedAndPreserveSelection();
+  if (clearIssuesBtn) {
+    clearIssuesBtn.addEventListener('click', clearIssueTrackerData);
+  }
+
+  if (archivedToggle) {
+    archivedToggle.addEventListener('click', () => {
+      archivedVisible = !archivedVisible;
+      archivedToggle.textContent = archivedVisible ? 'Hide closed issues' : 'Show closed issues';
+      const invoice = data.find(d => d.id === selectedInvoiceId);
+      renderArchivedIssues(invoice);
+    });
+  }
+  if (closedInvoiceToggle) {
+    closedInvoiceToggle.addEventListener('click', () => {
+      showClosedInvoices = !showClosedInvoices;
+      closedInvoiceToggle.textContent = showClosedInvoices ? 'Hide closed invoices' : 'Show closed invoices';
+      renderInvoicesSortedAndPreserveSelection();
+    });
+  }
   if (invoiceSearchInput) {
     invoiceSearchInput.addEventListener('input', () => {
       invoiceSearchQuery = normalizeSearch(invoiceSearchInput.value);
@@ -2011,7 +2398,7 @@
         selectInvoice(prevSelectedInvoice);
         if (prevSelectedIssue) {
           const inv = data.find(d => d.id === prevSelectedInvoice);
-          const exists = inv && inv.issues && inv.issues.some(i => i.id === prevSelectedIssue);
+          const exists = inv && getDisplayIssues(inv).some(i => i.id === prevSelectedIssue);
           if (exists) selectIssue(prevSelectedIssue);
       }
       }

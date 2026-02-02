@@ -1,6 +1,7 @@
 (() => {
   const REQ_KEY = 'approval_requests';
   const ACTIVE_USER_KEY = 'approver_active_user';
+  const CUSTOM_ISSUES_KEY = 'customIssues';
 
   const requestMeta = document.getElementById('request-meta');
   const levelsWrap = document.getElementById('matrix-levels');
@@ -24,6 +25,56 @@
     }
   }
 
+  function loadCustomIssues() {
+    try {
+      const raw = localStorage.getItem(CUSTOM_ISSUES_KEY);
+      const parsed = JSON.parse(raw || '[]');
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (_) {
+      return [];
+    }
+  }
+
+  function saveCustomIssues(list) {
+    try {
+      localStorage.setItem(CUSTOM_ISSUES_KEY, JSON.stringify(list || []));
+    } catch (_) {}
+  }
+
+  function persistApprovalToCustomIssue(req, entry) {
+    const issueId = req?.issue?.id;
+    if (!issueId) return;
+    const list = loadCustomIssues();
+    const idx = list.findIndex(item => item && item.id === issueId);
+    if (idx < 0) return;
+    const current = list[idx];
+    const actionTrail = Array.isArray(current.actionTrail) ? current.actionTrail : [];
+    const approvalKey = `approval:${req.id || issueId}:${entry.at}:${entry.action}`;
+    actionTrail.push({
+      who: entry.by || 'Approver',
+      what: entry.action === 'approved'
+        ? 'approved the issue'
+        : entry.action === 'rejected'
+          ? 'rejected the issue'
+          : 'updated approval',
+      type: 'approval',
+      when: entry.at,
+      remark: entry.remark || '',
+      files: Array.isArray(entry.files) ? entry.files.slice() : [],
+      approvalKey
+    });
+    list[idx] = {
+      ...current,
+      status: req.status || current.status || '',
+      approvalProcessId: req.processId || current.approvalProcessId || '',
+      approvalProcessName: req.processName || current.approvalProcessName || '',
+      approvalMatrixId: req.matrixId || current.approvalMatrixId || '',
+      approvalMatrixName: req.matrixName || current.approvalMatrixName || '',
+      actionTrail
+    };
+    saveCustomIssues(list);
+  }
+
   function saveRequests(list) {
     localStorage.setItem(REQ_KEY, JSON.stringify(list || []));
   }
@@ -31,6 +82,21 @@
   function getParam(name) {
     const params = new URLSearchParams(window.location.search);
     return params.get(name) || '';
+  }
+
+  function normalizeId(value) {
+    return String(value || '').trim().toLowerCase();
+  }
+
+  function normalizeIdentity(value) {
+    return normalizeId(value).replace(/[^a-z0-9]+/g, ' ').trim();
+  }
+
+  function normalizeEmailName(value) {
+    if (!value || typeof value !== 'string') return '';
+    const at = value.indexOf('@');
+    if (at === -1) return '';
+    return normalizeIdentity(value.slice(0, at));
   }
 
   function setMessage(text, tone) {
@@ -229,15 +295,20 @@
 
   function updatePermissions() {
     const currentOwner = getCurrentOwner();
-    const canAct = req.status === 'pending' && currentOwner && viewerEmail && currentOwner.ownerEmail === viewerEmail;
+    const viewerId = normalizeIdentity(viewerEmail);
+    const viewerNameFromEmail = normalizeEmailName(viewerEmail);
+    const ownerEmail = normalizeIdentity(currentOwner && currentOwner.ownerEmail);
+    const ownerName = normalizeIdentity(currentOwner && currentOwner.ownerName);
+    const canAct = req.status === 'pending' && currentOwner && viewerId
+      && (viewerId === ownerEmail || viewerId === ownerName || viewerNameFromEmail === ownerName);
     if (decisionCard) {
       decisionCard.style.display = '';
     }
-    if (approveBtn) approveBtn.disabled = true;
-    if (rejectBtn) rejectBtn.disabled = true;
+    if (approveBtn) approveBtn.disabled = !canAct;
+    if (rejectBtn) rejectBtn.disabled = !canAct;
     if (backBtn) {
-      backBtn.setAttribute('aria-disabled', 'true');
-      backBtn.setAttribute('tabindex', '-1');
+      backBtn.removeAttribute('aria-disabled');
+      backBtn.removeAttribute('tabindex');
     }
     if (viewerNote) {
       if (!canAct) {
@@ -270,7 +341,12 @@
       return;
     }
     const currentOwner = getCurrentOwner();
-    const canAct = req.status === 'pending' && currentOwner && viewerEmail && currentOwner.ownerEmail === viewerEmail;
+    const viewerId = normalizeIdentity(viewerEmail);
+    const viewerNameFromEmail = normalizeEmailName(viewerEmail);
+    const ownerEmail = normalizeIdentity(currentOwner && currentOwner.ownerEmail);
+    const ownerName = normalizeIdentity(currentOwner && currentOwner.ownerName);
+    const canAct = req.status === 'pending' && currentOwner && viewerId
+      && (viewerId === ownerEmail || viewerId === ownerName || viewerNameFromEmail === ownerName);
     if (!canAct) {
       setMessage('You cannot act on this request at the current level.', 'error');
       return;
@@ -303,6 +379,7 @@
 
     req.updatedAt = now;
     saveRequests(list);
+    persistApprovalToCustomIssue(req, req.trail[req.trail.length - 1]);
     renderMeta(req);
     renderLevels(req.levels || [], req.currentLevel || 1);
     renderTrail(req);

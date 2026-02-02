@@ -19,6 +19,34 @@
   margin-bottom: 18px;
 }
 
+.managerHeaderControls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.role-select {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.role-link {
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+.role-link:hover {
+  color: #475569;
+  text-decoration: underline;
+}
+
 .managerHeader h1 {
   font-size: 22px;
   margin: 0;
@@ -118,6 +146,14 @@
   border: 1px solid #e2e8f4;
   background: #ffffff;
   font-size: 12px;
+}
+
+.invoiceSearch {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .summaryCard {
@@ -270,6 +306,46 @@
   margin: 0 0 10px;
   font-size: 14px;
   color: #111827;
+}
+
+.issueListActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: 10px;
+}
+
+.issueListToggle {
+  border: none;
+  background: transparent;
+  color: #5b21b6;
+  font-weight: 700;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.issueListToggle:hover {
+  text-decoration: underline;
+}
+
+.archivedIssues {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px dashed #e2e8f4;
+}
+
+.archivedTitle {
+  font-size: 12px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+}
+
+.issueList--archived .issue-card {
+  opacity: 0.78;
 }
 
 .reasonList {

@@ -87,10 +87,17 @@ const managerAgentData = [
 const initialAgentParam = urlParams.get("agent");
 const todoStorageKey = "ineburaTodoTasks";
 const remarksStorageKey = "ineburaRemarksByInvoice";
+const activityTrailStorageKey = "ineburaActivityTrailByInvoice";
 const managerNotificationsKey = "ineburaManagerNotifications";
 const pdcNotificationKey = "ineburaPdcNotifications";
 const pdcStorageKey = "ineburaPdcRecords";
 const notificationCenterKey = "ineburaNotificationCenter";
+const issueTrackerTotalKey = "issueTrackerTotalIssues";
+const issueTrackerBaseKey = "issueTrackerBaseData";
+const issueTrackerCustomKey = "customIssues";
+const issueTrackerProcessKey = "approval_processes";
+const issueTrackerMatrixKey = "approval_matrices";
+const issueTrackerClearedKey = "issueTrackerDataCleared";
 
 const rootPath = (() => {
   const raw = String(document.body.dataset.rootPath || "").trim();
@@ -102,6 +109,83 @@ const resolvePath = (path) => {
   if (/^(?:[a-z]+:)?\/\//i.test(path) || path.startsWith("/")) return path;
   const cleaned = path.replace(/^\.\//, "");
   return `${rootPath}${cleaned}`;
+};
+
+const readStoredArray = (key) => {
+  try {
+    const raw = localStorage.getItem(key);
+    const parsed = JSON.parse(raw || "[]");
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (_) {
+    return [];
+  }
+};
+
+const countIssueTrackerBaseIssues = () => {
+  const base = readStoredArray(issueTrackerBaseKey);
+  if (!base.length) return 0;
+  return base.reduce((sum, inv) => sum + (Array.isArray(inv?.issues) ? inv.issues.length : 0), 0);
+};
+
+const computeIssueTrackerTotal = () => {
+  if (localStorage.getItem(issueTrackerClearedKey) === "1") return 0;
+  const baseCount = countIssueTrackerBaseIssues();
+  const customCount = readStoredArray(issueTrackerCustomKey).length;
+  return baseCount + customCount;
+};
+
+const getIssueTrackerTotal = () => {
+  if (localStorage.getItem(issueTrackerClearedKey) === "1") return 0;
+  const raw = localStorage.getItem(issueTrackerTotalKey);
+  const parsed = Number(raw);
+  if (Number.isFinite(parsed)) return Math.max(0, Math.floor(parsed));
+  const base = readStoredArray(issueTrackerBaseKey);
+  const custom = readStoredArray(issueTrackerCustomKey);
+  if (!base.length && !custom.length) return null;
+  return countIssueTrackerBaseIssues() + custom.length;
+};
+
+const syncIssueTrackerTotal = () => {
+  const total = computeIssueTrackerTotal();
+  try { localStorage.setItem(issueTrackerTotalKey, String(total)); } catch (_) {}
+  return total;
+};
+
+const findApprovalProcessId = (processName) => {
+  if (!processName) return "";
+  const processes = readStoredArray(issueTrackerProcessKey);
+  const match = processes.find((proc) => String(proc?.process || "").trim() === processName);
+  return match?.id || "";
+};
+
+const findApprovalMatrixForProcess = (processName) => {
+  if (!processName) return { id: "", name: "" };
+  const processes = readStoredArray(issueTrackerProcessKey);
+  const matrices = readStoredArray(issueTrackerMatrixKey);
+  const match = processes.find((proc) => String(proc?.process || "").trim() === processName);
+  const matrixId = match?.matrixId || "";
+  const matrix = matrices.find((mat) => mat?.id === matrixId);
+  return { id: matrixId || "", name: matrix?.name || "" };
+};
+
+const findApprovalProcessByName = (processName) => {
+  if (!processName) return null;
+  const processes = readStoredArray(issueTrackerProcessKey);
+  return processes.find((proc) => String(proc?.process || "").trim() === processName) || null;
+};
+
+const findApprovalMatrixById = (matrixId) => {
+  if (!matrixId) return null;
+  const matrices = readStoredArray(issueTrackerMatrixKey);
+  return matrices.find((mat) => mat?.id === matrixId) || null;
+};
+
+const parseAmount = (value) => {
+  if (typeof value === "number") return Number.isFinite(value) ? value : 0;
+  if (value == null) return 0;
+  const cleaned = String(value).replace(/[^0-9.-]/g, "");
+  const parsed = Number(cleaned);
+  return Number.isFinite(parsed) ? parsed : 0;
 };
 
 // ===============================
@@ -907,6 +991,88 @@ function saveRemarksMap(map) {
   } catch (err) {
     console.warn("Unable to save remarks", err);
   }
+}
+
+function loadActivityTrailMap() {
+  try {
+    const raw = localStorage.getItem(activityTrailStorageKey);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch (err) {
+    console.warn("Unable to load activity trail", err);
+    return {};
+  }
+}
+
+function saveActivityTrailMap(map) {
+  try {
+    localStorage.setItem(activityTrailStorageKey, JSON.stringify(map));
+  } catch (err) {
+    console.warn("Unable to save activity trail", err);
+  }
+}
+
+function addActivityTrailEntry(invoiceNo, payload) {
+  if (!invoiceNo || !payload) return;
+  const map = loadActivityTrailMap();
+  if (!Array.isArray(map[invoiceNo])) map[invoiceNo] = [];
+  if (payload.id) {
+    const exists = map[invoiceNo].some((item) => item && item.id === payload.id);
+    if (exists) return;
+  }
+  map[invoiceNo].unshift(payload);
+  saveActivityTrailMap(map);
+}
+
+function buildActivityTrailNode(payload) {
+  if (!payload || !payload.type) return null;
+  if (payload.type === "status") return buildStatusUpdateEntry(payload.data || {});
+  if (payload.type === "issue") {
+    const event = payload.event || {};
+    return buildIssueTrailEntry({
+      ...event,
+      title: "Issue tracker update",
+      badge: "Issue",
+      eventClass: "event-issue"
+    });
+  }
+  if (payload.type === "email") return buildEmailTrailEntry(payload.data || {});
+  return null;
+}
+
+function renderStoredActivityTrail(invoiceNo) {
+  const list = document.getElementById("activityTrailList");
+  if (!list) return;
+  if (!invoiceNo) {
+    list.innerHTML = `<div class="eventMeta">Select an invoice to view activity.</div>`;
+    return;
+  }
+  syncIssueTrackerTrailForInvoice(invoiceNo);
+  const map = loadActivityTrailMap();
+  const entries = Array.isArray(map[invoiceNo]) ? map[invoiceNo] : [];
+  if (entries.length === 0) {
+    list.innerHTML = `<div class="eventMeta">No activity yet.</div>`;
+    return;
+  }
+  list.innerHTML = "";
+  const sorted = entries.slice().sort((a, b) => {
+    const aTime = Date.parse(a?.at || a?.when || "") || 0;
+    const bTime = Date.parse(b?.at || b?.when || "") || 0;
+    if (aTime !== bTime) return bTime - aTime;
+    const aSeq = Number.isFinite(a?.sequence) ? a.sequence : null;
+    const bSeq = Number.isFinite(b?.sequence) ? b.sequence : null;
+    if (aSeq != null || bSeq != null) {
+      if (aSeq == null) return 1;
+      if (bSeq == null) return -1;
+      if (aSeq !== bSeq) return aSeq - bSeq;
+    }
+    return 0;
+  });
+  sorted.forEach((payload) => {
+    const node = buildActivityTrailNode(payload);
+    if (node) list.appendChild(node);
+  });
 }
 
 function addStoredRemark(invoiceNo, remark) {
@@ -1921,7 +2087,7 @@ function buildStatusUpdateEntry(data) {
         <div class="eventTitle">Invoice update</div>
         <div class="eventMeta">${summaryMeta}</div>
       </div>
-      <span class="eventBadge">Status update</span>
+      <span class="eventBadge">Status</span>
     </summary>
     <div class="eventBody">
       ${detailItems.map(item => `
@@ -1934,6 +2100,200 @@ function buildStatusUpdateEntry(data) {
   `;
 
   return details;
+}
+
+function buildIssueTrailEntry({ title, meta, badge, lines, eventClass }) {
+  const details = document.createElement("details");
+  details.className = `activityEvent ${eventClass || "event-issue"}`;
+  const safeLines = Array.isArray(lines) ? lines : [];
+  details.innerHTML = `
+    <summary>
+      <div>
+        <div class="eventTitle">${safeText(title)}</div>
+        <div class="eventMeta">${safeText(meta)}</div>
+      </div>
+      <span class="eventBadge">${safeText(badge)}</span>
+    </summary>
+    <div class="eventBody">
+      ${safeLines.map(item => `
+        <div class="activityDetailLine">
+          <span class="activityLabel">${safeText(item.label)}</span>
+          <span class="activityValue">${safeText(item.value)}</span>
+        </div>
+      `).join("")}
+    </div>
+  `;
+  return details;
+}
+
+function formatApprovalTrailText(action, processLabel, level) {
+  const actionLower = String(action || "").toLowerCase();
+  const process = processLabel ? ` (${processLabel})` : "";
+  if (actionLower === "submitted") return `submitted for approval${process}`;
+  if (actionLower === "approved") {
+    const lvl = level ? `Level ${level}` : "approval";
+    return `approved at ${lvl}${process}`;
+  }
+  if (actionLower === "rejected") {
+    const lvl = level ? `Level ${level}` : "approval";
+    return `rejected at ${lvl}${process}`;
+  }
+  if (actionLower) return `${actionLower}${process}`;
+  return `approval update${process}`;
+}
+
+function buildIssueTrackerEvent(issue, entry, extra) {
+  const actionText = entry?.what || entry?.actionText || entry?.type || "update";
+  const meta = `${issue?.id || "Issue"} - ${actionText}`;
+  const files = Array.isArray(entry?.files) ? entry.files : [];
+  const fileNames = files.map((file) => {
+    if (!file) return "";
+    if (typeof file === "string") return file;
+    return file.name || "";
+  }).filter(Boolean);
+  const lines = [
+    { label: "Action", value: actionText },
+    { label: "By", value: entry?.who || entry?.by || "-" },
+    { label: "Status", value: entry?.type || entry?.status || "-" },
+    { label: "Remark", value: entry?.remark || "-" }
+  ];
+  if (fileNames.length) {
+    lines.push({ label: "Documents", value: fileNames.join(", ") });
+  }
+  if (extra?.process) lines.push({ label: "Process", value: extra.process });
+  if (extra?.matrix) lines.push({ label: "Matrix", value: extra.matrix });
+  if (extra?.level != null && extra?.level !== "") lines.push({ label: "Level", value: String(extra.level) });
+  return {
+    title: "Issue tracker update",
+    meta,
+    badge: "Issue",
+    lines,
+    eventClass: "event-issue"
+  };
+}
+
+function buildStatusTrailPayload(data, timestamp) {
+  const nowIso = timestamp || new Date().toISOString();
+  return {
+    id: `status:${nowIso}`,
+    at: nowIso,
+    type: "status",
+    data: {
+      activityType: data.activityType,
+      broadStatus: data.broadStatus,
+      primaryStatus: data.primaryStatus,
+      subStatus: data.subStatus,
+      remarks: data.remarks,
+      invoices: data.invoices,
+      instrumentMode: data.instrumentMode,
+      instrumentRef: data.instrumentRef,
+      bank: data.bank,
+      transferDate: data.transferDate,
+      amount: data.amount,
+      tds: data.tds,
+      ld: data.ld,
+      miscRows: data.miscRows,
+      pdcRows: data.pdcRows,
+      pdcOpsUser: data.pdcOpsUser,
+      dispatchDetails: data.dispatchDetails,
+      totalCollected: data.totalCollected
+    }
+  };
+}
+
+function syncIssueTrackerTrailForInvoice(invoiceNo) {
+  if (!invoiceNo) return;
+  const customIssues = readStoredArray(issueTrackerCustomKey);
+  const relevant = customIssues.filter((issue) => issue && issue.invoiceNo === invoiceNo);
+  if (relevant.length === 0) return;
+  const map = loadActivityTrailMap();
+  if (!Array.isArray(map[invoiceNo])) map[invoiceNo] = [];
+  const existing = new Set(map[invoiceNo].map((item) => item?.id).filter(Boolean));
+  const approvalRequests = readStoredArray("approval_requests");
+
+  relevant.forEach((issue) => {
+    const trail = Array.isArray(issue.actionTrail) ? issue.actionTrail : [];
+    const approvalMatches = approvalRequests.filter((req) => req?.issue?.id === issue.id);
+    const approvalEntries = [];
+    approvalMatches.forEach((req) => {
+      const processLabel = req?.processName || req?.processId || "";
+      const matrixLabel = req?.matrixName || "";
+      const reqTrail = Array.isArray(req?.trail) ? req.trail : [];
+      reqTrail.forEach((entry) => {
+        const when = entry?.at || req?.updatedAt || req?.createdAt || "";
+        const actionText = formatApprovalTrailText(entry?.action, processLabel, entry?.level);
+        approvalEntries.push({
+          approvalKey: `approval:${req.id}:${when}:${entry?.action || "update"}`,
+          when,
+          actionText,
+          who: entry?.by || "Approver",
+          type: entry?.action || "approval",
+          remark: entry?.remark || "",
+          files: Array.isArray(entry?.files) ? entry.files : [],
+          process: processLabel,
+          matrix: matrixLabel,
+          level: entry?.level
+        });
+      });
+    });
+
+    const combinedMap = new Map();
+    trail.forEach((entry) => {
+      const key = entry?.approvalKey || entry?.trailId || `issue:${issue.id}:${entry?.when || ""}:${entry?.what || entry?.type || "update"}`;
+      if (!key) return;
+      combinedMap.set(key, {
+        when: entry?.when || "",
+        key,
+        entry,
+        extra: {
+          process: entry?.approvalProcessName || "",
+          matrix: entry?.approvalMatrixName || "",
+          level: entry?.level
+        }
+      });
+    });
+    approvalEntries.forEach((entry) => {
+      const key = entry?.approvalKey || `issue:${issue.id}:${entry?.when || ""}:${entry?.actionText || "approval"}`;
+      if (!key) return;
+      combinedMap.set(key, {
+        when: entry?.when || "",
+        key,
+        entry,
+        extra: {
+          process: entry?.process || "",
+          matrix: entry?.matrix || "",
+          level: entry?.level
+        }
+      });
+    });
+
+    Array.from(combinedMap.values()).forEach((item) => {
+      const when = item.when || "";
+      const key = item.key;
+      if (!key || existing.has(key)) return;
+      const sourceEntry = item.entry || {};
+      const normalizedEntry = sourceEntry.actionText
+        ? {
+            what: sourceEntry.actionText,
+            who: sourceEntry.who,
+            type: sourceEntry.type,
+            remark: sourceEntry.remark,
+            files: Array.isArray(sourceEntry.files) ? sourceEntry.files : []
+          }
+        : sourceEntry;
+      const event = buildIssueTrackerEvent(issue, normalizedEntry, item.extra);
+      map[invoiceNo].unshift({
+        id: key,
+        type: "issue",
+        at: when,
+        sequence: sourceEntry?.sequence,
+        event
+      });
+      existing.add(key);
+    });
+  });
+
+  saveActivityTrailMap(map);
 }
 
 function openMiscDetailsModal(payload) {
@@ -2311,6 +2671,7 @@ function renderInvoiceDetails(invoice) {
     setDetailValue("invoiceBusinessUnit", "-");
     setDetailValue("invoiceIndustry", "-");
     renderStoredRemarks(null);
+    renderStoredActivityTrail(null);
     return;
   }
 
@@ -2341,6 +2702,9 @@ function renderInvoiceDetails(invoice) {
     const clientName = customer?.name || "-";
     pushSubjectEl.textContent = `Subject: PTP missed for ${clientName}`;
   }
+
+  renderStoredRemarks(invoice.invoiceNo);
+  renderStoredActivityTrail(invoice.invoiceNo);
 }
 
 function highlightInvoiceRow(invNo) {
@@ -2361,6 +2725,7 @@ function selectInvoiceByNo(invNo) {
   renderInvoiceDetails(invoice);
   currentInvoiceNoForDocs = invNo;
   renderStoredRemarks(invNo);
+  renderStoredActivityTrail(invNo);
   const customer = customersData.find(c => c.id === selectedCustomerId);
   if (customer) renderDocsList(customer);
   highlightInvoiceRow(invNo);
@@ -3012,9 +3377,22 @@ function renderCenter(customer) {
     const primary = String(inv.primaryStatus || "").toLowerCase();
     return status === "dispute" || primary === "dispute";
   }).length;
-  if (issueEl) issueEl.textContent = String(issueCount);
+  updateCenterIssueCountDisplay(issueCount);
 
   if (dispositionTagEl) dispositionTagEl.textContent = customer.name;
+}
+
+function updateCenterIssueCountDisplay(fallbackCount) {
+  const issueEl = document.getElementById("centerIssueCount");
+  if (!issueEl) return;
+  const trackerTotal = getIssueTrackerTotal();
+  if (trackerTotal != null) {
+    issueEl.textContent = String(trackerTotal);
+    return;
+  }
+  if (fallbackCount != null) {
+    issueEl.textContent = String(fallbackCount);
+  }
 }
 
 function openCnAdvPdcModal() {
@@ -3557,6 +3935,33 @@ function wireEmailPanelEvents() {
 
   if (sendBtn) {
     sendBtn.addEventListener("click", () => {
+      const nowIso = new Date().toISOString();
+      const attachmentsRaw = String(composeAttachments?.value || "").trim();
+      const attachments = attachmentsRaw
+        ? attachmentsRaw.split(/[,;]+/).map(item => item.trim()).filter(Boolean)
+        : [];
+      const invoiceTargets = emailInvoiceFilter && emailInvoiceFilter.length
+        ? emailInvoiceFilter.slice()
+        : (currentInvoiceNoForDocs ? [currentInvoiceNoForDocs] : []);
+      if (invoiceTargets.length) {
+        const payload = {
+          id: `email:${nowIso}:${composeSubject?.value || composeTo?.value || "message"}`,
+          at: nowIso,
+          type: "email",
+          data: {
+            to: composeTo?.value || "",
+            cc: composeCc?.value || "",
+            from: composeFrom?.value || "",
+            subject: composeSubject?.value || "",
+            body: composeBody?.value || "",
+            attachments,
+            invoices: invoiceTargets
+          }
+        };
+        invoiceTargets.forEach((invNo) => addActivityTrailEntry(invNo, payload));
+        const activeInv = invoiceTargets[0] || currentInvoiceNoForDocs;
+        renderStoredActivityTrail(activeInv);
+      }
       resetCompose();
     });
   }
@@ -3598,6 +4003,10 @@ function wireDispositionActivityEvents() {
   const dispatchModalEl = document.getElementById("pdcDispatchConfirmModal");
   const dispatchAddBtn = document.getElementById("pdcDispatchAddDetailBtn");
   const dispatchProceedBtn = document.getElementById("pdcDispatchProceedBtn");
+  const deliveryChallanFields = document.getElementById("deliveryChallanFields");
+  const issueTrackerCheck = document.getElementById("issueTrackerCheck");
+  const actionOwnerSelect = document.getElementById("actionOwnerSelect");
+  const approvalProcessSelect = document.getElementById("approvalProcessSelect");
 
   const miscModes = ["NEFT", "RTGS", "Cheque", "Demand Draft", "PDC", "CN", "Adv"];
   const miscAdjustmentModes = new Set(["PDC", "CN", "Adv"]);
@@ -4139,15 +4548,24 @@ function wireDispositionActivityEvents() {
     }
   };
 
+  const toggleDeliveryChallanFields = () => {
+    if (!subStatusSelect || !deliveryChallanFields) return;
+    const selected = String(subStatusSelect.value || "").trim().toLowerCase();
+    const isDeliveryChallan = selected === "delivery challan required";
+    deliveryChallanFields.classList.toggle("hidden", !isDeliveryChallan);
+  };
+
   wireBankSuggestion(document.getElementById("collectionBank"));
 
   if (subStatusSelect) {
     subStatusSelect.addEventListener("change", () => {
       toggleCollectionFields();
       togglePdcFields();
+      toggleDeliveryChallanFields();
     });
     toggleCollectionFields();
     togglePdcFields();
+    toggleDeliveryChallanFields();
   }
 
   if (instrumentModeSelect) {
@@ -4365,6 +4783,200 @@ function wireDispositionActivityEvents() {
         });
       }
 
+      const isDeliveryChallan = String(subStatus || "").trim().toLowerCase() === "delivery challan required";
+      const shouldAddIssue = isDeliveryChallan && issueTrackerCheck && issueTrackerCheck.checked;
+      let issueTrailEntry = null;
+      let approvalTrailEntry = null;
+      let issueTrailPayload = null;
+      let approvalTrailPayload = null;
+      const activityTimestamp = new Date().toISOString();
+      if (shouldAddIssue) {
+        const customer = customersData.find(c => c.id === selectedCustomerId);
+        const invNo = dispositionInvoiceList && dispositionInvoiceList.length > 0
+          ? dispositionInvoiceList[0]
+          : currentInvoiceNoForDocs;
+        const invoice = invNo ? currentInvoicesAll.find(inv => inv.invoiceNo === invNo) : null;
+        const now = new Date();
+        const approvalProcessName = approvalProcessSelect?.value || "";
+        const approvalProcessId = findApprovalProcessId(approvalProcessName);
+        const approvalProcess = findApprovalProcessByName(approvalProcessName);
+        const approvalMatrix = findApprovalMatrixForProcess(approvalProcessName);
+        const approvalMatrixObj = findApprovalMatrixById(approvalProcess?.matrixId || approvalMatrix.id);
+        const actionOwner = actionOwnerSelect?.value || "";
+        const invoiceValue = parseAmount(invoice?.invoiceAmount ?? invoice?.amountForMonth ?? 0);
+        const invoiceDueAmount = parseAmount(invoice?.netDueAmount ?? invoiceValue ?? 0);
+        const issue = {
+          id: `ISS_MAN_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+          title: "Delivery Challan Required",
+          status: "Open",
+          created: now.toISOString().slice(0, 10),
+          createdAt: now.toISOString(),
+          description: remarkText || "Delivery challan required.",
+          activityType: data.activityType || "-",
+          primaryStatus: data.primaryStatus || "-",
+          broadStatus: data.broadStatus || "-",
+          subStatus: "Delivery Challan Required",
+          stage: 1,
+          agent: customer?.agentName || "Agent",
+          manager: customer?.managerName || "",
+          actionOwner,
+          approvalProcessId,
+          approvalProcessName,
+          approvalMatrixId: approvalMatrix.id,
+          approvalMatrixName: approvalMatrix.name,
+          invoiceDueAmount,
+          invoiceDueDate: invoice?.dueDate || "",
+          region: customer?.region || "",
+          invoiceNo: invNo || "",
+          invoiceDate: invoice?.invoiceDate || "",
+          invoiceTotal: invoiceValue,
+          customerName: customer?.name || "",
+          customerCode: customer?.code || "",
+          isCustom: true,
+          actionTrail: [{
+            who: "You",
+            what: "created issue from activity",
+            type: "remark",
+            when: now.toISOString(),
+            sequence: 1,
+            remark: remarkText || ""
+          }]
+        };
+
+        const customIssues = readStoredArray(issueTrackerCustomKey);
+        customIssues.push(issue);
+        try { localStorage.setItem(issueTrackerCustomKey, JSON.stringify(customIssues)); } catch (_) {}
+        try { localStorage.removeItem(issueTrackerClearedKey); } catch (_) {}
+        const total = syncIssueTrackerTotal();
+        const issueEl = document.getElementById("centerIssueCount");
+        if (issueEl) issueEl.textContent = String(total);
+
+        const issueTrailEvent = {
+          title: "Issue tracker update",
+          meta: `${issue.id} - created issue from activity`,
+          badge: "Issue",
+          lines: [
+            { label: "Invoice", value: invNo || "-" },
+            { label: "Action Owner", value: actionOwner || "-" },
+            { label: "Sub Status", value: issue.subStatus || "-" },
+            { label: "Approval Process", value: approvalProcessName || "-" },
+            { label: "Approval Matrix", value: approvalMatrix.name || "-" }
+          ],
+          eventClass: "event-issue"
+        };
+        issueTrailEntry = buildIssueTrailEntry(issueTrailEvent);
+        const createdTrail = issue.actionTrail[0];
+        issueTrailPayload = {
+          id: `issue:${issue.id}:${createdTrail?.when || activityTimestamp}:${createdTrail?.what || "created"}`,
+          type: "issue",
+          at: activityTimestamp,
+          sequence: 1,
+          event: issueTrailEvent
+        };
+
+        if (approvalProcessName) {
+          const reqKey = "approval_requests";
+          const existingReqs = readStoredArray(reqKey);
+          const processId = approvalProcess?.id || approvalProcessId || approvalProcessName;
+          const matrixId = approvalProcess?.matrixId || approvalMatrix.id || "";
+          const matrixName = approvalMatrixObj?.name || approvalMatrix.name || "";
+          const levels = Array.isArray(approvalMatrixObj?.levels)
+            ? approvalMatrixObj.levels.map((lvl, idx) => ({
+                level: idx + 1,
+                ownerName: lvl?.ownerName || "",
+                ownerEmail: lvl?.ownerEmail || ""
+              }))
+            : [];
+          const nowIso = activityTimestamp;
+          let req = existingReqs.find(r => r && r.issue && r.issue.id === issue.id && r.processId === processId && r.status === "pending");
+          if (!req) {
+            req = {
+              id: `REQ_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+              processId,
+              processName: approvalProcess?.process || approvalProcessName || processId,
+              matrixId,
+              matrixName,
+              levels,
+              currentLevel: 1,
+              status: "pending",
+              createdAt: nowIso,
+              updatedAt: nowIso,
+              issue: {
+                id: issue.id,
+                title: issue.title || "",
+                status: issue.status || "",
+                created: issue.created || "",
+                description: issue.description || "",
+                primaryStatus: issue.primaryStatus || "",
+                broadStatus: issue.broadStatus || "",
+                subStatus: issue.subStatus || "",
+                actionOwner: issue.actionOwner || ""
+              },
+              invoice: {
+                id: invNo || "",
+                customer: customer?.name || "",
+                date: invoice?.invoiceDate || "",
+                total: invoiceValue,
+                dueDate: invoice?.dueDate || "",
+                dueAmount: invoiceDueAmount
+              },
+              trail: []
+            };
+            existingReqs.push(req);
+          } else {
+            req.processName = approvalProcess?.process || req.processName || processId;
+            req.matrixId = matrixId || req.matrixId || "";
+            req.matrixName = matrixName || req.matrixName || "";
+            if (levels.length) req.levels = levels;
+            req.issue = req.issue || {};
+            req.issue.actionOwner = issue.actionOwner || req.issue.actionOwner || "";
+            req.updatedAt = nowIso;
+          }
+          req.trail = Array.isArray(req.trail) ? req.trail : [];
+          req.trail.push({
+            action: "submitted",
+            by: "You",
+            level: req.currentLevel || 1,
+            at: nowIso,
+            remark: remarkText || "Submitted from activity",
+            files: []
+          });
+          try { localStorage.setItem(reqKey, JSON.stringify(existingReqs)); } catch (_) {}
+
+          const approvalEntry = {
+            who: "You",
+            what: `submitted for approval (${req.processName || processId})`,
+            type: "approval",
+            when: nowIso,
+            sequence: 2,
+            remark: remarkText || "",
+            approvalKey: `approval:${req.id}:${nowIso}:submitted`
+          };
+          issue.actionTrail.push(approvalEntry);
+          try { localStorage.setItem(issueTrackerCustomKey, JSON.stringify(customIssues)); } catch (_) {}
+
+          const approvalTrailEvent = {
+            title: "Issue tracker update",
+            meta: `${issue.id} - submitted for approval (${req.processName || processId})`,
+            badge: "Issue",
+            lines: [
+              { label: "Process", value: req.processName || processId },
+              { label: "Matrix", value: matrixName || "-" },
+              { label: "Level", value: "1" }
+            ],
+            eventClass: "event-issue"
+          };
+          approvalTrailEntry = buildIssueTrailEntry(approvalTrailEvent);
+          approvalTrailPayload = {
+            id: approvalEntry.approvalKey || `issue:${issue.id}:${approvalEntry.when}:${approvalEntry.what}`,
+            type: "issue",
+            at: nowIso,
+            sequence: 2,
+            event: approvalTrailEvent
+          };
+        }
+      }
+
       if (isPdcGiven) {
         const customer = customersData.find(c => c.id === selectedCustomerId);
         const createdBy = localStorage.getItem("activeUserName") || customer?.agentName || "Agent";
@@ -4399,11 +5011,27 @@ function wireDispositionActivityEvents() {
           };
         });
         addPdcRecords(pdcRecords);
-        updateInvoiceStatuses(invoices, "PDC given");
       }
 
-      const entry = buildStatusUpdateEntry(data);
+      if (subStatus && invoices.length > 0) {
+        updateInvoiceStatuses(invoices, subStatus);
+      }
+
+      const statusPayload = buildStatusTrailPayload(data, activityTimestamp);
+      const entry = buildStatusUpdateEntry(statusPayload.data);
       trail.prepend(entry);
+      if (approvalTrailEntry) trail.prepend(approvalTrailEntry);
+      if (issueTrailEntry) trail.prepend(issueTrailEntry);
+
+      const invoiceTargets = Array.isArray(data.invoices) && data.invoices.length
+        ? data.invoices
+        : (currentInvoiceNoForDocs ? [currentInvoiceNoForDocs] : []);
+      if (invoiceTargets.length) {
+        const payloadsToStore = [issueTrailPayload, approvalTrailPayload, statusPayload].filter(Boolean);
+        invoiceTargets.forEach((invoiceNo) => {
+          payloadsToStore.forEach((payload) => addActivityTrailEntry(invoiceNo, payload));
+        });
+      }
 
       if (activityCollapse && window.bootstrap && window.bootstrap.Collapse) {
         const collapse = window.bootstrap.Collapse.getOrCreateInstance(activityCollapse, { toggle: false });
@@ -4425,12 +5053,16 @@ function wireDispositionActivityEvents() {
       resetSelect("broadStatusSelect");
       resetSelect("primaryStatusSelect");
       resetSelect("subStatusSelect", defaultSubStatus);
+      resetSelect("actionOwnerSelect");
+      resetSelect("approvalProcessSelect");
 
       ["activityRemarks", "collectionInstrumentRef", "collectionBank", "collectionTransferDate", "collectionAmount", "collectionTds", "collectionLd", "pdcOpsUser", "pdcCourierName", "pdcDispatchDate", "pdcTrackingNo", "pdcDispatchMode"]
         .forEach((id) => {
           const el = document.getElementById(id);
           if (el) el.value = "";
         });
+
+      if (issueTrackerCheck) issueTrackerCheck.checked = true;
 
       if (instrumentModeSelect) {
         instrumentModeSelect.value = "NEFT";
@@ -5745,6 +6377,32 @@ document.addEventListener("DOMContentLoaded", () => {
     if (event.key === remarksStorageKey) {
       renderStoredRemarks(currentInvoiceNoForDocs);
     }
+    if (event.key === activityTrailStorageKey) {
+      renderStoredActivityTrail(currentInvoiceNoForDocs);
+    }
+    if (event.key === issueTrackerCustomKey) {
+      renderStoredActivityTrail(currentInvoiceNoForDocs);
+    }
+    if (event.key === issueTrackerTotalKey || event.key === issueTrackerCustomKey || event.key === issueTrackerBaseKey) {
+      updateCenterIssueCountDisplay();
+    }
+  });
+
+  const refreshIssueCount = () => {
+    const customer = customersData.find(c => c.id === selectedCustomerId);
+    const fallback = customer
+      ? (customer.invoices || []).filter(inv => {
+          const status = String(inv.status || "").toLowerCase();
+          const primary = String(inv.primaryStatus || "").toLowerCase();
+          return status === "dispute" || primary === "dispute";
+        }).length
+      : 0;
+    updateCenterIssueCountDisplay(fallback);
+  };
+
+  window.addEventListener("focus", refreshIssueCount);
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) refreshIssueCount();
   });
 
   const bulkNew = document.getElementById("bulkNewActivity");

@@ -203,25 +203,21 @@
       tr.innerHTML = `
         <td>
           <div>${issue.id || '-'}</div>
-          <div class="meta">${issue.title || issue.subStatus || '-'}</div>
         </td>
         <td>
           <div>${invoice.id || '-'}</div>
-          <div class="meta">${invoice.customer || '-'}</div>
         </td>
         <td>
           <div>${r.processName || r.processId || '-'}</div>
-          <div class="meta">Matrix: ${r.matrixName || '-'}</div>
         </td>
         <td>
           <div>Level ${currentLevel}</div>
-          <div class="meta">${currentOwner ? currentOwner.ownerName : 'Unassigned'}</div>
-          ${myTurn ? '<div class="meta">My turn</div>' : ''}
+          ${myTurn ? '<div>My turn</div>' : ''}
         </td>
         <td><span class="${statusInfo.cls}">${statusInfo.label}</span></td>
         <td class="open-days-cell">${openDays}</td>
-        <td>
-          <a class="btn btn--ghost" href="approval-request.html?id=${encodeURIComponent(r.id || '')}&user=${encodeURIComponent(selected || '')}">Review</a>
+      <td>
+          <a class="btn btn--ghost" href="approval-request.html?id=${encodeURIComponent(r.id || '')}&user=${encodeURIComponent((currentOwner && (currentOwner.ownerEmail || currentOwner.ownerName)) ? (currentOwner.ownerEmail || currentOwner.ownerName) : (selected || ''))}">Review</a>
         </td>
       `;
       if (tooltip) {

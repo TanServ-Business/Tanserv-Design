@@ -19,9 +19,19 @@
         <h1>Issue Tracker</h1>
         <p>Invoice issue detail and action workflow.</p>
       </div>
-      <div class="managerClock">
-        <span>Updated</span>
-        <strong id="issueTrackerClock">--:--</strong>
+      <div class="managerHeaderControls">
+        <div class="role-select">
+          <label class="meta" for="role-select">Role</label>
+          <select id="role-select" aria-label="Select role">
+            <option value="agent">Agent</option>
+            <option value="manager">Manager</option>
+            <option value="action-owner">Action Owner</option>
+          </select>
+        </div>
+        <div class="managerClock">
+          <span>Updated</span>
+          <strong id="issueTrackerClock">--:--</strong>
+        </div>
       </div>
     </div>
 
@@ -37,7 +47,14 @@
       <div class="issueWorkspaceGrid">
         <aside class="issueListPanel" aria-labelledby="issue-list-title">
           <h3 id="issue-list-title">Issue cards</h3>
+          <div class="issueListActions">
+            <button id="toggle-archived-issues" class="issueListToggle" type="button">Show closed issues</button>
+          </div>
           <ul id="issue-list" class="issueList" role="listbox" aria-label="Issues"></ul>
+          <div id="archived-issues-wrap" class="archivedIssues hidden" aria-hidden="true">
+            <div class="archivedTitle">Closed issues</div>
+            <ul id="archived-issue-list" class="issueList issueList--archived" role="listbox" aria-label="Closed issues"></ul>
+          </div>
         </aside>
 
         <div class="issueDetailPanel">

@@ -1113,7 +1113,43 @@
             <option>PTP Set</option>
             <option>Dispute Raised</option>
             <option>PDC given</option>
+            <option>Delivery Challan Required</option>
           </select>
+        </div>
+      </div>
+
+      <div id="deliveryChallanFields" class="deliveryChallanFields hidden">
+        <div class="form-check deliveryChallanCheck">
+          <input class="form-check-input" type="checkbox" id="issueTrackerCheck" checked />
+          <label class="form-check-label" for="issueTrackerCheck">Add to issue tracker</label>
+        </div>
+
+        <div class="grid2">
+          <div>
+            <label>Select Action Owner</label>
+            <select id="actionOwnerSelect">
+              <option value="" selected disabled>Select action owner</option>
+              <option>Anoop Sharma</option>
+              <option>Priya Verma</option>
+              <option>Rohit Malhotra</option>
+              <option>Rahul Jain</option>
+              <option>Neha Gupta</option>
+              <option>Sanjay Rao</option>
+              <option>Arjun Patel</option>
+              <option>Meera Iyer</option>
+              <option>Compliance Team</option>
+            </select>
+          </div>
+
+          <div>
+            <label>Select Approval Process</label>
+            <select id="approvalProcessSelect">
+              <option value="" selected disabled>Select approval process</option>
+              <option>Invoice Delay Resolution</option>
+              <option>PO Approval Follow-up</option>
+              <option>Delivery Challan Collection</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -1387,7 +1423,7 @@
                           <div class="eventTitle">Invoice update</div>
                           <div class="eventMeta">Status change - Primary: Follow-up - Updated by Ops</div>
                         </div>
-                        <span class="eventBadge">Status updated</span>
+                        <span class="eventBadge">Status</span>
                       </summary>
                       <div class="eventBody">
                         Invoice marked as Submitted and tracking. Notes updated with next follow-up date.
@@ -1409,7 +1445,7 @@
                     <details class="activityEvent event-issue">
                       <summary>
                         <div>
-                          <div class="eventTitle">Issue tracker update</div>
+                          <div class="eventTitle">Issue tracker</div>
                           <div class="eventMeta">Dispute logged - Ticket updated</div>
                         </div>
                         <span class="eventBadge">Ticket updated</span>

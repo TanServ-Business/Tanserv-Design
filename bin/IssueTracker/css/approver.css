@@ -369,6 +369,14 @@ body {
   gap: 0.35rem;
 }
 
+.heroRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
 .hero h2 {
   margin: 0;
   font-size: 1.6rem;
