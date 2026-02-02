@@ -108,9 +108,9 @@ button.notifyBadge {
   min-width: 24px;
   text-align: center;
   border-radius: 999px;
-  background: #fee2e2;
-  color: #991b1b;
-  border: 1px solid #fecaca;
+  background: #f6effb;
+  color: #4b1f84;
+  border: 1px solid #decdee;
   padding: 2px 8px;
   font-size: 11px;
   font-weight: 700;
@@ -1735,9 +1735,10 @@ button.notifyBadge {
   font-size: 12px;
   padding: 4px 8px;
   border-radius: 10px;
-  background: var(--brand);
-  color: white;
+  background: #f6effb;
+  color: #5c258d;
   white-space: nowrap;
+  border: 1px solid #d7c3ea;
 }
 
 .custMetricsRow {
@@ -2423,9 +2424,9 @@ button.notifyBadge {
 }
 
 .notifyToggle[aria-pressed="false"] .notifyCount {
-  background: #e2e8f0;
-  color: #475569;
-  border-color: #d8e0eb;
+  background: #f6effb;
+  color: #4b1f73;
+  border-color: #d7c3ea;
 }
 
 .bulkBar {
@@ -2551,27 +2552,35 @@ button.notifyBadge {
 .invoiceTable td {
   padding: 8px 8px;
   border-bottom: 1px solid #eef1f7;
-  text-align: left;
+  text-align: center;
   font-size: 12.5px;
   vertical-align: middle;
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .invoiceTable tbody tr:hover { background: var(--brand-lighter); }
 .rowActive { background: var(--brand-light); }
 
 .cellCenter { text-align: center; }
-.colAmtRight { text-align: right; }
+.colAmtRight {text-align: right;width: 90px;}
 
 .colChk { width: 34px; }
 .colIcon { width: 44px; }
-.colInv { width: 110px; }
-.colDate { width: 96px; }
-.colShort { width: 88px; }
-.colStatus { width: 90px; }
-.colActions { width: 170px; }
+.colInv {width: 80px;}
+.colDate {width: 90px;}
+.colShort {width: 100px;}
+.colStatus {width: 150px;}
+.colActions {width: 125px;}
+
+.invoiceTable td.colStatus,
+.invoiceTable th.colStatus {
+  white-space: normal;
+}
+
+.invoiceTable td.colStatus {
+  overflow: visible;
+}
 
 .iconFlat {
   display: inline-flex;
@@ -2601,23 +2610,26 @@ button.notifyBadge {
   position: absolute;
   top: -5px;
   right: -7px;
-  background: #a00000;
-  color: white;
+  background: #f6effb;
+  color: #4b1f73;
   font-size: 10px;
   font-weight: 600;
   border-radius: 999px;
   padding: 1px 4px;
   min-width: 16px;
   text-align: center;
-  border: 1px solid white;
+  border: 1px solid #d7c3ea;
 }
 
 .pill {
   padding: 3px 8px;
-  border-radius: 999px;
+  border-radius: 6px;
   font-size: 11.5px;
   font-weight: 900;
   display: inline-block;
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .pill.overdue { background: #ffd0d0; color: #a00000; }
@@ -2626,6 +2638,10 @@ button.notifyBadge {
 .pill.ptp { background: #fff1c2; color: #8a6a00; }
 .pill.pdc { background: #e0f2fe; color: #075985; }
 .pill.collected { background: #d9f7e8; color: #1a7f4b; }
+.pill.guidance { background: #ffd0d0; color: #a00000; }
+.pill.ptp-primary { background: #dbeafe; color: #1d4ed8; }
+.pill.external-dependency { background: #fff1c2; color: #8a6a00; }
+.pill.work-in-progress { background: #d9f7e8; color: #1a7f4b; }
 
 .actionCell {
   display: inline-flex;

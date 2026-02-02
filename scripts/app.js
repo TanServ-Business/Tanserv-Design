@@ -174,8 +174,8 @@ const customersData = [
         amountForMonth: 124000,
         netDueAmount: 98000,
         dueDate: "05 Nov 2025",
-        primaryStatus: "Follow-up",
-        status: "Overdue",
+        primaryStatus: "No Due",
+        status: "Within Credit Period/Days",
         targetForMonth: 85000,
         unreadEmailCount: 3
       },
@@ -187,8 +187,8 @@ const customersData = [
         amountForMonth: 50000,
         netDueAmount: 86400,
         dueDate: "16 Nov 2025",
-        primaryStatus: "Reminder",
-        status: "Pre-Due",
+        primaryStatus: "Part Collected",
+        status: "Part Payment Made",
         targetForMonth: 50000,
         unreadEmailCount: 0
       },
@@ -200,8 +200,8 @@ const customersData = [
         amountForMonth: 0,
         netDueAmount: 210000,
         dueDate: "06 Oct 2025",
-        primaryStatus: "Dispute",
-        status: "Dispute",
+        primaryStatus: "Further Docs Required",
+        status: "Invoice Copy Required",
         targetForMonth: 0,
         unreadEmailCount: 2
       },
@@ -226,8 +226,8 @@ const customersData = [
         amountForMonth: 30000,
         netDueAmount: 76000,
         dueDate: "18 Nov 2025",
-        primaryStatus: "Reminder",
-        status: "Pre-Due",
+        primaryStatus: "Collection In Progress",
+        status: "Call Back",
         targetForMonth: 30000,
         unreadEmailCount: 0
       },
@@ -239,8 +239,8 @@ const customersData = [
         amountForMonth: 152000,
         netDueAmount: 152000,
         dueDate: "02 Dec 2025",
-        primaryStatus: "Reminder",
-        status: "Pre-Due",
+        primaryStatus: "Collection In Progress",
+        status: "PDC Given",
         targetForMonth: 70000,
         unreadEmailCount: 0
       },
@@ -252,8 +252,8 @@ const customersData = [
         amountForMonth: 0,
         netDueAmount: 56000,
         dueDate: "22 Oct 2025",
-        primaryStatus: "Dispute",
-        status: "Dispute",
+        primaryStatus: "Invoice Assignment",
+        status: "Assign the Invoice to Others",
         targetForMonth: 0,
         unreadEmailCount: 1
       },
@@ -265,8 +265,8 @@ const customersData = [
         amountForMonth: 98000,
         netDueAmount: 45000,
         dueDate: "08 Nov 2025",
-        primaryStatus: "Follow-up",
-        status: "Overdue",
+        primaryStatus: "Guidance",
+        status: "Recommended For Legal",
         targetForMonth: 45000,
         unreadEmailCount: 2
       },
@@ -278,8 +278,8 @@ const customersData = [
         amountForMonth: 34000,
         netDueAmount: 34000,
         dueDate: "12 Dec 2025",
-        primaryStatus: "PTP",
-        status: "PTP",
+        primaryStatus: "Further Action Required",
+        status: "Credit Note To Be Issued",
         targetForMonth: 34000,
         unreadEmailCount: 0
       },
@@ -291,8 +291,8 @@ const customersData = [
         amountForMonth: 215000,
         netDueAmount: 215000,
         dueDate: "17 Nov 2025",
-        primaryStatus: "Escalation",
-        status: "Overdue",
+        primaryStatus: "Material Delivery Issues",
+        status: "Material Not Received",
         targetForMonth: 120000,
         unreadEmailCount: 4
       },
@@ -304,8 +304,8 @@ const customersData = [
         amountForMonth: 76000,
         netDueAmount: 20000,
         dueDate: "28 Oct 2025",
-        primaryStatus: "Reminder",
-        status: "Pre-Due",
+        primaryStatus: "Collected",
+        status: "Collected",
         targetForMonth: 20000,
         unreadEmailCount: 0
       }
@@ -374,8 +374,8 @@ const customersData = [
         amountForMonth: 54000,
         netDueAmount: 54000,
         dueDate: "08 Nov 2025",
-        primaryStatus: "Follow-up",
-        status: "Overdue",
+        primaryStatus: "No Due",
+        status: "As Per Payment Terms",
         targetForMonth: 30000,
         unreadEmailCount: 0
       },
@@ -387,8 +387,8 @@ const customersData = [
         amountForMonth: 50000,
         netDueAmount: 66000,
         dueDate: "14 Nov 2025",
-        primaryStatus: "PTP",
-        status: "PTP",
+        primaryStatus: "Part Collected",
+        status: "Part Payment through LC done",
         targetForMonth: 66000,
         unreadEmailCount: 5
       },
@@ -400,8 +400,8 @@ const customersData = [
         amountForMonth: 123000,
         netDueAmount: 123000,
         dueDate: "19 Nov 2025",
-        primaryStatus: "Reminder",
-        status: "Pre-Due",
+        primaryStatus: "Collection In Progress",
+        status: "Funds Issue",
         targetForMonth: 90000,
         unreadEmailCount: 0
       },
@@ -413,8 +413,8 @@ const customersData = [
         amountForMonth: 67000,
         netDueAmount: 67000,
         dueDate: "27 Nov 2025",
-        primaryStatus: "Follow-up",
-        status: "Pre-Due",
+        primaryStatus: "Collection In Progress",
+        status: "Call Back/Email Follow up",
         targetForMonth: 40000,
         unreadEmailCount: 1
       },
@@ -426,8 +426,8 @@ const customersData = [
         amountForMonth: 0,
         netDueAmount: 94000,
         dueDate: "03 Oct 2025",
-        primaryStatus: "Dispute",
-        status: "Dispute",
+        primaryStatus: "Further Docs Required",
+        status: "PO (Purchase Order) Copy Required",
         targetForMonth: 0,
         unreadEmailCount: 0
       },
@@ -439,8 +439,8 @@ const customersData = [
         amountForMonth: 120000,
         netDueAmount: 120000,
         dueDate: "06 Nov 2025",
-        primaryStatus: "Reminder",
-        status: "Overdue",
+        primaryStatus: "Further Action Required",
+        status: "Wrong/Incorrect Billing",
         targetForMonth: 60000,
         unreadEmailCount: 3
       },
@@ -452,8 +452,8 @@ const customersData = [
         amountForMonth: 51000,
         netDueAmount: 31000,
         dueDate: "17 Nov 2025",
-        primaryStatus: "PTP",
-        status: "PTP",
+        primaryStatus: "Service Related Issues",
+        status: "Equipment Not Working",
         targetForMonth: 31000,
         unreadEmailCount: 0
       },
@@ -465,8 +465,8 @@ const customersData = [
         amountForMonth: 86000,
         netDueAmount: 86000,
         dueDate: "21 Oct 2025",
-        primaryStatus: "Follow-up",
-        status: "Overdue",
+        primaryStatus: "Guidance",
+        status: "Shifted - Address Not Found",
         targetForMonth: 50000,
         unreadEmailCount: 2
       }
@@ -535,8 +535,8 @@ const customersData = [
         amountForMonth: 0,
         netDueAmount: 310000,
         dueDate: "19 Sep 2025",
-        primaryStatus: "Escalation",
-        status: "Overdue",
+        primaryStatus: "No Due",
+        status: "Retention Amount",
         targetForMonth: 120000,
         unreadEmailCount: 1
       },
@@ -548,8 +548,8 @@ const customersData = [
         amountForMonth: 0,
         netDueAmount: 205000,
         dueDate: "11 Oct 2025",
-        primaryStatus: "Dispute",
-        status: "Dispute",
+        primaryStatus: "Further Docs Required",
+        status: "Delivery Challan Required",
         targetForMonth: 0,
         unreadEmailCount: 0
       },
@@ -561,8 +561,8 @@ const customersData = [
         amountForMonth: 98000,
         netDueAmount: 98000,
         dueDate: "02 Nov 2025",
-        primaryStatus: "Follow-up",
-        status: "Overdue",
+        primaryStatus: "Further Action Required",
+        status: "Tax Issue On The Invoice",
         targetForMonth: 50000,
         unreadEmailCount: 0
       },
@@ -574,8 +574,8 @@ const customersData = [
         amountForMonth: 144000,
         netDueAmount: 144000,
         dueDate: "04 Nov 2025",
-        primaryStatus: "Reminder",
-        status: "Pre-Due",
+        primaryStatus: "Material Delivery Issues",
+        status: "Late Shipment",
         targetForMonth: 70000,
         unreadEmailCount: 0
       },
@@ -587,8 +587,8 @@ const customersData = [
         amountForMonth: 67000,
         netDueAmount: 67000,
         dueDate: "12 Dec 2025",
-        primaryStatus: "PTP",
-        status: "PTP",
+        primaryStatus: "Service Related Issues",
+        status: "Installation Pending",
         targetForMonth: 67000,
         unreadEmailCount: 0
       },
@@ -600,8 +600,8 @@ const customersData = [
         amountForMonth: 0,
         netDueAmount: 198000,
         dueDate: "26 Sep 2025",
-        primaryStatus: "Escalation",
-        status: "Overdue",
+        primaryStatus: "Guidance",
+        status: "Send Pre-Legal Letter",
         targetForMonth: 90000,
         unreadEmailCount: 2
       },
@@ -613,8 +613,8 @@ const customersData = [
         amountForMonth: 0,
         netDueAmount: 52000,
         dueDate: "20 Oct 2025",
-        primaryStatus: "Dispute",
-        status: "Dispute",
+        primaryStatus: "Collection In Progress",
+        status: "Recon Required",
         targetForMonth: 0,
         unreadEmailCount: 0
       },
@@ -626,8 +626,8 @@ const customersData = [
         amountForMonth: 87000,
         netDueAmount: 87000,
         dueDate: "29 Nov 2025",
-        primaryStatus: "Follow-up",
-        status: "Pre-Due",
+        primaryStatus: "Part Collected",
+        status: "Part Payment Made",
         targetForMonth: 50000,
         unreadEmailCount: 1
       }
@@ -727,7 +727,21 @@ function formatINR(num) {
   }
 }
 
-function statusPillClass(status) {
+const workInProgressPrimaries = new Set([
+  "no due",
+  "part collected",
+  "collection in progress",
+  "invoice assignment"
+]);
+
+const externalDependencyPrimaries = new Set([
+  "further docs required",
+  "further action required",
+  "material delivery issues",
+  "service related issues"
+]);
+
+function statusPillClassByLabel(status) {
   const s = String(status || "").toLowerCase();
   if (s.includes("overdue") || s.includes("post")) return "overdue";
   if (s.includes("pre")) return "predue";
@@ -736,6 +750,15 @@ function statusPillClass(status) {
   if (s.includes("pdc")) return "pdc";
   if (s.includes("collect")) return "collected";
   return "predue";
+}
+
+function statusPillClass(status, primaryStatus) {
+  const primary = String(primaryStatus || "").toLowerCase();
+  if (primary === "guidance") return "guidance";
+  if (primary === "ptp") return "ptp-primary";
+  if (externalDependencyPrimaries.has(primary)) return "external-dependency";
+  if (workInProgressPrimaries.has(primary)) return "work-in-progress";
+  return statusPillClassByLabel(status);
 }
 
 function sumInvoiceTargets(invoices) {
@@ -2074,7 +2097,8 @@ function getBaseFilteredInvoices() {
   return (currentInvoicesAll || []).filter(inv => {
     if (fInvStatus !== "__ALL__" && String(inv.invoiceStatus) !== fInvStatus) return false;
     if (fPrimary !== "__ALL__" && String(inv.primaryStatus) !== fPrimary) return false;
-    if (fStatus !== "__ALL__" && String(inv.status) !== fStatus) return false;
+    const subStatus = inv.subStatus ?? inv.status;
+    if (fStatus !== "__ALL__" && String(subStatus) !== fStatus) return false;
     if (fNetDue !== "__ALL__") {
       const dueDate = parseInvoiceDateValue(inv.dueDate);
       if (!dueDate) return false;
@@ -2538,7 +2562,7 @@ const filterConfig = {
     menuId: "filterPrimaryStatusMenu"
   },
   status: {
-    label: "Status",
+    label: "Sub Status",
     buttonId: "filterStatusBtn",
     menuId: "filterStatusMenu"
   },
@@ -2746,7 +2770,7 @@ function renderFilterMenu(key) {
 function populateFilters(invoices) {
   const invoiceStatuses = uniqSorted(invoices.map(i => i.invoiceStatus));
   const primaryStatuses = uniqSorted(invoices.map(i => i.primaryStatus));
-  const statuses = uniqSorted(invoices.map(i => i.status));
+  const statuses = uniqSorted(invoices.map(i => i.subStatus ?? i.status));
 
   filterOptions.invoiceStatus = invoiceStatuses;
   filterOptions.primaryStatus = primaryStatuses;
@@ -2897,6 +2921,7 @@ function renderInvoiceTable(invoices) {
   (invoices || []).forEach((inv) => {
     const isChecked = selectedInvoiceNos.has(inv.invoiceNo);
     const tr = document.createElement("tr");
+    const subStatus = inv.subStatus ?? inv.status ?? "-";
 
     const targetTitle = `Target: Rs.${formatINR(inv.targetForMonth)} (≤ Invoice)`;
 
@@ -2927,21 +2952,18 @@ function renderInvoiceTable(invoices) {
 
       <td class="colInv" title="${inv.invoiceNo}">${inv.invoiceNo}</td>
       <td class="colAmtRight" title="Rs.${formatINR(inv.invoiceAmount)}">Rs.${formatINR(inv.invoiceAmount)}</td>
-      <td class="colDate" title="${inv.invoiceDate}">${inv.invoiceDate}</td>
       <td class="colAmtRight" title="Rs.${formatINR(inv.amountForMonth)}">Rs.${formatINR(inv.amountForMonth)}</td>
       <td class="colAmtRight" title="Rs.${formatINR(inv.netDueAmount)}">Rs.${formatINR(inv.netDueAmount)}</td>
+      <td class="colDate" title="${inv.invoiceDate}">${inv.invoiceDate}</td>
       <td class="colDate" title="${inv.dueDate}">${inv.dueDate}</td>
       <td class="colShort" title="${inv.primaryStatus}">${inv.primaryStatus}</td>
-      <td class="colStatus" title="${inv.status}">
-        <span class="pill ${statusPillClass(inv.status)}">${inv.status}</span>
+      <td class="colStatus" title="${subStatus}">
+        <span class="pill ${statusPillClass(subStatus, inv.primaryStatus)}" title="${subStatus}">${subStatus}</span>
       </td>
 
       <td class="colActions cellCenter">
         <div class="actionCell">
           <button class="btnNewActivity" type="button" data-action="new-activity" data-inv="${inv.invoiceNo}">${actionLabel}</button>
-          <button class="kebab" type="button" aria-label="More actions" data-action="open-menu" data-inv="${inv.invoiceNo}">
-            <i class="bi bi-three-dots-vertical" aria-hidden="true"></i>
-          </button>
         </div>
       </td>
     `;
@@ -4073,7 +4095,10 @@ function wireDispositionActivityEvents() {
     if (!Array.isArray(invoiceNos) || invoiceNos.length === 0) return;
     invoiceNos.forEach((invNo) => {
       const invoice = currentInvoicesAll.find(inv => inv.invoiceNo === invNo);
-      if (invoice) invoice.status = status;
+      if (invoice) {
+        invoice.status = status;
+        invoice.subStatus = status;
+      }
     });
     populateFilters(currentInvoicesAll);
     applyFiltersAndRender();
