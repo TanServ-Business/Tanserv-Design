@@ -3338,7 +3338,7 @@ textarea { min-height: 70px; resize: vertical; }
 
 .emailComposeRow input,
 .emailComposeRow textarea {
-  width: 100%;
+  /* width: 100%; */
   border: 1px solid #e6e9ef;
   border-radius: 8px;
   padding: 6px 8px;
@@ -3931,4 +3931,146 @@ table thead th {
   font-weight: 700 !important;
   text-transform: uppercase !important;
   letter-spacing: 0.04em !important;
+}
+.animateUp {
+  animation: slideUp 0.35s ease;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(12px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.notifyDock {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 500;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: min(320px, 92vw);
+  pointer-events: none;
+}
+
+.notifyPopup {
+  pointer-events: auto;
+  background: #ffffff;
+  border: 1px solid #fecaca;
+  border-radius: 14px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  box-shadow: 0 20px 34px rgba(15, 23, 42, 0.18);
+}
+
+.notifyPopup.success {
+  border-color: #bbf7d0;
+  background: #f0fdf4;
+  color: #166534;
+}
+
+.notifyPopup strong {
+  display: block;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.notifyPopup span {
+  font-size: 12px;
+  color: inherit;
+}
+
+.notifyClose {
+  margin-left: auto;
+  border: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.emailAttachmentField {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+}
+
+.emailAttachmentField input[type="text"] {
+  flex: 1;
+}
+
+.ghostBtn {
+  border: 1px dashed #cbd5f5;
+  background: #f8fafc;
+  color: #475569;
+  border-radius: 10px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ghostBtn:hover {
+  border-color: #94a3b8;
+  color: #1f2937;
+}
+
+.emailAttachmentPicker {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 0;
+  right: auto;
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #e2e8f4;
+  border-radius: 12px;
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+  padding: 8px;
+  display: grid;
+  gap: 6px;
+  z-index: 5;
+}
+
+.emailAttachmentPicker.hidden {
+  display: none;
+}
+
+.emailAttachmentItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 12px;
+  color: #1f2937;
+}
+
+.emailAttachmentLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  flex: 1;
+}
+
+.emailAttachmentChk {
+  accent-color: var(--brand);
+  margin: 0;
+  width: 14px;
+  height: 14px;
+}
+
+.emailAttachmentItem:hover {
+  background: #f1f5f9;
+}
+
+.emailAttachmentMeta {
+  color: #64748b;
+  font-size: 11px;
+  white-space: nowrap;
 }

@@ -1033,7 +1033,7 @@ function buildActivityTrailNode(payload) {
     return buildIssueTrailEntry({
       ...event,
       title: "Issue tracker update",
-      badge: "Issue",
+      badge: "Issue tracker update",
       eventClass: "event-issue"
     });
   }
@@ -1073,6 +1073,43 @@ function renderStoredActivityTrail(invoiceNo) {
     const node = buildActivityTrailNode(payload);
     if (node) list.appendChild(node);
   });
+
+  if (!list.dataset.emailTrailBound) {
+    list.dataset.emailTrailBound = "true";
+    list.addEventListener("click", (event) => {
+      const btn = event.target.closest(".emailTrailReadMore");
+      if (!btn) return;
+      const raw = btn.getAttribute("data-email") || "";
+      let payload;
+      try {
+        payload = JSON.parse(decodeURIComponent(raw));
+      } catch (_) {
+        return;
+      }
+      const invoices = Array.isArray(payload.invoices) ? payload.invoices : [];
+      const invNo = invoices[0] || currentInvoiceNoForDocs || "";
+      openEmailPanel(invNo);
+      setActiveTab("invoice");
+
+      const detailEmpty = document.getElementById("emailDetailEmpty");
+      const detailContent = document.getElementById("emailDetailContent");
+      if (detailEmpty) detailEmpty.classList.add("hidden");
+      if (detailContent) detailContent.classList.remove("hidden");
+      setDetailValue("emailDetailFrom", payload.from || "-");
+      setDetailValue("emailDetailTo", payload.to || "-");
+      setDetailValue("emailDetailCc", payload.cc || "-");
+      setDetailValue("emailDetailSubject", payload.subject || "-");
+      const bodyEl = document.getElementById("emailDetailBody");
+      if (bodyEl) bodyEl.textContent = payload.body || "-";
+      const attachmentsEl = document.getElementById("emailDetailAttachments");
+      if (attachmentsEl) {
+        const listText = Array.isArray(payload.attachments) && payload.attachments.length
+          ? payload.attachments.join(", ")
+          : "-";
+        attachmentsEl.textContent = listText;
+      }
+    });
+  }
 }
 
 function addStoredRemark(invoiceNo, remark) {
@@ -2166,10 +2203,56 @@ function buildIssueTrackerEvent(issue, entry, extra) {
   return {
     title: "Issue tracker update",
     meta,
-    badge: "Issue",
+    badge: "Issue tracker update",
     lines,
     eventClass: "event-issue"
   };
+}
+
+function buildEmailTrailEntry(data) {
+  const to = safeText(data.to);
+  const subject = safeText(data.subject);
+  const meta = subject !== "-" ? subject : (to !== "-" ? `To: ${to}` : "Email sent");
+  const payload = encodeURIComponent(JSON.stringify({
+    to: data.to || "",
+    cc: data.cc || "",
+    from: data.from || "",
+    subject: data.subject || "",
+    body: data.body || "",
+    attachments: Array.isArray(data.attachments) ? data.attachments : [],
+    invoices: Array.isArray(data.invoices) ? data.invoices : []
+  }));
+  const details = document.createElement("details");
+  details.className = "activityEvent event-push";
+  details.innerHTML = `
+    <summary>
+      <div>
+        <div class="eventTitle">Email sent</div>
+        <div class="eventMeta">${safeText(meta)}</div>
+      </div>
+      <span class="eventBadge">Email</span>
+    </summary>
+    <div class="eventBody">
+      <div class="activityDetailLine">
+        <span class="activityLabel">From</span>
+        <span class="activityValue">${safeText(data.from)}</span>
+      </div>
+      <div class="activityDetailLine">
+        <span class="activityLabel">To</span>
+        <span class="activityValue">${to}</span>
+      </div>
+      <div class="activityDetailLine">
+        <span class="activityLabel">CC</span>
+        <span class="activityValue">${safeText(data.cc)}</span>
+      </div>
+      <div class="activityDetailLine">
+        <span class="activityLabel">Subject</span>
+        <span class="activityValue">${subject}</span>
+      </div>
+      <button class="readMoreBtn emailTrailReadMore" type="button" data-email="${payload}">Read more</button>
+    </div>
+  `;
+  return details;
 }
 
 function buildStatusTrailPayload(data, timestamp) {
@@ -3694,12 +3777,104 @@ function wireEmailPanelEvents() {
   const composeSubject = document.getElementById("emailComposeSubject");
   const composeBody = document.getElementById("emailComposeBody");
   const composeAttachments = document.getElementById("emailComposeAttachments");
+  const attachmentPicker = document.getElementById("emailAttachmentPicker");
+  const attachmentUploadBtn = document.getElementById("emailAttachmentUploadBtn");
+  const attachmentUploadInput = document.getElementById("emailAttachmentUploadInput");
+  const notifyDock = document.getElementById("notifyDock");
   const newBtn = document.getElementById("emailNewBtn");
   const sendBtn = document.getElementById("emailSendBtn");
   const toSuggestions = document.getElementById("emailToSuggestions");
   const ccSuggestions = document.getElementById("emailCcSuggestions");
 
   const normalizeBody = (value) => String(value || "").replace(/\\\\n/g, "\n").replace(/\\n/g, "\n");
+
+  const showNotify = (title, message) => {
+    if (!notifyDock) return;
+    const popup = document.createElement("div");
+    popup.className = "notifyPopup success animateUp";
+    popup.innerHTML = `
+      <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+      <div>
+        <strong>${safeText(title)}</strong>
+        <span>${safeText(message)}</span>
+      </div>
+      <button class="notifyClose" type="button" aria-label="Dismiss">
+        <i class="bi bi-x-lg" aria-hidden="true"></i>
+      </button>
+    `;
+    const closeBtn = popup.querySelector(".notifyClose");
+    if (closeBtn) {
+      closeBtn.addEventListener("click", () => {
+        popup.remove();
+      });
+    }
+    notifyDock.prepend(popup);
+    setTimeout(() => {
+      if (!popup.isConnected) return;
+      popup.remove();
+    }, 4000);
+  };
+
+  const parseAttachmentList = (value) => (
+    String(value || "")
+      .split(/[,;]+/)
+      .map(item => item.trim())
+      .filter(Boolean)
+  );
+
+  const updateAttachmentValue = (names) => {
+    if (!composeAttachments) return;
+    const existing = parseAttachmentList(composeAttachments.value);
+    names.forEach(name => {
+      if (name && !existing.includes(name)) existing.push(name);
+    });
+    composeAttachments.value = existing.join(", ");
+  };
+
+  const getAttachmentDocs = () => {
+    const customer = customersData.find(c => c.id === selectedCustomerId);
+    const docs = Array.isArray(customer?.documents) ? customer.documents : [];
+    const scope = currentDocsScope || (currentInvoiceNoForDocs ? "invoice" : "customer");
+    if (scope === "invoice") return docs.filter(doc => doc.type === "invoice");
+    return docs.filter(doc => doc.type === "client");
+  };
+
+  const renderAttachmentPicker = () => {
+    if (!attachmentPicker) return;
+    const docs = getAttachmentDocs();
+    const selected = new Set(parseAttachmentList(composeAttachments?.value || ""));
+    if (!docs.length) {
+      attachmentPicker.innerHTML = `
+        <div class="emailAttachmentItem">
+          <span>No documents available</span>
+        </div>
+      `;
+      return;
+    }
+    attachmentPicker.innerHTML = docs.map(doc => {
+      const meta = doc.type === "invoice" ? "Invoice level document" : "Customer level document";
+      const checked = selected.has(doc.name);
+      return `
+        <div class="emailAttachmentItem" data-doc-name="${safeText(doc.name)}">
+          <label class="emailAttachmentLabel">
+            <input type="checkbox" class="emailAttachmentChk" data-doc-name="${safeText(doc.name)}" ${checked ? "checked" : ""} />
+            <span>${safeText(doc.name)}</span>
+          </label>
+          <span class="emailAttachmentMeta">${safeText(meta)}</span>
+        </div>
+      `;
+    }).join("");
+  };
+
+  const showAttachmentPicker = () => {
+    if (!attachmentPicker) return;
+    renderAttachmentPicker();
+    attachmentPicker.classList.remove("hidden");
+  };
+
+  const hideAttachmentPicker = () => {
+    if (attachmentPicker) attachmentPicker.classList.add("hidden");
+  };
 
   const resetDetail = () => {
     if (detailEmpty) detailEmpty.classList.remove("hidden");
@@ -3962,9 +4137,48 @@ function wireEmailPanelEvents() {
         const activeInv = invoiceTargets[0] || currentInvoiceNoForDocs;
         renderStoredActivityTrail(activeInv);
       }
+      showNotify("Email sent", "Your email was sent successfully.");
       resetCompose();
     });
   }
+
+  if (composeAttachments) {
+    composeAttachments.addEventListener("focus", showAttachmentPicker);
+    composeAttachments.addEventListener("click", showAttachmentPicker);
+  }
+
+  if (attachmentPicker) {
+    attachmentPicker.addEventListener("change", (event) => {
+      const checkbox = event.target.closest(".emailAttachmentChk");
+      if (!checkbox) return;
+      const docName = checkbox.getAttribute("data-doc-name") || "";
+      const current = parseAttachmentList(composeAttachments?.value || "");
+      const next = checkbox.checked
+        ? Array.from(new Set(current.concat(docName).filter(Boolean)))
+        : current.filter(name => name !== docName);
+      if (composeAttachments) composeAttachments.value = next.join(", ");
+    });
+  }
+
+  if (attachmentUploadBtn && attachmentUploadInput) {
+    attachmentUploadBtn.addEventListener("click", () => {
+      attachmentUploadInput.click();
+    });
+    attachmentUploadInput.addEventListener("change", () => {
+      const names = attachmentUploadInput.files
+        ? Array.from(attachmentUploadInput.files).map(file => file.name)
+        : [];
+      updateAttachmentValue(names);
+      attachmentUploadInput.value = "";
+    });
+  }
+
+  document.addEventListener("click", (event) => {
+    const field = event.target.closest(".emailAttachmentField");
+    if (!field && attachmentPicker) {
+      hideAttachmentPicker();
+    }
+  });
 
   wireSuggestionInput(composeTo, toSuggestions);
   wireSuggestionInput(composeCc, ccSuggestions);
