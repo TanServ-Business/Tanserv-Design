@@ -1766,7 +1766,13 @@ button.notifyBadge {
 
 .customerSummaryLeft { min-width: 0; }
 
-.customerSummary h2 { margin: 0; font-size: 20px; }
+.customerSummary h2 {
+  margin: 0;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
 .badge {
   font-size: 12px;
@@ -1775,6 +1781,10 @@ button.notifyBadge {
   color: white;
   border-radius: 8px;
   margin-left: 8px;
+}
+
+.customerSummary h2 .badge {
+  margin-left: 0;
 }
 
 .customerMetaRow {

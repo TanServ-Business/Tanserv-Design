@@ -151,6 +151,18 @@ body {
   white-space: nowrap;
 }
 
+.pdcTable tbody tr {
+  cursor: pointer;
+}
+
+.pdcTable tbody tr.is-selected td {
+  background: #eff6ff;
+}
+
+.pdcTable tbody tr.is-selected td:first-child {
+  border-left: 3px solid #2563eb;
+}
+
 .pdcTable th {
   font-size: 10.5px;
   text-transform: uppercase;

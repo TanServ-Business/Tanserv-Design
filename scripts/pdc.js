@@ -390,7 +390,10 @@
       const statusClass = statusClassMap[item.status] || "logged";
       const hasImage = Boolean(item.imageData);
       const canCollect = role !== "ops" && item.status === "PDC cleared";
+      const recordId = item.id || "";
       const tr = document.createElement("tr");
+      if (recordId) tr.dataset.pdcId = recordId;
+      if (recordId && recordId === selectedPdcId) tr.classList.add("is-selected");
       tr.innerHTML = `
         <td>${item.customerCode || "-"}</td>
         <td>${item.customerName || "-"}</td>
@@ -412,6 +415,13 @@
               : `<span class="text-muted">-</span>`)}
         </td>
       `;
+      tr.addEventListener("click", () => {
+        if (!recordId || recordId === selectedPdcId) return;
+        selectedPdcId = recordId;
+        tableBody.querySelectorAll("tr.is-selected").forEach((row) => row.classList.remove("is-selected"));
+        tr.classList.add("is-selected");
+        renderActivityTrail(records);
+      });
       tableBody.appendChild(tr);
     });
   };
@@ -431,9 +441,13 @@
   const renderActivityTrail = (records) => {
     const trailEl = document.getElementById("pdcActivityTrail");
     if (!trailEl) return;
-    const notifications = getVisibleNotifications(records);
+    if (!selectedPdcId) {
+      trailEl.innerHTML = `<div class="pdcEmptyState">Select a PDC to view activity.</div>`;
+      return;
+    }
+    const notifications = getVisibleNotifications(records).filter(note => note.pdcId === selectedPdcId);
     if (notifications.length === 0) {
-      trailEl.innerHTML = `<div class="pdcEmptyState">No activity yet.</div>`;
+      trailEl.innerHTML = `<div class="pdcEmptyState">No activity yet for this PDC.</div>`;
       return;
     }
 
@@ -478,6 +492,18 @@
   const notificationList = document.getElementById("notificationPopupList");
   const notificationCount = document.getElementById("notificationBellCount");
   let cachedRecords = [];
+  let selectedPdcId = null;
+
+  const ensureSelectedPdcId = (records) => {
+    if (!records || records.length === 0) {
+      selectedPdcId = null;
+      return null;
+    }
+    if (!selectedPdcId || !records.some(item => item.id === selectedPdcId)) {
+      selectedPdcId = records[0]?.id || null;
+    }
+    return selectedPdcId;
+  };
 
   const updateBellNotificationBadge = () => {
     if (!notificationCount) return;
@@ -652,6 +678,7 @@
   const renderAll = () => {
     const records = getVisibleRecords();
     cachedRecords = records;
+    ensureSelectedPdcId(records);
     renderCards(records);
     renderTable(records);
     renderActivityTrail(records);
