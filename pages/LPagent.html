@@ -28,168 +28,208 @@
   </section>
 
   <section class="dashboardTopGrid">
-    <div class="kpiGrid">
-      <article class="dashboardCard kpiCard kpiLavender kpiInverted">
-        <div class="kpiRow">
-          <span class="kpiLabel">Total Net Due</span>
-          <span class="kpiDelta">+6.2%</span>
+    <div class="row g-3">
+      <div class="col-12 col-md-9">
+        <div class="row g-3 kpiGrid">
+          <div class="col-12 col-md-4">
+            <article class="dashboardCard kpiCard kpiLavender kpiInverted kpiGradient cardClickable" id="totalNetDueCard" role="button" tabindex="0" aria-label="Open agent dashboard">
+              <div class="kpiRow">
+                <span class="kpiLabel">Total Net Due</span>
+                <span class="kpiDelta">+6.2%</span>
+              </div>
+              <div class="kpiValue">Rs. 2,48,89,26,295</div>
+              <div class="kpiSub">Invoices: 173 | Customers: 12</div>
+              <div class="kpiSplit">
+                <div class="kpiSplitItem">
+                  <span>Due</span>
+                  <strong>
+                    <span class="kpiSplitLine">Invoices 112</span>
+                    <span class="kpiSplitLine">Customers 8</span>
+                  </strong>
+                </div>
+                <div class="kpiSplitItem">
+                  <span>Not Due</span>
+                  <strong>
+                    <span class="kpiSplitLine">Invoices 61</span>
+                    <span class="kpiSplitLine">Customers 4</span>
+                  </strong>
+                </div>
+              </div>
+            </article>
+          </div>
+          <div class="col-12 col-md-4">
+            <article class="dashboardCard kpiCard kpiLavender">
+              <div class="kpiRow">
+                <span class="kpiLabel">MTD Collection</span>
+                <span class="kpiDelta">+11.4%</span>
+              </div>
+              <div class="kpiValue">Rs. 77,73,508</div>
+              <div class="kpiSub">Collected invoices: 4</div>
+              <div class="kpiSplit">
+                <div class="kpiSplitItem">
+                  <span>Due</span>
+                  <strong>
+                    <span class="kpiSplitLine">Invoices 3</span>
+                    <span class="kpiSplitLine">Customers 2</span>
+                  </strong>
+                </div>
+                <div class="kpiSplitItem">
+                  <span>Not Due</span>
+                  <strong>
+                    <span class="kpiSplitLine">Invoices 1</span>
+                    <span class="kpiSplitLine">Customers 1</span>
+                  </strong>
+                </div>
+              </div>
+            </article>
+          </div>
+          <div class="col-12 col-md-4">
+            <article class="dashboardCard kpiCard kpiLavender">
+              <div class="kpiLabel">Collection Within Due Date</div>
+              <div class="kpiProgressRow">
+                <div class="kpiValue">86.2%</div>
+                <div class="progressWrap">
+                  <div class="progressFill" style="--value: 0.862;"></div>
+                </div>
+              </div>
+              <div class="kpiSub">On-time collection ratio</div>
+              <div class="kpiSplit">
+                <div class="kpiSplitItem">
+                  <span>Due</span>
+                  <strong>
+                    <span class="kpiSplitLine">Invoices 92</span>
+                    <span class="kpiSplitLine">Customers 7</span>
+                  </strong>
+                </div>
+                <div class="kpiSplitItem">
+                  <span>Not Due</span>
+                  <strong>
+                    <span class="kpiSplitLine">Invoices 81</span>
+                    <span class="kpiSplitLine">Customers 5</span>
+                  </strong>
+                </div>
+              </div>
+            </article>
+          </div>
+          <div class="col-12 col-md-3">
+            <article class="dashboardCard kpiCard kpiOrange visitCard">
+              <div class="kpiLabel">Open Issues</div>
+              <div class="kpiValue">9</div>
+              <div class="kpiSub">High priority: 3</div>
+            </article>
+          </div>
+          <div class="col-12 col-md-3">
+            <article class="dashboardCard kpiCard kpiOrange">
+              <div class="kpiLabel">Aging &gt; 30 Days</div>
+              <div class="kpiValue">18%</div>
+              <div class="kpiSub">Value: Rs. 3.8 Cr</div>
+            </article>
+          </div>
+          <div class="col-12 col-md-3">
+            <article class="dashboardCard kpiCard kpiOrange">
+              <div class="kpiLabel">New Billing</div>
+              <div class="kpiValue">Rs. 1.2 Cr</div>
+              <div class="kpiSub">MTD growth: 4.6%</div>
+            </article>
+          </div>
+          <div class="col-12 col-md-3">
+            <article class="dashboardCard kpiCard kpiOrange">
+              <div class="kpiLabel">Visits for the day</div>
+              <div class="kpiValue">5 visits</div>
+              <div
+                class="kpiSub visitList"
+                data-tooltip="Apollo Pharmacy Pvt Ltd&#10;Blue Star Limited&#10;Ambane India Pvt Ltd&#10;Varun Beverages&#10;Shiva Healthcare Pvt Ltd"
+              >
+                <span class="visitNames">Apollo Pharmacy Pvt Ltd, Blue Star Limited, Ambane India Pvt Ltd, Varun Beverages, Shiva Healthcare Pvt Ltd</span>
+                <span class="visitMore">+2</span>
+              </div>
+            </article>
+          </div>
         </div>
-        <div class="kpiValue">Rs. 2,48,89,26,295</div>
-        <div class="kpiSub">Invoices: 173 | Customers: 12</div>
-        <div class="kpiSplit">
-          <div class="kpiSplitItem">
-            <span>Due</span>
-            <strong>
-              <span class="kpiSplitLine">Invoices 112</span>
-              <span class="kpiSplitLine">Customers 8</span>
-            </strong>
-          </div>
-          <div class="kpiSplitItem">
-            <span>Not Due</span>
-            <strong>
-              <span class="kpiSplitLine">Invoices 61</span>
-              <span class="kpiSplitLine">Customers 4</span>
-            </strong>
-          </div>
-        </div>
-      </article>
-      <article class="dashboardCard kpiCard kpiLavender">
-        <div class="kpiRow">
-          <span class="kpiLabel">MTD Collection</span>
-          <span class="kpiDelta">+11.4%</span>
-        </div>
-        <div class="kpiValue">Rs. 77,73,508</div>
-        <div class="kpiSub">Collected invoices: 4</div>
-        <div class="kpiSplit">
-          <div class="kpiSplitItem">
-            <span>Due</span>
-            <strong>
-              <span class="kpiSplitLine">Invoices 3</span>
-              <span class="kpiSplitLine">Customers 2</span>
-            </strong>
-          </div>
-          <div class="kpiSplitItem">
-            <span>Not Due</span>
-            <strong>
-              <span class="kpiSplitLine">Invoices 1</span>
-              <span class="kpiSplitLine">Customers 1</span>
-            </strong>
-          </div>
-        </div>
-      </article>
-      <article class="dashboardCard kpiCard kpiLavender">
-        <div class="kpiLabel">Collection Within Due Date</div>
-        <div class="kpiValue">86.2%</div>
-        <div class="progressWrap">
-          <div class="progressFill" style="--value: 0.862;"></div>
-        </div>
-        <div class="kpiSub">On-time collection ratio</div>
-        <div class="kpiSplit">
-          <div class="kpiSplitItem">
-            <span>Due</span>
-            <strong>
-              <span class="kpiSplitLine">Invoices 92</span>
-              <span class="kpiSplitLine">Customers 7</span>
-            </strong>
-          </div>
-          <div class="kpiSplitItem">
-            <span>Not Due</span>
-            <strong>
-              <span class="kpiSplitLine">Invoices 81</span>
-              <span class="kpiSplitLine">Customers 5</span>
-            </strong>
-          </div>
-        </div>
-      </article>
-      <article class="dashboardCard kpiCard">
-        <div class="kpiLabel">Open Issues</div>
-        <div class="kpiValue">9</div>
-        <div class="kpiSub">High priority: 3</div>
-      </article>
-      <article class="dashboardCard kpiCard">
-        <div class="kpiLabel">Aging &gt; 30 Days</div>
-        <div class="kpiValue">18%</div>
-        <div class="kpiSub">Value: Rs. 3.8 Cr</div>
-      </article>
-      <article class="dashboardCard kpiCard">
-        <div class="kpiLabel">New Billing</div>
-        <div class="kpiValue">Rs. 1.2 Cr</div>
-        <div class="kpiSub">MTD growth: 4.6%</div>
-      </article>
-      <aside class="actionStack">
-        <article class="dashboardCard actionCard accentPurple">
-          <div class="actionMeta">
-            <span>New Allocations</span>
-            <strong>17 invoices</strong>
-            <span>Value: Rs. 3.1 Cr</span>
-          </div>
-          <div class="actionIcon"><i class="bi bi-inbox"></i></div>
-        </article>
-        <article class="dashboardCard actionCard accentPurple">
-          <div class="actionMeta">
-            <span>PTP For The Day</span>
-            <strong>5 commitments</strong>
-            <span>Value: Rs. 1.4 Cr</span>
-          </div>
-          <div class="actionIcon"><i class="bi bi-calendar-check"></i></div>
-        </article>
-        <article class="dashboardCard actionCard accentPurple">
-          <div class="actionMeta">
-            <span>Callbacks For The Day</span>
-            <strong>11 follow-ups</strong>
-            <span>Value: Rs. 0.8 Cr</span>
-          </div>
-          <div class="actionIcon"><i class="bi bi-telephone"></i></div>
-        </article>
-      </aside>
-    </div>
 
-    <div class="dashboardRightStack">
-      <article class="dashboardCard chartCard card overflow-hidden bg-primary border-0 ovarlay-primary-gradient radialCard" data-chart="planActual" data-span="4" role="button" tabindex="0" aria-label="Plan versus actual radial chart">
-        <div class="radialCardHeader">
-          <div>
-            <div class="radialTitle">Monthly Target</div>
-            <div class="radialPercentRow">
-              <span class="radialPercent">92%</span>
-              <span class="radialDelta">+15% vs last month</span>
+        <div class="row g-3 actionStack">
+          <div class="col-12 col-md-4">
+            <article class="dashboardCard actionCard accentPurple">
+              <div class="actionMeta">
+                <span>New Allocations</span>
+                <strong>17 invoices</strong>
+                <span>Value: Rs. 3.1 Cr</span>
+              </div>
+              <div class="actionIcon"><i class="bi bi-inbox"></i></div>
+            </article>
+          </div>
+          <div class="col-12 col-md-4">
+            <article class="dashboardCard actionCard accentPurple">
+              <div class="actionMeta">
+                <span>PTP For The Day</span>
+                <strong>5 commitments</strong>
+                <span>Value: Rs. 1.4 Cr</span>
+              </div>
+              <div class="actionIcon"><i class="bi bi-calendar-check"></i></div>
+            </article>
+          </div>
+          <div class="col-12 col-md-4">
+            <article class="dashboardCard actionCard accentPurple">
+              <div class="actionMeta">
+                <span>Callbacks For The Day</span>
+                <strong>11 follow-ups</strong>
+                <span>Value: Rs. 0.8 Cr</span>
+              </div>
+              <div class="actionIcon"><i class="bi bi-telephone"></i></div>
+            </article>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-md-3">
+        <div class="dashboardRightStack">
+          <article class="dashboardCard chartCard card overflow-hidden bg-primary border-0 ovarlay-primary-gradient radialCard" data-chart="planActual" data-span="4" role="button" tabindex="0" aria-label="Plan versus actual radial chart">
+            <div class="radialCardHeader">
+              <div>
+                <div class="radialTitle">Monthly Target</div>
+                <div class="radialPercentRow">
+                  <span class="radialPercent">92%</span>
+                  <span class="radialDelta">+15% vs last month</span>
+                </div>
+              </div>
+              <button class="radialMenuBtn" type="button" aria-label="More options">
+                <i class="bi bi-three-dots-vertical" aria-hidden="true"></i>
+              </button>
             </div>
-          </div>
-          <button class="radialMenuBtn" type="button" aria-label="More options">
-            <i class="bi bi-three-dots-vertical" aria-hidden="true"></i>
-          </button>
+            <div class="radialGaugeWrap">
+              <canvas id="chartPlanActual"></canvas>
+              <div class="radialGaugeCenter">
+                <div class="radialGaugeValue">77K</div>
+                <div class="radialGaugeLabel">173 Invoices</div>
+              </div>
+            </div>
+            <div class="radialCallout">
+              You collected <strong>Rs. 77,73,508</strong> this month, its higher than last month keep up your good trends!
+            </div>
+            <div class="radialSummary">
+              <div class="radialSummaryItem">
+                <div class="radialSummaryValue">$100K</div>
+                <div class="radialSummaryLabel">Target</div>
+              </div>
+              <div class="radialSummaryItem">
+                <div class="radialSummaryValue">$77k</div>
+                <div class="radialSummaryLabel">Collected</div>
+              </div>
+              <div class="radialSummaryItem">
+                <div class="radialSummaryValue">$8.5k</div>
+                <div class="radialSummaryLabel">Today</div>
+              </div>
+            </div>
+          </article>
         </div>
-        <div class="radialGaugeWrap">
-          <canvas id="chartPlanActual"></canvas>
-          <div class="radialGaugeCenter">
-            <div class="radialGaugeValue">77K</div>
-            <div class="radialGaugeLabel">173 Invoices</div>
-          </div>
-        </div>
-        <div class="radialCallout">
-          You collected <strong>Rs. 77,73,508</strong> this month, its higher than last month keep up your good trends!
-        </div>
-        <div class="radialSummary">
-          <div class="radialSummaryItem">
-            <div class="radialSummaryValue">$100K</div>
-            <div class="radialSummaryLabel">Target</div>
-          </div>
-          <div class="radialSummaryItem">
-            <div class="radialSummaryValue">$77k</div>
-            <div class="radialSummaryLabel">Collected</div>
-          </div>
-          <div class="radialSummaryItem">
-            <div class="radialSummaryValue">$8.5k</div>
-            <div class="radialSummaryLabel">Today</div>
-          </div>
-        </div>
-      </article>
-
-      
+      </div>
     </div>
   </section>
 
   <section class="chartGrid">
-    <article class="dashboardCard chartCard" data-chart="vintage" data-span="8" role="button" tabindex="0" aria-label="Vintage portfolio chart">
+    <div class="row g-3">
+      <div class="col-12 col-md-6">
+        <article class="dashboardCard chartCard" data-chart="vintage" data-span="8" role="button" tabindex="0" aria-label="Vintage portfolio chart">
       <div class="chartHeader">
         <div>
           <div class="chartTitle">Vintage Portfolio</div>
@@ -205,9 +245,11 @@
         <div class="chartStat">Total overdue<strong>Rs. 4.2 Cr</strong></div>
         <div class="chartStat">Resolved this month<strong>Rs. 1.6 Cr</strong></div>
       </div>
-    </article>
+        </article>
+      </div>
 
-    <article class="dashboardCard chartCard" data-chart="activity" data-span="4" role="button" tabindex="0" aria-label="Activity tracker chart">
+      <div class="col-12 col-md-3">
+        <article class="dashboardCard chartCard" data-chart="activity" data-span="4" role="button" tabindex="0" aria-label="Activity tracker chart">
       <div class="chartHeader">
         <div>
           <div class="chartTitle">Activity Tracker</div>
@@ -223,61 +265,72 @@
         <div class="chartStat">Emails<strong>28%</strong></div>
         <div class="chartStat">Visits<strong>30%</strong></div>
       </div>
-    </article>
+        </article>
+      </div>
 
-    <article class="dashboardCard chartCard" data-chart="cashflow" data-span="8" role="button" tabindex="0" aria-label="Cash flow trend chart">
-      <div class="chartHeader">
-        <div>
-          <div class="chartTitle">Cash Flow Trend</div>
-          <div class="chartMeta">Collections vs PTP (last 12 weeks)</div>
-        </div>
-        <div class="chartHint">Click for details</div>
+      <div class="col-12 col-md-3">
+        <article class="dashboardCard chartCard" data-chart="issues" data-span="4" role="button" tabindex="0" aria-label="Issue tracker chart">
+          <div class="chartHeader">
+            <div>
+              <div class="chartTitle">Issue Tracker</div>
+              <div class="chartMeta">Open issues by category</div>
+            </div>
+            <div class="chartHint">Click for details</div>
+          </div>
+          <div class="chartCanvasWrap">
+            <canvas id="chartIssues"></canvas>
+          </div>
+          <div class="chartStats">
+            <div class="chartStat">Docs pending<strong>4</strong></div>
+            <div class="chartStat">Disputes<strong>3</strong></div>
+            <div class="chartStat">Logistics<strong>2</strong></div>
+          </div>
+        </article>
       </div>
-      <div class="chartCanvasWrap">
-        <canvas id="chartCashflow"></canvas>
-      </div>
-      <div class="chartStats">
-        <div class="chartStat">Best week<strong>Week 6</strong></div>
-        <div class="chartStat">Avg weekly<strong>Rs. 0.62 Cr</strong></div>
-        <div class="chartStat">Volatility<strong>Moderate</strong></div>
-      </div>
-    </article>
+    </div>
 
-    <article class="dashboardCard chartCard" data-chart="issues" data-span="4" role="button" tabindex="0" aria-label="Issue tracker chart">
-      <div class="chartHeader">
-        <div>
-          <div class="chartTitle">Issue Tracker</div>
-          <div class="chartMeta">Open issues by category</div>
-        </div>
-        <div class="chartHint">Click for details</div>
+    <div class="row g-3">
+      <div class="col-12 col-md-6">
+        <article class="dashboardCard chartCard" data-chart="cashflow" data-span="8" role="button" tabindex="0" aria-label="Cash flow trend chart">
+          <div class="chartHeader">
+            <div>
+              <div class="chartTitle">Cash Flow Trend</div>
+              <div class="chartMeta">Collections vs PTP (last 12 weeks)</div>
+            </div>
+            <div class="chartHint">Click for details</div>
+          </div>
+          <div class="chartCanvasWrap">
+            <canvas id="chartCashflow"></canvas>
+          </div>
+          <div class="chartStats">
+            <div class="chartStat">Best week<strong>Week 6</strong></div>
+            <div class="chartStat">Avg weekly<strong>Rs. 0.62 Cr</strong></div>
+            <div class="chartStat">Volatility<strong>Moderate</strong></div>
+          </div>
+        </article>
       </div>
-      <div class="chartCanvasWrap">
-        <canvas id="chartIssues"></canvas>
-      </div>
-      <div class="chartStats">
-        <div class="chartStat">Docs pending<strong>4</strong></div>
-        <div class="chartStat">Disputes<strong>3</strong></div>
-        <div class="chartStat">Logistics<strong>2</strong></div>
-      </div>
-    </article>
 
-    <article class="dashboardCard chartCard" data-chart="mix" data-span="8" role="button" tabindex="0" aria-label="Collection mix chart">
-      <div class="chartHeader">
-        <div>
-          <div class="chartTitle">Collection Mix</div>
-          <div class="chartMeta">Committed vs non-committed vs adjustments</div>
-        </div>
-        <div class="chartHint">Click for details</div>
+      <div class="col-12 col-md-6">
+        <article class="dashboardCard chartCard" data-chart="mix" data-span="8" role="button" tabindex="0" aria-label="Collection mix chart">
+          <div class="chartHeader">
+            <div>
+              <div class="chartTitle">Collection Mix</div>
+              <div class="chartMeta">Committed vs non-committed vs adjustments</div>
+            </div>
+            <div class="chartHint">Click for details</div>
+          </div>
+          <div class="chartCanvasWrap">
+            <canvas id="chartMix"></canvas>
+          </div>
+          <div class="chartStats">
+            <div class="chartStat">Committed<strong>58%</strong></div>
+            <div class="chartStat">Non-committed<strong>27%</strong></div>
+            <div class="chartStat">Adjustments<strong>15%</strong></div>
+          </div>
+        </article>
       </div>
-      <div class="chartCanvasWrap">
-        <canvas id="chartMix"></canvas>
-      </div>
-      <div class="chartStats">
-        <div class="chartStat">Committed<strong>58%</strong></div>
-        <div class="chartStat">Non-committed<strong>27%</strong></div>
-        <div class="chartStat">Adjustments<strong>15%</strong></div>
-      </div>
-    </article>
+    </div>
+
   </section>
 </main>
 
@@ -436,7 +489,7 @@
         options: {
           cutout: "72%",
           plugins: {
-            legend: { position: "bottom" }
+            legend: { display: false }
           }
         },
         highlights: [
@@ -500,7 +553,7 @@
         },
         options: {
           cutout: "62%",
-          plugins: { legend: { position: "bottom" } }
+          plugins: { legend: { display: false } }
         },
         highlights: [
           { label: "Total activities", value: "128" },
@@ -524,7 +577,7 @@
         },
         options: {
           cutout: "60%",
-          plugins: { legend: { position: "bottom" } }
+          plugins: { legend: { display: false } }
         },
         highlights: [
           { label: "Critical", value: "3" },
@@ -676,6 +729,20 @@
         }
       });
     });
+
+    const totalNetDueCard = document.getElementById("totalNetDueCard");
+    if (totalNetDueCard) {
+      const goToAgentScreen = () => {
+        window.location.href = "../index.html";
+      };
+      totalNetDueCard.addEventListener("click", goToAgentScreen);
+      totalNetDueCard.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          goToAgentScreen();
+        }
+      });
+    }
   })();
 </script>
 </body>

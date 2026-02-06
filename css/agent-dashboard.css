@@ -11,7 +11,7 @@ body {
   position: relative;
   min-height: 100vh;
   padding: 24px clamp(16px, 10vw, 140px) 40px;
-  background: linear-gradient(180deg, #f8f9ff 0%, #f4f6fb 60%, #f3f5fa 100%);
+  background: linear-gradient(180deg, #f1f5f9 0%, #e7ecf3 55%, #e2e8f0 100%);
   overflow: hidden;
 }
 
@@ -123,47 +123,38 @@ body {
 }
 
 .dashboardTopGrid {
-  display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
-  gap: 8px;
   margin-bottom: 18px;
-  align-items: start;
+  overflow: visible;
 }
 
 .dashboardRightStack {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  grid-column: 2;
 }
 
 .kpiGrid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
-  grid-column: 1;
+  z-index: 2;
+  overflow: visible;
 }
 
 .actionStack {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  gap: 8px;
+  margin-top: 2px;
+  z-index: 1;
+  overflow: visible;
 }
 
-.kpiGrid .actionStack {
-  grid-column: 1 / -1;
-  width: 100%;
-}
-
-.actionStack .actionCard {
-  flex: 1 1 0;
+.kpiGrid > [class*="col-"] {
+  overflow: visible;
 }
 
 .chartGrid {
-  display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: 10px;
+  position: relative;
+  z-index: 1;
+}
+
+.chartGrid > .row + .row {
+  margin-top: 0px;
 }
 
 .dashboardCard {
@@ -174,9 +165,23 @@ body {
   box-shadow: 0 8px 16px rgba(15, 23, 42, 0.05);
 }
 
+.cardClickable {
+  cursor: pointer;
+}
+
+.cardClickable:focus-visible {
+  outline: 2px solid rgba(92, 37, 141, 0.35);
+  outline-offset: 2px;
+}
+
 .kpiLavender {
   background: #f3ecfb;
   border-color: #e3d5f5;
+}
+
+.kpiOrange {
+  background: #f5f6f9;
+  border-color: #e1e5ee;
 }
 
 .kpiInverted {
@@ -185,6 +190,29 @@ body {
   color: #ffffff;
 }
 
+.kpiGradient {
+  background-color: #4b1f73;
+  background-image: linear-gradient(135deg, rgba(92, 37, 141, 0.96), rgba(37, 99, 235, 0.92));
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-color: transparent;
+}
+
+.kpiGradient::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.2), transparent 55%);
+  opacity: 0.8;
+  border-radius: 12px;
+  pointer-events: none;
+}
+
+.kpiGradient > * {
+  position: relative;
+  z-index: 1;
+}
 .kpiInverted .kpiLabel,
 .kpiInverted .kpiSub,
 .kpiInverted .kpiDelta {
@@ -212,6 +240,15 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 115px;
+  height: 100%;
+}
+
+.kpiGrid > [class*="col-"] {
+  display: flex;
+}
+
+.kpiGrid .dashboardCard {
+  width: 100%;
 }
 
 .dashboardCard.accentPurple {
@@ -245,10 +282,94 @@ body {
   color: #0f172a;
 }
 
+.kpiProgressRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+
+.kpiProgressRow .kpiValue {
+  margin-top: 0;
+  white-space: nowrap;
+}
+
+.kpiProgressRow .progressWrap {
+  flex: 0 0 52%;
+  margin-top: 0;
+}
+
 .kpiSub {
   margin-top: 6px;
   font-size: 12px;
   color: #64748b;
+}
+
+.visitList {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+  white-space: nowrap;
+  overflow: visible;
+  cursor: pointer;
+  outline: none;
+}
+
+.visitList:focus,
+.visitList:focus-visible {
+  outline: none;
+}
+
+.visitCard {
+  border-style: solid;
+  outline: none;
+}
+
+.visitCard:focus-within {
+  outline: none;
+}
+
+.visitList::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 0;
+  top: calc(100% + 6px);
+  background: #111827;
+  color: #ffffff;
+  font-size: 11px;
+  line-height: 1.4;
+  padding: 6px 8px;
+  border-radius: 6px;
+  white-space: pre;
+  opacity: 0;
+  transform: translateY(4px);
+  pointer-events: none;
+  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.18);
+  z-index: 999;
+  min-width: 180px;
+}
+
+.visitList:hover::after {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.visitNames {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 35ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
+}
+
+.visitMore {
+  flex: 0 0 auto;
+  font-weight: 600;
+  color: #4b5563;
 }
 
 .kpiSplit {
@@ -262,7 +383,7 @@ body {
 .kpiSplitItem {
   background: #ffffff;
   border: 1px solid #e2e8f4;
-  border-radius: 10px;
+  border-radius: 5px;
   padding: 6px 8px;
   font-size: 11px;
   color: #64748b;
@@ -327,6 +448,8 @@ body {
   justify-content: space-between;
   gap: 12px;
   min-height: 103px;
+  background: #edf4ff;
+  border-color: #dbe7ff;
 }
 
 .actionIcon {
@@ -336,8 +459,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f2ebf8;
-  color: #4b1f73;
+  background: #5c258d;
+  color: #ffffff;
   font-size: 18px;
 }
 
@@ -409,7 +532,7 @@ body {
 .chartStat {
   background: #f8fafc;
   border: 1px solid #e2e8f4;
-  border-radius: 12px;
+  border-radius: 5px;
   padding: 8px 10px;
   font-size: 11px;
   color: #64748b;
@@ -429,7 +552,7 @@ body {
     linear-gradient(135deg, rgba(92, 37, 141, 0.96), rgba(37, 99, 235, 0.92)),
     url("../assets/wind.gif");
   background-size: cover;
-  background-position: center right;
+  background-position: center;
   background-repeat: no-repeat;
   color: #f8fafc;
   border: none;
@@ -515,8 +638,8 @@ body {
   position: relative;
   width: 100%;
   height: 150px;
-  margin-top: 25px;
-  margin-bottom: 30px;
+  margin-top: 20px;
+  margin-bottom: 25px;
 }
 
 .radialGaugeWrap canvas {
@@ -562,7 +685,7 @@ body {
 .radialSummary {
   margin-top: 12px;
   background: #ffffff;
-  border-radius: 14px;
+  border-radius: 5px;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 4px;
@@ -661,19 +784,6 @@ body {
 }
 
 @media (max-width: 1100px) {
-  .dashboardTopGrid {
-    grid-template-columns: 1fr;
-  }
-
-  .actionStack {
-    flex-direction: row;
-    flex-wrap: nowrap;
-  }
-
-  .actionCard {
-    flex: 1 1 0;
-  }
-
   .chartCard[data-span="6"] {
     grid-column: span 12;
   }
@@ -690,10 +800,6 @@ body {
     align-items: flex-start;
   }
 
-  .actionStack {
-    flex-direction: column;
-  }
-
   .chartCard[data-span="8"],
   .chartCard[data-span="4"] {
     grid-column: span 12;
@@ -701,16 +807,9 @@ body {
 }
 
 @media (max-width: 720px) {
-  .kpiGrid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
 }
 
 @media (max-width: 540px) {
-  .kpiGrid {
-    grid-template-columns: 1fr;
-  }
-
   .chartStats,
   .modalHighlights {
     grid-template-columns: 1fr;

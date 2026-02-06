@@ -544,6 +544,17 @@
         phone: "9876543210",
         password: "Admin@123",
         otp: "123456"
+      },
+      {
+        username: "agent",
+        email: "agent@inebura.com",
+        phone: "9999999999",
+        password: "pass",
+        otp: "654321",
+        role: "agent",
+        firstName: "Devashish",
+        lastName: "Agent1",
+        displayName: "Devashish Agent1"
       }
     ];
 
@@ -617,6 +628,24 @@
       }, 4000);
     };
 
+    const handleLoginSuccess = (user, message) => {
+      showNotify("success", "Login successful", message || "Welcome back.");
+      const role = user.role || (user.username === "agent" ? "agent" : "admin");
+      const displayName = user.displayName || user.username || "User";
+      localStorage.setItem("activeUserRole", role);
+      localStorage.setItem("activeUserName", displayName);
+      localStorage.setItem("userProfile", JSON.stringify({
+        firstName: user.firstName || displayName,
+        lastName: user.lastName || "",
+        email: user.email || "",
+        loginId: user.username || displayName,
+        role
+      }));
+      if (user.username === "agent") {
+        window.location.href = "LPagent.html";
+      }
+    };
+
     let currentMode = "default";
 
     const setLoginMode = (mode) => {
@@ -686,7 +715,7 @@
             showNotify("warning", "Incorrect Password/OTP", "Incorrect password or OTP.");
             return;
           }
-          showNotify("success", "Login successful", "Email OTP verified successfully.");
+          handleLoginSuccess(user, "Email OTP verified successfully.");
           return;
         }
 
@@ -701,7 +730,7 @@
             showNotify("warning", "Incorrect Password/OTP", "Incorrect password or OTP.");
             return;
           }
-          showNotify("success", "Login successful", "Phone OTP verified successfully.");
+          handleLoginSuccess(user, "Phone OTP verified successfully.");
           return;
         }
 
@@ -715,7 +744,7 @@
           showNotify("warning", "Incorrect Password/OTP", "Incorrect password or OTP.");
           return;
         }
-        showNotify("success", "Login successful", "Welcome back.");
+        handleLoginSuccess(user, "Welcome back.");
       });
     }
     if (resendOtpBtn) {
