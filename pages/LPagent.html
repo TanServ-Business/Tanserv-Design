@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="../css/styles.css" />
   <link rel="stylesheet" href="../css/agent-dashboard.css" />
 </head>
-<body data-root-path="../" data-relationship-name="Apollo" data-relationship-badge="AP" data-relationship-logo-src="assets/apollo-tyres-logo.svg">
+<body class="motion-preload" data-root-path="../" data-relationship-name="Apollo" data-relationship-badge="AP" data-relationship-logo-src="assets/apollo-tyres-logo.svg">
 
 <div data-shared-header></div>
 
@@ -112,28 +112,28 @@
             </article>
           </div>
           <div class="col-12 col-md-3">
-            <article class="dashboardCard kpiCard kpiOrange visitCard">
+            <article class="dashboardCard kpiCard visitCard">
               <div class="kpiLabel">Open Issues</div>
               <div class="kpiValue">9</div>
               <div class="kpiSub">High priority: 3</div>
             </article>
           </div>
           <div class="col-12 col-md-3">
-            <article class="dashboardCard kpiCard kpiOrange">
+            <article class="dashboardCard kpiCard">
               <div class="kpiLabel">Aging &gt; 30 Days</div>
               <div class="kpiValue">18%</div>
               <div class="kpiSub">Value: Rs. 3.8 Cr</div>
             </article>
           </div>
           <div class="col-12 col-md-3">
-            <article class="dashboardCard kpiCard kpiOrange">
+            <article class="dashboardCard kpiCard">
               <div class="kpiLabel">New Billing</div>
               <div class="kpiValue">Rs. 1.2 Cr</div>
               <div class="kpiSub">MTD growth: 4.6%</div>
             </article>
           </div>
           <div class="col-12 col-md-3">
-            <article class="dashboardCard kpiCard kpiOrange">
+            <article class="dashboardCard kpiCard">
               <div class="kpiLabel">Visits for the day</div>
               <div class="kpiValue">5 visits</div>
               <div
@@ -741,6 +741,101 @@
           event.preventDefault();
           goToAgentScreen();
         }
+      });
+    }
+
+    const counterSelector = ".kpiValue, .kpiDelta, .actionMeta strong, .radialPercent, .radialGaugeValue, .radialSummaryValue, .chartStat strong";
+
+    const parseCounter = (text) => {
+      const match = text.match(/-?\d[\d,]*(?:\.\d+)?/);
+      if (!match) return null;
+      const raw = match[0];
+      const start = match.index || 0;
+      const end = start + raw.length;
+      const value = Number(raw.replace(/,/g, ""));
+      if (!Number.isFinite(value)) return null;
+      const decimals = raw.includes(".") ? raw.split(".")[1].length : 0;
+      return {
+        prefix: text.slice(0, start),
+        suffix: text.slice(end),
+        value,
+        decimals
+      };
+    };
+
+    const formatCounterValue = (value, decimals) => (
+      decimals
+        ? value.toLocaleString("en-IN", { minimumFractionDigits: decimals, maximumFractionDigits: decimals })
+        : Math.round(value).toLocaleString("en-IN")
+    );
+
+    const animateCounter = (el) => {
+      if (!el || el.dataset.counted === "true") return;
+      const text = el.textContent.trim();
+      const parsed = parseCounter(text);
+      if (!parsed) return;
+      const { prefix, suffix, value, decimals } = parsed;
+      const duration = 1200;
+      const startTime = performance.now();
+      const tick = (now) => {
+        const progress = Math.min((now - startTime) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const current = value * eased;
+        el.textContent = `${prefix}${formatCounterValue(current, decimals)}${suffix}`;
+        if (progress < 1) {
+          requestAnimationFrame(tick);
+        } else {
+          el.textContent = `${prefix}${formatCounterValue(value, decimals)}${suffix}`;
+        }
+      };
+      el.dataset.counted = "true";
+      requestAnimationFrame(tick);
+    };
+
+    const animateCountersInCard = (card) => {
+      card.querySelectorAll(counterSelector).forEach(animateCounter);
+    };
+
+    const cards = document.querySelectorAll(".dashboardCard");
+    cards.forEach((card) => card.classList.add("cardMotion"));
+    document.querySelectorAll(".dashboardTopGrid .dashboardCard")
+      .forEach((card) => card.classList.add("cardMotionTop"));
+    requestAnimationFrame(() => {
+      document.body.classList.remove("motion-preload");
+    });
+
+    const isInViewport = (el) => {
+      const rect = el.getBoundingClientRect();
+      const vh = window.innerHeight || 0;
+      return rect.bottom > 0 && rect.top < vh;
+    };
+
+    const animateCard = (card, delay = 0) => {
+      if (!card || card.dataset.animated === "true") return;
+      card.dataset.animated = "true";
+      setTimeout(() => {
+        card.classList.add("is-visible");
+        animateCountersInCard(card);
+      }, delay);
+    };
+
+    if ("IntersectionObserver" in window) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          animateCard(entry.target, 0);
+          observer.unobserve(entry.target);
+        });
+      }, { threshold: 0.15 });
+      cards.forEach((card) => observer.observe(card));
+
+      requestAnimationFrame(() => {
+        const visibleCards = Array.from(cards).filter(isInViewport);
+        visibleCards.forEach((card, idx) => animateCard(card, idx * 60));
+      });
+    } else {
+      requestAnimationFrame(() => {
+        cards.forEach((card, idx) => animateCard(card, idx * 60));
       });
     }
   })();

@@ -7,6 +7,10 @@ body {
   overflow-y: auto;
 }
 
+body.motion-preload .dashboardCard {
+  opacity: 0;
+}
+
 .agentDashboard {
   position: relative;
   min-height: 100vh;
@@ -160,10 +164,33 @@ body {
 .dashboardCard {
   background: #ffffff;
   border: 1px solid #e2e8f4;
-  border-radius: 12px;
+  border-radius: 5px;
   padding: 14px 16px;
   box-shadow: 0 8px 16px rgba(15, 23, 42, 0.05);
 }
+
+.dashboardCard.cardMotion {
+  opacity: 0;
+  --parallax-y: 0px;
+  transform: translate3d(var(--motion-x, -24px), 18px, 0);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+  will-change: transform, opacity;
+}
+
+.dashboardCard.cardMotion:nth-child(even) {
+  --motion-x: 24px;
+}
+
+.dashboardCard.cardMotion.cardMotionTop {
+  --motion-x: 0px;
+  transform: translate3d(0, -14px, 0);
+}
+
+.dashboardCard.cardMotion.is-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
 
 .cardClickable {
   cursor: pointer;
