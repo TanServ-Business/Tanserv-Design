@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inebura Ops UI - Agent Dashboard</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../css/styles.css" />
+  <link rel="stylesheet" href="../css/agent-dashboard.css" />
+</head>
+<body data-root-path="../" data-relationship-name="Apollo" data-relationship-badge="AP" data-relationship-logo-src="assets/apollo-tyres-logo.svg">
+
+<div data-shared-header></div>
+
+<main class="agentDashboard">
+  <section class="dashboardHero">
+    <div>
+      <div class="heroEyebrow">Agent Dashboard</div>
+      <h1>Devashish Agent1</h1>
+      <div class="heroMeta">
+        <span class="heroTag">Portfolio Rs. 2,48,96,98,803</span>
+        <span class="heroTag">As of Feb 6, 2026</span>
+        <span class="heroTag">Territory: West Zone</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="dashboardTopGrid">
+    <div class="kpiGrid">
+      <article class="dashboardCard kpiCard kpiLavender kpiInverted">
+        <div class="kpiRow">
+          <span class="kpiLabel">Total Net Due</span>
+          <span class="kpiDelta">+6.2%</span>
+        </div>
+        <div class="kpiValue">Rs. 2,48,89,26,295</div>
+        <div class="kpiSub">Invoices: 173 | Customers: 12</div>
+        <div class="kpiSplit">
+          <div class="kpiSplitItem">
+            <span>Due</span>
+            <strong>
+              <span class="kpiSplitLine">Invoices 112</span>
+              <span class="kpiSplitLine">Customers 8</span>
+            </strong>
+          </div>
+          <div class="kpiSplitItem">
+            <span>Not Due</span>
+            <strong>
+              <span class="kpiSplitLine">Invoices 61</span>
+              <span class="kpiSplitLine">Customers 4</span>
+            </strong>
+          </div>
+        </div>
+      </article>
+      <article class="dashboardCard kpiCard kpiLavender">
+        <div class="kpiRow">
+          <span class="kpiLabel">MTD Collection</span>
+          <span class="kpiDelta">+11.4%</span>
+        </div>
+        <div class="kpiValue">Rs. 77,73,508</div>
+        <div class="kpiSub">Collected invoices: 4</div>
+        <div class="kpiSplit">
+          <div class="kpiSplitItem">
+            <span>Due</span>
+            <strong>
+              <span class="kpiSplitLine">Invoices 3</span>
+              <span class="kpiSplitLine">Customers 2</span>
+            </strong>
+          </div>
+          <div class="kpiSplitItem">
+            <span>Not Due</span>
+            <strong>
+              <span class="kpiSplitLine">Invoices 1</span>
+              <span class="kpiSplitLine">Customers 1</span>
+            </strong>
+          </div>
+        </div>
+      </article>
+      <article class="dashboardCard kpiCard kpiLavender">
+        <div class="kpiLabel">Collection Within Due Date</div>
+        <div class="kpiValue">86.2%</div>
+        <div class="progressWrap">
+          <div class="progressFill" style="--value: 0.862;"></div>
+        </div>
+        <div class="kpiSub">On-time collection ratio</div>
+        <div class="kpiSplit">
+          <div class="kpiSplitItem">
+            <span>Due</span>
+            <strong>
+              <span class="kpiSplitLine">Invoices 92</span>
+              <span class="kpiSplitLine">Customers 7</span>
+            </strong>
+          </div>
+          <div class="kpiSplitItem">
+            <span>Not Due</span>
+            <strong>
+              <span class="kpiSplitLine">Invoices 81</span>
+              <span class="kpiSplitLine">Customers 5</span>
+            </strong>
+          </div>
+        </div>
+      </article>
+      <article class="dashboardCard kpiCard">
+        <div class="kpiLabel">Open Issues</div>
+        <div class="kpiValue">9</div>
+        <div class="kpiSub">High priority: 3</div>
+      </article>
+      <article class="dashboardCard kpiCard">
+        <div class="kpiLabel">Aging &gt; 30 Days</div>
+        <div class="kpiValue">18%</div>
+        <div class="kpiSub">Value: Rs. 3.8 Cr</div>
+      </article>
+      <article class="dashboardCard kpiCard">
+        <div class="kpiLabel">New Billing</div>
+        <div class="kpiValue">Rs. 1.2 Cr</div>
+        <div class="kpiSub">MTD growth: 4.6%</div>
+      </article>
+      <aside class="actionStack">
+        <article class="dashboardCard actionCard accentPurple">
+          <div class="actionMeta">
+            <span>New Allocations</span>
+            <strong>17 invoices</strong>
+            <span>Value: Rs. 3.1 Cr</span>
+          </div>
+          <div class="actionIcon"><i class="bi bi-inbox"></i></div>
+        </article>
+        <article class="dashboardCard actionCard accentPurple">
+          <div class="actionMeta">
+            <span>PTP For The Day</span>
+            <strong>5 commitments</strong>
+            <span>Value: Rs. 1.4 Cr</span>
+          </div>
+          <div class="actionIcon"><i class="bi bi-calendar-check"></i></div>
+        </article>
+        <article class="dashboardCard actionCard accentPurple">
+          <div class="actionMeta">
+            <span>Callbacks For The Day</span>
+            <strong>11 follow-ups</strong>
+            <span>Value: Rs. 0.8 Cr</span>
+          </div>
+          <div class="actionIcon"><i class="bi bi-telephone"></i></div>
+        </article>
+      </aside>
+    </div>
+
+    <div class="dashboardRightStack">
+      <article class="dashboardCard chartCard card overflow-hidden bg-primary border-0 ovarlay-primary-gradient radialCard" data-chart="planActual" data-span="4" role="button" tabindex="0" aria-label="Plan versus actual radial chart">
+        <div class="radialCardHeader">
+          <div>
+            <div class="radialTitle">Monthly Target</div>
+            <div class="radialPercentRow">
+              <span class="radialPercent">92%</span>
+              <span class="radialDelta">+15% vs last month</span>
+            </div>
+          </div>
+          <button class="radialMenuBtn" type="button" aria-label="More options">
+            <i class="bi bi-three-dots-vertical" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="radialGaugeWrap">
+          <canvas id="chartPlanActual"></canvas>
+          <div class="radialGaugeCenter">
+            <div class="radialGaugeValue">77K</div>
+            <div class="radialGaugeLabel">173 Invoices</div>
+          </div>
+        </div>
+        <div class="radialCallout">
+          You collected <strong>Rs. 77,73,508</strong> this month, its higher than last month keep up your good trends!
+        </div>
+        <div class="radialSummary">
+          <div class="radialSummaryItem">
+            <div class="radialSummaryValue">$100K</div>
+            <div class="radialSummaryLabel">Target</div>
+          </div>
+          <div class="radialSummaryItem">
+            <div class="radialSummaryValue">$77k</div>
+            <div class="radialSummaryLabel">Collected</div>
+          </div>
+          <div class="radialSummaryItem">
+            <div class="radialSummaryValue">$8.5k</div>
+            <div class="radialSummaryLabel">Today</div>
+          </div>
+        </div>
+      </article>
+
+      
+    </div>
+  </section>
+
+  <section class="chartGrid">
+    <article class="dashboardCard chartCard" data-chart="vintage" data-span="8" role="button" tabindex="0" aria-label="Vintage portfolio chart">
+      <div class="chartHeader">
+        <div>
+          <div class="chartTitle">Vintage Portfolio</div>
+          <div class="chartMeta">Bucketed by overdue days</div>
+        </div>
+        <div class="chartHint">Click for details</div>
+      </div>
+      <div class="chartCanvasWrap">
+        <canvas id="chartVintage"></canvas>
+      </div>
+      <div class="chartStats">
+        <div class="chartStat">Highest bucket<strong>31-60 days</strong></div>
+        <div class="chartStat">Total overdue<strong>Rs. 4.2 Cr</strong></div>
+        <div class="chartStat">Resolved this month<strong>Rs. 1.6 Cr</strong></div>
+      </div>
+    </article>
+
+    <article class="dashboardCard chartCard" data-chart="activity" data-span="4" role="button" tabindex="0" aria-label="Activity tracker chart">
+      <div class="chartHeader">
+        <div>
+          <div class="chartTitle">Activity Tracker</div>
+          <div class="chartMeta">Daily engagement split</div>
+        </div>
+        <div class="chartHint">Click for details</div>
+      </div>
+      <div class="chartCanvasWrap">
+        <canvas id="chartActivity"></canvas>
+      </div>
+      <div class="chartStats">
+        <div class="chartStat">Calls<strong>42%</strong></div>
+        <div class="chartStat">Emails<strong>28%</strong></div>
+        <div class="chartStat">Visits<strong>30%</strong></div>
+      </div>
+    </article>
+
+    <article class="dashboardCard chartCard" data-chart="cashflow" data-span="8" role="button" tabindex="0" aria-label="Cash flow trend chart">
+      <div class="chartHeader">
+        <div>
+          <div class="chartTitle">Cash Flow Trend</div>
+          <div class="chartMeta">Collections vs PTP (last 12 weeks)</div>
+        </div>
+        <div class="chartHint">Click for details</div>
+      </div>
+      <div class="chartCanvasWrap">
+        <canvas id="chartCashflow"></canvas>
+      </div>
+      <div class="chartStats">
+        <div class="chartStat">Best week<strong>Week 6</strong></div>
+        <div class="chartStat">Avg weekly<strong>Rs. 0.62 Cr</strong></div>
+        <div class="chartStat">Volatility<strong>Moderate</strong></div>
+      </div>
+    </article>
+
+    <article class="dashboardCard chartCard" data-chart="issues" data-span="4" role="button" tabindex="0" aria-label="Issue tracker chart">
+      <div class="chartHeader">
+        <div>
+          <div class="chartTitle">Issue Tracker</div>
+          <div class="chartMeta">Open issues by category</div>
+        </div>
+        <div class="chartHint">Click for details</div>
+      </div>
+      <div class="chartCanvasWrap">
+        <canvas id="chartIssues"></canvas>
+      </div>
+      <div class="chartStats">
+        <div class="chartStat">Docs pending<strong>4</strong></div>
+        <div class="chartStat">Disputes<strong>3</strong></div>
+        <div class="chartStat">Logistics<strong>2</strong></div>
+      </div>
+    </article>
+
+    <article class="dashboardCard chartCard" data-chart="mix" data-span="8" role="button" tabindex="0" aria-label="Collection mix chart">
+      <div class="chartHeader">
+        <div>
+          <div class="chartTitle">Collection Mix</div>
+          <div class="chartMeta">Committed vs non-committed vs adjustments</div>
+        </div>
+        <div class="chartHint">Click for details</div>
+      </div>
+      <div class="chartCanvasWrap">
+        <canvas id="chartMix"></canvas>
+      </div>
+      <div class="chartStats">
+        <div class="chartStat">Committed<strong>58%</strong></div>
+        <div class="chartStat">Non-committed<strong>27%</strong></div>
+        <div class="chartStat">Adjustments<strong>15%</strong></div>
+      </div>
+    </article>
+  </section>
+</main>
+
+<div class="modal fade" id="chartDetailModal" tabindex="-1" aria-labelledby="chartDetailModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div>
+          <h5 class="modal-title" id="chartDetailModalLabel">Chart Details</h5>
+          <div class="text-muted small" id="chartDetailModalMeta">-</div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="modalChartWrap">
+          <canvas id="chartDetailCanvas"></canvas>
+        </div>
+        <div class="modalHighlights" id="chartDetailHighlights"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="../scripts/shared-header.js"></script>
+<script>
+  (() => {
+    const brand = getComputedStyle(document.documentElement).getPropertyValue("--brand").trim() || "#5c258d";
+    const brandDark = getComputedStyle(document.documentElement).getPropertyValue("--brand-dark").trim() || "#4b1f73";
+
+    Chart.defaults.font.family = getComputedStyle(document.body).fontFamily || "Arial, Helvetica, sans-serif";
+    Chart.defaults.color = "#475569";
+
+    const palette = {
+      purple: brand,
+      purplePastel: "rgba(92, 37, 141, 0.35)",
+      purpleLight: "rgba(92, 37, 141, 0.18)",
+      blue: "#2563eb",
+      bluePastel: "rgba(37, 99, 235, 0.35)",
+      blueLight: "rgba(37, 99, 235, 0.18)",
+      teal: "#0f766e",
+      tealPastel: "rgba(15, 118, 110, 0.35)",
+      tealLight: "rgba(15, 118, 110, 0.18)",
+      amber: "#d97706",
+      amberPastel: "rgba(217, 119, 6, 0.35)",
+      gray: "#94a3b8"
+    };
+
+    const chartConfigs = {
+      vintage: {
+        title: "Vintage Portfolio",
+        meta: "Bucketed by overdue days",
+        type: "bar",
+        data: {
+          labels: [
+            "Not Due",
+            "1-30",
+            "31-60",
+            "61-90",
+            "91-120",
+            "121-150",
+            "151-180",
+            "181-210",
+            "211-240",
+            "241-270",
+            "271-300",
+            "301-330",
+            "331-360",
+            "1 Year",
+            "2 Year",
+            "3 Year",
+            "4 Year",
+            "5+ Year"
+          ],
+          datasets: [
+            {
+              label: "Outstanding (Cr)",
+              data: [1.1, 2.4, 3.6, 2.8, 1.9, 1.4, 1.2, 1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.42, 0.36, 0.3, 0.24, 0.18],
+              backgroundColor: [
+                palette.purpleLight,
+                palette.purplePastel,
+                "rgba(92, 37, 141, 0.45)",
+                palette.bluePastel,
+                palette.tealPastel,
+                palette.amberPastel,
+                palette.purpleLight,
+                palette.bluePastel,
+                palette.tealPastel,
+                palette.amberPastel,
+                palette.purplePastel,
+                palette.bluePastel,
+                palette.tealPastel,
+                palette.purpleLight,
+                palette.bluePastel,
+                palette.tealPastel,
+                palette.amberPastel,
+                palette.purplePastel,
+                palette.bluePastel
+              ],
+              borderRadius: 6,
+              barThickness: 12,
+              maxBarThickness: 14,
+              categoryPercentage: 0.7,
+              barPercentage: 0.7
+            }
+          ]
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { callback: (value) => `Rs. ${value} Cr` }
+            }
+          }
+        },
+        highlights: [
+          { label: "Top bucket", value: "31-60 days" },
+          { label: "Overdue total", value: "Rs. 4.2 Cr" },
+          { label: "Resolved", value: "Rs. 1.6 Cr" }
+        ]
+      },
+      planActual: {
+        title: "Plan vs Actual",
+        meta: "Target achievement",
+        type: "doughnut",
+        cardData: {
+          labels: ["Achieved", "Remaining"],
+          datasets: [
+            {
+              data: [6.9, 1.5],
+              backgroundColor: ["rgba(255, 255, 255, 0.95)", "rgba(255, 255, 255, 0.2)"],
+              borderWidth: 0
+            }
+          ]
+        },
+        modalData: {
+          labels: ["Achieved", "Remaining"],
+          datasets: [
+            {
+              data: [6.9, 1.5],
+              backgroundColor: [palette.purple, palette.purpleLight],
+              borderWidth: 0
+            }
+          ]
+        },
+        cardOptions: {
+          cutout: "86%",
+          rotation: -90,
+          circumference: 180,
+          plugins: {
+            legend: { display: false },
+            tooltip: { enabled: false }
+          }
+        },
+        options: {
+          cutout: "72%",
+          plugins: {
+            legend: { position: "bottom" }
+          }
+        },
+        highlights: [
+          { label: "Target (MTD)", value: "Rs. 8.4 Cr" },
+          { label: "Achieved", value: "Rs. 6.9 Cr" },
+          { label: "Gap", value: "Rs. 1.5 Cr" }
+        ]
+      },
+      cashflow: {
+        title: "Cash Flow Trend",
+        meta: "Collections vs PTP (last 12 weeks)",
+        type: "line",
+        data: {
+          labels: ["W1", "W2", "W3", "W4", "W5", "W6", "W7", "W8", "W9", "W10", "W11", "W12"],
+          datasets: [
+            {
+              label: "Collections",
+              data: [0.4, 0.5, 0.48, 0.62, 0.58, 0.9, 0.72, 0.6, 0.64, 0.7, 0.55, 0.62],
+              borderColor: palette.blue,
+              backgroundColor: palette.blueLight,
+              tension: 0.35,
+              fill: true
+            },
+            {
+              label: "PTP",
+              data: [0.5, 0.54, 0.6, 0.65, 0.7, 0.82, 0.74, 0.63, 0.58, 0.66, 0.6, 0.68],
+              borderColor: palette.teal,
+              backgroundColor: palette.tealLight,
+              tension: 0.35,
+              fill: true
+            }
+          ]
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { callback: (value) => `Rs. ${value} Cr` }
+            }
+          }
+        },
+        highlights: [
+          { label: "Best week", value: "Week 6" },
+          { label: "Avg weekly", value: "Rs. 0.62 Cr" },
+          { label: "Volatility", value: "Moderate" }
+        ]
+      },
+      activity: {
+        title: "Activity Tracker",
+        meta: "Daily engagement split",
+        type: "doughnut",
+        data: {
+          labels: ["Calls", "Emails", "Visits"],
+          datasets: [
+            {
+              data: [42, 28, 30],
+              backgroundColor: [palette.purple, palette.blue, palette.teal],
+              borderWidth: 0
+            }
+          ]
+        },
+        options: {
+          cutout: "62%",
+          plugins: { legend: { position: "bottom" } }
+        },
+        highlights: [
+          { label: "Total activities", value: "128" },
+          { label: "Peak day", value: "Wednesday" },
+          { label: "Avg response", value: "2.1 hrs" }
+        ]
+      },
+      issues: {
+        title: "Issue Tracker",
+        meta: "Open issues by category",
+        type: "doughnut",
+        data: {
+          labels: ["Docs", "Disputes", "Logistics", "Other"],
+          datasets: [
+            {
+              data: [4, 3, 2, 1],
+              backgroundColor: [palette.amber, palette.purple, palette.blue, palette.gray],
+              borderWidth: 0
+            }
+          ]
+        },
+        options: {
+          cutout: "60%",
+          plugins: { legend: { position: "bottom" } }
+        },
+        highlights: [
+          { label: "Critical", value: "3" },
+          { label: "Stuck >7 days", value: "2" },
+          { label: "Resolved this month", value: "5" }
+        ]
+      },
+      mix: {
+        title: "Collection Mix",
+        meta: "Committed vs non-committed vs adjustments",
+        type: "bar",
+        data: {
+          labels: ["Week 1", "Week 2", "Week 3", "Week 4"],
+          datasets: [
+            {
+              label: "Committed",
+              data: [1.6, 2.1, 1.9, 2.4],
+              backgroundColor: palette.purplePastel
+            },
+            {
+              label: "Non-committed",
+              data: [0.8, 0.9, 0.6, 1.1],
+              backgroundColor: palette.bluePastel
+            },
+            {
+              label: "Adjustments",
+              data: [0.4, 0.3, 0.2, 0.35],
+              backgroundColor: palette.tealPastel
+            }
+          ]
+        },
+        options: {
+          scales: {
+            x: { stacked: true },
+            y: {
+              stacked: true,
+              beginAtZero: true,
+              ticks: { callback: (value) => `Rs. ${value} Cr` }
+            }
+          }
+        },
+        highlights: [
+          { label: "Committed share", value: "58%" },
+          { label: "Non-committed", value: "27%" },
+          { label: "Adjustments", value: "15%" }
+        ]
+      }
+    };
+
+    const baseOptions = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          labels: {
+            color: "#475569",
+            font: { size: 11 }
+          }
+        },
+        tooltip: {
+          backgroundColor: brandDark,
+          titleColor: "#ffffff",
+          bodyColor: "#ffffff",
+          padding: 10
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: "rgba(148, 163, 184, 0.2)" },
+          ticks: { color: "#64748b", font: { size: 10 } }
+        },
+        y: {
+          grid: { color: "rgba(148, 163, 184, 0.2)" },
+          ticks: { color: "#64748b", font: { size: 10 } }
+        }
+      }
+    };
+
+    const chartInstances = {};
+
+    const buildChart = (canvasId, config) => {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas || !config) return;
+      const ctx = canvas.getContext("2d");
+      const data = config.cardData || config.data;
+      const options = { ...baseOptions, ...(config.cardOptions || config.options) };
+      if (config.type === "doughnut") {
+        options.scales = {};
+      }
+      chartInstances[canvasId] = new Chart(ctx, {
+        type: config.type,
+        data,
+        options
+      });
+    };
+
+    buildChart("chartVintage", chartConfigs.vintage);
+    buildChart("chartPlanActual", chartConfigs.planActual);
+    buildChart("chartCashflow", chartConfigs.cashflow);
+    buildChart("chartActivity", chartConfigs.activity);
+    buildChart("chartIssues", chartConfigs.issues);
+    buildChart("chartMix", chartConfigs.mix);
+
+    const modalEl = document.getElementById("chartDetailModal");
+    const modalTitle = document.getElementById("chartDetailModalLabel");
+    const modalMeta = document.getElementById("chartDetailModalMeta");
+    const modalHighlights = document.getElementById("chartDetailHighlights");
+    const modalCanvas = document.getElementById("chartDetailCanvas");
+    let modalChart = null;
+
+    const openModal = (key) => {
+      const config = chartConfigs[key];
+      if (!config) return;
+      if (modalTitle) modalTitle.textContent = config.title;
+      if (modalMeta) modalMeta.textContent = config.meta;
+      if (modalHighlights) {
+        modalHighlights.innerHTML = config.highlights.map((item) => (
+          `<div class="chartStat"><span>${item.label}</span><strong>${item.value}</strong></div>`
+        )).join("");
+      }
+      if (modalChart) {
+        modalChart.destroy();
+        modalChart = null;
+      }
+      if (modalCanvas) {
+        const data = config.modalData || config.data;
+        const options = { ...baseOptions, ...(config.modalOptions || config.options) };
+        if (config.type === "doughnut") {
+          options.scales = {};
+        }
+        modalChart = new Chart(modalCanvas.getContext("2d"), {
+          type: config.type,
+          data,
+          options
+        });
+      }
+      const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+      modal.show();
+    };
+
+    const chartCards = document.querySelectorAll(".chartCard[data-chart]");
+    chartCards.forEach((card) => {
+      const key = card.getAttribute("data-chart");
+      card.addEventListener("click", () => openModal(key));
+      card.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          openModal(key);
+        }
+      });
+    });
+  })();
+</script>
+</body>
+</html>

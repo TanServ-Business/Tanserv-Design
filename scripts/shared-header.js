@@ -271,6 +271,7 @@
         </a>
         <div class="submenu">
           <a class="submenu-link" href="${resolvePath("index.html")}" data-module="landing">Landing Page</a>
+          <a class="submenu-link" href="${resolvePath("pages/LPagent.html")}" data-module="landing-agent">Landing Page - Agent</a>
           <a class="submenu-link" href="${resolvePath("pages/LPmanager.html")}" data-module="landing-manager">Landing Page - Manager</a>
           <a class="submenu-link" href="${resolvePath("pages/LPsupervisor.html")}" data-module="landing-supervisor">Landing Page - Supervisor</a>
           <a class="submenu-link" href="${resolvePath("pages/KAM.html")}" data-module="landing-kam">Landing Page - KAM</a>
@@ -650,6 +651,7 @@
             visit: "pages/visitmodule.html",
             "visit-review": "pages/visitmoduleReview.html",
             landing: "index.html",
+            "landing-agent": "pages/LPagent.html",
             "landing-manager": "pages/LPmanager.html",
             "landing-supervisor": "pages/LPsupervisor.html",
             "landing-kam": "pages/KAM.html",
