@@ -14,7 +14,7 @@ body.motion-preload .dashboardCard {
 .agentDashboard {
   position: relative;
   min-height: 100vh;
-  padding: 24px clamp(16px, 10vw, 140px) 40px;
+  padding: 24px 5% 40px;
   background: linear-gradient(180deg, #f1f5f9 0%, #e7ecf3 55%, #e2e8f0 100%);
   overflow: hidden;
 }
@@ -91,6 +91,27 @@ body.motion-preload .dashboardCard {
 .heroActions {
   display: flex;
   gap: 10px;
+}
+
+.viewModeControl {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.viewModeControl select {
+  border: 1px solid #d7c3ea;
+  background: #ffffff;
+  color: #4b1f73;
+  border-radius: 10px;
+  padding: 7px 12px;
+  font-size: 12px;
+  font-weight: 600;
 }
 
 .btnGhost {
@@ -333,11 +354,72 @@ body.motion-preload .dashboardCard {
   color: #64748b;
 }
 
+#visitForDayCard {
+  position: relative;
+}
+
+.visitProgressWrap {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex: 0 0 auto;
+}
+
+.visitProgressDonut {
+  --value: 0;
+  position: relative;
+  width: 60px;
+  height: 60px;
+  border-radius: 999px;
+  background: conic-gradient(#5c258d calc(var(--value) * 1turn), #e9ddf5 0);
+}
+
+.visitProgressDonut::after {
+  content: "";
+  position: absolute;
+  inset: 7px;
+  border-radius: 999px;
+  background: #ffffff;
+}
+
+.visitProgressDonut::before {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 6px);
+  transform: translate(-50%, 4px);
+  background: #111827;
+  color: #ffffff;
+  font-size: 10px;
+  line-height: 1.4;
+  padding: 6px 8px;
+  border-radius: 6px;
+  opacity: 0;
+  pointer-events: none;
+  white-space: nowrap;
+  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.18);
+  z-index: 999;
+}
+
+.visitProgressDonut:hover::before,
+.visitProgressDonut:focus-visible::before {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.agentDashboard.is-spacious .visitProgressWrap {
+  display: none;
+}
+
 .visitList {
   display: flex;
   align-items: center;
   gap: 6px;
   position: relative;
+  margin-top: auto;
   white-space: nowrap;
   overflow: visible;
   cursor: pointer;
@@ -358,29 +440,330 @@ body.motion-preload .dashboardCard {
   outline: none;
 }
 
-.visitList::after {
-  content: attr(data-tooltip);
+.openIssuesCardBody {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 10px;
+  height: 100%;
+}
+
+.openIssuesMain {
+  flex: 0 0 50%;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.openIssuesMain .kpiSub {
+  margin-top: auto;
+}
+
+.openIssuesTop3 {
+  flex: 0 0 50%;
+  margin-left: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: stretch;
+  justify-content: flex-start;
+  min-width: 0;
+}
+
+.openIssuesTop3Row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  background: #f4f4f4;
+  border: 1px solid #d1d5db;
+  border-radius: 999px;
+  padding: 2px 2px 2px 8px;
+  min-height: 20px;
+}
+
+.openIssuesStatusName {
+  font-size: 9px;
+  color: #ea580c;
+  text-align: right;
+  line-height: 1.25;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.openIssuesStatusCount {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: #b6b6b6;
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.agingBucketsCardBody {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 10px;
+  height: 100%;
+}
+
+.agingBucketsMain {
+  flex: 0 0 50%;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.agingBucketsMain .kpiSub {
+  margin-top: auto;
+}
+
+.agingBucketsTop3 {
+  flex: 0 0 50%;
+  margin-left: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  justify-content: flex-start;
+  align-items: stretch;
+  min-width: 0;
+}
+
+.agingBucketRow {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  border-radius: 999px;
+  padding: 2px 2px 2px 8px;
+  min-height: 20px;
+  border: 1px solid transparent;
+}
+
+.agingBucketName {
+  font-size: 9px;
+  color: #334155;
+  line-height: 1.25;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.agingBucketCount {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.32);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.agingBucketRow.is-31-60 {
+  background: rgba(92, 37, 141, 0.45);
+  border-color: rgba(92, 37, 141, 0.62);
+}
+
+.agingBucketRow.is-121-150 {
+  background: rgba(217, 119, 6, 0.35);
+  border-color: rgba(217, 119, 6, 0.55);
+}
+
+.agingBucketRow.is-150-180 {
+  background: rgba(92, 37, 141, 0.18);
+  border-color: rgba(92, 37, 141, 0.4);
+}
+
+.newBillingCardBody {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 10px;
+  height: 100%;
+}
+
+.newBillingMain {
+  flex: 0 0 50%;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.newBillingMain .kpiSub {
+  margin-top: auto;
+}
+
+.newBillingTop3 {
+  flex: 0 0 50%;
+  margin-left: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  justify-content: flex-start;
+  align-items: stretch;
+  min-width: 0;
+}
+
+.newBillingTop3Row {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  border-radius: 999px;
+  padding: 2px 2px 2px 8px;
+  min-height: 20px;
+  background: #f4f4f4;
+  border: 1px solid #d1d5db;
+}
+
+.newBillingTop3Row::after {
+  content: attr(data-fullname);
+  position: absolute;
+  left: 0;
+  top: calc(100% + 4px);
+  background: #111827;
+  color: #ffffff;
+  font-size: 10px;
+  line-height: 1.4;
+  padding: 6px 8px;
+  border-radius: 6px;
+  opacity: 0;
+  transform: translateY(3px);
+  pointer-events: none;
+  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.18);
+  z-index: 1200;
+  min-width: 130px;
+  max-width: 170px;
+  white-space: normal;
+}
+
+.newBillingTop3Row:hover::after,
+.newBillingTop3Row:focus-within::after {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.newBillingTop3Row:hover,
+.newBillingTop3Row:focus-within {
+  z-index: 1100;
+}
+
+.newBillingCustomerName {
+  font-size: 9px;
+  color: #475569;
+  line-height: 1.25;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.newBillingAmountBadge {
+  height: 18px;
+  border-radius: 999px;
+  background: #b6b6b6;
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 0 7px;
+  white-space: nowrap;
+}
+
+.agentDashboard.is-spacious .openIssuesTop3,
+.agentDashboard.is-spacious .agingBucketsTop3,
+.agentDashboard.is-spacious .newBillingTop3 {
+  display: none;
+}
+
+.agentDashboard.is-spacious .openIssuesMain,
+.agentDashboard.is-spacious .agingBucketsMain,
+.agentDashboard.is-spacious .newBillingMain {
+  flex: 1 1 100%;
+}
+
+.agentDashboard.is-spacious #newAllocationsCard .actionOverdueText,
+.agentDashboard.is-spacious #ptpForDayCard .actionOverdueText,
+.agentDashboard.is-spacious #callbacksForDayCard .actionOverdueText {
+  display: none;
+}
+
+.visitTooltip {
   position: absolute;
   left: 0;
   top: calc(100% + 6px);
   background: #111827;
   color: #ffffff;
-  font-size: 11px;
+  font-size: 10px;
   line-height: 1.4;
-  padding: 6px 8px;
+  padding: 8px;
   border-radius: 6px;
-  white-space: pre;
   opacity: 0;
   transform: translateY(4px);
   pointer-events: none;
   box-shadow: 0 10px 20px rgba(15, 23, 42, 0.18);
   z-index: 999;
-  min-width: 180px;
+  min-width: 260px;
 }
 
-.visitList:hover::after {
+.visitList:hover .visitTooltip,
+.visitList:focus-within .visitTooltip {
   opacity: 1;
   transform: translateY(0);
+}
+
+.visitTooltipList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.visitTooltipRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.visitTooltipIcon {
+  display: inline-flex;
+  align-items: center;
+}
+
+.visitTooltipCustomer {
+  color: #e2e8f0;
+  font-weight: 400;
+}
+
+.visitTooltipRow.is-planned .visitTooltipIcon,
+.visitTooltipRow.is-planned .visitTooltipCustomer {
+  color: #86efac;
+}
+
+.visitTooltipRow.is-unplanned .visitTooltipIcon,
+.visitTooltipRow.is-unplanned .visitTooltipCustomer {
+  color: #fdba74;
+}
+
+.visitTooltipRow.is-not-visited .visitTooltipIcon,
+.visitTooltipRow.is-not-visited .visitTooltipCustomer {
+  color: #fda4af;
 }
 
 .visitNames {
@@ -425,6 +808,10 @@ body.motion-preload .dashboardCard {
   margin-top: 4px;
   font-size: 12px;
   color: #0f172a;
+}
+
+.kpiDueLabel {
+  color: #ea580c;
 }
 
 .kpiSplitLine {
@@ -500,6 +887,10 @@ body.motion-preload .dashboardCard {
 .actionMeta span {
   font-size: 12px;
   color: #64748b;
+}
+
+.actionMeta .actionOverdueText {
+  color: #fb923c;
 }
 
 .actionMeta strong {
@@ -800,6 +1191,655 @@ body.motion-preload .dashboardCard {
   background: #ffffff;
 }
 
+.vintageDetailTableWrap {
+  border: 1px solid #e2e8f4;
+  border-radius: 10px;
+  overflow: auto;
+  max-height: 620px;
+}
+
+.vintageDetailTable {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 860px;
+}
+
+.vintageDetailTable th,
+.vintageDetailTable td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #e2e8f4;
+  font-size: 12px;
+  color: #334155;
+  vertical-align: middle;
+}
+
+.vintageDetailTable th {
+  position: sticky;
+  top: 0;
+  background: #f8fafc;
+  font-size: 11px;
+  font-weight: 700;
+  color: #475569;
+  z-index: 1;
+  text-align: center;
+}
+
+.vintageDetailTable th:nth-child(2),
+.vintageDetailTable td:nth-child(2),
+.vintageDetailTable th:nth-child(3),
+.vintageDetailTable td:nth-child(3) {
+  width: 90px;
+  white-space: nowrap;
+}
+
+.vintageDetailTable th:nth-child(2),
+.vintageDetailTable td:nth-child(2),
+.vintageDetailTable th:nth-child(3),
+.vintageDetailTable td:nth-child(3),
+.vintageDetailTable th:nth-child(4),
+.vintageDetailTable td:nth-child(4),
+.vintageDetailTable th:nth-child(5),
+.vintageDetailTable td:nth-child(5) {
+  text-align: right;
+}
+
+.vintageDetailTable th:nth-child(6),
+.vintageDetailTable td:nth-child(6) {
+  text-align: center;
+}
+
+.vintageShareProgress {
+  position: relative;
+  flex: 0 0 100px;
+  width: 100px;
+  height: 10px;
+  border-radius: 999px;
+  background: #e2e8f4;
+  overflow: hidden;
+  min-width: 100px;
+}
+
+.vintageShareProgressFill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #5c258d 0%, #2563eb 100%);
+}
+
+.vintageBucketBarText {
+  margin-left: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #475569;
+}
+
+.vintageBucketShareCell {
+  display: grid;
+  grid-template-columns: 100px auto;
+  column-gap: 8px;
+  align-items: center;
+  width: max-content;
+  min-width: 0;
+}
+
+.vintageDetailTable td:nth-child(6) .vintageBucketShareCell {
+  margin: 0 auto;
+}
+
+.visitPlanModal .modal-dialog {
+  max-width: min(1040px, 96vw);
+}
+
+.visitPlanModal .modal-content {
+  height: min(82vh, 900px);
+}
+
+.visitPlanModal .modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+}
+
+.visitPlanNav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.visitNavBtn {
+  width: 34px;
+  height: 34px;
+  border: 1px solid #e2e8f4;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #334155;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.visitTodayBtn {
+  border: 1px solid #d7c3ea;
+  background: #ffffff;
+  color: #4b1f73;
+  border-radius: 10px;
+  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.visitTodayBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.visitNavBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.visitDateInfo {
+  text-align: center;
+  flex: 1;
+}
+
+.visitDateLabel {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.visitDateSub {
+  margin-top: 2px;
+  font-size: 11px;
+  color: #64748b;
+}
+
+.visitPlanBoard {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(260px, 1fr));
+  gap: 10px;
+  min-height: 0;
+  overflow: auto;
+  padding-right: 2px;
+}
+
+.visitPlanColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.visitPlanColumn.is-today .visitPlanCard {
+  background: #eef4ff;
+  border-color: #c7d2fe;
+  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.12);
+}
+
+.visitColumnTitle {
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.visitPlanCard {
+  border: 1px solid #e2e8f4;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.04);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.visitPlanCardHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.visitCustomerName {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.visitPlanMeta {
+  margin-top: 6px;
+  font-size: 11px;
+  color: #64748b;
+}
+
+.visitPlanMeta i {
+  margin-right: 4px;
+}
+
+.visitPlanPurpose {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #334155;
+}
+
+.visitCustomerList {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.visitTypeGroup {
+  border: 1px solid #e2e8f4;
+  border-radius: 10px;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.visitTypeTitle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 10px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  border-bottom: 1px solid #e2e8f4;
+}
+
+.visitTypeList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+}
+
+.visitTypeGroup.is-planned .visitTypeTitle {
+  background: #ecfdf3;
+  color: #166534;
+}
+
+.visitTypeGroup.is-unplanned .visitTypeTitle {
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+.visitTypeGroup.is-not-visited .visitTypeTitle {
+  background: #fff1f2;
+  color: #be123c;
+}
+
+.visitCustomerItem {
+  border: 1px solid #dbe4f0;
+  border-radius: 10px;
+  background: #f8fafc;
+  padding: 8px 10px;
+}
+
+.visitTypeGroup.is-planned .visitCustomerItem {
+  border-left: 3px solid #22c55e;
+}
+
+.visitTypeGroup.is-unplanned .visitCustomerItem {
+  border-left: 3px solid #f97316;
+}
+
+.visitTypeGroup.is-not-visited .visitCustomerItem {
+  border-left: 3px solid #e11d48;
+}
+
+.visitCustomerHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.visitCustomerCode {
+  font-size: 10px;
+  font-weight: 700;
+  color: #334155;
+  background: #e2e8f0;
+  border: 1px solid #cbd5e1;
+  border-radius: 999px;
+  padding: 2px 8px;
+  white-space: nowrap;
+}
+
+.visitStatusPill,
+.visitTimelinessPill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+}
+
+.visitStatusPill.is-approved {
+  background: #dcfce7;
+  color: #166534;
+  border-color: #86efac;
+}
+
+.visitStatusPill.is-pending {
+  background: #fef9c3;
+  color: #a16207;
+  border-color: #fde68a;
+}
+
+.visitStatusPill.is-rejected {
+  background: #fee2e2;
+  color: #991b1b;
+  border-color: #fecaca;
+}
+
+.visitTimelinessPill.is-ontime {
+  background: #e0f2fe;
+  color: #0c4a6e;
+  border-color: #bae6fd;
+}
+
+.visitTimelinessPill.is-late {
+  background: #fff7ed;
+  color: #9a3412;
+  border-color: #fdba74;
+}
+
+.visitSubmitInfo {
+  font-size: 11px;
+  color: #64748b;
+}
+
+.visitPlanEmpty {
+  border: 1px dashed #cbd5e1;
+  border-radius: 12px;
+  background: #f8fafc;
+  color: #64748b;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 20px 12px;
+}
+
+.visitPlanCardEmpty {
+  height: 100%;
+}
+
+.mtdCollectionModal .modal-dialog {
+  max-width: min(1420px, 98vw);
+}
+
+.mtdCollectionModal .modal-content {
+  height: min(76vh, 700px);
+  min-height: min(76vh, 700px);
+}
+
+.mtdCollectionModal .modal-body {
+  padding: 14px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.mtdModalHeaderActions {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mtdIssueTrackerBtn {
+  padding: 6px 10px;
+  font-size: 11px;
+}
+
+.mtdTableFilters {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.mtdTableFilters .filterRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.mtdTableFilters .mtdFiltersRow {
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.mtdTableFilters .mtdFilterGroup {
+  margin-left: auto;
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.mtdCollectionModal .tableFilterSearch {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--brand-border);
+  background: #ffffff;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 12px;
+  color: #64748b;
+  min-width: min(460px, 100%);
+}
+
+.mtdCollectionModal .tableFilterSearch i {
+  color: var(--brand);
+}
+
+.mtdCollectionModal .tableFilterSearch input {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 12px;
+  color: #0f172a;
+  width: 100%;
+}
+
+.mtdCollectionModal .tableFilterSearch:focus-within {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 2px rgba(var(--brand-rgb), 0.14);
+}
+
+.mtdCollectionModal .filterDropdown {
+  position: relative;
+}
+
+.mtdCollectionModal .filterDropdown summary {
+  list-style: none;
+  cursor: pointer;
+  border: 1px solid #e2e8f4;
+  background: #ffffff;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #111827;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mtdCollectionModal .filterDropdown summary::-webkit-details-marker {
+  display: none;
+}
+
+.mtdCollectionModal .filterBadge {
+  background: #f1f5f9;
+  border: 1px solid #e2e8f4;
+  color: #334155;
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.mtdCollectionModal .filterMenu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  min-width: 220px;
+  background: #ffffff;
+  border: 1px solid #e2e8f4;
+  border-radius: 12px;
+  padding: 6px;
+  box-shadow: 0 16px 32px rgba(15, 23, 42, 0.12);
+  display: none;
+  z-index: 30;
+}
+
+.mtdCollectionModal .filterDropdown[open] .filterMenu {
+  display: block;
+}
+
+.mtdCollectionModal .filterItem {
+  width: 100%;
+  border: none;
+  background: transparent;
+  text-align: left;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  color: #111827;
+  cursor: pointer;
+}
+
+.mtdCollectionModal .filterItem:hover {
+  background: #f8fafc;
+}
+
+.mtdCollectionTable th,
+.mtdCollectionTable td {
+  text-align: left;
+  overflow: visible;
+}
+
+.mtdCollectionTable {
+  table-layout: auto;
+}
+
+.mtdCollectionModal .tableWrap {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+.mtdCollectionTable .amountCell {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.mtdCollectionTable th:last-child,
+.mtdCollectionTable td:last-child {
+  min-width: 165px;
+  white-space: normal;
+}
+
+.mtdCollectionTable tbody tr {
+  height: 40px;
+}
+
+.mtdCollectionEmpty {
+  text-align: center !important;
+  color: #64748b;
+  font-weight: 600;
+  padding: 18px 12px !important;
+}
+
+.mtdPlaceholderRow td {
+  color: transparent;
+}
+
+.mtdCollectionTable tbody tr.mtdPlaceholderRow:hover {
+  background: transparent !important;
+}
+
+.mtdStatusPill {
+  display: inline-block;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.mtdStatusPill.is-collected {
+  background: #dcfce7;
+  color: #166534;
+  border-color: #86efac;
+}
+
+.mtdStatusPill.is-partial {
+  background: #fef9c3;
+  color: #a16207;
+  border-color: #fde68a;
+}
+
+.mtdStatusPill.is-progress {
+  background: #e0f2fe;
+  color: #0c4a6e;
+  border-color: #bae6fd;
+}
+
+.mtdStatusPill.is-default {
+  background: #f1f5f9;
+  color: #334155;
+  border-color: #cbd5e1;
+}
+
+.mtdTablePagination {
+  margin-top: 8px;
+}
+
+.mtdPaginationActions {
+  display: inline-flex;
+  gap: 8px;
+}
+
+.mtdPageBtn {
+  border: 1px solid #e2e8f4;
+  background: #ffffff;
+  color: #334155;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 10px;
+}
+
+.mtdPageBtn:hover:not(:disabled) {
+  border-color: var(--brand);
+  color: var(--brand-dark);
+}
+
+.mtdPageBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 @media (max-width: 1300px) {
   .dashboardTopGrid {
     grid-template-columns: repeat(12, minmax(0, 1fr));
@@ -840,5 +1880,24 @@ body.motion-preload .dashboardCard {
   .chartStats,
   .modalHighlights {
     grid-template-columns: 1fr;
+  }
+
+  .mtdCollectionModal .modal-content {
+    height: min(88vh, 700px);
+    min-height: min(88vh, 700px);
+  }
+
+  .mtdCollectionModal .tableFilterSearch {
+    min-width: 100%;
+  }
+
+  .mtdTableFilters .mtdFiltersRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .mtdTableFilters .mtdFilterGroup {
+    margin-left: 0;
+    justify-content: flex-start;
   }
 }

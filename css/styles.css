@@ -207,6 +207,20 @@ button.notifyBadge {
   font-weight: 700;
 }
 
+.modal .modal-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.modal .modal-header > :last-child {
+  margin-left: auto;
+}
+
+.modal .modal-header .btn-close {
+  margin: 0 0 0 auto !important;
+}
+
 .notificationBell {
   border: none;
   background: transparent;
@@ -1239,7 +1253,7 @@ button.notifyBadge {
   padding: 4px 0;
   color: #94a3b8;
   font-weight: 700;
-  text-transform: uppercase;
+  text-transform: capitalize;
   letter-spacing: 0.04em;
   width: 40%;
 }
@@ -3939,7 +3953,7 @@ table thead th {
   background: #5c258d !important;
   color: #ffffff !important;
   font-weight: 700 !important;
-  text-transform: uppercase !important;
+  text-transform: capitalize !important;
   letter-spacing: 0.04em !important;
 }
 .animateUp {

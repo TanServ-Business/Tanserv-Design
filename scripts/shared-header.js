@@ -2,6 +2,15 @@
   const mount = document.querySelector("[data-shared-header]");
   if (!mount) return;
 
+  // Keep native browser right-click menu available across pages.
+  document.addEventListener(
+    "contextmenu",
+    (event) => {
+      event.stopPropagation();
+    },
+    true
+  );
+
   const rawRootPath = (document.body.dataset.rootPath || "").trim();
   const rootPath = rawRootPath && !rawRootPath.endsWith("/") ? `${rawRootPath}/` : rawRootPath;
 
@@ -31,6 +40,26 @@
     ? `<img src="${relationshipLogoSrc}" alt="${escapeHtml(relationshipLogoAlt)}" />`
     : escapeHtml(relationshipBadge);
 
+  const getDashboardPath = () => {
+    const explicit = (document.body.dataset.dashboardPath || "").trim();
+    if (explicit) return explicit;
+
+    const role = (localStorage.getItem("activeUserRole") || "").trim().toLowerCase();
+    const roleDashboards = {
+      agent: "pages/LPagent.html",
+      manager: "pages/LPmanager.html",
+      supervisor: "pages/LPsupervisor.html",
+      kam: "pages/KAM.html",
+      kas: "pages/KAS.html",
+      backend: "pages/LPbackend.html",
+      mis: "pages/LPmis.html",
+      approver: "bin/IssueTracker/approver-dashboard.html"
+    };
+
+    return roleDashboards[role] || "pages/LPagent.html";
+  };
+  const dashboardPath = resolvePath(getDashboardPath());
+
   const hasEmailPanel = Boolean(document.getElementById("emailPanel"));
   const emailActionMarkup = hasEmailPanel
     ? `
@@ -49,7 +78,7 @@
         <i class="bi bi-list" aria-hidden="true"></i>
       </button>
     </div>
-    <div class="brand"><a href="${resolvePath("index.html")}">
+    <div class="brand"><a href="${dashboardPath}">
       <img class="logoInebura" src="${resolvePath("assets/logo.png")}" alt="Inebura logo" /></a>
     </div>
 
