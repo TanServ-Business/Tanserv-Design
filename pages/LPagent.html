@@ -18,11 +18,15 @@
   <section class="dashboardHero">
     <div>
       <div class="heroEyebrow">Agent Dashboard</div>
-      <h1>Devashish Agent1</h1>
+      <div class="heroTitleRow">
+        <h1>Devashish Agent1</h1>
+        <button type="button" class="summaryIconBtn" id="dashboardSummaryBtn" aria-label="Summarise dashboard data" title="Summary">
+          <i class="bi bi-stars" aria-hidden="true"></i>
+        </button>
+      </div>
       <div class="heroMeta">
         <span class="heroTag">Portfolio Rs. 2,48,96,98,803</span>
-        <span class="heroTag">As of Feb 6, 2026</span>
-        <span class="heroTag">Territory: West Zone</span>
+        <span class="heroTag heroTagRefresh" id="asOfRefreshTag" role="button" tabindex="0" data-hint="click to refresh" title="click to refresh">As of Feb 6, 2026</span>
       </div>
     </div>
     <div class="heroActions">
@@ -384,7 +388,7 @@
           <div class="chartHeader">
             <div>
               <div class="chartTitle">Cash Flow Trend</div>
-              <div class="chartMeta">Collections vs PTP (last 12 weeks)</div>
+              <div class="chartMeta">Collections and PTP (current month)</div>
             </div>
             <div class="chartHint">Click for details</div>
           </div>
@@ -392,9 +396,9 @@
             <canvas id="chartCashflow"></canvas>
           </div>
           <div class="chartStats">
-            <div class="chartStat">Best week<strong>Week 6</strong></div>
-            <div class="chartStat">Avg weekly<strong>Rs. 0.62 Cr</strong></div>
-            <div class="chartStat">Volatility<strong>Moderate</strong></div>
+            <div class="chartStat">MTD Collection<strong id="cashflowCardMtd">-</strong></div>
+            <div class="chartStat">PTP Due<strong id="cashflowCardPtpDue">-</strong></div>
+            <div class="chartStat">Variance<strong id="cashflowCardVariance">-</strong></div>
           </div>
         </article>
       </div>
@@ -576,6 +580,59 @@
               </div>
             </div>
             <div class="activityDetailMeta" id="issueDetailMeta"></div>
+          </section>
+        </div>
+        <div class="cashflowDetailLayout" id="cashflowDetailLayout" hidden>
+          <section class="cashflowDetailChartPane">
+            <div class="cashflowPopupSummary" aria-label="Cashflow summary">
+              <div class="cashflowPopupSummaryText">
+                <span>MTD collection: <strong id="cashflowPopupMtd">-</strong></span>
+                <span class="cashflowPopupSummaryDivider">|</span>
+                <span>PTP due till date: <strong id="cashflowPopupPtpDue">-</strong></span>
+                <span class="cashflowPopupSummaryDivider">|</span>
+                <span>Projected month-end: <strong id="cashflowPopupProjected">-</strong></span>
+              </div>
+            </div>
+            <div class="cashflowDetailChartWrap">
+              <canvas id="cashflowDetailCanvas"></canvas>
+            </div>
+          </section>
+          <section class="cashflowDetailTablePane">
+            <div class="cashflowWeekToolbar">
+              <div class="cashflowWeekRange" id="cashflowDetailWeekInfo">Week 1 | 1st Feb 2026 - 7th Feb 2026</div>
+              <nav aria-label="Cashflow week navigation">
+                <ul class="pagination pagination-sm mb-0 cashflowWeekPager">
+                  <li class="page-item">
+                    <button type="button" class="page-link" id="cashflowDetailPrevWeekBtn" aria-label="Previous week">
+                      <i class="bi bi-chevron-left" aria-hidden="true"></i>
+                    </button>
+                  </li>
+                  <li class="page-item disabled" aria-disabled="true">
+                    <span class="page-link cashflowWeekLabel" id="cashflowDetailWeekLabel">Week 1</span>
+                  </li>
+                  <li class="page-item">
+                    <button type="button" class="page-link" id="cashflowDetailNextWeekBtn" aria-label="Next week">
+                      <i class="bi bi-chevron-right" aria-hidden="true"></i>
+                    </button>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+            <div class="cashflowDetailTableWrap">
+              <table class="cashflowDetailTable">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Collection</th>
+                    <th>PTP Date</th>
+                    <th>PTP Amount</th>
+                    <th>Projected Collection</th>
+                    <th>Variance</th>
+                  </tr>
+                </thead>
+                <tbody id="cashflowDetailTableBody"></tbody>
+              </table>
+            </div>
           </section>
         </div>
         <div class="targetDetailLayout" id="targetDetailLayout" hidden>
@@ -827,6 +884,30 @@
           </button>
         </div>
         <div class="visitPlanBoard" id="visitPlanBoard"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="dashboardSummaryModal" tabindex="-1" aria-labelledby="dashboardSummaryModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="dashboardSummaryModalLabel">Summary</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body dashboardSummaryBody">
+        <div class="dashboardSummaryLead">Overview generated from current dashboard values.</div>
+        <div id="dashboardSummarySkeleton" class="dashboardSummarySkeleton" hidden>
+          <div class="summarySkeletonLine w-70"></div>
+          <div class="summarySkeletonLine w-92"></div>
+          <div class="summarySkeletonLine w-85"></div>
+          <div class="summarySkeletonLine w-78"></div>
+          <div class="summarySkeletonLine w-88"></div>
+          <div class="summarySkeletonLine w-74"></div>
+        </div>
+        <div id="dashboardSummaryContent" class="dashboardSummaryContent"></div>
+        <div class="dashboardSummaryMeta" id="dashboardSummaryMeta">-</div>
       </div>
     </div>
   </div>
@@ -1101,14 +1182,14 @@
       },
       cashflow: {
         title: "Cash Flow Trend",
-        meta: "Collections vs PTP (last 12 weeks)",
+        meta: "Collections and PTP (current month)",
         type: "line",
         data: {
-          labels: ["W1", "W2", "W3", "W4", "W5", "W6", "W7", "W8", "W9", "W10", "W11", "W12"],
+          labels: [],
           datasets: [
             {
               label: "Collections",
-              data: [0.4, 0.5, 0.48, 0.62, 0.58, 0.9, 0.72, 0.6, 0.64, 0.7, 0.55, 0.62],
+              data: [],
               borderColor: palette.blue,
               backgroundColor: palette.blueLight,
               tension: 0.35,
@@ -1116,16 +1197,58 @@
             },
             {
               label: "PTP",
-              data: [0.5, 0.54, 0.6, 0.65, 0.7, 0.82, 0.74, 0.63, 0.58, 0.66, 0.6, 0.68],
-              borderColor: palette.teal,
-              backgroundColor: palette.tealLight,
-              tension: 0.35,
-              fill: true
+              data: [],
+              borderColor: "rgba(0,0,0,0)",
+              backgroundColor: "rgba(217, 119, 6, 0.12)",
+              showLine: false,
+              borderWidth: 0,
+              pointRadius: (context) => {
+                const day = (context.dataIndex || 0) + 1;
+                return getCashflowPtpEvent(day) ? 3 : 0;
+              },
+              pointHoverRadius: (context) => {
+                const day = (context.dataIndex || 0) + 1;
+                return getCashflowPtpEvent(day) ? 5 : 0;
+              },
+              pointBackgroundColor: (context) => {
+                const day = (context.dataIndex || 0) + 1;
+                return getCashflowPtpColors(day).fill;
+              },
+              pointBorderColor: (context) => {
+                const day = (context.dataIndex || 0) + 1;
+                return getCashflowPtpColors(day).border;
+              },
+              pointBorderWidth: (context) => {
+                const day = (context.dataIndex || 0) + 1;
+                return getCashflowPtpEvent(day) ? 1 : 0;
+              },
+              fill: false
             }
           ]
         },
         options: {
+          plugins: {
+            legend: {
+              position: "bottom",
+              labels: {
+                usePointStyle: true,
+                pointStyle: "line",
+                pointStyleWidth: 28,
+                boxWidth: 28,
+                boxHeight: 2
+              }
+            }
+          },
           scales: {
+            x: {
+              ticks: {
+                autoSkip: false,
+                callback: function(value) {
+                  const label = this.getLabelForValue(value);
+                  return ["D1", "D5", "D10", "D15", "D20", "D25"].includes(label) ? label : "";
+                }
+              }
+            },
             y: {
               beginAtZero: true,
               ticks: { callback: (value) => `Rs. ${value} Cr` }
@@ -1133,9 +1256,9 @@
           }
         },
         highlights: [
-          { label: "Best week", value: "Week 6" },
-          { label: "Avg weekly", value: "Rs. 0.62 Cr" },
-          { label: "Volatility", value: "Moderate" }
+          { label: "MTD collection", value: "-" },
+          { label: "PTP due", value: "-" },
+          { label: "Variance", value: "-" }
         ]
       },
       activity: {
@@ -1277,6 +1400,9 @@
     const issueCardDocsShare = document.getElementById("issueCardDocsShare");
     const issueCardActionShare = document.getElementById("issueCardActionShare");
     const issueCardMaterialShare = document.getElementById("issueCardMaterialShare");
+    const cashflowCardMtd = document.getElementById("cashflowCardMtd");
+    const cashflowCardPtpDue = document.getElementById("cashflowCardPtpDue");
+    const cashflowCardVariance = document.getElementById("cashflowCardVariance");
 
     const computeActivityPrimarySummary = (records) => {
       const bucket = records.reduce((acc, item) => {
@@ -1313,6 +1439,68 @@
         bucket[key] += 1;
       });
       return bucket;
+    };
+
+    const cashflowDaysInMonth = 28;
+    const cashflowCurrentDay = 13;
+    const cashflowCollectionDailyCr = [
+      0.00, 0.42, 0.00, 0.36, 0.00, 0.00, 0.95, 0.00, 0.18, 0.00, 0.00, 1.11, 0.30,
+      0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+    ];
+    const cashflowPtpDailyCr = [
+      0.00, 0.42, 0.00, 0.30, 0.00, 0.00, 1.05, 0.00, 0.24, 0.00, 0.59, 1.11, 0.40,
+      0.00, 0.00, 0.00, 0.52, 0.00, 0.00, 0.00, 0.46, 0.00, 0.00, 0.00, 0.00, 0.67, 0.00, 0.00
+    ];
+    const cashflowLastMonthCollectionDailyCr = [
+      0.16, 0.00, 0.33, 0.00, 0.28, 0.00, 0.62, 0.00, 0.21, 0.00, 0.49, 0.37, 0.00,
+      0.42, 0.00, 0.25, 0.54, 0.00, 0.00, 0.46, 0.00, 0.58, 0.00, 0.31, 0.00, 0.67, 0.00, 0.29
+    ];
+    const cashflowProjectedDailyCr = [
+      0.20, 0.22, 0.21, 0.25, 0.22, 0.24, 0.28, 0.23, 0.25, 0.24, 0.26, 0.30, 0.31,
+      0.32, 0.33, 0.30, 0.34, 0.31, 0.32, 0.33, 0.34, 0.32, 0.33, 0.34, 0.35, 0.37, 0.36, 0.38
+    ];
+    const cashflowMonthFlowRecords = Array.from({ length: cashflowDaysInMonth }, (_, index) => {
+      const day = index + 1;
+      const isPastOrToday = day <= cashflowCurrentDay;
+      const collectionCr = isPastOrToday ? Number(cashflowCollectionDailyCr[index] || 0) : null;
+      const ptpAmountCr = Number(cashflowPtpDailyCr[index] || 0);
+      const projectedCr = Number(cashflowProjectedDailyCr[index] || 0);
+      const varianceCr = isPastOrToday ? Number((collectionCr - projectedCr).toFixed(2)) : null;
+      return {
+        day,
+        dateLabel: `Feb ${String(day).padStart(2, "0")}, 2026`,
+        collectionCr,
+        ptpDateLabel: ptpAmountCr > 0 ? `Feb ${String(day).padStart(2, "0")}, 2026` : "-",
+        ptpAmountCr,
+        projectedCr,
+        varianceCr
+      };
+    });
+    function formatCrCurrency(value) {
+      return `Rs. ${Number(value || 0).toLocaleString("en-IN", { maximumFractionDigits: 2, minimumFractionDigits: 2 })} Cr`;
+    }
+    function formatCount(value) {
+      return Number(value || 0).toLocaleString("en-IN");
+    }
+    const getCashflowPtpEvent = (day) => {
+      const row = cashflowMonthFlowRecords[day - 1];
+      if (!row || Number(row.ptpAmountCr || 0) <= 0) return null;
+      if (day > cashflowCurrentDay) {
+        return { ...row, status: "future", varianceCr: null };
+      }
+      const varianceCr = Number((Number(row.collectionCr || 0) - Number(row.ptpAmountCr || 0)).toFixed(2));
+      const status = Math.abs(varianceCr) < 0.0005
+        ? "no-variance"
+        : (varianceCr > 0 ? "positive" : "negative");
+      return { ...row, status, varianceCr };
+    };
+    const getCashflowPtpColors = (day) => {
+      const event = getCashflowPtpEvent(day);
+      if (!event) return { fill: "rgba(0,0,0,0)", border: "rgba(0,0,0,0)" };
+      if (event.status === "future") return { fill: "#5c258d", border: "#4b1f73" };
+      if (event.status === "no-variance") return { fill: "#f59e0b", border: "#b45309" };
+      if (event.status === "positive") return { fill: "#16a34a", border: "#166534" };
+      return { fill: "#ef4444", border: "#b91c1c" };
     };
 
     const applyActivityCardConfiguration = () => {
@@ -1372,6 +1560,32 @@
 
     applyIssueCardConfiguration();
 
+    const applyCashflowCardConfiguration = () => {
+      const labels = cashflowMonthFlowRecords.map((row) => `D${row.day}`);
+      const collectionSeries = cashflowMonthFlowRecords.map((row) => row.collectionCr);
+      const ptpSeries = cashflowMonthFlowRecords.map((row) => row.ptpAmountCr > 0 ? row.ptpAmountCr : null);
+      chartConfigs.cashflow.data.labels = labels;
+      chartConfigs.cashflow.data.datasets[0].data = collectionSeries;
+      chartConfigs.cashflow.data.datasets[1].data = ptpSeries;
+
+      const mtdCollectionCr = cashflowMonthFlowRecords.reduce((sum, row) => sum + Number(row.collectionCr || 0), 0);
+      const ptpDueCr = cashflowMonthFlowRecords
+        .filter((row) => row.day <= cashflowCurrentDay)
+        .reduce((sum, row) => sum + Number(row.ptpAmountCr || 0), 0);
+      const varianceCr = Number((mtdCollectionCr - ptpDueCr).toFixed(2));
+      const varianceValue = `${varianceCr >= 0 ? "+" : "-"}${formatCrCurrency(Math.abs(varianceCr))}`;
+      chartConfigs.cashflow.highlights = [
+        { label: "MTD collection", value: formatCrCurrency(mtdCollectionCr) },
+        { label: "PTP due", value: formatCrCurrency(ptpDueCr) },
+        { label: "Variance", value: varianceValue }
+      ];
+      if (cashflowCardMtd) cashflowCardMtd.textContent = formatCrCurrency(mtdCollectionCr);
+      if (cashflowCardPtpDue) cashflowCardPtpDue.textContent = formatCrCurrency(ptpDueCr);
+      if (cashflowCardVariance) cashflowCardVariance.textContent = varianceValue;
+    };
+
+    applyCashflowCardConfiguration();
+
     buildChart("chartVintage", chartConfigs.vintage);
     buildChart("chartPlanActual", chartConfigs.planActual);
     buildChart("chartCashflow", chartConfigs.cashflow);
@@ -1426,6 +1640,18 @@
     const issueDetailPrevBtn = document.getElementById("issueDetailPrevBtn");
     const issueDetailNextBtn = document.getElementById("issueDetailNextBtn");
     const issueShowPrimaryBtn = document.getElementById("issueShowPrimaryBtn");
+    const cashflowDetailLayout = document.getElementById("cashflowDetailLayout");
+    const cashflowDetailCanvas = document.getElementById("cashflowDetailCanvas");
+    const cashflowDetailTableBody = document.getElementById("cashflowDetailTableBody");
+    const cashflowPopupMtd = document.getElementById("cashflowPopupMtd");
+    const cashflowPopupPtpDue = document.getElementById("cashflowPopupPtpDue");
+    const cashflowPopupProjected = document.getElementById("cashflowPopupProjected");
+    const cashflowDetailWeekLabel = document.getElementById("cashflowDetailWeekLabel");
+    const cashflowDetailWeekInfo = document.getElementById("cashflowDetailWeekInfo");
+    const cashflowDetailPrevWeekBtn = document.getElementById("cashflowDetailPrevWeekBtn");
+    const cashflowDetailNextWeekBtn = document.getElementById("cashflowDetailNextWeekBtn");
+    const cashflowDetailPrevWeekPageItem = cashflowDetailPrevWeekBtn ? cashflowDetailPrevWeekBtn.closest(".page-item") : null;
+    const cashflowDetailNextWeekPageItem = cashflowDetailNextWeekBtn ? cashflowDetailNextWeekBtn.closest(".page-item") : null;
     const targetDetailLayout = document.getElementById("targetDetailLayout");
     const targetCommitmentValue = document.getElementById("targetCommitmentValue");
     const targetCommitmentMeta = document.getElementById("targetCommitmentMeta");
@@ -1451,11 +1677,19 @@
     let modalChart = null;
     let activityDetailChart = null;
     let issueDetailChart = null;
+    let cashflowDetailChart = null;
     let targetPaceChart = null;
     const activityPageSize = 10;
     const issuePageSize = 10;
+    const cashflowWeekSize = 7;
+    const cashflowTotalWeeks = Math.ceil(cashflowDaysInMonth / cashflowWeekSize);
+    const cashflowDefaultWeekIndex = Math.max(
+      0,
+      Math.min(cashflowTotalWeeks - 1, Math.floor((cashflowCurrentDay - 1) / cashflowWeekSize))
+    );
     let activityCurrentPage = 1;
     let issueCurrentPage = 1;
+    let cashflowCurrentWeekIndex = cashflowDefaultWeekIndex;
     const activityFilterState = {
       search: "",
       primaryStatus: "all",
@@ -1492,10 +1726,6 @@
       previousMonthCommittedDailyCollectionsCr: [0.00, 0.26, 0.16, 0.00, 0.34, 0.00, 0.54, 0.00, 0.13, 0.43, 0.00, 0.58, 0.41],
       previousMonthNonCommittedDailyCollectionsCr: [0.00, 0.09, 0.06, 0.00, 0.07, 0.00, 0.12, 0.00, 0.05, 0.09, 0.00, 0.15, 0.12]
     };
-
-    const formatCrCurrency = (value) => `Rs. ${Number(value || 0).toLocaleString("en-IN", { maximumFractionDigits: 2, minimumFractionDigits: 2 })} Cr`;
-    const formatCount = (value) => Number(value || 0).toLocaleString("en-IN");
-
     const buildVintageTableRows = () => {
       const values = chartConfigs.vintage?.data?.datasets?.[0]?.data || [];
       const normalizedValues = [
@@ -1583,6 +1813,244 @@
       "\"": "&quot;",
       "'": "&#39;"
     })[ch] || ch);
+    const getCashflowWeekRange = (weekIndex) => {
+      const safeWeekIndex = Math.max(0, Math.min(cashflowTotalWeeks - 1, Number(weekIndex || 0)));
+      const startDay = (safeWeekIndex * cashflowWeekSize) + 1;
+      const endDay = Math.min(startDay + cashflowWeekSize - 1, cashflowDaysInMonth);
+      return {
+        weekIndex: safeWeekIndex,
+        weekNumber: safeWeekIndex + 1,
+        startDay,
+        endDay
+      };
+    };
+    const formatOrdinalDay = (day) => {
+      const n = Number(day || 0);
+      const mod100 = n % 100;
+      if (mod100 >= 11 && mod100 <= 13) return `${n}th`;
+      const mod10 = n % 10;
+      if (mod10 === 1) return `${n}st`;
+      if (mod10 === 2) return `${n}nd`;
+      if (mod10 === 3) return `${n}rd`;
+      return `${n}th`;
+    };
+    const formatCashflowWeekDate = (day) => {
+      const date = new Date(2026, 1, Number(day || 1));
+      const month = date.toLocaleString("en-IN", { month: "short" });
+      const year = date.getFullYear();
+      return `${formatOrdinalDay(date.getDate())} ${month} ${year}`;
+    };
+
+    const renderCashflowDetail = () => {
+      const rows = cashflowMonthFlowRecords;
+      const weekRange = getCashflowWeekRange(cashflowCurrentWeekIndex);
+      const weekRows = rows.slice(weekRange.startDay - 1, weekRange.endDay);
+      if (cashflowDetailTableBody) {
+        cashflowDetailTableBody.innerHTML = weekRows.map((row) => {
+          const hasActual = row.collectionCr != null;
+          const varianceCr = row.varianceCr;
+          const varianceText = varianceCr == null
+            ? "-"
+            : `${varianceCr >= 0 ? "+" : "-"}${formatCrCurrency(Math.abs(varianceCr))}`;
+          const varianceClass = varianceCr == null
+            ? ""
+            : (varianceCr > 0 ? "is-positive" : (varianceCr < 0 ? "is-negative" : "is-neutral"));
+          return `
+            <tr>
+              <td>${safeHtml(row.dateLabel)}</td>
+              <td>${hasActual ? formatCrCurrency(row.collectionCr) : "-"}</td>
+              <td>${safeHtml(row.ptpDateLabel)}</td>
+              <td>${row.ptpAmountCr > 0 ? formatCrCurrency(row.ptpAmountCr) : "-"}</td>
+              <td>${formatCrCurrency(row.projectedCr)}</td>
+              <td class="cashflowVariance ${varianceClass}">${varianceText}</td>
+            </tr>
+          `;
+        }).join("");
+      }
+      if (cashflowDetailWeekLabel) {
+        cashflowDetailWeekLabel.textContent = `Week ${weekRange.weekNumber}`;
+      }
+      if (cashflowDetailWeekInfo) {
+        cashflowDetailWeekInfo.textContent = `Week ${weekRange.weekNumber} | ${formatCashflowWeekDate(weekRange.startDay)} - ${formatCashflowWeekDate(weekRange.endDay)}`;
+      }
+      if (cashflowDetailPrevWeekBtn) {
+        const isDisabled = weekRange.weekIndex <= 0;
+        cashflowDetailPrevWeekBtn.disabled = isDisabled;
+        if (cashflowDetailPrevWeekPageItem) {
+          cashflowDetailPrevWeekPageItem.classList.toggle("disabled", isDisabled);
+          cashflowDetailPrevWeekPageItem.setAttribute("aria-disabled", isDisabled ? "true" : "false");
+        }
+      }
+      if (cashflowDetailNextWeekBtn) {
+        const isDisabled = weekRange.weekIndex >= (cashflowTotalWeeks - 1);
+        cashflowDetailNextWeekBtn.disabled = isDisabled;
+        if (cashflowDetailNextWeekPageItem) {
+          cashflowDetailNextWeekPageItem.classList.toggle("disabled", isDisabled);
+          cashflowDetailNextWeekPageItem.setAttribute("aria-disabled", isDisabled ? "true" : "false");
+        }
+      }
+
+      const mtdCollectionCr = rows.reduce((sum, row) => sum + Number(row.collectionCr || 0), 0);
+      const ptpDueCr = rows
+        .filter((row) => row.day <= cashflowCurrentDay)
+        .reduce((sum, row) => sum + Number(row.ptpAmountCr || 0), 0);
+      const projectedEomCr = rows.reduce((sum, row) => sum + Number(row.projectedCr || 0), 0);
+      if (cashflowPopupMtd) cashflowPopupMtd.textContent = formatCrCurrency(mtdCollectionCr);
+      if (cashflowPopupPtpDue) cashflowPopupPtpDue.textContent = formatCrCurrency(ptpDueCr);
+      if (cashflowPopupProjected) cashflowPopupProjected.textContent = formatCrCurrency(projectedEomCr);
+
+      if (!cashflowDetailCanvas) return;
+      if (cashflowDetailChart) {
+        cashflowDetailChart.destroy();
+        cashflowDetailChart = null;
+      }
+      const cashflowWeekHighlightPlugin = {
+        id: "cashflowWeekHighlight",
+        beforeDatasetsDraw(chart) {
+          const xScale = chart.scales?.x;
+          const chartArea = chart.chartArea;
+          if (!xScale || !chartArea) return;
+          const maxIndex = rows.length - 1;
+          const startIndex = Math.max(0, weekRange.startDay - 1);
+          const endIndex = Math.min(maxIndex, weekRange.endDay - 1);
+          const center = (index) => xScale.getPixelForValue(index);
+          const startCenter = center(startIndex);
+          const endCenter = center(endIndex);
+          if (!Number.isFinite(startCenter) || !Number.isFinite(endCenter)) return;
+          const leftEdge = startIndex <= 0
+            ? chartArea.left
+            : ((center(startIndex - 1) + startCenter) / 2);
+          const rightEdge = endIndex >= maxIndex
+            ? chartArea.right
+            : ((endCenter + center(endIndex + 1)) / 2);
+          const fillWidth = Math.max(0, rightEdge - leftEdge);
+          if (fillWidth <= 0) return;
+          const { ctx } = chart;
+          ctx.save();
+          ctx.fillStyle = "rgba(203, 213, 225, 0.30)";
+          ctx.fillRect(leftEdge, chartArea.top, fillWidth, chartArea.bottom - chartArea.top);
+          ctx.restore();
+        }
+      };
+      cashflowDetailChart = new Chart(cashflowDetailCanvas.getContext("2d"), {
+        plugins: [cashflowWeekHighlightPlugin],
+        type: "line",
+        data: {
+          labels: rows.map((row) => `D${row.day}`),
+          datasets: [
+            {
+              label: "Collection",
+              data: rows.map((row) => row.collectionCr),
+              borderColor: palette.blue,
+              backgroundColor: palette.blueLight,
+              tension: 0.32,
+              fill: true
+            },
+            {
+              label: "PTP",
+              data: rows.map((row) => row.ptpAmountCr > 0 ? row.ptpAmountCr : null),
+              borderColor: "rgba(0,0,0,0)",
+              backgroundColor: "rgba(217, 119, 6, 0.08)",
+              showLine: false,
+              borderWidth: 0,
+              pointRadius: (context) => {
+                const day = (context.dataIndex || 0) + 1;
+                return getCashflowPtpEvent(day) ? 3 : 0;
+              },
+              pointHoverRadius: (context) => {
+                const day = (context.dataIndex || 0) + 1;
+                return getCashflowPtpEvent(day) ? 5 : 0;
+              },
+              pointBackgroundColor: (context) => {
+                const day = (context.dataIndex || 0) + 1;
+                return getCashflowPtpColors(day).fill;
+              },
+              pointBorderColor: (context) => {
+                const day = (context.dataIndex || 0) + 1;
+                return getCashflowPtpColors(day).border;
+              },
+              pointBorderWidth: (context) => {
+                const day = (context.dataIndex || 0) + 1;
+                return getCashflowPtpEvent(day) ? 1 : 0;
+              },
+              fill: false
+            },
+            {
+              label: "Last Month Collection",
+              data: cashflowLastMonthCollectionDailyCr.map((value) => Number(value || 0)),
+              borderColor: "#cbd5e1",
+              backgroundColor: "rgba(203, 213, 225, 0.28)",
+              pointRadius: 0,
+              tension: 0.25,
+              fill: true
+            },
+            {
+              label: "Projected Collection",
+              data: rows.map((row) => row.projectedCr),
+              borderColor: palette.teal,
+              borderDash: [5, 4],
+              pointRadius: 0,
+              tension: 0.2,
+              fill: false
+            }
+          ]
+        },
+        options: {
+          ...baseOptions,
+          interaction: { mode: "index", intersect: false },
+          plugins: {
+            ...baseOptions.plugins,
+            tooltip: {
+              ...baseOptions.plugins.tooltip,
+              filter: (context) => (
+                context.dataset.label !== "PTP" || context.parsed.y !== null
+              ),
+              callbacks: {
+                label: (context) => {
+                  if (context.dataset.label !== "PTP") {
+                    return `${context.dataset.label}: ${formatCrCurrency(context.parsed.y)}`;
+                  }
+                  const day = (context.dataIndex || 0) + 1;
+                  const event = getCashflowPtpEvent(day);
+                  return event ? `PTP promised: ${formatCrCurrency(event.ptpAmountCr)}` : "PTP day";
+                },
+                afterLabel: (context) => {
+                  if (context.dataset.label !== "PTP") return "";
+                  const day = (context.dataIndex || 0) + 1;
+                  const event = getCashflowPtpEvent(day);
+                  if (!event) return "";
+                  if (event.status === "future") return "Status: Future PTP";
+                  const varianceCr = Number(event.varianceCr || 0);
+                  const varianceLabel = `${varianceCr >= 0 ? "+" : "-"}${formatCrCurrency(Math.abs(varianceCr))}`;
+                  return `Collected: ${formatCrCurrency(event.collectionCr)} | Variance: ${varianceLabel}`;
+                }
+              }
+            },
+            legend: {
+              position: "bottom",
+              labels: {
+                usePointStyle: true,
+                pointStyle: "line",
+                pointStyleWidth: 28,
+                boxWidth: 28,
+                boxHeight: 2
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { color: "rgba(148, 163, 184, 0.16)" },
+              ticks: { color: "#64748b", maxTicksLimit: 14, autoSkip: true }
+            },
+            y: {
+              beginAtZero: true,
+              grid: { color: "rgba(148, 163, 184, 0.18)" },
+              ticks: { color: "#64748b", callback: (value) => formatCrCurrency(value) }
+            }
+          }
+        }
+      });
+    };
     const activityTypePillConfig = {
       Call: { icon: "bi-telephone", color: "#0f766e", rgb: "15,118,110" },
       Email: { icon: "bi-envelope", color: "#2563eb", rgb: "37,99,235" },
@@ -2761,6 +3229,20 @@
         renderIssueDetail();
       });
     }
+    if (cashflowDetailPrevWeekBtn) {
+      cashflowDetailPrevWeekBtn.addEventListener("click", () => {
+        if (cashflowCurrentWeekIndex <= 0) return;
+        cashflowCurrentWeekIndex -= 1;
+        renderCashflowDetail();
+      });
+    }
+    if (cashflowDetailNextWeekBtn) {
+      cashflowDetailNextWeekBtn.addEventListener("click", () => {
+        if (cashflowCurrentWeekIndex >= (cashflowTotalWeeks - 1)) return;
+        cashflowCurrentWeekIndex += 1;
+        renderCashflowDetail();
+      });
+    }
 
     if (modalEl) {
       modalEl.addEventListener("hidden.bs.modal", () => {
@@ -2778,6 +3260,14 @@
           if (issueDetailChart) {
             issueDetailChart.destroy();
             issueDetailChart = null;
+          }
+        }
+        if (modalEl.classList.contains("is-cashflow-detail")) {
+          modalEl.classList.remove("is-cashflow-detail");
+          cashflowCurrentWeekIndex = cashflowDefaultWeekIndex;
+          if (cashflowDetailChart) {
+            cashflowDetailChart.destroy();
+            cashflowDetailChart = null;
           }
         }
         if (modalEl.classList.contains("is-target-detail")) {
@@ -2798,14 +3288,16 @@
       const isVintageDetail = key === "vintage";
       const isActivityDetail = key === "activity";
       const isIssueDetail = key === "issues";
+      const isCashflowDetail = key === "cashflow";
       const isTargetDetail = key === "planActual";
       if (modalEl) {
         modalEl.classList.toggle("is-activity-detail", isActivityDetail);
         modalEl.classList.toggle("is-issue-detail", isIssueDetail);
+        modalEl.classList.toggle("is-cashflow-detail", isCashflowDetail);
         modalEl.classList.toggle("is-target-detail", isTargetDetail);
       }
       if (modalCanvas) {
-        modalCanvas.parentElement.hidden = isVintageDetail || isActivityDetail || isIssueDetail || isTargetDetail;
+        modalCanvas.parentElement.hidden = isVintageDetail || isActivityDetail || isIssueDetail || isCashflowDetail || isTargetDetail;
       }
       if (vintageDetailTableWrap) {
         vintageDetailTableWrap.hidden = !isVintageDetail;
@@ -2816,11 +3308,14 @@
       if (issueDetailLayout) {
         issueDetailLayout.hidden = !isIssueDetail;
       }
+      if (cashflowDetailLayout) {
+        cashflowDetailLayout.hidden = !isCashflowDetail;
+      }
       if (targetDetailLayout) {
         targetDetailLayout.hidden = !isTargetDetail;
       }
       if (modalHighlights) {
-        modalHighlights.hidden = isVintageDetail || isActivityDetail || isIssueDetail || isTargetDetail;
+        modalHighlights.hidden = isVintageDetail || isActivityDetail || isIssueDetail || isCashflowDetail || isTargetDetail;
         modalHighlights.innerHTML = config.highlights.map((item) => (
           `<div class="chartStat"><span>${item.label}</span><strong>${item.value}</strong></div>`
         )).join("");
@@ -2833,6 +3328,10 @@
       }
       if (isIssueDetail) {
         renderIssueDetail();
+      }
+      if (isCashflowDetail) {
+        cashflowCurrentWeekIndex = cashflowDefaultWeekIndex;
+        renderCashflowDetail();
       }
       if (isTargetDetail) {
         renderTargetDetail();
@@ -2849,11 +3348,15 @@
         issueDetailChart.destroy();
         issueDetailChart = null;
       }
+      if (cashflowDetailChart && !isCashflowDetail) {
+        cashflowDetailChart.destroy();
+        cashflowDetailChart = null;
+      }
       if (targetPaceChart && !isTargetDetail) {
         targetPaceChart.destroy();
         targetPaceChart = null;
       }
-      if (modalCanvas && !isVintageDetail && !isActivityDetail && !isIssueDetail && !isTargetDetail) {
+      if (modalCanvas && !isVintageDetail && !isActivityDetail && !isIssueDetail && !isCashflowDetail && !isTargetDetail) {
         const data = config.modalData || config.data;
         const options = { ...baseOptions, ...(config.modalOptions || config.options) };
         if (config.type === "doughnut") {
@@ -4114,6 +4617,12 @@
 
     const dashboardRoot = document.querySelector(".agentDashboard");
     const dashboardViewMode = document.getElementById("dashboardViewMode");
+    const dashboardSummaryBtn = document.getElementById("dashboardSummaryBtn");
+    const dashboardSummaryModalEl = document.getElementById("dashboardSummaryModal");
+    const dashboardSummarySkeleton = document.getElementById("dashboardSummarySkeleton");
+    const dashboardSummaryContent = document.getElementById("dashboardSummaryContent");
+    const dashboardSummaryMeta = document.getElementById("dashboardSummaryMeta");
+    const asOfRefreshTag = document.getElementById("asOfRefreshTag");
     const applyDashboardViewMode = (mode) => {
       if (!dashboardRoot) return;
       const isSpacious = String(mode || "spacious").toLowerCase() === "spacious";
@@ -4124,6 +4633,130 @@
       applyDashboardViewMode(dashboardViewMode.value);
       dashboardViewMode.addEventListener("change", (event) => {
         applyDashboardViewMode(event.target.value);
+      });
+    }
+    if (asOfRefreshTag) {
+      const refreshPage = () => window.location.reload();
+      asOfRefreshTag.addEventListener("click", refreshPage);
+      asOfRefreshTag.addEventListener("keydown", (event) => {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        event.preventDefault();
+        refreshPage();
+      });
+    }
+    const stripHtml = (text) => String(text || "").replace(/<[^>]*>/g, " ");
+    const countWords = (text) => stripHtml(text).trim().split(/\s+/).filter(Boolean).length;
+    let dashboardSummaryRunId = 0;
+    const buildDashboardSummary = () => {
+      const metric = (value) => `<span class="dashboardSummaryMetric">${value}</span>`;
+      const mtdCollectionCr = cashflowMonthFlowRecords.reduce((sum, row) => sum + Number(row.collectionCr || 0), 0);
+      const ptpDueCr = cashflowMonthFlowRecords
+        .filter((row) => row.day <= cashflowCurrentDay)
+        .reduce((sum, row) => sum + Number(row.ptpAmountCr || 0), 0);
+      const projectedEomCr = cashflowMonthFlowRecords.reduce((sum, row) => sum + Number(row.projectedCr || 0), 0);
+      const commitmentCr = Number(targetDetailSnapshot?.targetCr || 0);
+      const achievedPct = commitmentCr > 0 ? (mtdCollectionCr / commitmentCr) * 100 : 0;
+      const projectedGapCr = Math.max(0, commitmentCr - projectedEomCr);
+
+      const ptpDueDays = cashflowMonthFlowRecords.filter((row) => row.day <= cashflowCurrentDay && Number(row.ptpAmountCr || 0) > 0);
+      const ptpMetDays = ptpDueDays.filter((row) => Number(row.collectionCr || 0) >= Number(row.ptpAmountCr || 0)).length;
+      const ptpMissedDays = ptpDueDays.filter((row) => Number(row.collectionCr || 0) < Number(row.ptpAmountCr || 0)).length;
+
+      const activityMix = computeActivityTypeSummary(activityDispositionRecords);
+      const totalActivities = activityMix.Call + activityMix.Email + activityMix.Visit;
+      const activityShare = (value) => (totalActivities > 0 ? ((value / totalActivities) * 100).toFixed(1) : "0.0");
+      const topPrimaryStatus = computeActivityPrimarySummary(activityDispositionRecords)[0] || ["-", 0];
+
+      const topIssueCategory = computeIssuePrimarySummary(issueDispositionRecords)[0] || ["-", 0];
+      const agedIssues = issueDispositionRecords.filter((row) => Number(row.openDays || 0) > 14).length;
+
+      const sections = [
+        {
+          title: "1. Collection Progress",
+          points: [
+            `MTD collection is ${metric(formatCrCurrency(mtdCollectionCr))} against commitment of ${metric(formatCrCurrency(commitmentCr))}, translating to ${metric(`${achievedPct.toFixed(1)}%`)} achievement so far.`,
+            `At current pace, projected month-end collection is ${metric(formatCrCurrency(projectedEomCr))}, leaving an estimated gap of ${metric(formatCrCurrency(projectedGapCr))} if conversion does not improve.`
+          ]
+        },
+        {
+          title: "2. PTP Conversion",
+          points: [
+            `PTP due till date is ${metric(formatCrCurrency(ptpDueCr))} across ${metric(String(ptpDueDays.length))} due PTP days.`,
+            `${metric(String(ptpMetDays))} days were met and ${metric(String(ptpMissedDays))} were under-delivered, indicating inconsistent promise quality and follow-through on committed dates.`
+          ]
+        },
+        {
+          title: "3. Activity Overview",
+          points: [
+            `Top invoice concentration is in ${topPrimaryStatus[0]} (${metric(`${topPrimaryStatus[1]} invoices`)}), which should guide prioritization for collection action.`,
+            `Activity mix is Calls ${metric(`${activityShare(activityMix.Call)}%`)}, Emails ${metric(`${activityShare(activityMix.Email)}%`)}, and Visits ${metric(`${activityShare(activityMix.Visit)}%`)}, suggesting broad outreach but uneven conversion.`
+          ]
+        },
+        {
+          title: "4. Risk and Focus",
+          points: [
+            `Top issue category is ${topIssueCategory[0]} (${metric(`${topIssueCategory[1]} cases`)}), with ${metric(String(agedIssues))} issues open beyond 14 days creating execution drag.`,
+            `Immediate focus should be to clear aged blockers, tighten near-term PTP validation, and accelerate high-probability collections scheduled this and next week.`
+          ]
+        }
+      ];
+      let totalWords = countWords(sections.flatMap((section) => section.points).join(" "));
+      if (totalWords < 150) {
+        sections[3].points.push("A tighter daily owner follow-up loop can improve forecast reliability and close the monthly gap faster.");
+        totalWords = countWords(sections.flatMap((section) => section.points).join(" "));
+      }
+      if (totalWords > 200) {
+        sections[2].points[1] = `Activity mix is Calls ${metric(`${activityShare(activityMix.Call)}%`)}, Emails ${metric(`${activityShare(activityMix.Email)}%`)}, and Visits ${metric(`${activityShare(activityMix.Visit)}%`)}.`;
+        totalWords = countWords(sections.flatMap((section) => section.points).join(" "));
+      }
+      return { sections, totalWords };
+    };
+    const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+    const renderDashboardSummary = async () => {
+      if (!dashboardSummaryContent) return;
+      const runId = ++dashboardSummaryRunId;
+      const { sections, totalWords } = buildDashboardSummary();
+      if (dashboardSummarySkeleton) dashboardSummarySkeleton.hidden = false;
+      dashboardSummaryContent.innerHTML = "";
+      if (dashboardSummaryMeta) dashboardSummaryMeta.textContent = "Generating summary...";
+      await sleep(5500);
+      if (runId !== dashboardSummaryRunId) return;
+      if (dashboardSummarySkeleton) dashboardSummarySkeleton.hidden = true;
+      dashboardSummaryContent.innerHTML = sections.map((section, sectionIndex) => `
+        <article class="dashboardSummarySection" data-summary-section="${sectionIndex}">
+          <h6>${section.title}</h6>
+          <ol class="dashboardSummaryList"></ol>
+        </article>
+      `).join("");
+      for (let i = 0; i < sections.length; i += 1) {
+        if (runId !== dashboardSummaryRunId) return;
+        const listEl = dashboardSummaryContent.querySelector(`[data-summary-section="${i}"] .dashboardSummaryList`);
+        if (!listEl) continue;
+        for (const point of sections[i].points) {
+          const li = document.createElement("li");
+          li.innerHTML = point;
+          listEl.appendChild(li);
+          await sleep(320);
+          if (runId !== dashboardSummaryRunId) return;
+        }
+      }
+      if (dashboardSummaryMeta) {
+        dashboardSummaryMeta.textContent = `${totalWords} words | Generated from current page data`;
+      }
+    };
+    if (dashboardSummaryBtn && dashboardSummaryModalEl) {
+      dashboardSummaryBtn.addEventListener("click", () => {
+        const summaryModal = bootstrap.Modal.getOrCreateInstance(dashboardSummaryModalEl);
+        summaryModal.show();
+        renderDashboardSummary();
+      });
+    }
+    if (dashboardSummaryModalEl) {
+      dashboardSummaryModalEl.addEventListener("hidden.bs.modal", () => {
+        dashboardSummaryRunId += 1;
+        if (dashboardSummarySkeleton) dashboardSummarySkeleton.hidden = true;
+        if (dashboardSummaryContent) dashboardSummaryContent.innerHTML = "";
+        if (dashboardSummaryMeta) dashboardSummaryMeta.textContent = "-";
       });
     }
 
