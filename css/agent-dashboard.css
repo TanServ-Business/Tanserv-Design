@@ -251,25 +251,50 @@ body.motion-preload .dashboardCard {
   100% { background-position: -200% 0; }
 }
 
-.viewModeControl {
+.viewModeToggle {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  font-size: 11px;
-  font-weight: 700;
-  color: #64748b;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  gap: 2px;
+  border: 1px solid #c9b0e3;
+  border-radius: 999px;
+  background: #fbf8fe;
+  padding: 2px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
-.viewModeControl select {
-  border: 1px solid #d7c3ea;
-  background: #ffffff;
-  color: #4b1f73;
-  border-radius: 10px;
-  padding: 7px 12px;
+.viewToggleBtn {
+  min-width: 36px;
+  height: 25px;
+  border: 1px solid transparent;
+  background: transparent;
+  border-radius: 999px;
+  color: #5b2e84;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8px;
+  transition: all 0.18s ease;
+}
+
+.viewToggleBtn .bi {
   font-size: 12px;
-  font-weight: 600;
+}
+
+.viewToggleBtn:hover {
+  background: #f3ebfb;
+  color: #45206b;
+}
+
+.viewToggleBtn.is-active {
+  border-color: #5c258d;
+  background: #5c258d;
+  color: #ffffff;
+  box-shadow: 0 6px 14px rgba(92, 37, 141, 0.28);
+}
+
+.viewToggleBtn:focus-visible {
+  outline: 2px solid rgba(92, 37, 141, 0.45);
+  outline-offset: 2px;
 }
 
 .btnGhost {

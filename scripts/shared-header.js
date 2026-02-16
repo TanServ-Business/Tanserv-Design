@@ -302,6 +302,7 @@
           <a class="submenu-link" href="${resolvePath("index.html")}" data-module="landing">Landing Page</a>
           <a class="submenu-link" href="${resolvePath("pages/LPagent.html")}" data-module="landing-agent">Landing Page - Agent</a>
           <a class="submenu-link" href="${resolvePath("pages/LPmanager.html")}" data-module="landing-manager">Landing Page - Manager</a>
+          <a class="submenu-link" href="${resolvePath("pages/dashManager.html")}" data-module="landing-manager-drilldown">Landing Page - Manager Drilldown</a>
           <a class="submenu-link" href="${resolvePath("pages/LPsupervisor.html")}" data-module="landing-supervisor">Landing Page - Supervisor</a>
           <a class="submenu-link" href="${resolvePath("pages/KAM.html")}" data-module="landing-kam">Landing Page - KAM</a>
           <a class="submenu-link" href="${resolvePath("pages/KAS.html")}" data-module="landing-kas">Landing Page - KAS</a>
@@ -682,6 +683,7 @@
             landing: "index.html",
             "landing-agent": "pages/LPagent.html",
             "landing-manager": "pages/LPmanager.html",
+            "landing-manager-drilldown": "pages/dashManager.html",
             "landing-supervisor": "pages/LPsupervisor.html",
             "landing-kam": "pages/KAM.html",
             "landing-kas": "pages/KAS.html",

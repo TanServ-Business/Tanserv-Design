@@ -1,0 +1,329 @@
+{
+  "page": "LPagent",
+  "meta": {
+    "agent_name": "Devashish Agent1",
+    "currency": "INR",
+    "as_of": "2026-02-06",
+    "portfolio_value_inr": 2489698803
+  },
+  "cards": {
+    "kpi": {
+      "total_net_due": {
+        "value_inr": 2488926295,
+        "delta_percent": 6.2,
+        "invoices": 173,
+        "customers": 12,
+        "not_due": {
+          "invoices": 61,
+          "amount_inr": 892416295,
+          "customers": 4
+        },
+        "due": {
+          "invoices": 112,
+          "amount_inr": 1596510000,
+          "customers": 8
+        }
+      },
+      "mtd_collection": {
+        "value_inr": 7773508,
+        "delta_percent": 11.4,
+        "collected_invoices": 4,
+        "not_due": {
+          "invoices": 1,
+          "amount_inr": 1843508,
+          "customers": 1
+        },
+        "due": {
+          "invoices": 3,
+          "amount_inr": 5930000,
+          "customers": 2
+        }
+      },
+      "collection_within_due_date": {
+        "ratio_percent": 86.2,
+        "progress_ratio": 0.862,
+        "not_due": {
+          "invoices": 81,
+          "amount_inr": 69840000,
+          "customers": 5
+        },
+        "due": {
+          "invoices": 92,
+          "amount_inr": 83520000,
+          "customers": 7
+        }
+      },
+      "open_issues": {
+        "total_count": 9,
+        "high_priority_count": 3,
+        "top_issue_counts": [4, 3, 2]
+      },
+      "aging_over_30_days": {
+        "share_percent": 18,
+        "value_cr": 3.8,
+        "top_buckets": {
+          "31_60_days_count": 24,
+          "121_150_days_count": 13,
+          "150_180_days_count": 9
+        }
+      },
+      "new_billing": {
+        "value_cr": 1.2,
+        "mtd_growth_percent": 4.6,
+        "top_3_amounts_cr": [0.62, 0.39, 0.21]
+      },
+      "visits_today": {
+        "planned_visits": 5,
+        "completed_visits": 3,
+        "completion_ratio": 0.6,
+        "visit_type_breakdown": {
+          "planned": 3,
+          "unplanned": 1,
+          "not_visited": 1
+        }
+      }
+    },
+    "action": {
+      "new_allocations": {
+        "count": 17,
+        "value_cr": 3.1,
+        "untouched_count": 17,
+        "untouched_value_cr": 7.2
+      },
+      "ptp_for_the_day": {
+        "count": 5,
+        "value_cr": 1.4,
+        "overdue_ptp_count": 2,
+        "overdue_ptp_value_cr": 0.75
+      },
+      "callbacks_for_the_day": {
+        "count": 11,
+        "value_cr": 0.8,
+        "overdue_callback_count": 2,
+        "overdue_callback_value_cr": 2.75
+      }
+    },
+    "monthly_target": {
+      "achievement_percent": 46,
+      "delta_vs_last_month_percent": 7,
+      "target_cr": 8.4,
+      "collected_cr": 3.85,
+      "today_collection_cr": 0.47,
+      "gauge": {
+        "value_label": "32K",
+        "invoice_count": 91
+      },
+      "plan_vs_actual": {
+        "achieved_cr": 3.85,
+        "remaining_cr": 4.55
+      }
+    }
+  },
+  "charts": {
+    "vintage_portfolio": {
+      "bucket_labels": [
+        "Not Due",
+        "1-30",
+        "31-60",
+        "61-90",
+        "91-120",
+        "121-150",
+        "151-180",
+        "181-210",
+        "211-240",
+        "241-270",
+        "271-300",
+        "301-330",
+        "331-360",
+        "1 Year",
+        "2 Year",
+        "3 Year",
+        "4 Year",
+        "5+ Year"
+      ],
+      "outstanding_cr_by_bucket": [1.1, 2.4, 3.6, 2.8, 1.9, 1.4, 1.2, 1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.42, 0.36, 0.3, 0.24, 0.18],
+      "total_outstanding_cr": 20.4,
+      "highlights": {
+        "top_bucket": "31-60 days",
+        "overdue_total_cr": 4.2,
+        "resolved_this_month_cr": 1.6
+      }
+    },
+    "activity_card": {
+      "total_tagged_invoices": 32,
+      "primary_status_count": 11,
+      "top_primary_status": {
+        "name": "Collection In Progress",
+        "count": 5
+      },
+      "primary_status_distribution": {
+        "No Due": 2,
+        "Part Collected": 4,
+        "PTP": 2,
+        "Collection In Progress": 5,
+        "Invoice Assignment": 1,
+        "Guidance": 2,
+        "Further Docs Required": 4,
+        "Further Action Required": 4,
+        "Material Delivery Issues": 3,
+        "Service Related Issues": 3,
+        "Collected": 2
+      },
+      "activity_type_distribution": {
+        "Call": {
+          "count": 11,
+          "share_percent": 34.4
+        },
+        "Email": {
+          "count": 11,
+          "share_percent": 34.4
+        },
+        "Visit": {
+          "count": 10,
+          "share_percent": 31.3
+        }
+      }
+    },
+    "issue_tracker": {
+      "issue_categories_count": 4,
+      "top_category": {
+        "name": "Further Action Required",
+        "count": 12
+      },
+      "open_over_14_days": 18,
+      "category_distribution": {
+        "Further Docs Required": 9,
+        "Further Action Required": 12,
+        "Material Delivery Issues": 7,
+        "Service Related Issues": 8
+      },
+      "card_stats": {
+        "further_docs": 9,
+        "further_action": 12,
+        "material_delivery": 7
+      }
+    },
+    "cash_flow_trend": {
+      "days_in_month": 28,
+      "current_day": 13,
+      "actual_collection_cr_by_day": [0.0, 0.42, 0.0, 0.36, 0.0, 0.0, 0.95, 0.0, 0.18, 0.0, 0.0, 1.11, 0.3, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
+      "ptp_due_cr_by_day": [0.0, 0.42, 0.0, 0.3, 0.0, 0.0, 1.05, 0.0, 0.24, 0.0, 0.59, 1.11, 0.4, 0.0, 0.0, 0.0, 0.52, 0.0, 0.0, 0.0, 0.46, 0.0, 0.0, 0.0, 0.0, 0.67, 0.0, 0.0],
+      "projected_collection_cr_by_day": [0.2, 0.22, 0.21, 0.25, 0.22, 0.24, 0.28, 0.23, 0.25, 0.24, 0.26, 0.3, 0.31, 0.32, 0.33, 0.3, 0.34, 0.31, 0.32, 0.33, 0.34, 0.32, 0.33, 0.34, 0.35, 0.37, 0.36, 0.38],
+      "last_month_collection_cr_by_day": [0.16, 0.0, 0.33, 0.0, 0.28, 0.0, 0.62, 0.0, 0.21, 0.0, 0.49, 0.37, 0.0, 0.42, 0.0, 0.25, 0.54, 0.0, 0.0, 0.46, 0.0, 0.58, 0.0, 0.31, 0.0, 0.67, 0.0, 0.29],
+      "summary": {
+        "mtd_collection_cr": 3.32,
+        "ptp_due_till_date_cr": 4.11,
+        "variance_cr": -0.79
+      }
+    },
+    "collection_mix": {
+      "week_labels": ["Week 1", "Week 2", "Week 3", "Week 4"],
+      "committed_cr": [1.6, 2.1, 1.9, 2.4],
+      "non_committed_cr": [0.8, 0.9, 0.6, 1.1],
+      "adjustments_cr": [0.4, 0.3, 0.2, 0.35],
+      "highlights": {
+        "committed_share_percent": 58,
+        "non_committed_share_percent": 27,
+        "adjustments_share_percent": 15
+      }
+    }
+  },
+  "target_popup": {
+    "month_label": "Feb 2026",
+    "day_of_month": 14,
+    "days_in_month": 28,
+    "monthly_commitment_cr": 8.4,
+    "collected_till_date_cr": 3.85,
+    "balance_to_collect_cr": 4.55,
+    "pace_vs_expected_cr": -0.35,
+    "run_rate": {
+      "urgency": "At risk",
+      "days_left": 14,
+      "required_per_day_cr": 0.325,
+      "current_avg_per_day_cr": 0.275,
+      "projected_month_end_cr": 6.93,
+      "projected_gap_vs_target_cr": 1.47,
+      "previous_month_same_day_cr": 3.93,
+      "delta_vs_previous_month_percent": -2.04
+    },
+    "daily_series": {
+      "committed_collection_cr": [0.0, 0.3, 0.0, 0.24, 0.0, 0.0, 0.74, 0.0, 0.18, 0.0, 0.0, 0.96, 0.28, 0.42],
+      "non_committed_collection_cr": [0.0, 0.12, 0.0, 0.12, 0.0, 0.0, 0.21, 0.0, 0.06, 0.0, 0.0, 0.15, 0.02, 0.05],
+      "projected_future_collection_cr": [0.22, 0.21, 0.22, 0.23, 0.21, 0.22, 0.23, 0.21, 0.22, 0.23, 0.21, 0.22, 0.23, 0.22],
+      "ideal_collection_per_day_cr": 0.3,
+      "expected_collection_till_day_14_cr": 4.2
+    },
+    "ptp": {
+      "due_days": {
+        "count": 7,
+        "promised_total_cr": 4.11,
+        "met_total_cr": 3.14,
+        "variance_cr": -0.97,
+        "status_counts": {
+          "met": 3,
+          "partial": 2,
+          "unmet": 2
+        }
+      },
+      "future_days": {
+        "count": 3,
+        "promised_total_cr": 0.36,
+        "promised_values_cr": [0.12, 0.1, 0.14]
+      }
+    }
+  },
+  "visit_module": {
+    "window_offsets_days": [-2, -1, 0, 1, 2],
+    "plan_summary_by_offset": {
+      "-2": {
+        "approval_status": "Rejected",
+        "submitted_at": "08:58",
+        "cutoff_at": "09:00",
+        "total_visits": 3,
+        "planned": 1,
+        "unplanned": 1,
+        "not_visited": 1
+      },
+      "-1": {
+        "approval_status": "Approved",
+        "submitted_at": "08:50",
+        "cutoff_at": "09:00",
+        "total_visits": 3,
+        "planned": 2,
+        "unplanned": 0,
+        "not_visited": 1
+      },
+      "0": {
+        "approval_status": "Pending",
+        "submitted_at": "09:12",
+        "cutoff_at": "09:00",
+        "total_visits": 5,
+        "planned": 3,
+        "unplanned": 1,
+        "not_visited": 1
+      },
+      "1": {
+        "approval_status": "Approved",
+        "submitted_at": "08:53",
+        "cutoff_at": "09:00",
+        "total_visits": 3,
+        "planned": 2,
+        "unplanned": 1,
+        "not_visited": 0
+      },
+      "2": {
+        "approval_status": "Rejected",
+        "submitted_at": "09:30",
+        "cutoff_at": "09:00",
+        "total_visits": 2,
+        "planned": 0,
+        "unplanned": 1,
+        "not_visited": 1
+      }
+    }
+  },
+  "constraints": {
+    "contains_customer_or_invoice_identifiers": false,
+    "contains_aggregate_values_only": true
+  }
+}

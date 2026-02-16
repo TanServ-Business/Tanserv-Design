@@ -196,6 +196,84 @@
       margin-bottom: 14px;
     }
 
+    .directReportsSection {
+      margin-bottom: 14px;
+    }
+
+    .directReportsSection.hidden {
+      display: none;
+    }
+
+    .directReportsGrid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 10px;
+    }
+
+    .reportAgentCard {
+      border: 1px solid #dbe5f2;
+      border-radius: 12px;
+      background: #f8fafc;
+      padding: 10px 12px;
+    }
+
+    .reportAgentHeader {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .reportAgentHeader strong {
+      font-size: 13px;
+      color: #111827;
+    }
+
+    .reportAgentHeader span {
+      display: block;
+      font-size: 11px;
+      color: #64748b;
+    }
+
+    .reportAgentMeta {
+      display: grid;
+      gap: 6px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .reportAgentMeta div {
+      border: 1px solid #e2e8f4;
+      border-radius: 8px;
+      background: #ffffff;
+      padding: 6px 8px;
+    }
+
+    .reportAgentMeta span {
+      display: block;
+      font-size: 10px;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .reportAgentMeta strong {
+      font-size: 12px;
+      color: #0f172a;
+    }
+
+    .reportDashboardBtn {
+      border: 1px solid var(--brand-border);
+      background: var(--brand);
+      color: #ffffff;
+      border-radius: 8px;
+      padding: 5px 8px;
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1.1;
+      white-space: nowrap;
+    }
+
     .globalCards {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -441,6 +519,10 @@
         <button type="button" id="selectedAgentClearBtn" aria-label="Clear agent filter">×</button>
       </div>
       <div class="summaryCards" id="summaryCards"></div>
+      <div class="directReportsSection" id="directReportsSection">
+        <div class="panelTitle">Direct Reports</div>
+        <div class="directReportsGrid" id="directReportsGrid"></div>
+      </div>
       <div class="panelTitle">Agent Portfolio</div>
       <table class="agentTable">
         <thead>
@@ -536,6 +618,8 @@
     const selectedAgentPill = document.getElementById("selectedAgentPill");
     const selectedAgentName = document.getElementById("selectedAgentName");
     const selectedAgentClearBtn = document.getElementById("selectedAgentClearBtn");
+    const directReportsSection = document.getElementById("directReportsSection");
+    const directReportsGrid = document.getElementById("directReportsGrid");
     const agentTableBody = document.getElementById("agentTableBody");
     const agentList = document.getElementById("agentList");
     const visitReviewBtn = document.getElementById("visitReviewBtn");
@@ -669,6 +753,34 @@
         <div class="summaryCard"><span>New Billing</span><strong>${summarySource.newBilling}</strong></div>
       `;
       renderAgentList();
+      renderDirectReports();
+    };
+
+    const getDirectReports = () => (activeAgent ? [] : agentData);
+
+    const renderDirectReports = () => {
+      if (!directReportsSection || !directReportsGrid) return;
+      const reports = getDirectReports();
+      directReportsSection.classList.toggle("hidden", reports.length === 0);
+      if (!reports.length) {
+        directReportsGrid.innerHTML = "";
+        return;
+      }
+      directReportsGrid.innerHTML = reports.map((agent) => `
+        <article class="reportAgentCard">
+          <div class="reportAgentHeader">
+            <div>
+              <strong>${agent.name}</strong>
+              <span>Target ${formatAmount(agent.target)}</span>
+            </div>
+            <button class="reportDashboardBtn" type="button" data-action="open-dashboard" data-agent="${agent.name}">Open Dashboard</button>
+          </div>
+          <div class="reportAgentMeta">
+            <div><span>Achievement</span><strong>${formatAmount(agent.achievement)}</strong></div>
+            <div><span>Aging &gt;30</span><strong>${formatAmount(agent.aging30Amount)}</strong></div>
+          </div>
+        </article>
+      `).join("");
     };
 
     const renderAgentList = () => {
@@ -736,6 +848,16 @@
         const btn = event.target.closest(".agentCardBtn[data-agent]");
         if (!btn) return;
         setActiveAgent(btn.getAttribute("data-agent"));
+      });
+    }
+
+    if (directReportsGrid) {
+      directReportsGrid.addEventListener("click", (event) => {
+        const button = event.target.closest("button[data-action='open-dashboard'][data-agent]");
+        if (!button) return;
+        const agentName = button.getAttribute("data-agent");
+        if (!agentName) return;
+        window.location.href = `LPagent.html?agent=${encodeURIComponent(agentName)}`;
       });
     }
 
@@ -1070,6 +1192,5 @@
 </script>
 </body>
 </html>
-
 
 

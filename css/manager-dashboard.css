@@ -1,0 +1,469 @@
+.myTeamBtn {
+  border: 1px solid #4b1f73;
+  background: #5c258d;
+  color: #ffffff;
+  border-radius: 999px;
+  padding: 7px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1;
+  box-shadow: 0 8px 18px rgba(92, 37, 141, 0.28);
+}
+
+.managerHeroRight {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.viewModeToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  border: 1px solid #c9b0e3;
+  border-radius: 999px;
+  background: #fbf8fe;
+  padding: 2px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.viewToggleBtn {
+  min-width: 36px;
+  height: 25px;
+  border: 1px solid transparent;
+  background: transparent;
+  border-radius: 999px;
+  color: #5b2e84;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8px;
+  transition: all 0.18s ease;
+}
+
+.viewToggleBtn .bi {
+  font-size: 12px;
+}
+
+.viewToggleBtn:hover {
+  background: #f3ebfb;
+  color: #45206b;
+}
+
+.viewToggleBtn.is-active {
+  border-color: #5c258d;
+  background: #5c258d;
+  color: #ffffff;
+  box-shadow: 0 6px 14px rgba(92, 37, 141, 0.28);
+}
+
+.myTeamBtn:hover {
+  border-color: #4b1f73;
+  background: #4b1f73;
+  color: #ffffff;
+}
+
+.myTeamBtn:focus-visible,
+.viewToggleBtn:focus-visible,
+.teamOverlayClose:focus-visible,
+.teamToggleBtn:focus-visible,
+.teamSelectBtn:focus-visible,
+.inlineOverlayBtn:focus-visible,
+.trailChip:focus-visible {
+  outline: 2px solid rgba(92, 37, 141, 0.45);
+  outline-offset: 2px;
+}
+
+.teamOverlay.hidden {
+  display: none;
+}
+
+.teamOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1600;
+  display: grid;
+  place-items: center;
+}
+
+.teamOverlayBackdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.48);
+  backdrop-filter: blur(1px);
+}
+
+.teamOverlayPanel {
+  position: relative;
+  width: min(1520px, calc(100vw - 28px));
+  max-height: min(90vh, 940px);
+  background: #ffffff;
+  border: 1px solid #e2e8f4;
+  border-radius: 18px;
+  box-shadow: 0 28px 60px rgba(15, 23, 42, 0.28);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.teamOverlayHeader {
+  padding: 14px 16px;
+  border-bottom: 1px solid #e2e8f4;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  background: #f8fafc;
+}
+
+.teamOverlayHeader h5 {
+  margin: 0;
+  font-size: 16px;
+  color: #0f172a;
+}
+
+.teamOverlayHeader p {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: #64748b;
+}
+
+.teamOverlayClose {
+  border: 1px solid #dbe5f2;
+  background: #ffffff;
+  color: #334155;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+}
+
+.teamOverlayBody {
+  padding: 12px 16px 16px;
+  overflow: auto;
+}
+
+.teamOverlayCard {
+  border: 1px solid #e2e8f4;
+  border-radius: 14px;
+  background: #f8fafc;
+  padding: 10px;
+}
+
+.teamOverlayGrid {
+  display: grid;
+  grid-template-columns: 420px minmax(0, 1fr);
+  gap: 12px;
+}
+
+.teamTreePane,
+.teamInsightsPane {
+  border: 1px solid #e2e8f4;
+  border-radius: 12px;
+  background: #ffffff;
+  padding: 10px;
+}
+
+.teamTrail {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.trailChip {
+  border: 1px solid #d7c3ea;
+  background: #f6effb;
+  color: #4b1f73;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.teamTreeWrap {
+  max-height: min(68vh, 650px);
+  overflow: auto;
+  padding-right: 4px;
+}
+
+.teamTreeRoot,
+.teamTreeRoot ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.teamTreeRoot li {
+  margin: 4px 0;
+}
+
+.teamNodeRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.teamToggleBtn {
+  width: 24px;
+  height: 24px;
+  border: 1px solid #dbe5f2;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #64748b;
+  padding: 0;
+}
+
+.teamToggleBtn[disabled] {
+  visibility: hidden;
+}
+
+.teamSelectBtn {
+  flex: 1;
+  border: 1px solid #e2e8f4;
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-align: left;
+  gap: 10px;
+}
+
+.teamSelectBtn span {
+  display: block;
+  font-size: 11px;
+  color: #64748b;
+}
+
+.teamSelectBtn strong {
+  display: block;
+  color: #0f172a;
+  font-size: 12px;
+}
+
+.teamSelectBtn em {
+  font-style: normal;
+  font-size: 11px;
+  font-weight: 700;
+  color: #1e3a8a;
+  white-space: nowrap;
+}
+
+.teamSelectBtn.is-selected {
+  border-color: #cab2e6;
+  background: #f6effb;
+}
+
+.teamNodeChildren {
+  margin-left: 14px;
+  padding-left: 10px;
+  border-left: 1px dashed #d7c3ea;
+}
+
+.teamOverlayCardTitle {
+  margin: 4px 0 8px;
+  font-size: 13px;
+  color: #0f172a;
+}
+
+.teamOverlayTitleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.teamOverlayTitleRow .teamOverlayCardTitle {
+  margin: 0;
+}
+
+.teamInsightGrid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.teamReplicaCard.card-span-3 {
+  grid-column: span 3;
+}
+
+.teamReplicaCard.card-span-2 {
+  grid-column: span 2;
+}
+
+.teamReplicaCard.dashboardCard {
+  margin: 0;
+  cursor: default;
+}
+
+.teamReplicaCard {
+  position: relative;
+  pointer-events: none;
+}
+
+.teamReplicaCard * {
+  pointer-events: none !important;
+}
+
+.teamReportCardGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.teamMemberCard {
+  border: 1px solid #d7c3ea;
+  border-radius: 12px;
+  background: #f6effb;
+  padding: 10px;
+}
+
+.teamMemberTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+  border: 1px solid #dbe7f6;
+  border-radius: 10px;
+  background: #ffffff;
+  padding: 8px;
+}
+
+.teamMemberInfo {
+  min-width: 0;
+}
+
+.teamMemberCard h6 {
+  margin: 0;
+  font-size: 13px;
+  color: #0f172a;
+}
+
+.teamMemberCard p {
+  margin: 2px 0 0;
+  font-size: 11px;
+  color: #64748b;
+}
+
+.teamMemberActions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.teamMemberMeta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.teamMemberMeta div {
+  border: 1px solid #d7e5f6;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 6px 8px;
+}
+
+.teamMemberMeta span {
+  display: block;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #64748b;
+}
+
+.teamMemberMeta strong {
+  font-size: 12px;
+  color: #0f172a;
+}
+
+.teamMemberFoot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.teamMemberFoot span {
+  font-size: 10px;
+  color: #304861;
+  border: 1px solid #cfe0f5;
+  border-radius: 999px;
+  padding: 2px 7px;
+  background: #f6fbff;
+}
+
+.inlineOverlayBtn {
+  border: 1px solid #dbe5f2;
+  background: #ffffff;
+  color: #334155;
+  border-radius: 8px;
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.inlineOverlayBtn.link {
+  border-color: #9fc5ef;
+  background: #e8f4ff;
+  color: #144b7d;
+  text-decoration: none;
+  display: inline-block;
+}
+
+body.team-overlay-open {
+  overflow: hidden;
+}
+
+@media (max-width: 1200px) {
+  .teamInsightGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .teamReportCardGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .teamReplicaCard.card-span-3 {
+    grid-column: span 2;
+  }
+
+  .teamReplicaCard.card-span-2 {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 1100px) {
+  .teamOverlayGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .teamOverlayPanel {
+    width: calc(100vw - 14px);
+    max-height: 96vh;
+  }
+
+  .teamInsightGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .teamReplicaCard.card-span-3,
+  .teamReplicaCard.card-span-2 {
+    grid-column: span 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .managerHeroRight {
+    align-items: flex-start;
+  }
+}

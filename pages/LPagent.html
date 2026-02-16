@@ -30,13 +30,14 @@
       </div>
     </div>
     <div class="heroActions">
-      <label class="viewModeControl" for="dashboardViewMode">
-        <span>View</span>
-        <select id="dashboardViewMode" aria-label="Dashboard density view">
-          <option value="compact">Compact</option>
-          <option value="spacious" selected>Spacious</option>
-        </select>
-      </label>
+      <div class="viewModeToggle" id="dashboardViewToggle" role="group" aria-label="Dashboard density view">
+        <button type="button" class="viewToggleBtn" data-view-mode="compact" aria-pressed="false" aria-label="Compact view" title="Compact view">
+          <i class="bi bi-arrows-angle-contract" aria-hidden="true"></i>
+        </button>
+        <button type="button" class="viewToggleBtn is-active" data-view-mode="spacious" aria-pressed="true" aria-label="Spacious view" title="Spacious view">
+          <i class="bi bi-arrows-angle-expand" aria-hidden="true"></i>
+        </button>
+      </div>
     </div>
   </section>
 
@@ -56,14 +57,14 @@
                 <div class="kpiSplitItem">
                   <span>Not Due</span>
                   <strong>
-                    <span class="kpiSplitLine">Invoices 61</span>
+                    <span class="kpiSplitLine">Invoices 61 | Amount Rs. 89,24,16,295</span>
                     <span class="kpiSplitLine">Customers 4</span>
                   </strong>
                 </div>
                 <div class="kpiSplitItem">
                   <span class="kpiDueLabel">Due</span>
                   <strong>
-                    <span class="kpiSplitLine">Invoices 112</span>
+                    <span class="kpiSplitLine">Invoices 112 | Amount Rs. 1,59,65,10,000</span>
                     <span class="kpiSplitLine">Customers 8</span>
                   </strong>
                 </div>
@@ -82,14 +83,14 @@
                 <div class="kpiSplitItem">
                   <span>Not Due</span>
                   <strong>
-                    <span class="kpiSplitLine">Invoices 1</span>
+                    <span class="kpiSplitLine">Invoices 1 | Amount Rs. 18,43,508</span>
                     <span class="kpiSplitLine">Customers 1</span>
                   </strong>
                 </div>
                 <div class="kpiSplitItem">
                   <span class="kpiDueLabel">Due</span>
                   <strong>
-                    <span class="kpiSplitLine">Invoices 3</span>
+                    <span class="kpiSplitLine">Invoices 3 | Amount Rs. 59,30,000</span>
                     <span class="kpiSplitLine">Customers 2</span>
                   </strong>
                 </div>
@@ -110,14 +111,14 @@
                 <div class="kpiSplitItem">
                   <span>Not Due</span>
                   <strong>
-                    <span class="kpiSplitLine">Invoices 81</span>
+                    <span class="kpiSplitLine">Invoices 81 | Amount Rs. 6,98,40,000</span>
                     <span class="kpiSplitLine">Customers 5</span>
                   </strong>
                 </div>
                 <div class="kpiSplitItem">
                   <span class="kpiDueLabel">Due</span>
                   <strong>
-                    <span class="kpiSplitLine">Invoices 92</span>
+                    <span class="kpiSplitLine">Invoices 92 | Amount Rs. 8,35,20,000</span>
                     <span class="kpiSplitLine">Customers 7</span>
                   </strong>
                 </div>
@@ -281,8 +282,8 @@
               <div>
                 <div class="radialTitle">Monthly Target</div>
                 <div class="radialPercentRow">
-                  <span class="radialPercent">38%</span>
-                  <span class="radialDelta">-12% vs last month</span>
+                  <span class="radialPercent">46%</span>
+                  <span class="radialDelta">+7% vs last month</span>
                 </div>
               </div>
               <button class="radialMenuBtn" type="button" aria-label="More options">
@@ -297,19 +298,19 @@
               </div>
             </div>
             <div class="radialCallout">
-              You collected <strong>Rs. 32,10,000</strong> this month. You are behind commitment, focus on top due accounts.
+              You collected <strong>Rs. 3,85,00,000</strong> this month. You are behind commitment, focus on top due accounts.
             </div>
             <div class="radialSummary">
               <div class="radialSummaryItem">
-                <div class="radialSummaryValue">$100K</div>
+                <div class="radialSummaryValue">8.4 Cr</div>
                 <div class="radialSummaryLabel">Target</div>
               </div>
               <div class="radialSummaryItem">
-                <div class="radialSummaryValue">$38k</div>
+                <div class="radialSummaryValue">3.85 Cr</div>
                 <div class="radialSummaryLabel">Collected</div>
               </div>
               <div class="radialSummaryItem">
-                <div class="radialSummaryValue">$2.1k</div>
+                <div class="radialSummaryValue">0.47 Cr</div>
                 <div class="radialSummaryLabel">Today</div>
               </div>
             </div>
@@ -1143,7 +1144,7 @@
           labels: ["Achieved", "Remaining"],
           datasets: [
             {
-              data: [3.2, 5.2],
+              data: [3.85, 4.55],
               backgroundColor: ["rgba(255, 255, 255, 0.95)", "rgba(255, 255, 255, 0.2)"],
               borderWidth: 0
             }
@@ -1153,7 +1154,7 @@
           labels: ["Achieved", "Remaining"],
           datasets: [
             {
-              data: [3.2, 5.2],
+              data: [3.85, 4.55],
               backgroundColor: [palette.purple, palette.purpleLight],
               borderWidth: 0
             }
@@ -1176,8 +1177,8 @@
         },
         highlights: [
           { label: "Target (MTD)", value: "Rs. 8.4 Cr" },
-          { label: "Achieved", value: "Rs. 3.2 Cr" },
-          { label: "Gap", value: "Rs. 5.2 Cr" }
+          { label: "Achieved", value: "Rs. 3.85 Cr" },
+          { label: "Gap", value: "Rs. 4.55 Cr" }
         ]
       },
       cashflow: {
@@ -1704,10 +1705,10 @@
     };
     const targetDetailSnapshot = {
       monthLabel: "Feb 2026",
-      dayOfMonth: 13,
+      dayOfMonth: 14,
       daysInMonth: 28,
       targetCr: 8.4,
-      achievedCr: 3.2,
+      achievedCr: 3.85,
       previousMonthAchievedCr: 3.6,
       ptpEvents: [
         { day: 2, promisedCr: 0.42, metCr: 0.42 },
@@ -1717,14 +1718,15 @@
         { day: 11, promisedCr: 0.59, metCr: 0.00 },
         { day: 12, promisedCr: 1.11, metCr: 1.11 },
         { day: 13, promisedCr: 0.40, metCr: 0.30 },
-        { day: 17, promisedCr: 0.52 },
-        { day: 21, promisedCr: 0.46 },
-        { day: 26, promisedCr: 0.67 }
+        { day: 17, promisedCr: 0.12 },
+        { day: 21, promisedCr: 0.10 },
+        { day: 26, promisedCr: 0.14 }
       ],
-      committedDailyCollectionsCr: [0.00, 0.30, 0.00, 0.14, 0.00, 0.00, 0.74, 0.00, 0.18, 0.00, 0.00, 0.96, 0.28],
-      nonCommittedDailyCollectionsCr: [0.00, 0.12, 0.00, 0.04, 0.00, 0.00, 0.21, 0.00, 0.06, 0.00, 0.00, 0.15, 0.02],
-      previousMonthCommittedDailyCollectionsCr: [0.00, 0.26, 0.16, 0.00, 0.34, 0.00, 0.54, 0.00, 0.13, 0.43, 0.00, 0.58, 0.41],
-      previousMonthNonCommittedDailyCollectionsCr: [0.00, 0.09, 0.06, 0.00, 0.07, 0.00, 0.12, 0.00, 0.05, 0.09, 0.00, 0.15, 0.12]
+      committedDailyCollectionsCr: [0.00, 0.30, 0.00, 0.24, 0.00, 0.00, 0.74, 0.00, 0.18, 0.00, 0.00, 0.96, 0.28, 0.42],
+      nonCommittedDailyCollectionsCr: [0.00, 0.12, 0.00, 0.12, 0.00, 0.00, 0.21, 0.00, 0.06, 0.00, 0.00, 0.15, 0.02, 0.05],
+      projectedFutureDailyCollectionsCr: [0.22, 0.21, 0.22, 0.23, 0.21, 0.22, 0.23, 0.21, 0.22, 0.23, 0.21, 0.22, 0.23, 0.22],
+      previousMonthCommittedDailyCollectionsCr: [0.00, 0.26, 0.16, 0.00, 0.34, 0.00, 0.54, 0.00, 0.13, 0.43, 0.00, 0.58, 0.41, 0.25],
+      previousMonthNonCommittedDailyCollectionsCr: [0.00, 0.09, 0.06, 0.00, 0.07, 0.00, 0.12, 0.00, 0.05, 0.09, 0.00, 0.15, 0.12, 0.08]
     };
     const buildVintageTableRows = () => {
       const values = chartConfigs.vintage?.data?.datasets?.[0]?.data || [];
@@ -2240,11 +2242,19 @@
       const cumulativePrevious = labels.map((_, index) => (index < daysElapsed ? cumulativePreviousElapsed[index] : null));
 
       const avgPerDay = daysElapsed > 0 ? achievedMtd / daysElapsed : 0;
+      const daysLeft = Math.max(0, daysInMonth - daysElapsed);
+      const projectedFutureDaily = Array.from({ length: daysLeft }, (_, index) => (
+        Math.max(0, Number(snapshot.projectedFutureDailyCollectionsCr?.[index] || avgPerDay))
+      ));
       const projectedLine = labels.map((_, index) => {
         const day = index + 1;
         if (day < daysElapsed) return null;
         if (day === daysElapsed) return cumulativeActual[index];
-        return Number((achievedMtd + ((day - daysElapsed) * avgPerDay)).toFixed(2));
+        const futureDaysCovered = day - daysElapsed;
+        const projectedFuture = projectedFutureDaily
+          .slice(0, futureDaysCovered)
+          .reduce((sum, value) => sum + Number(value || 0), 0);
+        return Number((achievedMtd + projectedFuture).toFixed(2));
       });
       const ptpByDay = new Map();
       const ptpSummary = {
@@ -2315,6 +2325,7 @@
         cumulativeActual,
         cumulativePrevious,
         projectedLine,
+        projectedEomCr: Number(projectedLine[projectedLine.length - 1] || achievedMtd),
         daysElapsed,
         achievedMtd,
         previousMonthMtd,
@@ -2344,7 +2355,7 @@
       const paceDelta = achievedCr - expectedByNow;
       const currentPerDay = daysElapsed > 0 ? achievedCr / daysElapsed : 0;
       const requiredPerDay = daysLeft > 0 ? gapCr / daysLeft : 0;
-      const projectedCr = achievedCr + (currentPerDay * daysLeft);
+      const projectedCr = Number(paceSeries.projectedEomCr || achievedCr);
       const progressWidth = Math.max(0, Math.min(100, achievementPct));
       const vsLastMonthPct = previousMonthMtd > 0
         ? ((achievedCr - previousMonthMtd) / previousMonthMtd) * 100
@@ -2352,6 +2363,7 @@
 
       const urgencyState = (() => {
         if (gapCr <= 0) return { label: "Achieved", className: "is-good" };
+        if (projectedCr < targetCr) return { label: "At risk", className: "is-risk" };
         if (currentPerDay <= 0) return { label: "Critical", className: "is-risk" };
         const ratio = requiredPerDay / currentPerDay;
         if (ratio <= 1) return { label: "On track", className: "is-good" };
@@ -2419,7 +2431,7 @@
           labels: paceSeries.labels,
           datasets: [
             {
-              label: "Idea collection amount",
+              label: "Ideal collection amount",
               data: paceSeries.cumulativePlan,
               borderColor: "#64748b",
               borderWidth: 2,
@@ -3652,6 +3664,7 @@
     const mtdKamHeader = document.getElementById("mtdKamHeader");
     const mtdKasHeader = document.getElementById("mtdKasHeader");
     const mtdStatusFilterDropdown = document.getElementById("mtdStatusFilterDropdown");
+    const mtdStatusFilterMenu = document.querySelector("#mtdStatusFilterDropdown .filterMenu");
     const mtdCommitmentFilterDropdown = document.getElementById("mtdCommitmentFilterDropdown");
     const mtdAgingRangeFilterDropdown = document.getElementById("mtdAgingRangeFilterDropdown");
     const mtdManagerFilterDropdown = document.getElementById("mtdManagerFilterDropdown");
@@ -3711,7 +3724,7 @@
         invoiceDate: "03 Jan 2026",
         dueDate: "31 Jan 2026",
         committedAmount: 120000,
-        status: "Collection In Progress",
+        status: "Delivery Challan Required",
         dueType: "due",
         commitmentType: "committed"
       },
@@ -3753,7 +3766,7 @@
         invoiceDate: "02 Feb 2026",
         dueDate: "28 Feb 2026",
         committedAmount: 0,
-        status: "Collection In Progress",
+        status: "PO (Purchase Order) Copy Required",
         dueType: "not_due",
         commitmentType: "non_committed"
       },
@@ -3795,7 +3808,7 @@
         invoiceDate: "28 Dec 2025",
         dueDate: "27 Jan 2026",
         committedAmount: 45000,
-        status: "Collection In Progress",
+        status: "Delivery Issue",
         dueType: "due",
         commitmentType: "committed"
       },
@@ -3809,7 +3822,7 @@
         invoiceDate: "24 Jan 2026",
         dueDate: "21 Feb 2026",
         committedAmount: 0,
-        status: "Partially Collected",
+        status: "Service Related Issues",
         dueType: "not_due",
         commitmentType: "non_committed"
       },
@@ -3851,7 +3864,7 @@
         invoiceDate: "26 Jan 2026",
         dueDate: "25 Feb 2026",
         committedAmount: 25000,
-        status: "Collection In Progress",
+        status: "Incomplete Material Delivered",
         dueType: "not_due",
         commitmentType: "committed"
       },
@@ -3865,7 +3878,7 @@
         invoiceDate: "21 Dec 2025",
         dueDate: "20 Jan 2026",
         committedAmount: 70000,
-        status: "Partially Collected",
+        status: "Delivery Challan Required",
         dueType: "due",
         commitmentType: "committed"
       },
@@ -3893,7 +3906,7 @@
         invoiceDate: "12 Jan 2026",
         dueDate: "11 Feb 2026",
         committedAmount: 50000,
-        status: "Collection In Progress",
+        status: "Delivery Issue",
         actionOwner: "Aditi Sharma",
         openDays: 8,
         dueType: "due",
@@ -3909,7 +3922,7 @@
         invoiceDate: "30 Jan 2026",
         dueDate: "01 Mar 2026",
         committedAmount: 0,
-        status: "Partially Collected",
+        status: "Service Related Issues",
         dueType: "not_due",
         commitmentType: "non_committed"
       },
@@ -3937,7 +3950,7 @@
         invoiceDate: "06 Feb 2026",
         dueDate: "08 Mar 2026",
         committedAmount: 0,
-        status: "Collection In Progress",
+        status: "PO (Purchase Order) Copy Required",
         actionOwner: "Manish Kumar",
         openDays: 11,
         dueType: "not_due",
@@ -3970,7 +3983,7 @@
         invoiceDate: "11 Jan 2026",
         dueDate: "09 Feb 2026",
         committedAmount: 50000,
-        status: "Collection In Progress",
+        status: "Delivery Challan Required",
         dueType: "due",
         commitmentType: "committed"
       },
@@ -3984,7 +3997,7 @@
         invoiceDate: "02 Feb 2026",
         dueDate: "28 Feb 2026",
         committedAmount: 0,
-        status: "Collection In Progress",
+        status: "PO (Purchase Order) Copy Required",
         dueType: "not_due",
         commitmentType: "non_committed"
       },
@@ -3998,7 +4011,7 @@
         invoiceDate: "28 Dec 2025",
         dueDate: "27 Jan 2026",
         committedAmount: 45000,
-        status: "Collection In Progress",
+        status: "Delivery Issue",
         actionOwner: "Sakshi Sharma",
         openDays: 14,
         dueType: "due",
@@ -4014,7 +4027,7 @@
         invoiceDate: "18 Dec 2025",
         dueDate: "17 Jan 2026",
         committedAmount: 90000,
-        status: "Partially Collected",
+        status: "Service Related Issues",
         actionOwner: "Abhishek Sharma",
         openDays: 9,
         dueType: "due",
@@ -4030,7 +4043,7 @@
         invoiceDate: "26 Jan 2026",
         dueDate: "25 Feb 2026",
         committedAmount: 25000,
-        status: "Collection In Progress",
+        status: "Incomplete Material Delivered",
         actionOwner: "Palak Choudhary",
         openDays: 6,
         dueType: "not_due",
@@ -4046,7 +4059,7 @@
         invoiceDate: "21 Dec 2025",
         dueDate: "20 Jan 2026",
         committedAmount: 70000,
-        status: "Partially Collected",
+        status: "Delivery Challan Required",
         actionOwner: "Aditi Sharma",
         openDays: 13,
         dueType: "due",
@@ -4062,7 +4075,7 @@
         invoiceDate: "12 Jan 2026",
         dueDate: "11 Feb 2026",
         committedAmount: 50000,
-        status: "Collection In Progress",
+        status: "PO (Purchase Order) Copy Required",
         actionOwner: "Manish Kumar",
         openDays: 10,
         dueType: "due",
@@ -4078,7 +4091,7 @@
         invoiceDate: "03 Jan 2026",
         dueDate: "01 Feb 2026",
         committedAmount: 65000,
-        status: "Partially Collected",
+        status: "Delivery Issue",
         actionOwner: "Sakshi Sharma",
         openDays: 15,
         dueType: "due",
@@ -4094,7 +4107,7 @@
         invoiceDate: "06 Feb 2026",
         dueDate: "08 Mar 2026",
         committedAmount: 0,
-        status: "Collection In Progress",
+        status: "Service Related Issues",
         actionOwner: "Palak Choudhary",
         openDays: 7,
         dueType: "not_due",
@@ -4267,6 +4280,26 @@
     };
 
     const normalizeKey = (value) => String(value || "").trim().toLowerCase().replace(/\s+/g, "_");
+    const normalizeMtdStatus = (value) => (normalizeKey(value) === "collected" ? "collected" : "partially_collected");
+    const getMtdStatusLabel = (value) => (normalizeMtdStatus(value) === "collected" ? "Collected" : "Partially Collected");
+    const statusFilterOptionsByMode = {
+      mtd: [
+        { value: "collected", label: "Collected" },
+        { value: "partially_collected", label: "Partially Collected" }
+      ],
+      issues: [
+        { value: "delivery_challan_required", label: "Delivery Challan Required" },
+        { value: "po_(purchase_order)_copy_required", label: "PO (Purchase Order) Copy Required" },
+        { value: "delivery_issue", label: "Delivery Issue" },
+        { value: "service_related_issues", label: "Service Related Issues" },
+        { value: "incomplete_material_delivered", label: "Incomplete Material Delivered" }
+      ],
+      default: [
+        { value: "collected", label: "Collected" },
+        { value: "partially_collected", label: "Partially Collected" },
+        { value: "collection_in_progress", label: "Collection In Progress" }
+      ]
+    };
     const escapeHtml = (value) => String(value || "").replace(/[&<>"']/g, (ch) => ({
       "&": "&amp;",
       "<": "&lt;",
@@ -4292,6 +4325,21 @@
     let mtdCurrentPage = 1;
     const getMtdActiveConfig = () => modalDataConfig[mtdActiveModalType] || modalDataConfig.mtd;
     const getMtdActiveData = () => getMtdActiveConfig().rows;
+    const getStatusFilterOptions = () => statusFilterOptionsByMode[mtdActiveModalType] || statusFilterOptionsByMode.default;
+    const renderStatusFilterOptions = () => {
+      if (!mtdStatusFilterMenu) return;
+      const options = getStatusFilterOptions();
+      if (mtdFilters.status !== "all" && !options.some((option) => option.value === mtdFilters.status)) {
+        mtdFilters.status = "all";
+        if (mtdStatusFilterBadge) mtdStatusFilterBadge.textContent = "All";
+      }
+      mtdStatusFilterMenu.innerHTML = [
+        `<button class="filterItem" type="button" data-value="all">All</button>`,
+        ...options.map((option) => (
+          `<button class="filterItem" type="button" data-value="${escapeHtml(option.value)}">${escapeHtml(option.label)}</button>`
+        ))
+      ].join("");
+    };
 
     const resetMtdFilters = () => {
       mtdFilters.due = "all";
@@ -4356,7 +4404,8 @@
       if (mtdKasHeader) mtdKasHeader.hidden = !showOwnerColumns;
       const filteredRows = activeRows.filter((row) => {
         const dueMatches = mtdFilters.due === "all" || row.dueType === mtdFilters.due;
-        const statusMatches = !showStatusColumn || mtdFilters.status === "all" || normalizeKey(row.status) === mtdFilters.status;
+        const rowStatusKey = mtdActiveModalType === "mtd" ? normalizeMtdStatus(row.status) : normalizeKey(row.status);
+        const statusMatches = !showStatusColumn || mtdFilters.status === "all" || rowStatusKey === mtdFilters.status;
         const commitmentMatches = mtdFilters.commitment === "all" || row.commitmentType === mtdFilters.commitment;
         const managerMatches = !showOwnerColumns || mtdFilters.manager === "all" || normalizeKey(row.manager) === mtdFilters.manager;
         const kamMatches = !showOwnerColumns || mtdFilters.kam === "all" || normalizeKey(row.kam) === mtdFilters.kam;
@@ -4401,7 +4450,8 @@
       }
 
       const pageRowsMarkup = pageRows.map((row) => {
-        const statusKey = normalizeKey(row.status);
+        const statusKey = mtdActiveModalType === "mtd" ? normalizeMtdStatus(row.status) : normalizeKey(row.status);
+        const statusLabel = mtdActiveModalType === "mtd" ? getMtdStatusLabel(row.status) : row.status;
         const statusClass = statusClassMap[statusKey] || "is-default";
         const agingCell = showAgingColumn ? `<td>${escapeHtml(row.agingDays ?? "-")}</td>` : "";
         const valueColumnCell = !showValueColumn
@@ -4413,7 +4463,7 @@
           ? `<td class="amountCell">${formatCurrency(row.amountForMonth)}</td>`
           : "";
         const statusCell = showStatusColumn
-          ? `<td><span class="mtdStatusPill ${statusClass}">${escapeHtml(row.status)}</span></td>`
+          ? `<td><span class="mtdStatusPill ${statusClass}">${escapeHtml(statusLabel)}</span></td>`
           : "";
         const actionOwnerCell = showActionOwnerColumn
           ? `<td>${escapeHtml(row.actionOwner || "-")}</td>`
@@ -4489,12 +4539,25 @@
     };
 
     wireFilterDropdown("mtdDueFilterDropdown", "due", "mtdDueFilterBadge");
-    wireFilterDropdown("mtdStatusFilterDropdown", "status", "mtdStatusFilterBadge");
     wireFilterDropdown("mtdCommitmentFilterDropdown", "commitment", "mtdCommitmentFilterBadge");
     wireFilterDropdown("mtdAgingRangeFilterDropdown", "agingRange", "mtdAgingRangeFilterBadge");
     wireFilterDropdown("mtdManagerFilterDropdown", "manager", "mtdManagerFilterBadge");
     wireFilterDropdown("mtdKamFilterDropdown", "kam", "mtdKamFilterBadge");
     wireFilterDropdown("mtdKasFilterDropdown", "kas", "mtdKasFilterBadge");
+    renderStatusFilterOptions();
+
+    if (mtdStatusFilterMenu) {
+      mtdStatusFilterMenu.addEventListener("click", (event) => {
+        const itemBtn = event.target.closest(".filterItem");
+        if (!itemBtn) return;
+        const nextValue = itemBtn.dataset.value || "all";
+        mtdFilters.status = nextValue;
+        mtdCurrentPage = 1;
+        if (mtdStatusFilterBadge) mtdStatusFilterBadge.textContent = itemBtn.textContent.trim();
+        if (mtdStatusFilterDropdown) mtdStatusFilterDropdown.removeAttribute("open");
+        renderMtdCollectionsTable();
+      });
+    }
 
     if (mtdSearchInput) {
       mtdSearchInput.addEventListener("input", (event) => {
@@ -4548,6 +4611,7 @@
         if (mtdStatusFilterDropdown) {
           mtdStatusFilterDropdown.hidden = activeConfig.showStatusFilter === false;
         }
+        renderStatusFilterOptions();
         const showOwnerFilters = ["allocations", "billing"].includes(mtdActiveModalType);
         if (mtdManagerFilterDropdown) {
           mtdManagerFilterDropdown.hidden = !showOwnerFilters;
@@ -4616,7 +4680,8 @@
     });
 
     const dashboardRoot = document.querySelector(".agentDashboard");
-    const dashboardViewMode = document.getElementById("dashboardViewMode");
+    const dashboardViewToggle = document.getElementById("dashboardViewToggle");
+    const dashboardViewButtons = Array.from(document.querySelectorAll(".viewToggleBtn[data-view-mode]"));
     const dashboardSummaryBtn = document.getElementById("dashboardSummaryBtn");
     const dashboardSummaryModalEl = document.getElementById("dashboardSummaryModal");
     const dashboardSummarySkeleton = document.getElementById("dashboardSummarySkeleton");
@@ -4629,10 +4694,22 @@
       dashboardRoot.classList.toggle("is-spacious", isSpacious);
     };
 
-    if (dashboardViewMode) {
-      applyDashboardViewMode(dashboardViewMode.value);
-      dashboardViewMode.addEventListener("change", (event) => {
-        applyDashboardViewMode(event.target.value);
+    const setDashboardViewMode = (mode) => {
+      applyDashboardViewMode(mode);
+      dashboardViewButtons.forEach((button) => {
+        const isActive = (button.dataset.viewMode || "spacious") === mode;
+        button.classList.toggle("is-active", isActive);
+        button.setAttribute("aria-pressed", isActive ? "true" : "false");
+      });
+    };
+
+    if (dashboardViewToggle && dashboardViewButtons.length) {
+      const defaultMode = (dashboardViewButtons.find((button) => button.classList.contains("is-active"))?.dataset.viewMode || "spacious");
+      setDashboardViewMode(defaultMode);
+      dashboardViewButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          setDashboardViewMode(button.dataset.viewMode || "spacious");
+        });
       });
     }
     if (asOfRefreshTag) {
