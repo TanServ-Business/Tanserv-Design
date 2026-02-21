@@ -2532,6 +2532,10 @@ function getBaseFilteredInvoices() {
   const fStatus = filterState.status;
   const fNetDue = filterState.netDue;
   const fUnreadOnly = filterState.unreadOnly;
+  const invoiceSearch = (document.getElementById("invoiceSearch")?.value || "").trim().toLowerCase();
+  const selectedCustomer = customersData.find(c => c.id === selectedCustomerId);
+  const selectedCustomerName = String(selectedCustomer?.name || "").toLowerCase();
+  const selectedCustomerCode = String(selectedCustomer?.code || "").toLowerCase();
 
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -2557,6 +2561,15 @@ function getBaseFilteredInvoices() {
       if (fNetDue === "All due invoices" && due > today) return false;
     }
     if (fUnreadOnly && Number(inv.unreadEmailCount || 0) <= 0) return false;
+    if (invoiceSearch) {
+      const subStatus = String(inv.subStatus ?? inv.status ?? "").toLowerCase();
+      const invoiceMatches = String(inv.invoiceNo || "").toLowerCase().includes(invoiceSearch)
+        || String(inv.invoiceStatus || "").toLowerCase().includes(invoiceSearch)
+        || String(inv.primaryStatus || "").toLowerCase().includes(invoiceSearch)
+        || subStatus.includes(invoiceSearch);
+      const customerMatches = selectedCustomerName.includes(invoiceSearch) || selectedCustomerCode.includes(invoiceSearch);
+      if (!invoiceMatches && !customerMatches) return false;
+    }
     return true;
   });
 }
@@ -3021,6 +3034,61 @@ const filterConfig = {
   }
 };
 
+const filterToneClassNames = [
+  "filterTone-neutral",
+  "filterTone-green",
+  "filterTone-blue",
+  "filterTone-yellow",
+  "filterTone-orange",
+  "filterTone-red"
+];
+
+function applyFilterToneClass(element, tone) {
+  if (!element) return;
+  filterToneClassNames.forEach((cls) => element.classList.remove(cls));
+  if (!tone || tone === "neutral") return;
+  element.classList.add(`filterTone-${tone}`);
+}
+
+function getFilterTone(key, value) {
+  if (value === "__ALL__" || value == null) return "neutral";
+  const normalized = String(value).trim().toLowerCase();
+
+  if (key === "invoiceStatus") {
+    if (normalized.includes("not submitted")) return "red";
+    if (normalized.includes("externally submitted")) return "blue";
+    if (normalized.includes("submitted")) return "green";
+    return "neutral";
+  }
+
+  if (key === "primaryStatus") {
+    if (normalized === "collected") return "green";
+    if (["collection in progress", "part collected", "ptp", "no due"].includes(normalized)) return "blue";
+    if ([
+      "further action required",
+      "further docs required",
+      "material delivery issues",
+      "invoice assignment"
+    ].includes(normalized)) return "orange";
+    if (normalized === "guidance") return "red";
+    return "neutral";
+  }
+
+  if (key === "status") {
+    return "neutral";
+  }
+
+  if (key === "netDue") {
+    if (normalized === "not due") return "green";
+    if (normalized === "due this month") return "yellow";
+    if (normalized === "due next month") return "orange";
+    if (normalized === "all due invoices") return "red";
+    return "neutral";
+  }
+
+  return "neutral";
+}
+
 const netDueFilterOptions = [
   "Not Due",
   "Due this month",
@@ -3174,9 +3242,15 @@ function updateFilterButton(key) {
   const btn = config ? document.getElementById(config.buttonId) : null;
   if (!btn) return;
 
-  const valueText = filterState[key] === "__ALL__" ? "All" : String(filterState[key]);
+  const currentValue = filterState[key];
+  const valueText = currentValue === "__ALL__" ? "All" : String(currentValue);
+  const tone = getFilterTone(key, currentValue);
   const valueEl = btn.querySelector("[data-role='filter-value']");
-  if (valueEl) valueEl.textContent = valueText;
+  if (valueEl) {
+    valueEl.textContent = valueText;
+    applyFilterToneClass(valueEl, tone);
+  }
+  applyFilterToneClass(btn, tone);
 }
 
 function updateMenuActive(key) {
@@ -3192,6 +3266,117 @@ function updateMenuActive(key) {
   });
 }
 
+function getActiveFilterChipData() {
+  const chips = [];
+  Object.keys(filterConfig).forEach((key) => {
+    const value = filterState[key];
+    if (value === "__ALL__") return;
+    chips.push({
+      key,
+      label: filterConfig[key]?.label || key,
+      value: String(value)
+    });
+  });
+  return chips;
+}
+
+function renderFilterChips() {
+  const chipBar = document.getElementById("filterChipBar");
+  if (!chipBar) return;
+
+  const chips = getActiveFilterChipData();
+  chipBar.classList.toggle("hidden", chips.length === 0);
+
+  if (chips.length === 0) {
+    chipBar.innerHTML = "";
+    return;
+  }
+
+  chipBar.innerHTML = chips.map((chip) => `
+    <span class="filterChip filterTone-${getFilterTone(chip.key, chip.value)}">
+      <span>${chip.label}: ${chip.value}</span>
+      <button type="button" class="filterChipClear" data-chip-key="${chip.key}" aria-label="Clear ${chip.label}">
+        <i class="bi bi-x" aria-hidden="true"></i>
+      </button>
+    </span>
+  `).join("");
+}
+
+function positionFilterPopover() {
+  const filterPopover = document.getElementById("filterPopover");
+  const toggleBtn = document.getElementById("filterCollapseBtn");
+  if (!filterPopover || !toggleBtn || filterPopover.classList.contains("hidden")) return;
+
+  const viewportPad = 12;
+  const anchorGap = 8;
+  const btnRect = toggleBtn.getBoundingClientRect();
+  const popRect = filterPopover.getBoundingClientRect();
+  const isMobile = window.innerWidth <= 640;
+
+  let left;
+  let top;
+
+  if (isMobile) {
+    left = Math.max(viewportPad, (window.innerWidth - popRect.width) / 2);
+    top = btnRect.bottom + anchorGap;
+  } else {
+    // Place popover on the left side of the filter button.
+    left = btnRect.left - popRect.width - anchorGap;
+    top = btnRect.top;
+
+    // If there is no room on the left, fall back to the right side.
+    if (left < viewportPad) left = btnRect.right + anchorGap;
+  }
+
+  if (left + popRect.width > window.innerWidth - viewportPad) {
+    left = window.innerWidth - popRect.width - viewportPad;
+  }
+  if (top + popRect.height > window.innerHeight - viewportPad) {
+    top = window.innerHeight - popRect.height - viewportPad;
+  }
+
+  left = Math.max(viewportPad, left);
+  top = Math.max(viewportPad, top);
+
+  filterPopover.style.left = `${Math.round(left)}px`;
+  filterPopover.style.top = `${Math.round(top)}px`;
+}
+
+function setFilterPopoverOpen(isOpen) {
+  const filterPopover = document.getElementById("filterPopover");
+  const filterBackdrop = document.getElementById("filterPopoverBackdrop");
+  const toggleBtn = document.getElementById("filterCollapseBtn");
+  if (!filterPopover || !filterBackdrop || !toggleBtn) return;
+
+  filterPopover.classList.toggle("hidden", !isOpen);
+  filterBackdrop.classList.toggle("hidden", !isOpen);
+  toggleBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+  toggleBtn.title = isOpen ? "Hide filters" : "Show filters";
+
+  if (isOpen) {
+    positionFilterPopover();
+    requestAnimationFrame(positionFilterPopover);
+  }
+}
+
+function closeFilterDropdown(key) {
+  const config = filterConfig[key];
+  if (!config) return;
+
+  const toggleBtn = document.getElementById(config.buttonId);
+  const menu = document.getElementById(config.menuId);
+  if (!toggleBtn) return;
+
+  if (typeof bootstrap !== "undefined" && bootstrap.Dropdown) {
+    bootstrap.Dropdown.getOrCreateInstance(toggleBtn).hide();
+    return;
+  }
+
+  toggleBtn.classList.remove("show");
+  toggleBtn.setAttribute("aria-expanded", "false");
+  if (menu) menu.classList.remove("show");
+}
+
 function renderFilterMenu(key) {
   const config = filterConfig[key];
   const menu = config ? document.getElementById(config.menuId) : null;
@@ -3205,8 +3390,9 @@ function renderFilterMenu(key) {
   items.forEach(item => {
     const li = document.createElement("li");
     const btn = document.createElement("button");
+    const tone = getFilterTone(key, item.value);
     btn.type = "button";
-    btn.className = "dropdown-item";
+    btn.className = tone === "neutral" ? "dropdown-item" : `dropdown-item filterTone-${tone}`;
     btn.textContent = item.label;
     btn.setAttribute("data-value", item.value);
     if (item.value === filterState[key]) btn.classList.add("active");
@@ -3239,6 +3425,11 @@ function populateFilters(invoices) {
   updateFilterButton("primaryStatus");
   updateFilterButton("status");
   updateFilterButton("netDue");
+  updateMenuActive("invoiceStatus");
+  updateMenuActive("primaryStatus");
+  updateMenuActive("status");
+  updateMenuActive("netDue");
+  renderFilterChips();
 }
 
 // ===============================
@@ -3317,6 +3508,7 @@ function applyFiltersAndRender() {
   syncSelectAllCheckbox();
   updateBulkBar();
   updateUnreadEmailToggleCount();
+  renderFilterChips();
 }
 
 // ===============================
@@ -3595,7 +3787,8 @@ function getFilteredCustomers() {
     filtered = customersData.filter(c => {
       const n = String(c.name || "").toLowerCase();
       const code = String(c.code || "").toLowerCase();
-      return n.includes(q) || code.includes(q);
+      const invoiceMatch = (c.invoices || []).some((inv) => String(inv.invoiceNo || "").toLowerCase().includes(q));
+      return n.includes(q) || code.includes(q) || invoiceMatch;
     });
   }
 
@@ -3618,7 +3811,11 @@ function getFilteredCustomers() {
 // ===============================
 function wireFilterEvents() {
   const unreadToggle = document.getElementById("filterUnreadEmail");
-  const clearBtn = document.getElementById("filterClearBtn");
+  const filterToggle = document.getElementById("filterCollapseBtn");
+  const filterPopover = document.getElementById("filterPopover");
+  const filterBackdrop = document.getElementById("filterPopoverBackdrop");
+  const filterClose = document.getElementById("filterPopoverCloseBtn");
+  const chipBar = document.getElementById("filterChipBar");
 
   Object.keys(filterConfig).forEach(key => {
     const menu = document.getElementById(filterConfig[key].menuId);
@@ -3633,9 +3830,64 @@ function wireFilterEvents() {
       currentPage = 1;
       updateFilterButton(key);
       updateMenuActive(key);
+      closeFilterDropdown(key);
       closeFloatingMenu();
       applyFiltersAndRender();
     });
+  });
+
+  if (chipBar) {
+    chipBar.addEventListener("click", (event) => {
+      const btn = event.target.closest("[data-chip-key]");
+      if (!btn) return;
+      const key = btn.getAttribute("data-chip-key");
+      if (!key || !Object.prototype.hasOwnProperty.call(filterState, key)) return;
+      filterState[key] = "__ALL__";
+      currentPage = 1;
+      updateFilterButton(key);
+      updateMenuActive(key);
+      applyFiltersAndRender();
+    });
+  }
+
+  if (filterToggle) {
+    filterToggle.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      const shouldOpen = filterPopover ? filterPopover.classList.contains("hidden") : false;
+      setFilterPopoverOpen(shouldOpen);
+    });
+  }
+
+  if (filterClose) {
+    filterClose.addEventListener("click", () => {
+      setFilterPopoverOpen(false);
+    });
+  }
+
+  if (filterBackdrop) {
+    filterBackdrop.addEventListener("click", () => {
+      setFilterPopoverOpen(false);
+    });
+  }
+
+  if (filterPopover) {
+    filterPopover.addEventListener("click", (event) => {
+      event.stopPropagation();
+    });
+  }
+
+  window.addEventListener("resize", () => {
+    positionFilterPopover();
+  });
+  window.addEventListener("scroll", () => {
+    positionFilterPopover();
+  }, true);
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape") return;
+    if (!filterPopover || filterPopover.classList.contains("hidden")) return;
+    setFilterPopoverOpen(false);
   });
 
   if (unreadToggle) {
@@ -3648,29 +3900,8 @@ function wireFilterEvents() {
     });
   }
 
-  if (clearBtn) {
-    clearBtn.addEventListener("click", () => {
-      filterState.invoiceStatus = "__ALL__";
-      filterState.primaryStatus = "__ALL__";
-      filterState.status = "__ALL__";
-      filterState.netDue = "__ALL__";
-      currentPage = 1;
-
-      setUnreadFilterActive(false);
-
-      updateFilterButton("invoiceStatus");
-      updateFilterButton("primaryStatus");
-      updateFilterButton("status");
-      updateFilterButton("netDue");
-      updateMenuActive("invoiceStatus");
-      updateMenuActive("primaryStatus");
-      updateMenuActive("status");
-      updateMenuActive("netDue");
-
-      closeFloatingMenu();
-      applyFiltersAndRender();
-    });
-  }
+  setFilterPopoverOpen(false);
+  renderFilterChips();
 }
 
 function wireTabEvents() {
@@ -6432,7 +6663,7 @@ function wireSideNavEvents() {
       const destinations = {
         "visit": "pages/visitmodule.html",
         "visit-review": "pages/visitmoduleReview.html",
-        "landing": "index.html",
+        "landing": "LPagent.html",
         "landing-manager": "pages/LPmanager.html",
         "landing-backend": "pages/LPbackend.html",
         "pdc-agent": "pages/PDCagent.html",
@@ -6470,6 +6701,15 @@ document.addEventListener("DOMContentLoaded", () => {
   if (search) {
     search.addEventListener("input", () => {
       renderCustomers(getFilteredCustomers(), selectedCustomerId);
+    });
+  }
+
+  const invoiceSearch = document.getElementById("invoiceSearch");
+  if (invoiceSearch) {
+    invoiceSearch.addEventListener("input", () => {
+      currentPage = 1;
+      closeFloatingMenu();
+      applyFiltersAndRender();
     });
   }
 
@@ -6657,7 +6897,3 @@ document.addEventListener("DOMContentLoaded", () => {
     applyFiltersAndRender();
   }
 });
-
-
-
-

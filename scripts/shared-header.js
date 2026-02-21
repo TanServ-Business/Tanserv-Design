@@ -46,7 +46,7 @@
 
     const role = (localStorage.getItem("activeUserRole") || "").trim().toLowerCase();
     const roleDashboards = {
-      agent: "pages/LPagent.html",
+      agent: "pages/Dashboard_Agent.html",
       manager: "pages/LPmanager.html",
       supervisor: "pages/LPsupervisor.html",
       kam: "pages/KAM.html",
@@ -56,7 +56,7 @@
       approver: "bin/IssueTracker/approver-dashboard.html"
     };
 
-    return roleDashboards[role] || "pages/LPagent.html";
+    return roleDashboards[role] || "pages/Dashboard_Agent.html";
   };
   const dashboardPath = resolvePath(getDashboardPath());
 
@@ -299,8 +299,8 @@
           <i class="bi bi-chevron-down chevron" aria-hidden="true"></i>
         </a>
         <div class="submenu">
-          <a class="submenu-link" href="${resolvePath("index.html")}" data-module="landing">Landing Page</a>
-          <a class="submenu-link" href="${resolvePath("pages/LPagent.html")}" data-module="landing-agent">Landing Page - Agent</a>
+          <a class="submenu-link" href="${resolvePath("LPagent.html")}" data-module="landing">Landing Page</a>
+          <a class="submenu-link" href="${resolvePath("LPagent.html")}" data-module="landing-agent">Landing Page - Agent</a>
           <a class="submenu-link" href="${resolvePath("pages/LPmanager.html")}" data-module="landing-manager">Landing Page - Manager</a>
           <a class="submenu-link" href="${resolvePath("pages/dashManager.html")}" data-module="landing-manager-drilldown">Landing Page - Manager Drilldown</a>
           <a class="submenu-link" href="${resolvePath("pages/LPsupervisor.html")}" data-module="landing-supervisor">Landing Page - Supervisor</a>
@@ -308,6 +308,19 @@
           <a class="submenu-link" href="${resolvePath("pages/KAS.html")}" data-module="landing-kas">Landing Page - KAS</a>
           <a class="submenu-link" href="${resolvePath("pages/LPbackend.html")}" data-module="landing-backend">Landing Page - Backend</a>
           <a class="submenu-link" href="${resolvePath("pages/LPmis.html")}" data-module="landing-mis">Landing Page - MIS</a>
+        </div>
+      </li>
+      <li class="menu-item">
+        <a class="nav-link" href="#" data-toggle="submenu" aria-expanded="false">
+          <span class="link-content">
+            <i class="bi bi-speedometer2" aria-hidden="true"></i>
+            <span>Dashboards</span>
+          </span>
+          <i class="bi bi-chevron-down chevron" aria-hidden="true"></i>
+        </a>
+        <div class="submenu">
+          <a class="submenu-link" href="${resolvePath("pages/Dashboard_Agent.html")}" data-module="dashboard-agent">Dashboard - Agent</a>
+          <a class="submenu-link" href="${resolvePath("pages/dashManager.html")}" data-module="dashboard-manager">Dashboard - Manager</a>
         </div>
       </li>
       <li class="menu-item">
@@ -680,8 +693,8 @@
           const destinations = {
             visit: "pages/visitmodule.html",
             "visit-review": "pages/visitmoduleReview.html",
-            landing: "index.html",
-            "landing-agent": "pages/LPagent.html",
+            landing: "LPagent.html",
+            "landing-agent": "LPagent.html",
             "landing-manager": "pages/LPmanager.html",
             "landing-manager-drilldown": "pages/dashManager.html",
             "landing-supervisor": "pages/LPsupervisor.html",
@@ -689,6 +702,8 @@
             "landing-kas": "pages/KAS.html",
             "landing-backend": "pages/LPbackend.html",
             "landing-mis": "pages/LPmis.html",
+            "dashboard-agent": "pages/Dashboard_Agent.html",
+            "dashboard-manager": "pages/dashManager.html",
             "issue-tracker": "pages/issuetrackerLP.html",
             "issue-matrix": "bin/IssueTracker/escalationMatrix.html",
             "issue-approver": "bin/IssueTracker/approver-dashboard.html",

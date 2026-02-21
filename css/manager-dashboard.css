@@ -61,6 +61,420 @@
   box-shadow: 0 6px 14px rgba(92, 37, 141, 0.28);
 }
 
+body[data-dashboard-path="pages/dashManager.html"] .kpiSplitItem strong {
+  font-weight: 400;
+}
+
+body[data-dashboard-path="pages/dashManager.html"] #openIssuesCard,
+body[data-dashboard-path="pages/dashManager.html"] #agingOver30Card,
+body[data-dashboard-path="pages/dashManager.html"] #newBillingCard,
+body[data-dashboard-path="pages/dashManager.html"] #visitForDayCard {
+  min-height: 96px;
+  padding: 11px 12px;
+}
+
+body[data-dashboard-path="pages/dashManager.html"] #openIssuesCard .kpiValue,
+body[data-dashboard-path="pages/dashManager.html"] #agingOver30Card .kpiValue,
+body[data-dashboard-path="pages/dashManager.html"] #newBillingCard .kpiValue {
+  margin-top: 6px;
+  font-size: 20px;
+  line-height: 1.1;
+}
+
+body[data-dashboard-path="pages/dashManager.html"] #openIssuesCard .kpiSub,
+body[data-dashboard-path="pages/dashManager.html"] #agingOver30Card .kpiSub,
+body[data-dashboard-path="pages/dashManager.html"] #newBillingCard .kpiSub,
+body[data-dashboard-path="pages/dashManager.html"] #visitForDayCard .kpiSub {
+  margin-top: 2px;
+  font-size: 11px;
+}
+
+body[data-dashboard-path="pages/dashManager.html"] #openIssuesCard .openIssuesCardBody,
+body[data-dashboard-path="pages/dashManager.html"] #agingOver30Card .agingBucketsCardBody,
+body[data-dashboard-path="pages/dashManager.html"] #newBillingCard .newBillingCardBody {
+  gap: 8px;
+}
+
+body[data-dashboard-path="pages/dashManager.html"] #openIssuesCard .openIssuesTop3,
+body[data-dashboard-path="pages/dashManager.html"] #agingOver30Card .agingBucketsTop3,
+body[data-dashboard-path="pages/dashManager.html"] #newBillingCard .newBillingTop3 {
+  gap: 3px;
+}
+
+body[data-dashboard-path="pages/dashManager.html"] #openIssuesCard .openIssuesTop3Row,
+body[data-dashboard-path="pages/dashManager.html"] #agingOver30Card .agingBucketRow,
+body[data-dashboard-path="pages/dashManager.html"] #newBillingCard .newBillingTop3Row {
+  min-height: 18px;
+  padding: 1px 2px 1px 7px;
+}
+
+body[data-dashboard-path="pages/dashManager.html"] #visitForDayCard {
+  gap: 1px;
+}
+
+body[data-dashboard-path="pages/dashManager.html"] #visitForDayCard .stuckOwnerSelectWrap {
+  margin-top: 1px;
+}
+
+body[data-dashboard-path="pages/dashManager.html"] #visitForDayCard .stuckOwnerCardSelect {
+  border-bottom: 0;
+  font-weight: 700;
+}
+
+body[data-dashboard-path="pages/dashManager.html"] #visitForDayCard .stuckOwnerCardSelect:focus-visible {
+  border-bottom: 0;
+  outline: 2px solid rgba(37, 99, 235, 0.35);
+  outline-offset: 1px;
+}
+
+body[data-dashboard-path="pages/dashManager.html"] .cashflowHeaderControls {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+body[data-dashboard-path="pages/dashManager.html"] .cashflowTeamToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px;
+  border: 1px solid #dbe5f2;
+  border-radius: 999px;
+  background: #f8fafc;
+  color: #475569;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.1;
+  cursor: pointer;
+  user-select: none;
+}
+
+body[data-dashboard-path="pages/dashManager.html"] .cashflowTeamToggle input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  accent-color: #2563eb;
+}
+
+body[data-dashboard-path="pages/dashManager.html"] #targetAgentHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+body[data-dashboard-path="pages/dashManager.html"] #targetAgentHeader .targetAgentIdentity {
+  min-width: 0;
+}
+
+body[data-dashboard-path="pages/dashManager.html"] #targetAgentHeader .targetAgentLabel {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+body[data-dashboard-path="pages/dashManager.html"] #targetAgentHeader .targetAgentName {
+  margin-top: 2px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 420px;
+}
+
+body[data-dashboard-path="pages/dashManager.html"] #targetAgentHeader .targetAgentFilterDropdown {
+  position: relative;
+}
+
+body[data-dashboard-path="pages/dashManager.html"] #targetAgentHeader .targetAgentFilterDropdown summary {
+  list-style: none;
+  cursor: pointer;
+  border: 1px solid #e2e8f4;
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #111827;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+body[data-dashboard-path="pages/dashManager.html"] #targetAgentHeader .targetAgentFilterDropdown summary::-webkit-details-marker {
+  display: none;
+}
+
+body[data-dashboard-path="pages/dashManager.html"] #targetAgentHeader .targetAgentFilterDropdown .filterBadge {
+  background: #f1f5f9;
+  border: 1px solid #e2e8f4;
+  color: #334155;
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+body[data-dashboard-path="pages/dashManager.html"] #targetAgentHeader .targetAgentFilterDropdown .filterMenu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  min-width: 200px;
+  background: #ffffff;
+  border: 1px solid #e2e8f4;
+  border-radius: 12px;
+  padding: 6px;
+  box-shadow: 0 16px 32px rgba(15, 23, 42, 0.12);
+  display: none;
+  z-index: 50;
+}
+
+body[data-dashboard-path="pages/dashManager.html"] #targetAgentHeader .targetAgentFilterDropdown[open] .filterMenu {
+  display: block;
+  animation: fadeIn 0.2s ease;
+}
+
+body[data-dashboard-path="pages/dashManager.html"] #targetAgentHeader .targetAgentFilterDropdown .filterItem {
+  width: 100%;
+  border: none;
+  background: transparent;
+  text-align: left;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  color: #111827;
+  cursor: pointer;
+}
+
+body[data-dashboard-path="pages/dashManager.html"] #targetAgentHeader .targetAgentFilterDropdown .filterItem:hover {
+  background: #f8fafc;
+}
+
+body[data-dashboard-path="pages/dashManager.html"] #targetAgentHeader .targetAgentFilterDropdown .filterItem.is-active {
+  background: #f8fafc;
+  color: #111827;
+  font-weight: 400;
+}
+
+body[data-dashboard-path="pages/dashManager.html"] #targetAgentHeader .targetAgentFilterDropdown .filterItem:focus-visible,
+body[data-dashboard-path="pages/dashManager.html"] #targetAgentHeader .targetAgentFilterDropdown summary:focus-visible {
+  outline: 2px solid rgba(37, 99, 235, 0.35);
+  outline-offset: 1px;
+}
+
+body[data-dashboard-path="pages/dashManager.html"] #chartDetailModal.is-vintage-detail .modal-dialog {
+  max-width: min(1620px, 98vw);
+}
+
+body[data-dashboard-path="pages/dashManager.html"] #chartDetailModal.is-vintage-detail .modal-content {
+  height: auto;
+  min-height: 0;
+  max-height: min(88vh, 860px);
+}
+
+body[data-dashboard-path="pages/dashManager.html"] #chartDetailModal.is-vintage-detail .modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0;
+  padding: 12px 16px 16px;
+  overflow: auto;
+}
+
+body[data-dashboard-path="pages/dashManager.html"] #vintageDetailLayout {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0;
+}
+
+body[data-dashboard-path="pages/dashManager.html"] #vintageDetailLayout .vintageTableFilters {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+body[data-dashboard-path="pages/dashManager.html"] #vintageDetailLayout .vintageFiltersRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+body[data-dashboard-path="pages/dashManager.html"] #vintageDetailLayout .vintageCustomerSearchWrap {
+  position: relative;
+}
+
+body[data-dashboard-path="pages/dashManager.html"] #vintageDetailLayout .vintageCustomerSearch {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--brand-border);
+  background: #ffffff;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 12px;
+  color: #64748b;
+  min-width: 320px;
+  width: min(620px, 100%);
+}
+
+body[data-dashboard-path="pages/dashManager.html"] #vintageDetailLayout .vintageCustomerSearch i {
+  color: var(--brand);
+}
+
+body[data-dashboard-path="pages/dashManager.html"] #vintageDetailLayout .vintageCustomerSearch input {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 12px;
+  color: #0f172a;
+  width: 100%;
+}
+
+body[data-dashboard-path="pages/dashManager.html"] #vintageDetailLayout .vintageCustomerSearch:focus-within {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 2px rgba(var(--brand-rgb), 0.14);
+}
+
+body[data-dashboard-path="pages/dashManager.html"] #vintageDetailLayout .vintageCustomerSuggestMenu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  min-width: 220px;
+  width: 100%;
+  max-height: 260px;
+  overflow: auto;
+  background: #ffffff;
+  border: 1px solid #e2e8f4;
+  border-radius: 12px;
+  padding: 6px;
+  box-shadow: 0 16px 32px rgba(15, 23, 42, 0.12);
+  display: none;
+  z-index: 60;
+}
+
+body[data-dashboard-path="pages/dashManager.html"] #vintageDetailLayout .vintageCustomerSearchWrap.is-open .vintageCustomerSuggestMenu {
+  display: block;
+  animation: fadeIn 0.2s ease;
+}
+
+body[data-dashboard-path="pages/dashManager.html"] #vintageDetailLayout .vintageCustomerSuggestItem {
+  width: 100%;
+  border: none;
+  background: transparent;
+  text-align: left;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  color: #111827;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+body[data-dashboard-path="pages/dashManager.html"] #vintageDetailLayout .vintageCustomerSuggestItem:hover {
+  background: #f8fafc;
+}
+
+body[data-dashboard-path="pages/dashManager.html"] #vintageDetailLayout .vintageSuggestCode {
+  color: #64748b;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+body[data-dashboard-path="pages/dashManager.html"] #vintageDetailLayout .vintageDetailMeta {
+  font-size: 12px;
+  color: #475569;
+  font-weight: 600;
+}
+
+body[data-dashboard-path="pages/dashManager.html"] #vintageDetailLayout .vintageDetailSplit {
+  display: grid;
+  grid-template-columns: minmax(280px, 30%) minmax(0, 1fr);
+  gap: 12px;
+  min-height: 0;
+}
+
+body[data-dashboard-path="pages/dashManager.html"] #vintageDetailLayout .vintagePiePane {
+  border: 1px solid #e2e8f4;
+  border-radius: 10px;
+  background: #ffffff;
+  padding: 10px;
+}
+
+body[data-dashboard-path="pages/dashManager.html"] #vintageDetailLayout .vintagePieWrap {
+  height: 340px;
+}
+
+body[data-dashboard-path="pages/dashManager.html"] #vintageDetailLayout .vintagePieWrap canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+body[data-dashboard-path="pages/dashManager.html"] #vintageDetailLayout .vintageTablePane {
+  min-width: 0;
+}
+
+body[data-dashboard-path="pages/dashManager.html"] #vintageDetailLayout .vintageDetailTableWrap {
+  max-height: 392px;
+}
+
+body[data-dashboard-path="pages/dashManager.html"] #vintageDetailLayout .vintageDetailTable th:nth-child(2),
+body[data-dashboard-path="pages/dashManager.html"] #vintageDetailLayout .vintageDetailTable td:nth-child(2),
+body[data-dashboard-path="pages/dashManager.html"] #vintageDetailLayout .vintageDetailTable th:nth-child(3),
+body[data-dashboard-path="pages/dashManager.html"] #vintageDetailLayout .vintageDetailTable td:nth-child(3),
+body[data-dashboard-path="pages/dashManager.html"] #vintageDetailLayout .vintageDetailTable th:nth-child(4),
+body[data-dashboard-path="pages/dashManager.html"] #vintageDetailLayout .vintageDetailTable td:nth-child(4) {
+  text-align: right;
+}
+
+body[data-dashboard-path="pages/dashManager.html"] #vintageDetailLayout .vintageDetailTable th:nth-child(5),
+body[data-dashboard-path="pages/dashManager.html"] #vintageDetailLayout .vintageDetailTable td:nth-child(5) {
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  body[data-dashboard-path="pages/dashManager.html"] #targetAgentHeader {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  body[data-dashboard-path="pages/dashManager.html"] #targetAgentHeader .targetAgentName {
+    max-width: 100%;
+  }
+
+  body[data-dashboard-path="pages/dashManager.html"] #targetAgentHeader .targetAgentFilterDropdown summary {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  body[data-dashboard-path="pages/dashManager.html"] #targetAgentHeader .targetAgentFilterDropdown .filterMenu {
+    left: 0;
+    width: min(100%, 320px);
+  }
+}
+
+@media (max-width: 1100px) {
+  body[data-dashboard-path="pages/dashManager.html"] #vintageDetailLayout .vintageDetailSplit {
+    grid-template-columns: 1fr;
+  }
+
+  body[data-dashboard-path="pages/dashManager.html"] #vintageDetailLayout .vintagePieWrap {
+    height: 280px;
+  }
+}
+
 .myTeamBtn:hover {
   border-color: #4b1f73;
   background: #4b1f73;

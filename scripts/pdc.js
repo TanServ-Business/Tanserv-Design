@@ -1469,7 +1469,7 @@
           return true;
         }
         if (action === "open-invoice" || action === "open-email" || action === "open-todo") {
-          window.location.href = resolvePath("index.html");
+          window.location.href = resolvePath("LPagent.html");
           return true;
         }
         if (href) {

@@ -424,9 +424,318 @@
       font-weight: 600;
     }
 
+    .tableCardHeader {
+      position: relative;
+    }
+
+    .filtersRow.filtersRowCompact {
+      flex-wrap: nowrap !important;
+      gap: 8px;
+      overflow-x: auto;
+      overflow-y: visible;
+      padding-bottom: 2px;
+    }
+
+    .filtersRow.filtersRowCompact::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    .invoiceFilterGroups {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .invoiceFilterGroups.invoiceFilterGroupsPopup {
+      display: grid;
+      grid-template-columns: 1fr;
+      align-items: stretch;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .invoiceFilterGroups.invoiceFilterGroupsPopup .btn-group {
+      display: flex;
+      width: 100%;
+      min-width: 0;
+    }
+
+    .filterPopover {
+      position: fixed;
+      top: 0;
+      left: 0;
+      transform: none;
+      border: 1px solid #e2e8f4;
+      border-radius: 12px;
+      background: #ffffff;
+      box-shadow: 0 20px 44px rgba(15, 23, 42, 0.2);
+      z-index: 210;
+      padding: 12px;
+      width: min(460px, calc(100vw - 24px));
+      max-width: min(460px, calc(100vw - 24px));
+      overflow-x: visible;
+      overflow-y: visible;
+    }
+
+    .filterPopover.hidden {
+      display: none;
+    }
+
+    .filterPopoverBackdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.35);
+      z-index: 205;
+    }
+
+    .filterPopoverBackdrop.hidden {
+      display: none;
+    }
+
+    .filterPopoverHeader {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .filterPopoverTitle {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #475569;
+    }
+
+    .filterPopoverCloseBtn {
+      border: 1px solid #e2e8f4;
+      background: #ffffff;
+      color: #64748b;
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .filterPopoverCloseBtn:hover {
+      border-color: #cbd5e1;
+      color: #334155;
+    }
+
+    .filterPopover .invoiceFilterGroups.invoiceFilterGroupsPopup .filterBtn {
+      width: 100%;
+      min-height: 38px;
+      justify-content: flex-start;
+      text-align: left;
+    }
+
+    .filterPopover .filterBtn {
+      border: 1px solid #e2e8f4;
+      background: #ffffff;
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #111827;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .filterPopover .dropdown-toggle.filterBtn::after {
+      margin-left: 6px;
+      border-top-color: #94a3b8;
+    }
+
+    .filterPopover .invoiceFilterGroups.invoiceFilterGroupsPopup .filterBadge {
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+
+    .filterPopover .filterBtn:hover,
+    .filterPopover .filterBtn:focus,
+    .filterPopover .filterBtn:focus-visible,
+    .filterPopover .filterBtn.show {
+      border-color: var(--brand);
+      box-shadow: 0 0 0 2px rgba(var(--brand-rgb), 0.14);
+    }
+
+    .filterPopover .filterBadge {
+      background: #f1f5f9;
+      border: 1px solid #e2e8f4;
+      color: #334155;
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .filterPopover .filterBtn.filterTone-green { color: #166534; }
+    .filterPopover .filterBtn.filterTone-blue { color: #1d4ed8; }
+    .filterPopover .filterBtn.filterTone-yellow { color: #854d0e; }
+    .filterPopover .filterBtn.filterTone-orange { color: #e88619; }
+    .filterPopover .filterBtn.filterTone-red { color: #991b1b; }
+
+    .filterPopover .filterBadge.filterTone-green { color: #166534; }
+    .filterPopover .filterBadge.filterTone-blue { color: #1d4ed8; }
+    .filterPopover .filterBadge.filterTone-yellow { color: #854d0e; }
+    .filterPopover .filterBadge.filterTone-orange { color: #e88619; }
+    .filterPopover .filterBadge.filterTone-red { color: #991b1b; }
+
+    .filterPopover .dropdown-menu {
+      border: 1px solid #e2e8f4;
+      border-radius: 12px;
+      padding: 6px;
+      box-shadow: 0 16px 32px rgba(15, 23, 42, 0.12);
+    }
+
+    .filterPopover .dropdown-item {
+      border: 1px solid transparent;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 8px 10px;
+      color: #111827;
+    }
+
+    .filterPopover .dropdown-item.filterTone-green { color: #166534; }
+    .filterPopover .dropdown-item.filterTone-blue { color: #1d4ed8; }
+    .filterPopover .dropdown-item.filterTone-yellow { color: #854d0e; }
+    .filterPopover .dropdown-item.filterTone-orange { color: #e88619; }
+    .filterPopover .dropdown-item.filterTone-red { color: #991b1b; }
+
+    .filterPopover .dropdown-item:hover,
+    .filterPopover .dropdown-item:focus {
+      background: #f8fafc;
+      color: inherit;
+    }
+
+    .filterPopover .dropdown-item.active,
+    .filterPopover .dropdown-item:active {
+      background: #f1f5f9;
+      color: inherit;
+    }
+
+    .filterCollapseBtn {
+      min-width: 92px;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .filterChipBar {
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      flex-wrap: wrap;
+      flex: 1 1 280px;
+      min-width: 0;
+      overflow: visible;
+      max-width: clamp(240px, 42vw, 520px);
+      padding-bottom: 0;
+      align-content: flex-start;
+    }
+
+    .filterChip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      flex: 0 0 auto;
+      border: 1px solid #dbe4f3;
+      background: #f8fafc;
+      color: #334155;
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-size: 10.5px;
+      font-weight: 700;
+      max-width: 100%;
+      white-space: nowrap;
+    }
+
+    .filterChip.filterTone-green { background: #dcfce7; border-color: #86efac; color: #166534; }
+    .filterChip.filterTone-blue { background: #dbeafe; border-color: #93c5fd; color: #1d4ed8; }
+    .filterChip.filterTone-yellow { background: #fef9c3; border-color: #fcd34d; color: #854d0e; }
+    .filterChip.filterTone-orange { background: #ffedd5; border-color: #fdba74; color: #e88619; }
+    .filterChip.filterTone-red { background: #fee2e2; border-color: #fca5a5; color: #991b1b; }
+
+    .filterChipClear {
+      border: none;
+      background: transparent;
+      color: currentColor;
+      opacity: 0.72;
+      padding: 0;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .filterChipClear:hover {
+      color: currentColor;
+      opacity: 1;
+    }
+
+    .invoiceSearchInline {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid #e2e8f4;
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 7px 10px;
+      min-width: 280px;
+    }
+
+    .invoiceSearchInline i {
+      color: #64748b;
+      font-size: 12px;
+    }
+
+    .invoiceSearchInline input {
+      border: none;
+      outline: none;
+      width: 100%;
+      font-size: 12px;
+      color: #111827;
+      padding: 0;
+      background: transparent;
+    }
+
+    .invoiceSearchInline input::placeholder {
+      color: #94a3b8;
+    }
+
     @media (max-width: 900px) {
       .pdcGrid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .invoiceSearchInline {
+        min-width: 220px;
+      }
+
+      .filterChipBar {
+        max-width: clamp(220px, 40vw, 420px);
+      }
+
+      .filterPopover {
+        width: min(420px, 94vw);
+        max-width: min(420px, 94vw);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .filterPopover {
+        width: min(360px, 96vw);
+        max-width: min(360px, 96vw);
+        padding: 10px;
       }
     }
   </style>
@@ -459,7 +768,7 @@
       </select>
     </div>
 
-    <input id="customerSearch" class="searchBox" placeholder="Search customer by name or code..." />
+    <input id="customerSearch" class="searchBox" placeholder="Search customer or invoice number..." />
 
     <div id="customerCards" class="cards">
       <!-- Rendered by JS -->
@@ -512,78 +821,104 @@
     <div class="tableCard">
 
       <div class="tableCardHeader">
-        <div class="filtersRow d-flex flex-wrap align-items-center">
-          <div class="btn-group">
-            <button
-              id="filterInvoiceStatusBtn"
-              type="button"
-              class="filterBtn dropdown-toggle"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-              title="Filter - Invoice Status"
-            >
-              Invoice Status
-              <span class="filterBadge" data-role="filter-value">All</span>
-            </button>
-            <ul class="dropdown-menu" id="filterInvoiceStatusMenu" data-filter="invoiceStatus"></ul>
-          </div>
+        <div class="filtersRow filtersRowCompact d-flex align-items-center">
+          <label class="invoiceSearchInline" for="invoiceSearch">
+            <i class="bi bi-search" aria-hidden="true"></i>
+            <input id="invoiceSearch" type="search" placeholder="Search invoices or customer..." maxlength="100" />
+          </label>
 
-          <div class="btn-group">
-            <button
-              id="filterPrimaryStatusBtn"
-              type="button"
-              class="filterBtn dropdown-toggle"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-              title="Filter - Primary Status"
-            >
-              Primary Status
-              <span class="filterBadge" data-role="filter-value">All</span>
-            </button>
-            <ul class="dropdown-menu" id="filterPrimaryStatusMenu" data-filter="primaryStatus"></ul>
-          </div>
+          <div class="filterChipBar hidden" id="filterChipBar" aria-live="polite"></div>
 
-          <div class="btn-group">
-            <button
-              id="filterStatusBtn"
-              type="button"
-              class="filterBtn dropdown-toggle"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-              title="Filter - Sub Status"
-            >
-              Sub Status
-              <span class="filterBadge" data-role="filter-value">All</span>
-            </button>
-            <ul class="dropdown-menu" id="filterStatusMenu" data-filter="status"></ul>
-          </div>
+          <button
+            class="filterBtn filterCollapseBtn ms-auto"
+            type="button"
+            id="filterCollapseBtn"
+            aria-controls="filterPopover"
+            aria-expanded="false"
+            title="Show filters"
+          >
+            <i class="bi bi-funnel" aria-hidden="true"></i>
+            <span>Filter</span>
+          </button>
 
-          <div class="btn-group">
-            <button
-              id="filterNetDueBtn"
-              type="button"
-              class="filterBtn dropdown-toggle"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-              title="Filter - Net Due"
-            >
-              Net Due
-              <span class="filterBadge" data-role="filter-value">All</span>
-            </button>
-            <ul class="dropdown-menu" id="filterNetDueMenu" data-filter="netDue"></ul>
-          </div>
-
-          <button class="notifyToggle ms-auto" type="button" id="filterUnreadEmail" aria-pressed="false">
+          <button class="notifyToggle" type="button" id="filterUnreadEmail" aria-pressed="false">
             <span class="notifyToggleLabel">
               <i class="bi bi-envelope-fill" aria-hidden="true"></i>
               <span>Unread Emails</span>
             </span>
             <span class="notifyCount" id="unreadEmailCount">0</span>
           </button>
+        </div>
 
-          <button class="filterBtn filterBtnClear" type="button" id="filterClearBtn">
-            Clear filters
-          </button>
+        <div class="filterPopoverBackdrop hidden" id="filterPopoverBackdrop" aria-hidden="true"></div>
+        <div class="filterPopover hidden" id="filterPopover" role="dialog" aria-label="Invoice filters">
+          <div class="filterPopoverHeader">
+            <span class="filterPopoverTitle">Filters</span>
+            <button class="filterPopoverCloseBtn" type="button" id="filterPopoverCloseBtn" aria-label="Close filters">
+              <i class="bi bi-x-lg" aria-hidden="true"></i>
+            </button>
+          </div>
+          <div class="invoiceFilterGroups invoiceFilterGroupsPopup" id="invoiceFilterGroups">
+            <div class="btn-group">
+              <button
+                id="filterInvoiceStatusBtn"
+                type="button"
+                class="filterBtn dropdown-toggle"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+                title="Filter - Invoice Status"
+              >
+                Invoice Status
+                <span class="filterBadge" data-role="filter-value">All</span>
+              </button>
+              <ul class="dropdown-menu" id="filterInvoiceStatusMenu" data-filter="invoiceStatus"></ul>
+            </div>
+
+            <div class="btn-group">
+              <button
+                id="filterPrimaryStatusBtn"
+                type="button"
+                class="filterBtn dropdown-toggle"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+                title="Filter - Primary Status"
+              >
+                Primary Status
+                <span class="filterBadge" data-role="filter-value">All</span>
+              </button>
+              <ul class="dropdown-menu" id="filterPrimaryStatusMenu" data-filter="primaryStatus"></ul>
+            </div>
+
+            <div class="btn-group">
+              <button
+                id="filterStatusBtn"
+                type="button"
+                class="filterBtn dropdown-toggle"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+                title="Filter - Sub Status"
+              >
+                Sub Status
+                <span class="filterBadge" data-role="filter-value">All</span>
+              </button>
+              <ul class="dropdown-menu" id="filterStatusMenu" data-filter="status"></ul>
+            </div>
+
+            <div class="btn-group">
+              <button
+                id="filterNetDueBtn"
+                type="button"
+                class="filterBtn dropdown-toggle"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+                title="Filter - Net Due"
+              >
+                Net Due
+                <span class="filterBadge" data-role="filter-value">All</span>
+              </button>
+              <ul class="dropdown-menu" id="filterNetDueMenu" data-filter="netDue"></ul>
+            </div>
+          </div>
         </div>
 
         <div id="bulkBar" class="bulkBar hidden">
@@ -1580,7 +1915,7 @@
 
       syncInvoiceDetails();
     })();
+
   </script>
 </body>
 </html>
-

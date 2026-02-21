@@ -62,14 +62,14 @@
                 <div class="kpiSplitItem">
                   <span>Not Due</span>
                   <strong>
-                    <span class="kpiSplitLine">Invoices 61</span>
+                    <span class="kpiSplitLine">Invoices 61 | Rs. 89,24,16,295</span>
                     <span class="kpiSplitLine">Customers 4</span>
                   </strong>
                 </div>
                 <div class="kpiSplitItem">
                   <span class="kpiDueLabel">Due</span>
                   <strong>
-                    <span class="kpiSplitLine">Invoices 112</span>
+                    <span class="kpiSplitLine">Invoices 112 | Rs. 1,59,65,10,000</span>
                     <span class="kpiSplitLine">Customers 8</span>
                   </strong>
                 </div>
@@ -88,14 +88,14 @@
                 <div class="kpiSplitItem">
                   <span>Not Due</span>
                   <strong>
-                    <span class="kpiSplitLine">Invoices 1</span>
+                    <span class="kpiSplitLine">Invoices 1 | Rs. 18,43,508</span>
                     <span class="kpiSplitLine">Customers 1</span>
                   </strong>
                 </div>
                 <div class="kpiSplitItem">
                   <span class="kpiDueLabel">Due</span>
                   <strong>
-                    <span class="kpiSplitLine">Invoices 3</span>
+                    <span class="kpiSplitLine">Invoices 3 | Rs. 59,30,000</span>
                     <span class="kpiSplitLine">Customers 2</span>
                   </strong>
                 </div>
@@ -116,14 +116,14 @@
                 <div class="kpiSplitItem">
                   <span>Not Due</span>
                   <strong>
-                    <span class="kpiSplitLine">Invoices 81</span>
+                    <span class="kpiSplitLine">Invoices 81 | Rs. 6,98,40,000</span>
                     <span class="kpiSplitLine">Customers 5</span>
                   </strong>
                 </div>
                 <div class="kpiSplitItem">
                   <span class="kpiDueLabel">Due</span>
                   <strong>
-                    <span class="kpiSplitLine">Invoices 92</span>
+                    <span class="kpiSplitLine">Invoices 92 | Rs. 8,35,20,000</span>
                     <span class="kpiSplitLine">Customers 7</span>
                   </strong>
                 </div>
@@ -131,148 +131,121 @@
             </article>
           </div>
           <div class="col-12 col-md-3">
-            <article class="dashboardCard kpiCard visitCard cardClickable" id="openIssuesCard" role="button" tabindex="0" aria-label="Open issues details">
+            <article class="dashboardCard kpiCard visitCard cardClickable" id="openIssuesCard" role="button" tabindex="0" aria-label="Open open-issues details">
               <div class="openIssuesCardBody">
                 <div class="openIssuesMain">
                   <div class="kpiLabel">Open Issues</div>
-                  <div class="kpiValue">9</div>
-                  <div class="kpiSub">High priority: 3</div>
+                  <div class="kpiValue" id="openIssuesCardValue">0</div>
+                  <div class="kpiSub" id="openIssuesCardSub">Past TAT: 0</div>
                 </div>
                 <div class="openIssuesTop3" aria-label="Top 3 issue status">
                   <div class="openIssuesTop3Row">
                     <span class="openIssuesStatusName">Further docs required</span>
-                    <strong class="openIssuesStatusCount">4</strong>
+                    <strong class="openIssuesStatusCount" id="openIssuesCardDocsCount">0</strong>
                   </div>
                   <div class="openIssuesTop3Row">
                     <span class="openIssuesStatusName">Further action required</span>
-                    <strong class="openIssuesStatusCount">3</strong>
+                    <strong class="openIssuesStatusCount" id="openIssuesCardActionCount">0</strong>
                   </div>
                   <div class="openIssuesTop3Row">
                     <span class="openIssuesStatusName">Material delivery issue</span>
-                    <strong class="openIssuesStatusCount">2</strong>
+                    <strong class="openIssuesStatusCount" id="openIssuesCardMaterialCount">0</strong>
                   </div>
                 </div>
               </div>
             </article>
           </div>
           <div class="col-12 col-md-3">
-            <article class="dashboardCard kpiCard cardClickable" id="agingOver30Card" role="button" tabindex="0" aria-label="Open aging over 30 days details">
+            <article class="dashboardCard kpiCard cardClickable" id="agingOver30Card" role="button" tabindex="0" aria-label="Open past TAT breaches details">
               <div class="agingBucketsCardBody">
                 <div class="agingBucketsMain">
-                  <div class="kpiLabel">Aging &gt; 30 Days</div>
-                  <div class="kpiValue">18%</div>
-                  <div class="kpiSub">Value: Rs. 3.8 Cr</div>
+                  <div class="kpiLabel">Past TAT Breaches</div>
+                  <div class="kpiValue" id="pastTatCardValue">0</div>
+                  <div class="kpiSub" id="pastTatCardSub">Overdue days: 0</div>
                 </div>
                 <div class="agingBucketsTop3" aria-label="Top aging buckets by invoices">
                   <div class="agingBucketRow is-31-60">
-                    <span class="agingBucketName">31-60 days</span>
-                    <strong class="agingBucketCount">24</strong>
+                    <span class="agingBucketName">Further docs</span>
+                    <strong class="agingBucketCount" id="pastTatCardBucketOne">0</strong>
                   </div>
                   <div class="agingBucketRow is-121-150">
-                    <span class="agingBucketName">121-150 days</span>
-                    <strong class="agingBucketCount">13</strong>
+                    <span class="agingBucketName">Further action</span>
+                    <strong class="agingBucketCount" id="pastTatCardBucketTwo">0</strong>
                   </div>
                   <div class="agingBucketRow is-150-180">
-                    <span class="agingBucketName">150-180 days</span>
-                    <strong class="agingBucketCount">9</strong>
+                    <span class="agingBucketName">Service/material</span>
+                    <strong class="agingBucketCount" id="pastTatCardBucketThree">0</strong>
                   </div>
                 </div>
               </div>
             </article>
           </div>
           <div class="col-12 col-md-3">
-            <article class="dashboardCard kpiCard cardClickable" id="newBillingCard" role="button" tabindex="0" aria-label="Open new billing details">
+            <article class="dashboardCard kpiCard cardClickable" id="newBillingCard" role="button" tabindex="0" aria-label="Open resolved-today details">
               <div class="newBillingCardBody">
                 <div class="newBillingMain">
-                  <div class="kpiLabel">New Billing</div>
-                  <div class="kpiValue">Rs. 1.2 Cr</div>
-                  <div class="kpiSub">MTD growth: 4.6%</div>
+                  <div class="kpiLabel">Resolved Today</div>
+                  <div class="kpiValue" id="resolvedTodayCardValue">0</div>
+                  <div class="kpiSub" id="resolvedTodayCardSub">Closed today: 0</div>
                 </div>
-                <div class="newBillingTop3" aria-label="Top 3 customers by invoice amount">
-                  <div class="newBillingTop3Row" data-fullname="Apollo Pharmacy Pvt Ltd">
-                    <span class="newBillingCustomerName">Apollo Pharmacy Pvt Ltd</span>
-                    <strong class="newBillingAmountBadge">0.62 Cr</strong>
+                <div class="newBillingTop3" aria-label="Top owners by resolutions">
+                  <div class="newBillingTop3Row" data-fullname="Owner 1">
+                    <span class="newBillingCustomerName" id="resolvedTodayOwnerOne">Owner 1</span>
+                    <strong class="newBillingAmountBadge" id="resolvedTodayOwnerOneCount">0</strong>
                   </div>
-                  <div class="newBillingTop3Row" data-fullname="Blue Star Limited">
-                    <span class="newBillingCustomerName">Blue Star Limited</span>
-                    <strong class="newBillingAmountBadge">0.39 Cr</strong>
+                  <div class="newBillingTop3Row" data-fullname="Owner 2">
+                    <span class="newBillingCustomerName" id="resolvedTodayOwnerTwo">Owner 2</span>
+                    <strong class="newBillingAmountBadge" id="resolvedTodayOwnerTwoCount">0</strong>
                   </div>
-                  <div class="newBillingTop3Row" data-fullname="Varun Beverages">
-                    <span class="newBillingCustomerName">Varun Beverages</span>
-                    <strong class="newBillingAmountBadge">0.21 Cr</strong>
+                  <div class="newBillingTop3Row" data-fullname="Owner 3">
+                    <span class="newBillingCustomerName" id="resolvedTodayOwnerThree">Owner 3</span>
+                    <strong class="newBillingAmountBadge" id="resolvedTodayOwnerThreeCount">0</strong>
                   </div>
                 </div>
               </div>
             </article>
           </div>
           <div class="col-12 col-md-3">
-            <article class="dashboardCard kpiCard cardClickable" id="visitForDayCard" role="button" tabindex="0" aria-label="Open visits for the day">
-              <div class="kpiLabel">Visits Today</div>
-              <div class="visitProgressWrap" aria-label="Visited 3 out of 5 planned visits">
-                <div class="visitProgressDonut" style="--value: 0.6;" data-tooltip="3/5 visits"></div>
-              </div>
-              <div class="kpiValue">5 visits</div>
-              <div
-                class="kpiSub visitList"
-              >
-                <span class="visitNames">Apollo Pharmacy Pvt Ltd, Blue Star Limited, Ambane India Pvt Ltd, Varun Beverages, Shiva Healthcare Pvt Ltd</span>
-                <span class="visitMore">+2</span>
-                <div class="visitTooltip" role="tooltip">
-                  <div class="visitTooltipList">
-                    <div class="visitTooltipRow is-planned">
-                      <span class="visitTooltipIcon"><i class="bi bi-check2-circle" aria-hidden="true"></i></span>
-                      <span class="visitTooltipCustomer">Apollo Pharmacy Pvt Ltd</span>
-                    </div>
-                    <div class="visitTooltipRow is-planned">
-                      <span class="visitTooltipIcon"><i class="bi bi-check2-circle" aria-hidden="true"></i></span>
-                      <span class="visitTooltipCustomer">Blue Star Limited</span>
-                    </div>
-                    <div class="visitTooltipRow is-planned">
-                      <span class="visitTooltipIcon"><i class="bi bi-check2-circle" aria-hidden="true"></i></span>
-                      <span class="visitTooltipCustomer">Ambane India Pvt Ltd</span>
-                    </div>
-                    <div class="visitTooltipRow is-unplanned">
-                      <span class="visitTooltipIcon"><i class="bi bi-arrow-repeat" aria-hidden="true"></i></span>
-                      <span class="visitTooltipCustomer">Varun Beverages</span>
-                    </div>
-                    <div class="visitTooltipRow is-not-visited">
-                      <span class="visitTooltipIcon"><i class="bi bi-x-circle" aria-hidden="true"></i></span>
-                      <span class="visitTooltipCustomer">Shiva Healthcare Pvt Ltd</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
+            <article class="dashboardCard kpiCard cardClickable" id="visitForDayCard" role="button" tabindex="0" aria-label="Open stuck-by-owner details">
+              <div class="kpiLabel">Stuck by Owner</div>
+              <label class="stuckOwnerSelectWrap" for="stuckOwnerCardSelect">
+                <span class="visually-hidden">Select owner</span>
+                <select id="stuckOwnerCardSelect" class="stuckOwnerCardSelect" aria-label="Select owner for stuck issue data">
+                  <option value="">-</option>
+                </select>
+              </label>
+              <div class="kpiSub" id="stuckOwnerCardSub">Cases: 0 | Past TAT: 0</div>
             </article>
           </div>
         </div>
 
         <div class="row g-3 actionStack">
           <div class="col-12 col-md-4">
-            <article class="dashboardCard actionCard accentPurple cardClickable" id="newAllocationsCard" role="button" tabindex="0" aria-label="Open new allocations details">
+            <article class="dashboardCard actionCard accentPurple cardClickable" id="newAllocationsCard" role="button" tabindex="0" aria-label="Open team cashflow variance details">
               <div class="actionMeta">
-                <span>New Allocations</span>
-                <strong>17</strong>
-                <span>Value: Rs. 3.1 Cr <span class="actionOverdueText">| Untouched: 17 (7.2 Cr)</span></span>
+                <span>Team Cashflow Variance</span>
+                <strong id="cashflowVarianceCardValue">Rs. 0.00 Cr</strong>
+                <span id="cashflowVarianceCardSub">Actual vs expected (full team)</span>
               </div>
               <div class="actionIcon"><i class="bi bi-inbox"></i></div>
             </article>
           </div>
           <div class="col-12 col-md-4">
-            <article class="dashboardCard actionCard accentPurple cardClickable" id="ptpForDayCard" role="button" tabindex="0" aria-label="Open PTP for the day details">
+            <article class="dashboardCard actionCard accentPurple cardClickable" id="ptpForDayCard" role="button" tabindex="0" aria-label="Open expected collection details">
               <div class="actionMeta">
-                <span>PTP For The Day</span>
-                <strong>5</strong>
-                <span>Value: Rs. 1.4 Cr <span class="actionOverdueText">| Overdue PTP: 2 (0.75 Cr)</span></span>
+                <span>Expected Collection (Next 7 Days)</span>
+                <strong id="expectedWeekCardValue">Rs. 0.00 Cr</strong>
+                <span id="expectedWeekCardSub">Projected trend based expected inflow</span>
               </div>
               <div class="actionIcon"><i class="bi bi-calendar-check"></i></div>
             </article>
           </div>
           <div class="col-12 col-md-4">
-            <article class="dashboardCard actionCard accentPurple cardClickable" id="callbacksForDayCard" role="button" tabindex="0" aria-label="Open callbacks for the day details">
+            <article class="dashboardCard actionCard accentPurple cardClickable" id="callbacksForDayCard" role="button" tabindex="0" aria-label="Open PTP at-risk details">
               <div class="actionMeta">
-                <span>Callbacks For The Day</span>
-                <strong>11</strong>
-                <span>Value: Rs. 0.8 Cr <span class="actionOverdueText">| Overdue Callback: 2 (2.75 Cr)</span></span>
+                <span>PTP At Risk</span>
+                <strong id="ptpRiskCardValue">0</strong>
+                <span id="ptpRiskCardSub">PTPs at risk of miss / delay</span>
               </div>
               <div class="actionIcon"><i class="bi bi-telephone"></i></div>
             </article>
@@ -282,13 +255,13 @@
 
       <div class="col-12 col-md-3">
         <div class="dashboardRightStack">
-          <article class="dashboardCard chartCard card overflow-hidden bg-primary border-0 ovarlay-primary-gradient radialCard" data-chart="planActual" data-span="4" role="button" tabindex="0" aria-label="Plan versus actual radial chart">
+          <article class="dashboardCard chartCard card overflow-hidden bg-primary border-0 ovarlay-primary-gradient radialCard" data-chart="planActual" data-span="4" role="button" tabindex="0" aria-label="Issue resolution radial chart">
             <div class="radialCardHeader">
               <div>
-                <div class="radialTitle">Monthly Target</div>
+                <div class="radialTitle">Issue Resolution</div>
                 <div class="radialPercentRow">
-                  <span class="radialPercent">38%</span>
-                  <span class="radialDelta">-12% vs last month</span>
+                  <span class="radialPercent" id="issueResolutionRate">0%</span>
+                  <span class="radialDelta" id="issueResolutionDelta">-</span>
                 </div>
               </div>
               <button class="radialMenuBtn" type="button" aria-label="More options">
@@ -298,25 +271,25 @@
             <div class="radialGaugeWrap">
               <canvas id="chartPlanActual"></canvas>
               <div class="radialGaugeCenter">
-                <div class="radialGaugeValue">32K</div>
-                <div class="radialGaugeLabel">91 Invoices</div>
+                <div class="radialGaugeValue" id="issueResolutionOpenCount">0</div>
+                <div class="radialGaugeLabel" id="issueResolutionOpenLabel">Open issues</div>
               </div>
             </div>
-            <div class="radialCallout">
-              You collected <strong>Rs. 32,10,000</strong> this month. You are behind commitment, focus on top due accounts.
+            <div class="radialCallout" id="issueResolutionCallout">
+              Issue resolution health and TAT risk snapshot for your team.
             </div>
             <div class="radialSummary">
               <div class="radialSummaryItem">
-                <div class="radialSummaryValue">$100K</div>
-                <div class="radialSummaryLabel">Target</div>
+                <div class="radialSummaryValue" id="issueResolutionSummaryOpen">-</div>
+                <div class="radialSummaryLabel">Open</div>
               </div>
               <div class="radialSummaryItem">
-                <div class="radialSummaryValue">$38k</div>
-                <div class="radialSummaryLabel">Collected</div>
+                <div class="radialSummaryValue" id="issueResolutionSummaryResolved">-</div>
+                <div class="radialSummaryLabel">Resolved</div>
               </div>
               <div class="radialSummaryItem">
-                <div class="radialSummaryValue">$2.1k</div>
-                <div class="radialSummaryLabel">Today</div>
+                <div class="radialSummaryValue" id="issueResolutionSummaryPastTat">-</div>
+                <div class="radialSummaryLabel">Past TAT</div>
               </div>
             </div>
           </article>
@@ -394,7 +367,7 @@
           <div class="chartHeader">
             <div>
               <div class="chartTitle">Cash Flow Trend</div>
-              <div class="chartMeta">Collections and PTP (current month)</div>
+              <div class="chartMeta" id="cashflowChartMeta">Collections and PTP (current month)</div>
             </div>
             <div class="chartHint">Click for details</div>
           </div>
@@ -447,20 +420,42 @@
         <div class="modalChartWrap">
           <canvas id="chartDetailCanvas"></canvas>
         </div>
-        <div class="vintageDetailTableWrap" id="vintageDetailTableWrap" hidden>
-          <table class="vintageDetailTable">
-            <thead>
-              <tr>
-                <th>Aging Bucket</th>
-                <th>Count of invoices</th>
-                <th>Count of customers</th>
-                <th>Total Amount</th>
-                <th>Total Net Due</th>
-                <th>Share %</th>
-              </tr>
-            </thead>
-            <tbody id="vintageDetailTableBody"></tbody>
-          </table>
+        <div class="vintageDetailLayout" id="vintageDetailLayout" hidden>
+          <div class="tableFilters vintageTableFilters">
+            <div class="filterRow vintageFiltersRow">
+              <div class="vintageCustomerSearchWrap" id="vintageCustomerSearchWrap">
+                <label class="tableFilterSearch vintageCustomerSearch" for="vintageCustomerSearch">
+                  <i class="bi bi-search" aria-hidden="true"></i>
+                  <input type="search" id="vintageCustomerSearch" placeholder="Search customer name or code" autocomplete="off" maxlength="100" />
+                </label>
+                <div class="filterMenu vintageCustomerSuggestMenu" id="vintageCustomerSuggestMenu"></div>
+              </div>
+              <div class="vintageDetailMeta" id="vintageDetailMeta">Showing 0 invoices across 0 customers</div>
+            </div>
+          </div>
+          <div class="vintageDetailSplit">
+            <section class="vintagePiePane" aria-label="Aging bucket distribution">
+              <div class="vintagePieWrap">
+                <canvas id="vintagePieCanvas"></canvas>
+              </div>
+            </section>
+            <section class="vintageTablePane">
+              <div class="vintageDetailTableWrap" id="vintageDetailTableWrap">
+                <table class="vintageDetailTable">
+                  <thead>
+                    <tr>
+                      <th>Aging bucket</th>
+                      <th>Count of invoices</th>
+                      <th>Invoice Amount</th>
+                      <th>Net due</th>
+                      <th>Share %</th>
+                    </tr>
+                  </thead>
+                  <tbody id="vintageDetailTableBody"></tbody>
+                </table>
+              </div>
+            </section>
+          </div>
         </div>
         <div class="activityDetailLayout" id="activityDetailLayout" hidden>
           <section class="activityDetailChartPane">
@@ -538,7 +533,7 @@
               <div class="filterRow">
                 <label class="tableFilterSearch" for="issueDetailSearch">
                   <i class="bi bi-search" aria-hidden="true"></i>
-                  <input type="search" id="issueDetailSearch" placeholder="Search issue status or sub-status" autocomplete="off" />
+                  <input type="search" id="issueDetailSearch" placeholder="Search status, owner or resolution" autocomplete="off" />
                 </label>
                 <details class="filterDropdown activityFilterDropdown" id="issuePrimaryFilterDropdown">
                   <summary>Primary Status <span class="filterBadge" id="issuePrimaryFilterBadge">All</span></summary>
@@ -549,12 +544,12 @@
                   <div class="filterMenu" id="issueSubStatusFilterMenu"></div>
                 </details>
                 <details class="filterDropdown activityFilterDropdown" id="issueTypeFilterDropdown">
-                  <summary>Activity Type <span class="filterBadge" id="issueTypeFilterBadge">All</span></summary>
+                  <summary>Resolution <span class="filterBadge" id="issueTypeFilterBadge">All</span></summary>
                   <div class="filterMenu" id="issueTypeFilterMenu">
                     <button class="filterItem" type="button" data-filter-value="all">All</button>
-                    <button class="filterItem" type="button" data-filter-value="Call">Call</button>
-                    <button class="filterItem" type="button" data-filter-value="Email">Email</button>
-                    <button class="filterItem" type="button" data-filter-value="Visit">Visit</button>
+                    <button class="filterItem" type="button" data-filter-value="open">Open</button>
+                    <button class="filterItem" type="button" data-filter-value="resolved">Resolved</button>
+                    <button class="filterItem" type="button" data-filter-value="closed">Closed</button>
                   </div>
                 </details>
                 <button type="button" id="issueClearFilters">Clear</button>
@@ -568,11 +563,11 @@
                     <th>Invoice count</th>
                     <th>Invoice value</th>
                     <th>Net due</th>
-                    <th>Aging days</th>
-                    <th>Activity Type</th>
-                    <th>Status</th>
+                    <th>Expected TAT (days)</th>
+                    <th>Resolution</th>
+                    <th>Issue sub-status</th>
                     <th>Action owner</th>
-                    <th>Open days</th>
+                    <th>Past TAT (days)</th>
                   </tr>
                 </thead>
                 <tbody id="issueDetailTableBody"></tbody>
@@ -605,19 +600,19 @@
           </section>
           <section class="cashflowDetailTablePane">
             <div class="cashflowWeekToolbar">
-              <div class="cashflowWeekRange" id="cashflowDetailWeekInfo">Week 1 | 1st Feb 2026 - 7th Feb 2026</div>
+              <div class="cashflowWeekRange" id="cashflowDetailWeekInfo">Direct report nodes with full subtree rollup</div>
               <nav aria-label="Cashflow week navigation">
                 <ul class="pagination pagination-sm mb-0 cashflowWeekPager">
                   <li class="page-item">
-                    <button type="button" class="page-link" id="cashflowDetailPrevWeekBtn" aria-label="Previous week">
+                    <button type="button" class="page-link" id="cashflowDetailPrevWeekBtn" aria-label="Drill up">
                       <i class="bi bi-chevron-left" aria-hidden="true"></i>
                     </button>
                   </li>
                   <li class="page-item disabled" aria-disabled="true">
-                    <span class="page-link cashflowWeekLabel" id="cashflowDetailWeekLabel">Week 1</span>
+                    <span class="page-link cashflowWeekLabel" id="cashflowDetailWeekLabel">Direct Reports</span>
                   </li>
                   <li class="page-item">
-                    <button type="button" class="page-link" id="cashflowDetailNextWeekBtn" aria-label="Next week">
+                    <button type="button" class="page-link" id="cashflowDetailNextWeekBtn" aria-label="Reset view">
                       <i class="bi bi-chevron-right" aria-hidden="true"></i>
                     </button>
                   </li>
@@ -628,12 +623,13 @@
               <table class="cashflowDetailTable">
                 <thead>
                   <tr>
-                    <th>Date</th>
+                    <th>Team Node</th>
                     <th>Collection</th>
-                    <th>PTP Date</th>
                     <th>PTP Amount</th>
-                    <th>Projected Collection</th>
+                    <th>Part Payment</th>
+                    <th>Expected Collection</th>
                     <th>Variance</th>
+                    <th>Drilldown</th>
                   </tr>
                 </thead>
                 <tbody id="cashflowDetailTableBody"></tbody>
@@ -642,6 +638,19 @@
           </section>
         </div>
         <div class="targetDetailLayout" id="targetDetailLayout" hidden>
+          <div class="targetAgentHeader" id="targetAgentHeader">
+            <div class="targetAgentIdentity">
+              <div class="targetAgentLabel">Selected Agent</div>
+              <div class="targetAgentName" id="targetSelectedAgentName">-</div>
+            </div>
+            <details class="filterDropdown targetAgentFilterDropdown" id="targetAgentFilterDropdown">
+              <summary>
+                Agent
+                <span class="filterBadge" id="targetAgentFilterBadge">-</span>
+              </summary>
+              <div class="filterMenu" id="targetAgentFilterMenu"></div>
+            </details>
+          </div>
           <section class="targetHeroGrid">
             <article class="targetKpiCard">
               <span class="targetKpiLabel">Monthly commitment</span>
@@ -764,6 +773,9 @@
                   <button class="filterItem" type="button" data-value="collected">Collected</button>
                   <button class="filterItem" type="button" data-value="partially_collected">Partially Collected</button>
                   <button class="filterItem" type="button" data-value="collection_in_progress">Collection In Progress</button>
+                  <button class="filterItem" type="button" data-value="open">Open</button>
+                  <button class="filterItem" type="button" data-value="resolved">Resolved</button>
+                  <button class="filterItem" type="button" data-value="closed">Closed</button>
                 </div>
               </details>
               <details class="filterDropdown mtdFilterDropdown" id="mtdAgingRangeFilterDropdown" hidden>
@@ -943,7 +955,7 @@
             <div class="teamInsightsPane">
               <div class="teamOverlayTitleRow">
                 <h6 class="teamOverlayCardTitle" id="managerNodeTitle">Team Summary</h6>
-                <a class="inlineOverlayBtn link" id="managerNodeOpenDashboardBtn" href="LPagent.html" aria-label="Open selected dashboard">Open Dashboard</a>
+                <a class="inlineOverlayBtn link" id="managerNodeOpenDashboardBtn" href="Dashboard_Agent.html" aria-label="Open selected dashboard">Open Dashboard</a>
               </div>
               <div class="teamInsightGrid" id="managerKpiGrid"></div>
               <h6 class="teamOverlayCardTitle">Direct Reports</h6>
@@ -1080,6 +1092,16 @@
     ];
 
     const issueOwners = ["Sakshi Sharma", "Abhishek Sharma", "Palak Choudhary", "Manish Kumar", "Aditi Sharma", "Ravi Singh"];
+    const issueTatByPrimaryStatus = {
+      "Further Docs Required": 5,
+      "Further Action Required": 7,
+      "Material Delivery Issues": 6,
+      "Service Related Issues": 4
+    };
+    const issueDateFromOffset = (daysOffset) => {
+      const date = new Date(2026, 1, 14 + Number(daysOffset || 0));
+      return date.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+    };
     const issueSeedRecords = activityDispositionRecords.filter((row) => externalDependencyPrimaryStatuses.has(row.primaryStatus));
     const issueDispositionRecords = Object.entries(issueDispositionMap).flatMap(([primaryStatus, subStatuses], primaryIndex) => (
       subStatuses.map((subStatus, subIndex) => {
@@ -1087,6 +1109,21 @@
         const invoiceValue = Number(seed?.invoiceValue || 0);
         const seededNetDue = Number(seed?.netDue || 0);
         const calculatedNetDue = Math.max(0, Math.round(invoiceValue * (0.42 + ((subIndex % 4) * 0.11))));
+        const expectedTatDays = Number(issueTatByPrimaryStatus[primaryStatus] || 6);
+        const openDays = 4 + ((primaryIndex * 4 + subIndex * 3) % 19);
+        const lifecycleScore = (primaryIndex * 11 + subIndex * 5) % 10;
+        const resolutionState = lifecycleScore <= 4
+          ? "open"
+          : (lifecycleScore <= 7 ? "resolved" : "closed");
+        const isOpen = resolutionState === "open";
+        const resolvedAt = isOpen ? null : issueDateFromOffset(-((primaryIndex + subIndex) % 4));
+        const closedAt = resolutionState === "closed" ? issueDateFromOffset(-((primaryIndex + subIndex) % 3)) : null;
+        const tatOverdueDays = Math.max(
+          0,
+          (resolutionState === "open"
+            ? openDays
+            : (openDays + 1 + ((primaryIndex + subIndex) % 4))) - expectedTatDays
+        );
         return {
           customerCode: seed?.customerCode || `CUST-${String(primaryIndex + 1).padStart(3, "0")}`,
           customerName: seed?.customerName || "Issue Tracker Customer",
@@ -1097,11 +1134,182 @@
           activityType: ["Call", "Email", "Visit"][(primaryIndex + subIndex) % 3],
           primaryStatus,
           subStatus,
+          broadStatus: isOpen ? "External Dependency" : "Under Internal Resolution",
+          resolutionState,
           actionOwner: issueOwners[(primaryIndex + subIndex) % issueOwners.length],
-          openDays: 5 + ((primaryIndex * 4 + subIndex * 3) % 21)
+          resolvedBy: isOpen ? "-" : issueOwners[(primaryIndex + subIndex + 2) % issueOwners.length],
+          resolvedAt,
+          closedAt,
+          expectedTatDays,
+          tatOverdueDays,
+          openDays
         };
       })
     ));
+    const computeIssueLifecycleMetrics = (records) => {
+      const openRecords = records.filter((row) => row.broadStatus === "External Dependency");
+      const resolvedRecords = records.filter((row) => row.resolutionState === "resolved" || row.resolutionState === "closed");
+      const closedRecords = records.filter((row) => row.resolutionState === "closed");
+      const pastTatRecords = openRecords.filter((row) => Number(row.tatOverdueDays || 0) > 0);
+      const pastTatDays = pastTatRecords.reduce((sum, row) => sum + Number(row.tatOverdueDays || 0), 0);
+      const resolutionRate = records.length ? (resolvedRecords.length / records.length) * 100 : 0;
+      const groupByCount = (rows, keyFn) => Object.entries(rows.reduce((acc, row) => {
+        const key = keyFn(row);
+        acc[key] = (acc[key] || 0) + 1;
+        return acc;
+      }, {})).sort((a, b) => b[1] - a[1]);
+      const stuckByCategory = groupByCount(pastTatRecords, (row) => String(row.primaryStatus || "Unspecified"));
+      const stuckByOwner = groupByCount(pastTatRecords, (row) => String(row.actionOwner || "Unassigned"));
+      return {
+        totalIssues: records.length,
+        openCount: openRecords.length,
+        resolvedCount: resolvedRecords.length,
+        closedCount: closedRecords.length,
+        pastTatCount: pastTatRecords.length,
+        pastTatDays,
+        resolutionRate,
+        stuckByCategory,
+        stuckByOwner
+      };
+    };
+    const issueLifecycleMetrics = computeIssueLifecycleMetrics(issueDispositionRecords);
+
+    const managerOrgTree = window.managerOrgTree || {
+      id: "mgr-01",
+      name: "Rohit Malhotra",
+      role: "Collections Manager",
+      metrics: null,
+      children: [
+        {
+          id: "tl-01",
+          name: "Nisha Verma",
+          role: "Team Lead",
+          metrics: null,
+          children: [
+            {
+              id: "sa-01",
+              name: "Aditi Sharma",
+              role: "Senior Agent",
+              metrics: null,
+              children: [
+                { id: "ag-01", name: "Rahul Sinha", role: "Agent", metrics: { portfolio: 46800000, netDue: 12800000, mtdCollection: 9100000, openIssues: 5, resolvedIssues: 8, pastTat: 2, collectionsCr: 1.24, ptpCr: 1.39, partPaymentCr: 0.28, projectedCr: 1.33 }, children: [] },
+                { id: "ag-02", name: "Karan Mehta", role: "Agent", metrics: { portfolio: 42100000, netDue: 11200000, mtdCollection: 8600000, openIssues: 4, resolvedIssues: 7, pastTat: 1, collectionsCr: 1.09, ptpCr: 1.26, partPaymentCr: 0.22, projectedCr: 1.17 }, children: [] }
+              ]
+            },
+            {
+              id: "sa-02",
+              name: "Palak Choudhary",
+              role: "Senior Agent",
+              metrics: null,
+              children: [
+                { id: "ag-03", name: "Ishita Jain", role: "Agent", metrics: { portfolio: 39700000, netDue: 9800000, mtdCollection: 9200000, openIssues: 3, resolvedIssues: 6, pastTat: 1, collectionsCr: 0.96, ptpCr: 1.08, partPaymentCr: 0.19, projectedCr: 1.03 }, children: [] },
+                { id: "ag-04", name: "Raman Kapoor", role: "Agent", metrics: { portfolio: 38500000, netDue: 10600000, mtdCollection: 7900000, openIssues: 6, resolvedIssues: 5, pastTat: 3, collectionsCr: 0.88, ptpCr: 1.01, partPaymentCr: 0.17, projectedCr: 0.96 }, children: [] }
+              ]
+            }
+          ]
+        },
+        {
+          id: "tl-02",
+          name: "Manish Kumar",
+          role: "Team Lead",
+          metrics: null,
+          children: [
+            {
+              id: "sa-03",
+              name: "Abhishek Sharma",
+              role: "Senior Agent",
+              metrics: null,
+              children: [
+                { id: "ag-05", name: "Megha Arora", role: "Agent", metrics: { portfolio: 43200000, netDue: 12100000, mtdCollection: 8800000, openIssues: 5, resolvedIssues: 7, pastTat: 2, collectionsCr: 1.13, ptpCr: 1.29, partPaymentCr: 0.25, projectedCr: 1.2 }, children: [] },
+                { id: "ag-06", name: "Sagar Patel", role: "Agent", metrics: { portfolio: 35600000, netDue: 9200000, mtdCollection: 7400000, openIssues: 2, resolvedIssues: 5, pastTat: 1, collectionsCr: 0.92, ptpCr: 1.02, partPaymentCr: 0.16, projectedCr: 0.97 }, children: [] }
+              ]
+            },
+            {
+              id: "sa-04",
+              name: "Sakshi Sharma",
+              role: "Senior Agent",
+              metrics: null,
+              children: [
+                { id: "ag-07", name: "Riya Nair", role: "Agent", metrics: { portfolio: 34100000, netDue: 8700000, mtdCollection: 7000000, openIssues: 3, resolvedIssues: 4, pastTat: 1, collectionsCr: 0.81, ptpCr: 0.94, partPaymentCr: 0.15, projectedCr: 0.89 }, children: [] },
+                { id: "ag-08", name: "Vikram Das", role: "Agent", metrics: { portfolio: 31800000, netDue: 7900000, mtdCollection: 6800000, openIssues: 4, resolvedIssues: 5, pastTat: 2, collectionsCr: 0.77, ptpCr: 0.88, partPaymentCr: 0.14, projectedCr: 0.84 }, children: [] }
+              ]
+            }
+          ]
+        },
+        {
+          id: "tl-03",
+          name: "Priya Nair",
+          role: "Team Lead",
+          metrics: null,
+          children: [
+            {
+              id: "sa-05",
+              name: "Devendra Joshi",
+              role: "Senior Agent",
+              metrics: null,
+              children: [
+                { id: "ag-09", name: "Neha Gupta", role: "Agent", metrics: { portfolio: 37200000, netDue: 9600000, mtdCollection: 7600000, openIssues: 4, resolvedIssues: 6, pastTat: 2, collectionsCr: 0.86, ptpCr: 0.98, partPaymentCr: 0.15, projectedCr: 0.93 }, children: [] },
+                { id: "ag-10", name: "Arjun Bedi", role: "Agent", metrics: { portfolio: 40400000, netDue: 10900000, mtdCollection: 8400000, openIssues: 5, resolvedIssues: 6, pastTat: 2, collectionsCr: 1.01, ptpCr: 1.15, partPaymentCr: 0.2, projectedCr: 1.07 }, children: [] }
+              ]
+            },
+            {
+              id: "sa-06",
+              name: "Kavita Menon",
+              role: "Senior Agent",
+              metrics: null,
+              children: [
+                { id: "ag-11", name: "Pooja Rao", role: "Agent", metrics: { portfolio: 32900000, netDue: 8450000, mtdCollection: 6900000, openIssues: 3, resolvedIssues: 5, pastTat: 1, collectionsCr: 0.79, ptpCr: 0.91, partPaymentCr: 0.14, projectedCr: 0.86 }, children: [] },
+                { id: "ag-12", name: "Harsh Vora", role: "Agent", metrics: { portfolio: 34700000, netDue: 9050000, mtdCollection: 7200000, openIssues: 4, resolvedIssues: 5, pastTat: 1, collectionsCr: 0.84, ptpCr: 0.96, partPaymentCr: 0.15, projectedCr: 0.9 }, children: [] }
+              ]
+            }
+          ]
+        }
+      ]
+    };
+    window.managerOrgTree = managerOrgTree;
+    const cashflowNodeById = new Map();
+    const cashflowParentById = new Map();
+    const indexCashflowHierarchy = (node, parentId = "root") => {
+      cashflowNodeById.set(node.id, node);
+      cashflowParentById.set(node.id, parentId);
+      node.children.forEach((child) => indexCashflowHierarchy(child, node.id));
+    };
+    indexCashflowHierarchy(managerOrgTree, "root");
+    const aggregateCashflowNode = (node) => {
+      const own = node.metrics || {};
+      const childTotals = node.children.reduce((acc, child) => {
+        const total = aggregateCashflowNode(child);
+        acc.collectionsCr += total.collectionsCr;
+        acc.ptpCr += total.ptpCr;
+        acc.partPaymentCr += total.partPaymentCr;
+        acc.projectedCr += total.projectedCr;
+        return acc;
+      }, { collectionsCr: 0, ptpCr: 0, partPaymentCr: 0, projectedCr: 0 });
+      const totals = {
+        collectionsCr: Number((Number(own.collectionsCr || 0) + childTotals.collectionsCr).toFixed(2)),
+        ptpCr: Number((Number(own.ptpCr || 0) + childTotals.ptpCr).toFixed(2)),
+        partPaymentCr: Number((Number(own.partPaymentCr || 0) + childTotals.partPaymentCr).toFixed(2)),
+        projectedCr: Number((Number(own.projectedCr || 0) + childTotals.projectedCr).toFixed(2))
+      };
+      totals.varianceCr = Number((totals.collectionsCr - totals.projectedCr).toFixed(2));
+      return totals;
+    };
+    const getCashflowRowsForNode = (nodeId = "root") => {
+      const scopeNodes = nodeId === "root"
+        ? (managerOrgTree.children || [])
+        : ((cashflowNodeById.get(nodeId)?.children) || []);
+      return scopeNodes.map((node) => {
+        const totals = aggregateCashflowNode(node);
+        return {
+          id: node.id,
+          name: node.name,
+          role: node.role,
+          hasChildren: node.children.length > 0,
+          ...totals
+        };
+      });
+    };
+    const directReportCashflowRollup = getCashflowRowsForNode("root");
 
     const activityStatusPalette = ["#3b82f6", "#06b6d4", "#22c55e", "#f59e0b", "#f97316", "#ef4444", "#ec4899", "#6366f1", "#84cc16", "#14b8a6", "#0ea5e9", "#64748b"];
 
@@ -1179,25 +1387,25 @@
         ]
       },
       planActual: {
-        title: "Plan vs Actual",
-        meta: "Target achievement",
+        title: "Issue Resolution",
+        meta: "Open vs resolved lifecycle",
         type: "doughnut",
         cardData: {
-          labels: ["Achieved", "Remaining"],
+          labels: ["Resolved", "Open"],
           datasets: [
             {
-              data: [3.2, 5.2],
+              data: [0, 1],
               backgroundColor: ["rgba(255, 255, 255, 0.95)", "rgba(255, 255, 255, 0.2)"],
               borderWidth: 0
             }
           ]
         },
         modalData: {
-          labels: ["Achieved", "Remaining"],
+          labels: ["Resolved", "Open"],
           datasets: [
             {
-              data: [3.2, 5.2],
-              backgroundColor: [palette.purple, palette.purpleLight],
+              data: [0, 1],
+              backgroundColor: [palette.blue, palette.blueLight],
               borderWidth: 0
             }
           ]
@@ -1218,9 +1426,9 @@
           }
         },
         highlights: [
-          { label: "Target (MTD)", value: "Rs. 8.4 Cr" },
-          { label: "Achieved", value: "Rs. 3.2 Cr" },
-          { label: "Gap", value: "Rs. 5.2 Cr" }
+          { label: "Open", value: "-" },
+          { label: "Resolved", value: "-" },
+          { label: "Past TAT", value: "-" }
         ]
       },
       cashflow: {
@@ -1446,6 +1654,49 @@
     const cashflowCardMtd = document.getElementById("cashflowCardMtd");
     const cashflowCardPtpDue = document.getElementById("cashflowCardPtpDue");
     const cashflowCardVariance = document.getElementById("cashflowCardVariance");
+    const cashflowChartMeta = document.getElementById("cashflowChartMeta");
+    const pastTatCardValue = document.getElementById("pastTatCardValue");
+    const pastTatCardSub = document.getElementById("pastTatCardSub");
+    const pastTatCardBucketOne = document.getElementById("pastTatCardBucketOne");
+    const pastTatCardBucketTwo = document.getElementById("pastTatCardBucketTwo");
+    const pastTatCardBucketThree = document.getElementById("pastTatCardBucketThree");
+    const resolvedTodayCardValue = document.getElementById("resolvedTodayCardValue");
+    const resolvedTodayCardSub = document.getElementById("resolvedTodayCardSub");
+    const resolvedTodayOwnerOne = document.getElementById("resolvedTodayOwnerOne");
+    const resolvedTodayOwnerOneCount = document.getElementById("resolvedTodayOwnerOneCount");
+    const resolvedTodayOwnerTwo = document.getElementById("resolvedTodayOwnerTwo");
+    const resolvedTodayOwnerTwoCount = document.getElementById("resolvedTodayOwnerTwoCount");
+    const resolvedTodayOwnerThree = document.getElementById("resolvedTodayOwnerThree");
+    const resolvedTodayOwnerThreeCount = document.getElementById("resolvedTodayOwnerThreeCount");
+    const stuckOwnerCardSelect = document.getElementById("stuckOwnerCardSelect");
+    const stuckOwnerCardSub = document.getElementById("stuckOwnerCardSub");
+    const cashflowVarianceCardValue = document.getElementById("cashflowVarianceCardValue");
+    const cashflowVarianceCardSub = document.getElementById("cashflowVarianceCardSub");
+    const expectedWeekCardValue = document.getElementById("expectedWeekCardValue");
+    const expectedWeekCardSub = document.getElementById("expectedWeekCardSub");
+    const ptpRiskCardValue = document.getElementById("ptpRiskCardValue");
+    const ptpRiskCardSub = document.getElementById("ptpRiskCardSub");
+    let stuckOwnerCardSummary = [];
+    const renderStuckOwnerCardSelection = (ownerName) => {
+      const selected = stuckOwnerCardSummary.find((item) => item.owner === ownerName) || stuckOwnerCardSummary[0] || null;
+      if (stuckOwnerCardSelect) {
+        stuckOwnerCardSelect.value = selected ? selected.owner : "";
+      }
+      if (stuckOwnerCardSub) {
+        stuckOwnerCardSub.textContent = selected
+          ? `Cases: ${selected.count} | Past TAT: ${selected.pastTatDays}`
+          : "Cases: 0 | Past TAT: 0";
+      }
+    };
+    if (stuckOwnerCardSelect) {
+      ["click", "mousedown", "keydown", "pointerdown"].forEach((eventName) => {
+        stuckOwnerCardSelect.addEventListener(eventName, (event) => event.stopPropagation());
+      });
+      stuckOwnerCardSelect.addEventListener("change", (event) => {
+        event.stopPropagation();
+        renderStuckOwnerCardSelection(event.target.value || "");
+      });
+    }
 
     const computeActivityPrimarySummary = (records) => {
       const bucket = records.reduce((acc, item) => {
@@ -1493,10 +1744,6 @@
     const cashflowPtpDailyCr = [
       0.00, 0.42, 0.00, 0.30, 0.00, 0.00, 1.05, 0.00, 0.24, 0.00, 0.59, 1.11, 0.40,
       0.00, 0.00, 0.00, 0.52, 0.00, 0.00, 0.00, 0.46, 0.00, 0.00, 0.00, 0.00, 0.67, 0.00, 0.00
-    ];
-    const cashflowLastMonthCollectionDailyCr = [
-      0.16, 0.00, 0.33, 0.00, 0.28, 0.00, 0.62, 0.00, 0.21, 0.00, 0.49, 0.37, 0.00,
-      0.42, 0.00, 0.25, 0.54, 0.00, 0.00, 0.46, 0.00, 0.58, 0.00, 0.31, 0.00, 0.67, 0.00, 0.29
     ];
     const cashflowProjectedDailyCr = [
       0.20, 0.22, 0.21, 0.25, 0.22, 0.24, 0.28, 0.23, 0.25, 0.24, 0.26, 0.30, 0.31,
@@ -1576,7 +1823,9 @@
     applyActivityCardConfiguration();
 
     const applyIssueCardConfiguration = () => {
-      const issueSummary = computeIssuePrimarySummary(issueDispositionRecords);
+      const openIssueRows = issueDispositionRecords.filter((row) => row.broadStatus === "External Dependency");
+      const pastTatIssueRows = openIssueRows.filter((row) => Number(row.tatOverdueDays || 0) > 0);
+      const issueSummary = computeIssuePrimarySummary(openIssueRows);
       const issueLabels = issueSummary.map(([status]) => status);
       const issueData = issueSummary.map(([, count]) => count);
       chartConfigs.issues.data.labels = issueLabels;
@@ -1584,21 +1833,124 @@
       chartConfigs.issues.data.datasets[0].backgroundColor = issueLabels.map((_, index) => (
         activityStatusPalette[index % activityStatusPalette.length]
       ));
-      const topIssue = issueSummary[0] || ["-", 0];
-      const criticalCount = issueDispositionRecords.filter((row) => Number(row.openDays || 0) > 14).length;
       chartConfigs.issues.highlights = [
-        { label: "Issue categories", value: String(issueLabels.length) },
-        { label: "Top category", value: `${topIssue[0]} (${topIssue[1]})` },
-        { label: "Open >14 days", value: String(criticalCount) }
+        { label: "Open issues", value: String(issueLifecycleMetrics.openCount) },
+        { label: "Resolved (incl. closed)", value: String(issueLifecycleMetrics.resolvedCount) },
+        { label: "Past TAT", value: `${issueLifecycleMetrics.pastTatCount}` }
       ];
 
       const issueCounts = issueSummary.reduce((acc, [label, count]) => {
         acc[label] = count;
         return acc;
       }, {});
+      const pastTatCounts = computeIssuePrimarySummary(pastTatIssueRows).reduce((acc, [label, count]) => {
+        acc[label] = count;
+        return acc;
+      }, {});
+      const resolvedRows = issueDispositionRecords.filter((row) => row.resolutionState !== "open");
+      const todayIssueDate = issueDateFromOffset(0);
+      const resolvedTodayRows = resolvedRows.filter((row) => (
+        row.resolvedAt === todayIssueDate || row.closedAt === todayIssueDate
+      ));
+      const closedTodayCount = resolvedTodayRows.filter((row) => row.resolutionState === "closed" && row.closedAt === todayIssueDate).length;
+      const resolvedOwnerRows = Object.entries(resolvedTodayRows.reduce((acc, row) => {
+        const owner = String(row.resolvedBy || row.actionOwner || "Unassigned");
+        acc[owner] = (acc[owner] || 0) + 1;
+        return acc;
+      }, {})).sort((a, b) => b[1] - a[1]);
       if (issueCardDocsShare) issueCardDocsShare.textContent = String(issueCounts["Further Docs Required"] || 0);
       if (issueCardActionShare) issueCardActionShare.textContent = String(issueCounts["Further Action Required"] || 0);
       if (issueCardMaterialShare) issueCardMaterialShare.textContent = String(issueCounts["Material Delivery Issues"] || 0);
+      const openIssuesMainValue = document.getElementById("openIssuesCardValue");
+      const openIssuesMainSub = document.getElementById("openIssuesCardSub");
+      if (openIssuesMainValue) openIssuesMainValue.textContent = String(issueLifecycleMetrics.openCount);
+      if (openIssuesMainSub) openIssuesMainSub.textContent = `Past TAT: ${issueLifecycleMetrics.pastTatCount}`;
+      if (document.getElementById("openIssuesCardDocsCount")) document.getElementById("openIssuesCardDocsCount").textContent = String(issueCounts["Further Docs Required"] || 0);
+      if (document.getElementById("openIssuesCardActionCount")) document.getElementById("openIssuesCardActionCount").textContent = String(issueCounts["Further Action Required"] || 0);
+      if (document.getElementById("openIssuesCardMaterialCount")) document.getElementById("openIssuesCardMaterialCount").textContent = String(issueCounts["Material Delivery Issues"] || 0);
+      if (pastTatCardValue) pastTatCardValue.textContent = String(issueLifecycleMetrics.pastTatCount);
+      if (pastTatCardSub) pastTatCardSub.textContent = `Overdue days: ${issueLifecycleMetrics.pastTatDays}`;
+      if (pastTatCardBucketOne) pastTatCardBucketOne.textContent = String(pastTatCounts["Further Docs Required"] || 0);
+      if (pastTatCardBucketTwo) pastTatCardBucketTwo.textContent = String(pastTatCounts["Further Action Required"] || 0);
+      if (pastTatCardBucketThree) pastTatCardBucketThree.textContent = String((pastTatCounts["Material Delivery Issues"] || 0) + (pastTatCounts["Service Related Issues"] || 0));
+      if (resolvedTodayCardValue) resolvedTodayCardValue.textContent = String(resolvedTodayRows.length);
+      if (resolvedTodayCardSub) resolvedTodayCardSub.textContent = `Closed today: ${closedTodayCount}`;
+      const ownerCards = [
+        { ownerEl: resolvedTodayOwnerOne, countEl: resolvedTodayOwnerOneCount },
+        { ownerEl: resolvedTodayOwnerTwo, countEl: resolvedTodayOwnerTwoCount },
+        { ownerEl: resolvedTodayOwnerThree, countEl: resolvedTodayOwnerThreeCount }
+      ];
+      ownerCards.forEach(({ ownerEl, countEl }, index) => {
+        const ownerRow = resolvedOwnerRows[index] || ["-", 0];
+        if (ownerEl) ownerEl.textContent = ownerRow[0];
+        if (countEl) countEl.textContent = String(ownerRow[1]);
+      });
+
+      const unresolvedCount = issueLifecycleMetrics.openCount;
+      const resolvedCount = issueLifecycleMetrics.resolvedCount;
+      const resolutionRate = Math.max(0, Math.min(100, Number(issueLifecycleMetrics.resolutionRate || 0)));
+      const topStuckCategory = issueLifecycleMetrics.stuckByCategory[0] || ["-", 0];
+      const ownerSummaryMap = pastTatIssueRows.reduce((acc, row) => {
+        const owner = String(row.actionOwner || "Unassigned");
+        if (!acc[owner]) {
+          acc[owner] = { owner, count: 0, pastTatDays: 0 };
+        }
+        acc[owner].count += 1;
+        acc[owner].pastTatDays += Number(row.tatOverdueDays || 0);
+        return acc;
+      }, {});
+      stuckOwnerCardSummary = Object.values(ownerSummaryMap)
+        .sort((a, b) => (b.count - a.count) || (b.pastTatDays - a.pastTatDays) || a.owner.localeCompare(b.owner));
+      const topStuckOwner = stuckOwnerCardSummary.length
+        ? [stuckOwnerCardSummary[0].owner, stuckOwnerCardSummary[0].count]
+        : ["-", 0];
+
+      chartConfigs.planActual.cardData.datasets[0].data = [resolvedCount, unresolvedCount];
+      chartConfigs.planActual.modalData.datasets[0].data = [resolvedCount, unresolvedCount];
+      chartConfigs.planActual.highlights = [
+        { label: "Open", value: String(unresolvedCount) },
+        { label: "Resolved", value: `${resolvedCount} (${issueLifecycleMetrics.closedCount} closed)` },
+        { label: "Past TAT", value: `${issueLifecycleMetrics.pastTatCount} issues | ${issueLifecycleMetrics.pastTatDays} days` }
+      ];
+
+      const issueResolutionRate = document.getElementById("issueResolutionRate");
+      const issueResolutionDelta = document.getElementById("issueResolutionDelta");
+      const issueResolutionOpenCount = document.getElementById("issueResolutionOpenCount");
+      const issueResolutionCallout = document.getElementById("issueResolutionCallout");
+      const issueResolutionSummaryOpen = document.getElementById("issueResolutionSummaryOpen");
+      const issueResolutionSummaryResolved = document.getElementById("issueResolutionSummaryResolved");
+      const issueResolutionSummaryPastTat = document.getElementById("issueResolutionSummaryPastTat");
+      if (issueResolutionRate) issueResolutionRate.textContent = `${resolutionRate.toFixed(0)}%`;
+      if (issueResolutionDelta) issueResolutionDelta.textContent = `${issueLifecycleMetrics.closedCount} closed | ${issueLifecycleMetrics.pastTatCount} past TAT`;
+      if (issueResolutionOpenCount) issueResolutionOpenCount.textContent = String(unresolvedCount);
+      if (issueResolutionSummaryOpen) issueResolutionSummaryOpen.textContent = String(unresolvedCount);
+      if (issueResolutionSummaryResolved) issueResolutionSummaryResolved.textContent = String(resolvedCount);
+      if (issueResolutionSummaryPastTat) issueResolutionSummaryPastTat.textContent = `${issueLifecycleMetrics.pastTatCount}`;
+      if (issueResolutionCallout) {
+        issueResolutionCallout.textContent = `Open ${unresolvedCount} vs resolved ${resolvedCount}. Stuck mostly in ${topStuckCategory[0]} (${topStuckCategory[1]}) with owner focus on ${topStuckOwner[0]}.`;
+      }
+      if (stuckOwnerCardSelect) {
+        const previousOwner = stuckOwnerCardSelect.value;
+        stuckOwnerCardSelect.innerHTML = "";
+        if (!stuckOwnerCardSummary.length) {
+          const emptyOption = document.createElement("option");
+          emptyOption.value = "";
+          emptyOption.textContent = "-";
+          stuckOwnerCardSelect.appendChild(emptyOption);
+        } else {
+          stuckOwnerCardSummary.forEach((row) => {
+            const option = document.createElement("option");
+            option.value = row.owner;
+            option.textContent = row.owner;
+            stuckOwnerCardSelect.appendChild(option);
+          });
+        }
+        const selectedOwner = stuckOwnerCardSummary.find((row) => row.owner === previousOwner)?.owner
+          || (stuckOwnerCardSummary[0]?.owner || "");
+        renderStuckOwnerCardSelection(selectedOwner);
+      } else {
+        renderStuckOwnerCardSelection("");
+      }
     };
 
     applyIssueCardConfiguration();
@@ -1606,17 +1958,46 @@
     const applyCashflowCardConfiguration = () => {
       const labels = cashflowMonthFlowRecords.map((row) => `D${row.day}`);
       const collectionSeries = cashflowMonthFlowRecords.map((row) => row.collectionCr);
-      const ptpSeries = cashflowMonthFlowRecords.map((row) => row.ptpAmountCr > 0 ? row.ptpAmountCr : null);
+      const ptpSeries = cashflowMonthFlowRecords.map((row) => (row.ptpAmountCr > 0 ? row.ptpAmountCr : null));
       chartConfigs.cashflow.data.labels = labels;
       chartConfigs.cashflow.data.datasets[0].data = collectionSeries;
       chartConfigs.cashflow.data.datasets[1].data = ptpSeries;
+      chartConfigs.cashflow.meta = "Collections and PTP (current month)";
+      if (cashflowChartMeta) {
+        cashflowChartMeta.textContent = chartConfigs.cashflow.meta;
+      }
+      const cashflowCardChart = chartInstances.chartCashflow;
+      if (cashflowCardChart) {
+        cashflowCardChart.data = chartConfigs.cashflow.data;
+        cashflowCardChart.options = { ...baseOptions, ...(chartConfigs.cashflow.options || {}) };
+        cashflowCardChart.update();
+      }
 
-      const mtdCollectionCr = cashflowMonthFlowRecords.reduce((sum, row) => sum + Number(row.collectionCr || 0), 0);
+      const mtdCollectionCr = cashflowMonthFlowRecords.reduce(
+        (sum, row) => sum + Number(row.collectionCr || 0),
+        0
+      );
       const ptpDueCr = cashflowMonthFlowRecords
         .filter((row) => row.day <= cashflowCurrentDay)
         .reduce((sum, row) => sum + Number(row.ptpAmountCr || 0), 0);
       const varianceCr = Number((mtdCollectionCr - ptpDueCr).toFixed(2));
       const varianceValue = `${varianceCr >= 0 ? "+" : "-"}${formatCrCurrency(Math.abs(varianceCr))}`;
+
+      const rootTotals = aggregateCashflowNode(managerOrgTree);
+      const teamVarianceCr = Number((rootTotals.collectionsCr - rootTotals.projectedCr).toFixed(2));
+      const daysLeft = Math.max(1, cashflowDaysInMonth - cashflowCurrentDay);
+      const remainingProjectedCr = Math.max(0, Number(rootTotals.projectedCr || 0) - Number(rootTotals.collectionsCr || 0));
+      const expectedNextWeekCr = Number(((remainingProjectedCr / daysLeft) * 7).toFixed(2));
+      const ptpRiskRows = issueDispositionRecords.filter((row) => (
+        row.broadStatus === "External Dependency"
+        && Number(row.tatOverdueDays || 0) > 0
+        && Number(row.netDue || 0) > 0
+      ));
+      const ptpRiskTopOwner = Object.entries(ptpRiskRows.reduce((acc, row) => {
+        const owner = String(row.actionOwner || "Unassigned");
+        acc[owner] = (acc[owner] || 0) + 1;
+        return acc;
+      }, {})).sort((a, b) => b[1] - a[1])[0] || ["-", 0];
       chartConfigs.cashflow.highlights = [
         { label: "MTD collection", value: formatCrCurrency(mtdCollectionCr) },
         { label: "PTP due", value: formatCrCurrency(ptpDueCr) },
@@ -1625,6 +2006,15 @@
       if (cashflowCardMtd) cashflowCardMtd.textContent = formatCrCurrency(mtdCollectionCr);
       if (cashflowCardPtpDue) cashflowCardPtpDue.textContent = formatCrCurrency(ptpDueCr);
       if (cashflowCardVariance) cashflowCardVariance.textContent = varianceValue;
+      if (cashflowVarianceCardValue) {
+        const teamVarianceValue = `${teamVarianceCr >= 0 ? "+" : "-"}${formatCrCurrency(Math.abs(teamVarianceCr))}`;
+        cashflowVarianceCardValue.textContent = teamVarianceValue;
+      }
+      if (cashflowVarianceCardSub) cashflowVarianceCardSub.textContent = `Collections ${formatCrCurrency(rootTotals.collectionsCr)} vs expected ${formatCrCurrency(rootTotals.projectedCr)}`;
+      if (expectedWeekCardValue) expectedWeekCardValue.textContent = formatCrCurrency(expectedNextWeekCr);
+      if (expectedWeekCardSub) expectedWeekCardSub.textContent = `Remaining expected this month: ${formatCrCurrency(remainingProjectedCr)}`;
+      if (ptpRiskCardValue) ptpRiskCardValue.textContent = String(ptpRiskRows.length);
+      if (ptpRiskCardSub) ptpRiskCardSub.textContent = `Top owner at risk: ${ptpRiskTopOwner[0]} (${ptpRiskTopOwner[1]})`;
     };
 
     applyCashflowCardConfiguration();
@@ -1641,7 +2031,12 @@
     const modalMeta = document.getElementById("chartDetailModalMeta");
     const modalHighlights = document.getElementById("chartDetailHighlights");
     const modalCanvas = document.getElementById("chartDetailCanvas");
-    const vintageDetailTableWrap = document.getElementById("vintageDetailTableWrap");
+    const vintageDetailLayout = document.getElementById("vintageDetailLayout");
+    const vintageCustomerSearch = document.getElementById("vintageCustomerSearch");
+    const vintageCustomerSearchWrap = document.getElementById("vintageCustomerSearchWrap");
+    const vintageCustomerSuggestMenu = document.getElementById("vintageCustomerSuggestMenu");
+    const vintageDetailMeta = document.getElementById("vintageDetailMeta");
+    const vintagePieCanvas = document.getElementById("vintagePieCanvas");
     const vintageDetailTableBody = document.getElementById("vintageDetailTableBody");
     const activityDetailLayout = document.getElementById("activityDetailLayout");
     const activityDetailCanvas = document.getElementById("activityDetailCanvas");
@@ -1717,11 +2112,16 @@
     const targetPrevMonthDelta = document.getElementById("targetPrevMonthDelta");
     const targetUrgencyTrackFill = document.getElementById("targetUrgencyTrackFill");
     const targetRunRateNote = document.getElementById("targetRunRateNote");
+    const targetSelectedAgentName = document.getElementById("targetSelectedAgentName");
+    const targetAgentFilterDropdown = document.getElementById("targetAgentFilterDropdown");
+    const targetAgentFilterBadge = document.getElementById("targetAgentFilterBadge");
+    const targetAgentFilterMenu = document.getElementById("targetAgentFilterMenu");
     let modalChart = null;
     let activityDetailChart = null;
     let issueDetailChart = null;
     let cashflowDetailChart = null;
     let targetPaceChart = null;
+    let vintageDetailPieChart = null;
     const activityPageSize = 10;
     const issuePageSize = 10;
     const cashflowWeekSize = 7;
@@ -1732,7 +2132,9 @@
     );
     let activityCurrentPage = 1;
     let issueCurrentPage = 1;
-    let cashflowCurrentWeekIndex = cashflowDefaultWeekIndex;
+    let vintageSearchQuery = "";
+    const cashflowRootNodeId = "root";
+    let cashflowActiveNodeId = cashflowRootNodeId;
     const activityFilterState = {
       search: "",
       primaryStatus: "all",
@@ -1743,7 +2145,7 @@
       search: "",
       primaryStatus: "all",
       subStatus: "all",
-      activityType: "all"
+      resolutionState: "all"
     };
     const targetDetailSnapshot = {
       monthLabel: "Feb 2026",
@@ -1769,79 +2171,427 @@
       previousMonthCommittedDailyCollectionsCr: [0.00, 0.26, 0.16, 0.00, 0.34, 0.00, 0.54, 0.00, 0.13, 0.43, 0.00, 0.58, 0.41],
       previousMonthNonCommittedDailyCollectionsCr: [0.00, 0.09, 0.06, 0.00, 0.07, 0.00, 0.12, 0.00, 0.05, 0.09, 0.00, 0.15, 0.12]
     };
-    const buildVintageTableRows = () => {
-      const values = chartConfigs.vintage?.data?.datasets?.[0]?.data || [];
-      const normalizedValues = [
-        Number(values[0] || 0), // Not Due
-        Number(values[1] || 0), // 1-30
-        Number(values[2] || 0), // 31-60
-        Number(values[3] || 0) + Number(values[4] || 0), // 61-120
-        Number(values[5] || 0), // 121-150
-        Number(values[6] || 0) + Number(values[7] || 0) + Number(values[8] || 0), // 151-240
-        Number(values[9] || 0) + Number(values[10] || 0) + Number(values[11] || 0) + Number(values[12] || 0), // 241-365
-        Number(values[13] || 0) + Number(values[14] || 0) + Number(values[15] || 0) + Number(values[16] || 0) + Number(values[17] || 0) // 1+ year
-      ];
-      const buckets = [
-        "Not Due",
-        "1-30",
-        "31-60",
-        "61-120",
-        "121-150",
-        "151-240",
-        "241-365",
-        "1+ Year"
-      ];
-      const totalValue = normalizedValues.reduce((sum, value) => sum + Number(value || 0), 0);
-      const roundedPercentages = (() => {
-        if (totalValue <= 0) return normalizedValues.map(() => 0);
-        // Allocate percentage in tenths (1000 = 100.0%) so displayed values always sum to exactly 100.0.
-        const unitsTarget = 1000;
-        const rawUnits = normalizedValues.map((amountCr) => (amountCr / totalValue) * unitsTarget);
-        const floorUnits = rawUnits.map((value) => Math.floor(value));
-        let remainderUnits = unitsTarget - floorUnits.reduce((sum, value) => sum + value, 0);
-        const byRemainderDesc = rawUnits
-          .map((value, index) => ({ index, frac: value - floorUnits[index] }))
-          .sort((a, b) => b.frac - a.frac);
-        for (let i = 0; i < byRemainderDesc.length && remainderUnits > 0; i += 1) {
-          floorUnits[byRemainderDesc[i].index] += 1;
-          remainderUnits -= 1;
+    const listTargetLeafAgents = (node, collector = []) => {
+      if (!node?.children?.length) {
+        if (node.metrics) {
+          collector.push({
+            id: node.id,
+            name: node.name,
+            role: node.role,
+            metrics: { ...node.metrics }
+          });
         }
-        return floorUnits.map((units) => units / 10);
-      })();
+        return collector;
+      }
+      node.children.forEach((child) => listTargetLeafAgents(child, collector));
+      return collector;
+    };
+    const targetLeafAgents = listTargetLeafAgents(managerOrgTree, []);
+    const targetLeafAgentById = new Map(targetLeafAgents.map((agent) => [agent.id, agent]));
+    let selectedTargetAgentId = targetLeafAgents[0]?.id || "";
 
-      return buckets.map((bucket, index) => {
-        const amountCr = Number(normalizedValues[index] || 0);
-        const netDueCr = amountCr * 0.93;
-        const invoices = Math.max(6, Math.round(amountCr * 26));
-        const customers = Math.max(2, Math.round(invoices * 0.28));
-        const percentage = roundedPercentages[index] || 0;
-        return {
-          bucket,
-          invoices,
-          customers,
-          percentage,
-          amountCr,
-          netDueCr
-        };
-      });
+    const distributeTotalBySeries = (baseSeries, total, dayCount) => {
+      const count = Math.max(1, Number(dayCount) || 1);
+      const safeTotal = Math.max(0, Number(total || 0));
+      const baseline = Array.from({ length: count }, (_, index) => Math.max(0, Number(baseSeries?.[index] || 0)));
+      const baselineTotal = baseline.reduce((sum, value) => sum + value, 0);
+      if (safeTotal <= 0) {
+        return Array.from({ length: count }, () => 0);
+      }
+      if (baselineTotal <= 0) {
+        const evenValue = Number((safeTotal / count).toFixed(2));
+        const uniform = Array.from({ length: count }, () => evenValue);
+        const correction = Number((safeTotal - uniform.reduce((sum, value) => sum + value, 0)).toFixed(2));
+        uniform[count - 1] = Number((uniform[count - 1] + correction).toFixed(2));
+        return uniform;
+      }
+      const scaled = baseline.map((value) => Number(((value / baselineTotal) * safeTotal).toFixed(2)));
+      const correction = Number((safeTotal - scaled.reduce((sum, value) => sum + value, 0)).toFixed(2));
+      scaled[count - 1] = Number((scaled[count - 1] + correction).toFixed(2));
+      return scaled;
     };
 
-    const renderVintageDetailTable = () => {
+    const buildAgentTargetSnapshot = (agentId) => {
+      const agent = targetLeafAgentById.get(agentId) || targetLeafAgents[0] || null;
+      if (!agent) {
+        return { ...targetDetailSnapshot, agentName: "-", agentRole: "Agent", agentId: "" };
+      }
+      const metrics = agent.metrics || {};
+      const daysInMonth = Math.max(1, Number(targetDetailSnapshot.daysInMonth) || 1);
+      const dayOfMonth = Math.min(daysInMonth, Math.max(1, Number(targetDetailSnapshot.dayOfMonth) || 1));
+      const achievedCr = Math.max(0, Number(metrics.collectionsCr || 0));
+      const projectedRunRateCr = (achievedCr / dayOfMonth) * daysInMonth;
+      const projectedTrackCr = Math.max(0, Number(metrics.projectedCr || 0)) * (daysInMonth / dayOfMonth);
+      const targetCr = Number(Math.max(projectedRunRateCr * 1.08, projectedTrackCr * 1.05, achievedCr + 0.2).toFixed(2));
+      const variationSeed = agent.id.split("").reduce((sum, char) => sum + char.charCodeAt(0), 0);
+      const variationRatio = 0.88 + ((variationSeed % 9) * 0.015);
+      const previousMonthAchievedCr = Number((achievedCr * variationRatio).toFixed(2));
+      const nonCommittedShareRaw = achievedCr > 0 ? Number(metrics.partPaymentCr || 0) / achievedCr : 0.18;
+      const nonCommittedShare = Math.max(0.08, Math.min(0.42, Number.isFinite(nonCommittedShareRaw) ? nonCommittedShareRaw : 0.18));
+      const committedCr = Number((achievedCr * (1 - nonCommittedShare)).toFixed(2));
+      const nonCommittedCr = Number((achievedCr - committedCr).toFixed(2));
+      const previousNonCommittedCr = Number((previousMonthAchievedCr * Math.max(0.07, Math.min(0.4, nonCommittedShare * 0.95))).toFixed(2));
+      const previousCommittedCr = Number((previousMonthAchievedCr - previousNonCommittedCr).toFixed(2));
+
+      const committedDailyCollectionsCr = distributeTotalBySeries(
+        targetDetailSnapshot.committedDailyCollectionsCr,
+        committedCr,
+        dayOfMonth
+      );
+      const nonCommittedDailyCollectionsCr = distributeTotalBySeries(
+        targetDetailSnapshot.nonCommittedDailyCollectionsCr,
+        nonCommittedCr,
+        dayOfMonth
+      );
+      const previousMonthCommittedDailyCollectionsCr = distributeTotalBySeries(
+        targetDetailSnapshot.previousMonthCommittedDailyCollectionsCr,
+        previousCommittedCr,
+        dayOfMonth
+      );
+      const previousMonthNonCommittedDailyCollectionsCr = distributeTotalBySeries(
+        targetDetailSnapshot.previousMonthNonCommittedDailyCollectionsCr,
+        previousNonCommittedCr,
+        dayOfMonth
+      );
+
+      const basePtpEvents = Array.isArray(targetDetailSnapshot.ptpEvents) ? targetDetailSnapshot.ptpEvents : [];
+      const basePtpPromisedTotal = basePtpEvents.reduce((sum, event) => sum + Math.max(0, Number(event?.promisedCr || 0)), 0);
+      const basePtpMetTotal = basePtpEvents.reduce((sum, event) => (
+        Number.isFinite(Number(event?.metCr)) ? sum + Math.max(0, Number(event.metCr)) : sum
+      ), 0);
+      const promisedTargetCr = Math.max(0.2, Number(metrics.ptpCr || 0));
+      const promisedScale = basePtpPromisedTotal > 0 ? (promisedTargetCr / basePtpPromisedTotal) : 1;
+      const metScale = basePtpMetTotal > 0 ? (achievedCr / basePtpMetTotal) : 1;
+      const ptpEvents = basePtpEvents.map((event) => {
+        const promisedCr = Number((Math.max(0, Number(event?.promisedCr || 0)) * promisedScale).toFixed(2));
+        if (!Number.isFinite(Number(event?.metCr))) {
+          return { day: Number(event?.day || 0), promisedCr };
+        }
+        return {
+          day: Number(event?.day || 0),
+          promisedCr,
+          metCr: Number((Math.max(0, Number(event.metCr)) * metScale).toFixed(2))
+        };
+      });
+
+      return {
+        ...targetDetailSnapshot,
+        agentId: agent.id,
+        agentName: agent.name,
+        agentRole: agent.role,
+        dayOfMonth,
+        daysInMonth,
+        targetCr,
+        achievedCr,
+        previousMonthAchievedCr,
+        ptpEvents,
+        committedDailyCollectionsCr,
+        nonCommittedDailyCollectionsCr,
+        previousMonthCommittedDailyCollectionsCr,
+        previousMonthNonCommittedDailyCollectionsCr
+      };
+    };
+
+    const setTargetAgentFilterBadge = (agentName) => {
+      if (!targetAgentFilterBadge) return;
+      targetAgentFilterBadge.textContent = agentName || "-";
+    };
+
+    const syncTargetAgentFilterSelection = (agentId) => {
+      if (!targetAgentFilterMenu) return;
+      const selectedId = agentId || "";
+      targetAgentFilterMenu.querySelectorAll(".filterItem[data-agent-id]").forEach((item) => {
+        const isActive = item.getAttribute("data-agent-id") === selectedId;
+        item.classList.toggle("is-active", isActive);
+        item.setAttribute("aria-pressed", isActive ? "true" : "false");
+      });
+      const selectedAgent = targetLeafAgentById.get(selectedId);
+      setTargetAgentFilterBadge(selectedAgent?.name || "-");
+    };
+
+    const populateTargetAgentFilterMenu = () => {
+      if (!targetAgentFilterMenu) return;
+      targetAgentFilterMenu.innerHTML = "";
+      if (!targetLeafAgents.length) {
+        selectedTargetAgentId = "";
+        const emptyItem = document.createElement("button");
+        emptyItem.type = "button";
+        emptyItem.className = "filterItem";
+        emptyItem.disabled = true;
+        emptyItem.textContent = "No agents available";
+        targetAgentFilterMenu.appendChild(emptyItem);
+        setTargetAgentFilterBadge("-");
+        return;
+      }
+      if (!targetLeafAgentById.has(selectedTargetAgentId)) {
+        selectedTargetAgentId = targetLeafAgents[0].id;
+      }
+      targetLeafAgents.forEach((agent) => {
+        const item = document.createElement("button");
+        item.type = "button";
+        item.className = "filterItem";
+        item.setAttribute("data-agent-id", agent.id);
+        item.setAttribute("aria-pressed", "false");
+        item.textContent = agent.name;
+        targetAgentFilterMenu.appendChild(item);
+      });
+      syncTargetAgentFilterSelection(selectedTargetAgentId);
+    };
+    const vintageCustomerSeeds = [
+      { customerCode: "CUST-D001", customerName: "Orion Retail Pvt Ltd" },
+      { customerCode: "CUST-D002", customerName: "Vertex Medisupply Ltd" },
+      { customerCode: "CUST-D003", customerName: "Bluewave Industrial Corp" },
+      { customerCode: "CUST-D004", customerName: "Nexa Pharma Distributors" },
+      { customerCode: "CUST-D005", customerName: "Meridian Healthcare Systems" },
+      { customerCode: "CUST-D006", customerName: "Aster Clinical Network" },
+      { customerCode: "CUST-D007", customerName: "Summit Diagnostics Group" },
+      { customerCode: "CUST-D008", customerName: "Pioneer Life Sciences" }
+    ];
+    const vintageAgingDaysFromBucket = (bucketIndex, seedValue) => {
+      const seed = Number(seedValue || 0);
+      if (bucketIndex === 0) return -((seed % 7) + 1); // Not due
+      if (bucketIndex === 1) return 1 + (seed % 30);
+      if (bucketIndex === 2) return 31 + (seed % 30);
+      if (bucketIndex === 3) return 61 + (seed % 60);
+      if (bucketIndex === 4) return 121 + (seed % 30);
+      if (bucketIndex === 5) return 151 + (seed % 90);
+      if (bucketIndex === 6) return 241 + (seed % 125);
+      return 366 + (seed % 390);
+    };
+    const buildVintageInvoiceData = () => {
+      const rows = [];
+      let invoiceCounter = 10000;
+      vintageCustomerSeeds.forEach((customer, customerIndex) => {
+        // Each customer gets between 100 and 150 invoices.
+        const invoiceCount = 100 + ((customerIndex * 13) % 51);
+        for (let index = 0; index < invoiceCount; index += 1) {
+          const bucketIndex = (index + (customerIndex * 3)) % 8;
+          const amountBase = 38000 + ((index * 1790 + customerIndex * 9100) % 220000);
+          const invoiceAmount = Math.round(amountBase / 100) * 100;
+          const dueRatio = 0.22 + (((index + customerIndex) % 9) * 0.07);
+          const netDue = Math.max(0, Math.min(invoiceAmount, Math.round(invoiceAmount * dueRatio)));
+          const agingDays = vintageAgingDaysFromBucket(bucketIndex, index + customerIndex);
+          rows.push({
+            customerCode: customer.customerCode,
+            customerName: customer.customerName,
+            invoiceNo: `VIN-${invoiceCounter}`,
+            invoiceAmount,
+            netDue,
+            agingDays
+          });
+          invoiceCounter += 1;
+        }
+      });
+      return rows;
+    };
+    const vintageInvoiceData = buildVintageInvoiceData();
+    const vintageCustomerOptions = Array.from(new Map(
+      vintageCustomerSeeds.map((customer) => [customer.customerName, customer])
+    ).values());
+    const getVintageMatchedCustomers = (queryText) => {
+      const query = String(queryText || "").trim().toLowerCase();
+      if (!query) return vintageCustomerOptions.slice(0, 12);
+      return vintageCustomerOptions.filter((customer) => (
+        customer.customerName.toLowerCase().includes(query)
+        || customer.customerCode.toLowerCase().includes(query)
+      ));
+    };
+    const renderVintageCustomerSuggestions = (queryText = vintageSearchQuery) => {
+      if (!vintageCustomerSuggestMenu) return;
+      const matches = getVintageMatchedCustomers(queryText).slice(0, 12);
+      vintageCustomerSuggestMenu.innerHTML = "";
+      if (!matches.length) {
+        const emptyButton = document.createElement("button");
+        emptyButton.type = "button";
+        emptyButton.className = "filterItem";
+        emptyButton.disabled = true;
+        emptyButton.textContent = "No matching customer";
+        vintageCustomerSuggestMenu.appendChild(emptyButton);
+        return;
+      }
+      matches.forEach((customer) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "filterItem vintageCustomerSuggestItem";
+        button.setAttribute("data-customer-value", customer.customerName);
+        const nameSpan = document.createElement("span");
+        nameSpan.className = "vintageSuggestName";
+        nameSpan.textContent = customer.customerName;
+        const codeSpan = document.createElement("span");
+        codeSpan.className = "vintageSuggestCode";
+        codeSpan.textContent = customer.customerCode;
+        button.appendChild(nameSpan);
+        button.appendChild(codeSpan);
+        vintageCustomerSuggestMenu.appendChild(button);
+      });
+    };
+    const openVintageCustomerSuggestions = () => {
+      if (!vintageCustomerSearchWrap) return;
+      vintageCustomerSearchWrap.classList.add("is-open");
+    };
+    const closeVintageCustomerSuggestions = () => {
+      if (!vintageCustomerSearchWrap) return;
+      vintageCustomerSearchWrap.classList.remove("is-open");
+    };
+    const vintageBucketConfig = [
+      { label: "Not Due", color: "#c4b5fd" },
+      { label: "1-30", color: "#93c5fd" },
+      { label: "31-60", color: "#67e8f9" },
+      { label: "61-120", color: "#86efac" },
+      { label: "121-150", color: "#fde68a" },
+      { label: "151-240", color: "#fbcfe8" },
+      { label: "241-365", color: "#d8b4fe" },
+      { label: "1+ Year", color: "#fca5a5" }
+    ];
+    const getVintageBucketIndex = (agingDays) => {
+      const days = Number(agingDays || 0);
+      if (days <= 0) return 0;
+      if (days <= 30) return 1;
+      if (days <= 60) return 2;
+      if (days <= 120) return 3;
+      if (days <= 150) return 4;
+      if (days <= 240) return 5;
+      if (days <= 365) return 6;
+      return 7;
+    };
+    const computeRoundedPercentages = (counts, total) => {
+      if (total <= 0) return counts.map(() => 0);
+      const unitsTarget = 1000;
+      const rawUnits = counts.map((count) => (Number(count || 0) / total) * unitsTarget);
+      const floorUnits = rawUnits.map((value) => Math.floor(value));
+      let remainder = unitsTarget - floorUnits.reduce((sum, value) => sum + value, 0);
+      const byRemainderDesc = rawUnits
+        .map((value, index) => ({ index, fraction: value - floorUnits[index] }))
+        .sort((a, b) => b.fraction - a.fraction);
+      for (let i = 0; i < byRemainderDesc.length && remainder > 0; i += 1) {
+        floorUnits[byRemainderDesc[i].index] += 1;
+        remainder -= 1;
+      }
+      return floorUnits.map((units) => units / 10);
+    };
+    const getVintageFilteredInvoices = () => {
+      const query = vintageSearchQuery.trim().toLowerCase();
+      if (!query) return [...vintageInvoiceData];
+      return vintageInvoiceData.filter((row) => (
+        String(row.customerName || "").toLowerCase().includes(query)
+        || String(row.customerCode || "").toLowerCase().includes(query)
+      ));
+    };
+    const aggregateVintageBuckets = (rows) => {
+      const bucketRows = vintageBucketConfig.map((bucket) => ({
+        bucket: bucket.label,
+        color: bucket.color,
+        invoiceCount: 0,
+        invoiceAmount: 0,
+        netDue: 0,
+        sharePct: 0
+      }));
+      rows.forEach((row) => {
+        const bucketIndex = getVintageBucketIndex(row.agingDays);
+        const target = bucketRows[bucketIndex];
+        target.invoiceCount += 1;
+        target.invoiceAmount += Number(row.invoiceAmount || 0);
+        target.netDue += Number(row.netDue || 0);
+      });
+      const totalInvoices = bucketRows.reduce((sum, row) => sum + Number(row.invoiceCount || 0), 0);
+      const roundedPercentages = computeRoundedPercentages(
+        bucketRows.map((row) => row.invoiceCount),
+        totalInvoices
+      );
+      bucketRows.forEach((row, index) => {
+        row.sharePct = roundedPercentages[index] || 0;
+      });
+      return {
+        bucketRows,
+        totalInvoices,
+        customerCount: new Set(rows.map((row) => String(row.customerCode || row.customerName || "").trim())).size
+      };
+    };
+    const renderVintagePieChart = (bucketRows, totalInvoices) => {
+      if (!vintagePieCanvas) return;
+      if (vintageDetailPieChart) {
+        vintageDetailPieChart.destroy();
+        vintageDetailPieChart = null;
+      }
+      const hasData = totalInvoices > 0;
+      const chartLabels = hasData
+        ? bucketRows.map((row) => row.bucket)
+        : ["No matching customer data"];
+      const chartValues = hasData
+        ? bucketRows.map((row) => row.invoiceCount)
+        : [1];
+      const chartColors = hasData
+        ? bucketRows.map((row) => row.color)
+        : ["#cbd5e1"];
+      vintageDetailPieChart = new Chart(vintagePieCanvas.getContext("2d"), {
+        type: "doughnut",
+        data: {
+          labels: chartLabels,
+          datasets: [{
+            data: chartValues,
+            backgroundColor: chartColors,
+            borderColor: "#ffffff",
+            borderWidth: 1
+          }]
+        },
+        options: {
+          ...baseOptions,
+          scales: {},
+          cutout: "62%",
+          plugins: {
+            ...baseOptions.plugins,
+            legend: {
+              position: "bottom",
+              labels: {
+                usePointStyle: true,
+                pointStyle: "circle",
+                boxWidth: 10
+              }
+            },
+            tooltip: {
+              ...baseOptions.plugins.tooltip,
+              callbacks: {
+                label: (context) => {
+                  if (!hasData) return "No matching customer data";
+                  const row = bucketRows[context.dataIndex];
+                  return `${row.bucket}: ${formatCount(row.invoiceCount)} invoices`;
+                }
+              }
+            }
+          }
+        }
+      });
+    };
+    const renderVintageDetail = () => {
       if (!vintageDetailTableBody) return;
-      const rows = buildVintageTableRows();
-      vintageDetailTableBody.innerHTML = rows.map((row) => `
+      const filteredRows = getVintageFilteredInvoices();
+      const { bucketRows, totalInvoices, customerCount } = aggregateVintageBuckets(filteredRows);
+      if (vintageDetailMeta) {
+        const activeQuery = vintageSearchQuery.trim();
+        const summary = `Showing ${formatCount(totalInvoices)} invoices across ${formatCount(customerCount)} customers`;
+        vintageDetailMeta.textContent = activeQuery ? `Filter: ${activeQuery} | ${summary}` : summary;
+      }
+      renderVintagePieChart(bucketRows, totalInvoices);
+      if (!filteredRows.length) {
+        vintageDetailTableBody.innerHTML = `
+          <tr>
+            <td colspan="5" class="activityDetailTableEmpty">No matching customer data found.</td>
+          </tr>
+        `;
+        return;
+      }
+      vintageDetailTableBody.innerHTML = bucketRows.map((row) => `
         <tr>
           <td>${escapeHtml(row.bucket)}</td>
-          <td>${formatCount(row.invoices)}</td>
-          <td>${formatCount(row.customers)}</td>
-          <td>${formatCrCurrency(row.amountCr)}</td>
-          <td>${formatCrCurrency(row.netDueCr)}</td>
+          <td>${formatCount(row.invoiceCount)}</td>
+          <td>${formatInrCompact(row.invoiceAmount)}</td>
+          <td>${formatInrCompact(row.netDue)}</td>
           <td>
             <span class="vintageBucketShareCell">
-              <span class="vintageShareProgress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${row.percentage.toFixed(1)}">
-                <span class="vintageShareProgressFill" style="width: ${Math.max(0, Math.min(100, row.percentage))}%;"></span>
+              <span class="vintageShareProgress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${row.sharePct.toFixed(1)}">
+                <span class="vintageShareProgressFill" style="width: ${Math.max(0, Math.min(100, row.sharePct))}%;"></span>
               </span>
-              <span class="vintageBucketBarText">${row.percentage.toFixed(1)}%</span>
+              <span class="vintageBucketBarText">${row.sharePct.toFixed(1)}%</span>
             </span>
           </td>
         </tr>
@@ -1885,211 +2635,121 @@
     };
 
     const renderCashflowDetail = () => {
-      const rows = cashflowMonthFlowRecords;
-      const weekRange = getCashflowWeekRange(cashflowCurrentWeekIndex);
-      const weekRows = rows.slice(weekRange.startDay - 1, weekRange.endDay);
-      if (cashflowDetailTableBody) {
-        cashflowDetailTableBody.innerHTML = weekRows.map((row) => {
-          const hasActual = row.collectionCr != null;
-          const varianceCr = row.varianceCr;
-          const varianceText = varianceCr == null
-            ? "-"
-            : `${varianceCr >= 0 ? "+" : "-"}${formatCrCurrency(Math.abs(varianceCr))}`;
-          const varianceClass = varianceCr == null
-            ? ""
-            : (varianceCr > 0 ? "is-positive" : (varianceCr < 0 ? "is-negative" : "is-neutral"));
-          return `
-            <tr>
-              <td>${safeHtml(row.dateLabel)}</td>
-              <td>${hasActual ? formatCrCurrency(row.collectionCr) : "-"}</td>
-              <td>${safeHtml(row.ptpDateLabel)}</td>
-              <td>${row.ptpAmountCr > 0 ? formatCrCurrency(row.ptpAmountCr) : "-"}</td>
-              <td>${formatCrCurrency(row.projectedCr)}</td>
-              <td class="cashflowVariance ${varianceClass}">${varianceText}</td>
-            </tr>
-          `;
-        }).join("");
-      }
+      const scopeRows = getCashflowRowsForNode(cashflowActiveNodeId);
+      const isRootLikeNode = cashflowActiveNodeId === cashflowRootNodeId || cashflowActiveNodeId === managerOrgTree.id;
+      const selectedNode = isRootLikeNode ? null : cashflowNodeById.get(cashflowActiveNodeId);
+      const rootTotals = aggregateCashflowNode(managerOrgTree);
+      rootTotals.varianceCr = Number((rootTotals.collectionsCr - rootTotals.projectedCr).toFixed(2));
+
+      if (cashflowPopupMtd) cashflowPopupMtd.textContent = formatCrCurrency(rootTotals.collectionsCr);
+      if (cashflowPopupPtpDue) cashflowPopupPtpDue.textContent = formatCrCurrency(rootTotals.ptpCr);
+      if (cashflowPopupProjected) cashflowPopupProjected.textContent = formatCrCurrency(rootTotals.projectedCr);
+
       if (cashflowDetailWeekLabel) {
-        cashflowDetailWeekLabel.textContent = `Week ${weekRange.weekNumber}`;
+        cashflowDetailWeekLabel.textContent = selectedNode ? selectedNode.name : "Direct Reports";
       }
       if (cashflowDetailWeekInfo) {
-        cashflowDetailWeekInfo.textContent = `Week ${weekRange.weekNumber} | ${formatCashflowWeekDate(weekRange.startDay)} - ${formatCashflowWeekDate(weekRange.endDay)}`;
+        cashflowDetailWeekInfo.textContent = selectedNode
+          ? `${selectedNode.name} (${selectedNode.role}) | Full subtree rollup`
+          : "Direct report nodes with full subtree rollup";
       }
+
       if (cashflowDetailPrevWeekBtn) {
-        const isDisabled = weekRange.weekIndex <= 0;
-        cashflowDetailPrevWeekBtn.disabled = isDisabled;
+        const parentId = cashflowParentById.get(cashflowActiveNodeId) || cashflowRootNodeId;
+        const canDrillUp = !isRootLikeNode && parentId !== cashflowRootNodeId;
+        cashflowDetailPrevWeekBtn.disabled = !canDrillUp;
         if (cashflowDetailPrevWeekPageItem) {
-          cashflowDetailPrevWeekPageItem.classList.toggle("disabled", isDisabled);
-          cashflowDetailPrevWeekPageItem.setAttribute("aria-disabled", isDisabled ? "true" : "false");
+          cashflowDetailPrevWeekPageItem.classList.toggle("disabled", !canDrillUp);
+          cashflowDetailPrevWeekPageItem.setAttribute("aria-disabled", canDrillUp ? "false" : "true");
         }
       }
       if (cashflowDetailNextWeekBtn) {
-        const isDisabled = weekRange.weekIndex >= (cashflowTotalWeeks - 1);
-        cashflowDetailNextWeekBtn.disabled = isDisabled;
+        const canReset = !isRootLikeNode;
+        cashflowDetailNextWeekBtn.disabled = !canReset;
         if (cashflowDetailNextWeekPageItem) {
-          cashflowDetailNextWeekPageItem.classList.toggle("disabled", isDisabled);
-          cashflowDetailNextWeekPageItem.setAttribute("aria-disabled", isDisabled ? "true" : "false");
+          cashflowDetailNextWeekPageItem.classList.toggle("disabled", !canReset);
+          cashflowDetailNextWeekPageItem.setAttribute("aria-disabled", canReset ? "false" : "true");
         }
       }
 
-      const mtdCollectionCr = rows.reduce((sum, row) => sum + Number(row.collectionCr || 0), 0);
-      const ptpDueCr = rows
-        .filter((row) => row.day <= cashflowCurrentDay)
-        .reduce((sum, row) => sum + Number(row.ptpAmountCr || 0), 0);
-      const projectedEomCr = rows.reduce((sum, row) => sum + Number(row.projectedCr || 0), 0);
-      if (cashflowPopupMtd) cashflowPopupMtd.textContent = formatCrCurrency(mtdCollectionCr);
-      if (cashflowPopupPtpDue) cashflowPopupPtpDue.textContent = formatCrCurrency(ptpDueCr);
-      if (cashflowPopupProjected) cashflowPopupProjected.textContent = formatCrCurrency(projectedEomCr);
+      if (cashflowDetailTableBody) {
+        if (!scopeRows.length) {
+          cashflowDetailTableBody.innerHTML = `
+            <tr>
+              <td colspan="7" class="activityDetailTableEmpty">No direct reports found in this node.</td>
+            </tr>
+          `;
+        } else {
+          cashflowDetailTableBody.innerHTML = scopeRows.map((row) => {
+            const varianceCr = Number(row.varianceCr || 0);
+            const varianceClass = varianceCr > 0 ? "is-positive" : (varianceCr < 0 ? "is-negative" : "is-neutral");
+            const varianceText = `${varianceCr >= 0 ? "+" : "-"}${formatCrCurrency(Math.abs(varianceCr))}`;
+            return `
+              <tr>
+                <td>
+                  <strong>${safeHtml(row.name)}</strong>
+                  <div class="text-muted small">${safeHtml(row.role)}</div>
+                </td>
+                <td>${formatCrCurrency(row.collectionsCr)}</td>
+                <td>${formatCrCurrency(row.ptpCr)}</td>
+                <td>${formatCrCurrency(row.partPaymentCr)}</td>
+                <td>${formatCrCurrency(row.projectedCr)}</td>
+                <td class="cashflowVariance ${varianceClass}">${varianceText}</td>
+                <td>
+                  ${row.hasChildren ? `<button type="button" class="btn btn-sm btn-outline-secondary" data-cashflow-drill="${safeHtml(row.id)}">Drill down</button>` : "-"}
+                </td>
+              </tr>
+            `;
+          }).join("");
+        }
+      }
 
       if (!cashflowDetailCanvas) return;
       if (cashflowDetailChart) {
         cashflowDetailChart.destroy();
         cashflowDetailChart = null;
       }
-      const cashflowWeekHighlightPlugin = {
-        id: "cashflowWeekHighlight",
-        beforeDatasetsDraw(chart) {
-          const xScale = chart.scales?.x;
-          const chartArea = chart.chartArea;
-          if (!xScale || !chartArea) return;
-          const maxIndex = rows.length - 1;
-          const startIndex = Math.max(0, weekRange.startDay - 1);
-          const endIndex = Math.min(maxIndex, weekRange.endDay - 1);
-          const center = (index) => xScale.getPixelForValue(index);
-          const startCenter = center(startIndex);
-          const endCenter = center(endIndex);
-          if (!Number.isFinite(startCenter) || !Number.isFinite(endCenter)) return;
-          const leftEdge = startIndex <= 0
-            ? chartArea.left
-            : ((center(startIndex - 1) + startCenter) / 2);
-          const rightEdge = endIndex >= maxIndex
-            ? chartArea.right
-            : ((endCenter + center(endIndex + 1)) / 2);
-          const fillWidth = Math.max(0, rightEdge - leftEdge);
-          if (fillWidth <= 0) return;
-          const { ctx } = chart;
-          ctx.save();
-          ctx.fillStyle = "rgba(203, 213, 225, 0.30)";
-          ctx.fillRect(leftEdge, chartArea.top, fillWidth, chartArea.bottom - chartArea.top);
-          ctx.restore();
-        }
-      };
       cashflowDetailChart = new Chart(cashflowDetailCanvas.getContext("2d"), {
-        plugins: [cashflowWeekHighlightPlugin],
-        type: "line",
+        type: "bar",
         data: {
-          labels: rows.map((row) => `D${row.day}`),
+          labels: scopeRows.map((row) => row.name),
           datasets: [
             {
-              label: "Collection",
-              data: rows.map((row) => row.collectionCr),
-              borderColor: palette.blue,
-              backgroundColor: palette.blueLight,
-              tension: 0.32,
-              fill: true
+              label: "Collections",
+              data: scopeRows.map((row) => row.collectionsCr),
+              backgroundColor: palette.bluePastel,
+              borderRadius: 6
+            },
+            {
+              label: "Expected",
+              data: scopeRows.map((row) => row.projectedCr),
+              backgroundColor: palette.tealPastel,
+              borderRadius: 6
             },
             {
               label: "PTP",
-              data: rows.map((row) => row.ptpAmountCr > 0 ? row.ptpAmountCr : null),
-              borderColor: "rgba(0,0,0,0)",
-              backgroundColor: "rgba(217, 119, 6, 0.08)",
-              showLine: false,
-              borderWidth: 0,
-              pointRadius: (context) => {
-                const day = (context.dataIndex || 0) + 1;
-                return getCashflowPtpEvent(day) ? 3 : 0;
-              },
-              pointHoverRadius: (context) => {
-                const day = (context.dataIndex || 0) + 1;
-                return getCashflowPtpEvent(day) ? 5 : 0;
-              },
-              pointBackgroundColor: (context) => {
-                const day = (context.dataIndex || 0) + 1;
-                return getCashflowPtpColors(day).fill;
-              },
-              pointBorderColor: (context) => {
-                const day = (context.dataIndex || 0) + 1;
-                return getCashflowPtpColors(day).border;
-              },
-              pointBorderWidth: (context) => {
-                const day = (context.dataIndex || 0) + 1;
-                return getCashflowPtpEvent(day) ? 1 : 0;
-              },
-              fill: false
-            },
-            {
-              label: "Last Month Collection",
-              data: cashflowLastMonthCollectionDailyCr.map((value) => Number(value || 0)),
-              borderColor: "#cbd5e1",
-              backgroundColor: "rgba(203, 213, 225, 0.28)",
-              pointRadius: 0,
-              tension: 0.25,
-              fill: true
-            },
-            {
-              label: "Projected Collection",
-              data: rows.map((row) => row.projectedCr),
-              borderColor: palette.teal,
-              borderDash: [5, 4],
-              pointRadius: 0,
-              tension: 0.2,
-              fill: false
+              data: scopeRows.map((row) => row.ptpCr),
+              backgroundColor: palette.amberPastel,
+              borderRadius: 6
             }
           ]
         },
         options: {
           ...baseOptions,
-          interaction: { mode: "index", intersect: false },
-          plugins: {
-            ...baseOptions.plugins,
-            tooltip: {
-              ...baseOptions.plugins.tooltip,
-              filter: (context) => (
-                context.dataset.label !== "PTP" || context.parsed.y !== null
-              ),
-              callbacks: {
-                label: (context) => {
-                  if (context.dataset.label !== "PTP") {
-                    return `${context.dataset.label}: ${formatCrCurrency(context.parsed.y)}`;
-                  }
-                  const day = (context.dataIndex || 0) + 1;
-                  const event = getCashflowPtpEvent(day);
-                  return event ? `PTP promised: ${formatCrCurrency(event.ptpAmountCr)}` : "PTP day";
-                },
-                afterLabel: (context) => {
-                  if (context.dataset.label !== "PTP") return "";
-                  const day = (context.dataIndex || 0) + 1;
-                  const event = getCashflowPtpEvent(day);
-                  if (!event) return "";
-                  if (event.status === "future") return "Status: Future PTP";
-                  const varianceCr = Number(event.varianceCr || 0);
-                  const varianceLabel = `${varianceCr >= 0 ? "+" : "-"}${formatCrCurrency(Math.abs(varianceCr))}`;
-                  return `Collected: ${formatCrCurrency(event.collectionCr)} | Variance: ${varianceLabel}`;
-                }
-              }
-            },
-            legend: {
-              position: "bottom",
-              labels: {
-                usePointStyle: true,
-                pointStyle: "line",
-                pointStyleWidth: 28,
-                boxWidth: 28,
-                boxHeight: 2
-              }
-            }
-          },
           scales: {
             x: {
               grid: { color: "rgba(148, 163, 184, 0.16)" },
-              ticks: { color: "#64748b", maxTicksLimit: 14, autoSkip: true }
+              ticks: { color: "#64748b", maxTicksLimit: 6, autoSkip: false }
             },
             y: {
               beginAtZero: true,
               grid: { color: "rgba(148, 163, 184, 0.18)" },
               ticks: { color: "#64748b", callback: (value) => formatCrCurrency(value) }
             }
+          },
+          plugins: {
+            ...baseOptions.plugins,
+            legend: { position: "bottom", labels: { usePointStyle: true } }
           }
         }
       });
@@ -2371,14 +3031,14 @@
       };
     };
 
-    const renderTargetDetail = () => {
-      const paceSeries = buildTargetPaceSeries(targetDetailSnapshot);
-      const targetCr = Number(targetDetailSnapshot.targetCr || 0);
-      const achievedCr = Number(paceSeries.achievedMtd || targetDetailSnapshot.achievedCr || 0);
-      const daysInMonth = Math.max(1, Number(targetDetailSnapshot.daysInMonth) || 1);
-      const daysElapsed = Math.min(daysInMonth, Math.max(1, Number(targetDetailSnapshot.dayOfMonth) || 1));
+    const renderTargetDetail = (snapshot = targetDetailSnapshot) => {
+      const paceSeries = buildTargetPaceSeries(snapshot);
+      const targetCr = Number(snapshot.targetCr || 0);
+      const achievedCr = Number(paceSeries.achievedMtd || snapshot.achievedCr || 0);
+      const daysInMonth = Math.max(1, Number(snapshot.daysInMonth) || 1);
+      const daysElapsed = Math.min(daysInMonth, Math.max(1, Number(snapshot.dayOfMonth) || 1));
       const previousMonthMtd = Number(
-        paceSeries.previousMonthMtd > 0 ? paceSeries.previousMonthMtd : Number(targetDetailSnapshot.previousMonthAchievedCr || 0)
+        paceSeries.previousMonthMtd > 0 ? paceSeries.previousMonthMtd : Number(snapshot.previousMonthAchievedCr || 0)
       );
       const daysLeft = Math.max(0, daysInMonth - daysElapsed);
       const gapCr = Math.max(0, targetCr - achievedCr);
@@ -2403,10 +3063,15 @@
       })();
 
       if (targetCommitmentValue) targetCommitmentValue.textContent = formatCrCurrency(targetCr);
-      if (targetCommitmentMeta) targetCommitmentMeta.textContent = `${targetDetailSnapshot.monthLabel} manager-approved commitment`;
+      if (targetCommitmentMeta) targetCommitmentMeta.textContent = `${snapshot.monthLabel} manager-approved commitment`;
       if (targetAchievedValue) targetAchievedValue.textContent = formatCrCurrency(achievedCr);
       if (targetAchievedMeta) {
         targetAchievedMeta.textContent = `Committed ${formatCrCurrency(paceSeries.committedMtd)} | Non-committed ${formatCrCurrency(paceSeries.nonCommittedMtd)}`;
+      }
+      if (targetSelectedAgentName) {
+        targetSelectedAgentName.textContent = snapshot.agentName
+          ? `${snapshot.agentName}${snapshot.agentRole ? ` (${snapshot.agentRole})` : ""}`
+          : "-";
       }
       if (targetAchievedDonut) {
         targetAchievedDonut.style.setProperty("--target-achieved-pct", String(Math.max(0, Math.min(100, achievementPct)).toFixed(1)));
@@ -2573,6 +3238,13 @@
         }
       });
     };
+
+    const renderSelectedTargetAgentDetail = () => {
+      const snapshot = buildAgentTargetSnapshot(selectedTargetAgentId);
+      syncTargetAgentFilterSelection(snapshot?.agentId || "");
+      renderTargetDetail(snapshot);
+    };
+    populateTargetAgentFilterMenu();
 
     const getActivityChartBreakdown = (records, primaryColorMap) => {
       const isSubStatusView = activityFilterState.primaryStatus !== "all";
@@ -2890,8 +3562,10 @@
       !searchTerm
       || row.primaryStatus.toLowerCase().includes(searchTerm)
       || row.subStatus.toLowerCase().includes(searchTerm)
-      || row.activityType.toLowerCase().includes(searchTerm)
+      || String(row.resolutionState || "").toLowerCase().includes(searchTerm)
+      || String(row.broadStatus || "").toLowerCase().includes(searchTerm)
       || String(row.actionOwner || "").toLowerCase().includes(searchTerm)
+      || String(row.resolvedBy || "").toLowerCase().includes(searchTerm)
     );
 
     const getIssueFilteredRecords = () => {
@@ -2899,7 +3573,7 @@
       return issueDispositionRecords.filter((row) => {
         const primaryMatch = issueFilterState.primaryStatus === "all" || row.primaryStatus === issueFilterState.primaryStatus;
         const subMatch = issueFilterState.subStatus === "all" || row.subStatus === issueFilterState.subStatus;
-        const typeMatch = issueFilterState.activityType === "all" || row.activityType === issueFilterState.activityType;
+        const typeMatch = issueFilterState.resolutionState === "all" || row.resolutionState === issueFilterState.resolutionState;
         const searchMatch = doesIssueSearchMatch(row, search);
         return primaryMatch && subMatch && typeMatch && searchMatch;
       });
@@ -2908,7 +3582,7 @@
     const getIssuePrimaryColorScopeRecords = () => {
       const search = issueFilterState.search.trim().toLowerCase();
       return issueDispositionRecords.filter((row) => {
-        const typeMatch = issueFilterState.activityType === "all" || row.activityType === issueFilterState.activityType;
+        const typeMatch = issueFilterState.resolutionState === "all" || row.resolutionState === issueFilterState.resolutionState;
         const searchMatch = doesIssueSearchMatch(row, search);
         return typeMatch && searchMatch;
       });
@@ -2926,21 +3600,21 @@
       const grouped = new Map();
       records.forEach((row) => {
         const owner = row.actionOwner || "-";
-        const key = `${row.primaryStatus}|||${row.subStatus}|||${row.activityType}|||${owner}`;
+        const key = `${row.primaryStatus}|||${row.subStatus}|||${row.resolutionState}|||${owner}`;
         if (!grouped.has(key)) {
           grouped.set(key, {
             primaryStatus: row.primaryStatus,
             subStatus: row.subStatus,
-            activityType: row.activityType,
+            resolutionState: row.resolutionState,
             actionOwner: owner,
             customers: new Set(),
             invoices: new Set(),
             invoiceValue: 0,
             netDue: 0,
-            agingTotal: 0,
-            agingCount: 0,
-            openDaysTotal: 0,
-            openDaysCount: 0
+            expectedTatTotal: 0,
+            expectedTatCount: 0,
+            pastTatTotal: 0,
+            pastTatCount: 0
           });
         }
         const target = grouped.get(key);
@@ -2948,10 +3622,10 @@
         target.invoices.add(row.invoiceNo);
         target.invoiceValue += Number(row.invoiceValue || 0);
         target.netDue += Number(row.netDue || 0);
-        target.agingTotal += Number(row.agingDays || 0);
-        target.agingCount += 1;
-        target.openDaysTotal += Number(row.openDays || 0);
-        target.openDaysCount += 1;
+        target.expectedTatTotal += Number(row.expectedTatDays || 0);
+        target.expectedTatCount += 1;
+        target.pastTatTotal += Number(row.tatOverdueDays || 0);
+        target.pastTatCount += 1;
       });
 
       return Array.from(grouped.values())
@@ -2960,14 +3634,14 @@
           invoiceCount: row.invoices.size,
           invoiceValue: row.invoiceValue,
           netDue: row.netDue,
-          agingDays: row.agingCount ? Math.round(row.agingTotal / row.agingCount) : 0,
-          activityType: row.activityType,
+          expectedTatDays: row.expectedTatCount ? Math.round(row.expectedTatTotal / row.expectedTatCount) : 0,
+          resolutionState: row.resolutionState,
           status: row.subStatus,
           primaryStatus: row.primaryStatus,
           actionOwner: row.actionOwner,
-          openDays: row.openDaysCount ? Math.round(row.openDaysTotal / row.openDaysCount) : 0
+          tatOverdueDays: row.pastTatCount ? Math.round(row.pastTatTotal / row.pastTatCount) : 0
         }))
-        .sort((a, b) => b.invoiceCount - a.invoiceCount || b.invoiceValue - a.invoiceValue);
+        .sort((a, b) => b.tatOverdueDays - a.tatOverdueDays || b.invoiceCount - a.invoiceCount || b.invoiceValue - a.invoiceValue);
     };
 
     const getIssueChartBreakdown = (records, primaryColorMap) => {
@@ -3056,7 +3730,9 @@
         issueSubStatusFilterBadge.textContent = issueFilterState.subStatus === "all" ? "All" : issueFilterState.subStatus;
       }
       if (issueTypeFilterBadge) {
-        issueTypeFilterBadge.textContent = issueFilterState.activityType === "all" ? "All" : issueFilterState.activityType;
+        issueTypeFilterBadge.textContent = issueFilterState.resolutionState === "all"
+          ? "All"
+          : `${issueFilterState.resolutionState.charAt(0).toUpperCase()}${issueFilterState.resolutionState.slice(1)}`;
       }
     };
 
@@ -3120,14 +3796,25 @@
           issueDetailTableBody.innerHTML = pageRows.map((row) => {
             const statusColorKey = chartBreakdown.mode === "substatus" ? row.status : row.primaryStatus;
             const statusColor = pillColorMap.get(statusColorKey) || "#64748b";
+            const resolutionColor = ({
+              open: "#ef4444",
+              resolved: "#f59e0b",
+              closed: "#16a34a"
+            })[row.resolutionState] || "#64748b";
+            const resolutionLabel = `${row.resolutionState.charAt(0).toUpperCase()}${row.resolutionState.slice(1)}`;
             return `
             <tr>
               <td>${row.customerCount}</td>
               <td>${row.invoiceCount}</td>
               <td>${formatInrCompact(row.invoiceValue)}</td>
               <td>${formatInrCompact(row.netDue)}</td>
-              <td>${row.agingDays}</td>
-              <td>${renderActivityTypePill(row.activityType)}</td>
+              <td>${row.expectedTatDays}</td>
+              <td>
+                <span
+                  class="activityStatusPill"
+                  style="--status-pill-color:${resolutionColor};--status-pill-rgb:${hexToRgb(resolutionColor)};"
+                >${resolutionLabel}</span>
+              </td>
               <td>
                 <span
                   class="activityStatusPill"
@@ -3136,7 +3823,7 @@
                 >${safeHtml(row.status)}</span>
               </td>
               <td>${safeHtml(row.actionOwner)}</td>
-              <td>${row.openDays}</td>
+              <td>${row.tatOverdueDays}</td>
             </tr>
           `;
           }).join("");
@@ -3144,7 +3831,8 @@
       }
       if (issueDetailMeta) {
         const totalInvoiceCount = rows.reduce((sum, item) => sum + item.invoiceCount, 0);
-        issueDetailMeta.textContent = `Showing ${pageRows.length} grouped rows on this page from ${filteredRecords.length} issues (${totalInvoiceCount} invoices).`;
+        const pastTatRows = filteredRecords.filter((row) => Number(row.tatOverdueDays || 0) > 0).length;
+        issueDetailMeta.textContent = `Showing ${pageRows.length} grouped rows from ${filteredRecords.length} issues (${totalInvoiceCount} invoices). Past TAT cases in this filter: ${pastTatRows}.`;
       }
       renderIssuePagination(totalRows, pageRows.length, totalPages);
       renderIssueDetailChart(chartBreakdown);
@@ -3192,7 +3880,7 @@
       issueTypeFilterMenu.addEventListener("click", (event) => {
         const button = event.target.closest(".filterItem[data-filter-value]");
         if (!button) return;
-        issueFilterState.activityType = button.getAttribute("data-filter-value") || "all";
+        issueFilterState.resolutionState = button.getAttribute("data-filter-value") || "all";
         setIssueFilterBadges();
         if (issueTypeFilterDropdown) issueTypeFilterDropdown.removeAttribute("open");
         issueCurrentPage = 1;
@@ -3210,7 +3898,7 @@
       issueFilterState.search = "";
       issueFilterState.primaryStatus = "all";
       issueFilterState.subStatus = "all";
-      issueFilterState.activityType = "all";
+      issueFilterState.resolutionState = "all";
       issueCurrentPage = 1;
       if (issueDetailSearch) issueDetailSearch.value = "";
       renderIssueSubStatusOptions();
@@ -3274,18 +3962,93 @@
     }
     if (cashflowDetailPrevWeekBtn) {
       cashflowDetailPrevWeekBtn.addEventListener("click", () => {
-        if (cashflowCurrentWeekIndex <= 0) return;
-        cashflowCurrentWeekIndex -= 1;
+        if (cashflowActiveNodeId === cashflowRootNodeId || cashflowActiveNodeId === managerOrgTree.id) return;
+        const parentId = cashflowParentById.get(cashflowActiveNodeId) || cashflowRootNodeId;
+        if (parentId === cashflowRootNodeId) return;
+        cashflowActiveNodeId = parentId === managerOrgTree.id ? cashflowRootNodeId : parentId;
         renderCashflowDetail();
       });
     }
     if (cashflowDetailNextWeekBtn) {
       cashflowDetailNextWeekBtn.addEventListener("click", () => {
-        if (cashflowCurrentWeekIndex >= (cashflowTotalWeeks - 1)) return;
-        cashflowCurrentWeekIndex += 1;
+        if (cashflowActiveNodeId === cashflowRootNodeId || cashflowActiveNodeId === managerOrgTree.id) return;
+        cashflowActiveNodeId = cashflowRootNodeId;
         renderCashflowDetail();
       });
     }
+    if (cashflowDetailTableBody) {
+      cashflowDetailTableBody.addEventListener("click", (event) => {
+        const drillBtn = event.target.closest("[data-cashflow-drill]");
+        if (!drillBtn) return;
+        const nodeId = drillBtn.getAttribute("data-cashflow-drill");
+        if (!nodeId || !cashflowNodeById.has(nodeId)) return;
+        cashflowActiveNodeId = nodeId;
+        renderCashflowDetail();
+      });
+    }
+    if (vintageCustomerSearch) {
+      vintageCustomerSearch.addEventListener("input", (event) => {
+        vintageSearchQuery = event.target.value || "";
+        renderVintageCustomerSuggestions(vintageSearchQuery);
+        openVintageCustomerSuggestions();
+        if (!modalEl?.classList.contains("is-vintage-detail")) return;
+        renderVintageDetail();
+      });
+      vintageCustomerSearch.addEventListener("focus", () => {
+        renderVintageCustomerSuggestions(vintageSearchQuery);
+        openVintageCustomerSuggestions();
+      });
+      vintageCustomerSearch.addEventListener("keydown", (event) => {
+        if (event.key !== "Escape") return;
+        closeVintageCustomerSuggestions();
+      });
+    }
+    if (vintageCustomerSuggestMenu) {
+      vintageCustomerSuggestMenu.addEventListener("click", (event) => {
+        const item = event.target.closest(".filterItem[data-customer-value]");
+        if (!item) return;
+        const selectedCustomer = item.getAttribute("data-customer-value") || "";
+        vintageSearchQuery = selectedCustomer;
+        if (vintageCustomerSearch) vintageCustomerSearch.value = selectedCustomer;
+        closeVintageCustomerSuggestions();
+        if (!modalEl?.classList.contains("is-vintage-detail")) return;
+        renderVintageDetail();
+      });
+    }
+    document.addEventListener("click", (event) => {
+      if (!vintageCustomerSearchWrap?.classList.contains("is-open")) return;
+      if (event.target.closest("#vintageCustomerSearchWrap")) return;
+      closeVintageCustomerSuggestions();
+    });
+    if (targetAgentFilterMenu) {
+      targetAgentFilterMenu.addEventListener("click", (event) => {
+        const agentItem = event.target.closest(".filterItem[data-agent-id]");
+        if (!agentItem) return;
+        const nextAgentId = agentItem.getAttribute("data-agent-id") || "";
+        if (!nextAgentId || nextAgentId === selectedTargetAgentId) {
+          targetAgentFilterDropdown?.removeAttribute("open");
+          return;
+        }
+        selectedTargetAgentId = nextAgentId;
+        if (modalEl?.classList.contains("is-target-detail")) {
+          renderSelectedTargetAgentDetail();
+        } else {
+          syncTargetAgentFilterSelection(selectedTargetAgentId);
+        }
+        targetAgentFilterDropdown?.removeAttribute("open");
+      });
+    }
+    if (targetAgentFilterDropdown) {
+      targetAgentFilterDropdown.addEventListener("toggle", () => {
+        if (!targetAgentFilterDropdown.open) return;
+        syncTargetAgentFilterSelection(selectedTargetAgentId);
+      });
+    }
+    document.addEventListener("click", (event) => {
+      if (!targetAgentFilterDropdown?.open) return;
+      if (event.target.closest("#targetAgentFilterDropdown")) return;
+      targetAgentFilterDropdown.removeAttribute("open");
+    });
 
     if (modalEl) {
       modalEl.addEventListener("hidden.bs.modal", () => {
@@ -3307,10 +4070,20 @@
         }
         if (modalEl.classList.contains("is-cashflow-detail")) {
           modalEl.classList.remove("is-cashflow-detail");
-          cashflowCurrentWeekIndex = cashflowDefaultWeekIndex;
+          cashflowActiveNodeId = cashflowRootNodeId;
           if (cashflowDetailChart) {
             cashflowDetailChart.destroy();
             cashflowDetailChart = null;
+          }
+        }
+        if (modalEl.classList.contains("is-vintage-detail")) {
+          modalEl.classList.remove("is-vintage-detail");
+          vintageSearchQuery = "";
+          if (vintageCustomerSearch) vintageCustomerSearch.value = "";
+          closeVintageCustomerSuggestions();
+          if (vintageDetailPieChart) {
+            vintageDetailPieChart.destroy();
+            vintageDetailPieChart = null;
           }
         }
         if (modalEl.classList.contains("is-target-detail")) {
@@ -3326,14 +4099,16 @@
     const openModal = (key) => {
       const config = chartConfigs[key];
       if (!config) return;
-      if (modalTitle) modalTitle.textContent = config.title;
-      if (modalMeta) modalMeta.textContent = config.meta;
+      const openTargetFromCashflow = key === "cashflow";
+      if (modalTitle) modalTitle.textContent = openTargetFromCashflow ? "Plan vs Actual" : config.title;
+      if (modalMeta) modalMeta.textContent = openTargetFromCashflow ? "Target achievement" : config.meta;
       const isVintageDetail = key === "vintage";
       const isActivityDetail = key === "activity";
       const isIssueDetail = key === "issues";
-      const isCashflowDetail = key === "cashflow";
-      const isTargetDetail = key === "planActual";
+      const isCashflowDetail = false;
+      const isTargetDetail = openTargetFromCashflow;
       if (modalEl) {
+        modalEl.classList.toggle("is-vintage-detail", isVintageDetail);
         modalEl.classList.toggle("is-activity-detail", isActivityDetail);
         modalEl.classList.toggle("is-issue-detail", isIssueDetail);
         modalEl.classList.toggle("is-cashflow-detail", isCashflowDetail);
@@ -3342,8 +4117,8 @@
       if (modalCanvas) {
         modalCanvas.parentElement.hidden = isVintageDetail || isActivityDetail || isIssueDetail || isCashflowDetail || isTargetDetail;
       }
-      if (vintageDetailTableWrap) {
-        vintageDetailTableWrap.hidden = !isVintageDetail;
+      if (vintageDetailLayout) {
+        vintageDetailLayout.hidden = !isVintageDetail;
       }
       if (activityDetailLayout) {
         activityDetailLayout.hidden = !isActivityDetail;
@@ -3364,7 +4139,11 @@
         )).join("");
       }
       if (isVintageDetail) {
-        renderVintageDetailTable();
+        vintageSearchQuery = "";
+        if (vintageCustomerSearch) vintageCustomerSearch.value = "";
+        renderVintageCustomerSuggestions("");
+        closeVintageCustomerSuggestions();
+        renderVintageDetail();
       }
       if (isActivityDetail) {
         renderActivityDetail();
@@ -3373,11 +4152,11 @@
         renderIssueDetail();
       }
       if (isCashflowDetail) {
-        cashflowCurrentWeekIndex = cashflowDefaultWeekIndex;
+        cashflowActiveNodeId = cashflowRootNodeId;
         renderCashflowDetail();
       }
       if (isTargetDetail) {
-        renderTargetDetail();
+        renderSelectedTargetAgentDetail();
       }
       if (modalChart) {
         modalChart.destroy();
@@ -3394,6 +4173,10 @@
       if (cashflowDetailChart && !isCashflowDetail) {
         cashflowDetailChart.destroy();
         cashflowDetailChart = null;
+      }
+      if (vintageDetailPieChart && !isVintageDetail) {
+        vintageDetailPieChart.destroy();
+        vintageDetailPieChart = null;
       }
       if (targetPaceChart && !isTargetDetail) {
         targetPaceChart.destroy();
@@ -3430,7 +4213,7 @@
     const totalNetDueCard = document.getElementById("totalNetDueCard");
     if (totalNetDueCard) {
       const goToAgentScreen = () => {
-        window.location.href = "../index.html";
+        window.location.href = "../LPagent.html";
       };
       totalNetDueCard.addEventListener("click", goToAgentScreen);
       totalNetDueCard.addEventListener("keydown", (event) => {
@@ -3633,22 +4416,6 @@
         renderVisitBoardColumn(visitActiveOffset + 1)
       ].join("");
     };
-
-    if (visitForDayCard && visitPlanModalEl && typeof bootstrap !== "undefined") {
-      const openVisitPlanModal = () => {
-        visitActiveOffset = 0;
-        renderVisitPlanModal();
-        const visitModal = bootstrap.Modal.getOrCreateInstance(visitPlanModalEl);
-        visitModal.show();
-      };
-      visitForDayCard.addEventListener("click", openVisitPlanModal);
-      visitForDayCard.addEventListener("keydown", (event) => {
-        if (event.key === "Enter" || event.key === " ") {
-          event.preventDefault();
-          openVisitPlanModal();
-        }
-      });
-    }
 
     if (visitPrevDayBtn) {
       visitPrevDayBtn.addEventListener("click", () => {
@@ -4002,213 +4769,126 @@
       }
     ];
 
-    const openIssuesData = [
-      {
-        customerCode: "CUST-004",
-        customerName: "Ambane India Pvt Ltd",
-        invoiceNo: "INV-22119",
-        invoiceValue: 143500,
-        amountForMonth: 25000,
-        totalNetDue: 118500,
-        invoiceDate: "11 Jan 2026",
-        dueDate: "09 Feb 2026",
-        committedAmount: 50000,
-        status: "Collection In Progress",
-        dueType: "due",
-        commitmentType: "committed"
-      },
-      {
-        customerCode: "CUST-009",
-        customerName: "Blue Star Limited",
-        invoiceNo: "INV-22127",
-        invoiceValue: 121000,
-        amountForMonth: 0,
-        totalNetDue: 121000,
-        invoiceDate: "02 Feb 2026",
-        dueDate: "28 Feb 2026",
-        committedAmount: 0,
-        status: "Collection In Progress",
-        dueType: "not_due",
-        commitmentType: "non_committed"
-      },
-      {
-        customerCode: "CUST-024",
-        customerName: "Shiva Healthcare Pvt Ltd",
-        invoiceNo: "INV-40109",
-        invoiceValue: 168000,
-        amountForMonth: 28000,
-        totalNetDue: 140000,
-        invoiceDate: "28 Dec 2025",
-        dueDate: "27 Jan 2026",
-        committedAmount: 45000,
-        status: "Collection In Progress",
-        actionOwner: "Sakshi Sharma",
-        openDays: 14,
-        dueType: "due",
-        commitmentType: "committed"
-      },
-      {
-        customerCode: "CUST-034",
-        customerName: "Mediport Labs",
-        invoiceNo: "INV-45501",
-        invoiceValue: 214000,
-        amountForMonth: 50000,
-        totalNetDue: 164000,
-        invoiceDate: "18 Dec 2025",
-        dueDate: "17 Jan 2026",
-        committedAmount: 90000,
-        status: "Partially Collected",
-        actionOwner: "Abhishek Sharma",
-        openDays: 9,
-        dueType: "due",
-        commitmentType: "committed"
-      },
-      {
-        customerCode: "CUST-041",
-        customerName: "Zen Meditech",
-        invoiceNo: "INV-47703",
-        invoiceValue: 89000,
-        amountForMonth: 15000,
-        totalNetDue: 74000,
-        invoiceDate: "26 Jan 2026",
-        dueDate: "25 Feb 2026",
-        committedAmount: 25000,
-        status: "Collection In Progress",
-        actionOwner: "Palak Choudhary",
-        openDays: 6,
-        dueType: "not_due",
-        commitmentType: "committed"
-      },
-      {
-        customerCode: "CUST-045",
-        customerName: "Careline Pharma",
-        invoiceNo: "INV-47768",
-        invoiceValue: 156200,
-        amountForMonth: 32000,
-        totalNetDue: 124200,
-        invoiceDate: "21 Dec 2025",
-        dueDate: "20 Jan 2026",
-        committedAmount: 70000,
-        status: "Partially Collected",
-        actionOwner: "Aditi Sharma",
-        openDays: 13,
-        dueType: "due",
-        commitmentType: "committed"
-      },
-      {
-        customerCode: "CUST-056",
-        customerName: "Blue Star Limited",
-        invoiceNo: "INV-50372",
-        invoiceValue: 205600,
-        amountForMonth: 56000,
-        totalNetDue: 149600,
-        invoiceDate: "12 Jan 2026",
-        dueDate: "11 Feb 2026",
-        committedAmount: 50000,
-        status: "Collection In Progress",
-        actionOwner: "Manish Kumar",
-        openDays: 10,
-        dueType: "due",
-        commitmentType: "committed"
-      },
-      {
-        customerCode: "CUST-066",
-        customerName: "Pulse Diagnostics",
-        invoiceNo: "INV-52246",
-        invoiceValue: 172800,
-        amountForMonth: 45000,
-        totalNetDue: 127800,
-        invoiceDate: "03 Jan 2026",
-        dueDate: "01 Feb 2026",
-        committedAmount: 65000,
-        status: "Partially Collected",
-        actionOwner: "Sakshi Sharma",
-        openDays: 15,
-        dueType: "due",
-        commitmentType: "committed"
-      },
-      {
-        customerCode: "CUST-071",
-        customerName: "Lifecrest Hospitals",
-        invoiceNo: "INV-54832",
-        invoiceValue: 84000,
-        amountForMonth: 10000,
-        totalNetDue: 74000,
-        invoiceDate: "06 Feb 2026",
-        dueDate: "08 Mar 2026",
-        committedAmount: 0,
-        status: "Collection In Progress",
-        actionOwner: "Palak Choudhary",
-        openDays: 7,
-        dueType: "not_due",
-        commitmentType: "non_committed"
-      }
-    ];
-
-    const agingOver30Data = [
-      { ...mtdCollectionsData[0], agingDays: 38, dueType: "due" },
-      { ...mtdCollectionsData[3], agingDays: 42, dueType: "due" },
-      { ...mtdCollectionsData[9], agingDays: 55, dueType: "due" },
-      { ...mtdCollectionsData[10], agingDays: 61, dueType: "due" },
-      { ...mtdCollectionsData[11], agingDays: 49, dueType: "due" },
-      { ...mtdCollectionsData[14], agingDays: 73, dueType: "due" },
-      { ...mtdCollectionsData[16], agingDays: 47, dueType: "due" },
-      { ...mtdCollectionsData[18], agingDays: 67, dueType: "due" }
-    ];
-
-    const newBillingData = [
-      { ...mtdCollectionsData[2], status: "Collection In Progress", dueType: "not_due" },
-      { ...mtdCollectionsData[5], dueType: "not_due" },
-      { ...mtdCollectionsData[8], status: "Collected", dueType: "not_due" },
-      { ...mtdCollectionsData[12], status: "Collected", dueType: "not_due" },
-      { ...mtdCollectionsData[15], status: "Collected", dueType: "not_due" },
-      { ...mtdCollectionsData[17], dueType: "not_due" },
-      { ...mtdCollectionsData[19], dueType: "not_due" }
-    ].map((row, index) => {
-      const billingOwners = [
-        { manager: "Rahul Mehta", kam: "Sakshi Sharma", kas: "Ravi Singh" },
-        { manager: "Neha Iyer", kam: "Abhishek Sharma", kas: "Priya Nair" },
-        { manager: "Arvind Rao", kam: "Palak Choudhary", kas: "Ankit Verma" }
-      ];
-      return { ...row, ...billingOwners[index % billingOwners.length] };
+    const openIssuesData = issueDispositionRecords.map((row, index) => {
+      const invoiceDate = issueDateFromOffset(-(22 + (index % 13)));
+      const dueDate = issueDateFromOffset(-(6 - (index % 17)));
+      const monthlyAmount = Math.max(0, Math.round(Number(row.invoiceValue || 0) * (0.1 + ((index % 4) * 0.05))));
+      const committedAmount = Math.max(0, Math.round(Number(row.netDue || 0) * (0.2 + ((index % 3) * 0.12))));
+      return {
+        customerCode: row.customerCode,
+        customerName: row.customerName,
+        invoiceNo: row.invoiceNo,
+        invoiceValue: row.invoiceValue,
+        amountForMonth: monthlyAmount,
+        totalNetDue: row.netDue,
+        invoiceDate,
+        dueDate,
+        committedAmount,
+        status: row.resolutionState.charAt(0).toUpperCase() + row.resolutionState.slice(1),
+        primaryStatus: row.primaryStatus,
+        broadStatus: row.broadStatus,
+        actionOwner: row.actionOwner,
+        openDays: row.openDays,
+        expectedTatDays: row.expectedTatDays,
+        tatOverdueDays: row.tatOverdueDays,
+        resolvedBy: row.resolvedBy,
+        resolvedAt: row.resolvedAt,
+        closedAt: row.closedAt,
+        dueType: Number(row.agingDays || 0) > 30 ? "due" : "not_due",
+        commitmentType: committedAmount > 0 ? "committed" : "non_committed"
+      };
     });
 
-    const newAllocationsData = [
-      { ...mtdCollectionsData[4], status: "Collection In Progress" },
-      { ...mtdCollectionsData[6], status: "Collection In Progress" },
-      { ...mtdCollectionsData[7], status: "Partially Collected" },
-      { ...mtdCollectionsData[10], status: "Partially Collected" },
-      { ...mtdCollectionsData[11], status: "Collection In Progress" },
-      { ...mtdCollectionsData[13], status: "Collection In Progress" },
-      { ...mtdCollectionsData[14], status: "Partially Collected" },
-      { ...mtdCollectionsData[16], status: "Collection In Progress" }
-    ].map((row, index) => {
-      const allocationOwners = [
-        { manager: "Rahul Mehta", kam: "Sakshi Sharma", kas: "Ravi Singh" },
-        { manager: "Neha Iyer", kam: "Abhishek Sharma", kas: "Priya Nair" },
-        { manager: "Arvind Rao", kam: "Palak Choudhary", kas: "Ankit Verma" }
-      ];
-      return { ...row, ...allocationOwners[index % allocationOwners.length] };
-    });
+    const resolutionStatus = (row) => String(row.status || "").trim().toLowerCase();
+    const parseIssueDateToMs = (value) => {
+      const parsed = new Date(String(value || "")).getTime();
+      return Number.isFinite(parsed) ? parsed : 0;
+    };
+    const crToRupees = (valueCr) => Math.round(Number(valueCr || 0) * 10000000);
 
-    const ptpForDayData = [
-      { ...mtdCollectionsData[0], committedAmount: 85000, status: "Partially Collected", commitmentType: "committed" },
-      { ...mtdCollectionsData[3], committedAmount: 120000, status: "Collection In Progress", commitmentType: "committed" },
-      { ...mtdCollectionsData[9], committedAmount: 90000, status: "Partially Collected", commitmentType: "committed" },
-      { ...mtdCollectionsData[11], committedAmount: 70000, status: "Partially Collected", commitmentType: "committed" },
-      { ...mtdCollectionsData[18], committedAmount: 65000, status: "Partially Collected", commitmentType: "committed" }
-    ];
+    const openIssueRows = openIssuesData.filter((row) => resolutionStatus(row) === "open");
+    const pastTatRows = openIssueRows.filter((row) => Number(row.tatOverdueDays || 0) > 0);
+    const resolvedRows = openIssuesData.filter((row) => ["resolved", "closed"].includes(resolutionStatus(row)));
+    const issueTodayLabel = issueDateFromOffset(0);
+    const resolvedTodayRows = resolvedRows
+      .filter((row) => row.resolvedAt === issueTodayLabel || row.closedAt === issueTodayLabel)
+      .sort((a, b) => (
+        parseIssueDateToMs(b.closedAt || b.resolvedAt || b.dueDate)
+        - parseIssueDateToMs(a.closedAt || a.resolvedAt || a.dueDate)
+      ));
 
-    const callbacksForDayData = [
-      { ...mtdCollectionsData[4], status: "Collection In Progress" },
-      { ...mtdCollectionsData[6], status: "Collection In Progress" },
-      { ...mtdCollectionsData[13], status: "Collection In Progress" },
-      { ...mtdCollectionsData[16], status: "Collection In Progress" },
-      { ...mtdCollectionsData[19], status: "Collection In Progress" },
-      { ...openIssuesData[0], status: "Collection In Progress" },
-      { ...openIssuesData[2], status: "Collection In Progress" },
-      { ...openIssuesData[4], status: "Collection In Progress" }
-    ];
+    const stuckOwnerRows = (() => {
+      const grouped = pastTatRows.reduce((acc, row) => {
+        const owner = String(row.actionOwner || "Unassigned");
+        if (!acc[owner]) {
+          acc[owner] = {
+            owner,
+            count: 0,
+            totalOverdue: 0,
+            totalNetDue: 0,
+            totalExpectedTat: 0,
+            maxTat: 0,
+            topCategory: row.primaryStatus || "-"
+          };
+        }
+        acc[owner].count += 1;
+        acc[owner].totalOverdue += Number(row.tatOverdueDays || 0);
+        acc[owner].totalNetDue += Number(row.totalNetDue || row.netDue || 0);
+        acc[owner].totalExpectedTat += Number(row.expectedTatDays || 0);
+        acc[owner].maxTat = Math.max(acc[owner].maxTat, Number(row.tatOverdueDays || 0));
+        return acc;
+      }, {});
+      return Object.values(grouped)
+        .sort((a, b) => b.totalOverdue - a.totalOverdue)
+        .map((row, index) => ({
+          customerCode: `OWN-${String(index + 1).padStart(2, "0")}`,
+          customerName: row.owner,
+          invoiceNo: `${row.count} cases`,
+          invoiceValue: Math.round(row.totalNetDue),
+          amountForMonth: Math.round(row.count),
+          totalNetDue: Math.round(row.totalNetDue),
+          invoiceDate: "-",
+          dueDate: "-",
+          committedAmount: Math.round(row.totalOverdue),
+          status: "Open",
+          primaryStatus: row.topCategory,
+          broadStatus: `${row.totalOverdue} overdue days`,
+          actionOwner: row.owner,
+          openDays: row.maxTat,
+          expectedTatDays: Math.max(1, Math.round(row.totalExpectedTat / Math.max(1, row.count))),
+          tatOverdueDays: row.totalOverdue,
+          dueType: "due",
+          commitmentType: "committed"
+        }));
+    })();
+
+    const teamCashflowRows = directReportCashflowRollup.map((row, index) => ({
+      customerCode: `TEAM-${String(index + 1).padStart(2, "0")}`,
+      customerName: row.name,
+      invoiceNo: row.role,
+      invoiceValue: crToRupees(row.collectionsCr),
+      amountForMonth: crToRupees(row.ptpCr),
+      totalNetDue: crToRupees(row.projectedCr),
+      invoiceDate: "Current Month",
+      dueDate: "Month End",
+      committedAmount: crToRupees(Math.abs(row.varianceCr)),
+      status: row.varianceCr >= 0 ? "On Track" : "At Risk",
+      actionOwner: row.name,
+      dueType: "due",
+      commitmentType: "committed"
+    }));
+    const cashflowVarianceRows = [...teamCashflowRows]
+      .sort((a, b) => Number(b.committedAmount || 0) - Number(a.committedAmount || 0));
+    const expectedWeekRows = teamCashflowRows.map((row) => ({
+      ...row,
+      amountForMonth: Math.round((Number(row.totalNetDue || 0) / 4)),
+      committedAmount: Math.round(Math.max(0, Number(row.totalNetDue || 0) - Number(row.invoiceValue || 0))),
+      status: Number(row.invoiceValue || 0) >= Number(row.totalNetDue || 0) ? "Ahead" : "Watch"
+    }));
+    const ptpRiskRows = [...openIssueRows]
+      .filter((row) => row.commitmentType === "committed")
+      .sort((a, b) => Number(b.tatOverdueDays || 0) - Number(a.tatOverdueDays || 0))
+      .slice(0, 25);
 
     const modalDataConfig = {
       mtd: {
@@ -4220,73 +4900,178 @@
         showStatusFilter: true,
         showStatusColumn: true,
         showCommitmentFilter: true,
-        showIssueTracker: false
+        showIssueTracker: false,
+        showAmountForMonth: true,
+        showValueColumn: true,
+        showActionOwner: false,
+        showOpenDays: false,
+        showOwnerColumns: false,
+        valueField: "committedAmount",
+        valueIsAmount: true,
+        valueColumnLabel: "Committed amount",
+        statusColumnLabel: "Status"
       },
-      issues: {
+      open_issues: {
         title: "Open Issues",
-        subtext: "Issue-wise invoice view",
-        rows: openIssuesData,
-        showAging: false,
-        showAgingRangeFilter: false,
-        showStatusFilter: true,
-        showStatusColumn: true,
-        showCommitmentFilter: true,
-        showIssueTracker: true
-      },
-      aging: {
-        title: "Aging > 30 Days",
-        subtext: "Invoices aging beyond 30 days",
-        rows: agingOver30Data,
+        subtext: "Issue lifecycle and ownership view",
+        rows: openIssueRows,
         showAging: true,
-        showAgingRangeFilter: true,
+        showAgingRangeFilter: false,
         showStatusFilter: true,
         showStatusColumn: true,
         showCommitmentFilter: false,
-        showIssueTracker: false
+        showIssueTracker: true,
+        showAmountForMonth: false,
+        showValueColumn: true,
+        showActionOwner: true,
+        showOpenDays: true,
+        showOwnerColumns: false,
+        valueField: "broadStatus",
+        valueIsAmount: false,
+        agingDisplayField: "expectedTatDays",
+        openDaysField: "tatOverdueDays",
+        agingColumnLabel: "Expected TAT (days)",
+        valueColumnLabel: "Broad status",
+        statusColumnLabel: "Resolution",
+        openDaysColumnLabel: "Past TAT (days)"
       },
-      billing: {
-        title: "New Billing",
-        subtext: "Latest billed invoices in active follow-up",
-        rows: newBillingData,
-        showAging: false,
+      past_tat: {
+        title: "Past TAT Breaches",
+        subtext: "Open cases breaching expected TAT",
+        rows: pastTatRows,
+        showAging: true,
         showAgingRangeFilter: false,
-        showStatusFilter: false,
-        showStatusColumn: false,
+        showStatusFilter: true,
+        showStatusColumn: true,
         showCommitmentFilter: false,
-        showIssueTracker: false
+        showIssueTracker: true,
+        showAmountForMonth: false,
+        showValueColumn: true,
+        showActionOwner: true,
+        showOpenDays: true,
+        showOwnerColumns: false,
+        valueField: "broadStatus",
+        valueIsAmount: false,
+        agingDisplayField: "expectedTatDays",
+        openDaysField: "tatOverdueDays",
+        agingColumnLabel: "Expected TAT (days)",
+        valueColumnLabel: "Broad status",
+        statusColumnLabel: "Resolution",
+        openDaysColumnLabel: "Past TAT (days)"
       },
-      allocations: {
-        title: "New Allocations",
-        subtext: "Recently allocated invoices",
-        rows: newAllocationsData,
-        showAging: false,
+      resolved_today: {
+        title: "Resolved Today",
+        subtext: "Latest resolved and closed issues",
+        rows: resolvedTodayRows,
+        showAging: true,
         showAgingRangeFilter: false,
-        showStatusFilter: false,
-        showStatusColumn: false,
+        showStatusFilter: true,
+        showStatusColumn: true,
         showCommitmentFilter: false,
-        showIssueTracker: false
+        showIssueTracker: false,
+        showAmountForMonth: false,
+        showValueColumn: true,
+        showActionOwner: true,
+        showOpenDays: true,
+        showOwnerColumns: false,
+        valueField: "broadStatus",
+        valueIsAmount: false,
+        agingDisplayField: "expectedTatDays",
+        openDaysField: "tatOverdueDays",
+        agingColumnLabel: "Expected TAT (days)",
+        valueColumnLabel: "Broad status",
+        statusColumnLabel: "Resolution",
+        openDaysColumnLabel: "Past TAT (days)"
       },
-      ptp: {
-        title: "PTP For The Day",
-        subtext: "Today's promise-to-pay commitments",
-        rows: ptpForDayData,
+      stuck_owner: {
+        title: "Stuck by Owner",
+        subtext: "Owner-wise backlog concentration",
+        rows: stuckOwnerRows,
+        showAging: true,
+        showAgingRangeFilter: false,
+        showStatusFilter: true,
+        showStatusColumn: true,
+        showCommitmentFilter: false,
+        showIssueTracker: false,
+        showAmountForMonth: false,
+        showValueColumn: true,
+        showActionOwner: true,
+        showOpenDays: true,
+        showOwnerColumns: false,
+        valueField: "broadStatus",
+        valueIsAmount: false,
+        agingDisplayField: "expectedTatDays",
+        openDaysField: "tatOverdueDays",
+        agingColumnLabel: "Expected TAT (days)",
+        valueColumnLabel: "Past TAT days",
+        statusColumnLabel: "Resolution",
+        openDaysColumnLabel: "Past TAT (days)"
+      },
+      cashflow_variance: {
+        title: "Team Cashflow Variance",
+        subtext: "Collections vs expected by direct report node",
+        rows: cashflowVarianceRows,
         showAging: false,
         showAgingRangeFilter: false,
         showStatusFilter: false,
-        showStatusColumn: false,
-        showCommitmentFilter: true,
-        showIssueTracker: false
+        showStatusColumn: true,
+        showCommitmentFilter: false,
+        showIssueTracker: false,
+        showAmountForMonth: true,
+        amountForMonthLabel: "PTP amount",
+        showValueColumn: true,
+        valueField: "committedAmount",
+        valueIsAmount: true,
+        valueColumnLabel: "Variance amount",
+        showActionOwner: false,
+        showOpenDays: false,
+        showOwnerColumns: false,
+        statusColumnLabel: "Variance status"
       },
-      callbacks: {
-        title: "Callbacks For The Day",
-        subtext: "Invoices queued for callback follow-up",
-        rows: callbacksForDayData,
+      expected_week: {
+        title: "Expected Collection (Next 7 Days)",
+        subtext: "Projected inflow by direct report node",
+        rows: expectedWeekRows,
         showAging: false,
         showAgingRangeFilter: false,
         showStatusFilter: false,
-        showStatusColumn: false,
+        showStatusColumn: true,
+        showCommitmentFilter: false,
+        showIssueTracker: false,
+        showAmountForMonth: true,
+        amountForMonthLabel: "Expected (7d)",
+        showValueColumn: true,
+        valueField: "committedAmount",
+        valueIsAmount: true,
+        valueColumnLabel: "Run-rate gap",
+        showActionOwner: false,
+        showOpenDays: false,
+        showOwnerColumns: false,
+        statusColumnLabel: "Readiness"
+      },
+      ptp_risk: {
+        title: "PTP At Risk",
+        subtext: "Committed open issues with elevated breach risk",
+        rows: ptpRiskRows,
+        showAging: true,
+        showAgingRangeFilter: false,
+        showStatusFilter: true,
+        showStatusColumn: true,
         showCommitmentFilter: true,
-        showIssueTracker: false
+        showIssueTracker: false,
+        showAmountForMonth: false,
+        showValueColumn: true,
+        showActionOwner: true,
+        showOpenDays: true,
+        showOwnerColumns: false,
+        valueField: "broadStatus",
+        valueIsAmount: false,
+        agingDisplayField: "expectedTatDays",
+        openDaysField: "tatOverdueDays",
+        agingColumnLabel: "Expected TAT (days)",
+        valueColumnLabel: "Broad status",
+        statusColumnLabel: "Resolution",
+        openDaysColumnLabel: "Past TAT (days)"
       }
     };
 
@@ -4306,7 +5091,14 @@
     const statusClassMap = {
       collected: "is-collected",
       partially_collected: "is-partial",
-      collection_in_progress: "is-progress"
+      collection_in_progress: "is-progress",
+      open: "is-progress",
+      resolved: "is-partial",
+      closed: "is-collected",
+      on_track: "is-collected",
+      ahead: "is-collected",
+      watch: "is-partial",
+      at_risk: "is-progress"
     };
 
     const normalizeKey = (value) => String(value || "").trim().toLowerCase().replace(/\s+/g, "_");
@@ -4375,38 +5167,51 @@
       if (!mtdTableBody) return;
       const searchValue = mtdFilters.search.trim().toLowerCase();
       const activeConfig = getMtdActiveConfig();
-      const activeRows = activeConfig.rows;
+      const activeRows = activeConfig.rows || [];
       const showAgingColumn = Boolean(activeConfig.showAging);
-      const isIssuesMode = mtdActiveModalType === "issues";
-      const showPrimaryStatusColumn = isIssuesMode;
-      const showValueColumn = !["aging", "billing", "allocations"].includes(mtdActiveModalType);
+      const showAmountForMonthColumn = activeConfig.showAmountForMonth !== false;
+      const showValueColumn = activeConfig.showValueColumn !== false;
       const showStatusColumn = activeConfig.showStatusColumn !== false;
-      const showAmountForMonthColumn = !isIssuesMode;
-      const showActionOwnerColumn = isIssuesMode;
-      const showOpenDaysColumn = isIssuesMode;
-      const showOwnerColumns = ["allocations", "billing"].includes(mtdActiveModalType);
-      if (mtdAmountForMonthHeader) mtdAmountForMonthHeader.hidden = !showAmountForMonthColumn;
+      const showActionOwnerColumn = Boolean(activeConfig.showActionOwner);
+      const showOpenDaysColumn = Boolean(activeConfig.showOpenDays);
+      const showOwnerColumns = Boolean(activeConfig.showOwnerColumns);
+      const valueField = activeConfig.valueField || "committedAmount";
+      const valueIsAmount = activeConfig.valueIsAmount !== false;
+      const agingDisplayField = activeConfig.agingDisplayField || (activeConfig.showIssueTracker ? "expectedTatDays" : "agingDays");
+      const agingFilterField = activeConfig.agingFilterField || agingDisplayField;
+      const openDaysField = activeConfig.openDaysField || (activeConfig.showIssueTracker ? "tatOverdueDays" : "openDays");
+      if (mtdAmountForMonthHeader) {
+        mtdAmountForMonthHeader.hidden = !showAmountForMonthColumn;
+        mtdAmountForMonthHeader.textContent = activeConfig.amountForMonthLabel || "Amount for the month";
+      }
       if (mtdAgingDaysHeader) mtdAgingDaysHeader.hidden = !showAgingColumn;
       if (mtdValueColumnHeader) {
         mtdValueColumnHeader.hidden = !showValueColumn;
-        mtdValueColumnHeader.textContent = showPrimaryStatusColumn ? "Primary status" : "Committed amount";
+        mtdValueColumnHeader.textContent = activeConfig.valueColumnLabel || "Committed amount";
       }
-      if (mtdStatusHeader) mtdStatusHeader.hidden = !showStatusColumn;
+      if (mtdAgingDaysHeader) mtdAgingDaysHeader.textContent = activeConfig.agingColumnLabel || "Aging days";
+      if (mtdStatusHeader) {
+        mtdStatusHeader.hidden = !showStatusColumn;
+        mtdStatusHeader.textContent = activeConfig.statusColumnLabel || "Status";
+      }
       if (mtdActionOwnerHeader) mtdActionOwnerHeader.hidden = !showActionOwnerColumn;
-      if (mtdOpenDaysHeader) mtdOpenDaysHeader.hidden = !showOpenDaysColumn;
+      if (mtdOpenDaysHeader) {
+        mtdOpenDaysHeader.hidden = !showOpenDaysColumn;
+        mtdOpenDaysHeader.textContent = activeConfig.openDaysColumnLabel || "Open days";
+      }
       if (mtdManagerHeader) mtdManagerHeader.hidden = !showOwnerColumns;
       if (mtdKamHeader) mtdKamHeader.hidden = !showOwnerColumns;
       if (mtdKasHeader) mtdKasHeader.hidden = !showOwnerColumns;
       const filteredRows = activeRows.filter((row) => {
         const dueMatches = mtdFilters.due === "all" || row.dueType === mtdFilters.due;
         const statusMatches = !showStatusColumn || mtdFilters.status === "all" || normalizeKey(row.status) === mtdFilters.status;
-        const commitmentMatches = mtdFilters.commitment === "all" || row.commitmentType === mtdFilters.commitment;
+        const commitmentMatches = !activeConfig.showCommitmentFilter || mtdFilters.commitment === "all" || row.commitmentType === mtdFilters.commitment;
         const managerMatches = !showOwnerColumns || mtdFilters.manager === "all" || normalizeKey(row.manager) === mtdFilters.manager;
         const kamMatches = !showOwnerColumns || mtdFilters.kam === "all" || normalizeKey(row.kam) === mtdFilters.kam;
         const kasMatches = !showOwnerColumns || mtdFilters.kas === "all" || normalizeKey(row.kas) === mtdFilters.kas;
         const agingMatches = (() => {
           if (!showAgingColumn || mtdFilters.agingRange === "all") return true;
-          const days = Number(row.agingDays || 0);
+          const days = Number(row[agingFilterField] || 0);
           if (mtdFilters.agingRange === "31_45") return days >= 31 && days <= 45;
           if (mtdFilters.agingRange === "46_60") return days >= 46 && days <= 60;
           if (mtdFilters.agingRange === "61_90") return days >= 61 && days <= 90;
@@ -4414,9 +5219,12 @@
           return true;
         })();
         const searchMatches = !searchValue
-          || row.invoiceNo.toLowerCase().includes(searchValue)
-          || row.customerName.toLowerCase().includes(searchValue)
-          || row.customerCode.toLowerCase().includes(searchValue);
+          || String(row.invoiceNo || "").toLowerCase().includes(searchValue)
+          || String(row.customerName || "").toLowerCase().includes(searchValue)
+          || String(row.customerCode || "").toLowerCase().includes(searchValue)
+          || String(row.actionOwner || "").toLowerCase().includes(searchValue)
+          || String(row.primaryStatus || "").toLowerCase().includes(searchValue)
+          || String(row.status || "").toLowerCase().includes(searchValue);
         return dueMatches && statusMatches && commitmentMatches && managerMatches && kamMatches && kasMatches && agingMatches && searchMatches;
       });
       const totalRows = filteredRows.length;
@@ -4446,14 +5254,16 @@
       const pageRowsMarkup = pageRows.map((row) => {
         const statusKey = normalizeKey(row.status);
         const statusClass = statusClassMap[statusKey] || "is-default";
-        const agingCell = showAgingColumn ? `<td>${escapeHtml(row.agingDays ?? "-")}</td>` : "";
+        const agingCell = showAgingColumn
+          ? `<td>${escapeHtml(row[agingDisplayField] ?? "-")}</td>`
+          : "";
         const valueColumnCell = !showValueColumn
           ? ""
-          : showPrimaryStatusColumn
-          ? `<td>${escapeHtml(row.primaryStatus || row.status || "-")}</td>`
-          : `<td class="amountCell">${formatCurrency(row.committedAmount)}</td>`;
+          : valueIsAmount
+          ? `<td class="amountCell">${formatCurrency(row[valueField])}</td>`
+          : `<td>${escapeHtml(row[valueField] ?? "-")}</td>`;
         const amountForMonthCell = showAmountForMonthColumn
-          ? `<td class="amountCell">${formatCurrency(row.amountForMonth)}</td>`
+          ? `<td class="amountCell">${formatCurrency(row.amountForMonth || 0)}</td>`
           : "";
         const statusCell = showStatusColumn
           ? `<td><span class="mtdStatusPill ${statusClass}">${escapeHtml(row.status)}</span></td>`
@@ -4462,7 +5272,7 @@
           ? `<td>${escapeHtml(row.actionOwner || "-")}</td>`
           : "";
         const openDaysCell = showOpenDaysColumn
-          ? `<td>${escapeHtml(row.openDays ?? "-")}</td>`
+          ? `<td>${escapeHtml(row[openDaysField] ?? "-")}</td>`
           : "";
         const managerCell = showOwnerColumns
           ? `<td>${escapeHtml(row.manager || "-")}</td>`
@@ -4591,7 +5401,7 @@
         if (mtdStatusFilterDropdown) {
           mtdStatusFilterDropdown.hidden = activeConfig.showStatusFilter === false;
         }
-        const showOwnerFilters = ["allocations", "billing"].includes(mtdActiveModalType);
+        const showOwnerFilters = Boolean(activeConfig.showOwnerColumns);
         if (mtdManagerFilterDropdown) {
           mtdManagerFilterDropdown.hidden = !showOwnerFilters;
         }
@@ -4616,16 +5426,6 @@
         });
       }
 
-      if (openIssuesCard) {
-        openIssuesCard.addEventListener("click", () => openDashboardTableModal("issues"));
-        openIssuesCard.addEventListener("keydown", (event) => {
-          if (event.key === "Enter" || event.key === " ") {
-            event.preventDefault();
-            openDashboardTableModal("issues");
-          }
-        });
-      }
-
       const wireDashboardModalCard = (cardEl, modalType) => {
         if (!cardEl) return;
         cardEl.addEventListener("click", () => openDashboardTableModal(modalType));
@@ -4637,11 +5437,13 @@
         });
       };
 
-      wireDashboardModalCard(agingOver30Card, "aging");
-      wireDashboardModalCard(newBillingCard, "billing");
-      wireDashboardModalCard(newAllocationsCard, "allocations");
-      wireDashboardModalCard(ptpForDayCard, "ptp");
-      wireDashboardModalCard(callbacksForDayCard, "callbacks");
+      wireDashboardModalCard(openIssuesCard, "open_issues");
+      wireDashboardModalCard(agingOver30Card, "past_tat");
+      wireDashboardModalCard(newBillingCard, "resolved_today");
+      wireDashboardModalCard(visitForDayCard, "stuck_owner");
+      wireDashboardModalCard(newAllocationsCard, "cashflow_variance");
+      wireDashboardModalCard(ptpForDayCard, "expected_week");
+      wireDashboardModalCard(callbacksForDayCard, "ptp_risk");
     }
 
     mtdDropdowns.forEach((dropdown) => {
@@ -4705,54 +5507,47 @@
     let dashboardSummaryRunId = 0;
     const buildDashboardSummary = () => {
       const metric = (value) => `<span class="dashboardSummaryMetric">${value}</span>`;
-      const mtdCollectionCr = cashflowMonthFlowRecords.reduce((sum, row) => sum + Number(row.collectionCr || 0), 0);
-      const ptpDueCr = cashflowMonthFlowRecords
-        .filter((row) => row.day <= cashflowCurrentDay)
-        .reduce((sum, row) => sum + Number(row.ptpAmountCr || 0), 0);
-      const projectedEomCr = cashflowMonthFlowRecords.reduce((sum, row) => sum + Number(row.projectedCr || 0), 0);
-      const commitmentCr = Number(targetDetailSnapshot?.targetCr || 0);
-      const achievedPct = commitmentCr > 0 ? (mtdCollectionCr / commitmentCr) * 100 : 0;
-      const projectedGapCr = Math.max(0, commitmentCr - projectedEomCr);
-
-      const ptpDueDays = cashflowMonthFlowRecords.filter((row) => row.day <= cashflowCurrentDay && Number(row.ptpAmountCr || 0) > 0);
-      const ptpMetDays = ptpDueDays.filter((row) => Number(row.collectionCr || 0) >= Number(row.ptpAmountCr || 0)).length;
-      const ptpMissedDays = ptpDueDays.filter((row) => Number(row.collectionCr || 0) < Number(row.ptpAmountCr || 0)).length;
-
-      const activityMix = computeActivityTypeSummary(activityDispositionRecords);
-      const totalActivities = activityMix.Call + activityMix.Email + activityMix.Visit;
-      const activityShare = (value) => (totalActivities > 0 ? ((value / totalActivities) * 100).toFixed(1) : "0.0");
-      const topPrimaryStatus = computeActivityPrimarySummary(activityDispositionRecords)[0] || ["-", 0];
-
-      const topIssueCategory = computeIssuePrimarySummary(issueDispositionRecords)[0] || ["-", 0];
-      const agedIssues = issueDispositionRecords.filter((row) => Number(row.openDays || 0) > 14).length;
+      const cashflowTotals = directReportCashflowRollup.reduce((acc, row) => {
+        acc.collectionsCr += Number(row.collectionsCr || 0);
+        acc.ptpCr += Number(row.ptpCr || 0);
+        acc.partPaymentCr += Number(row.partPaymentCr || 0);
+        acc.projectedCr += Number(row.projectedCr || 0);
+        return acc;
+      }, { collectionsCr: 0, ptpCr: 0, partPaymentCr: 0, projectedCr: 0 });
+      const cashflowVarianceCr = Number((cashflowTotals.collectionsCr - cashflowTotals.projectedCr).toFixed(2));
+      const atRiskNode = [...directReportCashflowRollup]
+        .sort((a, b) => a.varianceCr - b.varianceCr)[0] || null;
+      const topStuckCategory = issueLifecycleMetrics.stuckByCategory[0] || ["-", 0];
+      const topStuckOwner = issueLifecycleMetrics.stuckByOwner[0] || ["-", 0];
+      const resolutionRate = Number(issueLifecycleMetrics.resolutionRate || 0);
 
       const sections = [
         {
-          title: "1. Collection Progress",
+          title: "1. Issue Resolution Health",
           points: [
-            `MTD collection is ${metric(formatCrCurrency(mtdCollectionCr))} against commitment of ${metric(formatCrCurrency(commitmentCr))}, translating to ${metric(`${achievedPct.toFixed(1)}%`)} achievement so far.`,
-            `At current pace, projected month-end collection is ${metric(formatCrCurrency(projectedEomCr))}, leaving an estimated gap of ${metric(formatCrCurrency(projectedGapCr))} if conversion does not improve.`
+            `Resolution rate is ${metric(`${resolutionRate.toFixed(1)}%`)} with ${metric(String(issueLifecycleMetrics.openCount))} open issues and ${metric(String(issueLifecycleMetrics.resolvedCount))} resolved/closed issues.`,
+            `The open queue remains anchored in ${topStuckCategory[0]} where ${metric(`${topStuckCategory[1]} cases`)} are currently blocked in the external-dependency state.`
           ]
         },
         {
-          title: "2. PTP Conversion",
+          title: "2. TAT Breach Risk",
           points: [
-            `PTP due till date is ${metric(formatCrCurrency(ptpDueCr))} across ${metric(String(ptpDueDays.length))} due PTP days.`,
-            `${metric(String(ptpMetDays))} days were met and ${metric(String(ptpMissedDays))} were under-delivered, indicating inconsistent promise quality and follow-through on committed dates.`
+            `${metric(String(issueLifecycleMetrics.pastTatCount))} open issues are already past expected TAT with an aggregate overrun of ${metric(`${issueLifecycleMetrics.pastTatDays} days`)}, signaling immediate breach pressure.`,
+            `Owner concentration is highest with ${topStuckOwner[0]} (${metric(`${topStuckOwner[1]} aged cases`)}), so daily resolution checkpoints should be owner-led rather than generic queue sweeps.`
           ]
         },
         {
-          title: "3. Activity Overview",
+          title: "3. Team Cashflow Forecast vs Actual",
           points: [
-            `Top invoice concentration is in ${topPrimaryStatus[0]} (${metric(`${topPrimaryStatus[1]} invoices`)}), which should guide prioritization for collection action.`,
-            `Activity mix is Calls ${metric(`${activityShare(activityMix.Call)}%`)}, Emails ${metric(`${activityShare(activityMix.Email)}%`)}, and Visits ${metric(`${activityShare(activityMix.Visit)}%`)}, suggesting broad outreach but uneven conversion.`
+            `Team collections are ${metric(formatCrCurrency(cashflowTotals.collectionsCr))} against expected ${metric(formatCrCurrency(cashflowTotals.projectedCr))}, giving a variance of ${metric(`${cashflowVarianceCr >= 0 ? "+" : "-"}${formatCrCurrency(Math.abs(cashflowVarianceCr))}`)}.`,
+            `PTP is ${metric(formatCrCurrency(cashflowTotals.ptpCr))} and part-payments contribute ${metric(formatCrCurrency(cashflowTotals.partPaymentCr))}, so near-term cashflow confidence depends on converting committed inflows quickly.`
           ]
         },
         {
-          title: "4. Risk and Focus",
+          title: "4. Immediate Owner/Category Focus",
           points: [
-            `Top issue category is ${topIssueCategory[0]} (${metric(`${topIssueCategory[1]} cases`)}), with ${metric(String(agedIssues))} issues open beyond 14 days creating execution drag.`,
-            `Immediate focus should be to clear aged blockers, tighten near-term PTP validation, and accelerate high-probability collections scheduled this and next week.`
+            `Primary action lane is ${topStuckCategory[0]} under ${topStuckOwner[0]}, while cashflow execution risk is highest in ${atRiskNode?.name || "-"} (${metric(`${atRiskNode?.varianceCr != null ? `${atRiskNode.varianceCr >= 0 ? "+" : "-"}${formatCrCurrency(Math.abs(atRiskNode.varianceCr))}` : "-"}`)} vs expected).`,
+            `Immediate plan: close past-TAT open items first, then run team-wise cashflow reviews at direct-report level to recover expected-collection variance this week.`
           ]
         }
       ];
@@ -4762,7 +5557,7 @@
         totalWords = countWords(sections.flatMap((section) => section.points).join(" "));
       }
       if (totalWords > 200) {
-        sections[2].points[1] = `Activity mix is Calls ${metric(`${activityShare(activityMix.Call)}%`)}, Emails ${metric(`${activityShare(activityMix.Email)}%`)}, and Visits ${metric(`${activityShare(activityMix.Visit)}%`)}.`;
+        sections[2].points[1] = `PTP is ${metric(formatCrCurrency(cashflowTotals.ptpCr))} and part-payments are ${metric(formatCrCurrency(cashflowTotals.partPaymentCr))}, with focus on committed conversion.`;
         totalWords = countWords(sections.flatMap((section) => section.points).join(" "));
       }
       return { sections, totalWords };
@@ -4930,118 +5725,8 @@
     const closeTargets = Array.from(overlay.querySelectorAll("[data-team-close]"));
     if (!teamTrail || !teamTree || !nodeTitle || !nodeOpenDashboardBtn || !kpiGrid || !reportCardGrid) return;
 
-    const orgTree = {
-      id: "mgr-01",
-      name: "Rohit Malhotra",
-      role: "Collections Manager",
-      metrics: null,
-      children: [
-        {
-          id: "tl-01",
-          name: "Nisha Verma",
-          role: "Team Lead",
-          metrics: null,
-          children: [
-            {
-              id: "sa-01",
-              name: "Aditi Sharma",
-              role: "Senior Agent",
-              metrics: null,
-              children: [
-                {
-                  id: "ag-01",
-                  name: "Rahul Sinha",
-                  role: "Agent",
-                  metrics: { portfolio: 46800000, netDue: 12800000, mtdCollection: 9100000, openIssues: 5, target: 10200000 },
-                  children: []
-                },
-                {
-                  id: "ag-02",
-                  name: "Karan Mehta",
-                  role: "Agent",
-                  metrics: { portfolio: 42100000, netDue: 11200000, mtdCollection: 8600000, openIssues: 4, target: 9800000 },
-                  children: []
-                }
-              ]
-            },
-            {
-              id: "sa-02",
-              name: "Palak Choudhary",
-              role: "Senior Agent",
-              metrics: null,
-              children: [
-                {
-                  id: "ag-03",
-                  name: "Ishita Jain",
-                  role: "Agent",
-                  metrics: { portfolio: 39700000, netDue: 9800000, mtdCollection: 9200000, openIssues: 3, target: 9600000 },
-                  children: []
-                },
-                {
-                  id: "ag-04",
-                  name: "Raman Kapoor",
-                  role: "Agent",
-                  metrics: { portfolio: 38500000, netDue: 10600000, mtdCollection: 7900000, openIssues: 6, target: 9400000 },
-                  children: []
-                }
-              ]
-            }
-          ]
-        },
-        {
-          id: "tl-02",
-          name: "Manish Kumar",
-          role: "Team Lead",
-          metrics: null,
-          children: [
-            {
-              id: "sa-03",
-              name: "Abhishek Sharma",
-              role: "Senior Agent",
-              metrics: null,
-              children: [
-                {
-                  id: "ag-05",
-                  name: "Megha Arora",
-                  role: "Agent",
-                  metrics: { portfolio: 43200000, netDue: 12100000, mtdCollection: 8800000, openIssues: 5, target: 10100000 },
-                  children: []
-                },
-                {
-                  id: "ag-06",
-                  name: "Sagar Patel",
-                  role: "Agent",
-                  metrics: { portfolio: 35600000, netDue: 9200000, mtdCollection: 7400000, openIssues: 2, target: 8600000 },
-                  children: []
-                }
-              ]
-            },
-            {
-              id: "sa-04",
-              name: "Sakshi Sharma",
-              role: "Senior Agent",
-              metrics: null,
-              children: [
-                {
-                  id: "ag-07",
-                  name: "Riya Nair",
-                  role: "Agent",
-                  metrics: { portfolio: 34100000, netDue: 8700000, mtdCollection: 7000000, openIssues: 3, target: 8200000 },
-                  children: []
-                },
-                {
-                  id: "ag-08",
-                  name: "Vikram Das",
-                  role: "Agent",
-                  metrics: { portfolio: 31800000, netDue: 7900000, mtdCollection: 6800000, openIssues: 4, target: 7900000 },
-                  children: []
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    };
+    const orgTree = window.managerOrgTree;
+    if (!orgTree) return;
 
     const byId = new Map();
     const parentById = new Map();
@@ -5049,6 +5734,7 @@
     let activeNodeId = orgTree.id;
 
     const formatInr = (value) => `Rs. ${Number(value || 0).toLocaleString("en-IN")}`;
+    const formatCrCurrency = (value) => `Rs. ${Number(value || 0).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Cr`;
     const formatPct = (value) => `${Number.isFinite(value) ? value.toFixed(1) : "0.0"}%`;
     const replicaCardConfig = [
       { id: "totalNetDueCard", spanClass: "card-span-3" },
@@ -5063,6 +5749,7 @@
       if (!source) return "";
       const clone = source.cloneNode(true);
       clone.removeAttribute("id");
+      clone.querySelectorAll("[id]").forEach((node) => node.removeAttribute("id"));
       clone.removeAttribute("role");
       clone.removeAttribute("tabindex");
       clone.removeAttribute("aria-label");
@@ -5109,21 +5796,20 @@
         const portfolio = Number(metric.portfolio || 0);
         const netDue = Number(metric.netDue || 0);
         const openIssues = Number(metric.openIssues || 0);
-        const visitsPlanned = Number(metric.visitsPlanned || Math.max(6, Math.round(portfolio / 7000000)));
-        const visitsDone = Number(metric.visitsDone || Math.max(0, Math.round(visitsPlanned * 0.78)));
-        const callbacks = Number(metric.callbacks || Math.max(1, Math.round(openIssues * 0.7)));
-        const ptpToday = Number(metric.ptpToday || Math.max(0, Math.round(openIssues * 0.5)));
+        const resolvedIssues = Number(metric.resolvedIssues || 0);
+        const pastTat = Number(metric.pastTat || 0);
         acc.members += 1;
         acc.portfolio += portfolio;
         acc.netDue += netDue;
         acc.notDue += Math.max(0, portfolio - netDue);
         acc.mtdCollection += Number(metric.mtdCollection || 0);
         acc.openIssues += openIssues;
-        acc.target += Number(metric.target || 0);
-        acc.visitsPlanned += visitsPlanned;
-        acc.visitsDone += Math.min(visitsDone, visitsPlanned);
-        acc.callbacks += callbacks;
-        acc.ptpToday += ptpToday;
+        acc.resolvedIssues += resolvedIssues;
+        acc.pastTat += pastTat;
+        acc.collectionsCr += Number(metric.collectionsCr || 0);
+        acc.ptpCr += Number(metric.ptpCr || 0);
+        acc.partPaymentCr += Number(metric.partPaymentCr || 0);
+        acc.projectedCr += Number(metric.projectedCr || 0);
         return acc;
       }, {
         members: 0,
@@ -5132,14 +5818,16 @@
         notDue: 0,
         mtdCollection: 0,
         openIssues: 0,
-        target: 0,
-        visitsPlanned: 0,
-        visitsDone: 0,
-        callbacks: 0,
-        ptpToday: 0
+        resolvedIssues: 0,
+        pastTat: 0,
+        collectionsCr: 0,
+        ptpCr: 0,
+        partPaymentCr: 0,
+        projectedCr: 0
       });
-      totals.achievementPct = totals.target ? (totals.mtdCollection / totals.target) * 100 : 0;
-      totals.visitPct = totals.visitsPlanned ? (totals.visitsDone / totals.visitsPlanned) * 100 : 0;
+      totals.varianceCr = totals.collectionsCr - totals.projectedCr;
+      const totalIssueFlow = totals.openIssues + totals.resolvedIssues;
+      totals.issueResolutionPct = totalIssueFlow > 0 ? (totals.resolvedIssues / totalIssueFlow) * 100 : 0;
       return totals;
     };
 
@@ -5182,15 +5870,16 @@
       const node = byId.get(activeNodeId) || orgTree;
       const totals = aggregateNode(node);
       nodeTitle.textContent = `${node.name} - ${node.role}`;
-      nodeOpenDashboardBtn.href = `LPagent.html?agent=${encodeURIComponent(node.name)}`;
+      nodeOpenDashboardBtn.href = `Dashboard_Agent.html?agent=${encodeURIComponent(node.name)}`;
       kpiGrid.innerHTML = buildReplicaKpiCards();
 
       if (!node.children.length) {
+        const issueFlow = totals.openIssues + totals.resolvedIssues;
         const leafDetails = [
           { label: "Due", value: formatInr(totals.netDue) },
           { label: "Not Due", value: formatInr(totals.notDue) },
-          { label: "Visits", value: `${totals.visitsDone}/${totals.visitsPlanned}` },
-          { label: "Issues", value: `${totals.openIssues}` }
+          { label: "Issue resolution", value: `${totals.resolvedIssues}/${issueFlow || 0}` },
+          { label: "Past TAT", value: `${totals.pastTat}` }
         ];
         reportCardGrid.innerHTML = `
           <article class="teamMemberCard">
@@ -5199,10 +5888,15 @@
                 <h6>${node.name}</h6>
                 <p>${node.role}</p>
               </div>
-              <a class="inlineOverlayBtn link" href="LPagent.html?agent=${encodeURIComponent(node.name)}">Open Dashboard</a>
+              <a class="inlineOverlayBtn link" href="Dashboard_Agent.html?agent=${encodeURIComponent(node.name)}">Open Dashboard</a>
             </div>
             <div class="teamMemberMeta">
               ${leafDetails.map((item) => `<div><span>${item.label}</span><strong>${item.value}</strong></div>`).join("")}
+            </div>
+            <div class="teamMemberFoot">
+              <span>Collection ${formatCrCurrency(totals.collectionsCr)}</span>
+              <span>Expected ${formatCrCurrency(totals.projectedCr)}</span>
+              <span>Variance ${totals.varianceCr >= 0 ? "+" : "-"}${formatCrCurrency(Math.abs(totals.varianceCr))}</span>
             </div>
           </article>
         `;
@@ -5220,19 +5914,19 @@
               </div>
               <div class="teamMemberActions">
                 <button type="button" class="inlineOverlayBtn" data-team-select="${child.id}">Drill Down</button>
-                <a class="inlineOverlayBtn link" href="LPagent.html?agent=${encodeURIComponent(child.name)}">Open Dashboard</a>
+                <a class="inlineOverlayBtn link" href="Dashboard_Agent.html?agent=${encodeURIComponent(child.name)}">Open Dashboard</a>
               </div>
             </div>
             <div class="teamMemberMeta">
               <div><span>Due</span><strong>${formatInr(childTotals.netDue)}</strong></div>
               <div><span>Not Due</span><strong>${formatInr(childTotals.notDue)}</strong></div>
-              <div><span>Visits</span><strong>${childTotals.visitsDone}/${childTotals.visitsPlanned}</strong></div>
-              <div><span>Issues</span><strong>${childTotals.openIssues} Open</strong></div>
+              <div><span>Issue resolution</span><strong>${formatPct(childTotals.issueResolutionPct)}</strong></div>
+              <div><span>Past TAT</span><strong>${childTotals.pastTat} cases</strong></div>
             </div>
             <div class="teamMemberFoot">
-              <span>MTD ${formatInr(childTotals.mtdCollection)}</span>
-              <span>Achv ${formatPct(childTotals.achievementPct)}</span>
-              <span>Callbacks ${childTotals.callbacks}</span>
+              <span>Collections ${formatCrCurrency(childTotals.collectionsCr)}</span>
+              <span>Expected ${formatCrCurrency(childTotals.projectedCr)}</span>
+              <span>Variance ${childTotals.varianceCr >= 0 ? "+" : "-"}${formatCrCurrency(Math.abs(childTotals.varianceCr))}</span>
             </div>
           </article>
         `;
