@@ -48,7 +48,7 @@
     const roleDashboards = {
       agent: "pages/Dashboard_Agent.html",
       manager: "pages/LPmanager.html",
-      supervisor: "pages/LPsupervisor.html",
+      supervisor: "pages/Dashboard_Supervisor.html",
       kam: "pages/KAM.html",
       kas: "pages/KAS.html",
       backend: "pages/LPbackend.html",
@@ -321,6 +321,7 @@
         <div class="submenu">
           <a class="submenu-link" href="${resolvePath("pages/Dashboard_Agent.html")}" data-module="dashboard-agent">Dashboard - Agent</a>
           <a class="submenu-link" href="${resolvePath("pages/dashManager.html")}" data-module="dashboard-manager">Dashboard - Manager</a>
+          <a class="submenu-link" href="${resolvePath("pages/Dashboard_Supervisor.html")}" data-module="dashboard-supervisor">Dashboard - Supervisor</a>
         </div>
       </li>
       <li class="menu-item">
@@ -704,6 +705,7 @@
             "landing-mis": "pages/LPmis.html",
             "dashboard-agent": "pages/Dashboard_Agent.html",
             "dashboard-manager": "pages/dashManager.html",
+            "dashboard-supervisor": "pages/Dashboard_Supervisor.html",
             "issue-tracker": "pages/issuetrackerLP.html",
             "issue-matrix": "bin/IssueTracker/escalationMatrix.html",
             "issue-approver": "bin/IssueTracker/approver-dashboard.html",
