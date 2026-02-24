@@ -147,6 +147,280 @@
       white-space: nowrap;
     }
 
+    #untouchedCasesModal .modal-body {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding-top: 12px;
+    }
+
+    .untouchedCasesKpiGrid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .untouchedCasesKpiCard {
+      border: 1px solid #dbe5f2;
+      border-radius: 10px;
+      background: #f8fbff;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      min-height: 84px;
+    }
+
+    .untouchedCasesKpiLabel {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #64748b;
+    }
+
+    .untouchedCasesKpiValue {
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.2;
+      color: #0f172a;
+    }
+
+    .untouchedCasesKpiMeta {
+      font-size: 11px;
+      color: #64748b;
+    }
+
+    .untouchedCasesGranularity {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid #dbe5f2;
+      border-radius: 999px;
+      background: #fff;
+      overflow: hidden;
+    }
+
+    .untouchedGranularityBtn {
+      border: 0;
+      border-right: 1px solid #e2e8f4;
+      background: transparent;
+      color: #475569;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 6px 10px;
+      line-height: 1;
+    }
+
+    .untouchedGranularityBtn:last-child {
+      border-right: 0;
+    }
+
+    .untouchedGranularityBtn.is-active {
+      background: #1d4ed8;
+      color: #fff;
+    }
+
+    .untouchedCasesContext {
+      font-size: 12px;
+      color: #334155;
+      padding: 0 2px;
+      text-align: left;
+    }
+
+    .untouchedCasesClearBtn {
+      border: 1px solid #dbe5f2;
+      border-radius: 999px;
+      background: #fff;
+      color: #334155;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 5px 10px;
+      line-height: 1.2;
+    }
+
+    .untouchedHeatmapHeader {
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .untouchedHeatmapHeaderLeft {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 8px;
+      flex: 1 1 auto;
+      min-width: 0;
+      flex-wrap: wrap;
+    }
+
+    .untouchedHeatmapHeaderLeft .untouchedCasesContext {
+      text-align: left;
+      color: #334155;
+    }
+
+    .untouchedHeatmapHeaderRight {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      flex: 0 0 auto;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .untouchedCasesLayout {
+      display: grid;
+      grid-template-columns: minmax(0, 40%) minmax(0, 60%);
+      gap: 10px;
+      min-height: 0;
+      align-items: start;
+    }
+
+    .untouchedPanelCard {
+      border: 1px solid #dbe5f2;
+      border-radius: 10px;
+      background: #fff;
+      padding: 10px;
+      min-height: 0;
+    }
+
+    .untouchedPanelHeader {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .untouchedPanelHeader h6 {
+      margin: 0;
+      font-size: 14px;
+      color: #0f172a;
+    }
+
+    .untouchedPanelHeader span {
+      font-size: 11px;
+      color: #64748b;
+      text-align: right;
+    }
+
+    .untouchedHeatmapSubmeta {
+      font-size: 11px;
+      color: #64748b;
+      margin-bottom: 8px;
+    }
+
+    .untouchedHeatmapWrap {
+      overflow: auto;
+      border: 1px solid #e2e8f4;
+      border-radius: 8px;
+    }
+
+    .untouchedHeatmapTable {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 420px;
+    }
+
+    .untouchedHeatmapTable th,
+    .untouchedHeatmapTable td {
+      padding: 7px 8px;
+      border-bottom: 1px solid #e2e8f4;
+      border-right: 1px solid #e2e8f4;
+      font-size: 11px;
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    .untouchedHeatmapTable th:first-child,
+    .untouchedHeatmapTable td:first-child {
+      text-align: left;
+      font-weight: 700;
+      color: #334155;
+      white-space: nowrap;
+      background: #f8fafc;
+      min-width: 82px;
+    }
+
+    .untouchedHeatmapTable th:last-child,
+    .untouchedHeatmapTable td:last-child {
+      border-right: 0;
+    }
+
+    .untouchedHeatmapTable tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .untouchedHeatCell {
+      --heat-level: 0;
+      background: hsl(218 90% calc(98% - (var(--heat-level) * 30%)));
+      color: #0f172a;
+      font-weight: 700;
+      min-width: 62px;
+    }
+
+    .untouchedHeatCell.is-strong {
+      color: #fff;
+    }
+
+    .untouchedHeatLegend {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+      font-size: 10px;
+      color: #64748b;
+    }
+
+    .untouchedHeatLegendBar {
+      flex: 1;
+      height: 8px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #e0edff 0%, #1d4ed8 100%);
+      border: 1px solid #cbd5e1;
+    }
+
+    .untouchedCasesTablePane .tableWrap {
+      max-height: min(45vh, 430px);
+      overflow: auto;
+    }
+
+    .untouchedCasesTableSearch {
+      min-width: min(360px, 100%);
+      width: min(360px, 100%);
+      margin: 0 0 8px;
+      justify-content: flex-start;
+    }
+
+    #untouchedCasesModal .mtdCollectionTable tbody tr {
+      cursor: pointer;
+      transition: background-color 140ms ease;
+    }
+
+    #untouchedCasesModal .mtdCollectionTable tbody tr:hover {
+      background: #f8fafc;
+    }
+
+    #untouchedCasesModal .mtdCollectionTable tbody tr.is-selected {
+      background: #eff6ff;
+    }
+
+    #untouchedCasesModal .mtdCollectionTable tbody tr.is-selected td:first-child {
+      color: #1d4ed8;
+      font-weight: 700;
+    }
+
+    @media (max-width: 1200px) {
+      .untouchedCasesKpiGrid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .untouchedCasesLayout {
+        grid-template-columns: 1fr;
+      }
+    }
+
     /* Supervisor: DSO detail view mirrors ui-elements table/filter theme. */
     #chartDetailModal.is-dso-detail .modal-body {
       max-height: calc(100vh - 150px);
@@ -820,6 +1094,205 @@
           "target-side"
           "target-chart"
           "target-table";
+      }
+    }
+
+    .projectedDetailLayout {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .projectedScenarioGrid {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .projectedMetricCard {
+      border: 1px solid #dbe5f2;
+      border-radius: 12px;
+      background: #f8fbff;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-height: 92px;
+    }
+
+    .projectedMetricLabel {
+      font-size: 12px;
+      line-height: 1.2;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: #64748b;
+    }
+
+    .projectedMetricValue {
+      margin: 0;
+      font-size: 20px;
+      line-height: 1.2;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .projectedMetricMeta {
+      font-size: 12px;
+      color: #475569;
+    }
+
+    .projectedMetricCard.is-best {
+      border-color: #bbf7d0;
+      background: #f0fdf4;
+    }
+
+    .projectedMetricCard.is-worst {
+      border-color: #fecaca;
+      background: #fef2f2;
+    }
+
+    .projectedMetricCard.is-gap {
+      border-color: #bfdbfe;
+      background: #eff6ff;
+    }
+
+    .projectedBodyGrid {
+      display: grid;
+      grid-template-columns: minmax(0, 68%) minmax(0, 32%);
+      gap: 12px;
+      align-items: start;
+    }
+
+    .projectedPanelCard {
+      border: 1px solid #dbe5f2;
+      border-radius: 12px;
+      background: #fff;
+      padding: 10px 12px;
+      min-height: 0;
+    }
+
+    .projectedPanelHeader {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .projectedPanelHeader h6 {
+      margin: 0;
+      font-size: 15px;
+      color: #0f172a;
+    }
+
+    .projectedPanelHeader span {
+      font-size: 12px;
+      color: #64748b;
+      text-align: right;
+    }
+
+    .projectedForecastChartWrap {
+      min-height: 320px;
+      height: clamp(280px, 38vh, 420px);
+    }
+
+    .projectedCustomerPanel {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      overflow: hidden;
+    }
+
+    .projectedCustomerTableWrap {
+      max-height: min(54vh, 520px);
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    .projectedCustomerPanel .tableFilterSearch {
+      display: flex;
+      width: 100%;
+      min-width: 0;
+      max-width: 100%;
+      box-sizing: border-box;
+      margin: 0;
+    }
+
+    .projectedCustomerPanel .activityTableFilters {
+      width: 100%;
+      padding: 1px 0;
+      margin-bottom: 8px;
+    }
+
+    .projectedCustomerPanel .activityTableFilters .filterRow {
+      width: 100%;
+      min-width: 0;
+    }
+
+    .projectedCustomerTable.activityDetailTable {
+      width: 100%;
+      min-width: 0;
+      margin: 0;
+      table-layout: fixed;
+    }
+
+    .projectedCustomerTable th,
+    .projectedCustomerTable td {
+      min-width: 0;
+      padding: 4px 5px;
+    }
+
+    .projectedCustomerTable th:nth-child(1),
+    .projectedCustomerTable td:nth-child(1) {
+      width: 22%;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    .projectedCustomerTable th:nth-child(2),
+    .projectedCustomerTable td:nth-child(2) {
+      width: 36%;
+      text-align: left;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .projectedCustomerTable th:nth-child(3),
+    .projectedCustomerTable td:nth-child(3),
+    .projectedCustomerTable th:nth-child(4),
+    .projectedCustomerTable td:nth-child(4) {
+      width: 21%;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .projectedCustomerTable tbody tr {
+      cursor: pointer;
+      transition: background-color 140ms ease;
+    }
+
+    .projectedCustomerTable tbody tr:hover {
+      background: #f8fafc;
+    }
+
+    .projectedCustomerTable tbody tr.is-selected {
+      background: #eff6ff;
+    }
+
+    .projectedCustomerTable tbody tr.is-selected td:first-child {
+      color: #1d4ed8;
+      font-weight: 700;
+    }
+
+    @media (max-width: 1100px) {
+      .projectedScenarioGrid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .projectedBodyGrid {
+        grid-template-columns: 1fr;
       }
     }
   </style>
@@ -1654,6 +2127,65 @@
             </article>
           </section>
         </div>
+        <div class="projectedDetailLayout" id="projectedDetailLayout" hidden>
+          <section class="projectedScenarioGrid">
+            <article class="projectedMetricCard">
+              <span class="projectedMetricLabel">Base Forecast (EOM)</span>
+              <strong class="projectedMetricValue" id="projectedBaseForecastValue">Rs. 0.00 Cr</strong>
+              <span class="projectedMetricMeta" id="projectedBaseForecastMeta">Current run-rate outcome</span>
+            </article>
+            <article class="projectedMetricCard is-best">
+              <span class="projectedMetricLabel">Best Case</span>
+              <strong class="projectedMetricValue" id="projectedBestCaseValue">Rs. 0.00 Cr</strong>
+              <span class="projectedMetricMeta" id="projectedBestCaseMeta">Upside scenario (+8%)</span>
+            </article>
+            <article class="projectedMetricCard is-worst">
+              <span class="projectedMetricLabel">Worst Case</span>
+              <strong class="projectedMetricValue" id="projectedWorstCaseValue">Rs. 0.00 Cr</strong>
+              <span class="projectedMetricMeta" id="projectedWorstCaseMeta">Downside scenario (-10%)</span>
+            </article>
+            <article class="projectedMetricCard is-gap">
+              <span class="projectedMetricLabel">Gap to Commitment</span>
+              <strong class="projectedMetricValue" id="projectedGapCommitmentValue">Rs. 0.00 Cr</strong>
+              <span class="projectedMetricMeta" id="projectedGapCommitmentMeta">Shortfall at base forecast</span>
+            </article>
+          </section>
+          <section class="projectedBodyGrid">
+            <article class="projectedPanelCard">
+              <div class="projectedPanelHeader">
+                <h6>Projected month-end scenarios</h6>
+                <span id="projectedChartMeta">Base, best and worst trajectories from current run-rate.</span>
+              </div>
+              <div class="projectedForecastChartWrap">
+                <canvas id="projectedForecastCanvas"></canvas>
+              </div>
+            </article>
+            <article class="projectedPanelCard projectedCustomerPanel">
+              <div class="tableFilters activityTableFilters">
+                <div class="filterRow">
+                  <label class="tableFilterSearch" for="projectedCustomerSearch">
+                    <i class="bi bi-search" aria-hidden="true"></i>
+                    <input type="search" id="projectedCustomerSearch" placeholder="Search customer name or code" autocomplete="off" />
+                  </label>
+                </div>
+              </div>
+              <div class="activityDetailTableWrap projectedCustomerTableWrap">
+                <table class="activityDetailTable projectedCustomerTable">
+                  <thead>
+                    <tr>
+                      <th>Customer code</th>
+                      <th>Customer Name</th>
+                      <th>Projected</th>
+                      <th>Net Due</th>
+                    </tr>
+                  </thead>
+                  <tbody id="projectedCustomerTableBody"></tbody>
+                </table>
+              </div>
+              <div class="activityDetailMeta" id="projectedCustomerMeta"></div>
+            </article>
+          </section>
+        </div>
         <div class="modalHighlights" id="chartDetailHighlights"></div>
       </div>
     </div>
@@ -1804,35 +2336,94 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <div class="tableFilters mtdTableFilters">
-          <div class="filterRow mtdFiltersRow">
-            <label class="tableFilterSearch" for="untouchedCasesSearch">
+        <section class="untouchedCasesKpiGrid" aria-label="Untouched cases summary">
+          <article class="untouchedCasesKpiCard">
+            <span class="untouchedCasesKpiLabel">Untouched Cases</span>
+            <strong class="untouchedCasesKpiValue" id="untouchedCasesKpiCount">0</strong>
+            <span class="untouchedCasesKpiMeta">Latest period case count</span>
+          </article>
+          <article class="untouchedCasesKpiCard">
+            <span class="untouchedCasesKpiLabel">Untouched Amount</span>
+            <strong class="untouchedCasesKpiValue" id="untouchedCasesKpiAmount">Rs. 0</strong>
+            <span class="untouchedCasesKpiMeta">Latest period untouched value</span>
+          </article>
+          <article class="untouchedCasesKpiCard">
+            <span class="untouchedCasesKpiLabel">Avg Untouched Days</span>
+            <strong class="untouchedCasesKpiValue" id="untouchedCasesKpiAvgDays">0d</strong>
+            <span class="untouchedCasesKpiMeta">Weighted by case count</span>
+          </article>
+          <article class="untouchedCasesKpiCard">
+            <span class="untouchedCasesKpiLabel">High-risk Cases (1 year+)</span>
+            <strong class="untouchedCasesKpiValue" id="untouchedCasesKpiHighRisk">0</strong>
+            <span class="untouchedCasesKpiMeta">Latest period in 1 year+ aging</span>
+          </article>
+        </section>
+        <section class="untouchedCasesLayout">
+          <article class="untouchedPanelCard">
+            <div class="untouchedPanelHeader untouchedHeatmapHeader">
+              <div class="untouchedHeatmapHeaderLeft">
+                <h6>Aging heatmap</h6>
+                <span class="untouchedCasesContext" id="untouchedCasesContextLabel">All customers</span>
+              </div>
+              <div class="untouchedHeatmapHeaderRight">
+                <div class="untouchedCasesGranularity" role="tablist" aria-label="Aging granularity">
+                  <button type="button" class="untouchedGranularityBtn is-active" id="untouchedGranularityMonthlyBtn" data-untouched-granularity="monthly">Monthly</button>
+                  <button type="button" class="untouchedGranularityBtn" id="untouchedGranularityQuarterlyBtn" data-untouched-granularity="quarterly">Quarterly</button>
+                  <button type="button" class="untouchedGranularityBtn" id="untouchedGranularityYearlyBtn" data-untouched-granularity="yearly">Yearly</button>
+                </div>
+                <button type="button" class="untouchedCasesClearBtn" id="untouchedCasesClearSelectionBtn" hidden>Clear selection</button>
+              </div>
+            </div>
+            <div class="untouchedHeatmapSubmeta" id="untouchedHeatmapMeta">Monthly bucket distribution (last 6 months)</div>
+            <div class="untouchedHeatmapWrap">
+              <table class="untouchedHeatmapTable">
+                <thead>
+                  <tr>
+                    <th>Period</th>
+                    <th>0-30 days</th>
+                    <th>31-60</th>
+                    <th>61-120 days</th>
+                    <th>120-365 days</th>
+                    <th>1year+</th>
+                  </tr>
+                </thead>
+                <tbody id="untouchedHeatmapBody"></tbody>
+              </table>
+            </div>
+            <div class="untouchedHeatLegend" aria-label="Heatmap intensity legend">
+              <span>Low</span>
+              <span class="untouchedHeatLegendBar" aria-hidden="true"></span>
+              <span>High</span>
+            </div>
+          </article>
+          <article class="untouchedPanelCard untouchedCasesTablePane">
+            <label class="tableFilterSearch untouchedCasesTableSearch" for="untouchedCasesSearch">
               <i class="bi bi-search" aria-hidden="true"></i>
               <input type="search" id="untouchedCasesSearch" placeholder="Search customer name or code" autocomplete="off" />
             </label>
-          </div>
-        </div>
-        <div class="tableWrap">
-          <table class="invoiceTable mtdCollectionTable">
-            <thead>
-              <tr>
-                <th>Customer Code</th>
-                <th>Customer Name</th>
-                <th>Untouched Invoice Value</th>
-                <th>Untouched Invoice Count</th>
-                <th>Untouched days</th>
-              </tr>
-            </thead>
-            <tbody id="untouchedCasesTableBody"></tbody>
-          </table>
-        </div>
-        <div class="tablePagination mtdTablePagination" id="untouchedCasesPagination">
-          <div class="paginationInfo" id="untouchedCasesPaginationInfo">Showing 0-0 of 0</div>
-          <div class="mtdPaginationActions">
-            <button type="button" class="mtdPageBtn" id="untouchedCasesPrevBtn">Previous</button>
-            <button type="button" class="mtdPageBtn" id="untouchedCasesNextBtn">Next</button>
-          </div>
-        </div>
+            <div class="tableWrap">
+              <table class="invoiceTable mtdCollectionTable">
+                <thead>
+                  <tr>
+                    <th>Customer Code</th>
+                    <th>Customer Name</th>
+                    <th>Untouched Invoice Value</th>
+                    <th>Untouched Invoice Count</th>
+                    <th>Untouched days</th>
+                  </tr>
+                </thead>
+                <tbody id="untouchedCasesTableBody"></tbody>
+              </table>
+            </div>
+            <div class="tablePagination mtdTablePagination" id="untouchedCasesPagination">
+              <div class="paginationInfo" id="untouchedCasesPaginationInfo">Showing 0-0 of 0</div>
+              <div class="mtdPaginationActions">
+                <button type="button" class="mtdPageBtn" id="untouchedCasesPrevBtn">Previous</button>
+                <button type="button" class="mtdPageBtn" id="untouchedCasesNextBtn">Next</button>
+              </div>
+            </div>
+          </article>
+        </section>
       </div>
     </div>
   </div>
@@ -2159,8 +2750,8 @@
         ]
       },
       projectedCollection: {
-        title: "Projected Collection",
-        meta: "Projected month-end amount based on current run-rate",
+        title: "Projected Collection Forecast",
+        meta: "Scenario-based month-end forecast from current run-rate",
         type: "line",
         data: { labels: [], datasets: [] },
         highlights: []
@@ -2844,6 +3435,7 @@
     const cashflowDetailPrevWeekPageItem = cashflowDetailPrevWeekBtn ? cashflowDetailPrevWeekBtn.closest(".page-item") : null;
     const cashflowDetailNextWeekPageItem = cashflowDetailNextWeekBtn ? cashflowDetailNextWeekBtn.closest(".page-item") : null;
     const targetDetailLayout = document.getElementById("targetDetailLayout");
+    const projectedDetailLayout = document.getElementById("projectedDetailLayout");
     const targetCommitmentValue = document.getElementById("targetCommitmentValue");
     const targetCommitmentMeta = document.getElementById("targetCommitmentMeta");
     const targetAchievedValue = document.getElementById("targetAchievedValue");
@@ -2869,6 +3461,19 @@
     const targetCustomerSearch = document.getElementById("targetCustomerSearch");
     const targetCustomerTableBody = document.getElementById("targetCustomerTableBody");
     const targetCustomerMeta = document.getElementById("targetCustomerMeta");
+    const projectedBaseForecastValue = document.getElementById("projectedBaseForecastValue");
+    const projectedBaseForecastMeta = document.getElementById("projectedBaseForecastMeta");
+    const projectedBestCaseValue = document.getElementById("projectedBestCaseValue");
+    const projectedBestCaseMeta = document.getElementById("projectedBestCaseMeta");
+    const projectedWorstCaseValue = document.getElementById("projectedWorstCaseValue");
+    const projectedWorstCaseMeta = document.getElementById("projectedWorstCaseMeta");
+    const projectedGapCommitmentValue = document.getElementById("projectedGapCommitmentValue");
+    const projectedGapCommitmentMeta = document.getElementById("projectedGapCommitmentMeta");
+    const projectedChartMeta = document.getElementById("projectedChartMeta");
+    const projectedForecastCanvas = document.getElementById("projectedForecastCanvas");
+    const projectedCustomerSearch = document.getElementById("projectedCustomerSearch");
+    const projectedCustomerTableBody = document.getElementById("projectedCustomerTableBody");
+    const projectedCustomerMeta = document.getElementById("projectedCustomerMeta");
     let modalChart = null;
     let activityDetailChart = null;
     let issueDetailChart = null;
@@ -2878,6 +3483,7 @@
     let creditUtilDetailChart = null;
     let cashflowDetailChart = null;
     let targetPaceChart = null;
+    let projectedForecastChart = null;
     const activityPageSize = 10;
     const issuePageSize = 10;
     const dsoPageSize = 5;
@@ -2923,6 +3529,11 @@
     const targetDetailState = {
       mode: "target",
       customerSearch: ""
+    };
+    const projectedDetailState = {
+      customerSearch: "",
+      sortOrder: "projected_desc",
+      selectedCustomerCode: ""
     };
     const targetDetailSnapshot = {
       monthLabel: "Feb 2026",
@@ -3828,11 +4439,271 @@
       });
     };
 
+    const buildProjectedScenarioModel = (snapshot, selectedCustomerRow = null) => {
+      const paceSeries = buildTargetPaceSeries(snapshot);
+      const daysInMonth = Math.max(1, Number(snapshot.daysInMonth) || 1);
+      const daysElapsed = Math.min(daysInMonth, Math.max(1, Number(snapshot.dayOfMonth) || 1));
+      const portfolioTargetCr = Number(snapshot.targetCr || 0);
+      const portfolioAchievedMtd = Number(paceSeries.achievedMtd || snapshot.achievedCr || 0);
+      const daysLeft = Math.max(0, daysInMonth - daysElapsed);
+      const fallbackFutureDaily = daysElapsed > 0 ? portfolioAchievedMtd / daysElapsed : 0;
+      const projectedFutureDailyPortfolio = Array.from({ length: daysLeft }, (_, index) => (
+        Math.max(0, Number(snapshot.projectedFutureDailyCollectionsCr?.[index] || fallbackFutureDaily))
+      ));
+      const projectedFutureTotalPortfolio = projectedFutureDailyPortfolio.reduce((sum, value) => sum + Number(value || 0), 0);
+      const portfolioBaseEomCr = Number((portfolioAchievedMtd + projectedFutureTotalPortfolio).toFixed(2));
+
+      const distributeByWeights = (totalValue, weights) => {
+        const safeTotal = Math.max(0, Number(totalValue || 0));
+        const normalizedWeights = Array.isArray(weights) ? weights.map((value) => Math.max(0, Number(value || 0))) : [];
+        const sumWeights = normalizedWeights.reduce((sum, value) => sum + value, 0);
+        if (!normalizedWeights.length) return [];
+        if (sumWeights <= 0) {
+          const evenValue = normalizedWeights.length > 0 ? safeTotal / normalizedWeights.length : 0;
+          return normalizedWeights.map(() => Number(evenValue.toFixed(4)));
+        }
+        return normalizedWeights.map((value) => Number(((safeTotal * value) / sumWeights).toFixed(4)));
+      };
+
+      const buildCumulative = (dailySeries) => {
+        let running = 0;
+        return dailySeries.map((value) => {
+          running += Number(value || 0);
+          return Number(running.toFixed(2));
+        });
+      };
+
+      const actualDailyPortfolio = Array.from({ length: daysElapsed }, (_, index) => {
+        if (index === 0) return Number(paceSeries.cumulativeActual[0] || 0);
+        const current = Number(paceSeries.cumulativeActual[index] || 0);
+        const previous = Number(paceSeries.cumulativeActual[index - 1] || 0);
+        return Number(Math.max(0, current - previous).toFixed(4));
+      });
+
+      let scenarioTargetRef = portfolioTargetCr;
+      let scenarioAchievedMtd = portfolioAchievedMtd;
+      let scenarioFutureDaily = projectedFutureDailyPortfolio.slice();
+      let cumulativeActualSeries = paceSeries.cumulativeActual.slice();
+      let selectedCustomerCode = "";
+
+      if (selectedCustomerRow) {
+        selectedCustomerCode = String(selectedCustomerRow.customerCode || "");
+        const customerBaseEomCr = Math.max(0, Number(selectedCustomerRow.projectedCr || 0));
+        const customerTargetRef = Math.max(0, Number(selectedCustomerRow.netDueCr || 0));
+        const achievedRatio = portfolioBaseEomCr > 0
+          ? Math.max(0, Math.min(1, portfolioAchievedMtd / portfolioBaseEomCr))
+          : 0;
+        const customerAchievedMtd = Number((customerBaseEomCr * achievedRatio).toFixed(2));
+        const customerFutureTotal = Number(Math.max(0, customerBaseEomCr - customerAchievedMtd).toFixed(2));
+        const customerActualDaily = distributeByWeights(customerAchievedMtd, actualDailyPortfolio);
+        scenarioFutureDaily = distributeByWeights(customerFutureTotal, projectedFutureDailyPortfolio);
+        const customerCumulativeActualElapsed = buildCumulative(customerActualDaily);
+        cumulativeActualSeries = paceSeries.labels.map((_, index) => (
+          index < daysElapsed ? customerCumulativeActualElapsed[index] : null
+        ));
+        scenarioTargetRef = customerTargetRef;
+        scenarioAchievedMtd = customerAchievedMtd;
+      }
+
+      const scenarioFutureTotal = scenarioFutureDaily.reduce((sum, value) => sum + Number(value || 0), 0);
+      const baseEomCr = Number((scenarioAchievedMtd + scenarioFutureTotal).toFixed(2));
+      const bestEomCr = Number((baseEomCr * 1.08).toFixed(2));
+      const worstEomCr = Number((baseEomCr * 0.9).toFixed(2));
+      const gapToCommitmentCr = Number(Math.max(0, scenarioTargetRef - baseEomCr).toFixed(2));
+
+      const buildScenarioLine = (multiplier) => (
+        paceSeries.labels.map((_, index) => {
+          const day = index + 1;
+          if (day < daysElapsed) return null;
+          if (day === daysElapsed) return Number(cumulativeActualSeries[index] || scenarioAchievedMtd);
+          const futureDaysCovered = day - daysElapsed;
+          const projectedFuture = scenarioFutureDaily
+            .slice(0, futureDaysCovered)
+            .reduce((sum, value) => sum + Number(value || 0), 0);
+          const scenarioValue = (scenarioAchievedMtd + projectedFuture) * multiplier;
+          return Number(scenarioValue.toFixed(2));
+        })
+      );
+
+      return {
+        labels: paceSeries.labels,
+        cumulativeActual: cumulativeActualSeries,
+        baseLine: buildScenarioLine(1),
+        bestLine: buildScenarioLine(1.08),
+        worstLine: buildScenarioLine(0.9),
+        baseEomCr,
+        bestEomCr,
+        worstEomCr,
+        gapToCommitmentCr,
+        selectedCustomerCode
+      };
+    };
+
+    const getProjectedCustomerRows = () => {
+      const searchTerm = projectedDetailState.customerSearch.trim().toLowerCase();
+      return targetCustomerProjectionRows
+        .filter((row) => (
+          !searchTerm
+          || row.customerName.toLowerCase().includes(searchTerm)
+          || row.customerCode.toLowerCase().includes(searchTerm)
+        ))
+        .slice()
+        .sort((a, b) => (
+          projectedDetailState.sortOrder === "projected_desc"
+            ? Number(b.projectedCr || 0) - Number(a.projectedCr || 0) || Number(b.netDueCr || 0) - Number(a.netDueCr || 0)
+            : Number(a.projectedCr || 0) - Number(b.projectedCr || 0) || Number(a.netDueCr || 0) - Number(b.netDueCr || 0)
+        ));
+    };
+
+    const getProjectedSelectedCustomerRow = () => (
+      targetCustomerProjectionRows.find((row) => row.customerCode === projectedDetailState.selectedCustomerCode) || null
+    );
+
+    const renderProjectedCustomerTable = () => {
+      if (!projectedCustomerTableBody) return;
+      const rows = getProjectedCustomerRows();
+      if (!rows.length) {
+        projectedCustomerTableBody.innerHTML = `<tr><td colspan="4" class="activityDetailTableEmpty">No customers match the search.</td></tr>`;
+      } else {
+        projectedCustomerTableBody.innerHTML = rows.map((row) => `
+          <tr data-customer-code="${safeHtml(row.customerCode)}" class="${row.customerCode === projectedDetailState.selectedCustomerCode ? "is-selected" : ""}">
+            <td>${safeHtml(row.customerCode)}</td>
+            <td>${safeHtml(row.customerName)}</td>
+            <td>${formatCrCurrency(row.projectedCr)}</td>
+            <td>${formatCrCurrency(row.netDueCr)}</td>
+          </tr>
+        `).join("");
+      }
+      if (projectedCustomerMeta) {
+        const selectedCustomerRow = getProjectedSelectedCustomerRow();
+        const selectedText = selectedCustomerRow
+          ? ` | Selected: ${selectedCustomerRow.customerCode} - ${selectedCustomerRow.customerName}`
+          : "";
+        projectedCustomerMeta.textContent = `${rows.length} customer${rows.length === 1 ? "" : "s"} shown in projected view.${selectedText}`;
+      }
+    };
+
+    const renderProjectedDetail = () => {
+      const selectedCustomerRow = getProjectedSelectedCustomerRow();
+      const summaryScenario = buildProjectedScenarioModel(targetDetailSnapshot);
+      const chartScenario = buildProjectedScenarioModel(targetDetailSnapshot, selectedCustomerRow);
+      if (projectedBaseForecastValue) projectedBaseForecastValue.textContent = formatCrCurrency(summaryScenario.baseEomCr);
+      if (projectedBaseForecastMeta) projectedBaseForecastMeta.textContent = `${targetDetailSnapshot.monthLabel} base run-rate scenario`;
+      if (projectedBestCaseValue) projectedBestCaseValue.textContent = formatCrCurrency(summaryScenario.bestEomCr);
+      if (projectedBestCaseMeta) projectedBestCaseMeta.textContent = "Upside scenario (+8%)";
+      if (projectedWorstCaseValue) projectedWorstCaseValue.textContent = formatCrCurrency(summaryScenario.worstEomCr);
+      if (projectedWorstCaseMeta) projectedWorstCaseMeta.textContent = "Downside scenario (-10%)";
+      if (projectedGapCommitmentValue) projectedGapCommitmentValue.textContent = formatCrCurrency(summaryScenario.gapToCommitmentCr);
+      if (projectedGapCommitmentMeta) {
+        projectedGapCommitmentMeta.textContent = summaryScenario.gapToCommitmentCr > 0
+          ? "Shortfall vs commitment at base scenario"
+          : "Base scenario meets commitment";
+      }
+      if (projectedChartMeta) {
+        projectedChartMeta.textContent = selectedCustomerRow
+          ? `Showing customer trend: ${selectedCustomerRow.customerCode} - ${selectedCustomerRow.customerName}`
+          : "Base, best (+8%) and worst (-10%) scenario band for month-end.";
+      }
+      renderProjectedCustomerTable();
+      if (!projectedForecastCanvas) return;
+      if (projectedForecastChart) {
+        projectedForecastChart.destroy();
+        projectedForecastChart = null;
+      }
+      projectedForecastChart = new Chart(projectedForecastCanvas.getContext("2d"), {
+        type: "line",
+        data: {
+          labels: chartScenario.labels,
+          datasets: [
+            {
+              label: "Actual (MTD)",
+              data: chartScenario.cumulativeActual,
+              borderColor: palette.blue,
+              backgroundColor: palette.blueLight,
+              borderWidth: 2,
+              pointRadius: 2,
+              pointHoverRadius: 4,
+              tension: 0.35,
+              fill: true
+            },
+            {
+              label: "Best case",
+              data: chartScenario.bestLine,
+              borderColor: "#16a34a",
+              borderWidth: 2,
+              pointRadius: 0,
+              tension: 0.25,
+              fill: false
+            },
+            {
+              label: "Worst case",
+              data: chartScenario.worstLine,
+              borderColor: "#dc2626",
+              backgroundColor: "rgba(15, 118, 110, 0.14)",
+              borderWidth: 2,
+              pointRadius: 0,
+              tension: 0.25,
+              fill: "-1"
+            },
+            {
+              label: "Base forecast",
+              data: chartScenario.baseLine,
+              borderColor: "#0f766e",
+              borderDash: [5, 4],
+              borderWidth: 2,
+              pointRadius: 0,
+              tension: 0.25,
+              fill: false
+            }
+          ]
+        },
+        options: {
+          ...baseOptions,
+          interaction: { mode: "index", intersect: false },
+          plugins: {
+            ...baseOptions.plugins,
+            tooltip: {
+              ...baseOptions.plugins.tooltip,
+              callbacks: {
+                label: (context) => {
+                  const value = context.parsed?.y;
+                  if (value == null) return `${context.dataset.label}: -`;
+                  return `${context.dataset.label}: ${formatCrCurrency(value)}`;
+                }
+              }
+            },
+            legend: {
+              position: "bottom",
+              labels: { boxWidth: 12, usePointStyle: true, pointStyle: "line" }
+            }
+          },
+          scales: {
+            x: {
+              grid: { color: "rgba(148, 163, 184, 0.16)" },
+              ticks: {
+                color: "#64748b",
+                maxTicksLimit: 8,
+                autoSkip: true
+              }
+            },
+            y: {
+              beginAtZero: true,
+              grid: { color: "rgba(148, 163, 184, 0.18)" },
+              ticks: {
+                color: "#64748b",
+                callback: (value) => formatCrCurrency(value)
+              }
+            }
+          }
+        }
+      });
+    };
+
     const applyProjectedCollectionCardConfiguration = () => {
       const projectedCollectionCardValue = document.getElementById("projectedCollectionCardValue");
       if (!projectedCollectionCardValue) return;
-      const paceSeries = buildTargetPaceSeries(targetDetailSnapshot);
-      projectedCollectionCardValue.textContent = formatCrCurrency(paceSeries.projectedEomCr || 0);
+      const scenario = buildProjectedScenarioModel(targetDetailSnapshot);
+      projectedCollectionCardValue.textContent = formatCrCurrency(scenario.baseEomCr || 0);
     };
 
     applyProjectedCollectionCardConfiguration();
@@ -3841,6 +4712,29 @@
       targetCustomerSearch.addEventListener("input", (event) => {
         targetDetailState.customerSearch = event.target.value || "";
         renderTargetCustomerTable();
+      });
+    }
+
+    if (projectedCustomerSearch) {
+      projectedCustomerSearch.addEventListener("input", (event) => {
+        projectedDetailState.customerSearch = event.target.value || "";
+        const visibleRows = getProjectedCustomerRows();
+        const selectedStillVisible = visibleRows.some((row) => row.customerCode === projectedDetailState.selectedCustomerCode);
+        if (!selectedStillVisible) {
+          projectedDetailState.selectedCustomerCode = "";
+        }
+        renderProjectedDetail();
+      });
+    }
+
+    if (projectedCustomerTableBody) {
+      projectedCustomerTableBody.addEventListener("click", (event) => {
+        const rowEl = event.target.closest("tr[data-customer-code]");
+        if (!rowEl) return;
+        const customerCode = String(rowEl.getAttribute("data-customer-code") || "").trim();
+        if (!customerCode) return;
+        projectedDetailState.selectedCustomerCode = projectedDetailState.selectedCustomerCode === customerCode ? "" : customerCode;
+        renderProjectedDetail();
       });
     }
 
@@ -5426,6 +6320,16 @@
             targetPaceChart = null;
           }
         }
+        if (modalEl.classList.contains("is-projected-collection-detail")) {
+          modalEl.classList.remove("is-projected-collection-detail");
+          projectedDetailState.customerSearch = "";
+          projectedDetailState.selectedCustomerCode = "";
+          if (projectedCustomerSearch) projectedCustomerSearch.value = "";
+          if (projectedForecastChart) {
+            projectedForecastChart.destroy();
+            projectedForecastChart = null;
+          }
+        }
       });
     }
 
@@ -5440,17 +6344,20 @@
       const isDsoDetail = key === "dso";
       const isCreditUtilDetail = key === "creditUtilization";
       const isCashflowDetail = key === "cashflow";
-      const isTargetDetail = key === "planActual" || key === "projectedCollection";
+      const isTargetDetail = key === "planActual";
+      const isProjectedCollectionDetail = key === "projectedCollection";
+      const useTargetDetailModalFrame = isTargetDetail || isProjectedCollectionDetail;
       if (modalEl) {
         modalEl.classList.toggle("is-activity-detail", isActivityDetail);
         modalEl.classList.toggle("is-issue-detail", isIssueDetail);
         modalEl.classList.toggle("is-dso-detail", isDsoDetail);
         modalEl.classList.toggle("is-credit-util-detail", isCreditUtilDetail);
         modalEl.classList.toggle("is-cashflow-detail", isCashflowDetail);
-        modalEl.classList.toggle("is-target-detail", isTargetDetail);
+        modalEl.classList.toggle("is-target-detail", useTargetDetailModalFrame);
+        modalEl.classList.toggle("is-projected-collection-detail", isProjectedCollectionDetail);
       }
       if (modalCanvas) {
-        modalCanvas.parentElement.hidden = isVintageDetail || isActivityDetail || isIssueDetail || isDsoDetail || isCreditUtilDetail || isCashflowDetail || isTargetDetail;
+        modalCanvas.parentElement.hidden = isVintageDetail || isActivityDetail || isIssueDetail || isDsoDetail || isCreditUtilDetail || isCashflowDetail || isTargetDetail || isProjectedCollectionDetail;
       }
       if (vintageDetailTableWrap) {
         vintageDetailTableWrap.hidden = !isVintageDetail;
@@ -5473,8 +6380,11 @@
       if (targetDetailLayout) {
         targetDetailLayout.hidden = !isTargetDetail;
       }
+      if (projectedDetailLayout) {
+        projectedDetailLayout.hidden = !isProjectedCollectionDetail;
+      }
       if (modalHighlights) {
-        modalHighlights.hidden = isVintageDetail || isActivityDetail || isIssueDetail || isDsoDetail || isCreditUtilDetail || isCashflowDetail || isTargetDetail;
+        modalHighlights.hidden = isVintageDetail || isActivityDetail || isIssueDetail || isDsoDetail || isCreditUtilDetail || isCashflowDetail || isTargetDetail || isProjectedCollectionDetail;
         modalHighlights.innerHTML = config.highlights.map((item) => (
           `<div class="chartStat"><span>${item.label}</span><strong>${item.value}</strong></div>`
         )).join("");
@@ -5501,10 +6411,16 @@
         renderCashflowDetail();
       }
       if (isTargetDetail) {
-        targetDetailState.mode = key === "projectedCollection" ? "projected" : "target";
+        targetDetailState.mode = "target";
         targetDetailState.customerSearch = "";
         if (targetCustomerSearch) targetCustomerSearch.value = "";
-        renderTargetDetail({ mode: targetDetailState.mode });
+        renderTargetDetail({ mode: "target" });
+      }
+      if (isProjectedCollectionDetail) {
+        projectedDetailState.customerSearch = "";
+        projectedDetailState.selectedCustomerCode = "";
+        if (projectedCustomerSearch) projectedCustomerSearch.value = "";
+        renderProjectedDetail();
       }
       if (modalChart) {
         modalChart.destroy();
@@ -5534,7 +6450,11 @@
         targetPaceChart.destroy();
         targetPaceChart = null;
       }
-      if (modalCanvas && !isVintageDetail && !isActivityDetail && !isIssueDetail && !isDsoDetail && !isCreditUtilDetail && !isCashflowDetail && !isTargetDetail) {
+      if (projectedForecastChart && !isProjectedCollectionDetail) {
+        projectedForecastChart.destroy();
+        projectedForecastChart = null;
+      }
+      if (modalCanvas && !isVintageDetail && !isActivityDetail && !isIssueDetail && !isDsoDetail && !isCreditUtilDetail && !isCashflowDetail && !isTargetDetail && !isProjectedCollectionDetail) {
         const data = config.modalData || config.data;
         const options = { ...baseOptions, ...(config.modalOptions || config.options) };
         if (config.type === "doughnut") {
@@ -5848,11 +6768,20 @@
     const mtdKasFilterDropdown = document.getElementById("mtdKasFilterDropdown");
     const untouchedCasesModalEl = document.getElementById("untouchedCasesModal");
     const untouchedCasesCardCount = document.getElementById("untouchedCasesCardCount");
+    const untouchedCasesKpiCount = document.getElementById("untouchedCasesKpiCount");
+    const untouchedCasesKpiAmount = document.getElementById("untouchedCasesKpiAmount");
+    const untouchedCasesKpiAvgDays = document.getElementById("untouchedCasesKpiAvgDays");
+    const untouchedCasesKpiHighRisk = document.getElementById("untouchedCasesKpiHighRisk");
     const untouchedCasesTableBody = document.getElementById("untouchedCasesTableBody");
     const untouchedCasesSearchInput = document.getElementById("untouchedCasesSearch");
     const untouchedCasesPaginationInfo = document.getElementById("untouchedCasesPaginationInfo");
     const untouchedCasesPrevBtn = document.getElementById("untouchedCasesPrevBtn");
     const untouchedCasesNextBtn = document.getElementById("untouchedCasesNextBtn");
+    const untouchedCasesContextLabel = document.getElementById("untouchedCasesContextLabel");
+    const untouchedCasesClearSelectionBtn = document.getElementById("untouchedCasesClearSelectionBtn");
+    const untouchedHeatmapBody = document.getElementById("untouchedHeatmapBody");
+    const untouchedHeatmapMeta = document.getElementById("untouchedHeatmapMeta");
+    const untouchedGranularityButtons = Array.from(document.querySelectorAll("#untouchedCasesModal [data-untouched-granularity]"));
 
     const untouchedCasesData = [
       { customerCode: "CUST-001", customerName: "Apollo Pharmacy Pvt Ltd", untouchedInvoiceValue: 1240000, untouchedInvoiceCount: 4, untouchedDays: 9 },
@@ -5871,7 +6800,123 @@
     const untouchedCasesPageSize = 8;
     let untouchedCasesCurrentPage = 1;
     const untouchedCasesState = {
-      search: ""
+      search: "",
+      selectedCustomerCode: "",
+      agingGranularity: "monthly"
+    };
+    const untouchedHistoryCache = new Map();
+    const untouchedAgingBuckets = [
+      { key: "b0_30", label: "0-30 days" },
+      { key: "b31_60", label: "31-60 days" },
+      { key: "b61_120", label: "61-120 days" },
+      { key: "b120_365", label: "120-365 days" },
+      { key: "b1year_plus", label: "1year+" }
+    ];
+    const untouchedCaseFactors = {
+      monthly: [0.88, 0.93, 0.98, 1.03, 1.08, 1.12],
+      quarterly: [0.9, 0.98, 1.06, 1.14],
+      yearly: [0.86, 0.94, 1.01, 1.08, 1.16]
+    };
+    const untouchedAmountFactors = {
+      monthly: [0.9, 0.95, 1.0, 1.05, 1.09, 1.14],
+      quarterly: [0.92, 1.0, 1.08, 1.16],
+      yearly: [0.88, 0.96, 1.04, 1.11, 1.19]
+    };
+    const untouchedAgingMultipliers = {
+      monthly: [1.8, 2.6, 3.5, 4.6, 5.8, 6.6],
+      quarterly: [2.2, 3.6, 5.1, 6.8],
+      yearly: [2.5, 3.8, 5.4, 6.9, 8.2]
+    };
+    const untouchedReferenceDate = new Date(2026, 1, 1);
+    const untouchedGranularityLabel = {
+      monthly: "Monthly (last 6 months)",
+      quarterly: "Quarterly (last 4 quarters)",
+      yearly: "Yearly (last 5 years)"
+    };
+
+    const clampValue = (value, min, max) => Math.max(min, Math.min(max, value));
+
+    const getUntouchedPeriodLabels = (granularity) => {
+      const key = String(granularity || "monthly").toLowerCase();
+      if (key === "quarterly") {
+        const labels = [];
+        const baseYear = untouchedReferenceDate.getFullYear();
+        const baseQuarterIndex = Math.floor(untouchedReferenceDate.getMonth() / 3);
+        const baseAbsoluteQuarter = (baseYear * 4) + baseQuarterIndex;
+        for (let offset = 3; offset >= 0; offset -= 1) {
+          const absoluteQuarter = baseAbsoluteQuarter - offset;
+          const year = Math.floor(absoluteQuarter / 4);
+          const quarter = (absoluteQuarter % 4) + 1;
+          labels.push(`Q${quarter} ${year}`);
+        }
+        return labels;
+      }
+      if (key === "yearly") {
+        const labels = [];
+        const baseYear = untouchedReferenceDate.getFullYear();
+        for (let offset = 4; offset >= 0; offset -= 1) {
+          labels.push(String(baseYear - offset));
+        }
+        return labels;
+      }
+      const monthFormatter = new Intl.DateTimeFormat("en-US", { month: "short", year: "numeric" });
+      const labels = [];
+      for (let offset = 5; offset >= 0; offset -= 1) {
+        const month = new Date(untouchedReferenceDate);
+        month.setDate(1);
+        month.setMonth(month.getMonth() - offset);
+        labels.push(monthFormatter.format(month));
+      }
+      return labels;
+    };
+
+    const getUntouchedAgingBucketKey = (days) => {
+      const value = Math.max(0, Number(days || 0));
+      if (value <= 30) return "b0_30";
+      if (value <= 60) return "b31_60";
+      if (value <= 120) return "b61_120";
+      if (value <= 365) return "b120_365";
+      return "b1year_plus";
+    };
+
+    const buildUntouchedSyntheticHistory = (baseRows, granularity) => {
+      const granularityKey = String(granularity || "monthly").toLowerCase();
+      const labels = getUntouchedPeriodLabels(granularityKey);
+      const caseFactors = untouchedCaseFactors[granularityKey] || untouchedCaseFactors.monthly;
+      const amountFactors = untouchedAmountFactors[granularityKey] || untouchedAmountFactors.monthly;
+      const agingMultipliers = untouchedAgingMultipliers[granularityKey] || untouchedAgingMultipliers.monthly;
+      return labels.flatMap((periodLabel, periodIndex) => (
+        baseRows.map((row) => {
+          const codeSeed = Number(String(row.customerCode || "").replace(/\D/g, "")) || ((row.customerName || "").length * 7);
+          const customerBias = 0.84 + ((codeSeed % 11) * 0.03);
+          const customerBiasAmount = 0.86 + ((codeSeed % 9) * 0.035);
+          const customerDrift = ((codeSeed % 7) - 3) * 2;
+          const agingMultiplier = Number(agingMultipliers[periodIndex] || 1);
+          const periodDrift = Math.round((periodIndex - ((labels.length - 1) / 2)) * 6);
+          const caseCount = clampValue(Math.round(Number(row.untouchedInvoiceCount || 0) * Number(caseFactors[periodIndex] || 1) * customerBias), 0, 999);
+          const amount = Math.max(0, Math.round(Number(row.untouchedInvoiceValue || 0) * Number(amountFactors[periodIndex] || 1) * customerBiasAmount));
+          const days = clampValue(Math.round((Number(row.untouchedDays || 0) * agingMultiplier) + periodDrift + customerDrift), 1, 1825);
+          return {
+            periodLabel,
+            periodIndex,
+            granularity: granularityKey,
+            customerCode: row.customerCode,
+            customerName: row.customerName,
+            caseCount,
+            amount,
+            days,
+            bucketKey: getUntouchedAgingBucketKey(days)
+          };
+        })
+      ));
+    };
+
+    const getUntouchedSyntheticHistory = (granularity) => {
+      const key = String(granularity || "monthly").toLowerCase();
+      if (untouchedHistoryCache.has(key)) return untouchedHistoryCache.get(key);
+      const rows = buildUntouchedSyntheticHistory(untouchedCasesData, key);
+      untouchedHistoryCache.set(key, rows);
+      return rows;
     };
 
     const getUntouchedCasesFilteredRows = () => {
@@ -5886,10 +6931,99 @@
         .sort((a, b) => Number(b.untouchedDays || 0) - Number(a.untouchedDays || 0));
     };
 
+    const getUntouchedSelectedCustomerRow = () => (
+      untouchedCasesData.find((row) => row.customerCode === untouchedCasesState.selectedCustomerCode) || null
+    );
+
+    const buildUntouchedHeatmapMatrix = ({ granularity = "monthly", selectedCustomerCode = "", search = "" } = {}) => {
+      const labels = getUntouchedPeriodLabels(granularity);
+      const searchTerm = String(search || "").trim().toLowerCase();
+      const rows = getUntouchedSyntheticHistory(granularity)
+        .filter((row) => (
+          !searchTerm
+          || row.customerName.toLowerCase().includes(searchTerm)
+          || row.customerCode.toLowerCase().includes(searchTerm)
+        ))
+        .filter((row) => (!selectedCustomerCode || row.customerCode === selectedCustomerCode));
+      const matrix = labels.map((periodLabel, periodIndex) => ({
+        periodLabel,
+        periodIndex,
+        buckets: {
+          b0_30: 0,
+          b31_60: 0,
+          b61_120: 0,
+          b120_365: 0,
+          b1year_plus: 0
+        },
+        totalCases: 0,
+        totalAmount: 0,
+        weightedDays: 0
+      }));
+      rows.forEach((row) => {
+        const target = matrix[row.periodIndex];
+        if (!target) return;
+        target.buckets[row.bucketKey] += Number(row.caseCount || 0);
+        target.totalCases += Number(row.caseCount || 0);
+        target.totalAmount += Number(row.amount || 0);
+        target.weightedDays += Number(row.days || 0) * Number(row.caseCount || 0);
+      });
+      return matrix.map((row) => ({
+        ...row,
+        avgDays: row.totalCases > 0 ? (row.weightedDays / row.totalCases) : 0
+      }));
+    };
+
+    const computeUntouchedKpis = ({ granularity = "monthly", selectedCustomerCode = "", search = "" } = {}) => {
+      const matrix = buildUntouchedHeatmapMatrix({ granularity, selectedCustomerCode, search });
+      const latest = matrix[matrix.length - 1] || {
+        buckets: { b1year_plus: 0 },
+        totalCases: 0,
+        totalAmount: 0,
+        avgDays: 0
+      };
+      return {
+        totalCases: Number(latest.totalCases || 0),
+        totalAmount: Number(latest.totalAmount || 0),
+        avgUntouchedDays: Number(latest.avgDays || 0),
+        highRiskCases: Number(latest.buckets?.b1year_plus || 0),
+        matrix
+      };
+    };
+
+    const syncUntouchedGranularityButtons = () => {
+      untouchedGranularityButtons.forEach((button) => {
+        const buttonGranularity = String(button.getAttribute("data-untouched-granularity") || "").toLowerCase();
+        button.classList.toggle("is-active", buttonGranularity === untouchedCasesState.agingGranularity);
+      });
+    };
+
+    const renderUntouchedHeatmap = (matrixRows) => {
+      if (!untouchedHeatmapBody) return;
+      if (!matrixRows.length) {
+        untouchedHeatmapBody.innerHTML = `<tr><td colspan="6" class="mtdCollectionEmpty">No heatmap data available.</td></tr>`;
+        return;
+      }
+      const maxValue = matrixRows.reduce((maxVal, row) => (
+        Math.max(maxVal, ...untouchedAgingBuckets.map((bucket) => Number(row.buckets?.[bucket.key] || 0)))
+      ), 0);
+      untouchedHeatmapBody.innerHTML = matrixRows.map((row) => {
+        const cells = untouchedAgingBuckets.map((bucket) => {
+          const value = Number(row.buckets?.[bucket.key] || 0);
+          const level = maxValue > 0 ? (value / maxValue) : 0;
+          return `<td class="untouchedHeatCell ${level >= 0.58 ? "is-strong" : ""}" style="--heat-level:${level.toFixed(3)}">${value.toLocaleString("en-IN")}</td>`;
+        }).join("");
+        return `<tr><td>${escapeHtml(row.periodLabel)}</td>${cells}</tr>`;
+      }).join("");
+    };
+
     const renderUntouchedCasesCard = () => {
       if (!untouchedCasesCardCount) return;
-      const totalCases = untouchedCasesData.reduce((sum, row) => sum + Number(row.untouchedInvoiceCount || 0), 0);
-      untouchedCasesCardCount.textContent = String(totalCases);
+      const kpi = computeUntouchedKpis({
+        granularity: "monthly",
+        selectedCustomerCode: "",
+        search: ""
+      });
+      untouchedCasesCardCount.textContent = Number(kpi.totalCases || 0).toLocaleString("en-IN");
     };
 
     const renderUntouchedCasesPagination = (totalRows, totalPages, pageRowsCount) => {
@@ -5906,9 +7040,8 @@
       if (untouchedCasesNextBtn) untouchedCasesNextBtn.disabled = untouchedCasesCurrentPage >= totalPages || !totalRows;
     };
 
-    const renderUntouchedCasesTable = () => {
+    const renderUntouchedCasesTable = (filteredRows) => {
       if (!untouchedCasesTableBody) return;
-      const filteredRows = getUntouchedCasesFilteredRows();
       const totalRows = filteredRows.length;
       const totalPages = Math.max(1, Math.ceil(totalRows / untouchedCasesPageSize));
       if (untouchedCasesCurrentPage > totalPages) untouchedCasesCurrentPage = totalPages;
@@ -5926,7 +7059,7 @@
       }
 
       untouchedCasesTableBody.innerHTML = pageRows.map((row) => `
-        <tr>
+        <tr data-customer-code="${escapeHtml(row.customerCode)}" class="${row.customerCode === untouchedCasesState.selectedCustomerCode ? "is-selected" : ""}">
           <td>${escapeHtml(row.customerCode)}</td>
           <td>${escapeHtml(row.customerName)}</td>
           <td class="amountCell">${formatCurrency(row.untouchedInvoiceValue)}</td>
@@ -5937,12 +7070,53 @@
       renderUntouchedCasesPagination(totalRows, totalPages, pageRows.length);
     };
 
+    const renderUntouchedCasesDashboard = () => {
+      const filteredRows = getUntouchedCasesFilteredRows();
+      const hasSelectedVisibleRow = filteredRows.some((row) => row.customerCode === untouchedCasesState.selectedCustomerCode);
+      if (untouchedCasesState.selectedCustomerCode && !hasSelectedVisibleRow) {
+        untouchedCasesState.selectedCustomerCode = "";
+      }
+
+      const selectedCustomerRow = getUntouchedSelectedCustomerRow();
+      const kpi = computeUntouchedKpis({
+        granularity: untouchedCasesState.agingGranularity,
+        selectedCustomerCode: untouchedCasesState.selectedCustomerCode,
+        search: untouchedCasesState.search
+      });
+
+      if (untouchedCasesKpiCount) untouchedCasesKpiCount.textContent = Number(kpi.totalCases || 0).toLocaleString("en-IN");
+      if (untouchedCasesKpiAmount) untouchedCasesKpiAmount.textContent = formatCurrency(kpi.totalAmount || 0);
+      if (untouchedCasesKpiAvgDays) untouchedCasesKpiAvgDays.textContent = `${(kpi.avgUntouchedDays || 0).toFixed(1)}d`;
+      if (untouchedCasesKpiHighRisk) untouchedCasesKpiHighRisk.textContent = Number(kpi.highRiskCases || 0).toLocaleString("en-IN");
+
+      if (untouchedCasesContextLabel) {
+        untouchedCasesContextLabel.textContent = selectedCustomerRow
+          ? `Selected: ${selectedCustomerRow.customerCode} - ${selectedCustomerRow.customerName}`
+          : "All customers";
+      }
+      if (untouchedCasesClearSelectionBtn) {
+        untouchedCasesClearSelectionBtn.hidden = !selectedCustomerRow;
+      }
+      if (untouchedHeatmapMeta) {
+        const periodLabel = untouchedGranularityLabel[untouchedCasesState.agingGranularity] || untouchedGranularityLabel.monthly;
+        untouchedHeatmapMeta.textContent = selectedCustomerRow
+          ? `${periodLabel} aging distribution for selected customer`
+          : `${periodLabel} aging distribution for all customers`;
+      }
+
+      syncUntouchedGranularityButtons();
+      renderUntouchedHeatmap(kpi.matrix);
+      renderUntouchedCasesTable(filteredRows);
+    };
+
     const openUntouchedCasesModal = () => {
       if (!untouchedCasesModalEl || typeof bootstrap === "undefined") return;
       untouchedCasesState.search = "";
+      untouchedCasesState.selectedCustomerCode = "";
+      untouchedCasesState.agingGranularity = "monthly";
       untouchedCasesCurrentPage = 1;
       if (untouchedCasesSearchInput) untouchedCasesSearchInput.value = "";
-      renderUntouchedCasesTable();
+      renderUntouchedCasesDashboard();
       const untouchedModal = bootstrap.Modal.getOrCreateInstance(untouchedCasesModalEl);
       untouchedModal.show();
     };
@@ -5985,7 +7159,7 @@
       untouchedCasesSearchInput.addEventListener("input", (event) => {
         untouchedCasesState.search = event.target.value || "";
         untouchedCasesCurrentPage = 1;
-        renderUntouchedCasesTable();
+        renderUntouchedCasesDashboard();
       });
     }
 
@@ -5993,16 +7167,45 @@
       untouchedCasesPrevBtn.addEventListener("click", () => {
         if (untouchedCasesCurrentPage <= 1) return;
         untouchedCasesCurrentPage -= 1;
-        renderUntouchedCasesTable();
+        renderUntouchedCasesDashboard();
       });
     }
 
     if (untouchedCasesNextBtn) {
       untouchedCasesNextBtn.addEventListener("click", () => {
         untouchedCasesCurrentPage += 1;
-        renderUntouchedCasesTable();
+        renderUntouchedCasesDashboard();
       });
     }
+
+    if (untouchedCasesTableBody) {
+      untouchedCasesTableBody.addEventListener("click", (event) => {
+        const rowEl = event.target.closest("tr[data-customer-code]");
+        if (!rowEl) return;
+        const customerCode = String(rowEl.getAttribute("data-customer-code") || "").trim();
+        if (!customerCode) return;
+        untouchedCasesState.selectedCustomerCode = untouchedCasesState.selectedCustomerCode === customerCode ? "" : customerCode;
+        untouchedCasesCurrentPage = 1;
+        renderUntouchedCasesDashboard();
+      });
+    }
+
+    if (untouchedCasesClearSelectionBtn) {
+      untouchedCasesClearSelectionBtn.addEventListener("click", () => {
+        untouchedCasesState.selectedCustomerCode = "";
+        renderUntouchedCasesDashboard();
+      });
+    }
+
+    untouchedGranularityButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const granularity = String(button.getAttribute("data-untouched-granularity") || "").toLowerCase();
+        if (!["monthly", "quarterly", "yearly"].includes(granularity)) return;
+        if (untouchedCasesState.agingGranularity === granularity) return;
+        untouchedCasesState.agingGranularity = granularity;
+        renderUntouchedCasesDashboard();
+      });
+    });
 
     const mtdCollectionsData = [
       {
