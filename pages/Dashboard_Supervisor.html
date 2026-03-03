@@ -4294,7 +4294,10 @@
       if (targetUrgencyTrackFill) {
         targetUrgencyTrackFill.style.width = `${progressWidth}%`;
         const trackEl = targetUrgencyTrackFill.parentElement;
-        if (trackEl) trackEl.setAttribute("aria-valuenow", progressWidth.toFixed(1));
+        if (trackEl) {
+          trackEl.style.setProperty("--target-needle-x", `${progressWidth}%`);
+          trackEl.setAttribute("aria-valuenow", progressWidth.toFixed(1));
+        }
       }
       if (targetRunRateNote) {
         targetRunRateNote.textContent = daysLeft > 0

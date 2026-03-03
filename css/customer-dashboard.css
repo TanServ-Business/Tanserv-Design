@@ -1,0 +1,279 @@
+.customerDashboardPage .heroTagCustomer {
+  background: #eef2ff;
+  border-color: #c7d2fe;
+  color: #3730a3;
+  font-weight: 700;
+}
+
+.customerDashboardPage .heroTitleRow h1 {
+  text-transform: none;
+}
+
+.customerDashboardPage .unappliedCreditsCard {
+  display: grid;
+  gap: 8px;
+}
+
+.unappliedCreditsModal .modal-dialog {
+  max-width: min(1240px, 98vw);
+}
+
+.unappliedCreditsModal .modal-body {
+  padding: 16px 18px 18px;
+}
+
+.unappliedModalTitleWrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.unappliedBackBtn {
+  width: 30px;
+  height: 30px;
+  border: 1px solid #dbe3f1;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #334155;
+  background: #ffffff;
+  cursor: pointer;
+  transition: border-color 0.18s ease, color 0.18s ease, background 0.18s ease;
+}
+
+.unappliedBackBtn:hover,
+.unappliedBackBtn:focus-visible {
+  border-color: #94a3b8;
+  color: #0f172a;
+  background: #f8fafc;
+  outline: none;
+}
+
+.unappliedCreditsLayout {
+  display: grid;
+  gap: 14px;
+}
+
+.unappliedCreditsStats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.unappliedStatCard {
+  border: 1px solid #e2e8f4;
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+}
+
+.unappliedStatCard span {
+  display: block;
+  font-size: 11px;
+  color: #64748b;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.unappliedStatCard strong {
+  display: block;
+  font-size: 16px;
+  color: #0f172a;
+}
+
+.unappliedCreditsSplit {
+  display: grid;
+  grid-template-columns: minmax(0, 40%) minmax(0, 60%);
+  gap: 12px;
+  align-items: stretch;
+}
+
+.unappliedCreditsChartCard {
+  border: 1px solid #e2e8f4;
+  border-radius: 14px;
+  padding: 12px;
+  background: #ffffff;
+}
+
+.unappliedCreditsChartHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.unappliedCreditsChartHead h6 {
+  margin: 0;
+  font-size: 13px;
+  color: #0f172a;
+}
+
+.unappliedCreditsChartHead span {
+  font-size: 11px;
+  color: #64748b;
+}
+
+.unappliedCreditsChartWrap {
+  height: 280px;
+}
+
+.unappliedCreditsTableWrap {
+  border: 1px solid #e2e8f4;
+  border-radius: 14px;
+  overflow: hidden;
+  max-height: 520px;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+
+.unappliedCreditsTableToolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid #e2e8f4;
+  background: #f8fafc;
+}
+
+.unappliedFilterControl {
+  min-width: 140px;
+}
+
+.unappliedFilterControl span {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  color: #64748b;
+  letter-spacing: 0.03em;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+
+.unappliedFilterControl select {
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  height: 32px;
+  padding: 0 8px;
+  font-size: 12px;
+  color: #0f172a;
+  background: #ffffff;
+}
+
+.unappliedFilterControl select:focus-visible {
+  outline: none;
+  border-color: #94a3b8;
+  box-shadow: 0 0 0 2px rgba(148, 163, 184, 0.15);
+}
+
+.unappliedCreditsTableScroller {
+  overflow: auto;
+  max-height: 420px;
+}
+
+.unappliedCreditsPager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border-top: 1px solid #e2e8f4;
+  padding: 8px 12px;
+  background: #ffffff;
+}
+
+.unappliedCreditsPagerInfo {
+  font-size: 11px;
+  color: #64748b;
+}
+
+.unappliedCreditsPagerActions {
+  display: inline-flex;
+  gap: 8px;
+}
+
+.unappliedPageBtn {
+  width: 30px;
+  height: 30px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #334155;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.18s ease, background 0.18s ease, color 0.18s ease;
+}
+
+.unappliedPageBtn:hover:not(:disabled),
+.unappliedPageBtn:focus-visible:not(:disabled) {
+  border-color: #94a3b8;
+  background: #f8fafc;
+  color: #0f172a;
+  outline: none;
+}
+
+.unappliedPageBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.unappliedCreditsTable th,
+.unappliedCreditsTable td {
+  white-space: nowrap;
+}
+
+.unappliedStatusBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 4px 8px;
+  font-size: 10px;
+  font-weight: 700;
+  border: 1px solid transparent;
+}
+
+.unappliedStatusBadge.is-pending {
+  background: #fff7ed;
+  color: #9a3412;
+  border-color: #fed7aa;
+}
+
+.unappliedStatusBadge.is-review {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border-color: #bfdbfe;
+}
+
+.unappliedStatusBadge.is-ready {
+  background: #ecfdf5;
+  color: #166534;
+  border-color: #bbf7d0;
+}
+
+.unappliedCreditsEmpty {
+  border: 1px dashed #dbe3f1;
+  border-radius: 12px;
+  background: #f8fafc;
+  color: #64748b;
+  text-align: center;
+  padding: 12px;
+  font-size: 12px;
+}
+
+@media (max-width: 980px) {
+  .unappliedCreditsStats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .unappliedCreditsSplit {
+    grid-template-columns: 1fr;
+  }
+
+  .unappliedFilterControl {
+    flex: 1 1 calc(50% - 6px);
+    min-width: 0;
+  }
+}

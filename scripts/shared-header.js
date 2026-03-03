@@ -47,6 +47,7 @@
     const role = (localStorage.getItem("activeUserRole") || "").trim().toLowerCase();
     const roleDashboards = {
       agent: "pages/Dashboard_Agent.html",
+      customer: "pages/Dashboard_Customer.html",
       manager: "pages/LPmanager.html",
       supervisor: "pages/Dashboard_Supervisor.html",
       kam: "pages/KAM.html",
@@ -320,6 +321,7 @@
         </a>
         <div class="submenu">
           <a class="submenu-link" href="${resolvePath("pages/Dashboard_Agent.html")}" data-module="dashboard-agent">Dashboard - Agent</a>
+          <a class="submenu-link" href="${resolvePath("pages/Dashboard_Customer.html")}" data-module="dashboard-customer">Dashboard - Customer</a>
           <a class="submenu-link" href="${resolvePath("pages/dashManager.html")}" data-module="dashboard-manager">Dashboard - Manager</a>
           <a class="submenu-link" href="${resolvePath("pages/Dashboard_Supervisor.html")}" data-module="dashboard-supervisor">Dashboard - Supervisor</a>
         </div>
@@ -704,6 +706,7 @@
             "landing-backend": "pages/LPbackend.html",
             "landing-mis": "pages/LPmis.html",
             "dashboard-agent": "pages/Dashboard_Agent.html",
+            "dashboard-customer": "pages/Dashboard_Customer.html",
             "dashboard-manager": "pages/dashManager.html",
             "dashboard-supervisor": "pages/Dashboard_Supervisor.html",
             "issue-tracker": "pages/issuetrackerLP.html",
@@ -712,7 +715,9 @@
             "issue-approval-request": "bin/IssueTracker/approval-request.html",
             "submission-module": "pages/submission.html",
             "pdc-agent": "pages/PDCagent.html",
-            "pdc-ops": "pages/PDCOps.html"
+            "pdc-ops": "pages/PDCOps.html",
+            "commitment-agent": "pages/commitment.html",
+            "commitment-manager": "pages/CommitmentManager.html"
           };
           const target = destinations[moduleKey];
           if (target) {

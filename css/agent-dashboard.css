@@ -1981,6 +1981,7 @@ body.motion-preload .dashboardCard {
 }
 
 .targetUrgencyTrack {
+  --target-needle-x: 0%;
   position: relative;
   margin-top: 12px;
   width: 100%;
@@ -1988,6 +1989,18 @@ body.motion-preload .dashboardCard {
   border-radius: 999px;
   background: #e2e8f4;
   overflow: hidden;
+}
+
+.targetUrgencyTrack::after {
+  content: "";
+  position: absolute;
+  left: clamp(0px, calc(var(--target-needle-x) - 1px), calc(100% - 2px));
+  top: 1px;
+  bottom: 1px;
+  width: 2px;
+  border-radius: 999px;
+  background: #dc2626;
+  z-index: 2;
 }
 
 .targetUrgencyTrack > span {

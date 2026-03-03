@@ -57,14 +57,14 @@
                 <div class="kpiSplitItem">
                   <span>Not Due</span>
                   <strong>
-                    <span class="kpiSplitLine">Invoices 61 | Amount Rs. 89,24,16,295</span>
+                    <span class="kpiSplitLine">Invoices 61 | Rs. 89,16,295</span>
                     <span class="kpiSplitLine">Customers 4</span>
                   </strong>
                 </div>
                 <div class="kpiSplitItem">
                   <span class="kpiDueLabel">Due</span>
                   <strong>
-                    <span class="kpiSplitLine">Invoices 112 | Amount Rs. 1,59,65,10,000</span>
+                    <span class="kpiSplitLine">Invoices 112 | Rs. 1,65,10,000</span>
                     <span class="kpiSplitLine">Customers 8</span>
                   </strong>
                 </div>
@@ -83,14 +83,14 @@
                 <div class="kpiSplitItem">
                   <span>Not Due</span>
                   <strong>
-                    <span class="kpiSplitLine">Invoices 1 | Amount Rs. 18,43,508</span>
+                    <span class="kpiSplitLine">Invoices 1 | Rs. 18,43,508</span>
                     <span class="kpiSplitLine">Customers 1</span>
                   </strong>
                 </div>
                 <div class="kpiSplitItem">
                   <span class="kpiDueLabel">Due</span>
                   <strong>
-                    <span class="kpiSplitLine">Invoices 3 | Amount Rs. 59,30,000</span>
+                    <span class="kpiSplitLine">Invoices 3 | Rs. 59,30,000</span>
                     <span class="kpiSplitLine">Customers 2</span>
                   </strong>
                 </div>
@@ -111,14 +111,14 @@
                 <div class="kpiSplitItem">
                   <span>Not Due</span>
                   <strong>
-                    <span class="kpiSplitLine">Invoices 81 | Amount Rs. 6,98,40,000</span>
+                    <span class="kpiSplitLine">Invoices 81 | Rs. 6,98,40,000</span>
                     <span class="kpiSplitLine">Customers 5</span>
                   </strong>
                 </div>
                 <div class="kpiSplitItem">
                   <span class="kpiDueLabel">Due</span>
                   <strong>
-                    <span class="kpiSplitLine">Invoices 92 | Amount Rs. 8,35,20,000</span>
+                    <span class="kpiSplitLine">Invoices 92 | Rs. 8,35,20,000</span>
                     <span class="kpiSplitLine">Customers 7</span>
                   </strong>
                 </div>
@@ -940,6 +940,43 @@
       gray: "#94a3b8"
     };
 
+    const planActualNeedlePlugin = {
+      id: "planActualNeedle",
+      afterDatasetsDraw(chart, _args, pluginOptions) {
+        const achievedArc = chart.getDatasetMeta(0)?.data?.[0];
+        if (!achievedArc) return;
+        if (!chart.$needleVisible) return;
+
+        const { x, y, innerRadius, outerRadius, endAngle } = achievedArc.getProps(
+          ["x", "y", "innerRadius", "outerRadius", "endAngle"],
+          false
+        );
+        if (![x, y, innerRadius, outerRadius, endAngle].every(Number.isFinite)) return;
+
+        const color = pluginOptions?.color || "#dc2626";
+        const lineWidth = Math.max(1, Number(pluginOptions?.lineWidth) || 2);
+        const innerOffset = Number.isFinite(Number(pluginOptions?.innerOffset)) ? Number(pluginOptions.innerOffset) : 0;
+        const outerOffset = Number.isFinite(Number(pluginOptions?.outerOffset)) ? Number(pluginOptions.outerOffset) : 0;
+        const startRadius = Math.max(0, innerRadius + innerOffset);
+        const endRadius = Math.max(startRadius, outerRadius + outerOffset);
+        const startX = x + Math.cos(endAngle) * startRadius;
+        const startY = y + Math.sin(endAngle) * startRadius;
+        const endX = x + Math.cos(endAngle) * endRadius;
+        const endY = y + Math.sin(endAngle) * endRadius;
+
+        const { ctx } = chart;
+        ctx.save();
+        ctx.beginPath();
+        ctx.lineWidth = lineWidth;
+        ctx.lineCap = "butt";
+        ctx.strokeStyle = color;
+        ctx.moveTo(startX, startY);
+        ctx.lineTo(endX, endY);
+        ctx.stroke();
+        ctx.restore();
+      }
+    };
+
     const activityDispositionMap = {
       "No Due": ["Within Credit Period/Days", "LC Payment", "As Per Payment Terms", "Retention Amount", "SD Amount"],
       "Part Collected": ["Part Payment through LC done", "Part Payment Made"],
@@ -1140,11 +1177,13 @@
         title: "Plan vs Actual",
         meta: "Target achievement",
         type: "doughnut",
+        plugins: [planActualNeedlePlugin],
+        cardProgressTarget: [3.85, 4.55],
         cardData: {
           labels: ["Achieved", "Remaining"],
           datasets: [
             {
-              data: [3.85, 4.55],
+              data: [0, 8.4],
               backgroundColor: ["rgba(255, 255, 255, 0.95)", "rgba(255, 255, 255, 0.2)"],
               borderWidth: 0
             }
@@ -1166,7 +1205,13 @@
           circumference: 180,
           plugins: {
             legend: { display: false },
-            tooltip: { enabled: false }
+            tooltip: { enabled: false },
+            planActualNeedle: {
+              color: "#ef4444",
+              lineWidth: 3,
+              innerOffset: -6,
+              outerOffset: 6,
+            }
           }
         },
         options: {
@@ -1385,13 +1430,67 @@
       const ctx = canvas.getContext("2d");
       const data = config.cardData || config.data;
       const options = { ...baseOptions, ...(config.cardOptions || config.options) };
+      const plugins = Array.isArray(config.plugins) ? config.plugins : [];
       if (config.type === "doughnut") {
         options.scales = {};
       }
-      chartInstances[canvasId] = new Chart(ctx, {
+      const chart = new Chart(ctx, {
         type: config.type,
         data,
-        options
+        options,
+        plugins
+      });
+      if (Array.isArray(config.cardProgressTarget) && config.cardProgressTarget.length >= 2) {
+        chart.$progressTarget = config.cardProgressTarget.map((value) => Number(value || 0));
+      }
+      chartInstances[canvasId] = chart;
+    };
+
+    const animatePlanActualGauge = (chartId = "chartPlanActual") => {
+      const chart = chartInstances[chartId];
+      if (!chart || chart.$progressAnimated) return;
+
+      const dataset = chart.data?.datasets?.[0];
+      const rawData = Array.isArray(chart.$progressTarget) && chart.$progressTarget.length >= 2
+        ? chart.$progressTarget
+        : (Array.isArray(dataset?.data) ? dataset.data.map((value) => Number(value || 0)) : []);
+      if (!dataset || rawData.length < 2) return;
+
+      const achievedTarget = Math.max(0, rawData[0]);
+      const totalTarget = Math.max(0, rawData[0] + rawData[1]);
+      if (totalTarget <= 0) return;
+
+      chart.$progressAnimated = true;
+      chart.$progressAnimating = true;
+
+      if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        chart.$needleVisible = true;
+        dataset.data[0] = achievedTarget;
+        dataset.data[1] = Number(Math.max(0, totalTarget - achievedTarget).toFixed(4));
+        chart.update("none");
+        chart.$progressAnimating = false;
+        return;
+      }
+
+      chart.$needleVisible = false;
+      dataset.data[0] = 0;
+      dataset.data[1] = totalTarget;
+      chart.update("none");
+
+      const originalAnimation = chart.options.animation;
+      chart.options.animation = {
+        duration: 1400,
+        easing: "easeOutCubic",
+        onComplete: () => {
+          chart.options.animation = originalAnimation;
+          chart.$progressAnimating = false;
+        }
+      };
+      requestAnimationFrame(() => {
+        chart.$needleVisible = true;
+        dataset.data[0] = achievedTarget;
+        dataset.data[1] = Number(Math.max(0, totalTarget - achievedTarget).toFixed(4));
+        chart.update();
       });
     };
 
@@ -2408,7 +2507,10 @@
       if (targetUrgencyTrackFill) {
         targetUrgencyTrackFill.style.width = `${progressWidth}%`;
         const trackEl = targetUrgencyTrackFill.parentElement;
-        if (trackEl) trackEl.setAttribute("aria-valuenow", progressWidth.toFixed(1));
+        if (trackEl) {
+          trackEl.style.setProperty("--target-needle-x", `${progressWidth}%`);
+          trackEl.setAttribute("aria-valuenow", progressWidth.toFixed(1));
+        }
       }
       if (targetRunRateNote) {
         targetRunRateNote.textContent = daysLeft > 0
@@ -4905,12 +5007,65 @@
       return rect.bottom > 0 && rect.top < vh;
     };
 
+    const planActualCardEl = document.querySelector('.dashboardCard[data-chart="planActual"]');
+
+    const isFullyInViewport = (el) => {
+      if (!el) return false;
+      const rect = el.getBoundingClientRect();
+      const vh = window.innerHeight || 0;
+      return rect.top >= 0 && rect.bottom <= vh;
+    };
+
+    const teardownPlanActualGaugeWatchers = () => {
+      window.removeEventListener("scroll", maybeAnimatePlanActualGauge);
+      window.removeEventListener("resize", maybeAnimatePlanActualGauge);
+    };
+
+    function maybeAnimatePlanActualGauge() {
+      if (!planActualCardEl) {
+        teardownPlanActualGaugeWatchers();
+        return;
+      }
+      if (!planActualCardEl.classList.contains("is-visible")) return;
+      if (planActualCardEl.dataset.revealSettled !== "true") return;
+      if (!isFullyInViewport(planActualCardEl)) return;
+      animatePlanActualGauge("chartPlanActual");
+      const chart = chartInstances.chartPlanActual;
+      if (chart && chart.$progressAnimated && !chart.$progressAnimating) {
+        teardownPlanActualGaugeWatchers();
+      }
+    }
+
+    window.addEventListener("scroll", maybeAnimatePlanActualGauge, { passive: true });
+    window.addEventListener("resize", maybeAnimatePlanActualGauge);
+
     const animateCard = (card, delay = 0) => {
       if (!card || card.dataset.animated === "true") return;
       card.dataset.animated = "true";
       setTimeout(() => {
         card.classList.add("is-visible");
         animateCountersInCard(card);
+        if (card === planActualCardEl) {
+          let settled = false;
+          const markSettled = () => {
+            if (settled) return;
+            settled = true;
+            card.dataset.revealSettled = "true";
+            maybeAnimatePlanActualGauge();
+          };
+          const onRevealTransitionEnd = (event) => {
+            if (event.target !== card) return;
+            if (event.propertyName !== "transform" && event.propertyName !== "opacity") return;
+            card.removeEventListener("transitionend", onRevealTransitionEnd);
+            markSettled();
+          };
+          card.addEventListener("transitionend", onRevealTransitionEnd);
+          setTimeout(() => {
+            card.removeEventListener("transitionend", onRevealTransitionEnd);
+            markSettled();
+          }, 560);
+          maybeAnimatePlanActualGauge();
+        }
       }, delay);
     };
 
@@ -4927,10 +5082,12 @@
       requestAnimationFrame(() => {
         const visibleCards = Array.from(cards).filter(isInViewport);
         visibleCards.forEach((card, idx) => animateCard(card, idx * 60));
+        maybeAnimatePlanActualGauge();
       });
     } else {
       requestAnimationFrame(() => {
         cards.forEach((card, idx) => animateCard(card, idx * 60));
+        maybeAnimatePlanActualGauge();
       });
     }
   })();
