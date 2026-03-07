@@ -60,6 +60,11 @@
     return roleDashboards[role] || "pages/Dashboard_Agent.html";
   };
   const dashboardPath = resolvePath(getDashboardPath());
+  const getLandingPath = () => {
+    const role = (localStorage.getItem("activeUserRole") || "").trim().toLowerCase();
+    return role === "customer" ? "pages/LPcustomer.html" : "LPagent.html";
+  };
+  const landingPath = resolvePath(getLandingPath());
 
   const hasEmailPanel = Boolean(document.getElementById("emailPanel"));
   const emailActionMarkup = hasEmailPanel
@@ -300,8 +305,9 @@
           <i class="bi bi-chevron-down chevron" aria-hidden="true"></i>
         </a>
         <div class="submenu">
-          <a class="submenu-link" href="${resolvePath("LPagent.html")}" data-module="landing">Landing Page</a>
+          <a class="submenu-link" href="${landingPath}" data-module="landing">Landing Page</a>
           <a class="submenu-link" href="${resolvePath("LPagent.html")}" data-module="landing-agent">Landing Page - Agent</a>
+          <a class="submenu-link" href="${resolvePath("pages/LPcustomer.html")}" data-module="landing-customer">Landing Page - Customer</a>
           <a class="submenu-link" href="${resolvePath("pages/LPmanager.html")}" data-module="landing-manager">Landing Page - Manager</a>
           <a class="submenu-link" href="${resolvePath("pages/dashManager.html")}" data-module="landing-manager-drilldown">Landing Page - Manager Drilldown</a>
           <a class="submenu-link" href="${resolvePath("pages/LPsupervisor.html")}" data-module="landing-supervisor">Landing Page - Supervisor</a>
@@ -693,11 +699,14 @@
           if (!item) return;
           const moduleKey = item.getAttribute("data-module");
           if (!moduleKey) return;
+          const activeRole = (localStorage.getItem("activeUserRole") || "").trim().toLowerCase();
+          const landingDestination = activeRole === "customer" ? "pages/LPcustomer.html" : "LPagent.html";
           const destinations = {
             visit: "pages/visitmodule.html",
             "visit-review": "pages/visitmoduleReview.html",
-            landing: "LPagent.html",
+            landing: landingDestination,
             "landing-agent": "LPagent.html",
+            "landing-customer": "pages/LPcustomer.html",
             "landing-manager": "pages/LPmanager.html",
             "landing-manager-drilldown": "pages/dashManager.html",
             "landing-supervisor": "pages/LPsupervisor.html",

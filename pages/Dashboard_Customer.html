@@ -26,7 +26,6 @@
         </button>
       </div>
       <div class="heroMeta">
-        <span class="heroTag heroTagCustomer" id="activeCustomerTag">Customer: --</span>
         <span class="heroTag">Portfolio Rs. 2,48,96,98,803</span>
         <span class="heroTag heroTagRefresh" id="asOfRefreshTag" role="button" tabindex="0" data-hint="click to refresh" title="click to refresh">As of Feb 6, 2026</span>
       </div>
@@ -48,7 +47,7 @@
       <div class="col-12 col-md-9">
         <div class="row g-3 kpiGrid">
           <div class="col-12 col-md-4">
-            <article class="dashboardCard kpiCard kpiLavender kpiInverted kpiGradient cardClickable" id="totalNetDueCard" role="button" tabindex="0" aria-label="Open agent dashboard">
+            <article class="dashboardCard kpiCard kpiLavender kpiInverted kpiGradient cardClickable" id="totalNetDueCard" role="button" tabindex="0" aria-label="Open customer landing page">
               <div class="kpiRow">
                 <span class="kpiLabel">Total Amount To Be Paid</span>
                 <span class="kpiDelta">+6.2%</span>
@@ -97,25 +96,25 @@
           </div>
           <div class="col-12 col-md-4">
             <article class="dashboardCard kpiCard kpiLavender">
-              <div class="kpiLabel">Paid Within Due Date</div>
+              <div class="kpiLabel">Paid After Due Date</div>
               <div class="kpiProgressRow">
                 <div class="kpiValue">86.2%</div>
                 <div class="progressWrap">
                   <div class="progressFill" style="--value: 0.862;"></div>
                 </div>
               </div>
-              <div class="kpiSub">On-time collection ratio</div>
+              <div class="kpiSub">Delayed collection ratio</div>
               <div class="kpiSplit">
                 <div class="kpiSplitItem">
-                  <span>Not Due</span>
+                  <span>Within Due Date</span>
                   <strong>
-                    <span class="kpiSplitLine">Invoices 81 | Rs. 6,98,40,000</span>
+                    <span class="kpiSplitLine">Invoices 4 | Rs. 1,07,00,000</span>
                   </strong>
                 </div>
                 <div class="kpiSplitItem">
-                  <span class="kpiDueLabel">Due</span>
+                  <span class="kpiDueLabel">After Due Date</span>
                   <strong>
-                    <span class="kpiSplitLine">Invoices 92 | Rs. 8,35,20,000</span>
+                    <span class="kpiSplitLine">Invoices 25 | Rs. 6,70,00,000</span>
                   </strong>
                 </div>
               </div>
@@ -198,9 +197,60 @@
           </div>
           <div class="col-12 col-md-3">
             <article class="dashboardCard kpiCard cardClickable unappliedCreditsCard" id="unappliedCreditsCard" role="button" tabindex="0" aria-label="Open unapplied credits details">
-              <div class="kpiLabel">Unapplied Credits</div>
-              <div class="kpiValue" id="unappliedCreditsValue">Rs. 0</div>
-              <div class="kpiSub" id="unappliedCreditsSub">0 unapplied entries</div>
+              <div class="agingBucketsCardBody">
+                <div class="agingBucketsMain">
+                  <div class="kpiLabel">Unapplied Credits</div>
+                  <div class="kpiValue" id="unappliedCreditsValue">Rs. 0</div>
+                  <div class="kpiSub" id="unappliedCreditsSub">Entries: 0</div>
+                </div>
+                <div class="agingBucketsTop3" aria-label="Unapplied credit status summary">
+                  <div class="agingBucketRow is-31-60">
+                    <span class="agingBucketName">Pending Validation</span>
+                    <strong class="agingBucketCount" id="unappliedCreditsPendingCount">0</strong>
+                  </div>
+                  <div class="agingBucketRow is-121-150">
+                    <span class="agingBucketName">Under Review</span>
+                    <strong class="agingBucketCount" id="unappliedCreditsReviewCount">0</strong>
+                  </div>
+                  <div class="agingBucketRow is-150-180">
+                    <span class="agingBucketName">Ready to Apply</span>
+                    <strong class="agingBucketCount" id="unappliedCreditsReadyCount">0</strong>
+                  </div>
+                </div>
+              </div>
+            </article>
+          </div>
+
+        </div>
+        <div class="row g-3 actionStack">
+          <div class="col-12 col-md-4">
+            <article class="dashboardCard actionCard accentPurple cardClickable" id="invoicesDueWeekCard" role="button" tabindex="0" aria-label="Open invoices due this week details">
+              <div class="actionMeta">
+                <span>Invoices Due this Week</span>
+                <strong id="dueWeekCountValue">0</strong>
+                <span>Value: Rs. <span id="dueWeekAmountValue">0</span></span>
+              </div>
+              <div class="actionIcon"><i class="bi bi-calendar-week"></i></div>
+            </article>
+          </div>
+          <div class="col-12 col-md-4">
+            <article class="dashboardCard actionCard accentPurple cardClickable" id="invoicesDueMonthCard" role="button" tabindex="0" aria-label="Open invoices due this month details">
+              <div class="actionMeta">
+                <span>Invoices Due this Month</span>
+                <strong id="dueMonthCountValue">0</strong>
+                <span>Value: Rs. <span id="dueMonthAmountValue">0</span></span>
+              </div>
+              <div class="actionIcon"><i class="bi bi-calendar3"></i></div>
+            </article>
+          </div>
+          <div class="col-12 col-md-4">
+            <article class="dashboardCard actionCard accentPurple cardClickable" id="invoicesOnHoldCard" role="button" tabindex="0" aria-label="Open invoices on hold details">
+              <div class="actionMeta">
+                <span>Invoices On Hold</span>
+                <strong id="onHoldCountValue">0</strong>
+                <span>Value: Rs. <span id="onHoldAmountValue">0</span></span>
+              </div>
+              <div class="actionIcon"><i class="bi bi-pause-circle"></i></div>
             </article>
           </div>
         </div>
@@ -212,7 +262,7 @@
           <article class="dashboardCard chartCard card overflow-hidden bg-primary border-0 ovarlay-primary-gradient radialCard" data-chart="planActual" data-span="4" role="button" tabindex="0" aria-label="Plan versus actual radial chart">
             <div class="radialCardHeader">
               <div>
-                <div class="radialTitle">Monthly Target</div>
+                <div class="radialTitle">Monthly Due Resolution</div>
                 <div class="radialPercentRow">
                   <span class="radialPercent">46%</span>
                   <span class="radialDelta">+7% vs last month</span>
@@ -225,25 +275,25 @@
             <div class="radialGaugeWrap">
               <canvas id="chartPlanActual"></canvas>
               <div class="radialGaugeCenter">
-                <div class="radialGaugeValue">32K</div>
+                <div class="radialGaugeValue">3,20,00,000</div>
                 <div class="radialGaugeLabel">91 Invoices</div>
               </div>
-            </div>
+            </div> 
             <div class="radialCallout">
-              You collected <strong>Rs. 3,85,00,000</strong> this month. You are behind commitment, focus on top due accounts.
+              Rs. 3,85,00,000 has been paid against Rs. 8.4 Cr due this month. Focus on the pending invoices due in the current cycle.
             </div>
             <div class="radialSummary">
               <div class="radialSummaryItem">
                 <div class="radialSummaryValue">8.4 Cr</div>
-                <div class="radialSummaryLabel">Target</div>
+                <div class="radialSummaryLabel">Due this month</div>
               </div>
               <div class="radialSummaryItem">
                 <div class="radialSummaryValue">3.85 Cr</div>
-                <div class="radialSummaryLabel">Collected</div>
+                <div class="radialSummaryLabel">Paid this month</div>
               </div>
               <div class="radialSummaryItem">
                 <div class="radialSummaryValue">0.47 Cr</div>
-                <div class="radialSummaryLabel">Today</div>
+                <div class="radialSummaryLabel">Paid today</div>
               </div>
             </div>
           </article>
@@ -729,6 +779,46 @@
   </div>
 </div>
 
+<div class="modal fade" id="invoiceFocusModal" tabindex="-1" aria-labelledby="invoiceFocusModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div>
+          <h5 class="modal-title" id="invoiceFocusModalLabel">Invoices</h5>
+          <div class="text-muted small" id="invoiceFocusModalSubtext">Invoice details</div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="tableWrap">
+          <table class="invoiceTable">
+            <thead>
+              <tr>
+                <th>Customer code</th>
+                <th>Customer name</th>
+                <th>Invoice No</th>
+                <th>Invoice amt</th>
+                <th>Due Amount</th>
+                <th>Invoice Date</th>
+                <th>Due date</th>
+                <th id="invoiceFocusSubstatusHeader" hidden>Substatus</th>
+              </tr>
+            </thead>
+            <tbody id="invoiceFocusTableBody"></tbody>
+          </table>
+        </div>
+        <div class="tablePagination">
+          <div class="paginationInfo" id="invoiceFocusPaginationInfo">Showing 0-0 of 0</div>
+          <div class="mtdPaginationActions">
+            <button type="button" class="mtdPageBtn" id="invoiceFocusPrevBtn">Previous</button>
+            <button type="button" class="mtdPageBtn" id="invoiceFocusNextBtn">Next</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="modal fade unappliedCreditsModal" id="unappliedCreditsModal" tabindex="-1" aria-labelledby="unappliedCreditsModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
     <div class="modal-content">
@@ -1088,13 +1178,6 @@
       localStorage.setItem("activeCustomerCode", activeCustomerCode);
       localStorage.setItem("activeCustomerName", activeCustomerName);
       localStorage.setItem("activeUserRole", "customer");
-    }
-
-    const activeCustomerTag = document.getElementById("activeCustomerTag");
-    if (activeCustomerTag) {
-      activeCustomerTag.textContent = activeCustomerCode
-        ? `Customer: ${activeCustomerName} (${activeCustomerCode})`
-        : "Customer: --";
     }
 
     const customerDashboardTitle = document.getElementById("customerDashboardTitle");
@@ -3504,7 +3587,13 @@
     const totalNetDueCard = document.getElementById("totalNetDueCard");
     if (totalNetDueCard) {
       const goToAgentScreen = () => {
-        window.location.href = "../LPagent.html";
+        const activeCode = normalizeCustomerCode(
+          localStorage.getItem("activeCustomerCode") || activeCustomerCode
+        );
+        const destination = activeCode
+          ? `LPcustomer.html?customerCode=${encodeURIComponent(activeCode)}`
+          : "LPcustomer.html";
+        window.location.href = destination;
       };
       totalNetDueCard.addEventListener("click", goToAgentScreen);
       totalNetDueCard.addEventListener("keydown", (event) => {
@@ -3526,6 +3615,9 @@
     const unappliedStatTotalPdc = document.getElementById("unappliedStatTotalPdc");
     const unappliedStatTotalCn = document.getElementById("unappliedStatTotalCn");
     const unappliedCreditsChartCanvas = document.getElementById("unappliedCreditsChart");
+    const unappliedCreditsPendingCount = document.getElementById("unappliedCreditsPendingCount");
+    const unappliedCreditsReviewCount = document.getElementById("unappliedCreditsReviewCount");
+    const unappliedCreditsReadyCount = document.getElementById("unappliedCreditsReadyCount");
     const unappliedCreditsTableBody = document.getElementById("unappliedCreditsTableBody");
     const unappliedCreditsEmpty = document.getElementById("unappliedCreditsEmpty");
     const unappliedSourceFilter = document.getElementById("unappliedSourceFilter");
@@ -3549,6 +3641,35 @@
     const promisedPaymentsPendingCount = document.getElementById("promisedPaymentsPendingCount");
     const agingOver30Card = document.getElementById("agingOver30Card");
     const newBillingCard = document.getElementById("newBillingCard");
+    const invoicesDueWeekCard = document.getElementById("invoicesDueWeekCard");
+    const dueWeekCountValue = document.getElementById("dueWeekCountValue");
+    const dueWeekAmountValue = document.getElementById("dueWeekAmountValue");
+    const dueWeekOverdueCount = document.getElementById("dueWeekOverdueCount");
+    const dueWeekTodayCount = document.getElementById("dueWeekTodayCount");
+    const dueWeekUpcomingCount = document.getElementById("dueWeekUpcomingCount");
+    const invoicesDueMonthCard = document.getElementById("invoicesDueMonthCard");
+    const dueMonthCountValue = document.getElementById("dueMonthCountValue");
+    const dueMonthAmountValue = document.getElementById("dueMonthAmountValue");
+    const dueMonthFirstBandCount = document.getElementById("dueMonthFirstBandCount");
+    const dueMonthSecondBandCount = document.getElementById("dueMonthSecondBandCount");
+    const dueMonthThirdBandCount = document.getElementById("dueMonthThirdBandCount");
+    const invoicesOnHoldCard = document.getElementById("invoicesOnHoldCard");
+    const onHoldCountValue = document.getElementById("onHoldCountValue");
+    const onHoldAmountValue = document.getElementById("onHoldAmountValue");
+    const onHoldDocsCount = document.getElementById("onHoldDocsCount");
+    const onHoldActionCount = document.getElementById("onHoldActionCount");
+    const onHoldOtherCount = document.getElementById("onHoldOtherCount");
+    const invoiceFocusModalEl = document.getElementById("invoiceFocusModal");
+    const invoiceFocusModalLabel = document.getElementById("invoiceFocusModalLabel");
+    const invoiceFocusModalSubtext = document.getElementById("invoiceFocusModalSubtext");
+    const invoiceFocusSubstatusHeader = document.getElementById("invoiceFocusSubstatusHeader");
+    const invoiceFocusTableBody = document.getElementById("invoiceFocusTableBody");
+    const invoiceFocusPaginationInfo = document.getElementById("invoiceFocusPaginationInfo");
+    const invoiceFocusPrevBtn = document.getElementById("invoiceFocusPrevBtn");
+    const invoiceFocusNextBtn = document.getElementById("invoiceFocusNextBtn");
+    const invoiceFocusPageSize = 10;
+    let invoiceFocusCurrentPage = 1;
+    let invoiceFocusCurrentMode = "dueWeek";
     const newAllocationsCard = document.getElementById("newAllocationsCard");
     const ptpForDayCard = document.getElementById("ptpForDayCard");
     const callbacksForDayCard = document.getElementById("callbacksForDayCard");
@@ -4434,6 +4555,41 @@
       }
     ];
 
+    const invoicesDueThisWeekData = [
+      { customerCode: "CUST-001", customerName: "Apollo Pharmacy Pvt Ltd", invoiceNo: "INV-10912", invoiceValue: 165000, dueAmount: 128000, invoiceDate: "2026-02-14", dueDate: "2026-03-03" },
+      { customerCode: "CUST-001", customerName: "Apollo Pharmacy Pvt Ltd", invoiceNo: "INV-10941", invoiceValue: 94000, dueAmount: 54000, invoiceDate: "2026-02-18", dueDate: "2026-03-05" },
+      { customerCode: "CUST-001", customerName: "Apollo Pharmacy Pvt Ltd", invoiceNo: "INV-10983", invoiceValue: 112000, dueAmount: 79000, invoiceDate: "2026-02-22", dueDate: "2026-03-06" },
+      { customerCode: "CUST-001", customerName: "Apollo Pharmacy Pvt Ltd", invoiceNo: "INV-11017", invoiceValue: 138000, dueAmount: 101000, invoiceDate: "2026-02-26", dueDate: "2026-03-08" },
+      { customerCode: "CUST-001", customerName: "Apollo Pharmacy Pvt Ltd", invoiceNo: "INV-11042", invoiceValue: 87000, dueAmount: 67000, invoiceDate: "2026-02-28", dueDate: "2026-03-09" },
+      { customerCode: "CUST-024", customerName: "Shiva Healthcare Pvt Ltd", invoiceNo: "INV-41092", invoiceValue: 118000, dueAmount: 84000, invoiceDate: "2026-02-20", dueDate: "2026-03-06" },
+      { customerCode: "CUST-071", customerName: "Lifecrest Hospitals", invoiceNo: "INV-52018", invoiceValue: 99000, dueAmount: 61000, invoiceDate: "2026-02-21", dueDate: "2026-03-07" }
+    ];
+
+    const invoicesDueThisMonthData = [
+      { customerCode: "CUST-001", customerName: "Apollo Pharmacy Pvt Ltd", invoiceNo: "INV-10912", invoiceValue: 165000, dueAmount: 128000, invoiceDate: "2026-02-14", dueDate: "2026-03-03" },
+      { customerCode: "CUST-001", customerName: "Apollo Pharmacy Pvt Ltd", invoiceNo: "INV-10941", invoiceValue: 94000, dueAmount: 54000, invoiceDate: "2026-02-18", dueDate: "2026-03-05" },
+      { customerCode: "CUST-001", customerName: "Apollo Pharmacy Pvt Ltd", invoiceNo: "INV-10983", invoiceValue: 112000, dueAmount: 79000, invoiceDate: "2026-02-22", dueDate: "2026-03-06" },
+      { customerCode: "CUST-001", customerName: "Apollo Pharmacy Pvt Ltd", invoiceNo: "INV-11017", invoiceValue: 138000, dueAmount: 101000, invoiceDate: "2026-02-26", dueDate: "2026-03-08" },
+      { customerCode: "CUST-001", customerName: "Apollo Pharmacy Pvt Ltd", invoiceNo: "INV-11042", invoiceValue: 87000, dueAmount: 67000, invoiceDate: "2026-02-28", dueDate: "2026-03-09" },
+      { customerCode: "CUST-001", customerName: "Apollo Pharmacy Pvt Ltd", invoiceNo: "INV-11073", invoiceValue: 173000, dueAmount: 123000, invoiceDate: "2026-03-01", dueDate: "2026-03-13" },
+      { customerCode: "CUST-001", customerName: "Apollo Pharmacy Pvt Ltd", invoiceNo: "INV-11110", invoiceValue: 145000, dueAmount: 96000, invoiceDate: "2026-03-03", dueDate: "2026-03-17" },
+      { customerCode: "CUST-001", customerName: "Apollo Pharmacy Pvt Ltd", invoiceNo: "INV-11162", invoiceValue: 109000, dueAmount: 69000, invoiceDate: "2026-03-04", dueDate: "2026-03-23" },
+      { customerCode: "CUST-001", customerName: "Apollo Pharmacy Pvt Ltd", invoiceNo: "INV-11195", invoiceValue: 128000, dueAmount: 98000, invoiceDate: "2026-03-06", dueDate: "2026-03-27" },
+      { customerCode: "CUST-034", customerName: "Mediport Labs", invoiceNo: "INV-33212", invoiceValue: 131000, dueAmount: 93000, invoiceDate: "2026-03-02", dueDate: "2026-03-19" },
+      { customerCode: "CUST-066", customerName: "Pulse Diagnostics", invoiceNo: "INV-34108", invoiceValue: 88000, dueAmount: 64000, invoiceDate: "2026-03-01", dueDate: "2026-03-25" }
+    ];
+
+    const invoicesOnHoldData = [
+      { customerCode: "CUST-001", customerName: "Apollo Pharmacy Pvt Ltd", invoiceNo: "INV-10288", invoiceValue: 121000, dueAmount: 87000, invoiceDate: "2026-01-30", dueDate: "2026-02-21", subStatus: "Invoice Copy Required" },
+      { customerCode: "CUST-001", customerName: "Apollo Pharmacy Pvt Ltd", invoiceNo: "INV-10344", invoiceValue: 91000, dueAmount: 61000, invoiceDate: "2026-02-02", dueDate: "2026-02-26", subStatus: "PO (Purchase Order) Copy Required" },
+      { customerCode: "CUST-001", customerName: "Apollo Pharmacy Pvt Ltd", invoiceNo: "INV-10410", invoiceValue: 148000, dueAmount: 102000, invoiceDate: "2026-02-05", dueDate: "2026-03-01", subStatus: "Delivery Challan Required" },
+      { customerCode: "CUST-001", customerName: "Apollo Pharmacy Pvt Ltd", invoiceNo: "INV-10462", invoiceValue: 117000, dueAmount: 74000, invoiceDate: "2026-02-11", dueDate: "2026-03-04", subStatus: "Vendor Portal Issue" },
+      { customerCode: "CUST-001", customerName: "Apollo Pharmacy Pvt Ltd", invoiceNo: "INV-10503", invoiceValue: 133000, dueAmount: 98000, invoiceDate: "2026-02-16", dueDate: "2026-03-06", subStatus: "Wrong/Incorrect Billing" },
+      { customerCode: "CUST-001", customerName: "Apollo Pharmacy Pvt Ltd", invoiceNo: "INV-10554", invoiceValue: 102000, dueAmount: 72000, invoiceDate: "2026-02-19", dueDate: "2026-03-08", subStatus: "Tax Issue On The Invoice" },
+      { customerCode: "CUST-024", customerName: "Shiva Healthcare Pvt Ltd", invoiceNo: "INV-40175", invoiceValue: 96000, dueAmount: 64000, invoiceDate: "2026-02-10", dueDate: "2026-02-28", subStatus: "Service/PM Report Required" },
+      { customerCode: "CUST-071", customerName: "Lifecrest Hospitals", invoiceNo: "INV-51116", invoiceValue: 119000, dueAmount: 79000, invoiceDate: "2026-02-12", dueDate: "2026-03-02", subStatus: "Discount Required" }
+    ];
+
     const customerScopePredicate = (row) => isActiveCustomerRow(row, activeCustomerCode);
     scopeArrayInPlace(activityDispositionRecords, customerScopePredicate);
     scopeArrayInPlace(issueDispositionRecords, customerScopePredicate);
@@ -4445,6 +4601,9 @@
     scopeArrayInPlace(ptpForDayData, customerScopePredicate);
     scopeArrayInPlace(callbacksForDayData, customerScopePredicate);
     scopeArrayInPlace(unappliedCreditsData, customerScopePredicate);
+    scopeArrayInPlace(invoicesDueThisWeekData, customerScopePredicate);
+    scopeArrayInPlace(invoicesDueThisMonthData, customerScopePredicate);
+    scopeArrayInPlace(invoicesOnHoldData, customerScopePredicate);
 
     const modalDataConfig = {
       mtd: {
@@ -4585,6 +4744,43 @@
       if (Number.isNaN(parsed.getTime())) return "-";
       return parsed.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
     };
+    const parseIsoDate = (value) => {
+      if (!value) return null;
+      const parsed = new Date(`${value}T00:00:00`);
+      if (Number.isNaN(parsed.getTime())) return null;
+      parsed.setHours(0, 0, 0, 0);
+      return parsed;
+    };
+    const formatInvoiceDate = (value) => {
+      const parsed = parseIsoDate(value);
+      if (!parsed) return "-";
+      return parsed.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+    };
+    const getInvoiceDueAmount = (row) => Number(row?.dueAmount || 0);
+    const getDueRowsTotal = (rows) => rows.reduce((sum, row) => sum + getInvoiceDueAmount(row), 0);
+    const getInvoiceFocusConfig = (mode) => {
+      const configs = {
+        dueWeek: {
+          title: "Invoices Due this Week",
+          subtext: "Invoices with due dates in the current week window",
+          rows: invoicesDueThisWeekData,
+          showSubstatus: false
+        },
+        dueMonth: {
+          title: "Invoices Due this Month",
+          subtext: "Invoices with due dates in the current month",
+          rows: invoicesDueThisMonthData,
+          showSubstatus: false
+        },
+        onHold: {
+          title: "Invoices On Hold",
+          subtext: "Invoices currently on hold where additional action is pending",
+          rows: invoicesOnHoldData,
+          showSubstatus: true
+        }
+      };
+      return configs[mode] || configs.dueWeek;
+    };
 
     const getUnappliedCreditsRows = () => unappliedCreditsData;
 
@@ -4652,12 +4848,136 @@
       if (promisedPaymentsPendingCount) promisedPaymentsPendingCount.textContent = String(pendingCount);
     };
 
-    const renderUnappliedCreditsCard = () => {
-      if (unappliedCreditsValue) unappliedCreditsValue.textContent = formatCurrency(getUnappliedCreditsTotal());
-      if (unappliedCreditsSub) {
-        const totalRows = getUnappliedCreditsRows().length;
-        unappliedCreditsSub.textContent = `${totalRows} unapplied entr${totalRows === 1 ? "y" : "ies"}`;
+    const renderInvoicesDueThisWeekCard = () => {
+      const rows = invoicesDueThisWeekData;
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const weekEnd = new Date(today);
+      weekEnd.setDate(weekEnd.getDate() + 7);
+
+      const overdueCount = rows.filter((row) => {
+        const dueDate = parseIsoDate(row.dueDate);
+        return dueDate && dueDate < today;
+      }).length;
+      const dueTodayCount = rows.filter((row) => {
+        const dueDate = parseIsoDate(row.dueDate);
+        return dueDate && dueDate.getTime() === today.getTime();
+      }).length;
+      const upcomingCount = rows.filter((row) => {
+        const dueDate = parseIsoDate(row.dueDate);
+        return dueDate && dueDate > today && dueDate <= weekEnd;
+      }).length;
+
+      if (dueWeekCountValue) dueWeekCountValue.textContent = String(rows.length);
+      if (dueWeekAmountValue) dueWeekAmountValue.textContent = formatAmountValue(getDueRowsTotal(rows));
+      if (dueWeekOverdueCount) dueWeekOverdueCount.textContent = String(overdueCount);
+      if (dueWeekTodayCount) dueWeekTodayCount.textContent = String(dueTodayCount);
+      if (dueWeekUpcomingCount) dueWeekUpcomingCount.textContent = String(upcomingCount);
+    };
+
+    const renderInvoicesDueThisMonthCard = () => {
+      const rows = invoicesDueThisMonthData;
+      const firstBand = rows.filter((row) => {
+        const day = parseIsoDate(row.dueDate)?.getDate() || 0;
+        return day >= 1 && day <= 10;
+      }).length;
+      const secondBand = rows.filter((row) => {
+        const day = parseIsoDate(row.dueDate)?.getDate() || 0;
+        return day >= 11 && day <= 20;
+      }).length;
+      const thirdBand = rows.filter((row) => {
+        const day = parseIsoDate(row.dueDate)?.getDate() || 0;
+        return day >= 21;
+      }).length;
+
+      if (dueMonthCountValue) dueMonthCountValue.textContent = String(rows.length);
+      if (dueMonthAmountValue) dueMonthAmountValue.textContent = formatAmountValue(getDueRowsTotal(rows));
+      if (dueMonthFirstBandCount) dueMonthFirstBandCount.textContent = String(firstBand);
+      if (dueMonthSecondBandCount) dueMonthSecondBandCount.textContent = String(secondBand);
+      if (dueMonthThirdBandCount) dueMonthThirdBandCount.textContent = String(thirdBand);
+    };
+
+    const renderInvoicesOnHoldCard = () => {
+      const rows = invoicesOnHoldData;
+      const counts = rows.reduce((acc, row) => {
+        const subStatus = normalizeKey(row.subStatus);
+        if (/required|copy|challan|report|docs|po/.test(subStatus)) {
+          acc.docs += 1;
+        } else if (/issue|billing|discount|deduction|reversal|write_off|tax/.test(subStatus)) {
+          acc.action += 1;
+        } else {
+          acc.other += 1;
+        }
+        return acc;
+      }, { docs: 0, action: 0, other: 0 });
+
+      if (onHoldCountValue) onHoldCountValue.textContent = String(rows.length);
+      if (onHoldAmountValue) onHoldAmountValue.textContent = formatAmountValue(getDueRowsTotal(rows));
+      if (onHoldDocsCount) onHoldDocsCount.textContent = String(counts.docs);
+      if (onHoldActionCount) onHoldActionCount.textContent = String(counts.action);
+      if (onHoldOtherCount) onHoldOtherCount.textContent = String(counts.other);
+    };
+
+    const renderInvoiceFocusModal = () => {
+      const config = getInvoiceFocusConfig(invoiceFocusCurrentMode);
+      const allRows = [...config.rows].sort((a, b) => {
+        const dueA = parseIsoDate(a.dueDate)?.getTime() || 0;
+        const dueB = parseIsoDate(b.dueDate)?.getTime() || 0;
+        return dueA - dueB;
+      });
+      const totalRows = allRows.length;
+      const totalPages = Math.max(1, Math.ceil(totalRows / invoiceFocusPageSize));
+      if (invoiceFocusCurrentPage > totalPages) invoiceFocusCurrentPage = totalPages;
+      const startIndex = totalRows > 0 ? (invoiceFocusCurrentPage - 1) * invoiceFocusPageSize : 0;
+      const pageRows = allRows.slice(startIndex, startIndex + invoiceFocusPageSize);
+      const showingFrom = totalRows > 0 ? startIndex + 1 : 0;
+      const showingTo = totalRows > 0 ? startIndex + pageRows.length : 0;
+      const colspan = config.showSubstatus ? 8 : 7;
+
+      if (invoiceFocusModalLabel) invoiceFocusModalLabel.textContent = config.title;
+      if (invoiceFocusModalSubtext) invoiceFocusModalSubtext.textContent = config.subtext;
+      if (invoiceFocusSubstatusHeader) invoiceFocusSubstatusHeader.hidden = !config.showSubstatus;
+      if (invoiceFocusTableBody) {
+        if (pageRows.length === 0) {
+          invoiceFocusTableBody.innerHTML = `<tr><td colspan="${colspan}" class="mtdCollectionEmpty">No invoices available for this view.</td></tr>`;
+        } else {
+          invoiceFocusTableBody.innerHTML = pageRows.map((row) => (
+            `<tr>
+              <td>${escapeHtml(row.customerCode)}</td>
+              <td>${escapeHtml(row.customerName)}</td>
+              <td>${escapeHtml(row.invoiceNo)}</td>
+              <td>${formatCurrency(row.invoiceValue)}</td>
+              <td>${formatCurrency(row.dueAmount)}</td>
+              <td>${formatInvoiceDate(row.invoiceDate)}</td>
+              <td>${formatInvoiceDate(row.dueDate)}</td>
+              ${config.showSubstatus ? `<td>${escapeHtml(row.subStatus || "-")}</td>` : ""}
+            </tr>`
+          )).join("");
+        }
       }
+      if (invoiceFocusPaginationInfo) {
+        invoiceFocusPaginationInfo.textContent = `Showing ${showingFrom}-${showingTo} of ${totalRows}`;
+      }
+      if (invoiceFocusPrevBtn) invoiceFocusPrevBtn.disabled = invoiceFocusCurrentPage <= 1 || totalRows === 0;
+      if (invoiceFocusNextBtn) invoiceFocusNextBtn.disabled = invoiceFocusCurrentPage >= totalPages || totalRows === 0;
+    };
+
+    const renderUnappliedCreditsCard = () => {
+      const rows = getUnappliedCreditsRows();
+      if (unappliedCreditsValue) unappliedCreditsValue.textContent = formatCurrency(getUnappliedCreditsTotal(rows));
+      if (unappliedCreditsSub) {
+        unappliedCreditsSub.textContent = `Entries: ${rows.length}`;
+      }
+      const statusCounts = rows.reduce((acc, row) => {
+        const key = normalizeKey(row.status);
+        if (key === "ready_to_apply") acc.ready += 1;
+        else if (key === "under_review") acc.review += 1;
+        else acc.pending += 1;
+        return acc;
+      }, { pending: 0, review: 0, ready: 0 });
+      if (unappliedCreditsPendingCount) unappliedCreditsPendingCount.textContent = String(statusCounts.pending);
+      if (unappliedCreditsReviewCount) unappliedCreditsReviewCount.textContent = String(statusCounts.review);
+      if (unappliedCreditsReadyCount) unappliedCreditsReadyCount.textContent = String(statusCounts.ready);
     };
 
     const renderUnappliedCreditsModal = () => {
@@ -4833,6 +5153,9 @@
     }
 
     renderPromisedPaymentsTodayCard();
+    renderInvoicesDueThisWeekCard();
+    renderInvoicesDueThisMonthCard();
+    renderInvoicesOnHoldCard();
     renderUnappliedCreditsCard();
 
     const mtdTableBody = document.getElementById("mtdCollectionsTableBody");
@@ -5190,6 +5513,46 @@
       wireDashboardModalCard(newAllocationsCard, "allocations");
       wireDashboardModalCard(ptpForDayCard, "ptp");
       wireDashboardModalCard(callbacksForDayCard, "callbacks");
+    }
+
+    if (invoiceFocusModalEl && typeof bootstrap !== "undefined") {
+      const openInvoiceFocusModal = (mode) => {
+        invoiceFocusCurrentMode = mode;
+        invoiceFocusCurrentPage = 1;
+        renderInvoiceFocusModal();
+        const focusModal = bootstrap.Modal.getOrCreateInstance(invoiceFocusModalEl);
+        focusModal.show();
+      };
+
+      const wireInvoiceFocusCard = (cardEl, mode) => {
+        if (!cardEl) return;
+        cardEl.addEventListener("click", () => openInvoiceFocusModal(mode));
+        cardEl.addEventListener("keydown", (event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            openInvoiceFocusModal(mode);
+          }
+        });
+      };
+
+      wireInvoiceFocusCard(invoicesDueWeekCard, "dueWeek");
+      wireInvoiceFocusCard(invoicesDueMonthCard, "dueMonth");
+      wireInvoiceFocusCard(invoicesOnHoldCard, "onHold");
+    }
+
+    if (invoiceFocusPrevBtn) {
+      invoiceFocusPrevBtn.addEventListener("click", () => {
+        if (invoiceFocusCurrentPage <= 1) return;
+        invoiceFocusCurrentPage -= 1;
+        renderInvoiceFocusModal();
+      });
+    }
+
+    if (invoiceFocusNextBtn) {
+      invoiceFocusNextBtn.addEventListener("click", () => {
+        invoiceFocusCurrentPage += 1;
+        renderInvoiceFocusModal();
+      });
     }
 
     mtdDropdowns.forEach((dropdown) => {

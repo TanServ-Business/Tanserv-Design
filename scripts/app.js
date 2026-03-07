@@ -18,6 +18,7 @@ const headerDirectoryContacts = {
 
 const userRoleLabels = {
   agent: "Agent",
+  customer: "Customer",
   manager: "Manager",
   agent_manager: "Agent cum manager",
   supervisor: "Supervisor"
@@ -77,6 +78,8 @@ let directorySearchQuery = "";
 
 const urlParams = new URLSearchParams(window.location.search);
 const isManagerView = urlParams.get("role") === "manager";
+const lpMode = String(document.body.dataset.lpMode || "").trim().toLowerCase();
+const isCustomerLandingView = lpMode === "customer";
 const managerAgentData = [
   { name: "Aditi Sharma", portfolio: 15250000, target: 650000 },
   { name: "Manish Kumar", portfolio: 13500000, target: 600000 },
@@ -92,6 +95,7 @@ const managerNotificationsKey = "ineburaManagerNotifications";
 const pdcNotificationKey = "ineburaPdcNotifications";
 const pdcStorageKey = "ineburaPdcRecords";
 const notificationCenterKey = "ineburaNotificationCenter";
+const invoiceStatusOverridesKey = "ineburaInvoiceStatusOverrides";
 const issueTrackerTotalKey = "issueTrackerTotalIssues";
 const issueTrackerBaseKey = "issueTrackerBaseData";
 const issueTrackerCustomKey = "customIssues";
@@ -719,6 +723,94 @@ const customersData = [
   }
 ];
 
+function loadInvoiceStatusOverrides() {
+  try {
+    const raw = localStorage.getItem(invoiceStatusOverridesKey);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch (_) {
+    return {};
+  }
+}
+
+function saveInvoiceStatusOverrides(map) {
+  try {
+    localStorage.setItem(invoiceStatusOverridesKey, JSON.stringify(map || {}));
+  } catch (_) {}
+}
+
+function upsertInvoiceStatusOverride(invoiceNo, payload) {
+  if (!invoiceNo || !payload || typeof payload !== "object") return;
+  const map = loadInvoiceStatusOverrides();
+  const existing = map[invoiceNo] && typeof map[invoiceNo] === "object" ? map[invoiceNo] : {};
+  const next = {
+    broadStatus: payload.broadStatus || existing.broadStatus || "",
+    primaryStatus: payload.primaryStatus || existing.primaryStatus || "",
+    subStatus: payload.subStatus || existing.subStatus || "",
+    status: payload.status || payload.subStatus || existing.status || "",
+    updatedAt: payload.updatedAt || new Date().toISOString(),
+    updatedBy: payload.updatedBy || existing.updatedBy || ""
+  };
+  map[invoiceNo] = next;
+  saveInvoiceStatusOverrides(map);
+}
+
+function applyInvoiceStatusOverrides(records) {
+  if (!Array.isArray(records) || records.length === 0) return;
+  const map = loadInvoiceStatusOverrides();
+  if (!map || typeof map !== "object") return;
+  records.forEach((customer) => {
+    (customer?.invoices || []).forEach((invoice) => {
+      const override = map[invoice?.invoiceNo];
+      if (!override || typeof override !== "object") return;
+      if (override.broadStatus) invoice.broadStatus = override.broadStatus;
+      if (override.primaryStatus) invoice.primaryStatus = override.primaryStatus;
+      if (override.subStatus) invoice.subStatus = override.subStatus;
+      if (override.status || override.subStatus) {
+        invoice.status = override.status || override.subStatus;
+      }
+    });
+  });
+}
+
+const normalizeLpCustomerCode = (value) => String(value || "").trim().toUpperCase();
+
+const resolveLandingCustomerCode = () => {
+  if (!isCustomerLandingView) return "";
+  const queryCode = normalizeLpCustomerCode(urlParams.get("customerCode"));
+  if (queryCode) return queryCode;
+  const storedCode = normalizeLpCustomerCode(localStorage.getItem("activeCustomerCode"));
+  if (storedCode) return storedCode;
+  return "";
+};
+
+if (isCustomerLandingView) {
+  const requestedCode = resolveLandingCustomerCode();
+  const activeCustomer = customersData.find((customer) => (
+    normalizeLpCustomerCode(customer.code) === requestedCode
+  )) || customersData[0] || null;
+
+  if (activeCustomer) {
+    customersData.splice(0, customersData.length, activeCustomer);
+    const activeCode = normalizeLpCustomerCode(activeCustomer.code);
+    try {
+      localStorage.setItem("activeCustomerCode", activeCustomer.code || "");
+      localStorage.setItem("activeCustomerName", activeCustomer.name || "");
+      localStorage.setItem("activeUserRole", "customer");
+    } catch (_) {}
+
+    const currentQueryCode = normalizeLpCustomerCode(urlParams.get("customerCode"));
+    if (activeCode && activeCode !== currentQueryCode) {
+      const nextUrl = new URL(window.location.href);
+      nextUrl.searchParams.set("customerCode", activeCode);
+      window.history.replaceState({}, "", nextUrl.toString());
+    }
+  }
+}
+
+applyInvoiceStatusOverrides(customersData);
+
 customersData.forEach(customer => {
   const defaultCreditPeriod = customer.creditPeriod;
   (customer.invoices || []).forEach(invoice => {
@@ -1255,7 +1347,12 @@ function normalizeNotificationCenter() {
 }
 
 function getNotificationAudience() {
-  return isManagerView ? "manager" : "agent";
+  if (isCustomerLandingView) return "customer";
+  if (isManagerView) return "manager";
+  const role = String(localStorage.getItem("activeUserRole") || "").trim().toLowerCase();
+  if (role === "manager") return "manager";
+  if (role === "customer") return "customer";
+  return "agent";
 }
 
 function getVisibleNotificationCenter() {
@@ -1266,6 +1363,11 @@ function getVisibleNotificationCenter() {
     if (audiences.length === 0) return true;
     return audiences.includes("all") || audiences.includes(audience);
   });
+}
+
+function getNotificationCenterItemById(noteId) {
+  if (!noteId) return null;
+  return normalizeNotificationCenter().find((note) => note.id === noteId) || null;
 }
 
 function markNotificationCenterRead() {
@@ -1627,6 +1729,7 @@ function renderNotificationPopup() {
     "visit-approval": "Visit approval",
     todo: "Todo",
     email: "Email",
+    "customer-payment": "Customer payment",
     "commitment-approved": "Commitment",
     "task-completed": "Task",
     manager: "Manager"
@@ -1680,6 +1783,13 @@ function renderNotificationPopup() {
       if (invoice) return `${base} - ${invoice}`;
       return base;
     }
+    if (type === "customer-payment") {
+      const base = "Customer payment submitted";
+      if (invoice && customer) return `${base} - ${invoice} - ${customer}`;
+      if (invoice) return `${base} - ${invoice}`;
+      if (customer) return `${base} - ${customer}`;
+      return base;
+    }
     if (type === "commitment-approved") {
       const base = "Commitment approved";
       if (invoice && customer) return `${base} - ${invoice} - ${customer}`;
@@ -1724,6 +1834,7 @@ function renderNotificationPopup() {
         : (note.type === "pdc" || note.type === "pdc-reminder") ? "open-pdc"
           : note.type === "todo" ? "open-todo"
             : note.type === "email" ? "open-email"
+              : note.type === "customer-payment" ? "open-disposition"
               : note.type === "commitment-approved" ? "open-invoice"
                 : "");
     const defaultHref = defaultCta.href
@@ -2060,7 +2171,12 @@ function buildStatusUpdateEntry(data) {
     detailItems.unshift({ label: "Invoices", value: data.invoices.join(", ") });
   }
 
-  if (data.subStatus === "Collection") {
+  const isCollectionTrailEvent = (
+    ["Collection", "Paid by customer", "Collected"].includes(String(data.subStatus || "").trim())
+    || String(data.activityType || "").trim() === "Collection"
+  );
+
+  if (isCollectionTrailEvent) {
     detailItems.push({ label: "Instrument mode", value: safeText(data.instrumentMode) });
     if (data.instrumentMode === "Miscellenious") {
       const detailsPayload = encodeURIComponent(JSON.stringify({
@@ -2441,6 +2557,30 @@ function safeText(value) {
   return String(value);
 }
 
+function showTransientNotification(title, message, tone = "success") {
+  const notifyDock = document.getElementById("notifyDock");
+  if (!notifyDock) return;
+  const popup = document.createElement("div");
+  const iconClass = tone === "error" ? "bi bi-x-circle-fill" : "bi bi-check-circle-fill";
+  popup.className = `notifyPopup ${tone === "error" ? "warn" : "success"} animateUp`;
+  popup.innerHTML = `
+    <i class="${iconClass}" aria-hidden="true"></i>
+    <div>
+      <strong>${safeText(title)}</strong>
+      <span>${safeText(message)}</span>
+    </div>
+    <button class="notifyClose" type="button" aria-label="Dismiss">
+      <i class="bi bi-x-lg" aria-hidden="true"></i>
+    </button>
+  `;
+  const closeBtn = popup.querySelector(".notifyClose");
+  if (closeBtn) closeBtn.addEventListener("click", () => popup.remove());
+  notifyDock.prepend(popup);
+  setTimeout(() => {
+    if (popup.isConnected) popup.remove();
+  }, 4500);
+}
+
 function formatContactName(contact) {
   if (!contact) return "Unnamed Contact";
   const first = String(contact.firstName || "").trim();
@@ -2586,6 +2726,123 @@ function setDispositionVisible(show) {
   }
 }
 
+function applyDispositionPrefill(prefill) {
+  if (!prefill || typeof prefill !== "object") return;
+  const activityTypeSelect = document.getElementById("activityTypeSelect");
+  const broadStatusSelect = document.getElementById("broadStatusSelect");
+  const primaryStatusSelect = document.getElementById("primaryStatusSelect");
+  const subStatusSelect = document.getElementById("subStatusSelect");
+  const instrumentModeSelect = document.getElementById("collectionInstrumentMode");
+  const instrumentRefInput = document.getElementById("collectionInstrumentRef");
+  const bankInput = document.getElementById("collectionBank");
+  const transferDateInput = document.getElementById("collectionTransferDate");
+  const amountInput = document.getElementById("collectionAmount");
+  const tdsInput = document.getElementById("collectionTds");
+  const ldInput = document.getElementById("collectionLd");
+  const miscList = document.getElementById("collectionMiscList");
+  const addMiscBtn = document.getElementById("addMiscModeBtn");
+  const remarksInput = document.getElementById("activityRemarks");
+
+  const setSelectValue = (selectEl, value) => {
+    if (!selectEl || value === undefined || value === null || value === "") return;
+    const option = Array.from(selectEl.options).find((item) => item.value === value || item.text === value);
+    if (option) selectEl.value = option.value;
+  };
+  const setInputValue = (inputEl, value, eventName = "input") => {
+    if (!inputEl) return;
+    inputEl.value = value === undefined || value === null ? "" : String(value);
+    inputEl.dispatchEvent(new Event(eventName, { bubbles: true }));
+  };
+
+  setSelectValue(activityTypeSelect, prefill.activityType);
+  setSelectValue(broadStatusSelect, prefill.broadStatus);
+  setSelectValue(primaryStatusSelect, prefill.primaryStatus);
+  setSelectValue(subStatusSelect, prefill.subStatus);
+  setSelectValue(instrumentModeSelect, prefill.instrumentMode);
+
+  if (instrumentModeSelect) {
+    instrumentModeSelect.dispatchEvent(new Event("change", { bubbles: true }));
+  }
+
+  const isMiscMode = String(instrumentModeSelect?.value || "").trim() === "Miscellenious";
+  if (isMiscMode) {
+    const rows = Array.isArray(prefill.miscRows) ? prefill.miscRows : [];
+    if (miscList && rows.length > 0) {
+      miscList.innerHTML = "";
+      rows.forEach(() => {
+        if (addMiscBtn) addMiscBtn.click();
+      });
+      const rowEls = Array.from(miscList.querySelectorAll(".collectionMiscRow"));
+      rows.forEach((row, idx) => {
+        const rowEl = rowEls[idx];
+        if (!rowEl) return;
+        const modeSelect = rowEl.querySelector(".miscModeSelect");
+        const adjustmentSelect = rowEl.querySelector(".miscAdjustmentSelect");
+        setSelectValue(modeSelect, row.mode);
+        if (modeSelect) {
+          modeSelect.dispatchEvent(new Event("change", { bubbles: true }));
+        }
+        setInputValue(rowEl.querySelector(".miscInstrumentRef"), row.instrumentRef, "change");
+        setInputValue(rowEl.querySelector(".miscBank"), row.bank, "change");
+        setInputValue(rowEl.querySelector(".miscTransferDate"), row.transferDate, "change");
+        setInputValue(rowEl.querySelector(".miscAmount"), row.amount);
+        setInputValue(rowEl.querySelector(".miscTds"), row.tds);
+        setInputValue(rowEl.querySelector(".miscLd"), row.ld);
+        if (adjustmentSelect) {
+          setSelectValue(adjustmentSelect, row.adjustmentId);
+          adjustmentSelect.dispatchEvent(new Event("change", { bubbles: true }));
+        }
+      });
+    }
+  } else {
+    setInputValue(instrumentRefInput, prefill.instrumentRef, "change");
+    setInputValue(bankInput, prefill.bank, "change");
+    setInputValue(transferDateInput, prefill.transferDate, "change");
+    setInputValue(amountInput, prefill.amount);
+    setInputValue(tdsInput, prefill.tds);
+    setInputValue(ldInput, prefill.ld);
+  }
+
+  if (remarksInput && String(prefill.remarks || "").trim()) {
+    setInputValue(remarksInput, prefill.remarks);
+  }
+
+  if (activityTypeSelect) {
+    activityTypeSelect.dispatchEvent(new Event("change", { bubbles: true }));
+  }
+  if (subStatusSelect) {
+    subStatusSelect.dispatchEvent(new Event("change", { bubbles: true }));
+  }
+}
+
+function getLatestCustomerPaymentPrefill(invoiceNo) {
+  if (!invoiceNo) return null;
+  const trailMap = loadActivityTrailMap();
+  const entries = Array.isArray(trailMap[invoiceNo]) ? trailMap[invoiceNo] : [];
+  const latest = entries.find((entry) => {
+    if (!entry || entry.type !== "status" || !entry.data) return false;
+    return String(entry.data.subStatus || "").trim() === "Paid by customer";
+  });
+  if (!latest || !latest.data) return null;
+
+  const data = latest.data;
+  return {
+    activityType: "Collection",
+    broadStatus: data.broadStatus || "Work in Progress",
+    primaryStatus: data.primaryStatus || "Collection In Progress",
+    subStatus: data.subStatus || "Paid by customer",
+    remarks: data.remarks || "",
+    instrumentMode: data.instrumentMode || "NEFT",
+    instrumentRef: data.instrumentRef || "",
+    bank: data.bank || "",
+    transferDate: data.transferDate || "",
+    amount: data.amount ?? "",
+    tds: data.tds ?? "",
+    ld: data.ld ?? "",
+    miscRows: Array.isArray(data.miscRows) ? data.miscRows : []
+  };
+}
+
 function setEmailPanelVisible(show) {
   const panel = document.getElementById("emailPanel");
   if (!panel) return;
@@ -2614,12 +2871,13 @@ function renderDispositionInvoiceList() {
     .join("");
 }
 
-function openDispositionForSingleInvoice(invNo) {
+function openDispositionForSingleInvoice(invNo, prefill = null) {
   dispositionInvoiceFilter = invNo ? [invNo] : null;
   dispositionInvoiceList = invNo ? [invNo] : [];
   setDispositionVisible(true);
   setDispositionReadOnly(isManagerView);
   renderDispositionInvoiceList();
+  applyDispositionPrefill(prefill || getLatestCustomerPaymentPrefill(invNo));
   refreshCollectionTotals();
   applyFiltersAndRender();
 }
@@ -2828,6 +3086,26 @@ function selectInvoiceByNo(invNo) {
   return true;
 }
 
+function findInvoiceContext(invNo) {
+  if (!invNo) return null;
+  for (const customer of customersData) {
+    const invoice = (customer.invoices || []).find((item) => item.invoiceNo === invNo);
+    if (invoice) {
+      return { customer, invoice };
+    }
+  }
+  return null;
+}
+
+function openInvoiceContext(invNo) {
+  const context = findInvoiceContext(invNo);
+  if (!context) return false;
+  if (selectedCustomerId !== context.customer.id) {
+    selectCustomer(context.customer.id);
+  }
+  return selectInvoiceByNo(invNo);
+}
+
 function ensureFirstInvoiceSelected() {
   const tbody = document.getElementById("invoiceTableBody");
   if (currentInvoiceNoForDocs) return;
@@ -2995,6 +3273,8 @@ const docsSelectionState = {};
 const docsLockedState = {};
 let currentCnAdvPdcRows = [];
 let cnAdvPdcSortState = { key: null, dir: null };
+let openCustomerPayModal = null;
+let openCustomerRemarkModal = null;
 
 const filterState = {
   invoiceStatus: "__ALL__",
@@ -3557,6 +3837,9 @@ function renderInvoiceTable(invoices) {
 
   tbody.innerHTML = "";
   const actionLabel = isManagerView ? "Add remarks" : "New activity";
+  const showAgentIconColumns = !isCustomerLandingView;
+  const showStatusColumns = !isCustomerLandingView;
+  const emptyColSpan = showAgentIconColumns && showStatusColumns ? 12 : 8;
 
   (invoices || []).forEach((inv) => {
     const isChecked = selectedInvoiceNos.has(inv.invoiceNo);
@@ -3569,12 +3852,25 @@ function renderInvoiceTable(invoices) {
     const emailTitle = Number(inv.unreadEmailCount || 0) > 0
       ? `Unread emails: ${inv.unreadEmailCount}`
       : "Email panel";
+    const actionMarkup = isCustomerLandingView
+      ? `
+        <div class="invoiceActionGroup">
+          <button class="payActionBtn" type="button" data-action="pay" data-inv="${inv.invoiceNo}">Pay</button>
+          <button class="remarkActionBtn" type="button" data-action="add-remark" data-inv="${inv.invoiceNo}">Add Remark</button>
+        </div>
+      `
+      : `
+        <div class="actionCell">
+          <button class="btnNewActivity" type="button" data-action="new-activity" data-inv="${inv.invoiceNo}">${actionLabel}</button>
+        </div>
+      `;
 
     tr.innerHTML = `
       <td class="colChk cellCenter">
         <input type="checkbox" class="invChk" data-inv="${inv.invoiceNo}" ${isChecked ? "checked" : ""} />
       </td>
 
+      ${showAgentIconColumns ? `
       <td class="colIcon cellCenter">
         <span class="iconWrap">
           <span class="iconFlat" role="button" tabindex="0" title="${emailTitle}" data-action="email" data-inv="${inv.invoiceNo}">
@@ -3588,7 +3884,7 @@ function renderInvoiceTable(invoices) {
         <span class="iconFlat" role="button" tabindex="0" title="${targetTitle}" data-action="target" data-inv="${inv.invoiceNo}" style="${hasTarget ? "color: #16a34a;" : ""}">
           <i class="bi bi-bullseye" aria-hidden="true"></i>
         </span>
-      </td>
+      </td>` : ""}
 
       <td class="colInv" title="${inv.invoiceNo}">${inv.invoiceNo}</td>
       <td class="colAmtRight" title="Rs.${formatINR(inv.invoiceAmount)}">Rs.${formatINR(inv.invoiceAmount)}</td>
@@ -3596,15 +3892,14 @@ function renderInvoiceTable(invoices) {
       <td class="colAmtRight" title="Rs.${formatINR(inv.netDueAmount)}">Rs.${formatINR(inv.netDueAmount)}</td>
       <td class="colDate" title="${inv.invoiceDate}">${inv.invoiceDate}</td>
       <td class="colDate" title="${inv.dueDate}">${inv.dueDate}</td>
+      ${showStatusColumns ? `
       <td class="colShort" title="${inv.primaryStatus}">${inv.primaryStatus}</td>
       <td class="colStatus" title="${subStatus}">
         <span class="pill ${statusPillClass(subStatus, inv.primaryStatus)}" title="${subStatus}">${subStatus}</span>
-      </td>
+      </td>` : ""}
 
       <td class="colActions cellCenter">
-        <div class="actionCell">
-          <button class="btnNewActivity" type="button" data-action="new-activity" data-inv="${inv.invoiceNo}">${actionLabel}</button>
-        </div>
+        ${actionMarkup}
       </td>
     `;
 
@@ -3612,7 +3907,7 @@ function renderInvoiceTable(invoices) {
   });
 
   if (!invoices || invoices.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="12" style="padding:14px; color:#667085;">No invoices match the selected filters.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="${emptyColSpan}" style="padding:14px; color:#667085;">No invoices match the selected filters.</td></tr>`;
   }
 }
 
@@ -3727,6 +4022,12 @@ function updateBulkBar() {
   const bulkBar = document.getElementById("bulkBar");
   const bulkCount = document.getElementById("bulkCount");
   if (!bulkBar || !bulkCount) return;
+
+  if (isCustomerLandingView) {
+    bulkBar.classList.add("hidden");
+    bulkCount.textContent = "0";
+    return;
+  }
 
   const count = selectedInvoiceNos.size;
   bulkCount.textContent = String(count);
@@ -4418,6 +4719,7 @@ function wireEmailPanelEvents() {
 }
 
 function wireDispositionActivityEvents() {
+  const activityTypeSelect = document.getElementById("activityTypeSelect");
   const subStatusSelect = document.getElementById("subStatusSelect");
   const collectionFields = document.getElementById("collectionFields");
   const submitBtn = document.getElementById("submitActivityBtn");
@@ -4478,6 +4780,13 @@ function wireDispositionActivityEvents() {
   ];
   const defaultSubStatus = "No Response";
   let pendingPdcSubmission = null;
+  const collectionSubStatuses = new Set(["Collection", "Paid by customer", "Collected"]);
+
+  const isCollectionFlowSelected = () => {
+    const selectedSubStatus = String(subStatusSelect?.value || "").trim();
+    const selectedActivityType = String(activityTypeSelect?.value || "").trim();
+    return collectionSubStatuses.has(selectedSubStatus) || selectedActivityType === "Collection";
+  };
 
   const showError = (message) => {
     if (!errorEl) return;
@@ -4606,7 +4915,7 @@ function wireDispositionActivityEvents() {
   };
 
   const validateCollection = (showErrors) => {
-    const isCollection = subStatusSelect?.value === "Collection";
+    const isCollection = isCollectionFlowSelected();
     if (!isCollection) return true;
 
     const instrumentMode = instrumentModeSelect?.value || "";
@@ -4945,13 +5254,25 @@ function wireDispositionActivityEvents() {
     return invoice ? Number(invoice.netDueAmount || 0) : 0;
   };
 
-  const updateInvoiceStatuses = (invoiceNos, status) => {
+  const updateInvoiceStatuses = (invoiceNos, status, options = {}) => {
     if (!Array.isArray(invoiceNos) || invoiceNos.length === 0) return;
+    const updatedAt = options.updatedAt || new Date().toISOString();
+    const updatedBy = options.updatedBy || (isCustomerLandingView ? "customer" : "agent");
     invoiceNos.forEach((invNo) => {
       const invoice = currentInvoicesAll.find(inv => inv.invoiceNo === invNo);
       if (invoice) {
         invoice.status = status;
         invoice.subStatus = status;
+        if (options.primaryStatus) invoice.primaryStatus = options.primaryStatus;
+        if (options.broadStatus) invoice.broadStatus = options.broadStatus;
+        upsertInvoiceStatusOverride(invNo, {
+          broadStatus: options.broadStatus || invoice.broadStatus || "",
+          primaryStatus: options.primaryStatus || invoice.primaryStatus || "",
+          subStatus: status || invoice.subStatus || "",
+          status: status || invoice.status || "",
+          updatedAt,
+          updatedBy
+        });
       }
     });
     populateFilters(currentInvoicesAll);
@@ -4974,8 +5295,8 @@ function wireDispositionActivityEvents() {
   };
 
   const toggleCollectionFields = () => {
-    if (!subStatusSelect || !collectionFields) return;
-    const isCollection = subStatusSelect.value === "Collection";
+    if (!collectionFields) return;
+    const isCollection = isCollectionFlowSelected();
     collectionFields.classList.toggle("hidden", !isCollection);
     if (isCollection) updateCollectionTotals();
   };
@@ -5011,6 +5332,12 @@ function wireDispositionActivityEvents() {
     toggleCollectionFields();
     togglePdcFields();
     toggleDeliveryChallanFields();
+  }
+
+  if (activityTypeSelect) {
+    activityTypeSelect.addEventListener("change", () => {
+      toggleCollectionFields();
+    });
   }
 
   if (instrumentModeSelect) {
@@ -5145,7 +5472,7 @@ function wireDispositionActivityEvents() {
     clearError();
     clearPdcError();
     const subStatus = getValue("subStatusSelect");
-    const isCollection = subStatus === "Collection";
+    const isCollection = isCollectionFlowSelected();
     const isPdcGiven = subStatus === "PDC given";
     const instrumentMode = getValue("collectionInstrumentMode");
     const isMisc = instrumentMode === "Miscellenious";
@@ -5459,7 +5786,12 @@ function wireDispositionActivityEvents() {
       }
 
       if (subStatus && invoices.length > 0) {
-        updateInvoiceStatuses(invoices, subStatus);
+        updateInvoiceStatuses(invoices, subStatus, {
+          broadStatus: data.broadStatus,
+          primaryStatus: data.primaryStatus,
+          updatedBy: isCustomerLandingView ? "customer" : "agent",
+          updatedAt: activityTimestamp
+        });
       }
 
       const statusPayload = buildStatusTrailPayload(data, activityTimestamp);
@@ -5534,8 +5866,637 @@ function wireDispositionActivityEvents() {
       }
     }
 
-    submitActivity();
+  submitActivity();
   });
+}
+
+function wireCustomerPayRemarkEvents() {
+  if (!isCustomerLandingView) return;
+
+  const payModalEl = document.getElementById("customerPayModal");
+  const remarkModalEl = document.getElementById("customerRemarkModal");
+  if (!payModalEl || !remarkModalEl) return;
+
+  const payInvoiceMeta = document.getElementById("customerPayInvoiceMeta");
+  const payOutstandingAmount = document.getElementById("customerPayOutstandingAmount");
+  const payTotalAmount = document.getElementById("customerPayTotalAmount");
+  const payError = document.getElementById("customerPayError");
+  const payMode = document.getElementById("customerPayInstrumentMode");
+  const payInstrumentRef = document.getElementById("customerPayInstrumentRef");
+  const payBank = document.getElementById("customerPayBank");
+  const payTransferDate = document.getElementById("customerPayTransferDate");
+  const payAmount = document.getElementById("customerPayAmount");
+  const payTds = document.getElementById("customerPayTds");
+  const payLd = document.getElementById("customerPayLd");
+  const payMiscFields = document.getElementById("customerPayMiscFields");
+  const payMiscList = document.getElementById("customerPayMiscList");
+  const payAddMiscModeBtn = document.getElementById("customerPayAddMiscModeBtn");
+  const paySingleFields = document.querySelectorAll(".customerPaySingleFields");
+  const payReceiptInput = document.getElementById("customerPayReceiptInput");
+  const payReceiptHint = document.getElementById("customerPayReceiptHint");
+  const paySubmitBtn = document.getElementById("customerPaySubmitBtn");
+  const remarkInvoiceMeta = document.getElementById("customerRemarkInvoiceMeta");
+  const remarkText = document.getElementById("customerRemarkText");
+  const remarkError = document.getElementById("customerRemarkError");
+  const remarkSaveBtn = document.getElementById("customerRemarkSaveBtn");
+  const remarksAccordion = document.getElementById("invoiceRemarksCollapse");
+  const activityAccordion = document.getElementById("invoiceActivityCollapse");
+  const notifyDock = document.getElementById("notifyDock");
+
+  const allowedReceiptTypes = new Set(["application/pdf", "image/jpeg", "image/png"]);
+  const allowedReceiptExt = /\.(pdf|jpe?g|png)$/i;
+  const miscModes = ["NEFT", "RTGS", "Cheque", "Demand Draft", "PDC", "CN", "Adv"];
+  const bankSuggestions = [
+    "State Bank of India",
+    "HDFC Bank",
+    "ICICI Bank",
+    "Axis Bank",
+    "Kotak Mahindra Bank",
+    "Punjab National Bank",
+    "Bank of Baroda",
+    "Canara Bank",
+    "Union Bank of India",
+    "IDFC First Bank",
+    "IndusInd Bank",
+    "Yes Bank",
+    "IDBI Bank",
+    "Federal Bank",
+    "RBL Bank",
+    "HSBC",
+    "Citibank",
+    "Standard Chartered"
+  ];
+
+  let payInvoiceNo = "";
+  let remarkInvoiceNo = "";
+
+  const showNotify = (title, message) => {
+    if (!notifyDock) return;
+    const popup = document.createElement("div");
+    popup.className = "notifyPopup success animateUp";
+    popup.innerHTML = `
+      <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+      <div>
+        <strong>${safeText(title)}</strong>
+        <span>${safeText(message)}</span>
+      </div>
+      <button class="notifyClose" type="button" aria-label="Dismiss">
+        <i class="bi bi-x-lg" aria-hidden="true"></i>
+      </button>
+    `;
+    const closeBtn = popup.querySelector(".notifyClose");
+    if (closeBtn) closeBtn.addEventListener("click", () => popup.remove());
+    notifyDock.prepend(popup);
+    setTimeout(() => {
+      if (popup.isConnected) popup.remove();
+    }, 4000);
+  };
+
+  const hideBankSuggestions = (box) => {
+    if (!box) return;
+    box.style.display = "none";
+    box.innerHTML = "";
+  };
+
+  const renderBankSuggestions = (input, box, clearBtn) => {
+    if (!input || !box) return;
+    const query = String(input.value || "").trim().toLowerCase();
+    if (!query) {
+      hideBankSuggestions(box);
+      if (clearBtn) clearBtn.classList.remove("visible");
+      return;
+    }
+    const matches = bankSuggestions.filter((name) => name.toLowerCase().includes(query));
+    if (!matches.length) {
+      box.innerHTML = `<div style="padding:6px 8px; font-size:12px; color:#94a3b8;">No matches found.</div>`;
+      box.style.display = "block";
+      if (clearBtn) clearBtn.classList.add("visible");
+      return;
+    }
+    box.innerHTML = matches.map((name) => (
+      `<div class="suggestionItem" data-name="${safeText(name)}"><span>${safeText(name)}</span></div>`
+    )).join("");
+    box.style.display = "block";
+    if (clearBtn) clearBtn.classList.add("visible");
+  };
+
+  const wireBankSuggestion = (input) => {
+    if (!input || input.dataset.customerPayBankBound) return;
+    const wrap = input.closest(".bankSuggest");
+    const box = wrap ? wrap.querySelector(".suggestionBox") : null;
+    const clearBtn = wrap ? wrap.querySelector(".clearBtn") : null;
+    if (!box) return;
+
+    input.dataset.customerPayBankBound = "true";
+    const show = () => renderBankSuggestions(input, box, clearBtn);
+    input.addEventListener("input", show);
+    input.addEventListener("focus", show);
+
+    if (clearBtn) {
+      clearBtn.addEventListener("click", () => {
+        input.value = "";
+        input.focus();
+        hideBankSuggestions(box);
+        clearBtn.classList.remove("visible");
+      });
+    }
+
+    box.addEventListener("click", (event) => {
+      const item = event.target.closest(".suggestionItem");
+      if (!item) return;
+      input.value = item.getAttribute("data-name") || "";
+      hideBankSuggestions(box);
+      if (clearBtn) clearBtn.classList.add("visible");
+    });
+  };
+
+  const showPayError = (message) => {
+    if (!payError) return;
+    payError.textContent = message;
+    payError.classList.remove("hidden");
+  };
+
+  const clearPayError = () => {
+    if (!payError) return;
+    payError.textContent = "";
+    payError.classList.add("hidden");
+  };
+
+  const showRemarkError = (message) => {
+    if (!remarkError) return;
+    remarkError.textContent = message;
+    remarkError.classList.remove("hidden");
+  };
+
+  const clearRemarkError = () => {
+    if (!remarkError) return;
+    remarkError.textContent = "";
+    remarkError.classList.add("hidden");
+  };
+
+  const getPayInvoice = () => {
+    if (!payInvoiceNo) return null;
+    return currentInvoicesAll.find((invoice) => invoice.invoiceNo === payInvoiceNo) || null;
+  };
+
+  const getPayOutstanding = () => {
+    const invoice = getPayInvoice();
+    return invoice ? Number(invoice.netDueAmount || 0) : 0;
+  };
+
+  const getPayMiscRows = () => {
+    if (!payMiscList) return [];
+    return Array.from(payMiscList.querySelectorAll(".collectionMiscRow")).map((row) => ({
+      mode: row.querySelector(".miscModeSelect")?.value || "",
+      instrumentRef: row.querySelector(".miscInstrumentRef")?.value || "",
+      bank: row.querySelector(".miscBank")?.value || "",
+      transferDate: row.querySelector(".miscTransferDate")?.value || "",
+      amount: Number(row.querySelector(".miscAmount")?.value || 0),
+      tds: Number(row.querySelector(".miscTds")?.value || 0),
+      ld: Number(row.querySelector(".miscLd")?.value || 0)
+    }));
+  };
+
+  const computePayTotal = () => {
+    const isMisc = payMode?.value === "Miscellenious";
+    if (isMisc) {
+      return getPayMiscRows().reduce((sum, row) => sum + row.amount + row.tds + row.ld, 0);
+    }
+    return Number(payAmount?.value || 0) + Number(payTds?.value || 0) + Number(payLd?.value || 0);
+  };
+
+  const updatePayTotals = () => {
+    if (payOutstandingAmount) {
+      payOutstandingAmount.textContent = `Rs. ${formatINR(getPayOutstanding())}`;
+    }
+    if (payTotalAmount) {
+      payTotalAmount.textContent = `Rs. ${formatINR(computePayTotal())}`;
+    }
+  };
+
+  const createPayMiscRow = () => {
+    if (!payMiscList) return;
+    const row = document.createElement("div");
+    row.className = "collectionMiscRow";
+    row.innerHTML = `
+      <div class="collectionMiscRowHeader">
+        <div>
+          <label>Mode</label>
+          <select class="miscModeSelect">
+            ${miscModes.map((mode) => `<option>${mode}</option>`).join("")}
+          </select>
+        </div>
+        <button type="button" class="miscRemoveBtn">Remove</button>
+      </div>
+      <div class="collectionMiscGrid">
+        <div>
+          <label>Instrument ref no</label>
+          <input type="text" class="miscInstrumentRef" placeholder="Reference number" />
+        </div>
+        <div>
+          <label>Bank</label>
+          <div class="bankSuggest">
+            <div class="inputWithClear">
+              <input type="text" class="miscBank" placeholder="Bank name" autocomplete="off" />
+              <button class="clearBtn" type="button" aria-label="Clear search">
+                <i class="bi bi-x-lg" aria-hidden="true"></i>
+              </button>
+            </div>
+            <div class="suggestionBox"></div>
+          </div>
+        </div>
+        <div>
+          <label>Transfer date</label>
+          <input type="date" class="miscTransferDate" />
+        </div>
+        <div>
+          <label>Amount</label>
+          <input type="number" class="miscAmount" min="0" step="0.01" placeholder="0" />
+        </div>
+        <div>
+          <label>TDS</label>
+          <input type="number" class="miscTds" min="0" step="0.01" placeholder="0" />
+        </div>
+        <div>
+          <label>LD</label>
+          <input type="number" class="miscLd" min="0" step="0.01" placeholder="0" />
+        </div>
+      </div>
+    `;
+
+    const removeBtn = row.querySelector(".miscRemoveBtn");
+    if (removeBtn) {
+      removeBtn.addEventListener("click", () => {
+        row.remove();
+        updatePayTotals();
+      });
+    }
+
+    row.querySelectorAll("input, select").forEach((input) => {
+      input.addEventListener("input", () => {
+        clearPayError();
+        updatePayTotals();
+      });
+      input.addEventListener("change", () => {
+        clearPayError();
+        updatePayTotals();
+      });
+    });
+
+    wireBankSuggestion(row.querySelector(".miscBank"));
+    payMiscList.appendChild(row);
+    updatePayTotals();
+  };
+
+  const togglePayModeFields = () => {
+    const isMisc = payMode?.value === "Miscellenious";
+    paySingleFields.forEach((field) => field.classList.toggle("hidden", isMisc));
+    if (payMiscFields) payMiscFields.classList.toggle("hidden", !isMisc);
+    if (isMisc && payMiscList && payMiscList.children.length === 0) {
+      createPayMiscRow();
+    }
+    updatePayTotals();
+  };
+
+  const validateReceipt = () => {
+    if (!payReceiptInput || !payReceiptInput.files || payReceiptInput.files.length === 0) return true;
+    const file = payReceiptInput.files[0];
+    const fileName = String(file.name || "");
+    const fileType = String(file.type || "").toLowerCase();
+    if (!allowedReceiptExt.test(fileName) && !allowedReceiptTypes.has(fileType)) {
+      showPayError("Receipt must be a PDF, JPG, JPEG, or PNG file.");
+      payReceiptInput.value = "";
+      if (payReceiptHint) payReceiptHint.textContent = "Accepted: PDF, JPG, JPEG, PNG";
+      return false;
+    }
+    if (payReceiptHint) payReceiptHint.textContent = `Selected file: ${fileName}`;
+    return true;
+  };
+
+  const validatePayForm = () => {
+    clearPayError();
+    const outstanding = getPayOutstanding();
+    const mode = payMode?.value || "";
+    const isMisc = mode === "Miscellenious";
+    const totalCollected = computePayTotal();
+    const singleAmount = Number(payAmount?.value || 0);
+    const singleTds = Number(payTds?.value || 0);
+    const singleLd = Number(payLd?.value || 0);
+    const miscRows = isMisc ? getPayMiscRows() : [];
+
+    if (!mode) {
+      showPayError("Select instrument mode.");
+      return null;
+    }
+
+    if (isMisc) {
+      if (!miscRows.length) {
+        showPayError("Add at least one collection mode.");
+        return null;
+      }
+      const missingRow = miscRows.some((row) => (
+        !row.mode || !row.instrumentRef || !row.bank || !row.transferDate || Number(row.amount || 0) <= 0
+      ));
+      if (missingRow) {
+        showPayError("Complete mode, reference, bank, transfer date, and amount for each collection row.");
+        return null;
+      }
+    } else {
+      if (!String(payInstrumentRef?.value || "").trim()) {
+        showPayError("Enter instrument reference number.");
+        return null;
+      }
+      if (!String(payBank?.value || "").trim()) {
+        showPayError("Enter bank name.");
+        return null;
+      }
+      if (!String(payTransferDate?.value || "").trim()) {
+        showPayError("Select transfer date.");
+        return null;
+      }
+      if (singleAmount <= 0) {
+        showPayError("Amount must be greater than zero.");
+        return null;
+      }
+    }
+
+    if (totalCollected <= 0) {
+      showPayError("Total collected must be greater than zero.");
+      return null;
+    }
+    if (totalCollected > outstanding) {
+      showPayError("Total collected cannot be more than total outstanding.");
+      return null;
+    }
+    if (!validateReceipt()) return null;
+
+    return {
+      mode,
+      isMisc,
+      instrumentRef: String(payInstrumentRef?.value || "").trim(),
+      bank: String(payBank?.value || "").trim(),
+      transferDate: String(payTransferDate?.value || "").trim(),
+      amount: singleAmount,
+      tds: singleTds,
+      ld: singleLd,
+      miscRows,
+      totalCollected,
+      receiptName: payReceiptInput?.files?.[0]?.name || ""
+    };
+  };
+
+  const resetPayForm = () => {
+    clearPayError();
+    if (payInstrumentRef) payInstrumentRef.value = "";
+    if (payBank) payBank.value = "";
+    if (payTransferDate) payTransferDate.value = "";
+    if (payAmount) payAmount.value = "";
+    if (payTds) payTds.value = "";
+    if (payLd) payLd.value = "";
+    if (payReceiptInput) payReceiptInput.value = "";
+    if (payReceiptHint) payReceiptHint.textContent = "Accepted: PDF, JPG, JPEG, PNG";
+    if (payMode) payMode.value = "NEFT";
+    if (payMiscList) payMiscList.innerHTML = "";
+    togglePayModeFields();
+  };
+
+  const openPayModalForInvoice = (invNo) => {
+    const invoice = currentInvoicesAll.find((item) => item.invoiceNo === invNo);
+    if (!invoice) return;
+    payInvoiceNo = invNo;
+    clearPayError();
+    if (payInvoiceMeta) payInvoiceMeta.textContent = invoice.invoiceNo;
+    resetPayForm();
+    updatePayTotals();
+    if (window.bootstrap && window.bootstrap.Modal) {
+      const modal = window.bootstrap.Modal.getOrCreateInstance(payModalEl);
+      modal.show();
+    }
+  };
+
+  const openRemarkModalForInvoice = (invNo) => {
+    const invoice = currentInvoicesAll.find((item) => item.invoiceNo === invNo);
+    if (!invoice) return;
+    remarkInvoiceNo = invNo;
+    clearRemarkError();
+    if (remarkText) remarkText.value = "";
+    if (remarkInvoiceMeta) remarkInvoiceMeta.textContent = `Invoice: ${invoice.invoiceNo}`;
+    if (window.bootstrap && window.bootstrap.Modal) {
+      const modal = window.bootstrap.Modal.getOrCreateInstance(remarkModalEl);
+      modal.show();
+    }
+  };
+
+  openCustomerPayModal = openPayModalForInvoice;
+  openCustomerRemarkModal = openRemarkModalForInvoice;
+
+  wireBankSuggestion(payBank);
+
+  if (payMode) payMode.addEventListener("change", togglePayModeFields);
+  if (payAddMiscModeBtn) {
+    payAddMiscModeBtn.addEventListener("click", createPayMiscRow);
+  }
+  [payAmount, payTds, payLd, payInstrumentRef, payBank, payTransferDate].forEach((input) => {
+    if (!input) return;
+    input.addEventListener("input", () => {
+      clearPayError();
+      updatePayTotals();
+    });
+    input.addEventListener("change", () => {
+      clearPayError();
+      updatePayTotals();
+    });
+  });
+
+  if (payReceiptInput) {
+    payReceiptInput.addEventListener("change", () => {
+      clearPayError();
+      validateReceipt();
+    });
+  }
+
+  if (paySubmitBtn) {
+    paySubmitBtn.addEventListener("click", () => {
+      const invoice = getPayInvoice();
+      if (!invoice) return;
+      const values = validatePayForm();
+      if (!values) return;
+
+      const customer = customersData.find((item) => item.id === selectedCustomerId) || null;
+      const previousOutstanding = Number(invoice.netDueAmount || 0);
+      const updatedOutstanding = Math.max(0, previousOutstanding - values.totalCollected);
+      const timestampIso = new Date().toISOString();
+      const customerBroadStatus = "Work in Progress";
+      const customerPrimaryStatus = "Collection In Progress";
+      const customerSubStatus = "Paid by customer";
+      invoice.netDueAmount = Number(updatedOutstanding.toFixed(2));
+      invoice.broadStatus = customerBroadStatus;
+      invoice.primaryStatus = customerPrimaryStatus;
+      invoice.subStatus = customerSubStatus;
+      invoice.status = customerSubStatus;
+
+      upsertInvoiceStatusOverride(invoice.invoiceNo, {
+        broadStatus: customerBroadStatus,
+        primaryStatus: customerPrimaryStatus,
+        subStatus: customerSubStatus,
+        status: customerSubStatus,
+        updatedAt: timestampIso,
+        updatedBy: "customer"
+      });
+
+      const paymentRemark = values.receiptName
+        ? `Customer submitted payment details. Receipt: ${values.receiptName}`
+        : "Customer submitted payment details.";
+      const dispositionPrefill = {
+        activityType: "Collection",
+        broadStatus: customerBroadStatus,
+        primaryStatus: customerPrimaryStatus,
+        subStatus: customerSubStatus,
+        remarks: paymentRemark,
+        instrumentMode: values.mode,
+        instrumentRef: values.instrumentRef,
+        bank: values.bank,
+        transferDate: values.transferDate,
+        amount: values.amount,
+        tds: values.tds,
+        ld: values.ld,
+        miscRows: values.miscRows
+      };
+      const statusPayload = buildStatusTrailPayload({
+        activityType: "Collection",
+        broadStatus: customerBroadStatus,
+        primaryStatus: customerPrimaryStatus,
+        subStatus: customerSubStatus,
+        remarks: paymentRemark,
+        invoices: [invoice.invoiceNo],
+        instrumentMode: values.mode,
+        instrumentRef: values.instrumentRef,
+        bank: values.bank,
+        transferDate: values.transferDate,
+        amount: values.amount,
+        tds: values.tds,
+        ld: values.ld,
+        miscRows: values.miscRows,
+        totalCollected: values.totalCollected,
+        outstanding: previousOutstanding
+      }, timestampIso);
+      addActivityTrailEntry(invoice.invoiceNo, statusPayload);
+
+      addNotificationCenterItem({
+        id: `customer-payment:${invoice.invoiceNo}:${timestampIso}`,
+        type: "customer-payment",
+        title: "Customer payment submitted",
+        message: `${customer?.name || "Customer"} submitted payment details for ${invoice.invoiceNo}.`,
+        createdAt: timestampIso,
+        audience: ["agent"],
+        details: [
+          { label: "Customer", value: customer ? `${customer.name} (${customer.code})` : "-" },
+          { label: "Invoice", value: invoice.invoiceNo },
+          { label: "Amount submitted", value: `Rs. ${formatINR(values.totalCollected)}` },
+          { label: "Transfer date", value: values.transferDate || "-" },
+          { label: "Instrument mode", value: values.mode || "-" },
+          { label: "Status", value: `${customerBroadStatus} / ${customerPrimaryStatus} / ${customerSubStatus}` }
+        ],
+        ctas: [
+          { label: "Open activity", action: "open-disposition", invoiceNo: invoice.invoiceNo }
+        ],
+        data: {
+          invoiceNo: invoice.invoiceNo,
+          prefillDisposition: dispositionPrefill,
+          prefillStatus: {
+            broadStatus: customerBroadStatus,
+            primaryStatus: customerPrimaryStatus,
+            subStatus: customerSubStatus
+          }
+        }
+      });
+
+      applyFiltersAndRender();
+      if (!selectInvoiceByNo(invoice.invoiceNo)) {
+        currentInvoiceNoForDocs = invoice.invoiceNo;
+        renderInvoiceDetails(invoice);
+        renderStoredActivityTrail(invoice.invoiceNo);
+      }
+      setActiveTab("invoice");
+
+      if (activityAccordion && window.bootstrap && window.bootstrap.Collapse) {
+        const collapse = window.bootstrap.Collapse.getOrCreateInstance(activityAccordion, { toggle: false });
+        collapse.show();
+      }
+
+      if (window.bootstrap && window.bootstrap.Modal) {
+        const modal = window.bootstrap.Modal.getInstance(payModalEl);
+        if (modal) modal.hide();
+      }
+      showNotify("Payment saved", "Collection details captured successfully.");
+    });
+  }
+
+  if (remarkText) {
+    remarkText.addEventListener("input", clearRemarkError);
+  }
+
+  if (remarkSaveBtn) {
+    remarkSaveBtn.addEventListener("click", () => {
+      const invNo = remarkInvoiceNo;
+      if (!invNo) return;
+      const text = String(remarkText?.value || "").trim();
+      if (!text) {
+        showRemarkError("Remark cannot be empty.");
+        return;
+      }
+
+      const timestamp = new Date().toLocaleString("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+
+      addStoredRemark(invNo, {
+        text,
+        authorRole: "client",
+        authorLabel: "Customer",
+        timestamp,
+        createdAt: new Date().toISOString()
+      });
+
+      currentInvoiceNoForDocs = invNo;
+      if (!selectInvoiceByNo(invNo)) {
+        const invoice = currentInvoicesAll.find((item) => item.invoiceNo === invNo);
+        if (invoice) renderInvoiceDetails(invoice);
+      }
+      renderStoredRemarks(invNo);
+      if (remarksAccordion && window.bootstrap && window.bootstrap.Collapse) {
+        const collapse = window.bootstrap.Collapse.getOrCreateInstance(remarksAccordion, { toggle: false });
+        collapse.show();
+      }
+      setActiveTab("invoice");
+
+      if (window.bootstrap && window.bootstrap.Modal) {
+        const modal = window.bootstrap.Modal.getInstance(remarkModalEl);
+        if (modal) modal.hide();
+      }
+      showNotify("Remark added", "Your remark has been saved.");
+    });
+  }
+
+  document.addEventListener("click", (event) => {
+    document.querySelectorAll("#customerPayModal .bankSuggest").forEach((wrap) => {
+      if (wrap.contains(event.target)) return;
+      hideBankSuggestions(wrap.querySelector(".suggestionBox"));
+    });
+  });
+
+  payModalEl.addEventListener("hidden.bs.modal", () => {
+    clearPayError();
+  });
+  remarkModalEl.addEventListener("hidden.bs.modal", () => {
+    clearRemarkError();
+  });
+
+  togglePayModeFields();
 }
 
 function wireDocsEvents() {
@@ -5678,6 +6639,22 @@ function wireInvoiceTableEvents() {
     const action = btn.getAttribute("data-action");
     const inv = btn.getAttribute("data-inv") || "";
 
+    if (action === "pay") {
+      if (typeof openCustomerPayModal === "function") {
+        openCustomerPayModal(inv);
+      }
+      closeFloatingMenu();
+      return;
+    }
+
+    if (action === "add-remark") {
+      if (typeof openCustomerRemarkModal === "function") {
+        openCustomerRemarkModal(inv);
+      }
+      closeFloatingMenu();
+      return;
+    }
+
     if (action === "new-activity") {
       openDispositionForSingleInvoice(inv);
       closeFloatingMenu();
@@ -5695,6 +6672,7 @@ function wireInvoiceTableEvents() {
 }
 
 function wireBulkEvents() {
+  if (isCustomerLandingView) return;
   const bulkNew = document.getElementById("bulkNewActivity");
   const bulkEmail = document.getElementById("bulkSendEmail");
 
@@ -5961,7 +6939,7 @@ function applyTenantBrand(tenantId) {
     relationshipLogo.innerHTML = "";
     if (brand.logo) {
       const img = document.createElement("img");
-      img.src = brand.logo;
+      img.src = resolvePath(brand.logo);
       img.alt = `${brand.name} logo`;
       relationshipLogo.appendChild(img);
     } else {
@@ -6660,17 +7638,21 @@ function wireSideNavEvents() {
       const item = event.target.closest(".nav-link[data-module], .submenu-link[data-module]");
       if (!item) return;
       const moduleKey = item.getAttribute("data-module");
+      const activeRole = String(localStorage.getItem("activeUserRole") || "").trim().toLowerCase();
+      const landingPath = activeRole === "customer" ? "pages/LPcustomer.html" : "LPagent.html";
       const destinations = {
         "visit": "pages/visitmodule.html",
         "visit-review": "pages/visitmoduleReview.html",
-        "landing": "LPagent.html",
+        "landing": landingPath,
+        "landing-agent": "LPagent.html",
+        "landing-customer": "pages/LPcustomer.html",
         "landing-manager": "pages/LPmanager.html",
         "landing-backend": "pages/LPbackend.html",
         "pdc-agent": "pages/PDCagent.html",
         "pdc-ops": "pages/PDCOps.html"
       };
       const target = destinations[moduleKey];
-      if (target) window.location.href = target;
+      if (target) window.location.href = resolvePath(target);
     });
   }
 }
@@ -6726,6 +7708,7 @@ document.addEventListener("DOMContentLoaded", () => {
   wireContactEvents();
   wireDispositionEvents();
   wireDispositionActivityEvents();
+  wireCustomerPayRemarkEvents();
   wireEmailPanelEvents();
   wireDocsEvents();
   wireFilterEvents();
@@ -6768,8 +7751,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const notificationPopup = document.getElementById("notificationPopup");
   if (notificationPopup) {
     notificationPopup.addEventListener("click", (event) => {
-      const runAction = (action, href, invNo) => {
-        if (action === "open-invoice" && invNo && selectInvoiceByNo(invNo)) {
+      const runAction = (action, href, invNo, noteId = "") => {
+        if (action === "open-invoice" && invNo && openInvoiceContext(invNo)) {
           setActiveTab("invoice");
           return true;
         }
@@ -6778,7 +7761,28 @@ document.addEventListener("DOMContentLoaded", () => {
           return true;
         }
         if (action === "open-email") {
+          if (invNo) openInvoiceContext(invNo);
           openEmailPanel(invNo || "");
+          setActiveTab("invoice");
+          return true;
+        }
+        if (action === "open-disposition") {
+          if (!invNo || !openInvoiceContext(invNo)) {
+            showTransientNotification("Invoice not found", "Unable to open activity for this invoice.", "error");
+            return false;
+          }
+          const note = getNotificationCenterItemById(noteId);
+          const fallbackPrefill = getLatestCustomerPaymentPrefill(invNo);
+          const statusPrefill = note?.data?.prefillStatus || {};
+          const collectionPrefill = note?.data?.prefillDisposition || {};
+          const hasCollectionPayload = collectionPrefill && typeof collectionPrefill === "object"
+            && Object.keys(collectionPrefill).length > 0;
+          const hasStatusPayload = statusPrefill && typeof statusPrefill === "object"
+            && Object.keys(statusPrefill).length > 0;
+          const prefill = hasCollectionPayload || hasStatusPayload
+            ? { ...(fallbackPrefill || {}), ...statusPrefill, ...collectionPrefill }
+            : (fallbackPrefill || null);
+          openDispositionForSingleInvoice(invNo, prefill);
           setActiveTab("invoice");
           return true;
         }
@@ -6796,14 +7800,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const cta = event.target.closest(".notificationCta");
       if (cta) {
-        runAction(cta.getAttribute("data-action"), cta.getAttribute("data-href"), cta.getAttribute("data-inv"));
+        runAction(
+          cta.getAttribute("data-action"),
+          cta.getAttribute("data-href"),
+          cta.getAttribute("data-inv"),
+          cta.getAttribute("data-note")
+        );
         return;
       }
 
       if (notificationPopup.classList.contains("expanded")) return;
       const card = event.target.closest(".notificationCard");
       if (!card) return;
-      runAction(card.getAttribute("data-action"), card.getAttribute("data-href"), card.getAttribute("data-inv"));
+      runAction(
+        card.getAttribute("data-action"),
+        card.getAttribute("data-href"),
+        card.getAttribute("data-inv"),
+        card.getAttribute("data-note-id")
+      );
     });
   }
 
@@ -6839,6 +7853,20 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     if (event.key === issueTrackerTotalKey || event.key === issueTrackerCustomKey || event.key === issueTrackerBaseKey) {
       updateCenterIssueCountDisplay();
+    }
+    if (event.key === invoiceStatusOverridesKey) {
+      applyInvoiceStatusOverrides(customersData);
+      const customer = customersData.find(c => c.id === selectedCustomerId) || customersData[0];
+      if (customer) {
+        renderCenter(customer);
+        renderCustomerDetails(customer);
+        currentInvoicesAll = customer.invoices || [];
+        populateFilters(currentInvoicesAll);
+        applyFiltersAndRender();
+      }
+      if (currentInvoiceNoForDocs) {
+        selectInvoiceByNo(currentInvoiceNoForDocs);
+      }
     }
   });
 

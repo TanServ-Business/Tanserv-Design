@@ -1,17 +1,5 @@
-.customerDashboardPage .heroTagCustomer {
-  background: #eef2ff;
-  border-color: #c7d2fe;
-  color: #3730a3;
-  font-weight: 700;
-}
-
 .customerDashboardPage .heroTitleRow h1 {
   text-transform: none;
-}
-
-.customerDashboardPage .unappliedCreditsCard {
-  display: grid;
-  gap: 8px;
 }
 
 .unappliedCreditsModal .modal-dialog {
