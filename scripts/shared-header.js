@@ -50,8 +50,8 @@
       customer: "pages/Dashboard_Customer.html",
       manager: "pages/LPmanager.html",
       supervisor: "pages/Dashboard_Supervisor.html",
-      kam: "pages/KAM.html",
-      kas: "pages/KAS.html",
+      kam: "pages/dashKAM.html",
+      kas: "pages/dashKAS.html",
       backend: "pages/LPbackend.html",
       mis: "pages/LPmis.html",
       approver: "bin/IssueTracker/approver-dashboard.html"
@@ -329,6 +329,8 @@
           <a class="submenu-link" href="${resolvePath("pages/Dashboard_Agent.html")}" data-module="dashboard-agent">Dashboard - Agent</a>
           <a class="submenu-link" href="${resolvePath("pages/Dashboard_Customer.html")}" data-module="dashboard-customer">Dashboard - Customer</a>
           <a class="submenu-link" href="${resolvePath("pages/dashManager.html")}" data-module="dashboard-manager">Dashboard - Manager</a>
+          <a class="submenu-link" href="${resolvePath("pages/dashKAM.html")}" data-module="dashboard-kam">Dashboard - KAM</a>
+          <a class="submenu-link" href="${resolvePath("pages/dashKAS.html")}" data-module="dashboard-kas">Dashboard - KAS</a>
           <a class="submenu-link" href="${resolvePath("pages/Dashboard_Supervisor.html")}" data-module="dashboard-supervisor">Dashboard - Supervisor</a>
         </div>
       </li>
@@ -717,6 +719,8 @@
             "dashboard-agent": "pages/Dashboard_Agent.html",
             "dashboard-customer": "pages/Dashboard_Customer.html",
             "dashboard-manager": "pages/dashManager.html",
+            "dashboard-kam": "pages/dashKAM.html",
+            "dashboard-kas": "pages/dashKAS.html",
             "dashboard-supervisor": "pages/Dashboard_Supervisor.html",
             "issue-tracker": "pages/issuetrackerLP.html",
             "issue-matrix": "bin/IssueTracker/escalationMatrix.html",
