@@ -442,24 +442,47 @@
 
     .ui-table {
       width: 100%;
-      border-collapse: collapse;
+      border-collapse: separate;
+      border-spacing: 0;
       font-size: 12px;
+      border-radius: 12px 12px 0 0;
+      overflow: hidden;
+      border-left: 1px solid rgba(15, 23, 42, 0.06);
+      border-right: 1px solid rgba(15, 23, 42, 0.06);
     }
 
     .ui-table th,
     .ui-table td {
-      padding: 10px 8px;
-      border-bottom: 1px dashed #e2e8f4;
+      border-bottom: 1px solid #e2e8f4;
+      padding: 12px 10px;
       text-align: left;
+      vertical-align: middle;
+      white-space: nowrap;
     }
 
-    .ui-table th {
-      background: linear-gradient(180deg, var(--brand) 0%, var(--brand-dark) 100%);
+    .ui-table thead th {
+      background: #5c258d;
       color: #ffffff;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      font-size: 11px;
-      border-bottom: 2px solid var(--brand-dark);
+      font-weight: 700;
+      border-bottom: 2px solid #4c1d95;
+    }
+
+    .ui-table thead th:first-child {
+      border-top-left-radius: 12px;
+    }
+
+    .ui-table thead th:last-child {
+      border-top-right-radius: 12px;
+    }
+
+    /* make row separators more visible */
+    .ui-table tbody td {
+      border-bottom: 1px solid rgba(15, 23, 42, 0.12);
+    }
+
+    /* hide bottom border on last row for cleaner edge */
+    .ui-table tbody tr:last-child td {
+      border-bottom: none;
     }
 
     .formRow {
