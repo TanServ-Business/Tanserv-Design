@@ -1191,15 +1191,19 @@ function renderStoredActivityTrail(invoiceNo) {
       setDetailValue("emailDetailTo", payload.to || "-");
       setDetailValue("emailDetailCc", payload.cc || "-");
       setDetailValue("emailDetailSubject", payload.subject || "-");
-      const bodyEl = document.getElementById("emailDetailBody");
-      if (bodyEl) bodyEl.textContent = payload.body || "-";
-      const attachmentsEl = document.getElementById("emailDetailAttachments");
-      if (attachmentsEl) {
-        const listText = Array.isArray(payload.attachments) && payload.attachments.length
+      renderEmailConversation("emailDetailBody", [{
+        from: payload.from || "-",
+        to: payload.to || "-",
+        cc: payload.cc || "-",
+        mailbox: "Email",
+        date: payload.at || "-",
+        time: "-",
+        subject: payload.subject || "-",
+        attachments: Array.isArray(payload.attachments) && payload.attachments.length
           ? payload.attachments.join(", ")
-          : "-";
-        attachmentsEl.textContent = listText;
-      }
+          : "-",
+        body: payload.body || "-"
+      }]);
     });
   }
 }
@@ -2592,7 +2596,57 @@ function formatContactName(contact) {
 function setDetailValue(id, value) {
   const el = document.getElementById(id);
   if (!el) return;
-  el.textContent = safeText(value);
+  const text = safeText(value);
+  if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) {
+    el.value = text;
+    return;
+  }
+  el.textContent = text;
+}
+
+function normalizeEmailText(value) {
+  return String(value || "").replace(/\\\\n/g, "\n").replace(/\\n/g, "\n");
+}
+
+function escapeHtml(value) {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function formatEmailConversationHtml(entries) {
+  const list = Array.isArray(entries) ? entries.filter(Boolean) : [];
+  if (list.length === 0) return "-";
+
+  return list.map((entry) => {
+    const attachments = safeText(entry.attachments || "-");
+    const attachmentLine = attachments && attachments !== "-"
+      ? `<div class="emailConversationLine"><strong>Attachments:</strong> ${escapeHtml(attachments)}</div>`
+      : "";
+
+    return `
+      <div class="emailConversationEntry">
+        <div class="emailConversationLine"><strong>From:</strong> ${escapeHtml(safeText(entry.from || "-"))}</div>
+        <div class="emailConversationLine"><strong>To:</strong> ${escapeHtml(safeText(entry.to || "-"))}</div>
+        <div class="emailConversationLine"><strong>CC:</strong> ${escapeHtml(safeText(entry.cc || "-"))}</div>
+        <div class="emailConversationLine"><strong>Mailbox:</strong> ${escapeHtml(safeText(entry.mailbox || "-"))}</div>
+        <div class="emailConversationLine"><strong>Date:</strong> ${escapeHtml(safeText(entry.date || "-"))}</div>
+        <div class="emailConversationLine"><strong>Time:</strong> ${escapeHtml(safeText(entry.time || "-"))}</div>
+        <div class="emailConversationLine"><strong>Subject:</strong> ${escapeHtml(safeText(entry.subject || "-"))}</div>
+        ${attachmentLine}
+        <div class="emailConversationMessage">${escapeHtml(normalizeEmailText(entry.body || "-")).replace(/\n/g, "<br>")}</div>
+      </div>
+    `.trim();
+  }).join('<hr class="emailConversationDivider" />');
+}
+
+function renderEmailConversation(id, entries) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.innerHTML = formatEmailConversationHtml(entries);
 }
 
 function getInvoicePoNumber(invoice) {
@@ -4293,6 +4347,7 @@ function wireDispositionEvents() {
 }
 
 function wireEmailPanelEvents() {
+  const panelEl = document.getElementById("emailPanel");
   const closeBtn = document.getElementById("emailPanelCloseBtn");
   if (closeBtn) {
     closeBtn.addEventListener("click", closeEmailPanel);
@@ -4318,7 +4373,7 @@ function wireEmailPanelEvents() {
   const toSuggestions = document.getElementById("emailToSuggestions");
   const ccSuggestions = document.getElementById("emailCcSuggestions");
 
-  const normalizeBody = (value) => String(value || "").replace(/\\\\n/g, "\n").replace(/\\n/g, "\n");
+  const normalizeBody = normalizeEmailText;
 
   const showNotify = (title, message) => {
     if (!notifyDock) return;
@@ -4408,6 +4463,37 @@ function wireEmailPanelEvents() {
     if (attachmentPicker) attachmentPicker.classList.add("hidden");
   };
 
+  const getThreadItems = (item) => {
+    const thread = item?.closest(".emailThread");
+    if (!thread) return [];
+    return Array.from(thread.querySelectorAll(".emailItem"));
+  };
+
+  const getActiveEmailItem = () => panelEl ? panelEl.querySelector(".emailItem.active") : null;
+
+  const buildConversationTrail = (item) => {
+    const items = getThreadItems(item);
+    return items.map((threadItem) => ({
+      from: threadItem.getAttribute("data-from") || "-",
+      to: threadItem.getAttribute("data-to") || "-",
+      cc: threadItem.getAttribute("data-cc") || "-",
+      mailbox: threadItem.getAttribute("data-mailbox") || "-",
+      date: threadItem.getAttribute("data-date") || "-",
+      time: threadItem.getAttribute("data-time") || "-",
+      subject: threadItem.getAttribute("data-subject") || "-",
+      attachments: (() => {
+        const rawAttachments = threadItem.getAttribute("data-attachments") || "-";
+        return rawAttachments === "-" ? "-" : rawAttachments.split("|").join(", ");
+      })(),
+      body: threadItem.getAttribute("data-body") || "-"
+    }));
+  };
+
+  const openThreadForItem = (item) => {
+    const thread = item?.closest(".emailThread");
+    if (thread) thread.open = true;
+  };
+
   const resetDetail = () => {
     if (detailEmpty) detailEmpty.classList.remove("hidden");
     if (detailContent) detailContent.classList.add("hidden");
@@ -4416,19 +4502,44 @@ function wireEmailPanelEvents() {
     setDetailValue("emailDetailTo", "-");
     setDetailValue("emailDetailCc", "-");
     setDetailValue("emailDetailSubject", "-");
-    const bodyEl = document.getElementById("emailDetailBody");
-    if (bodyEl) bodyEl.textContent = "-";
-    const attachmentsEl = document.getElementById("emailDetailAttachments");
-    if (attachmentsEl) attachmentsEl.textContent = "-";
+    setDetailValue("emailDetailMailbox", "-");
+    setDetailValue("emailDetailThread", "-");
+    setDetailValue("emailDetailDate", "-");
+    setDetailValue("emailDetailTime", "-");
+    renderEmailConversation("emailDetailBody", []);
+  };
+
+  const showEmailDetail = (item) => {
+    if (!item) return;
+    const itemPanel = item.closest("#emailPanel");
+    if (!itemPanel) return;
+    hideCompose();
+    openThreadForItem(item);
+
+    itemPanel.querySelectorAll(".emailItem").forEach(el => el.classList.remove("active"));
+    item.classList.add("active");
+
+    setDetailValue("emailDetailFrom", item.getAttribute("data-from"));
+    setDetailValue("emailDetailTo", item.getAttribute("data-to"));
+    setDetailValue("emailDetailCc", item.getAttribute("data-cc"));
+    setDetailValue("emailDetailSubject", item.getAttribute("data-subject"));
+    setDetailValue("emailDetailMailbox", item.getAttribute("data-mailbox") || "-");
+    setDetailValue("emailDetailThread", item.getAttribute("data-thread") || "-");
+    setDetailValue("emailDetailDate", item.getAttribute("data-date") || "-");
+    setDetailValue("emailDetailTime", item.getAttribute("data-time") || "-");
+
+    renderEmailConversation("emailDetailBody", buildConversationTrail(item));
+
+    if (detailEmpty) detailEmpty.classList.add("hidden");
+    if (detailContent) detailContent.classList.remove("hidden");
   };
 
   const selectFirstEmail = () => {
-    const panel = document.getElementById("emailPanel");
-    if (!panel) return;
-    const activePane = panel.querySelector(".emailTabPane.active");
+    if (!panelEl) return;
+    const activePane = panelEl.querySelector(".emailTabPane.active");
     const firstItem = activePane ? activePane.querySelector(".emailItem") : null;
     if (firstItem) {
-      firstItem.click();
+      showEmailDetail(firstItem);
     }
   };
 
@@ -4442,6 +4553,7 @@ function wireEmailPanelEvents() {
   const hideCompose = () => {
     if (composePanel) composePanel.classList.add("hidden");
     document.querySelectorAll(".emailTemplatePill.active").forEach(pill => pill.classList.remove("active"));
+    document.querySelectorAll(".emailFormatBtn.is-active").forEach(btn => btn.classList.remove("is-active"));
   };
 
   const resetCompose = () => {
@@ -4450,22 +4562,27 @@ function wireEmailPanelEvents() {
     if (composeSubject) composeSubject.value = "";
     if (composeBody) composeBody.value = "";
     if (composeAttachments) composeAttachments.value = "";
+    document.querySelectorAll(".emailFormatBtn.is-active").forEach(btn => btn.classList.remove("is-active"));
   };
 
   const getDetailText = (id) => {
     const el = document.getElementById(id);
     if (!el) return "";
-    const value = String(el.textContent || "").trim();
+    const rawValue = el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement
+      ? el.value
+      : el.textContent;
+    const value = String(rawValue || "").trim();
     return value === "-" ? "" : value;
   };
 
   const openReplyAll = () => {
     if (!composePanel) return;
-    const from = getDetailText("emailDetailFrom");
-    const to = getDetailText("emailDetailTo");
-    const cc = getDetailText("emailDetailCc");
-    const subject = getDetailText("emailDetailSubject");
-    const body = getDetailText("emailDetailBody");
+    const activeItem = getActiveEmailItem();
+    const from = activeItem ? (activeItem.getAttribute("data-from") || "") : getDetailText("emailDetailFrom");
+    const to = activeItem ? (activeItem.getAttribute("data-to") || "") : getDetailText("emailDetailTo");
+    const cc = activeItem ? (activeItem.getAttribute("data-cc") || "") : getDetailText("emailDetailCc");
+    const subject = activeItem ? (activeItem.getAttribute("data-subject") || "") : getDetailText("emailDetailSubject");
+    const body = activeItem ? normalizeBody(activeItem.getAttribute("data-body") || "") : getDetailText("emailDetailBody");
 
     resetCompose();
     showCompose();
@@ -4604,33 +4721,15 @@ function wireEmailPanelEvents() {
       return;
     }
 
-    const item = e.target.closest(".emailItem");
-    if (!item) return;
-    const panel = item.closest("#emailPanel");
-    if (!panel) return;
-    hideCompose();
-
-    panel.querySelectorAll(".emailItem").forEach(el => el.classList.remove("active"));
-    item.classList.add("active");
-
-    setDetailValue("emailDetailFrom", item.getAttribute("data-from"));
-    setDetailValue("emailDetailTo", item.getAttribute("data-to"));
-    setDetailValue("emailDetailCc", item.getAttribute("data-cc"));
-    setDetailValue("emailDetailSubject", item.getAttribute("data-subject"));
-
-    const bodyEl = document.getElementById("emailDetailBody");
-    const rawBody = item.getAttribute("data-body") || "-";
-    if (bodyEl) bodyEl.textContent = normalizeBody(rawBody);
-
-    const attachmentsEl = document.getElementById("emailDetailAttachments");
-    const rawAttachments = item.getAttribute("data-attachments") || "-";
-    if (attachmentsEl) {
-      const formatted = rawAttachments === "-" ? "-" : rawAttachments.split("|").join(", ");
-      attachmentsEl.textContent = formatted;
+    const formatBtn = e.target.closest(".emailFormatBtn");
+    if (formatBtn) {
+      formatBtn.classList.toggle("is-active");
+      return;
     }
 
-    if (detailEmpty) detailEmpty.classList.add("hidden");
-    if (detailContent) detailContent.classList.remove("hidden");
+    const item = e.target.closest(".emailItem");
+    if (!item) return;
+    showEmailDetail(item);
   });
 
   if (newBtn) {

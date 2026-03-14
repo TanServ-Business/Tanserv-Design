@@ -1219,99 +1219,229 @@
 
       <div class="emailPane emailListPane">
         <div class="emailListSection">
-          <div class="emailSectionTitle">Emails</div>
+          <div class="emailListHeader">
+            <div>
+              <div class="emailSectionTitle">Email threads</div>
+              <div class="emailSectionHint">Expand a thread to view trail mails</div>
+            </div>
+          </div>
           <div class="emailTabPane active" data-email-tab="inbox">
             <div class="emailList">
-            <div class="emailItem" data-from="Collections Team &lt;collections@inebura.com&gt;" data-to="Ops Agent &lt;ops@inebura.com&gt;" data-cc="Ravi Sharma &lt;ravi@apollopharmacy.com&gt;" data-subject="PTP missed for APOLLO PHARMACY" data-body="Hello APOLLO PHARMACY,\\n\\nOur records show the PTP for INV-10291 was missed. Please share the revised payment date.\\n\\nRegards,\\nCollections Team" data-attachments="Invoice_INV-10291.pdf|PTP_Reminder.pdf">
-              <div class="emailMeta">
-                <span class="emailLabel">From</span>
-                <span class="emailValue">Collections Team</span>
-              </div>
-              <div class="emailMeta">
-                <span class="emailLabel">To</span>
-                <span class="emailValue">Ops Agent</span>
-              </div>
-              <div class="emailSubject">PTP missed for APOLLO PHARMACY</div>
-            </div>
-            <div class="emailItem" data-from="Ops Manager &lt;manager@inebura.com&gt;" data-to="Ops Agent &lt;ops@inebura.com&gt;" data-cc="-" data-subject="Follow-up cadence approved" data-body="Proceed with reminder emails every 2 days until payment.\n\nApproved by Ops Manager." data-attachments="-">
-              <div class="emailMeta">
-                <span class="emailLabel">From</span>
-                <span class="emailValue">Ops Manager</span>
-              </div>
-              <div class="emailMeta">
-                <span class="emailLabel">To</span>
-                <span class="emailValue">Ops Agent</span>
-              </div>
-              <div class="emailSubject">Follow-up cadence approved</div>
-            </div>
-            <div class="emailItem" data-from="Client - Finance &lt;finance@apollopharmacy.com&gt;" data-to="Ops Agent &lt;ops@inebura.com&gt;" data-cc="Anita Nair &lt;collections@apollopharmacy.com&gt;" data-subject="Re: Due date change request" data-body="Sharing updated PO copy. Please revise due date accordingly.\\n\\nThanks,\\nFinance Team" data-attachments="PO_Update.pdf">
-              <div class="emailMeta">
-                <span class="emailLabel">From</span>
-                <span class="emailValue">Client - Finance</span>
-              </div>
-              <div class="emailMeta">
-                <span class="emailLabel">To</span>
-                <span class="emailValue">Ops Agent</span>
-              </div>
-              <div class="emailSubject">Re: Due date change request</div>
-            </div>
-          </div>
-        </div>
+              <details class="emailThread" open>
+                <summary class="emailThreadSummary">
+                  <div class="emailThreadSummaryMain">
+                    <span class="emailThreadCount">2 mails</span>
+                    <div class="emailThreadTitle">Apollo Pharmacy | PTP follow-up</div>
+                    <div class="emailThreadPreview">Reminder shared with ops and cadence approved for the next collection cycle.</div>
+                  </div>
+                  <div class="emailThreadSummaryMeta">
+                    <span class="emailThreadLatest">12 Nov 2025</span>
+                    <span class="emailThreadChevron" aria-hidden="true">
+                      <i class="bi bi-chevron-down" aria-hidden="true"></i>
+                    </span>
+                  </div>
+                </summary>
+                <div class="emailThreadTrail">
+                  <div class="emailItem" data-from="Collections Team &lt;collections@inebura.com&gt;" data-to="Ops Agent &lt;ops@inebura.com&gt;" data-cc="Ravi Sharma &lt;ravi@apollopharmacy.com&gt;" data-subject="PTP missed for APOLLO PHARMACY" data-body="Hello APOLLO PHARMACY,\\n\\nOur records show the PTP for INV-10291 was missed. Please share the revised payment date.\\n\\nRegards,\\nCollections Team" data-attachments="Invoice_INV-10291.pdf|PTP_Reminder.pdf" data-date="12 Nov 2025" data-time="09:42 AM" data-mailbox="Inbox" data-thread="Apollo Pharmacy | PTP follow-up">
+                    <div class="emailRow">
+                      <span class="emailDirection emailDirectionInbound">Inbound</span>
+                      <div class="emailStampRow">
+                        <span><i class="bi bi-calendar3" aria-hidden="true"></i> 12 Nov 2025</span>
+                        <span><i class="bi bi-clock" aria-hidden="true"></i> 09:42 AM</span>
+                      </div>
+                    </div>
+                    <div class="emailMeta">
+                      <span class="emailLabel">From</span>
+                      <span class="emailValue">Collections Team</span>
+                    </div>
+                    <div class="emailMeta">
+                      <span class="emailLabel">To</span>
+                      <span class="emailValue">Ops Agent</span>
+                    </div>
+                    <div class="emailSubject">PTP missed for APOLLO PHARMACY</div>
+                    <div class="emailPreview">Our records show the PTP for INV-10291 was missed. Please share the revised payment date.</div>
+                  </div>
+                  <div class="emailItem" data-from="Ops Manager &lt;manager@inebura.com&gt;" data-to="Ops Agent &lt;ops@inebura.com&gt;" data-cc="-" data-subject="Follow-up cadence approved" data-body="Proceed with reminder emails every 2 days until payment.\n\nApproved by Ops Manager." data-attachments="-" data-date="11 Nov 2025" data-time="05:18 PM" data-mailbox="Inbox" data-thread="Apollo Pharmacy | PTP follow-up">
+                    <div class="emailRow">
+                      <span class="emailDirection emailDirectionInternal">Internal</span>
+                      <div class="emailStampRow">
+                        <span><i class="bi bi-calendar3" aria-hidden="true"></i> 11 Nov 2025</span>
+                        <span><i class="bi bi-clock" aria-hidden="true"></i> 05:18 PM</span>
+                      </div>
+                    </div>
+                    <div class="emailMeta">
+                      <span class="emailLabel">From</span>
+                      <span class="emailValue">Ops Manager</span>
+                    </div>
+                    <div class="emailMeta">
+                      <span class="emailLabel">To</span>
+                      <span class="emailValue">Ops Agent</span>
+                    </div>
+                    <div class="emailSubject">Follow-up cadence approved</div>
+                    <div class="emailPreview">Proceed with reminder emails every 2 days until payment. Approved by Ops Manager.</div>
+                  </div>
+                </div>
+              </details>
 
-        <div class="emailTabPane" data-email-tab="sent">
-          <div class="emailList">
-            <div class="emailItem" data-from="Ops Agent &lt;ops@inebura.com&gt;" data-to="Client - Finance &lt;finance@apollopharmacy.com&gt;" data-cc="-" data-subject="Payment reminder for INV-10270" data-body="Gentle reminder to process payment by the due date.\\n\\nRegards,\\nOps Agent" data-attachments="Invoice_INV-10270.pdf">
-              <div class="emailMeta">
-                <span class="emailLabel">To</span>
-                <span class="emailValue">Client - Finance</span>
-              </div>
-              <div class="emailMeta">
-                <span class="emailLabel">From</span>
-                <span class="emailValue">Ops Agent</span>
-              </div>
-              <div class="emailSubject">Payment reminder for INV-10270</div>
-            </div>
-            <div class="emailItem" data-from="Ops Agent &lt;ops@inebura.com&gt;" data-to="Client - Finance &lt;finance@apollopharmacy.com&gt;" data-cc="-" data-subject="Invoice copy shared" data-body="Attached the latest invoice copy for your records.\\n\\nRegards,\\nOps Agent" data-attachments="Invoice_INV-10308.pdf">
-              <div class="emailMeta">
-                <span class="emailLabel">To</span>
-                <span class="emailValue">Client - Finance</span>
-              </div>
-              <div class="emailMeta">
-                <span class="emailLabel">From</span>
-                <span class="emailValue">Ops Agent</span>
-              </div>
-              <div class="emailSubject">Invoice copy shared</div>
+              <details class="emailThread">
+                <summary class="emailThreadSummary">
+                  <div class="emailThreadSummaryMain">
+                    <span class="emailThreadCount">1 mail</span>
+                    <div class="emailThreadTitle">Apollo Pharmacy | Due date revision</div>
+                    <div class="emailThreadPreview">Client shared a PO update and asked for due date revision against the invoice.</div>
+                  </div>
+                  <div class="emailThreadSummaryMeta">
+                    <span class="emailThreadLatest">10 Nov 2025</span>
+                    <span class="emailThreadChevron" aria-hidden="true">
+                      <i class="bi bi-chevron-down" aria-hidden="true"></i>
+                    </span>
+                  </div>
+                </summary>
+                <div class="emailThreadTrail">
+                  <div class="emailItem" data-from="Client - Finance &lt;finance@apollopharmacy.com&gt;" data-to="Ops Agent &lt;ops@inebura.com&gt;" data-cc="Anita Nair &lt;collections@apollopharmacy.com&gt;" data-subject="Re: Due date change request" data-body="Sharing updated PO copy. Please revise due date accordingly.\\n\\nThanks,\\nFinance Team" data-attachments="PO_Update.pdf" data-date="10 Nov 2025" data-time="02:14 PM" data-mailbox="Inbox" data-thread="Apollo Pharmacy | Due date revision">
+                    <div class="emailRow">
+                      <span class="emailDirection emailDirectionInbound">Inbound</span>
+                      <div class="emailStampRow">
+                        <span><i class="bi bi-calendar3" aria-hidden="true"></i> 10 Nov 2025</span>
+                        <span><i class="bi bi-clock" aria-hidden="true"></i> 02:14 PM</span>
+                      </div>
+                    </div>
+                    <div class="emailMeta">
+                      <span class="emailLabel">From</span>
+                      <span class="emailValue">Client - Finance</span>
+                    </div>
+                    <div class="emailMeta">
+                      <span class="emailLabel">To</span>
+                      <span class="emailValue">Ops Agent</span>
+                    </div>
+                    <div class="emailSubject">Re: Due date change request</div>
+                    <div class="emailPreview">Sharing updated PO copy. Please revise due date accordingly for the current invoice.</div>
+                  </div>
+                </div>
+              </details>
             </div>
           </div>
-        </div>
 
-        <div class="emailTabPane" data-email-tab="system">
-          <div class="emailList">
-            <div class="emailItem" data-from="System &lt;no-reply@inebura.com&gt;" data-to="Ops Agent &lt;ops@inebura.com&gt;" data-cc="Client - Finance &lt;finance@apollopharmacy.com&gt;" data-subject="Auto-reminder: PTP missed" data-body="System generated reminder for PTP missed.\\n\\nThis notification was sent to all relevant contacts." data-attachments="PTP_Missed_Notice.pdf">
-              <div class="emailMeta">
-                <span class="emailLabel">From</span>
-                <span class="emailValue">System</span>
-              </div>
-              <div class="emailMeta">
-                <span class="emailLabel">To</span>
-                <span class="emailValue">Ops Agent</span>
-              </div>
-              <div class="emailSubject">Auto-reminder: PTP missed</div>
+          <div class="emailTabPane" data-email-tab="sent">
+            <div class="emailList">
+              <details class="emailThread" open>
+                <summary class="emailThreadSummary">
+                  <div class="emailThreadSummaryMain">
+                    <span class="emailThreadCount">2 mails</span>
+                    <div class="emailThreadTitle">Apollo Pharmacy | Outbound follow-ups</div>
+                    <div class="emailThreadPreview">Recent reminders and invoice copy shared with the customer finance team.</div>
+                  </div>
+                  <div class="emailThreadSummaryMeta">
+                    <span class="emailThreadLatest">09 Nov 2025</span>
+                    <span class="emailThreadChevron" aria-hidden="true">
+                      <i class="bi bi-chevron-down" aria-hidden="true"></i>
+                    </span>
+                  </div>
+                </summary>
+                <div class="emailThreadTrail">
+                  <div class="emailItem" data-from="Ops Agent &lt;ops@inebura.com&gt;" data-to="Client - Finance &lt;finance@apollopharmacy.com&gt;" data-cc="-" data-subject="Payment reminder for INV-10270" data-body="Gentle reminder to process payment by the due date.\\n\\nRegards,\\nOps Agent" data-attachments="Invoice_INV-10270.pdf" data-date="09 Nov 2025" data-time="11:06 AM" data-mailbox="Sent mail" data-thread="Apollo Pharmacy | Outbound follow-ups">
+                    <div class="emailRow">
+                      <span class="emailDirection emailDirectionOutbound">Outbound</span>
+                      <div class="emailStampRow">
+                        <span><i class="bi bi-calendar3" aria-hidden="true"></i> 09 Nov 2025</span>
+                        <span><i class="bi bi-clock" aria-hidden="true"></i> 11:06 AM</span>
+                      </div>
+                    </div>
+                    <div class="emailMeta">
+                      <span class="emailLabel">To</span>
+                      <span class="emailValue">Client - Finance</span>
+                    </div>
+                    <div class="emailMeta">
+                      <span class="emailLabel">From</span>
+                      <span class="emailValue">Ops Agent</span>
+                    </div>
+                    <div class="emailSubject">Payment reminder for INV-10270</div>
+                    <div class="emailPreview">Gentle reminder to process payment by the due date and confirm if any support is needed.</div>
+                  </div>
+                  <div class="emailItem" data-from="Ops Agent &lt;ops@inebura.com&gt;" data-to="Client - Finance &lt;finance@apollopharmacy.com&gt;" data-cc="-" data-subject="Invoice copy shared" data-body="Attached the latest invoice copy for your records.\\n\\nRegards,\\nOps Agent" data-attachments="Invoice_INV-10308.pdf" data-date="08 Nov 2025" data-time="03:28 PM" data-mailbox="Sent mail" data-thread="Apollo Pharmacy | Outbound follow-ups">
+                    <div class="emailRow">
+                      <span class="emailDirection emailDirectionOutbound">Outbound</span>
+                      <div class="emailStampRow">
+                        <span><i class="bi bi-calendar3" aria-hidden="true"></i> 08 Nov 2025</span>
+                        <span><i class="bi bi-clock" aria-hidden="true"></i> 03:28 PM</span>
+                      </div>
+                    </div>
+                    <div class="emailMeta">
+                      <span class="emailLabel">To</span>
+                      <span class="emailValue">Client - Finance</span>
+                    </div>
+                    <div class="emailMeta">
+                      <span class="emailLabel">From</span>
+                      <span class="emailValue">Ops Agent</span>
+                    </div>
+                    <div class="emailSubject">Invoice copy shared</div>
+                    <div class="emailPreview">Attached the latest invoice copy for the customer record and finance reference.</div>
+                  </div>
+                </div>
+              </details>
             </div>
-            <div class="emailItem" data-from="System &lt;no-reply@inebura.com&gt;" data-to="Ops Agent &lt;ops@inebura.com&gt;" data-cc="Ops Manager &lt;manager@inebura.com&gt;" data-subject="Auto-escalation triggered" data-body="Invoice escalated due to overdue threshold reached.\\n\\nPlease review and take action." data-attachments="Escalation_Report.pdf">
-              <div class="emailMeta">
-                <span class="emailLabel">From</span>
-                <span class="emailValue">System</span>
-              </div>
-              <div class="emailMeta">
-                <span class="emailLabel">To</span>
-                <span class="emailValue">Ops Agent</span>
-              </div>
-              <div class="emailSubject">Auto-escalation triggered</div>
+          </div>
+
+          <div class="emailTabPane" data-email-tab="system">
+            <div class="emailList">
+              <details class="emailThread" open>
+                <summary class="emailThreadSummary">
+                  <div class="emailThreadSummaryMain">
+                    <span class="emailThreadCount">2 mails</span>
+                    <div class="emailThreadTitle">Apollo Pharmacy | System actions</div>
+                    <div class="emailThreadPreview">Automated nudges and escalation alerts generated against collection milestones.</div>
+                  </div>
+                  <div class="emailThreadSummaryMeta">
+                    <span class="emailThreadLatest">12 Nov 2025</span>
+                    <span class="emailThreadChevron" aria-hidden="true">
+                      <i class="bi bi-chevron-down" aria-hidden="true"></i>
+                    </span>
+                  </div>
+                </summary>
+                <div class="emailThreadTrail">
+                  <div class="emailItem" data-from="System &lt;no-reply@inebura.com&gt;" data-to="Ops Agent &lt;ops@inebura.com&gt;" data-cc="Client - Finance &lt;finance@apollopharmacy.com&gt;" data-subject="Auto-reminder: PTP missed" data-body="System generated reminder for PTP missed.\\n\\nThis notification was sent to all relevant contacts." data-attachments="PTP_Missed_Notice.pdf" data-date="12 Nov 2025" data-time="09:45 AM" data-mailbox="System Generated" data-thread="Apollo Pharmacy | System actions">
+                    <div class="emailRow">
+                      <span class="emailDirection emailDirectionSystem">System</span>
+                      <div class="emailStampRow">
+                        <span><i class="bi bi-calendar3" aria-hidden="true"></i> 12 Nov 2025</span>
+                        <span><i class="bi bi-clock" aria-hidden="true"></i> 09:45 AM</span>
+                      </div>
+                    </div>
+                    <div class="emailMeta">
+                      <span class="emailLabel">From</span>
+                      <span class="emailValue">System</span>
+                    </div>
+                    <div class="emailMeta">
+                      <span class="emailLabel">To</span>
+                      <span class="emailValue">Ops Agent</span>
+                    </div>
+                    <div class="emailSubject">Auto-reminder: PTP missed</div>
+                    <div class="emailPreview">System generated reminder for PTP missed and routed to all relevant contacts.</div>
+                  </div>
+                  <div class="emailItem" data-from="System &lt;no-reply@inebura.com&gt;" data-to="Ops Agent &lt;ops@inebura.com&gt;" data-cc="Ops Manager &lt;manager@inebura.com&gt;" data-subject="Auto-escalation triggered" data-body="Invoice escalated due to overdue threshold reached.\\n\\nPlease review and take action." data-attachments="Escalation_Report.pdf" data-date="07 Nov 2025" data-time="07:10 PM" data-mailbox="System Generated" data-thread="Apollo Pharmacy | System actions">
+                    <div class="emailRow">
+                      <span class="emailDirection emailDirectionSystem">System</span>
+                      <div class="emailStampRow">
+                        <span><i class="bi bi-calendar3" aria-hidden="true"></i> 07 Nov 2025</span>
+                        <span><i class="bi bi-clock" aria-hidden="true"></i> 07:10 PM</span>
+                      </div>
+                    </div>
+                    <div class="emailMeta">
+                      <span class="emailLabel">From</span>
+                      <span class="emailValue">System</span>
+                    </div>
+                    <div class="emailMeta">
+                      <span class="emailLabel">To</span>
+                      <span class="emailValue">Ops Agent</span>
+                    </div>
+                    <div class="emailSubject">Auto-escalation triggered</div>
+                    <div class="emailPreview">Invoice escalated due to overdue threshold reached. Please review and take action.</div>
+                  </div>
+                </div>
+              </details>
             </div>
           </div>
         </div>
-      </div>
       </div>
 
       <div class="emailPane emailDetailPane">
@@ -1325,6 +1455,24 @@
                 <span class="emailActionIcon" title="Reply all" data-email-action="reply-all"><i class="bi bi-reply-all" aria-hidden="true"></i></span>
                 <span class="emailActionIcon" title="Forward"><i class="bi bi-forward" aria-hidden="true"></i></span>
               </div>
+            </div>
+            <div class="emailDetailTimeline">
+              <span class="emailDetailChip">
+                <i class="bi bi-inboxes" aria-hidden="true"></i>
+                <span id="emailDetailMailbox">-</span>
+              </span>
+              <span class="emailDetailChip">
+                <i class="bi bi-chat-left-text" aria-hidden="true"></i>
+                <span id="emailDetailThread">-</span>
+              </span>
+              <span class="emailDetailChip">
+                <i class="bi bi-calendar3" aria-hidden="true"></i>
+                <span id="emailDetailDate">-</span>
+              </span>
+              <span class="emailDetailChip">
+                <i class="bi bi-clock" aria-hidden="true"></i>
+                <span id="emailDetailTime">-</span>
+              </span>
             </div>
             <div class="emailDetailMeta">
               <div class="emailDetailLine">
@@ -1341,8 +1489,7 @@
               </div>
             </div>
           </div>
-          <div class="notificationBody" id="emailDetailBody">-</div>
-          <div class="kv"><span>Attachments</span><strong id="emailDetailAttachments" class="notificationAttachments">-</strong></div>
+          <div id="emailDetailBody" class="emailConversationPanel">-</div>
         </div>
         <div class="emailCompose hidden" id="emailComposePanel">
           <div class="emailComposeRow">
@@ -1383,7 +1530,31 @@
           </div>
           <div class="emailComposeRow emailComposeBodyRow">
             <label for="emailComposeBody">Body</label>
-            <textarea id="emailComposeBody" rows="6" placeholder="Write your email..."></textarea>
+            <div class="emailComposeEditor">
+              <div class="emailComposeToolbar" aria-hidden="true">
+                <button class="emailFormatBtn" type="button" title="Bold">
+                  <i class="bi bi-type-bold" aria-hidden="true"></i>
+                </button>
+                <button class="emailFormatBtn" type="button" title="Italic">
+                  <i class="bi bi-type-italic" aria-hidden="true"></i>
+                </button>
+                <button class="emailFormatBtn" type="button" title="Underline">
+                  <i class="bi bi-type-underline" aria-hidden="true"></i>
+                </button>
+                <span class="emailToolbarDivider" aria-hidden="true"></span>
+                <button class="emailFormatBtn" type="button" title="Bulleted list">
+                  <i class="bi bi-list-ul" aria-hidden="true"></i>
+                </button>
+                <button class="emailFormatBtn" type="button" title="Numbered list">
+                  <i class="bi bi-list-ol" aria-hidden="true"></i>
+                </button>
+                <button class="emailFormatBtn" type="button" title="Insert link">
+                  <i class="bi bi-link-45deg" aria-hidden="true"></i>
+                </button>
+                <span class="emailFormatHint">Formatting options</span>
+              </div>
+              <textarea id="emailComposeBody" rows="6" placeholder="Write your email..."></textarea>
+            </div>
           </div>
           <div class="emailComposeRow">
             <label for="emailComposeAttachments">Attachments</label>

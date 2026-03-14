@@ -21,6 +21,157 @@
     body[data-dashboard-path="pages/dashKAM.html"] .mtdCenteredCell {
       text-align: center;
     }
+
+    body[data-dashboard-path="pages/dashKAM.html"] #chartDetailModal.is-issue-detail .activityDetailLayout {
+      grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
+      gap: 18px;
+    }
+
+    body[data-dashboard-path="pages/dashKAM.html"] #chartDetailModal.is-issue-detail .activityDetailChartPane {
+      order: 1;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 8px 6px 8px 0;
+    }
+
+    body[data-dashboard-path="pages/dashKAM.html"] #chartDetailModal.is-issue-detail .activityDetailChartWrap {
+      width: min(100%, 320px);
+      max-width: 320px;
+      min-height: 320px;
+    }
+
+    body[data-dashboard-path="pages/dashKAM.html"] #chartDetailModal.is-issue-detail .activityDetailTablePane {
+      order: 2;
+      padding: 6px 0 0;
+    }
+
+    body[data-dashboard-path="pages/dashKAM.html"] .issueDetailTable {
+      width: 100%;
+      min-width: 1080px;
+    }
+
+    body[data-dashboard-path="pages/dashKAM.html"] .issueDetailTable th:nth-child(1),
+    body[data-dashboard-path="pages/dashKAM.html"] .issueDetailTable td:nth-child(1) {
+      width: 120px;
+      min-width: 120px;
+      max-width: 120px;
+      text-align: left !important;
+    }
+
+    body[data-dashboard-path="pages/dashKAM.html"] .issueDetailTable th:nth-child(2),
+    body[data-dashboard-path="pages/dashKAM.html"] .issueDetailTable td:nth-child(2) {
+      width: 220px;
+      min-width: 220px;
+      max-width: 220px;
+      text-align: left !important;
+      white-space: normal;
+    }
+
+    body[data-dashboard-path="pages/dashKAM.html"] .issueDetailTable th:nth-child(3),
+    body[data-dashboard-path="pages/dashKAM.html"] .issueDetailTable td:nth-child(3) {
+      width: 140px;
+      min-width: 140px;
+      max-width: 140px;
+      text-align: left !important;
+    }
+
+    body[data-dashboard-path="pages/dashKAM.html"] .issueDetailTable th:nth-child(4),
+    body[data-dashboard-path="pages/dashKAM.html"] .issueDetailTable td:nth-child(4) {
+      text-align: right !important;
+      width: 130px;
+      min-width: 130px;
+      max-width: 130px;
+    }
+
+    body[data-dashboard-path="pages/dashKAM.html"] .issueDetailTable th:nth-child(5),
+    body[data-dashboard-path="pages/dashKAM.html"] .issueDetailTable td:nth-child(5),
+    body[data-dashboard-path="pages/dashKAM.html"] .issueDetailTable th:nth-child(7),
+    body[data-dashboard-path="pages/dashKAM.html"] .issueDetailTable td:nth-child(7),
+    body[data-dashboard-path="pages/dashKAM.html"] .issueDetailTable th:nth-child(8),
+    body[data-dashboard-path="pages/dashKAM.html"] .issueDetailTable td:nth-child(8),
+    body[data-dashboard-path="pages/dashKAM.html"] .issueDetailTable th:nth-child(9),
+    body[data-dashboard-path="pages/dashKAM.html"] .issueDetailTable td:nth-child(9) {
+      text-align: center !important;
+    }
+
+    body[data-dashboard-path="pages/dashKAM.html"] .issueDetailTable th:nth-child(5),
+    body[data-dashboard-path="pages/dashKAM.html"] .issueDetailTable td:nth-child(5) {
+      width: 110px;
+      min-width: 110px;
+      max-width: 110px;
+    }
+
+    body[data-dashboard-path="pages/dashKAM.html"] .issueDetailTable th:nth-child(7),
+    body[data-dashboard-path="pages/dashKAM.html"] .issueDetailTable td:nth-child(7) {
+      width: 64px;
+      min-width: 64px;
+      max-width: 64px;
+    }
+
+    body[data-dashboard-path="pages/dashKAM.html"] .issueDetailTable th:nth-child(8),
+    body[data-dashboard-path="pages/dashKAM.html"] .issueDetailTable td:nth-child(8) {
+      width: 78px;
+      min-width: 78px;
+      max-width: 78px;
+    }
+
+    body[data-dashboard-path="pages/dashKAM.html"] .issueDetailTable th:nth-child(9),
+    body[data-dashboard-path="pages/dashKAM.html"] .issueDetailTable td:nth-child(9) {
+      width: 96px;
+      min-width: 96px;
+      max-width: 96px;
+    }
+
+    body[data-dashboard-path="pages/dashKAM.html"] .issueDetailTable th:nth-child(6),
+    body[data-dashboard-path="pages/dashKAM.html"] .issueDetailTable td:nth-child(6) {
+      min-width: 200px;
+      text-align: left !important;
+      white-space: normal;
+    }
+
+    body[data-dashboard-path="pages/dashKAM.html"] .issueOpenDaysValue {
+      display: inline-flex;
+      justify-content: center;
+      min-width: 40px;
+      font-weight: 700;
+      color: #334155;
+    }
+
+    body[data-dashboard-path="pages/dashKAM.html"] .issueOpenDaysValue.is-breach {
+      color: #b91c1c;
+    }
+
+    body[data-dashboard-path="pages/dashKAM.html"] .issueStatusBadge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1.2;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+
+    body[data-dashboard-path="pages/dashKAM.html"] .issueStatusBadge.is-open {
+      background: #e0f2fe;
+      color: #0c4a6e;
+      border-color: #bae6fd;
+    }
+
+    body[data-dashboard-path="pages/dashKAM.html"] .issueStatusBadge.is-need,
+    body[data-dashboard-path="pages/dashKAM.html"] .issueStatusBadge.is-approval {
+      background: #fef3c7;
+      color: #92400e;
+      border-color: #fcd34d;
+    }
+
+    body[data-dashboard-path="pages/dashKAM.html"] .issueStatusBadge.is-closed {
+      background: #dcfce7;
+      color: #166534;
+      border-color: #86efac;
+    }
   </style>
 </head>
 <body class="motion-preload" data-root-path="../" data-dashboard-path="pages/dashKAM.html" data-relationship-name="Apollo" data-relationship-badge="AP" data-relationship-logo-src="assets/apollo-tyres-logo.svg">
@@ -545,7 +696,7 @@
               <div class="filterRow">
                 <label class="tableFilterSearch" for="issueDetailSearch">
                   <i class="bi bi-search" aria-hidden="true"></i>
-                  <input type="search" id="issueDetailSearch" placeholder="Search status, owner or resolution" autocomplete="off" />
+                  <input type="search" id="issueDetailSearch" placeholder="Search customer, invoice, sub status or owner" autocomplete="off" />
                 </label>
                 <details class="filterDropdown activityFilterDropdown" id="issuePrimaryFilterDropdown">
                   <summary>Primary Status <span class="filterBadge" id="issuePrimaryFilterBadge">All</span></summary>
@@ -556,11 +707,12 @@
                   <div class="filterMenu" id="issueSubStatusFilterMenu"></div>
                 </details>
                 <details class="filterDropdown activityFilterDropdown" id="issueTypeFilterDropdown">
-                  <summary>Resolution <span class="filterBadge" id="issueTypeFilterBadge">All</span></summary>
+                  <summary>Issue Status <span class="filterBadge" id="issueTypeFilterBadge">All</span></summary>
                   <div class="filterMenu" id="issueTypeFilterMenu">
                     <button class="filterItem" type="button" data-filter-value="all">All</button>
                     <button class="filterItem" type="button" data-filter-value="open">Open</button>
-                    <button class="filterItem" type="button" data-filter-value="resolved">Resolved</button>
+                    <button class="filterItem" type="button" data-filter-value="need">Need</button>
+                    <button class="filterItem" type="button" data-filter-value="approval">Approval</button>
                     <button class="filterItem" type="button" data-filter-value="closed">Closed</button>
                   </div>
                 </details>
@@ -571,15 +723,15 @@
               <table class="activityDetailTable issueDetailTable">
                 <thead>
                   <tr>
-                    <th>Customer count</th>
-                    <th>Invoice count</th>
-                    <th>Invoice value</th>
-                    <th>Net due</th>
-                    <th>Expected TAT (days)</th>
-                    <th>Resolution</th>
-                    <th>Issue sub-status</th>
-                    <th>Action owner</th>
-                    <th>Past TAT (days)</th>
+                    <th>Customer code</th>
+                    <th>Customer name</th>
+                    <th>Invoice No</th>
+                    <th>Invoice Amount</th>
+                    <th>Due date</th>
+                    <th>Sub status</th>
+                    <th>TAT</th>
+                    <th>Open days</th>
+                    <th>Issue status</th>
                   </tr>
                 </thead>
                 <tbody id="issueDetailTableBody"></tbody>
@@ -2162,7 +2314,7 @@
     let targetPaceChart = null;
     let vintageDetailPieChart = null;
     const activityPageSize = 10;
-    const issuePageSize = 10;
+    const issuePageSize = 5;
     const cashflowWeekSize = 7;
     const cashflowTotalWeeks = Math.ceil(cashflowDaysInMonth / cashflowWeekSize);
     const cashflowDefaultWeekIndex = Math.max(
@@ -3602,9 +3754,13 @@
 
     const doesIssueSearchMatch = (row, searchTerm) => (
       !searchTerm
-      || row.primaryStatus.toLowerCase().includes(searchTerm)
-      || row.subStatus.toLowerCase().includes(searchTerm)
-      || String(row.resolutionState || "").toLowerCase().includes(searchTerm)
+      || String(row.customerCode || "").toLowerCase().includes(searchTerm)
+      || String(row.customerName || "").toLowerCase().includes(searchTerm)
+      || String(row.invoiceNo || "").toLowerCase().includes(searchTerm)
+      || String(row.primaryStatus || "").toLowerCase().includes(searchTerm)
+      || String(row.subStatus || "").toLowerCase().includes(searchTerm)
+      || String(row.dueDate || "").toLowerCase().includes(searchTerm)
+      || String(getIssuePopupStatus(row) || "").toLowerCase().includes(searchTerm)
       || String(row.broadStatus || "").toLowerCase().includes(searchTerm)
       || String(row.actionOwner || "").toLowerCase().includes(searchTerm)
       || String(row.resolvedBy || "").toLowerCase().includes(searchTerm)
@@ -3612,103 +3768,26 @@
 
     const getIssueFilteredRecords = () => {
       const search = issueFilterState.search.trim().toLowerCase();
-      return issueDispositionRecords.filter((row) => {
+      return openIssuesData.filter((row) => {
         const primaryMatch = issueFilterState.primaryStatus === "all" || row.primaryStatus === issueFilterState.primaryStatus;
         const subMatch = issueFilterState.subStatus === "all" || row.subStatus === issueFilterState.subStatus;
-        const typeMatch = issueFilterState.resolutionState === "all" || row.resolutionState === issueFilterState.resolutionState;
+        const typeMatch = issueFilterState.resolutionState === "all"
+          || normalizeKey(getIssuePopupStatus(row)) === issueFilterState.resolutionState;
         const searchMatch = doesIssueSearchMatch(row, search);
         return primaryMatch && subMatch && typeMatch && searchMatch;
       });
     };
 
-    const getIssuePrimaryColorScopeRecords = () => {
-      const search = issueFilterState.search.trim().toLowerCase();
-      return issueDispositionRecords.filter((row) => {
-        const typeMatch = issueFilterState.resolutionState === "all" || row.resolutionState === issueFilterState.resolutionState;
-        const searchMatch = doesIssueSearchMatch(row, search);
-        return typeMatch && searchMatch;
-      });
-    };
-
-    const buildIssuePrimaryColorMap = (records) => {
-      const summary = computeIssuePrimarySummary(records);
-      return summary.reduce((map, [status], index) => {
-        map.set(status, activityStatusPalette[index % activityStatusPalette.length]);
-        return map;
-      }, new Map());
-    };
-
-    const buildIssueTableRows = (records) => {
-      const grouped = new Map();
-      records.forEach((row) => {
-        const owner = row.actionOwner || "-";
-        const key = `${row.primaryStatus}|||${row.subStatus}|||${row.resolutionState}|||${owner}`;
-        if (!grouped.has(key)) {
-          grouped.set(key, {
-            primaryStatus: row.primaryStatus,
-            subStatus: row.subStatus,
-            resolutionState: row.resolutionState,
-            actionOwner: owner,
-            customers: new Set(),
-            invoices: new Set(),
-            invoiceValue: 0,
-            netDue: 0,
-            expectedTatTotal: 0,
-            expectedTatCount: 0,
-            pastTatTotal: 0,
-            pastTatCount: 0
-          });
-        }
-        const target = grouped.get(key);
-        target.customers.add(row.customerCode || row.customerName);
-        target.invoices.add(row.invoiceNo);
-        target.invoiceValue += Number(row.invoiceValue || 0);
-        target.netDue += Number(row.netDue || 0);
-        target.expectedTatTotal += Number(row.expectedTatDays || 0);
-        target.expectedTatCount += 1;
-        target.pastTatTotal += Number(row.tatOverdueDays || 0);
-        target.pastTatCount += 1;
-      });
-
-      return Array.from(grouped.values())
-        .map((row) => ({
-          customerCount: row.customers.size,
-          invoiceCount: row.invoices.size,
-          invoiceValue: row.invoiceValue,
-          netDue: row.netDue,
-          expectedTatDays: row.expectedTatCount ? Math.round(row.expectedTatTotal / row.expectedTatCount) : 0,
-          resolutionState: row.resolutionState,
-          status: row.subStatus,
-          primaryStatus: row.primaryStatus,
-          actionOwner: row.actionOwner,
-          tatOverdueDays: row.pastTatCount ? Math.round(row.pastTatTotal / row.pastTatCount) : 0
-        }))
-        .sort((a, b) => b.tatOverdueDays - a.tatOverdueDays || b.invoiceCount - a.invoiceCount || b.invoiceValue - a.invoiceValue);
-    };
-
-    const getIssueChartBreakdown = (records, primaryColorMap) => {
-      const isSubStatusView = issueFilterState.primaryStatus !== "all";
-      const summary = isSubStatusView
-        ? computeIssueSubStatusSummary(records)
-        : computeIssuePrimarySummary(records);
+    const getIssueChartBreakdown = (records) => {
+      const summary = computeIssueSubStatusSummary(records);
       const labels = summary.map(([label]) => label);
       const values = summary.map(([, count]) => count);
-      let colors = labels.map((_, index) => activityStatusPalette[index % activityStatusPalette.length]);
-      let colorMap = labels.reduce((map, label, index) => {
+      const colors = labels.map((_, index) => activityStatusPalette[index % activityStatusPalette.length]);
+      const colorMap = labels.reduce((map, label, index) => {
         map.set(label, colors[index]);
         return map;
       }, new Map());
-      if (isSubStatusView) {
-        const accentColor = primaryColorMap.get(issueFilterState.primaryStatus) || "#64748b";
-        const shadeSteps = [-0.14, -0.08, -0.02, 0.06, 0.12, 0.18];
-        colors = labels.map((_, index) => shiftHexTone(accentColor, shadeSteps[index % shadeSteps.length]));
-        colorMap = labels.reduce((map, label, index) => {
-          map.set(label, colors[index]);
-          return map;
-        }, new Map());
-      }
       return {
-        mode: isSubStatusView ? "substatus" : "primary",
         labels,
         values,
         colors,
@@ -3718,9 +3797,9 @@
 
     const renderIssueDetailChart = (chartBreakdown) => {
       if (!issueDetailCanvas) return;
-      const { mode, labels, values, colors } = chartBreakdown;
+      const { labels, values, colors } = chartBreakdown;
       if (issueShowPrimaryBtn) {
-        issueShowPrimaryBtn.hidden = mode !== "substatus";
+        issueShowPrimaryBtn.hidden = true;
       }
       if (issueDetailChart) {
         issueDetailChart.destroy();
@@ -3746,15 +3825,6 @@
             const clickedIndex = elements[0].index;
             const selectedLabel = chart?.data?.labels?.[clickedIndex];
             if (!selectedLabel || selectedLabel === "No data") return;
-            if (mode === "primary") {
-              issueFilterState.primaryStatus = String(selectedLabel);
-              issueFilterState.subStatus = "all";
-              renderIssueSubStatusOptions();
-              setIssueFilterBadges();
-              issueCurrentPage = 1;
-              renderIssueDetail();
-              return;
-            }
             issueFilterState.subStatus = String(selectedLabel);
             setIssueFilterBadges();
             issueCurrentPage = 1;
@@ -3774,13 +3844,18 @@
       if (issueTypeFilterBadge) {
         issueTypeFilterBadge.textContent = issueFilterState.resolutionState === "all"
           ? "All"
-          : `${issueFilterState.resolutionState.charAt(0).toUpperCase()}${issueFilterState.resolutionState.slice(1)}`;
+          : ({
+            open: "Open",
+            need: "Need",
+            approval: "Approval",
+            closed: "Closed"
+          })[issueFilterState.resolutionState] || issueFilterState.resolutionState;
       }
     };
 
     const renderIssuePrimaryStatusOptions = () => {
       if (!issuePrimaryFilterMenu) return;
-      const primaryOptions = Object.keys(issueDispositionMap);
+      const primaryOptions = Array.from(new Set(openIssuesData.map((row) => String(row.primaryStatus || "").trim()).filter(Boolean)));
       issuePrimaryFilterMenu.innerHTML = [
         `<button class="filterItem" type="button" data-filter-value="all">All</button>`,
         ...primaryOptions.map((status) => `<button class="filterItem" type="button" data-filter-value="${safeHtml(status)}">${safeHtml(status)}</button>`)
@@ -3790,9 +3865,10 @@
     const renderIssueSubStatusOptions = () => {
       if (!issueSubStatusFilterMenu) return;
       const selectedPrimary = issueFilterState.primaryStatus;
-      const sourceStatuses = selectedPrimary === "all"
-        ? Object.values(issueDispositionMap).flat()
-        : (issueDispositionMap[selectedPrimary] || []);
+      const sourceStatuses = openIssuesData
+        .filter((row) => selectedPrimary === "all" || row.primaryStatus === selectedPrimary)
+        .map((row) => String(row.subStatus || "").trim())
+        .filter(Boolean);
       const uniqueStatuses = Array.from(new Set(sourceStatuses));
       if (issueFilterState.subStatus !== "all" && !uniqueStatuses.includes(issueFilterState.subStatus)) {
         issueFilterState.subStatus = "all";
@@ -3822,10 +3898,16 @@
 
     const renderIssueDetail = () => {
       const filteredRecords = getIssueFilteredRecords();
-      const primaryColorMap = buildIssuePrimaryColorMap(getIssuePrimaryColorScopeRecords());
-      const chartBreakdown = getIssueChartBreakdown(filteredRecords, primaryColorMap);
-      const pillColorMap = chartBreakdown.colorMap;
-      const rows = buildIssueTableRows(filteredRecords);
+      const chartBreakdown = getIssueChartBreakdown(filteredRecords);
+      const subStatusColorMap = chartBreakdown.colorMap;
+      const rows = [...filteredRecords].sort((a, b) => {
+        const aBreach = Number(a.openDays || 0) > Number(a.expectedTatDays || 0) ? 1 : 0;
+        const bBreach = Number(b.openDays || 0) > Number(b.expectedTatDays || 0) ? 1 : 0;
+        return bBreach - aBreach
+          || Number(b.openDays || 0) - Number(a.openDays || 0)
+          || parseIssueDateToMs(a.dueDate) - parseIssueDateToMs(b.dueDate)
+          || String(a.customerName || "").localeCompare(String(b.customerName || ""));
+      });
       const totalRows = rows.length;
       const totalPages = Math.max(1, Math.ceil(totalRows / issuePageSize));
       if (issueCurrentPage > totalPages) issueCurrentPage = totalPages;
@@ -3836,53 +3918,38 @@
           issueDetailTableBody.innerHTML = `<tr><td colspan="9" class="activityDetailTableEmpty">No rows match the selected filters.</td></tr>`;
         } else {
           issueDetailTableBody.innerHTML = pageRows.map((row) => {
-            const statusColorKey = chartBreakdown.mode === "substatus" ? row.status : row.primaryStatus;
-            const statusColor = pillColorMap.get(statusColorKey) || "#64748b";
-            const resolutionColor = ({
-              open: "#ef4444",
-              resolved: "#f59e0b",
-              closed: "#16a34a"
-            })[row.resolutionState] || "#64748b";
-            const resolutionLabel = `${row.resolutionState.charAt(0).toUpperCase()}${row.resolutionState.slice(1)}`;
+            const subStatusColor = subStatusColorMap.get(row.subStatus) || "#64748b";
+            const issueStatus = getIssuePopupStatus(row);
+            const isTatBreach = Number(row.openDays || 0) > Number(row.expectedTatDays || 0);
             return `
             <tr>
-              <td>${row.customerCount}</td>
-              <td>${row.invoiceCount}</td>
+              <td>${safeHtml(row.customerCode)}</td>
+              <td>${safeHtml(row.customerName)}</td>
+              <td>${safeHtml(row.invoiceNo)}</td>
               <td>${formatInrCompact(row.invoiceValue)}</td>
-              <td>${formatInrCompact(row.netDue)}</td>
-              <td>${row.expectedTatDays}</td>
+              <td>${safeHtml(row.dueDate)}</td>
               <td>
                 <span
                   class="activityStatusPill"
-                  style="--status-pill-color:${resolutionColor};--status-pill-rgb:${hexToRgb(resolutionColor)};"
-                >${resolutionLabel}</span>
-              </td>
-              <td>
-                <span
-                  class="activityStatusPill"
-                  style="--status-pill-color:${statusColor};--status-pill-rgb:${hexToRgb(statusColor)};"
+                  style="--status-pill-color:${subStatusColor};--status-pill-rgb:${hexToRgb(subStatusColor)};"
                   title="${safeHtml(row.primaryStatus)}"
-                >${safeHtml(row.status)}</span>
+                >${safeHtml(row.subStatus)}</span>
               </td>
-              <td>${safeHtml(row.actionOwner)}</td>
-              <td>${row.tatOverdueDays}</td>
+              <td>${safeHtml(row.expectedTatDays)}</td>
+              <td><span class="issueOpenDaysValue${isTatBreach ? " is-breach" : ""}">${safeHtml(row.openDays ?? "-")}</span></td>
+              <td><span class="issueStatusBadge is-${normalizeKey(issueStatus)}">${safeHtml(issueStatus)}</span></td>
             </tr>
           `;
           }).join("");
         }
       }
       if (issueDetailMeta) {
-        const totalInvoiceCount = rows.reduce((sum, item) => sum + item.invoiceCount, 0);
-        const pastTatRows = filteredRecords.filter((row) => Number(row.tatOverdueDays || 0) > 0).length;
-        issueDetailMeta.textContent = `Showing ${pageRows.length} grouped rows from ${filteredRecords.length} issues (${totalInvoiceCount} invoices). Past TAT cases in this filter: ${pastTatRows}.`;
+        const breachCount = filteredRecords.filter((row) => Number(row.openDays || 0) > Number(row.expectedTatDays || 0)).length;
+        issueDetailMeta.textContent = `Showing ${pageRows.length} issues on this page from ${filteredRecords.length} matching invoices. TAT breaches in this filter: ${breachCount}.`;
       }
       renderIssuePagination(totalRows, pageRows.length, totalPages);
       renderIssueDetailChart(chartBreakdown);
     };
-
-    renderIssuePrimaryStatusOptions();
-    renderIssueSubStatusOptions();
-    setIssueFilterBadges();
 
     if (issueDetailSearch) {
       issueDetailSearch.addEventListener("input", (event) => {
@@ -4142,11 +4209,19 @@
       const config = chartConfigs[key];
       if (!config) return;
       const openTargetFromCashflow = key === "cashflow";
-      if (modalTitle) modalTitle.textContent = openTargetFromCashflow ? "Plan vs Actual" : config.title;
-      if (modalMeta) modalMeta.textContent = openTargetFromCashflow ? "Target achievement" : config.meta;
+      const isIssueDetail = key === "issues" || key === "planActual";
+      if (modalTitle) {
+        modalTitle.textContent = openTargetFromCashflow
+          ? "Plan vs Actual"
+          : (key === "planActual" ? "Issue Resolution" : config.title);
+      }
+      if (modalMeta) {
+        modalMeta.textContent = openTargetFromCashflow
+          ? "Target achievement"
+          : (isIssueDetail ? "Sub-status bifurcation with invoice-level issue details" : config.meta);
+      }
       const isVintageDetail = key === "vintage";
       const isActivityDetail = key === "activity";
-      const isIssueDetail = key === "issues";
       const isCashflowDetail = false;
       const isTargetDetail = openTargetFromCashflow;
       if (modalEl) {
@@ -4830,7 +4905,9 @@
         dueDate,
         committedAmount,
         status: row.resolutionState.charAt(0).toUpperCase() + row.resolutionState.slice(1),
+        resolutionState: row.resolutionState,
         primaryStatus: row.primaryStatus,
+        subStatus: row.subStatus,
         broadStatus: row.broadStatus,
         actionOwner: row.actionOwner,
         openDays: row.openDays,
@@ -4839,6 +4916,7 @@
         resolvedBy: row.resolvedBy,
         resolvedAt: row.resolvedAt,
         closedAt: row.closedAt,
+        netDue: row.netDue,
         ...getApprovalQueueDetails(row),
         dueType: Number(row.agingDays || 0) > 30 ? "due" : "not_due",
         commitmentType: committedAmount > 0 ? "committed" : "non_committed"
@@ -4846,6 +4924,17 @@
     });
 
     const resolutionStatus = (row) => String(row.status || "").trim().toLowerCase();
+    const getIssuePopupStatus = (row) => {
+      const lifecycleState = String(row.resolutionState || "").trim().toLowerCase();
+      if (lifecycleState === "closed") return "Closed";
+      if (lifecycleState === "resolved") return "Approval";
+      if (String(row.primaryStatus || "").trim() === "Further Docs Required") return "Need";
+      return "Open";
+    };
+    renderIssuePrimaryStatusOptions();
+    renderIssueSubStatusOptions();
+    setIssueFilterBadges();
+
     const parseIssueDateToMs = (value) => {
       const parsed = new Date(String(value || "")).getTime();
       return Number.isFinite(parsed) ? parsed : 0;

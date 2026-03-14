@@ -3240,6 +3240,18 @@ textarea { min-height: 70px; resize: vertical; }
   gap: 6px;
 }
 
+.emailListHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.emailSectionHint {
+  font-size: 10px;
+  color: #64748b;
+}
+
 .emailDetailPane {
   background: #fbfcff;
 }
@@ -3251,6 +3263,12 @@ textarea { min-height: 70px; resize: vertical; }
 
 .emailDetailPane .notificationBody {
   font-size: 11px;
+}
+
+.emailDetailContent {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .emailDetailHeader {
@@ -3273,6 +3291,32 @@ textarea { min-height: 70px; resize: vertical; }
   font-size: 13px;
   font-weight: 700;
   color: #0f172a;
+}
+
+.emailDetailTimeline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.emailDetailChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  color: #475569;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.emailDetailChip span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .emailDetailActions {
@@ -3313,6 +3357,47 @@ textarea { min-height: 70px; resize: vertical; }
   font-size: 10px;
   color: #94a3b8;
   min-width: 40px;
+}
+
+.emailConversationPanel {
+  width: 100%;
+  min-height: 360px;
+  border: 1px solid #dbe3ee;
+  border-radius: 12px;
+  background: #f8fafc;
+  padding: 12px;
+  font-size: 11px;
+  line-height: 1.55;
+  color: #334155;
+  overflow: auto;
+}
+
+.emailConversationEntry {
+  white-space: normal;
+}
+
+.emailConversationLine {
+  margin-bottom: 2px;
+}
+
+.emailConversationLine strong {
+  color: #64748b;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.emailConversationMessage {
+  margin-top: 10px;
+  white-space: pre-wrap;
+  color: #334155;
+}
+
+.emailConversationDivider {
+  width: 100%;
+  border: 0;
+  border-top: 3px solid #0f172a;
+  margin: 14px 0;
 }
 
 .commitmentList {
@@ -3374,6 +3459,60 @@ textarea { min-height: 70px; resize: vertical; }
 .emailComposeRow textarea {
   resize: vertical;
   min-height: 110px;
+}
+
+.emailComposeEditor {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.emailComposeToolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 6px;
+  border: 1px solid #e6e9ef;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.emailFormatBtn {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border: 1px solid #dbe3ee;
+  background: #ffffff;
+  color: #334155;
+  cursor: pointer;
+}
+
+.emailFormatBtn:hover {
+  border-color: #bfdbfe;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.emailFormatBtn.is-active {
+  border-color: #93c5fd;
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.emailToolbarDivider {
+  width: 1px;
+  height: 20px;
+  background: #dbe3ee;
+}
+
+.emailFormatHint {
+  margin-left: auto;
+  font-size: 10px;
+  color: #64748b;
 }
 
 .emailSuggestionBox {
@@ -3510,6 +3649,99 @@ textarea { min-height: 70px; resize: vertical; }
   gap: 8px;
 }
 
+.emailThread {
+  border: 1px solid #e6e9ef;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+  overflow: hidden;
+}
+
+.emailThreadSummary {
+  list-style: none;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+}
+
+.emailThreadSummary::-webkit-details-marker {
+  display: none;
+}
+
+.emailThreadSummary::marker {
+  content: "";
+}
+
+.emailThreadSummaryMain {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.emailThreadCount {
+  align-self: flex-start;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid #bfdbfe;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.emailThreadTitle {
+  font-size: 12px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.emailThreadPreview {
+  font-size: 10.5px;
+  color: #64748b;
+  line-height: 1.45;
+}
+
+.emailThreadSummaryMeta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.emailThreadLatest {
+  font-size: 10px;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.emailThreadChevron {
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #64748b;
+  transition: transform 0.2s ease;
+}
+
+.emailThread[open] .emailThreadChevron {
+  transform: rotate(180deg);
+}
+
+.emailThreadTrail {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 12px 12px;
+  border-top: 1px solid #eef2f7;
+}
+
 .emailItem {
   border: 1px solid #e6e9ef;
   background: white;
@@ -3531,10 +3763,57 @@ textarea { min-height: 70px; resize: vertical; }
 
 .emailRow {
   display: flex;
+  align-items: center;
   justify-content: space-between;
   gap: 8px;
   font-size: 10.5px;
   color: #6b7280;
+}
+
+.emailDirection {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.emailDirectionInbound {
+  background: #ecfdf3;
+  color: #166534;
+}
+
+.emailDirectionOutbound {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.emailDirectionInternal {
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+.emailDirectionSystem {
+  background: #f5f3ff;
+  color: #6d28d9;
+}
+
+.emailStampRow {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 10px;
+  color: #64748b;
+}
+
+.emailStampRow span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .emailMeta {
@@ -3562,6 +3841,46 @@ textarea { min-height: 70px; resize: vertical; }
   font-size: 12px;
   color: #111827;
   margin-top: 4px;
+}
+
+.emailPreview {
+  margin-top: 5px;
+  font-size: 10.5px;
+  color: #475569;
+  line-height: 1.45;
+}
+
+@media (max-width: 1080px) {
+  .emailSplit {
+    grid-template-columns: 1fr;
+  }
+
+  .emailPane {
+    min-height: auto;
+  }
+}
+
+@media (max-width: 700px) {
+  .emailComposeRow {
+    grid-template-columns: 1fr;
+  }
+
+  .emailFormatHint {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .emailRow,
+  .emailThreadSummary {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .emailStampRow,
+  .emailThreadSummaryMeta {
+    justify-content: flex-start;
+    align-items: flex-start;
+  }
 }
 
 /* ================= RIGHT PANEL ================= */

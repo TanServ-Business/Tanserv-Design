@@ -4824,103 +4824,666 @@
       });
     }
     const stripHtml = (text) => String(text || "").replace(/<[^>]*>/g, " ");
-    const countWords = (text) => stripHtml(text).trim().split(/\s+/).filter(Boolean).length;
-    let dashboardSummaryRunId = 0;
-    const buildDashboardSummary = () => {
-      const metric = (value) => `<span class="dashboardSummaryMetric">${value}</span>`;
-      const mtdCollectionCr = cashflowMonthFlowRecords.reduce((sum, row) => sum + Number(row.collectionCr || 0), 0);
-      const ptpDueCr = cashflowMonthFlowRecords
-        .filter((row) => row.day <= cashflowCurrentDay)
-        .reduce((sum, row) => sum + Number(row.ptpAmountCr || 0), 0);
-      const projectedEomCr = cashflowMonthFlowRecords.reduce((sum, row) => sum + Number(row.projectedCr || 0), 0);
-      const commitmentCr = Number(targetDetailSnapshot?.targetCr || 0);
-      const achievedPct = commitmentCr > 0 ? (mtdCollectionCr / commitmentCr) * 100 : 0;
-      const projectedGapCr = Math.max(0, commitmentCr - projectedEomCr);
-
-      const ptpDueDays = cashflowMonthFlowRecords.filter((row) => row.day <= cashflowCurrentDay && Number(row.ptpAmountCr || 0) > 0);
-      const ptpMetDays = ptpDueDays.filter((row) => Number(row.collectionCr || 0) >= Number(row.ptpAmountCr || 0)).length;
-      const ptpMissedDays = ptpDueDays.filter((row) => Number(row.collectionCr || 0) < Number(row.ptpAmountCr || 0)).length;
-
-      const activityMix = computeActivityTypeSummary(activityDispositionRecords);
-      const totalActivities = activityMix.Call + activityMix.Email + activityMix.Visit;
-      const activityShare = (value) => (totalActivities > 0 ? ((value / totalActivities) * 100).toFixed(1) : "0.0");
-      const topPrimaryStatus = computeActivityPrimarySummary(activityDispositionRecords)[0] || ["-", 0];
-
-      const topIssueCategory = computeIssuePrimarySummary(issueDispositionRecords)[0] || ["-", 0];
-      const agedIssues = issueDispositionRecords.filter((row) => Number(row.openDays || 0) > 14).length;
-
-      const sections = [
-        {
-          title: "1. Collection Progress",
-          points: [
-            `MTD collection is ${metric(formatCrCurrency(mtdCollectionCr))} against commitment of ${metric(formatCrCurrency(commitmentCr))}, translating to ${metric(`${achievedPct.toFixed(1)}%`)} achievement so far.`,
-            `At current pace, projected month-end collection is ${metric(formatCrCurrency(projectedEomCr))}, leaving an estimated gap of ${metric(formatCrCurrency(projectedGapCr))} if conversion does not improve.`
-          ]
-        },
-        {
-          title: "2. PTP Conversion",
-          points: [
-            `PTP due till date is ${metric(formatCrCurrency(ptpDueCr))} across ${metric(String(ptpDueDays.length))} due PTP days.`,
-            `${metric(String(ptpMetDays))} days were met and ${metric(String(ptpMissedDays))} were under-delivered, indicating inconsistent promise quality and follow-through on committed dates.`
-          ]
-        },
-        {
-          title: "3. Activity Overview",
-          points: [
-            `Top invoice concentration is in ${topPrimaryStatus[0]} (${metric(`${topPrimaryStatus[1]} invoices`)}), which should guide prioritization for collection action.`,
-            `Activity mix is Calls ${metric(`${activityShare(activityMix.Call)}%`)}, Emails ${metric(`${activityShare(activityMix.Email)}%`)}, and Visits ${metric(`${activityShare(activityMix.Visit)}%`)}, suggesting broad outreach but uneven conversion.`
-          ]
-        },
-        {
-          title: "4. Risk and Focus",
-          points: [
-            `Top issue category is ${topIssueCategory[0]} (${metric(`${topIssueCategory[1]} cases`)}), with ${metric(String(agedIssues))} issues open beyond 14 days creating execution drag.`,
-            `Immediate focus should be to clear aged blockers, tighten near-term PTP validation, and accelerate high-probability collections scheduled this and next week.`
-          ]
-        }
-      ];
-      let totalWords = countWords(sections.flatMap((section) => section.points).join(" "));
-      if (totalWords < 150) {
-        sections[3].points.push("A tighter daily owner follow-up loop can improve forecast reliability and close the monthly gap faster.");
-        totalWords = countWords(sections.flatMap((section) => section.points).join(" "));
-      }
-      if (totalWords > 200) {
-        sections[2].points[1] = `Activity mix is Calls ${metric(`${activityShare(activityMix.Call)}%`)}, Emails ${metric(`${activityShare(activityMix.Email)}%`)}, and Visits ${metric(`${activityShare(activityMix.Visit)}%`)}.`;
-        totalWords = countWords(sections.flatMap((section) => section.points).join(" "));
-      }
-      return { sections, totalWords };
+    const countWords = (text) => stripHtml(text).replace(/\*\*/g, "").trim().split(/\s+/).filter(Boolean).length;
+    const roundMetric = (value, decimals = 2) => Number(Number(value || 0).toFixed(decimals));
+    const parseFirstNumber = (value) => {
+      const match = String(value || "").match(/-?\d+(?:\.\d+)?/);
+      return match ? Number(match[0]) : 0;
     };
-    const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+    const formatDashboardSummaryDuration = (durationMs) => {
+      const totalSeconds = Math.max(0, Number(durationMs || 0)) / 1000;
+      if (totalSeconds < 60) return `${totalSeconds.toFixed(1)}s`;
+      const minutes = Math.floor(totalSeconds / 60);
+      const seconds = totalSeconds - (minutes * 60);
+      return `${minutes}m ${seconds.toFixed(1)}s`;
+    };
+    const dashboardSummaryAiConfig = {
+      endpoint: "http://127.0.0.1:11434/api/generate",
+      model: "llama3.2-vision:11b",
+      timeoutMs: 120000,
+      keepAlive: "10m",
+      ...(window.dashboardSummaryAiConfig || {})
+    };
+    const dashboardSummarySectionOrder = [
+      { key: "collectionProgress", title: "1. Collection Progress" },
+      { key: "ptpConversion", title: "2. PTP Conversion" },
+      { key: "activityOverview", title: "3. Activity Overview" },
+      { key: "riskAndFocus", title: "4. Risk and Focus" }
+    ];
+    const dashboardSummaryResponseSchema = {
+      type: "object",
+      additionalProperties: false,
+      required: dashboardSummarySectionOrder.map((section) => section.key),
+      properties: dashboardSummarySectionOrder.reduce((acc, section) => {
+        acc[section.key] = {
+          type: "array",
+          minItems: 2,
+          maxItems: 2,
+          items: {
+            type: "string"
+          }
+        };
+        return acc;
+      }, {})
+    };
+    const dashboardSummaryStaticSnapshot = {
+      page: "LPagent",
+      meta: {
+        agent_name: "Devashish Agent1",
+        currency: "INR",
+        as_of: "2026-02-06",
+        portfolio_value_inr: 2489698803
+      },
+      cards: {
+        kpi: {
+          total_net_due: {
+            value_inr: 2488926295,
+            delta_percent: 6.2,
+            invoices: 173,
+            customers: 12,
+            not_due: {
+              invoices: 61,
+              amount_inr: 892416295,
+              customers: 4
+            },
+            due: {
+              invoices: 112,
+              amount_inr: 1596510000,
+              customers: 8
+            }
+          },
+          mtd_collection: {
+            value_inr: 7773508,
+            delta_percent: 11.4,
+            collected_invoices: 4,
+            not_due: {
+              invoices: 1,
+              amount_inr: 1843508,
+              customers: 1
+            },
+            due: {
+              invoices: 3,
+              amount_inr: 5930000,
+              customers: 2
+            }
+          },
+          collection_within_due_date: {
+            ratio_percent: 86.2,
+            progress_ratio: 0.862,
+            not_due: {
+              invoices: 81,
+              amount_inr: 69840000,
+              customers: 5
+            },
+            due: {
+              invoices: 92,
+              amount_inr: 83520000,
+              customers: 7
+            }
+          },
+          open_issues: {
+            total_count: 9,
+            high_priority_count: 3,
+            top_issue_counts: [4, 3, 2]
+          },
+          aging_over_30_days: {
+            share_percent: 18,
+            value_cr: 3.8,
+            top_buckets: {
+              "31_60_days_count": 24,
+              "121_150_days_count": 13,
+              "150_180_days_count": 9
+            }
+          },
+          new_billing: {
+            value_cr: 1.2,
+            mtd_growth_percent: 4.6,
+            top_3_amounts_cr: [0.62, 0.39, 0.21]
+          },
+          visits_today: {
+            planned_visits: 5,
+            completed_visits: 3,
+            completion_ratio: 0.6,
+            visit_type_breakdown: {
+              planned: 3,
+              unplanned: 1,
+              not_visited: 1
+            }
+          }
+        },
+        action: {
+          new_allocations: {
+            count: 17,
+            value_cr: 3.1,
+            untouched_count: 17,
+            untouched_value_cr: 7.2
+          },
+          ptp_for_the_day: {
+            count: 5,
+            value_cr: 1.4,
+            overdue_ptp_count: 2,
+            overdue_ptp_value_cr: 0.75
+          },
+          callbacks_for_the_day: {
+            count: 11,
+            value_cr: 0.8,
+            overdue_callback_count: 2,
+            overdue_callback_value_cr: 2.75
+          }
+        },
+        monthly_target: {
+          gauge: {
+            value_label: "32K",
+            invoice_count: 91
+          }
+        }
+      }
+    };
+    const createDashboardSummaryError = (code, message, details = "") => Object.assign(new Error(message), { code, details });
+    const normalizeDashboardSummaryBullet = (value) => {
+      const text = String(value || "")
+        .replace(/<[^>]*>/g, " ")
+        .replace(/^\s*(?:[-*•]|\d+[.)])\s*/u, "")
+        .replace(/\s+/g, " ")
+        .trim();
+      const plainText = text.replace(/\*\*/g, "").trim();
+      if (!plainText) {
+        throw createDashboardSummaryError("OLLAMA_INVALID_SUMMARY", "Local model returned an empty bullet.");
+      }
+      if (((text.match(/\*\*/g) || []).length % 2) !== 0) {
+        throw createDashboardSummaryError("OLLAMA_INVALID_SUMMARY", "Local model returned invalid bold formatting.");
+      }
+      if (countWords(plainText) > 55 || plainText.length > 360) {
+        throw createDashboardSummaryError("OLLAMA_INVALID_SUMMARY", "Local model returned bullets that are too long for the summary layout.");
+      }
+      return text;
+    };
+    const renderDashboardSummaryPointHtml = (point) => (
+      escapeHtml(String(point || "")).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+    );
+    const normalizeDashboardSummarySections = (value) => {
+      if (!value || typeof value !== "object" || Array.isArray(value)) {
+        throw createDashboardSummaryError("OLLAMA_INVALID_SUMMARY", "Local model returned an invalid summary structure.");
+      }
+      const allowedKeys = new Set(dashboardSummarySectionOrder.map((section) => section.key));
+      const incomingKeys = Object.keys(value);
+      if (incomingKeys.length !== allowedKeys.size || incomingKeys.some((key) => !allowedKeys.has(key))) {
+        throw createDashboardSummaryError("OLLAMA_INVALID_SUMMARY", "Local model returned unexpected summary categories.");
+      }
+      return dashboardSummarySectionOrder.reduce((acc, section) => {
+        const rawPoints = value[section.key];
+        if (!Array.isArray(rawPoints) || rawPoints.length !== 2) {
+          throw createDashboardSummaryError("OLLAMA_INVALID_SUMMARY", `Section ${section.title} must contain exactly 2 bullets.`);
+        }
+        acc[section.key] = rawPoints.map(normalizeDashboardSummaryBullet);
+        return acc;
+      }, {});
+    };
+    const getDashboardSummaryRenderSections = (summaryData) => dashboardSummarySectionOrder.map((section) => ({
+      title: section.title,
+      points: summaryData[section.key] || []
+    }));
+    const assertAggregateOnlyPayload = (payload) => {
+      const payloadText = JSON.stringify(payload);
+      const forbiddenTokens = new Set();
+      [...activityDispositionRecords, ...issueDispositionRecords].forEach((row) => {
+        [row.customerCode, row.customerName, row.invoiceNo].forEach((token) => {
+          if (token) forbiddenTokens.add(String(token));
+        });
+      });
+      Object.values(visitPlanDataByOffset || {}).forEach((dayPlan) => {
+        (dayPlan?.customers || []).forEach((item) => {
+          if (item?.customerName) forbiddenTokens.add(String(item.customerName));
+        });
+      });
+      const matchedIdentifier = Array.from(forbiddenTokens).find((token) => payloadText.includes(token));
+      if (matchedIdentifier) {
+        throw createDashboardSummaryError("PAYLOAD_IDENTIFIER_LEAK", "Summary payload contains a customer or invoice identifier.", matchedIdentifier);
+      }
+    };
+    const getTargetUrgencyLabel = ({ gapCr, projectedCr, currentPerDay, requiredPerDay, targetCr }) => {
+      if (gapCr <= 0) return "Achieved";
+      if (projectedCr < targetCr) return "At risk";
+      if (currentPerDay <= 0) return "Critical";
+      const ratio = requiredPerDay / currentPerDay;
+      if (ratio <= 1) return "On track";
+      if (ratio <= 1.15) return "Watch";
+      return "At risk";
+    };
+    const buildAgentDashboardSummaryPayload = () => {
+      const baseCards = JSON.parse(JSON.stringify(dashboardSummaryStaticSnapshot.cards));
+      const paceSeries = buildTargetPaceSeries(targetDetailSnapshot);
+      const targetCr = Number(targetDetailSnapshot.targetCr || 0);
+      const daysInMonth = Math.max(1, Number(targetDetailSnapshot.daysInMonth) || 1);
+      const daysElapsed = Math.min(daysInMonth, Math.max(1, Number(targetDetailSnapshot.dayOfMonth) || 1));
+      const daysLeft = Math.max(0, daysInMonth - daysElapsed);
+      const achievedCr = roundMetric(Number(paceSeries.achievedMtd || targetDetailSnapshot.achievedCr || 0), 2);
+      const previousMonthCardCr = Number(targetDetailSnapshot.previousMonthAchievedCr || 0);
+      const previousMonthSameDayCr = roundMetric(
+        paceSeries.previousMonthMtd > 0 ? paceSeries.previousMonthMtd : previousMonthCardCr,
+        2
+      );
+      const gapCr = roundMetric(Math.max(0, targetCr - achievedCr), 2);
+      const expectedByNow = roundMetric((targetCr / daysInMonth) * daysElapsed, 2);
+      const paceVsExpectedCr = roundMetric(achievedCr - expectedByNow, 2);
+      const currentAvgPerDayCr = roundMetric(daysElapsed > 0 ? achievedCr / daysElapsed : 0, 3);
+      const requiredPerDayCr = roundMetric(daysLeft > 0 ? gapCr / daysLeft : 0, 3);
+      const projectedMonthEndCr = roundMetric(Number(paceSeries.projectedEomCr || achievedCr), 2);
+      const deltaVsPreviousMonthPercent = roundMetric(
+        previousMonthSameDayCr > 0 ? ((achievedCr - previousMonthSameDayCr) / previousMonthSameDayCr) * 100 : 0,
+        2
+      );
+      const deltaVsLastMonthPercent = previousMonthCardCr > 0
+        ? Math.round(((achievedCr - previousMonthCardCr) / previousMonthCardCr) * 100)
+        : 0;
+      const todayCollectionCr = roundMetric(
+        Number(targetDetailSnapshot.committedDailyCollectionsCr?.[daysElapsed - 1] || 0)
+        + Number(targetDetailSnapshot.nonCommittedDailyCollectionsCr?.[daysElapsed - 1] || 0),
+        2
+      );
+
+      const vintageLabels = Array.isArray(chartConfigs.vintage?.data?.labels) ? chartConfigs.vintage.data.labels.slice() : [];
+      const vintageValues = Array.isArray(chartConfigs.vintage?.data?.datasets?.[0]?.data)
+        ? chartConfigs.vintage.data.datasets[0].data.map((value) => roundMetric(value, 2))
+        : [];
+      const vintageTopIndex = vintageValues.reduce((bestIndex, value, index, source) => (
+        value > Number(source[bestIndex] || 0) ? index : bestIndex
+      ), 0);
+      const vintageHighlights = Array.isArray(chartConfigs.vintage?.highlights) ? chartConfigs.vintage.highlights : [];
+      const vintageTopLabel = (() => {
+        const label = vintageLabels[vintageTopIndex] || "-";
+        if (label === "Not Due" || label.includes("Year")) return label;
+        return `${label} days`;
+      })();
+
+      const activityPrimarySummary = computeActivityPrimarySummary(activityDispositionRecords);
+      const activityPrimaryDistribution = activityPrimarySummary.reduce((acc, [label, count]) => {
+        acc[label] = count;
+        return acc;
+      }, {});
+      const activityTypeSummary = computeActivityTypeSummary(activityDispositionRecords);
+      const totalActivities = Object.values(activityTypeSummary).reduce((sum, value) => sum + Number(value || 0), 0);
+      const activityTypeDistribution = Object.entries(activityTypeSummary).reduce((acc, [label, count]) => {
+        acc[label] = {
+          count,
+          share_percent: totalActivities > 0 ? roundMetric((count / totalActivities) * 100, 1) : 0
+        };
+        return acc;
+      }, {});
+
+      const issuePrimarySummary = computeIssuePrimarySummary(issueDispositionRecords);
+      const issuePrimaryDistribution = issuePrimarySummary.reduce((acc, [label, count]) => {
+        acc[label] = count;
+        return acc;
+      }, {});
+
+      const mtdCollectionCr = roundMetric(
+        cashflowMonthFlowRecords.reduce((sum, row) => sum + Number(row.collectionCr || 0), 0),
+        2
+      );
+      const ptpDueTillDateCr = roundMetric(
+        cashflowMonthFlowRecords
+          .filter((row) => row.day <= cashflowCurrentDay)
+          .reduce((sum, row) => sum + Number(row.ptpAmountCr || 0), 0),
+        2
+      );
+      const cashflowVarianceCr = roundMetric(mtdCollectionCr - ptpDueTillDateCr, 2);
+
+      const mixHighlights = Array.isArray(chartConfigs.mix?.highlights) ? chartConfigs.mix.highlights : [];
+      const committedShare = parseFirstNumber(mixHighlights.find((item) => item.label === "Committed share")?.value);
+      const nonCommittedShare = parseFirstNumber(mixHighlights.find((item) => item.label === "Non-committed")?.value);
+      const adjustmentsShare = parseFirstNumber(mixHighlights.find((item) => item.label === "Adjustments")?.value);
+
+      const duePtpEvents = (targetDetailSnapshot.ptpEvents || []).filter((event) => Number(event?.day || 0) <= daysElapsed);
+      const futurePtpEvents = (targetDetailSnapshot.ptpEvents || []).filter((event) => Number(event?.day || 0) > daysElapsed);
+      const visitSummaryByOffset = Object.entries(visitPlanDataByOffset || {}).reduce((acc, [offset, dayPlan]) => {
+        const visits = Array.isArray(dayPlan?.customers) ? dayPlan.customers : [];
+        acc[offset] = {
+          approval_status: String(dayPlan?.approvalStatus || "-"),
+          submitted_at: String(dayPlan?.submittedAt || "-"),
+          cutoff_at: String(dayPlan?.cutoffAt || "-"),
+          total_visits: visits.length,
+          planned: visits.filter((item) => item.visitType === "planned").length,
+          unplanned: visits.filter((item) => item.visitType === "unplanned").length,
+          not_visited: visits.filter((item) => item.visitType === "not_visited").length
+        };
+        return acc;
+      }, {});
+
+      baseCards.monthly_target = {
+        achievement_percent: Math.round(targetCr > 0 ? (achievedCr / targetCr) * 100 : 0),
+        delta_vs_last_month_percent: deltaVsLastMonthPercent,
+        target_cr: roundMetric(targetCr, 2),
+        collected_cr: achievedCr,
+        today_collection_cr: todayCollectionCr,
+        gauge: { ...baseCards.monthly_target.gauge },
+        plan_vs_actual: {
+          achieved_cr: achievedCr,
+          remaining_cr: gapCr
+        }
+      };
+
+      const payload = {
+        page: dashboardSummaryStaticSnapshot.page,
+        meta: { ...dashboardSummaryStaticSnapshot.meta },
+        cards: baseCards,
+        charts: {
+          vintage_portfolio: {
+            bucket_labels: vintageLabels,
+            outstanding_cr_by_bucket: vintageValues,
+            total_outstanding_cr: roundMetric(vintageValues.reduce((sum, value) => sum + Number(value || 0), 0), 2),
+            highlights: {
+              top_bucket: vintageTopLabel,
+              overdue_total_cr: roundMetric(parseFirstNumber(vintageHighlights.find((item) => item.label === "Overdue total")?.value), 2),
+              resolved_this_month_cr: roundMetric(parseFirstNumber(vintageHighlights.find((item) => item.label === "Resolved")?.value), 2)
+            }
+          },
+          activity_card: {
+            total_tagged_invoices: activityDispositionRecords.length,
+            primary_status_count: new Set(activityDispositionRecords.map((item) => item.primaryStatus)).size,
+            top_primary_status: {
+              name: activityPrimarySummary[0]?.[0] || "-",
+              count: activityPrimarySummary[0]?.[1] || 0
+            },
+            primary_status_distribution: activityPrimaryDistribution,
+            activity_type_distribution: activityTypeDistribution
+          },
+          issue_tracker: {
+            issue_categories_count: new Set(issueDispositionRecords.map((item) => item.primaryStatus)).size,
+            top_category: {
+              name: issuePrimarySummary[0]?.[0] || "-",
+              count: issuePrimarySummary[0]?.[1] || 0
+            },
+            open_over_14_days: issueDispositionRecords.filter((row) => Number(row.openDays || 0) > 14).length,
+            category_distribution: issuePrimaryDistribution,
+            card_stats: {
+              further_docs: issuePrimaryDistribution["Further Docs Required"] || 0,
+              further_action: issuePrimaryDistribution["Further Action Required"] || 0,
+              material_delivery: issuePrimaryDistribution["Material Delivery Issues"] || 0
+            }
+          },
+          cash_flow_trend: {
+            days_in_month: cashflowDaysInMonth,
+            current_day: cashflowCurrentDay,
+            actual_collection_cr_by_day: cashflowMonthFlowRecords.map((row) => (
+              row.collectionCr == null ? null : roundMetric(row.collectionCr, 2)
+            )),
+            ptp_due_cr_by_day: cashflowMonthFlowRecords.map((row) => roundMetric(row.ptpAmountCr, 2)),
+            projected_collection_cr_by_day: cashflowMonthFlowRecords.map((row) => roundMetric(row.projectedCr, 2)),
+            last_month_collection_cr_by_day: cashflowLastMonthCollectionDailyCr.map((value) => roundMetric(value, 2)),
+            summary: {
+              mtd_collection_cr: mtdCollectionCr,
+              ptp_due_till_date_cr: ptpDueTillDateCr,
+              variance_cr: cashflowVarianceCr
+            }
+          },
+          collection_mix: {
+            week_labels: Array.isArray(chartConfigs.mix?.data?.labels) ? chartConfigs.mix.data.labels.slice() : [],
+            committed_cr: Array.isArray(chartConfigs.mix?.data?.datasets?.[0]?.data)
+              ? chartConfigs.mix.data.datasets[0].data.map((value) => roundMetric(value, 2))
+              : [],
+            non_committed_cr: Array.isArray(chartConfigs.mix?.data?.datasets?.[1]?.data)
+              ? chartConfigs.mix.data.datasets[1].data.map((value) => roundMetric(value, 2))
+              : [],
+            adjustments_cr: Array.isArray(chartConfigs.mix?.data?.datasets?.[2]?.data)
+              ? chartConfigs.mix.data.datasets[2].data.map((value) => roundMetric(value, 2))
+              : [],
+            highlights: {
+              committed_share_percent: roundMetric(committedShare, 0),
+              non_committed_share_percent: roundMetric(nonCommittedShare, 0),
+              adjustments_share_percent: roundMetric(adjustmentsShare, 0)
+            }
+          }
+        },
+        target_popup: {
+          month_label: String(targetDetailSnapshot.monthLabel || "-"),
+          day_of_month: daysElapsed,
+          days_in_month: daysInMonth,
+          monthly_commitment_cr: roundMetric(targetCr, 2),
+          collected_till_date_cr: achievedCr,
+          balance_to_collect_cr: gapCr,
+          pace_vs_expected_cr: paceVsExpectedCr,
+          run_rate: {
+            urgency: getTargetUrgencyLabel({
+              gapCr,
+              projectedCr: projectedMonthEndCr,
+              currentPerDay: currentAvgPerDayCr,
+              requiredPerDay: requiredPerDayCr,
+              targetCr
+            }),
+            days_left: daysLeft,
+            required_per_day_cr: requiredPerDayCr,
+            current_avg_per_day_cr: currentAvgPerDayCr,
+            projected_month_end_cr: projectedMonthEndCr,
+            projected_gap_vs_target_cr: roundMetric(Math.max(0, targetCr - projectedMonthEndCr), 2),
+            previous_month_same_day_cr: previousMonthSameDayCr,
+            delta_vs_previous_month_percent: deltaVsPreviousMonthPercent
+          },
+          daily_series: {
+            committed_collection_cr: (targetDetailSnapshot.committedDailyCollectionsCr || []).map((value) => roundMetric(value, 2)),
+            non_committed_collection_cr: (targetDetailSnapshot.nonCommittedDailyCollectionsCr || []).map((value) => roundMetric(value, 2)),
+            projected_future_collection_cr: (targetDetailSnapshot.projectedFutureDailyCollectionsCr || []).map((value) => roundMetric(value, 2)),
+            ideal_collection_per_day_cr: roundMetric(targetCr / daysInMonth, 1),
+            expected_collection_till_day_14_cr: expectedByNow
+          },
+          ptp: {
+            due_days: {
+              count: duePtpEvents.length,
+              promised_total_cr: roundMetric(paceSeries.ptpSummary.duePromisedCr, 2),
+              met_total_cr: roundMetric(paceSeries.ptpSummary.metCr, 2),
+              variance_cr: roundMetric(paceSeries.ptpSummary.varianceCr, 2),
+              status_counts: {
+                met: paceSeries.ptpSummary.met,
+                partial: paceSeries.ptpSummary.partial,
+                unmet: paceSeries.ptpSummary.unmet
+              }
+            },
+            future_days: {
+              count: futurePtpEvents.length,
+              promised_total_cr: roundMetric(
+                futurePtpEvents.reduce((sum, event) => sum + Number(event?.promisedCr || 0), 0),
+                2
+              ),
+              promised_values_cr: futurePtpEvents.map((event) => roundMetric(event?.promisedCr, 2))
+            }
+          }
+        },
+        visit_module: {
+          window_offsets_days: Object.keys(visitSummaryByOffset).map((offset) => Number(offset)).sort((a, b) => a - b),
+          plan_summary_by_offset: visitSummaryByOffset
+        },
+        constraints: {
+          contains_customer_or_invoice_identifiers: false,
+          contains_aggregate_values_only: true
+        }
+      };
+
+      assertAggregateOnlyPayload(payload);
+      return payload;
+    };
+    const requestOllamaDashboardSummary = async (payload, config) => {
+      const timeoutMs = Math.max(1, Number(config?.timeoutMs || 45000));
+      const requestController = new AbortController();
+      const externalSignal = config?.signal;
+      let didTimeout = false;
+      let removeExternalAbortListener = null;
+      if (externalSignal) {
+        if (externalSignal.aborted) {
+          throw new DOMException("Summary request aborted.", "AbortError");
+        }
+        const onAbort = () => requestController.abort();
+        externalSignal.addEventListener("abort", onAbort, { once: true });
+        removeExternalAbortListener = () => externalSignal.removeEventListener("abort", onAbort);
+      }
+      const timeoutId = window.setTimeout(() => {
+        didTimeout = true;
+        requestController.abort();
+      }, timeoutMs);
+      try {
+        const response = await fetch(String(config?.endpoint || dashboardSummaryAiConfig.endpoint), {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            model: String(config?.model || dashboardSummaryAiConfig.model),
+            stream: false,
+            keep_alive: config?.keepAlive || dashboardSummaryAiConfig.keepAlive || "10m",
+            format: dashboardSummaryResponseSchema,
+            system: "You summarize collection dashboards for business users. Use only the supplied JSON payload. Return valid JSON that matches the schema exactly. Each category must contain exactly 2 concise insight-led bullets. Every bullet should interpret the metric, state the business implication, and mention the near-term focus when relevant. Use plain text only, except Markdown bold with **double asterisks** for the most important collection amounts and invoice counts. Do not use HTML, headings, or extra keys.",
+            prompt: [
+              "Summarize the following agent dashboard payload into four sections for an AR collections dashboard.",
+              "Required sections: Collection Progress, PTP Conversion, Activity Overview, Risk and Focus.",
+              "Keep every bullet concise, numeric where possible, and grounded only in the payload.",
+              "Each bullet should provide an insight, implication, or recommended focus, not just restate a metric.",
+              "Bold the most important collection amounts and invoice counts using **double asterisks**.",
+              "If a fact is not in the payload, do not invent it.",
+              "Do not mention customer names, customer codes, or invoice numbers.",
+              "The currency notations should be in the Indian currency formats",
+              JSON.stringify(payload)
+            ].join("\n"),
+            options: {
+              temperature: 0.2
+            }
+          }),
+          signal: requestController.signal
+        });
+        const rawText = await response.text();
+        let responseBody;
+        try {
+          responseBody = JSON.parse(rawText);
+        } catch (_) {
+          throw createDashboardSummaryError("OLLAMA_INVALID_RESPONSE", "Ollama returned unreadable JSON.", rawText.slice(0, 220));
+        }
+        if (!response.ok) {
+          const errorDetail = typeof responseBody?.error === "string"
+            ? responseBody.error
+            : rawText.slice(0, 220);
+          throw createDashboardSummaryError(
+            "OLLAMA_HTTP",
+            `Ollama request failed with status ${response.status}.`,
+            errorDetail
+          );
+        }
+        const summaryText = typeof responseBody?.response === "string" ? responseBody.response.trim() : "";
+        if (!summaryText) {
+          throw createDashboardSummaryError("OLLAMA_EMPTY_RESPONSE", "Ollama returned an empty summary response.");
+        }
+        let parsedSummary;
+        try {
+          parsedSummary = JSON.parse(summaryText);
+        } catch (_) {
+          throw createDashboardSummaryError("OLLAMA_INVALID_SUMMARY", "Ollama did not return valid summary JSON.", summaryText.slice(0, 220));
+        }
+        return normalizeDashboardSummarySections(parsedSummary);
+      } catch (error) {
+        if (requestController.signal.aborted && !didTimeout) {
+          throw error?.name === "AbortError" ? error : new DOMException("Summary request aborted.", "AbortError");
+        }
+        if (didTimeout) {
+          throw createDashboardSummaryError(
+            "OLLAMA_TIMEOUT",
+            `Ollama did not respond within ${Math.round(timeoutMs / 1000)} seconds.`,
+            "The first request can be slow while the local model loads into memory."
+          );
+        }
+        if (error instanceof TypeError) {
+          throw createDashboardSummaryError(
+            "OLLAMA_NETWORK",
+            "Unable to reach the local Ollama service from this page.",
+            error.message
+          );
+        }
+        throw error;
+      } finally {
+        window.clearTimeout(timeoutId);
+        if (removeExternalAbortListener) removeExternalAbortListener();
+      }
+    };
+    const renderDashboardSummaryError = (error, config, durationMs) => {
+      if (dashboardSummarySkeleton) dashboardSummarySkeleton.hidden = true;
+      if (!dashboardSummaryContent) return;
+      const protocolHint = window.location.protocol === "file:"
+        ? "This page is running from file://. Serve it over http://127.0.0.1 or another local origin before calling Ollama from the browser."
+        : "Ensure Ollama is running locally and allows requests from this page origin.";
+      const extraHint = error?.code === "OLLAMA_NETWORK"
+        ? "If the browser blocks local requests, use http://127.0.0.1 for both the page and Ollama, or check your Ollama CORS/origin configuration."
+        : "Check the local model response and endpoint configuration.";
+      dashboardSummaryContent.innerHTML = `
+        <div class="alert alert-warning mb-0" role="alert">
+          <div class="fw-semibold mb-2">Unable to generate the local summary.</div>
+          <div>${escapeHtml(error?.message || "Unknown summary error.")}</div>
+          <div class="small text-body-secondary mt-2">
+            Model: ${escapeHtml(String(config?.model || dashboardSummaryAiConfig.model))} | Endpoint: ${escapeHtml(String(config?.endpoint || dashboardSummaryAiConfig.endpoint))}
+          </div>
+          <div class="small text-body-secondary mt-1">${escapeHtml(protocolHint)}</div>
+          <div class="small text-body-secondary mt-1">${escapeHtml(extraHint)}</div>
+          ${error?.details ? `<div class="small text-body-secondary mt-1">Details: ${escapeHtml(String(error.details))}</div>` : ""}
+        </div>
+      `;
+      if (dashboardSummaryMeta) {
+        dashboardSummaryMeta.textContent = `${config?.model || dashboardSummaryAiConfig.model} | ${formatDashboardSummaryDuration(durationMs)} | Summary unavailable`;
+      }
+    };
+    const renderDashboardSummarySections = (summaryData, config, durationMs) => {
+      if (dashboardSummarySkeleton) dashboardSummarySkeleton.hidden = true;
+      if (!dashboardSummaryContent) return;
+      const sections = getDashboardSummaryRenderSections(summaryData);
+      const totalWords = countWords(sections.flatMap((section) => section.points).join(" "));
+      dashboardSummaryContent.innerHTML = sections.map((section) => `
+        <article class="dashboardSummarySection">
+          <h6>${escapeHtml(section.title)}</h6>
+          <ol class="dashboardSummaryList">
+            ${section.points.map((point) => `<li>${renderDashboardSummaryPointHtml(point)}</li>`).join("")}
+          </ol>
+        </article>
+      `).join("");
+      if (dashboardSummaryMeta) {
+        dashboardSummaryMeta.textContent = `${config?.model || dashboardSummaryAiConfig.model} | ${formatDashboardSummaryDuration(durationMs)} | ${totalWords} words | Generated from current dashboard data`;
+      }
+    };
+    let dashboardSummaryRunId = 0;
+    let dashboardSummaryAbortController = null;
+    const resetDashboardSummaryModalState = () => {
+      if (dashboardSummaryAbortController) {
+        dashboardSummaryAbortController.abort();
+        dashboardSummaryAbortController = null;
+      }
+      if (dashboardSummarySkeleton) dashboardSummarySkeleton.hidden = true;
+      if (dashboardSummaryContent) dashboardSummaryContent.innerHTML = "";
+      if (dashboardSummaryMeta) dashboardSummaryMeta.textContent = "-";
+    };
     const renderDashboardSummary = async () => {
       if (!dashboardSummaryContent) return;
       const runId = ++dashboardSummaryRunId;
-      const { sections, totalWords } = buildDashboardSummary();
+      const summaryStartTime = performance.now();
+      if (dashboardSummaryAbortController) {
+        dashboardSummaryAbortController.abort();
+      }
+      const abortController = new AbortController();
+      dashboardSummaryAbortController = abortController;
+      const requestConfig = {
+        ...dashboardSummaryAiConfig,
+        signal: abortController.signal
+      };
       if (dashboardSummarySkeleton) dashboardSummarySkeleton.hidden = false;
       dashboardSummaryContent.innerHTML = "";
-      if (dashboardSummaryMeta) dashboardSummaryMeta.textContent = "Generating summary...";
-      await sleep(5500);
-      if (runId !== dashboardSummaryRunId) return;
-      if (dashboardSummarySkeleton) dashboardSummarySkeleton.hidden = true;
-      dashboardSummaryContent.innerHTML = sections.map((section, sectionIndex) => `
-        <article class="dashboardSummarySection" data-summary-section="${sectionIndex}">
-          <h6>${section.title}</h6>
-          <ol class="dashboardSummaryList"></ol>
-        </article>
-      `).join("");
-      for (let i = 0; i < sections.length; i += 1) {
-        if (runId !== dashboardSummaryRunId) return;
-        const listEl = dashboardSummaryContent.querySelector(`[data-summary-section="${i}"] .dashboardSummaryList`);
-        if (!listEl) continue;
-        for (const point of sections[i].points) {
-          const li = document.createElement("li");
-          li.innerHTML = point;
-          listEl.appendChild(li);
-          await sleep(320);
-          if (runId !== dashboardSummaryRunId) return;
-        }
-      }
       if (dashboardSummaryMeta) {
-        dashboardSummaryMeta.textContent = `${totalWords} words | Generated from current page data`;
+        dashboardSummaryMeta.textContent = `Generating summary via ${requestConfig.model}...`;
+      }
+      try {
+        const payload = buildAgentDashboardSummaryPayload();
+        const summaryData = await requestOllamaDashboardSummary(payload, requestConfig);
+        if (runId !== dashboardSummaryRunId) return;
+        renderDashboardSummarySections(summaryData, requestConfig, performance.now() - summaryStartTime);
+      } catch (error) {
+        if (runId !== dashboardSummaryRunId) return;
+        if (error?.name === "AbortError") return;
+        renderDashboardSummaryError(error, requestConfig, performance.now() - summaryStartTime);
+      } finally {
+        if (dashboardSummaryAbortController === abortController) {
+          dashboardSummaryAbortController = null;
+        }
       }
     };
     if (dashboardSummaryBtn && dashboardSummaryModalEl) {
@@ -4933,9 +5496,7 @@
     if (dashboardSummaryModalEl) {
       dashboardSummaryModalEl.addEventListener("hidden.bs.modal", () => {
         dashboardSummaryRunId += 1;
-        if (dashboardSummarySkeleton) dashboardSummarySkeleton.hidden = true;
-        if (dashboardSummaryContent) dashboardSummaryContent.innerHTML = "";
-        if (dashboardSummaryMeta) dashboardSummaryMeta.textContent = "-";
+        resetDashboardSummaryModalState();
       });
     }
 
