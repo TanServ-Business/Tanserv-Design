@@ -3393,6 +3393,46 @@ textarea { min-height: 70px; resize: vertical; }
   color: #334155;
 }
 
+.emailConversationAttachmentRow {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.emailConversationAttachmentRow strong {
+  color: #1e293b;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.emailConversationAttachmentList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.emailConversationAttachmentPill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid #334155;
+  background: #0f172a;
+  color: #f8fafc;
+  font-size: 10px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.emailConversationAttachmentPill:hover {
+  background: #1e293b;
+  border-color: #1e293b;
+  color: #ffffff;
+}
+
 .emailConversationDivider {
   width: 100%;
   border: 0;
@@ -3814,6 +3854,14 @@ textarea { min-height: 70px; resize: vertical; }
   display: inline-flex;
   align-items: center;
   gap: 4px;
+}
+
+.emailThreadTrail .emailDirection {
+  display: none;
+}
+
+.emailThreadTrail .emailRow {
+  justify-content: flex-end;
 }
 
 .emailMeta {

@@ -2621,23 +2621,56 @@ function formatEmailConversationHtml(entries) {
   const list = Array.isArray(entries) ? entries.filter(Boolean) : [];
   if (list.length === 0) return "-";
 
+  const parseAttachmentNames = (value) => {
+    if (Array.isArray(value)) {
+      return value.map(item => String(item || "").trim()).filter(item => item && item !== "-");
+    }
+    return String(value || "")
+      .split(/[|,;]+/)
+      .map(item => item.trim())
+      .filter(item => item && item !== "-");
+  };
+
+  const buildDateTimeLine = (dateValue, timeValue) => {
+    const date = safeText(dateValue || "-");
+    const time = safeText(timeValue || "-");
+    if (date === "-" && time === "-") return "-";
+    if (date === "-") return time;
+    if (time === "-") return date;
+    return `${date} ${time}`;
+  };
+
+  const buildAttachmentPills = (attachments) => {
+    const names = parseAttachmentNames(attachments);
+    if (names.length === 0) return "";
+    const pills = names.map((name) => {
+      const fileName = name.replace(/\s+/g, "_");
+      const content = `Placeholder file for ${name}`;
+      const href = `data:application/octet-stream;charset=utf-8,${encodeURIComponent(content)}`;
+      return `<a class="emailConversationAttachmentPill" href="${href}" download="${escapeHtml(fileName)}">${escapeHtml(name)}</a>`;
+    }).join("");
+
+    return `
+      <div class="emailConversationAttachmentRow">
+        <strong>Attachments:</strong>
+        <div class="emailConversationAttachmentList">${pills}</div>
+      </div>
+    `.trim();
+  };
+
   return list.map((entry) => {
-    const attachments = safeText(entry.attachments || "-");
-    const attachmentLine = attachments && attachments !== "-"
-      ? `<div class="emailConversationLine"><strong>Attachments:</strong> ${escapeHtml(attachments)}</div>`
-      : "";
+    const attachmentLine = buildAttachmentPills(entry.attachments);
+    const dateTimeLine = buildDateTimeLine(entry.date, entry.time);
 
     return `
       <div class="emailConversationEntry">
         <div class="emailConversationLine"><strong>From:</strong> ${escapeHtml(safeText(entry.from || "-"))}</div>
         <div class="emailConversationLine"><strong>To:</strong> ${escapeHtml(safeText(entry.to || "-"))}</div>
         <div class="emailConversationLine"><strong>CC:</strong> ${escapeHtml(safeText(entry.cc || "-"))}</div>
-        <div class="emailConversationLine"><strong>Mailbox:</strong> ${escapeHtml(safeText(entry.mailbox || "-"))}</div>
-        <div class="emailConversationLine"><strong>Date:</strong> ${escapeHtml(safeText(entry.date || "-"))}</div>
-        <div class="emailConversationLine"><strong>Time:</strong> ${escapeHtml(safeText(entry.time || "-"))}</div>
+        <div class="emailConversationLine"><strong>Date &amp; Time:</strong> ${escapeHtml(dateTimeLine)}</div>
         <div class="emailConversationLine"><strong>Subject:</strong> ${escapeHtml(safeText(entry.subject || "-"))}</div>
-        ${attachmentLine}
         <div class="emailConversationMessage">${escapeHtml(normalizeEmailText(entry.body || "-")).replace(/\n/g, "<br>")}</div>
+        ${attachmentLine}
       </div>
     `.trim();
   }).join('<hr class="emailConversationDivider" />');
