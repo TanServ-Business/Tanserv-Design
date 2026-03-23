@@ -41,6 +41,14 @@
     : escapeHtml(relationshipBadge);
 
   const getDashboardPath = () => {
+    const currentPage = String(window.location.pathname || "")
+      .split("/")
+      .pop()
+      .toLowerCase();
+    if (currentPage === "lpagent.html") {
+      return "pages/Dashboard_Agent.html";
+    }
+
     const explicit = (document.body.dataset.dashboardPath || "").trim();
     if (explicit) return explicit;
 

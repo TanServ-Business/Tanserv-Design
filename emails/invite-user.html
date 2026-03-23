@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>You're Invited to Inebura Ops</title>
+  <!--[if mso]>
+  <noscript>
+    <xml>
+      <o:OfficeDocumentSettings>
+        <o:PixelsPerInch>96</o:PixelsPerInch>
+      </o:OfficeDocumentSettings>
+    </xml>
+  </noscript>
+  <![endif]-->
+  <style>
+    /* Reset */
+    body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+    table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+    img { -ms-interpolation-mode: bicubic; border: 0; outline: none; text-decoration: none; }
+    body { margin: 0 !important; padding: 0 !important; width: 100% !important; }
+
+    /* Responsive */
+    @media only screen and (max-width: 600px) {
+      .email-wrapper { width: 100% !important; padding: 16px !important; }
+      .email-body { padding: 28px 20px !important; }
+      .email-header { padding: 20px !important; }
+      .cta-btn { display: block !important; width: 100% !important; box-sizing: border-box !important; text-align: center !important; }
+      .info-row td { display: block !important; width: 100% !important; padding-bottom: 8px !important; }
+      h1 { font-size: 22px !important; }
+    }
+  </style>
+</head>
+<body style="margin:0;padding:0;background-color:#f1f5f9;font-family:Arial,Helvetica,sans-serif;">
+
+  <!-- Outer wrapper -->
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color:#f1f5f9;">
+    <tr>
+      <td align="center" style="padding: 40px 16px;">
+
+        <!-- Email card -->
+        <table role="presentation" class="email-wrapper" cellpadding="0" cellspacing="0" border="0" width="600" style="max-width:600px;width:100%;background-color:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 8px 32px rgba(15,23,42,0.10);border:1px solid #e2e8f4;">
+
+          <!-- ── Header ── -->
+          <tr>
+            <td class="email-header" style="background: linear-gradient(135deg, #5c258d 0%, #7c3aed 100%); padding: 32px 40px; text-align: center;">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                <tr>
+                  <td align="center" style="padding-bottom: 20px;">
+                    <!-- Logo box -->
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td style="background-color:#ffffff;border-radius:10px;padding:10px 18px;display:inline-block;">
+                          <img src="../assets/logo.png" alt="Inebura" width="100" height="32" style="display:block;width:100px;height:32px;object-fit:contain;" />
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td align="center">
+                    <!-- Invite badge -->
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;">
+                      <tr>
+                        <td style="background-color:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.35);border-radius:20px;padding:5px 16px;">
+                          <span style="color:#ffffff;font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;">Team Invitation</span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- ── Envelope icon strip ── -->
+          <tr>
+            <td align="center" style="background-color:#f6effb;padding:0;">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                <tr>
+                  <td align="center" style="padding: 24px 40px;">
+                    <!-- Icon circle -->
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 auto 0 auto;">
+                      <tr>
+                        <td style="width:64px;height:64px;background:linear-gradient(135deg,#5c258d,#7c3aed);border-radius:50%;text-align:center;vertical-align:middle;">
+                          <span style="font-size:28px;line-height:64px;display:block;">✉️</span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- ── Body ── -->
+          <tr>
+            <td class="email-body" style="padding: 36px 40px 28px 40px;">
+
+              <!-- Greeting -->
+              <h1 style="margin:0 0 8px 0;font-size:26px;font-weight:800;color:#0f172a;line-height:1.25;">You're invited to Inebura Ops!</h1>
+              <p style="margin:0 0 24px 0;font-size:14px;color:#64748b;line-height:1.6;">
+                Hi <strong style="color:#0f172a;">{{RecipientName}}</strong>,
+              </p>
+              <p style="margin:0 0 20px 0;font-size:14px;color:#374151;line-height:1.7;">
+                <strong style="color:#5c258d;">{{InviterName}}</strong> has invited you to join <strong>{{OrganisationName}}</strong> on <strong>Inebura Ops</strong> — the intelligent platform for managing accounts receivable, customer relationships, and collections workflows.
+              </p>
+              <p style="margin:0 0 28px 0;font-size:14px;color:#374151;line-height:1.7;">
+                Click the button below to set up your account and get started. This invitation link will expire in <strong>48 hours</strong>.
+              </p>
+
+              <!-- CTA Button -->
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin: 0 0 32px 0;">
+                <tr>
+                  <td>
+                    <a href="{{InviteLink}}" class="cta-btn" target="_blank"
+                       style="display:inline-block;background:linear-gradient(135deg,#5c258d 0%,#7c3aed 100%);color:#ffffff;font-size:15px;font-weight:700;text-decoration:none;padding:14px 36px;border-radius:10px;letter-spacing:0.3px;box-shadow:0 10px 22px rgba(92,37,141,0.30);">
+                      Accept Invitation &rarr;
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Divider -->
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom:28px;">
+                <tr>
+                  <td style="border-top:1px solid #e2e8f4;"></td>
+                </tr>
+              </table>
+
+              <!-- Invitation details card -->
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color:#f6effb;border:1px solid #d7c3ea;border-radius:12px;overflow:hidden;margin-bottom:28px;">
+                <tr>
+                  <td style="padding:18px 22px;">
+                    <p style="margin:0 0 14px 0;font-size:11px;font-weight:700;color:#5c258d;letter-spacing:1px;text-transform:uppercase;">Invitation Details</p>
+                    <!-- Row: Invited by -->
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom:10px;" class="info-row">
+                      <tr>
+                        <td style="width:36px;vertical-align:top;padding-top:1px;">
+                          <span style="display:inline-block;width:28px;height:28px;background-color:#e6d7f4;border-radius:6px;text-align:center;line-height:28px;font-size:14px;">👤</span>
+                        </td>
+                        <td style="vertical-align:top;padding-left:10px;">
+                          <span style="display:block;font-size:11px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">Invited by</span>
+                          <span style="display:block;font-size:13px;color:#0f172a;font-weight:600;margin-top:1px;">{{InviterName}} &lt;{{InviterEmail}}&gt;</span>
+                        </td>
+                      </tr>
+                    </table>
+                    <!-- Row: Organisation -->
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom:10px;" class="info-row">
+                      <tr>
+                        <td style="width:36px;vertical-align:top;padding-top:1px;">
+                          <span style="display:inline-block;width:28px;height:28px;background-color:#e6d7f4;border-radius:6px;text-align:center;line-height:28px;font-size:14px;">🏢</span>
+                        </td>
+                        <td style="vertical-align:top;padding-left:10px;">
+                          <span style="display:block;font-size:11px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">Organisation</span>
+                          <span style="display:block;font-size:13px;color:#0f172a;font-weight:600;margin-top:1px;">{{OrganisationName}}</span>
+                        </td>
+                      </tr>
+                    </table>
+                    <!-- Row: Role -->
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom:10px;" class="info-row">
+                      <tr>
+                        <td style="width:36px;vertical-align:top;padding-top:1px;">
+                          <span style="display:inline-block;width:28px;height:28px;background-color:#e6d7f4;border-radius:6px;text-align:center;line-height:28px;font-size:14px;">🔑</span>
+                        </td>
+                        <td style="vertical-align:top;padding-left:10px;">
+                          <span style="display:block;font-size:11px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">Assigned Role</span>
+                          <span style="display:block;font-size:13px;color:#0f172a;font-weight:600;margin-top:1px;">{{UserRole}}</span>
+                        </td>
+                      </tr>
+                    </table>
+                    <!-- Row: Expires -->
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" class="info-row">
+                      <tr>
+                        <td style="width:36px;vertical-align:top;padding-top:1px;">
+                          <span style="display:inline-block;width:28px;height:28px;background-color:#e6d7f4;border-radius:6px;text-align:center;line-height:28px;font-size:14px;">⏳</span>
+                        </td>
+                        <td style="vertical-align:top;padding-left:10px;">
+                          <span style="display:block;font-size:11px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">Expires</span>
+                          <span style="display:block;font-size:13px;color:#0f172a;font-weight:600;margin-top:1px;">{{ExpiryDate}} &middot; 48 hours from invitation</span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- What you can do section -->
+              <p style="margin:0 0 14px 0;font-size:13px;font-weight:700;color:#0f172a;">With Inebura Ops you can:</p>
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom:28px;">
+                <!-- Feature 1 -->
+                <tr>
+                  <td style="padding: 8px 0; vertical-align: top;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                      <tr>
+                        <td style="width:24px;vertical-align:top;padding-top:2px;">
+                          <span style="display:inline-block;width:18px;height:18px;background-color:#dcfce7;border-radius:50%;text-align:center;line-height:18px;font-size:10px;">✓</span>
+                        </td>
+                        <td style="padding-left:10px;font-size:13px;color:#374151;line-height:1.5;">
+                          <strong style="color:#0f172a;">Track Receivables</strong> — Monitor outstanding invoices and payment statuses in real time.
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <!-- Feature 2 -->
+                <tr>
+                  <td style="padding: 8px 0; vertical-align: top;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                      <tr>
+                        <td style="width:24px;vertical-align:top;padding-top:2px;">
+                          <span style="display:inline-block;width:18px;height:18px;background-color:#dcfce7;border-radius:50%;text-align:center;line-height:18px;font-size:10px;">✓</span>
+                        </td>
+                        <td style="padding-left:10px;font-size:13px;color:#374151;line-height:1.5;">
+                          <strong style="color:#0f172a;">Manage Customer Relationships</strong> — Keep tabs on contacts, credit limits, and communication trails.
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <!-- Feature 3 -->
+                <tr>
+                  <td style="padding: 8px 0; vertical-align: top;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                      <tr>
+                        <td style="width:24px;vertical-align:top;padding-top:2px;">
+                          <span style="display:inline-block;width:18px;height:18px;background-color:#dcfce7;border-radius:50%;text-align:center;line-height:18px;font-size:10px;">✓</span>
+                        </td>
+                        <td style="padding-left:10px;font-size:13px;color:#374151;line-height:1.5;">
+                          <strong style="color:#0f172a;">Automate Collections</strong> — Set up follow-up workflows and escalation rules to recover dues faster.
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <!-- Feature 4 -->
+                <tr>
+                  <td style="padding: 8px 0; vertical-align: top;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                      <tr>
+                        <td style="width:24px;vertical-align:top;padding-top:2px;">
+                          <span style="display:inline-block;width:18px;height:18px;background-color:#dcfce7;border-radius:50%;text-align:center;line-height:18px;font-size:10px;">✓</span>
+                        </td>
+                        <td style="padding-left:10px;font-size:13px;color:#374151;line-height:1.5;">
+                          <strong style="color:#0f172a;">Collaborate with your Team</strong> — Share notes, assign tasks, and stay aligned across agents and managers.
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Fallback link -->
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color:#f8fafc;border:1px solid #e2e8f4;border-radius:8px;margin-bottom:4px;">
+                <tr>
+                  <td style="padding:14px 18px;">
+                    <p style="margin:0 0 4px 0;font-size:12px;color:#64748b;line-height:1.5;">If the button above doesn't work, copy and paste this URL into your browser:</p>
+                    <a href="{{InviteLink}}" style="font-size:12px;color:#5c258d;word-break:break-all;text-decoration:underline;">{{InviteLink}}</a>
+                  </td>
+                </tr>
+              </table>
+
+            </td>
+          </tr>
+
+          <!-- ── Divider ── -->
+          <tr>
+            <td style="padding: 0 40px;">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                <tr><td style="border-top:1px solid #e2e8f4;"></td></tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- ── Footer ── -->
+          <tr>
+            <td style="padding: 24px 40px 32px 40px;">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                <!-- Help note -->
+                <tr>
+                  <td style="padding-bottom:16px;">
+                    <p style="margin:0;font-size:12px;color:#64748b;line-height:1.6;">
+                      Need help? Reach out to our support team at
+                      <a href="mailto:support@inebura.com" style="color:#5c258d;text-decoration:none;font-weight:600;">support@inebura.com</a>
+                    </p>
+                    <p style="margin:6px 0 0 0;font-size:12px;color:#94a3b8;line-height:1.6;">
+                      If you didn't expect this invitation, you can safely ignore this email. The link will expire automatically.
+                    </p>
+                  </td>
+                </tr>
+                <!-- Logo + copyright -->
+                <tr>
+                  <td>
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                      <tr>
+                        <td style="vertical-align:middle;">
+                          <img src="../assets/logo.png" alt="Inebura" width="72" height="22" style="display:inline-block;width:72px;height:22px;object-fit:contain;opacity:0.6;" />
+                        </td>
+                        <td align="right" style="vertical-align:middle;">
+                          <span style="font-size:11px;color:#94a3b8;">&copy; 2026 Inebura Ops. All rights reserved.</span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+        </table>
+        <!-- /Email card -->
+
+      </td>
+    </tr>
+  </table>
+  <!-- /Outer wrapper -->
+
+</body>
+</html>

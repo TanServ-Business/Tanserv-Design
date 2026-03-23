@@ -1,0 +1,1175 @@
+/* ===== Credit Limit Module — shared styles ===== */
+
+html, body { height: auto; }
+body { overflow-y: auto; }
+
+body.motion-preload .dashboardCard { opacity: 0; }
+
+/* ---- Dashboard layout ---- */
+.clDashboard {
+  position: relative;
+  min-height: 100vh;
+  padding: 24px 5% 48px;
+  background: linear-gradient(180deg, #f1f5f9 0%, #e7ecf3 55%, #e2e8f0 100%);
+  overflow: hidden;
+}
+
+.clDashboard::before {
+  content: "";
+  position: absolute;
+  width: 420px; height: 420px;
+  right: -120px; top: -160px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 30% 30%, rgba(92,37,141,0.14), transparent 60%);
+  pointer-events: none;
+}
+
+/* ---- Hero ---- */
+.clHero {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 8px 4px 24px;
+  position: relative;
+  z-index: 1;
+}
+
+.heroEyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #64748b;
+  margin-bottom: 6px;
+}
+
+.clHero h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.clHeroMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 8px;
+  font-size: 12px;
+  color: #475569;
+}
+
+.heroTag {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 1px solid #e2e8f4;
+  font-weight: 600;
+}
+
+.clHeroActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ---- KPI Grid ---- */
+.clKpiGrid {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 28px;
+}
+
+.dashboardCard {
+  background: #ffffff;
+  border: 1px solid #e2e8f4;
+  border-radius: 5px;
+  padding: 14px 16px;
+  box-shadow: 0 8px 16px rgba(15,23,42,0.05);
+}
+
+.cardClickable {
+  cursor: pointer;
+  transition: box-shadow 0.18s ease, transform 0.18s ease, border-color 0.18s ease;
+}
+
+.cardClickable:hover {
+  box-shadow: 0 12px 28px rgba(92,37,141,0.14);
+  transform: translateY(-2px);
+}
+
+.cardClickable.is-active {
+  border-color: #5c258d;
+  box-shadow: 0 0 0 2px rgba(92,37,141,0.2), 0 8px 20px rgba(92,37,141,0.12);
+}
+
+.cardClickable:focus-visible {
+  outline: 2px solid rgba(92,37,141,0.35);
+  outline-offset: 2px;
+}
+
+.kpiCard {
+  display: flex;
+  flex-direction: column;
+  min-height: 110px;
+  height: 100%;
+}
+
+.kpiRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.kpiLabel {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #64748b;
+  font-weight: 700;
+}
+
+.kpiValue {
+  margin-top: 8px;
+  font-size: 22px;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.1;
+}
+
+.kpiSub {
+  font-size: 11px;
+  color: #94a3b8;
+  margin-top: 4px;
+}
+
+.kpiBadge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 999px;
+}
+
+.kpiBadgeGreen { background: #dcfce7; color: #15803d; }
+.kpiBadgeAmber { background: #fef9c3; color: #a16207; }
+.kpiBadgeRed   { background: #fee2e2; color: #b91c1c; }
+.kpiBadgeBlue  { background: #dbeafe; color: #1d4ed8; }
+
+/* kpi colour variants */
+.kpiLavender { background: #f3ecfb; border-color: #e3d5f5; }
+.kpiLavender .kpiLabel { color: #7c3aed; }
+
+.kpiInverted {
+  background: var(--brand, #5c258d);
+  border-color: var(--brand-dark, #4b1f73);
+  color: #ffffff;
+}
+.kpiInverted .kpiLabel { color: rgba(255,255,255,0.75); }
+.kpiInverted .kpiValue { color: #ffffff; }
+.kpiInverted .kpiSub   { color: rgba(255,255,255,0.6); }
+
+.kpiGradient {
+  background-color: #4b1f73;
+  background-image: linear-gradient(135deg, rgba(92,37,141,0.96), rgba(37,99,235,0.92));
+  border-color: transparent;
+}
+
+.kpiAmber { background: #fffbeb; border-color: #fde68a; }
+.kpiAmber .kpiLabel { color: #92400e; }
+.kpiAmber .kpiValue { color: #92400e; }
+
+.kpiRed { background: #fff1f2; border-color: #fecdd3; }
+.kpiRed .kpiLabel { color: #9f1239; }
+.kpiRed .kpiValue { color: #be123c; }
+
+.kpiGreen { background: #f0fdf4; border-color: #bbf7d0; }
+.kpiGreen .kpiLabel { color: #166534; }
+.kpiGreen .kpiValue { color: #15803d; }
+
+.kpiBlue { background: #eff6ff; border-color: #bfdbfe; }
+.kpiBlue .kpiLabel { color: #1e40af; }
+.kpiBlue .kpiValue { color: #1d4ed8; }
+
+/* ---- Panel card ---- */
+.clPanel {
+  background: #ffffff;
+  border: 1px solid #e2e8f4;
+  border-radius: 5px;
+  padding: 20px 24px;
+  box-shadow: 0 4px 12px rgba(15,23,42,0.04);
+  position: relative;
+  z-index: 1;
+}
+
+.clPanelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  gap: 12px;
+}
+
+.clPanelTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.clPanelTitle .bi { color: #5c258d; }
+
+.clPanelSubtitle {
+  font-size: 11px;
+  color: #94a3b8;
+  margin: 0;
+}
+
+/* ---- Customer table ---- */
+.clTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+
+.clTable thead th {
+  padding: 8px 12px;
+  text-align: left;
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: #64748b;
+  border-bottom: 1px solid #e2e8f4;
+  white-space: nowrap;
+}
+
+.clTable tbody tr {
+  border-bottom: 1px solid #f1f5f9;
+  transition: background 0.12s ease;
+}
+
+.clTable tbody tr:hover { background: #f8fafd; }
+.clTable tbody tr:last-child { border-bottom: none; }
+
+.clTable td {
+  padding: 10px 12px;
+  color: #1e293b;
+  vertical-align: middle;
+}
+
+.clTable td.numericCell { text-align: right; font-variant-numeric: tabular-nums; }
+
+.clCustName { font-weight: 600; color: #0f172a; }
+.clCustCode { font-size: 11px; color: #94a3b8; }
+
+/* ---- Utilisation bar ---- */
+.utilBar {
+  height: 6px;
+  border-radius: 999px;
+  background: #e2e8f4;
+  overflow: hidden;
+  position: relative;
+  width: 80px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.utilBarFill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+.utilBarFill.uGreen  { background: #22c55e; }
+.utilBarFill.uAmber  { background: #f59e0b; }
+.utilBarFill.uRed    { background: #ef4444; }
+.utilBarFill.uOver   { background: #dc2626; width: 100% !important; }
+
+.utilPct {
+  font-size: 12px;
+  font-weight: 700;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+.utilPct.uGreen  { color: #15803d; }
+.utilPct.uAmber  { color: #a16207; }
+.utilPct.uRed    { color: #b91c1c; }
+.utilPct.uOver   { color: #dc2626; }
+
+/* ---- Status chips ---- */
+.statusChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.chipGreen  { background: #dcfce7; color: #15803d; }
+.chipAmber  { background: #fef9c3; color: #a16207; }
+.chipRed    { background: #fee2e2; color: #b91c1c; }
+.chipBlue   { background: #dbeafe; color: #1d4ed8; }
+.chipSlate  { background: #f1f5f9; color: #475569; }
+
+/* ---- Empty state ---- */
+.clEmptyState {
+  padding: 40px 24px;
+  text-align: center;
+  color: #94a3b8;
+  font-size: 13px;
+}
+
+.clEmptyState .bi { font-size: 28px; display: block; margin-bottom: 8px; color: #cbd5e1; }
+
+/* ---- Buttons ---- */
+.btnPrimary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #4b1f73;
+  background: #5c258d;
+  color: #ffffff;
+  border-radius: 10px;
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter 0.15s ease;
+  text-decoration: none;
+}
+
+.btnPrimary:hover { filter: brightness(0.93); color: #ffffff; }
+
+.btnGhost {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #d7c3ea;
+  background: #ffffff;
+  color: #4b1f73;
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter 0.15s ease;
+  text-decoration: none;
+}
+
+.btnGhost:hover { filter: brightness(0.96); }
+
+.btnSm {
+  padding: 5px 10px;
+  font-size: 11px;
+  border-radius: 8px;
+}
+
+/* ---- Action link in table ---- */
+.clActionLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #5c258d;
+  text-decoration: none;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: background 0.15s ease;
+}
+
+.clActionLink:hover { background: #f3ecfb; color: #4b1f73; }
+
+/* ======================================================
+   DETAIL PAGE
+   ====================================================== */
+
+.clDetailPage {
+  min-height: 100vh;
+  padding: 24px 5% 48px;
+  background: linear-gradient(180deg, #f1f5f9 0%, #e7ecf3 55%, #e2e8f0 100%);
+}
+
+/* ---- Detail hero ---- */
+.clDetailHero {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 20px;
+  position: relative;
+  z-index: 1;
+}
+
+.clDetailHero h1 {
+  margin: 0 0 4px;
+  font-size: 24px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.clDetailHeroMeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  font-size: 12px;
+}
+
+/* ---- Utilisation hero bar ---- */
+.clUtilHero {
+  background: #ffffff;
+  border: 1px solid #e2e8f4;
+  border-radius: 5px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  flex-wrap: wrap;
+  box-shadow: 0 4px 12px rgba(15,23,42,0.04);
+  position: relative;
+  z-index: 1;
+}
+
+.clUtilStat {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.clUtilStatLabel {
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  font-weight: 700;
+  color: #94a3b8;
+}
+
+.clUtilStatValue {
+  font-size: 20px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.clUtilStatSub {
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.clUtilBarWrap {
+  flex: 1;
+  min-width: 200px;
+}
+
+.clUtilBarLabel {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 6px;
+}
+
+.clUtilBarLarge {
+  height: 10px;
+  border-radius: 999px;
+  background: #e2e8f4;
+  overflow: hidden;
+}
+
+.clUtilBarLargeFill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.5s ease;
+}
+
+.clUtilBarLargeFill.uGreen { background: linear-gradient(90deg, #22c55e, #16a34a); }
+.clUtilBarLargeFill.uAmber { background: linear-gradient(90deg, #f59e0b, #d97706); }
+.clUtilBarLargeFill.uRed   { background: linear-gradient(90deg, #ef4444, #dc2626); }
+
+/* ---- Two-column detail layout ---- */
+.clDetailGrid {
+  display: grid;
+  grid-template-columns: 340px minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 900px) {
+  .clDetailGrid { grid-template-columns: 1fr; }
+}
+
+/* ---- Risk section ---- */
+.clRiskHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.clRiskTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.riskBanner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.riskBanner .bi { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+
+.riskBannerRed    { background: #fff1f2; border: 1px solid #fecdd3; color: #9f1239; }
+.riskBannerAmber  { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; }
+.riskBannerGreen  { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
+
+.riskIndicatorList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.riskIndicatorRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: #f8fafd;
+  border: 1px solid #e9eef6;
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+.riskIndicatorName {
+  font-weight: 600;
+  color: #334155;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.riskIndicatorName .bi { font-size: 12px; color: #94a3b8; }
+
+.riskIndicatorValue {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.riskDotGreen { width: 7px; height: 7px; border-radius: 50%; background: #22c55e; flex-shrink: 0; }
+.riskDotAmber { width: 7px; height: 7px; border-radius: 50%; background: #f59e0b; flex-shrink: 0; }
+.riskDotRed   { width: 7px; height: 7px; border-radius: 50%; background: #ef4444; flex-shrink: 0; }
+
+/* ---- Customer info list ---- */
+.clInfoList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.clInfoRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 12.5px;
+}
+
+.clInfoRow:last-child { border-bottom: none; }
+.clInfoKey { color: #64748b; }
+.clInfoVal { font-weight: 600; color: #0f172a; text-align: right; }
+
+/* ---- Parameter engine ---- */
+.clParamEngine {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.clParamRow {
+  display: grid;
+  grid-template-columns: 180px 1fr 52px 56px;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.clParamRow:last-child { border-bottom: none; }
+
+.clParamName {
+  font-size: 12px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.clParamSub {
+  font-size: 10px;
+  color: #94a3b8;
+  font-weight: 400;
+}
+
+/* range slider */
+.clParamSlider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 5px;
+  border-radius: 999px;
+  background: #e2e8f4;
+  outline: none;
+  cursor: pointer;
+}
+
+.clParamSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #5c258d;
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 6px rgba(92,37,141,0.35);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.clParamSlider::-webkit-slider-thumb:hover { transform: scale(1.2); }
+
+.clParamSlider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #5c258d;
+  border: 2px solid #ffffff;
+  cursor: pointer;
+}
+
+.clParamWeight {
+  font-size: 12px;
+  font-weight: 700;
+  color: #5c258d;
+  text-align: center;
+}
+
+.clParamScore {
+  font-size: 11px;
+  font-weight: 700;
+  text-align: right;
+}
+
+.scoreHigh   { color: #15803d; }
+.scoreMid    { color: #a16207; }
+.scoreLow    { color: #b91c1c; }
+
+/* ---- Suggested limit result ---- */
+.clSuggestedResult {
+  background: linear-gradient(135deg, rgba(92,37,141,0.06), rgba(37,99,235,0.04));
+  border: 1px solid #d7c3ea;
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.clSuggestedLabel {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #5c258d;
+  margin-bottom: 4px;
+}
+
+.clSuggestedValue {
+  font-size: 28px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.clSuggestedMeta {
+  font-size: 11px;
+  color: #64748b;
+  margin-top: 4px;
+}
+
+.clSuggestedScoreWrap {
+  text-align: right;
+}
+
+.clSuggestedScoreLabel {
+  font-size: 11px;
+  color: #64748b;
+  margin-bottom: 4px;
+}
+
+.clSuggestedScore {
+  font-size: 36px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.scoreCircle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  font-size: 20px;
+  font-weight: 800;
+  border: 3px solid;
+}
+
+.scoreCircleGreen { border-color: #22c55e; color: #15803d; background: #f0fdf4; }
+.scoreCircleAmber { border-color: #f59e0b; color: #a16207; background: #fffbeb; }
+.scoreCircleRed   { border-color: #ef4444; color: #b91c1c; background: #fff1f2; }
+
+/* ---- Edit limit form ---- */
+.clEditForm {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #e2e8f4;
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.clEditGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex: 1;
+  min-width: 180px;
+}
+
+.clEditLabel {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: #64748b;
+}
+
+.clEditInput {
+  border: 1px solid #d7c3ea;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+  background: #ffffff;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.clEditInput:focus {
+  border-color: #5c258d;
+  box-shadow: 0 0 0 3px rgba(92,37,141,0.12);
+}
+
+.clSaveBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  background: #5c258d;
+  color: #ffffff;
+  border-radius: 10px;
+  padding: 9px 20px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: filter 0.15s ease, transform 0.1s ease;
+}
+
+.clSaveBtn:hover { filter: brightness(0.92); transform: translateY(-1px); }
+.clSaveBtn:active { transform: translateY(0); }
+
+.clSaveFeedback {
+  font-size: 12px;
+  font-weight: 600;
+  color: #15803d;
+  display: none;
+  align-items: center;
+  gap: 4px;
+}
+
+.clSaveFeedback.is-visible { display: flex; }
+
+/* ---- Back button ---- */
+.clBackBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #5c258d;
+  text-decoration: none;
+  padding: 5px 0;
+  margin-bottom: 12px;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+.clBackBtn:hover { color: #4b1f73; }
+
+/* ---- Section stack spacing ---- */
+.clStack > * + * { margin-top: 16px; }
+
+/* ---- Divider ---- */
+.clDivider {
+  border: none;
+  border-top: 1px solid #e2e8f4;
+  margin: 0;
+}
+
+/* ======================================================
+   CUSTOMER SEARCH BAR
+   ====================================================== */
+
+.clCustSearchBar {
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f4;
+  padding: 10px 5%;
+  position: relative;
+  z-index: 10;
+}
+
+.clCustSearchWrap {
+  position: relative;
+  max-width: 440px;
+}
+
+.clCustSearchInner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #d7c3ea;
+  border-radius: 10px;
+  padding: 8px 12px;
+  background: #ffffff;
+  cursor: text;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.clCustSearchInner:focus-within {
+  border-color: #5c258d;
+  box-shadow: 0 0 0 3px rgba(92,37,141,0.12);
+}
+
+.clCustSearchInner .bi-search { font-size: 13px; color: #94a3b8; flex-shrink: 0; }
+.clCustSearchInner .bi-chevron-down { font-size: 11px; color: #94a3b8; flex-shrink: 0; }
+
+.clCustSearchInner input {
+  border: none;
+  outline: none;
+  font-size: 13px;
+  color: #0f172a;
+  flex: 1;
+  background: transparent;
+  font-family: inherit;
+}
+
+.clCustSearchInner input::placeholder { color: #94a3b8; }
+
+.clCustSearchDropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border: 1px solid #e2e8f4;
+  border-radius: 10px;
+  box-shadow: 0 8px 28px rgba(15,23,42,0.13);
+  overflow: hidden;
+  z-index: 200;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.clCustSearchDropdown.hidden { display: none; }
+
+.clCustSearchItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: background 0.12s ease;
+  border-bottom: 1px solid #f1f5f9;
+  gap: 12px;
+}
+
+.clCustSearchItem:last-child { border-bottom: none; }
+.clCustSearchItem:hover { background: #f6f0fc; }
+.clCustSearchItem.is-selected { background: #f3ecfb; }
+
+.clCustSearchItemLeft { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.clCustSearchItemName { font-size: 13px; font-weight: 600; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.clCustSearchItemCode { font-size: 11px; color: #94a3b8; }
+
+.clCustSearchItemRight { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.clCustSearchItemUtil { font-size: 11px; font-weight: 700; }
+
+/* ======================================================
+   HERO NAME ROW — inline pills
+   ====================================================== */
+
+.clDetailHero {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding-bottom: 20px;
+  position: relative;
+  z-index: 1;
+}
+
+.clDetailHeroLeft { flex: 1; min-width: 0; }
+
+.clHeroNameRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.clHeroNameRow h1 { margin: 0; flex-shrink: 0; }
+
+.clDetailPills {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.clDetailHeroRight {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.clScoreLabel {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #64748b;
+}
+
+/* ======================================================
+   SUGGESTED PANEL — top of right column (no top margin)
+   ====================================================== */
+
+.clSuggestedTopPanel .clSuggestedResult {
+  margin-top: 0;
+}
+
+.clSuggestedTopPanel .clEditForm {
+  margin-top: 16px;
+  padding-top: 16px;
+}
+
+/* ======================================================
+   PARAMETER TABLE
+   ====================================================== */
+
+.clParamTableWrap {
+  overflow-x: auto;
+  margin: 0 -4px;
+  padding: 0 4px;
+}
+
+.clParamTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+  min-width: 640px;
+}
+
+.clParamTable thead th {
+  padding: 8px 12px;
+  text-align: left;
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: #64748b;
+  border-bottom: 2px solid #e2e8f4;
+  white-space: nowrap;
+  background: #fafbfc;
+}
+
+.clParamTable thead th:not(:first-child) { text-align: center; }
+.clParamTable thead th:last-child { text-align: center; }
+
+.clParamTable tbody tr {
+  border-bottom: 1px solid #f1f5f9;
+  transition: background 0.12s ease;
+}
+
+.clParamTable tbody tr:hover { background: #f8fafd; }
+.clParamTable tbody tr:last-child { border-bottom: none; }
+
+.clParamTable td {
+  padding: 10px 12px;
+  vertical-align: middle;
+}
+
+.clParamTable td:not(:first-child) { text-align: center; }
+
+.clParamTdName { text-align: left !important; }
+.clParamTdName .clParamName { font-weight: 600; color: #0f172a; font-size: 12.5px; }
+.clParamTdName .clParamSub  { font-size: 10.5px; color: #94a3b8; margin-top: 2px; }
+
+/* weightage cell */
+.clWeightCell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* weight slider thumb (inline-styled element) */
+.clParamSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: #5c258d;
+  border: 2px solid #ffffff;
+  box-shadow: 0 1px 4px rgba(92,37,141,0.3);
+  cursor: pointer;
+}
+.clParamSlider::-moz-range-thumb {
+  width: 13px; height: 13px;
+  border-radius: 50%;
+  background: #5c258d;
+  border: 2px solid #ffffff;
+  cursor: pointer;
+}
+
+.clParamWeight {
+  font-size: 13px;
+  font-weight: 800;
+  color: #5c258d;
+  min-width: 20px;
+  text-align: center;
+}
+
+/* range cell */
+.clRangeCell {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 160px;
+}
+
+.clRangeLine {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+}
+
+.clRangeLbl {
+  color: #94a3b8;
+  font-weight: 600;
+  width: 24px;
+  flex-shrink: 0;
+  text-align: right;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.clRangeVal {
+  color: #334155;
+  font-weight: 700;
+  width: 38px;
+  text-align: left;
+  flex-shrink: 0;
+  font-size: 11px;
+}
+
+/* mini range slider inside table */
+.clMiniSlider {
+  -webkit-appearance: none;
+  appearance: none;
+  flex: 1;
+  height: 4px;
+  border-radius: 999px;
+  background: #e2e8f4;
+  outline: none;
+  cursor: pointer;
+  min-width: 60px;
+}
+
+.clMiniSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #5c258d;
+  border: 2px solid #ffffff;
+  box-shadow: 0 1px 4px rgba(92,37,141,0.3);
+  cursor: pointer;
+  transition: transform 0.12s ease;
+}
+
+.clMiniSlider::-webkit-slider-thumb:hover { transform: scale(1.2); }
+
+.clMiniSlider::-moz-range-thumb {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: #5c258d;
+  border: 2px solid #ffffff;
+  cursor: pointer;
+}
+
+/* customer data cell */
+.clDataCell {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #0f172a;
+  font-variant-numeric: tabular-nums;
+}
+
+/* row highlight when flagged */
+.clParamTable tbody tr.rowRisk   { background: #fff8f8; }
+.clParamTable tbody tr.rowUnder  { background: #f8fbff; }
+.clParamTable tbody tr.rowRisk:hover  { background: #fff1f2; }
+.clParamTable tbody tr.rowUnder:hover { background: #eff6ff; }
