@@ -40,33 +40,7 @@
     ? `<img src="${relationshipLogoSrc}" alt="${escapeHtml(relationshipLogoAlt)}" />`
     : escapeHtml(relationshipBadge);
 
-  const getDashboardPath = () => {
-    const currentPage = String(window.location.pathname || "")
-      .split("/")
-      .pop()
-      .toLowerCase();
-    if (currentPage === "lpagent.html") {
-      return "pages/Dashboard_Agent.html";
-    }
-
-    const explicit = (document.body.dataset.dashboardPath || "").trim();
-    if (explicit) return explicit;
-
-    const role = (localStorage.getItem("activeUserRole") || "").trim().toLowerCase();
-    const roleDashboards = {
-      agent: "pages/Dashboard_Agent.html",
-      customer: "pages/Dashboard_Customer.html",
-      manager: "pages/LPmanager.html",
-      supervisor: "pages/Dashboard_Supervisor.html",
-      kam: "pages/dashKAM.html",
-      kas: "pages/dashKAS.html",
-      backend: "pages/LPbackend.html",
-      mis: "pages/LPmis.html",
-      approver: "bin/IssueTracker/approver-dashboard.html"
-    };
-
-    return roleDashboards[role] || "pages/Dashboard_Agent.html";
-  };
+  const getDashboardPath = () => "pages/Dashboard_Agent.html";
   const dashboardPath = resolvePath(getDashboardPath());
   const getLandingPath = () => {
     const role = (localStorage.getItem("activeUserRole") || "").trim().toLowerCase();
@@ -407,6 +381,19 @@
         <div class="submenu">
           <a class="submenu-link" href="${resolvePath("pages/credit-limit-dashboard.html")}" data-module="credit-limit-dashboard">Portfolio Overview</a>
           <a class="submenu-link" href="${resolvePath("pages/credit-limit-detail.html")}" data-module="credit-limit-detail">Manage Credit Limits</a>
+        </div>
+      </li>
+      <li class="menu-item">
+        <a class="nav-link" href="#" data-toggle="submenu" aria-expanded="false">
+          <span class="link-content">
+            <i class="bi bi-question-circle" aria-hidden="true"></i>
+            <span>Help &amp; Support</span>
+          </span>
+          <i class="bi bi-chevron-down chevron" aria-hidden="true"></i>
+        </a>
+        <div class="submenu">
+          <a class="submenu-link" href="${resolvePath("pages/help-support.html")}" data-module="help-support">Help &amp; Support</a>
+          <a class="submenu-link" href="${resolvePath("pages/support-admin.html")}" data-module="support-admin">Support Admin Portal</a>
         </div>
       </li>
     </ul>
@@ -753,7 +740,9 @@
             "pdc-agent": "pages/PDCagent.html",
             "pdc-ops": "pages/PDCOps.html",
             "commitment-agent": "pages/commitment.html",
-            "commitment-manager": "pages/CommitmentManager.html"
+            "commitment-manager": "pages/CommitmentManager.html",
+            "help-support": "pages/help-support.html",
+            "support-admin": "pages/support-admin.html"
           };
           const target = destinations[moduleKey];
           if (target) {

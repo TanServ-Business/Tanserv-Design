@@ -1,0 +1,680 @@
+/* =========================================================
+   Support Admin Portal — support-admin.css
+   ========================================================= */
+
+/* ── Page Layout ───────────────────────────────────────────── */
+.supportAdminPage {
+  position: relative;
+  min-height: 100vh;
+  padding: 24px 5% 48px;
+  background: linear-gradient(180deg, #f1f5f9 0%, #e7ecf3 55%, #e2e8f0 100%);
+}
+
+.supportAdminPage::before {
+  content: "";
+  position: absolute;
+  width: 420px;
+  height: 420px;
+  right: -120px;
+  top: -160px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 30% 30%, rgba(92,37,141,0.12), transparent 60%);
+  pointer-events: none;
+}
+
+/* ── Access Denied ─────────────────────────────────────────── */
+.saAccessDenied {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 16px;
+  text-align: center;
+}
+
+.saAccessDeniedIcon {
+  font-size: 52px;
+  color: #e2e8f4;
+}
+
+.saAccessDeniedTitle {
+  font-size: 20px;
+  font-weight: 800;
+  color: #334155;
+}
+
+.saAccessDeniedText {
+  font-size: 13px;
+  color: #64748b;
+  max-width: 380px;
+}
+
+/* ── Filter / Search Bar ───────────────────────────────────── */
+.saFilterBar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+/* Search — left side */
+.saSearch {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--brand-border, #d7c3ea);
+  background: #ffffff;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 12px;
+  color: #64748b;
+  flex: 1;
+  max-width: 320px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.saSearch i { color: var(--brand, #5c258d); }
+
+.saSearch:focus-within {
+  border-color: var(--brand, #5c258d);
+  box-shadow: 0 0 0 3px rgba(92,37,141,0.08);
+}
+
+.saSearchInput {
+  border: none;
+  outline: none;
+  font-size: 12px;
+  color: #0f172a;
+  background: transparent;
+  width: 100%;
+}
+
+.saSearchInput::placeholder { color: #94a3b8; }
+
+/* Pills — right side */
+.saFilterTabs {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+}
+
+.saFilterTab {
+  padding: 7px 14px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f4;
+  cursor: pointer;
+  transition: background 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.saFilterTab .saTabCount {
+  background: rgba(0,0,0,0.08);
+  border-radius: 999px;
+  padding: 0 5px;
+  font-size: 10px;
+}
+
+.saFilterTab.active,
+.saFilterTab:hover {
+  background: #5c258d;
+  color: #ffffff;
+  border-color: #5c258d;
+}
+
+.saFilterTab.active .saTabCount,
+.saFilterTab:hover .saTabCount {
+  background: rgba(255,255,255,0.25);
+}
+
+/* Sort — filterDropdown style (from ui-elements) */
+.filterDropdown {
+  position: relative;
+}
+
+.filterDropdown summary {
+  list-style: none;
+  cursor: pointer;
+  border: 1px solid #e2e8f4;
+  background: #ffffff;
+  padding: 7px 12px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #111827;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  user-select: none;
+}
+
+.filterDropdown summary::-webkit-details-marker { display: none; }
+
+.filterBadge {
+  background: #f1f5f9;
+  border: 1px solid #e2e8f4;
+  color: #334155;
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.filterMenu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 160px;
+  background: #ffffff;
+  border: 1px solid #e2e8f4;
+  border-radius: 12px;
+  padding: 6px;
+  box-shadow: 0 16px 32px rgba(15,23,42,0.12);
+  display: none;
+  z-index: 50;
+}
+
+.filterDropdown[open] .filterMenu { display: block; }
+
+.filterItem {
+  width: 100%;
+  border: none;
+  background: transparent;
+  text-align: left;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  color: #111827;
+  cursor: pointer;
+}
+
+.filterItem:hover { background: #f8fafc; }
+.filterItem.active { font-weight: 700; color: #5c258d; }
+
+/* ── Ticket Cards ──────────────────────────────────────────── */
+.saTicketList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.saTicketCard {
+  background: #ffffff;
+  border: 1px solid #e2e8f4;
+  border-radius: 10px;
+  padding: 0;
+  overflow: hidden;
+  cursor: pointer;
+  transition: box-shadow 0.15s, border-color 0.15s, transform 0.15s;
+  box-shadow: 0 2px 8px rgba(15,23,42,0.04);
+}
+
+.saTicketCard:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(15,23,42,0.09);
+  border-color: #d7c3ea;
+}
+
+.saTicketCardInner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+}
+
+.saTicketAccent {
+  width: 4px;
+  align-self: stretch;
+  border-radius: 0;
+  flex-shrink: 0;
+  min-height: 50px;
+}
+
+.saTicketAccent.open        { background: #f59e0b; }
+.saTicketAccent.in-progress { background: #2563eb; }
+.saTicketAccent.closed      { background: #22c55e; }
+
+.saTicketMain {
+  flex: 1;
+  min-width: 0;
+}
+
+.saTicketTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 5px;
+}
+
+.saTicketMeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.saTicketId {
+  font-family: ui-monospace, 'SF Mono', Consolas, monospace;
+  font-size: 10px;
+  font-weight: 600;
+  color: #5c258d;
+  background: #f3ecfb;
+  border: 1px solid #e3d5f5;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.saTicketClient {
+  font-size: 11px;
+  color: #475569;
+  font-weight: 600;
+}
+
+.saTicketDate {
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.saTicketRight {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.saTicketMsgCount {
+  font-size: 11px;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+/* ── Ticket Detail Modal ───────────────────────────────────── */
+#saTicketModal {
+  z-index: 420;
+}
+
+#saTicketModal .saTwoPanel {
+  width: min(1100px, 100%);
+  max-height: min(90vh, 820px);
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 30px 70px rgba(15, 23, 42, 0.24);
+  border: 1px solid #dbe5f0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transform: translateY(12px) scale(0.99);
+  opacity: 0;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+#saTicketModal.open .saTwoPanel {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
+.saTwoPanelHeader {
+  height: 60px;
+  padding: 0 18px;
+  border-bottom: 1px solid #e2e8f4;
+  background: linear-gradient(180deg, #ffffff 0%, #f9fbff 100%);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.saTwoPanelTitle {
+  font-size: 16px;
+  line-height: 1.2;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.saTwoPanelClose {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f4;
+  background: #ffffff;
+  color: #64748b;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.saTwoPanelClose:hover {
+  background: #f8fafc;
+  color: #334155;
+  border-color: #d7c3ea;
+}
+
+.saTwoPanelBody {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+}
+
+.saTwoPanelLeft {
+  background: linear-gradient(180deg, #fbfcff 0%, #f8fafc 100%);
+  border-right: 1px solid #e2e8f4;
+  padding: 16px;
+  overflow-y: auto;
+}
+
+.saInfoTicketTitle {
+  font-size: 17px;
+  font-weight: 800;
+  line-height: 1.35;
+  color: #0f172a;
+}
+
+.saInfoMetaRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.saInfoDivider {
+  height: 1px;
+  background: #e2e8f4;
+  margin: 14px 0;
+}
+
+.saInfoSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.saInfoSectionLabel {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #94a3b8;
+  font-weight: 800;
+}
+
+.saInfoRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.saInfoKey {
+  font-size: 11px;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.saInfoVal {
+  font-size: 12px;
+  color: #0f172a;
+  font-weight: 700;
+  text-align: right;
+  min-width: 0;
+  word-break: break-word;
+}
+
+.saStatusSelect {
+  border: 1px solid #d9e3ef;
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #334155;
+  background: #ffffff;
+  outline: none;
+  cursor: pointer;
+}
+
+.saStatusSelect:focus {
+  border-color: rgba(92, 37, 141, 0.45);
+  box-shadow: 0 0 0 3px rgba(92, 37, 141, 0.08);
+}
+
+.saTwoPanelRight {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+}
+
+.saChatThread {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+}
+
+.saChatReplyBar {
+  border-top: 1px solid #e2e8f4;
+  background: #ffffff;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.saChatAttachBtn {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f4;
+  background: #ffffff;
+  color: #64748b;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.saChatAttachBtn:hover {
+  background: #f8fafc;
+}
+
+.saChatAttachBtn input[type="file"] {
+  display: none;
+}
+
+.saFilePill {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  background: #f3ecfb;
+  border: 1px solid #e3d5f5;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 11px;
+  color: #5c258d;
+  font-weight: 700;
+  max-width: 240px;
+}
+
+.saFilePill #saFileNameLabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.saFilePill.has-file {
+  display: inline-flex;
+}
+
+.saChatInput,
+.saReplyInput {
+  min-width: 0;
+  flex: 1;
+  border: 1px solid #e2e8f4;
+  border-radius: 10px;
+  padding: 9px 12px;
+  font-size: 13px;
+  color: #0f172a;
+  background: #ffffff;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.saChatInput::placeholder {
+  color: #94a3b8;
+}
+
+.saChatInput:focus,
+.saReplyInput:focus {
+  border-color: rgba(92, 37, 141, 0.45);
+  box-shadow: 0 0 0 3px rgba(92, 37, 141, 0.08);
+}
+
+.saChatSendBtn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 10px;
+  color: #ffffff;
+  background: linear-gradient(135deg, #5c258d 0%, #7c3aed 100%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.saChatSendBtn:hover {
+  filter: brightness(1.05);
+}
+
+.saChatClosedBar {
+  border-top: 1px solid #bbf7d0;
+  background: #f0fdf4;
+  color: #166534;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+}
+
+/* ── Empty state ───────────────────────────────────────────── */
+.saEmpty {
+  text-align: center;
+  padding: 60px 20px;
+  color: #94a3b8;
+}
+
+.saEmpty i {
+  font-size: 40px;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.saEmpty p {
+  font-size: 13px;
+  margin: 0;
+}
+
+/* ── Ticket pills shared with help-support ─────────────────── */
+.ticketPill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: 1px solid;
+}
+
+.ticketPill.open        { background: #fef3c7; color: #92400e; border-color: #fde68a; }
+.ticketPill.in-progress { background: #dbeafe; color: #1d4ed8; border-color: #bfdbfe; }
+.ticketPill.closed      { background: #dcfce7; color: #166534; border-color: #86efac; }
+
+.priorityPill {
+  display: inline-flex;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  border: 1px solid;
+}
+
+.priorityPill.critical { background: #fee2e2; color: #991b1b; border-color: #fecaca; }
+.priorityPill.high     { background: #fff1f2; color: #be123c; border-color: #fecdd3; }
+.priorityPill.medium   { background: #fef3c7; color: #92400e; border-color: #fde68a; }
+.priorityPill.low      { background: #f0fdf4; color: #166534; border-color: #bbf7d0; }
+
+/* Discussion thread (shared pattern) */
+.discussionThread { display: flex; flex-direction: column; gap: 14px; }
+.discussionMsg { display: flex; gap: 10px; align-items: flex-start; }
+.discAvatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #ffffff; flex-shrink: 0; }
+.discAvatar.client  { background: linear-gradient(135deg, #5c258d, #7c3aed); }
+.discAvatar.support { background: linear-gradient(135deg, #0f766e, #2563eb); }
+.discBubble { flex: 1; min-width: 0; }
+.discBubbleMeta { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+.discAuthor { font-size: 12px; font-weight: 700; color: #0f172a; }
+.discRoleBadge { font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 999px; text-transform: uppercase; }
+.discRoleBadge.client  { background: #f3ecfb; color: #5c258d; border: 1px solid #e3d5f5; }
+.discRoleBadge.support { background: #ccfbf1; color: #0f766e; border: 1px solid #99f6e4; }
+.discTime { font-size: 10px; color: #94a3b8; }
+.discText { background: #f8fafc; border: 1px solid #e2e8f4; border-radius: 0 10px 10px 10px; padding: 10px 12px; font-size: 12px; color: #334155; line-height: 1.55; }
+.discAttachment { display: inline-flex; align-items: center; gap: 6px; margin-top: 6px; background: #f3ecfb; border: 1px solid #e3d5f5; border-radius: 6px; padding: 4px 10px; font-size: 11px; font-weight: 600; color: #5c258d; cursor: pointer; }
+
+/* ── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 1080px) {
+  .supportAdminPage { padding: 18px 3% 40px; }
+  .saTwoPanelBody { grid-template-columns: 320px minmax(0, 1fr); }
+}
+
+@media (max-width: 920px) {
+  #saTicketModal { padding: 14px; }
+  .saTwoPanelBody { grid-template-columns: 1fr; }
+  .saTwoPanelLeft {
+    border-right: none;
+    border-bottom: 1px solid #e2e8f4;
+    max-height: 38vh;
+  }
+}
+
+@media (max-width: 700px) {
+  .supportAdminPage { padding: 14px 12px 32px; }
+  .saFilterBar { flex-direction: column; align-items: stretch; }
+  .saSearch { max-width: 100%; }
+  #saTicketModal { padding: 10px; }
+  #saTicketModal .saTwoPanel { border-radius: 12px; max-height: 94vh; }
+  .saTwoPanelHeader { height: 54px; padding: 0 12px; }
+  .saTwoPanelTitle { font-size: 14px; }
+  .saTwoPanelLeft { padding: 12px; max-height: 34vh; }
+  .saChatThread { padding: 12px; }
+  .saChatReplyBar { padding: 10px; gap: 8px; flex-wrap: wrap; }
+  .saFilePill { max-width: 100%; }
+  .saChatInput { order: 3; width: 100%; flex: 1 0 100%; }
+  .saChatSendBtn { margin-left: auto; }
+}

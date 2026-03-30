@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Help &amp; Support — Inebura Ops UI</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="../css/styles.css" />
+  <link rel="stylesheet" href="../css/shared-header.css" />
+  <link rel="stylesheet" href="../css/agent-dashboard.css" />
+  <link rel="stylesheet" href="../css/help-support.css" />
+</head>
+<body class="motion-preload"
+  data-root-path="../"
+  data-relationship-name="Inebura HO"
+  data-relationship-badge="HO">
+
+<div data-shared-header></div>
+
+<main class="helpSupportPage">
+
+  <!-- ── KB Hero Search ────────────────────────────────────── -->
+  <div class="kbHero">
+    <div class="kbHeroInner">
+      <div class="kbHeroEyebrow">Help Center</div>
+      <h1 class="kbHeroTitle">How can we help you?</h1>
+      <div class="kbSearchBar">
+        <input type="search" class="kbSearchInput" id="kbSearchInput" placeholder="Search articles, guides and FAQs…" autocomplete="off" />
+        <button class="kbSearchBtn" id="kbSearchBtn" type="button">
+          <i class="bi bi-search"></i> Search
+        </button>
+      </div>
+      <div class="kbSearchSuggestions">
+        <span class="kbSearchTag" data-query="invoice upload">Invoice upload</span>
+        <span class="kbSearchTag" data-query="user access">User access</span>
+        <span class="kbSearchTag" data-query="documents limbo">Documents in limbo</span>
+        <span class="kbSearchTag" data-query="ptp">PTP</span>
+        <span class="kbSearchTag" data-query="export">Export report</span>
+        <span class="kbSearchTag" data-query="password">Password reset</span>
+      </div>
+      <div class="kbTicketQuickActions">
+        <button class="kbTicketActionBtn primary" type="button" onclick="openCreateTicket()">
+          <i class="bi bi-plus-lg"></i> Create Ticket
+        </button>
+        <button class="kbTicketActionBtn" type="button" onclick="switchTab('tickets')">
+          <i class="bi bi-ticket-perforated"></i> My Tickets
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Page body ──────────────────────────────────────────── -->
+  <div class="helpSupportBody">
+
+    <!-- Tab Navigation -->
+    <div class="hsTabs">
+      <button class="hsTab active" data-tab="kb" id="tabKb">
+        <i class="bi bi-book"></i> Knowledge Base
+      </button>
+      <button class="hsTab" data-tab="tickets" id="tabTickets">
+        <i class="bi bi-ticket-perforated"></i> My Tickets
+        <span class="hsBadge" id="openTicketCount">0</span>
+      </button>
+    </div>
+
+    <!-- ── Knowledge Base Panel ──────────────────────────── -->
+    <div id="panelKb" class="hsPanel">
+
+      <!-- Default sections (hidden during search) -->
+      <div id="kbDefaultSections">
+
+        <!-- Section 1: Frequently Asked -->
+        <div class="kbSectionLabel">Frequently Asked</div>
+        <div class="kbArticleGrid" id="kbFaqGrid"></div>
+
+        <!-- Section 2: Browse by Category -->
+        <div class="kbSectionLabel">Browse by Category</div>
+        <div class="kbCategoryGrid" id="kbCategoryGrid">
+          <a class="kbCategoryCard" href="#" data-cat="invoice" onclick="filterCategory('invoice');return false;">
+            <div class="kbCategoryIcon purple"><i class="bi bi-file-text"></i></div>
+            <div class="kbCategoryName">Invoice &amp; Billing</div>
+            <div class="kbCategoryCount">8 articles</div>
+          </a>
+          <a class="kbCategoryCard" href="#" data-cat="payments" onclick="filterCategory('payments');return false;">
+            <div class="kbCategoryIcon teal"><i class="bi bi-cash-stack"></i></div>
+            <div class="kbCategoryName">Payments &amp; Collections</div>
+            <div class="kbCategoryCount">7 articles</div>
+          </a>
+          <a class="kbCategoryCard" href="#" data-cat="documents" onclick="filterCategory('documents');return false;">
+            <div class="kbCategoryIcon blue"><i class="bi bi-folder2-open"></i></div>
+            <div class="kbCategoryName">Documents &amp; Files</div>
+            <div class="kbCategoryCount">5 articles</div>
+          </a>
+          <a class="kbCategoryCard" href="#" data-cat="account" onclick="filterCategory('account');return false;">
+            <div class="kbCategoryIcon amber"><i class="bi bi-person-gear"></i></div>
+            <div class="kbCategoryName">Account &amp; Users</div>
+            <div class="kbCategoryCount">6 articles</div>
+          </a>
+          <a class="kbCategoryCard" href="#" data-cat="technical" onclick="filterCategory('technical');return false;">
+            <div class="kbCategoryIcon gray"><i class="bi bi-gear"></i></div>
+            <div class="kbCategoryName">Technical</div>
+            <div class="kbCategoryCount">6 articles</div>
+          </a>
+          <a class="kbCategoryCard" href="#" data-cat="all" onclick="filterCategory('all');return false;">
+            <div class="kbCategoryIcon indigo"><i class="bi bi-grid-3x3-gap"></i></div>
+            <div class="kbCategoryName">All Articles</div>
+            <div class="kbCategoryCount">32 articles</div>
+          </a>
+        </div>
+
+        <!-- Category articles panel — appears below grid when a category is selected -->
+        <div id="kbCategoryPanel" style="display:none;">
+          <div class="kbCategoryPanelHeader">
+            <div class="kbViewTitleRow">
+              <div class="kbCategoryIcon" id="kbCatViewIcon" style="width:32px;height:32px;font-size:14px;border-radius:8px;flex-shrink:0;"></div>
+              <span class="kbViewTitle" id="kbCatViewName"></span>
+              <span class="kbViewCount" id="kbCatViewCount"></span>
+            </div>
+            <button class="kbClearCatBtn" onclick="clearCategory()">
+              <i class="bi bi-x-lg"></i> Clear
+            </button>
+          </div>
+          <div class="kbArticleGrid" id="kbCategoryArticles"></div>
+        </div>
+
+      </div><!-- /kbDefaultSections -->
+
+      <!-- Section 3: Knowledge Base — only shown during search -->
+      <div id="kbSearchSection" style="display:none;">
+        <div class="kbSectionLabel">Knowledge Base</div>
+        <div class="kbSearchResultsHeader">
+          <span id="kbSearchResultsLabel" style="font-size:13px;color:#475569;"></span>
+          <button class="kbBackBtn" onclick="clearSearch()">
+            <i class="bi bi-x"></i> Clear Search
+          </button>
+        </div>
+        <div class="kbArticleGrid" id="kbSearchArticles"></div>
+        <div class="kbNoResults" id="kbNoResults" style="display:none;">
+          <i class="bi bi-search"></i>
+          <p>No articles found. Try different keywords or browse categories below.</p>
+        </div>
+      </div>
+
+    </div><!-- /panelKb -->
+
+    <!-- ── Tickets Panel ──────────────────────────────────── -->
+    <div id="panelTickets" class="hsPanel" style="display:none;">
+
+      <!-- Access gate (non-client-admin) -->
+      <div id="ticketAccessGate" style="display:none;">
+        <div class="hsAccessGate">
+          <div class="hsAccessGateIcon"><i class="bi bi-lock"></i></div>
+          <div class="hsAccessGateTitle">Access Restricted</div>
+          <div class="hsAccessGateText">Support ticket creation is available to Client Admin users only. Contact your administrator for assistance.</div>
+        </div>
+      </div>
+
+      <!-- Ticket content (client-admin) -->
+      <div id="ticketContent">
+
+        <!-- KPI row -->
+        <div class="ticketKpiRow" id="ticketKpiRow">
+          <!-- Populated by JS -->
+        </div>
+
+        <!-- Top bar: filters + new ticket -->
+        <div class="ticketTopBar">
+          <div class="ticketFilterTabs">
+            <button class="ticketFilterTab active" data-tfilter="all" onclick="filterTickets('all',this)">All</button>
+            <button class="ticketFilterTab" data-tfilter="open" onclick="filterTickets('open',this)">Open</button>
+            <button class="ticketFilterTab" data-tfilter="in-progress" onclick="filterTickets('in-progress',this)">In Progress</button>
+            <button class="ticketFilterTab" data-tfilter="closed" onclick="filterTickets('closed',this)">Closed</button>
+          </div>
+          <button class="btnPrimary" id="newTicketBtn" onclick="openCreateTicket()">
+            <i class="bi bi-plus-lg" style="margin-right:5px;"></i>New Ticket
+          </button>
+        </div>
+
+        <div class="ticketList" id="ticketList">
+          <!-- Populated by JS -->
+        </div>
+
+      </div><!-- /ticketContent -->
+
+    </div><!-- /panelTickets -->
+
+  </div><!-- /helpSupportBody -->
+
+</main>
+
+<!-- ── Create Ticket Modal ───────────────────────────────────── -->
+<div class="modalOverlay" id="createTicketModal" aria-modal="true" role="dialog">
+  <div class="modalCard" style="max-width:560px;">
+    <div class="modalHeader">
+      <div>
+        <div style="font-size:15px;font-weight:700;color:#0f172a;">Create Support Ticket</div>
+        <div style="font-size:11px;color:#64748b;margin-top:2px;">Describe your issue and our support team will respond shortly.</div>
+      </div>
+      <button class="modalCloseBtn" onclick="closeModal('createTicketModal')" aria-label="Close">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+    <div class="modalBody">
+      <form id="createTicketForm" onsubmit="submitTicket(event)">
+        <div class="hsFormRow" style="margin-bottom:12px;">
+          <div class="hsFormField">
+            <label class="hsLabel" for="ticketCategory">Category</label>
+            <select class="hsSelect" id="ticketCategory" required>
+              <option value="">Select category…</option>
+              <option value="Invoice &amp; Billing">Invoice &amp; Billing</option>
+              <option value="Payments &amp; Collections">Payments &amp; Collections</option>
+              <option value="Documents &amp; Files">Documents &amp; Files</option>
+              <option value="Account &amp; Users">Account &amp; Users</option>
+              <option value="Technical">Technical</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="hsFormField">
+            <label class="hsLabel" for="ticketPriority">Priority</label>
+            <select class="hsSelect" id="ticketPriority" required>
+              <option value="">Select priority…</option>
+              <option value="Low">Low</option>
+              <option value="Medium">Medium</option>
+              <option value="High">High</option>
+              <option value="Critical">Critical</option>
+            </select>
+          </div>
+        </div>
+        <div class="hsFormField" style="margin-bottom:12px;">
+          <label class="hsLabel" for="ticketTitle">Subject</label>
+          <input type="text" class="hsInput" id="ticketTitle" placeholder="Brief description of your issue…" required />
+        </div>
+        <div class="hsFormField" style="margin-bottom:12px;">
+          <label class="hsLabel" for="ticketDescription">Description</label>
+          <textarea class="hsTextarea" id="ticketDescription" placeholder="Provide as much detail as possible — steps to reproduce, error messages, affected records…" rows="4" required></textarea>
+        </div>
+        <div class="hsFormField" style="margin-bottom:0;">
+          <label class="hsLabel">Attachment <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#94a3b8;">(optional)</span></label>
+          <label class="hsFileUpload" id="ticketFileLabel">
+            <i class="bi bi-cloud-arrow-up"></i>
+            Click to attach a file or screenshot
+            <input type="file" id="ticketFile" accept="image/*,.pdf,.doc,.docx,.xlsx" onchange="handleTicketFileSelect()" />
+          </label>
+          <div class="hsFilePill" id="ticketFilePill" style="display:none;">
+            <i class="bi bi-paperclip"></i>
+            <span id="ticketFileName"></span>
+            <button type="button" onclick="clearTicketFile()"><i class="bi bi-x"></i></button>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modalFooter">
+      <button class="btnSecondary" onclick="closeModal('createTicketModal')">Cancel</button>
+      <button class="btnPrimary" onclick="document.getElementById('createTicketForm').requestSubmit()">
+        <i class="bi bi-send" style="margin-right:5px;"></i>Submit Ticket
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Ticket Detail Modal ───────────────────────────────────── -->
+<div class="modalOverlay" id="ticketDetailModal" aria-modal="true" role="dialog">
+  <div class="modalCard" style="max-width:680px;max-height:90vh;display:flex;flex-direction:column;">
+    <div class="modalHeader">
+      <div style="flex:1;min-width:0;">
+        <div class="tdTitle" id="tdTitle">—</div>
+        <div class="tdMeta" id="tdMeta"></div>
+      </div>
+      <button class="modalCloseBtn" onclick="closeModal('ticketDetailModal')" aria-label="Close">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+    <div class="modalBody" style="flex:1;overflow-y:auto;">
+      <!-- Discussion thread -->
+      <div class="discussionThread" id="tdDiscussion"></div>
+
+      <!-- Reply form -->
+      <div class="replyForm" id="tdReplyForm">
+        <div class="kbSectionLabel" style="margin-bottom:8px;">Add a Remark</div>
+        <textarea class="replyInput" id="tdReplyText" placeholder="Type your message…" rows="3"></textarea>
+        <div class="replyActions">
+          <div style="display:flex;gap:8px;align-items:center;">
+            <label class="replyFileBtn">
+              <i class="bi bi-paperclip"></i> Attach
+              <input type="file" id="tdReplyFile" accept="image/*,.pdf,.doc,.docx" onchange="handleReplyFileSelect('tdReplyFile','tdReplyFilePill','tdReplyFileName')" />
+            </label>
+            <div class="replyAttachPreview" id="tdReplyFilePill">
+              <i class="bi bi-file-earmark" style="color:#5c258d;"></i>
+              <span id="tdReplyFileName"></span>
+              <button type="button" onclick="clearReplyFile('tdReplyFile','tdReplyFilePill')" style="background:none;border:none;color:#94a3b8;cursor:pointer;"><i class="bi bi-x"></i></button>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button class="btnSecondary" id="tdReopenBtn" onclick="reopenTicket()" style="display:none;">
+              <i class="bi bi-arrow-counterclockwise" style="margin-right:5px;"></i>Reopen
+            </button>
+            <button class="btnSecondary" id="tdCloseBtn" onclick="closeTicket()">
+              <i class="bi bi-check-circle" style="margin-right:5px;"></i>Close Ticket
+            </button>
+            <button class="btnPrimary" onclick="sendReply()">
+              <i class="bi bi-send" style="margin-right:5px;"></i>Send
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ── Article Modal ─────────────────────────────────────────── -->
+<div class="modalOverlay" id="kbArticleModal" aria-modal="true" role="dialog">
+  <div class="modalCard" style="max-width:680px;max-height:90vh;display:flex;flex-direction:column;">
+    <div class="modalHeader">
+      <div>
+        <div style="font-size:15px;font-weight:700;color:#0f172a;" id="kbArticleModalTitle">—</div>
+        <div style="font-size:11px;color:#64748b;margin-top:2px;" id="kbArticleModalCategory">—</div>
+      </div>
+      <button class="modalCloseBtn" onclick="closeModal('kbArticleModal')" aria-label="Close">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+    <div class="modalBody kbArticleBody" id="kbArticleModalBody" style="overflow-y:auto;">
+    </div>
+    <div class="modalFooter">
+      <button class="btnSecondary" onclick="closeModal('kbArticleModal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../scripts/shared-header.js"></script>
+<script>
+(() => {
+  // ── Ticket storage key ──────────────────────────────────
+  const TICKETS_KEY = "inebura_support_tickets";
+
+  // ── Current user info (used to scope My Tickets) ────────
+  const normalize = (value) => String(value || "").trim().toLowerCase();
+  const titleCase = (value) => String(value || "")
+    .replace(/[-_]+/g, " ")
+    .split(" ")
+    .filter(Boolean)
+    .map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+    .join(" ");
+
+  const userRole = normalize(localStorage.getItem("activeUserRole") || "client-admin") || "client-admin";
+  const defaultUserName = titleCase(userRole) || "Client User";
+  const currentUserName = (localStorage.getItem("activeUserName") || localStorage.getItem("userName") || defaultUserName).trim();
+  const currentUserEmail = (localStorage.getItem("activeUserEmail") || localStorage.getItem("userEmail") || "").trim();
+  const currentCompany = (document.body?.dataset?.relationshipName || "Inebura HO").trim();
+  const currentUserId = normalize(localStorage.getItem("activeUserId") || currentUserEmail || currentUserName || defaultUserName);
+  const currentUserInitials = currentUserName
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map(w => w[0].toUpperCase())
+    .join("") || "CU";
+
+  // ── Seed mock tickets if storage is empty ──────────────
+  const seedTickets = [
+    {
+      id: "TKT-2026-001",
+      title: "Invoice INV-2025-04821 not reflecting in portal",
+      category: "Invoice & Billing",
+      priority: "High",
+      status: "in-progress",
+      createdBy: "Client Admin",
+      createdAt: "28 Mar 2026, 09:15 AM",
+      lastActivity: "29 Mar 2026",
+      discussion: [
+        { author: "Client Admin", role: "client", initials: "CA", time: "28 Mar, 09:15 AM", text: "The invoice was uploaded on 27th March but it is not showing in the portal. Can you check?", attachment: null },
+        { author: "Support Team", role: "support", initials: "ST", time: "28 Mar, 11:30 AM", text: "Thanks for raising this. We are investigating. Could you share the invoice ID and the exact upload timestamp?", attachment: null },
+        { author: "Client Admin", role: "client", initials: "CA", time: "28 Mar, 12:45 PM", text: "Invoice ID: INV-2025-04821, uploaded at 10:32 AM on 27th March.", attachment: "invoice-screenshot.png" },
+        { author: "Support Team", role: "support", initials: "ST", time: "29 Mar, 09:00 AM", text: "We found the issue. The invoice was in limbo due to a sync error. We have manually pushed it. Please verify.", attachment: null }
+      ]
+    },
+    {
+      id: "TKT-2026-002",
+      title: "New agent unable to log in — authentication error",
+      category: "Account & Users",
+      priority: "Medium",
+      status: "open",
+      createdBy: "Client Admin",
+      createdAt: "29 Mar 2026, 02:00 PM",
+      lastActivity: "29 Mar 2026",
+      discussion: [
+        { author: "Client Admin", role: "client", initials: "CA", time: "29 Mar, 02:00 PM", text: "We added a new agent 'Sneha Pillai' but she is unable to log in. Getting an authentication error.", attachment: "error-screenshot.png" }
+      ]
+    },
+    {
+      id: "TKT-2026-003",
+      title: "Supporting documents missing from INV-2025-04798",
+      category: "Documents & Files",
+      priority: "Low",
+      status: "closed",
+      createdBy: "Client Admin",
+      createdAt: "25 Mar 2026, 10:00 AM",
+      lastActivity: "27 Mar 2026",
+      discussion: [
+        { author: "Client Admin", role: "client", initials: "CA", time: "25 Mar, 10:00 AM", text: "Three supporting documents attached to INV-2025-04798 are not visible in the document view.", attachment: null },
+        { author: "Support Team", role: "support", initials: "ST", time: "25 Mar, 03:00 PM", text: "We have re-indexed the documents. They should now be visible. Please verify from your end.", attachment: null },
+        { author: "Client Admin", role: "client", initials: "CA", time: "27 Mar, 09:00 AM", text: "Confirmed — documents are now visible. Closing this ticket. Thank you!", attachment: null }
+      ]
+    },
+    {
+      id: "TKT-2026-004",
+      title: "Credit limit not updating after approval",
+      category: "Invoice & Billing",
+      priority: "High",
+      status: "open",
+      createdBy: "Client Admin",
+      createdAt: "30 Mar 2026, 08:30 AM",
+      lastActivity: "30 Mar 2026",
+      discussion: [
+        { author: "Client Admin", role: "client", initials: "CA", time: "30 Mar, 08:30 AM", text: "Credit limit for Apollo Tyres was approved 2 days ago but the dashboard still shows the old limit.", attachment: "approval-doc.pdf" }
+      ]
+    },
+    {
+      id: "TKT-2026-005",
+      title: "Export report button not responding",
+      category: "Technical",
+      priority: "Medium",
+      status: "in-progress",
+      createdBy: "Client Admin",
+      createdAt: "27 Mar 2026, 04:00 PM",
+      lastActivity: "28 Mar 2026",
+      discussion: [
+        { author: "Client Admin", role: "client", initials: "CA", time: "27 Mar, 04:00 PM", text: "When I click 'Export' on the collections report, nothing happens. Tried on both Chrome and Edge.", attachment: null },
+        { author: "Support Team", role: "support", initials: "ST", time: "28 Mar, 10:00 AM", text: "Thank you for reporting this. We are investigating the export functionality. Will update you shortly.", attachment: null }
+      ]
+    }
+  ];
+
+  if (!localStorage.getItem(TICKETS_KEY)) {
+    localStorage.setItem(TICKETS_KEY, JSON.stringify(seedTickets));
+  }
+
+  const hydrateTicket = (ticket) => ({
+    ...ticket,
+    discussion: Array.isArray(ticket.discussion) ? ticket.discussion : [],
+    createdBy: ticket.createdBy || "Client User",
+    createdByRole: ticket.createdByRole || "client-admin",
+    createdByCompany: ticket.createdByCompany || "",
+    createdByEmail: ticket.createdByEmail || "",
+    createdById: ticket.createdById || normalize(ticket.createdByEmail || ticket.createdBy)
+  });
+
+  const getTickets = () => (JSON.parse(localStorage.getItem(TICKETS_KEY) || "[]") || []).map(hydrateTicket);
+  const saveTickets = (tickets) => localStorage.setItem(TICKETS_KEY, JSON.stringify(tickets));
+
+  const isMyTicket = (ticket) => {
+    if (!ticket) return false;
+    if (ticket.createdById) return normalize(ticket.createdById) === currentUserId;
+    return normalize(ticket.createdBy) === normalize(currentUserName);
+  };
+
+  const getMyTickets = () => getTickets().filter(isMyTicket);
+
+  // ── Knowledge Base articles ─────────────────────────────
+  const kbArticles = [
+    {
+      id: "kb-001", cat: "invoice",
+      title: "How to upload a new invoice",
+      meta: "Invoice & Billing · 3 min read",
+      body: `<h4>Overview</h4><p>Invoices can be uploaded via the Submission Module. Each invoice requires a valid customer code and at least one line item.</p><h4>Steps</h4><ul><li>Navigate to <strong>AR Transactions → Submission Module</strong>.</li><li>Click <strong>Upload Invoice</strong> and select your file (PDF or image).</li><li>Fill in the required fields: Customer Code, Invoice Number, Invoice Date, Amount.</li><li>Click <strong>Submit</strong>. The invoice will enter a validation queue.</li></ul><h4>Troubleshooting</h4><p>If the invoice goes to <strong>Limbo</strong>, it means the customer code was not matched. Verify the customer code and re-submit.</p>`
+    },
+    {
+      id: "kb-002", cat: "invoice",
+      title: "What happens when an invoice enters 'Limbo' status?",
+      meta: "Invoice & Billing · 2 min read",
+      body: `<h4>What is Limbo?</h4><p>An invoice is in <strong>Limbo</strong> when it cannot be automatically matched to a customer or agent. This can occur due to:</p><ul><li>Unrecognised or missing customer code</li><li>Duplicate invoice number</li><li>Upload format mismatch</li></ul><h4>Resolution</h4><p>Go to the <strong>Admin Dashboard → Limbo Items</strong> section. Select the invoice and manually assign it to a customer and agent. Once assigned, it will leave limbo and enter normal workflow.</p>`
+    },
+    {
+      id: "kb-003", cat: "invoice",
+      title: "How to attach supporting documents to an invoice",
+      meta: "Invoice & Billing · 2 min read",
+      body: `<h4>Steps</h4><ul><li>Open the invoice detail from the <strong>Dashboard</strong> or <strong>Submission Module</strong>.</li><li>Scroll to the <strong>Documents</strong> section.</li><li>Click <strong>Attach Document</strong> and select files (PDF, JPG, PNG, max 10 MB each).</li><li>Add a document type label (e.g., Delivery Challan, PO Copy, GST Certificate).</li><li>Click <strong>Save</strong>.</li></ul><h4>Supported document types</h4><p>Delivery Challan · PO Copy · GST Certificate · Service Report · PDC · Indemnity Bond</p>`
+    },
+    {
+      id: "kb-004", cat: "invoice",
+      title: "Understanding invoice aging and how it is calculated",
+      meta: "Invoice & Billing · 3 min read",
+      body: `<h4>What is Aging?</h4><p>Invoice aging tracks how long an invoice has been outstanding (past its due date). Buckets are:</p><ul><li><code>Not Due</code> – within credit period</li><li><code>1–30 days</code> – slightly overdue</li><li><code>31–60 days</code> – moderately overdue</li><li><code>61–90 days</code> and beyond</li></ul><h4>Calculation</h4><p>Aging = Today's Date – Invoice Due Date. The due date is computed from the invoice date plus the customer's credit period.</p>`
+    },
+    {
+      id: "kb-005", cat: "invoice",
+      title: "How to raise a dispute on an invoice",
+      meta: "Invoice & Billing · 2 min read",
+      body: `<h4>Steps</h4><ul><li>Open the invoice in the dashboard.</li><li>Click <strong>Activity → Add Issue</strong>.</li><li>Select <code>Further Action Required</code> as the broad status.</li><li>Choose the sub-status that best describes the dispute (e.g., Wrong/Incorrect Billing, Tax Issue).</li><li>Add your remark and submit.</li></ul><p>The dispute will appear in the <strong>Issue Tracker</strong> module for resolution.</p>`
+    },
+    {
+      id: "kb-006", cat: "payments",
+      title: "How to log a PTP (Promise to Pay)",
+      meta: "Payments & Collections · 2 min read",
+      body: `<h4>What is a PTP?</h4><p>A <strong>Promise to Pay (PTP)</strong> is a commitment from a customer to pay by a specific date.</p><h4>Steps</h4><ul><li>Open the invoice in the Agent Dashboard.</li><li>Click <strong>Add Activity → PTP</strong>.</li><li>Set the PTP date and the expected amount.</li><li>Add remarks if needed and click <strong>Save</strong>.</li></ul><p>The PTP will appear in the <strong>PTP for the Day</strong> card on your dashboard on the promised date.</p>`
+    },
+    {
+      id: "kb-007", cat: "payments",
+      title: "Understanding collection statuses",
+      meta: "Payments & Collections · 3 min read",
+      body: `<h4>Primary Statuses</h4><ul><li><strong>No Due</strong> – Invoice within credit period</li><li><strong>PTP</strong> – Customer has promised to pay</li><li><strong>Part Collected</strong> – Partial payment received</li><li><strong>Collection In Progress</strong> – Active follow-up ongoing</li><li><strong>Further Docs Required</strong> – Pending documents from customer</li><li><strong>Further Action Required</strong> – Billing dispute or correction needed</li><li><strong>Collected</strong> – Payment received in full</li></ul>`
+    },
+    {
+      id: "kb-008", cat: "payments",
+      title: "How to record a partial payment",
+      meta: "Payments & Collections · 2 min read",
+      body: `<h4>Steps</h4><ul><li>Open the invoice detail.</li><li>Click <strong>Add Activity → Part Collected</strong>.</li><li>Enter the amount received and the payment reference.</li><li>The net due will be updated automatically.</li></ul><p>Use <code>Part Payment Made</code> as the sub-status if the customer paid directly. Use <code>Part Payment through LC</code> for letter of credit transactions.</p>`
+    },
+    {
+      id: "kb-009", cat: "payments",
+      title: "What is a PDC and how to log it?",
+      meta: "Payments & Collections · 2 min read",
+      body: `<h4>What is a PDC?</h4><p>A <strong>Post-Dated Cheque (PDC)</strong> is a cheque issued with a future date. It is used as collateral or a payment commitment.</p><h4>Logging a PDC</h4><ul><li>Navigate to <strong>PDC Module → Agent</strong>.</li><li>Click <strong>Add PDC</strong> and fill in: cheque number, bank, amount, and the clearing date.</li><li>Link it to the corresponding invoice(s).</li></ul><p>You will receive a banking reminder before the clearing date.</p>`
+    },
+    {
+      id: "kb-010", cat: "documents",
+      title: "Supported file formats for document upload",
+      meta: "Documents & Files · 1 min read",
+      body: `<h4>Accepted Formats</h4><ul><li><strong>Images:</strong> JPG, PNG, TIFF (max 10 MB each)</li><li><strong>Documents:</strong> PDF (max 25 MB), Word (.docx), Excel (.xlsx)</li></ul><h4>Restrictions</h4><ul><li>Maximum 10 attachments per invoice</li><li>File names must not contain special characters</li><li>Encrypted PDFs are not supported</li></ul>`
+    },
+    {
+      id: "kb-011", cat: "documents",
+      title: "What are 'Documents in Limbo'?",
+      meta: "Documents & Files · 2 min read",
+      body: `<h4>Definition</h4><p>Documents in <strong>Limbo</strong> are files that were uploaded but could not be automatically linked to an invoice or customer due to:</p><ul><li>Missing or unrecognised invoice reference</li><li>Upload format issues</li><li>OCR extraction failure</li></ul><h4>Resolution</h4><p>Go to <strong>Admin Dashboard → Other Docs in Limbo</strong>. Select each document and manually link it to an invoice or reclassify it.</p>`
+    },
+    {
+      id: "kb-012", cat: "documents",
+      title: "How to reclassify a document",
+      meta: "Documents & Files · 2 min read",
+      body: `<h4>Steps</h4><ul><li>Navigate to the <strong>Documents</strong> section of an invoice or the Limbo panel in Admin Dashboard.</li><li>Hover over the document and click <strong>Edit</strong>.</li><li>Change the document type label from the dropdown.</li><li>Click <strong>Save</strong>.</li></ul>`
+    },
+    {
+      id: "kb-013", cat: "documents",
+      title: "How to download a document",
+      meta: "Documents & Files · 1 min read",
+      body: `<h4>Steps</h4><ul><li>Open the invoice or document section.</li><li>Hover over the document thumbnail.</li><li>Click the <strong>download icon</strong> (⬇) to save the file locally.</li></ul><p>Bulk download is available for invoices with multiple attachments via the <strong>Download All</strong> button.</p>`
+    },
+    {
+      id: "kb-014", cat: "account",
+      title: "How to add a new user",
+      meta: "Account & Users · 2 min read",
+      body: `<h4>Steps</h4><ul><li>As Client Admin, go to <strong>Account Settings → Users</strong>.</li><li>Click <strong>Invite User</strong>.</li><li>Enter the user's email, name, and assign a role.</li><li>The user will receive an invitation email.</li></ul><h4>Available roles</h4><p>Agent · Manager · Supervisor · KAM · KAS · Backend · MIS</p>`
+    },
+    {
+      id: "kb-015", cat: "account",
+      title: "Understanding user roles and permissions",
+      meta: "Account & Users · 3 min read",
+      body: `<h4>Role Overview</h4><ul><li><strong>Agent</strong> – Manages their assigned invoices and collections</li><li><strong>Manager</strong> – Views team performance and escalations</li><li><strong>Supervisor</strong> – Oversees multiple teams and agents</li><li><strong>KAM</strong> – Key Account Manager, handles strategic accounts</li><li><strong>KAS</strong> – Key Account Specialist, supports KAM</li><li><strong>Backend</strong> – Manages technical operations and approvals</li><li><strong>MIS</strong> – Management information and reporting</li><li><strong>Client Admin</strong> – Full access + ticket creation</li></ul>`
+    },
+    {
+      id: "kb-016", cat: "account",
+      title: "How to reset a user's password",
+      meta: "Account & Users · 1 min read",
+      body: `<h4>Steps</h4><ul><li>Go to <strong>Account Settings → Users</strong>.</li><li>Find the user and click <strong>Actions → Reset Password</strong>.</li><li>The user will receive a password reset email.</li></ul><p>Users can also reset their own password from the login page using <strong>Forgot Password</strong>.</p>`
+    },
+    {
+      id: "kb-017", cat: "account",
+      title: "What is the session timeout policy?",
+      meta: "Account & Users · 1 min read",
+      body: `<h4>Policy</h4><p>All sessions are automatically terminated after <strong>30 minutes of inactivity</strong>. This is a security measure to protect your data.</p><p>You will see a warning notification 5 minutes before auto-logout. Click <strong>Stay Logged In</strong> to extend your session.</p><p>Admins can view auto-logout events per user in the <strong>Admin Dashboard → User Session Overview</strong>.</p>`
+    },
+    {
+      id: "kb-018", cat: "technical",
+      title: "Supported browsers and devices",
+      meta: "Technical · 1 min read",
+      body: `<h4>Supported Browsers</h4><ul><li>Google Chrome (latest 2 versions) ✓</li><li>Mozilla Firefox (latest 2 versions) ✓</li><li>Microsoft Edge (latest 2 versions) ✓</li><li>Safari 15+ ✓</li></ul><h4>Devices</h4><p>The platform is optimised for desktop (1280px+). Tablet support is available in read-only mode. Mobile is not recommended for data entry workflows.</p>`
+    },
+    {
+      id: "kb-019", cat: "technical",
+      title: "How to export reports",
+      meta: "Technical · 2 min read",
+      body: `<h4>Steps</h4><ul><li>Navigate to the dashboard or module you want to export.</li><li>Click the <strong>Export</strong> button in the top right.</li><li>Select format: <strong>CSV</strong> or <strong>Excel (.xlsx)</strong>.</li><li>The file will download automatically.</li></ul><h4>Common issues</h4><ul><li>If the Export button is unresponsive, try a hard refresh (<code>Ctrl+Shift+R</code>).</li><li>Pop-up blockers can prevent downloads — ensure the domain is whitelisted.</li></ul>`
+    },
+    {
+      id: "kb-020", cat: "technical",
+      title: "Data refresh frequency",
+      meta: "Technical · 1 min read",
+      body: `<h4>Refresh Intervals</h4><ul><li><strong>Dashboard KPIs:</strong> Updated every 15 minutes</li><li><strong>Activity feed:</strong> Real-time (on page load)</li><li><strong>Invoice data:</strong> Synced every 30 minutes</li><li><strong>Notifications:</strong> Near real-time (30 second polling)</li></ul><p>You can force a refresh by clicking the <strong>Refresh</strong> button in the dashboard hero section.</p>`
+    },
+    {
+      id: "kb-021", cat: "technical",
+      title: "How to enable browser notifications",
+      meta: "Technical · 1 min read",
+      body: `<h4>Steps</h4><ul><li>Click the <strong>Bell icon</strong> in the top navigation bar.</li><li>Click <strong>Enable Notifications</strong> when prompted.</li><li>Allow notifications in your browser's permission dialog.</li></ul><p>You will now receive alerts for new invoice assignments, PTP reminders, and system updates.</p>`
+    },
+    {
+      id: "kb-022", cat: "invoice",
+      title: "How to handle unassigned invoices",
+      meta: "Invoice & Billing · 2 min read",
+      body: `<h4>What are Unassigned Invoices?</h4><p>An invoice is <strong>Unassigned</strong> when it has been uploaded but not yet linked to a specific agent or collection executive.</p><h4>Steps to Assign</h4><ul><li>Go to <strong>Admin Dashboard → Unassigned Invoices</strong>.</li><li>Click on the invoice row to open its details.</li><li>Select the <strong>Agent</strong> and <strong>Team</strong> from the dropdown.</li><li>Click <strong>Assign</strong> to confirm.</li></ul><p>Once assigned, the invoice will appear in the agent's dashboard immediately.</p><h4>Bulk Assignment</h4><p>Select multiple invoices using the checkboxes and click <strong>Bulk Assign</strong> to assign them all to the same agent in one action.</p>`
+    },
+    {
+      id: "kb-023", cat: "payments",
+      title: "How to apply a credit note",
+      meta: "Payments & Collections · 2 min read",
+      body: `<h4>What is a Credit Note?</h4><p>A credit note is issued when a customer overpays or receives a billing adjustment. It reduces the outstanding amount on a future invoice.</p><h4>Steps</h4><ul><li>Open the relevant invoice in the dashboard.</li><li>Click <strong>Add Activity → Credit Note Applied</strong>.</li><li>Enter the credit note number, amount, and date.</li><li>The system will reduce the outstanding balance accordingly.</li></ul><h4>Viewing Applied Credit Notes</h4><p>All credit notes applied to an invoice are visible under the <strong>Payment History</strong> tab in the invoice detail view.</p>`
+    },
+    {
+      id: "kb-024", cat: "account",
+      title: "How to change a user's role",
+      meta: "Account & Users · 2 min read",
+      body: `<h4>Steps</h4><ul><li>Navigate to <strong>Account Settings → Users</strong> as Client Admin.</li><li>Find the user in the list and click <strong>Edit</strong>.</li><li>Change the <strong>Role</strong> dropdown to the new role.</li><li>Click <strong>Save Changes</strong>.</li></ul><h4>Notes</h4><ul><li>Role changes take effect on the user's next login.</li><li>Downgrading a Manager to Agent removes their team visibility.</li><li>You cannot change the primary Client Admin's role.</li></ul>`
+    },
+    {
+      id: "kb-025", cat: "documents",
+      title: "How to bulk upload documents",
+      meta: "Documents & Files · 2 min read",
+      body: `<h4>Supported Upload Methods</h4><ul><li><strong>Single upload:</strong> From the invoice detail page → Documents → Attach</li><li><strong>Bulk upload:</strong> From <strong>Submission Module → Bulk Documents</strong></li></ul><h4>Bulk Upload Steps</h4><ul><li>Go to <strong>Submission Module → Bulk Documents</strong>.</li><li>Drag and drop up to 20 files at once, or click to select.</li><li>Map each document to an invoice using the reference column.</li><li>Click <strong>Upload All</strong>.</li></ul><h4>Best Practice</h4><p>Name your files with the invoice number prefix (e.g., <code>INV-2025-04821_challan.pdf</code>) to enable automatic matching.</p>`
+    },
+    {
+      id: "kb-026", cat: "payments",
+      title: "Understanding the Escalation Matrix",
+      meta: "Payments & Collections · 3 min read",
+      body: `<h4>What is the Escalation Matrix?</h4><p>The Escalation Matrix defines who gets notified when an invoice remains overdue beyond set thresholds.</p><h4>Default Thresholds</h4><ul><li><strong>1–30 days overdue:</strong> Agent notified</li><li><strong>31–60 days overdue:</strong> Manager escalation</li><li><strong>61–90 days:</strong> Supervisor escalation + KAM alert</li><li><strong>90+ days:</strong> Executive team alert</li></ul><h4>Customising</h4><p>Admins can edit thresholds from <strong>Issue Tracker → Escalation Matrix</strong>. Changes apply to new invoices entering the overdue bucket.</p>`
+    },
+    {
+      id: "kb-027", cat: "technical",
+      title: "How to switch user roles for testing",
+      meta: "Technical · 1 min read",
+      body: `<h4>Role Switching (Development Mode)</h4><p>To simulate a different user role without logging out, open your browser's developer console (<code>F12</code>) and run:</p><pre style="background:#f8fafc;border:1px solid #e2e8f4;border-radius:6px;padding:10px;font-size:12px;overflow-x:auto;">localStorage.setItem('activeUserRole', 'agent');</pre><p>Replace <code>'agent'</code> with any role: <code>manager</code>, <code>supervisor</code>, <code>kam</code>, <code>kas</code>, <code>backend</code>, <code>mis</code>, <code>client-admin</code>, <code>support-admin</code>. Then refresh the page.</p>`
+    },
+    {
+      id: "kb-028", cat: "invoice",
+      title: "How to view invoice history and activity log",
+      meta: "Invoice & Billing · 2 min read",
+      body: `<h4>Where to Find It</h4><p>Every invoice has a full audit trail of activities. To access it:</p><ul><li>Open the invoice from your dashboard.</li><li>Click the <strong>Activity</strong> tab (or scroll to the Activity section).</li></ul><h4>What is Logged</h4><ul><li>Status changes (e.g., PTP added, Part Collected)</li><li>Agent assignments and reassignments</li><li>Document uploads and removals</li><li>Remarks and comments added</li><li>Dispute flags raised or resolved</li></ul><p>The activity log is read-only and cannot be deleted.</p>`
+    },
+    {
+      id: "kb-029", cat: "account",
+      title: "How to deactivate a user",
+      meta: "Account & Users · 1 min read",
+      body: `<h4>Steps</h4><ul><li>Go to <strong>Account Settings → Users</strong>.</li><li>Find the user and click <strong>Actions → Deactivate</strong>.</li><li>Confirm the action in the dialog.</li></ul><h4>What Happens</h4><ul><li>The user is immediately logged out of all active sessions.</li><li>Their data, invoices, and history are preserved.</li><li>They cannot log in until reactivated.</li></ul><h4>Reactivating</h4><p>Click <strong>Actions → Reactivate</strong> from the same Users page. The user will need to reset their password before logging in again.</p>`
+    },
+    {
+      id: "kb-030", cat: "technical",
+      title: "What to do if the page doesn't load correctly",
+      meta: "Technical · 2 min read",
+      body: `<h4>Troubleshooting Steps</h4><ol><li><strong>Hard refresh:</strong> Press <code>Ctrl + Shift + R</code> (Windows) or <code>Cmd + Shift + R</code> (Mac) to reload without cache.</li><li><strong>Clear browser cache:</strong> Go to browser settings → Clear browsing data → Cached images and files.</li><li><strong>Try incognito mode:</strong> Opens a clean session without extensions or cached data.</li><li><strong>Disable extensions:</strong> Ad blockers or script blockers can interfere with the portal.</li><li><strong>Check browser version:</strong> Ensure you are on a supported browser (Chrome/Edge/Firefox latest).</li></ol><p>If the issue persists, raise a <strong>Technical</strong> support ticket with a screenshot and your browser version.</p>`
+    }
+  ];
+
+  // ── Current ticket being viewed ─────────────────────────
+  let currentTicketId = null;
+  let currentTicketFilter = "all";
+
+  // ── Ticket view setup ───────────────────────────────────
+  function initRoleUI() {
+    updateOpenCount();
+  }
+
+  function updateOpenCount() {
+    const activeCount = getMyTickets().filter(t => t.status !== "closed").length;
+    const badge = document.getElementById("openTicketCount");
+    if (badge) badge.textContent = activeCount;
+  }
+
+  // ── Tab switching ───────────────────────────────────────
+  function switchTab(tabId) {
+    document.querySelectorAll(".hsTab").forEach(t => t.classList.remove("active"));
+    document.querySelectorAll(".hsPanel").forEach(p => p.style.display = "none");
+
+    const tab  = document.getElementById("tab" + tabId.charAt(0).toUpperCase() + tabId.slice(1));
+    const panel = document.getElementById("panel" + tabId.charAt(0).toUpperCase() + tabId.slice(1));
+    if (tab) tab.classList.add("active");
+    if (panel) panel.style.display = "";
+
+    if (tabId === "tickets") {
+      document.getElementById("ticketAccessGate").style.display = "none";
+      document.getElementById("ticketContent").style.display = "";
+      renderTickets(currentTicketFilter);
+      renderTicketKpis();
+    }
+  }
+
+  window.switchTab = switchTab;
+
+  document.querySelectorAll(".hsTab").forEach(tab => {
+    tab.addEventListener("click", () => switchTab(tab.dataset.tab));
+  });
+
+  // ── Category metadata ───────────────────────────────────
+  const catMeta = {
+    invoice:   { label: "Invoice & Billing",      icon: "bi-file-text",    cls: "purple" },
+    payments:  { label: "Payments & Collections", icon: "bi-cash-stack",   cls: "teal"   },
+    documents: { label: "Documents & Files",       icon: "bi-folder2-open", cls: "blue"   },
+    account:   { label: "Account & Users",         icon: "bi-person-gear",  cls: "amber"  },
+    technical: { label: "Technical",               icon: "bi-gear",         cls: "gray"   }
+  };
+
+  // ── Article card HTML ───────────────────────────────────
+  function articleCardHTML(a) {
+    const m = catMeta[a.cat] || { icon: "bi-file-earmark-text", cls: "gray" };
+    return `
+      <div class="kbArticleCard" onclick="openArticle('${a.id}')">
+        <div class="kbCategoryIcon ${m.cls}" style="width:36px;height:36px;font-size:15px;border-radius:8px;flex-shrink:0;">
+          <i class="bi ${m.icon}"></i>
+        </div>
+        <div class="kbArticleCardBody">
+          <div class="kbArticleCardTitle">${a.title}</div>
+          <div class="kbArticleCardMeta">${a.meta}</div>
+        </div>
+        <i class="bi bi-chevron-right kbArticleCardArrow"></i>
+      </div>`;
+  }
+
+  // ── FAQ articles (top 4 by id) ──────────────────────────
+  const faqIds = ["kb-001","kb-002","kb-006","kb-007"];
+
+  // ── Category filter — shows articles below the grid ────
+  window.filterCategory = (cat) => {
+    const articles = cat === "all" ? kbArticles : kbArticles.filter(a => a.cat === cat);
+    const m = cat === "all"
+      ? { label: "All Articles", icon: "bi-grid-3x3-gap", cls: "indigo" }
+      : (catMeta[cat] || { label: cat, icon: "bi-book", cls: "gray" });
+
+    // Update active state on category cards
+    document.querySelectorAll("#kbCategoryGrid .kbCategoryCard").forEach(c => {
+      c.classList.toggle("active", c.dataset.cat === cat);
+    });
+
+    const iconEl = document.getElementById("kbCatViewIcon");
+    iconEl.className = `kbCategoryIcon ${m.cls}`;
+    iconEl.style.cssText = "width:32px;height:32px;font-size:14px;border-radius:8px;flex-shrink:0;";
+    iconEl.innerHTML = `<i class="bi ${m.icon}"></i>`;
+
+    document.getElementById("kbCatViewName").textContent  = m.label;
+    document.getElementById("kbCatViewCount").textContent = `${articles.length} article${articles.length !== 1 ? "s" : ""}`;
+    document.getElementById("kbCategoryArticles").innerHTML = articles.map(articleCardHTML).join("");
+
+    const panel = document.getElementById("kbCategoryPanel");
+    panel.style.display = "";
+    // Smooth scroll to just below the category grid
+    setTimeout(() => panel.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
+  };
+
+  window.clearCategory = () => {
+    document.getElementById("kbCategoryPanel").style.display = "none";
+    document.querySelectorAll("#kbCategoryGrid .kbCategoryCard").forEach(c => c.classList.remove("active"));
+  };
+
+  window.clearSearch = () => {
+    document.getElementById("kbSearchInput").value = "";
+    document.getElementById("kbSearchSection").style.display = "none";
+    document.getElementById("kbDefaultSections").style.display = "";
+  };
+
+  // ── KB Search — shows Section 3, hides Sections 1+2 ────
+  function doSearch(query) {
+    if (!query.trim()) {
+      clearSearch();
+      return;
+    }
+    const words = query.toLowerCase().trim().split(/\s+/).filter(Boolean);
+    const results = kbArticles.filter(a => {
+      const hay = (a.title + " " + a.meta + " " + a.body).toLowerCase();
+      return words.every(w => hay.includes(w));
+    });
+
+    document.getElementById("kbDefaultSections").style.display = "none";
+    document.getElementById("kbSearchSection").style.display = "";
+
+    const label = results.length
+      ? `${results.length} result${results.length !== 1 ? "s" : ""} for "<strong>${query}</strong>"`
+      : `No results for "<strong>${query}</strong>"`;
+    document.getElementById("kbSearchResultsLabel").innerHTML = label;
+
+    const grid = document.getElementById("kbSearchArticles");
+    if (results.length) {
+      grid.innerHTML = results.map(articleCardHTML).join("");
+      grid.style.display = "";
+      document.getElementById("kbNoResults").style.display = "none";
+    } else {
+      grid.innerHTML = "";
+      grid.style.display = "none";
+      document.getElementById("kbNoResults").style.display = "";
+    }
+  }
+
+  document.getElementById("kbSearchBtn").addEventListener("click", () => {
+    doSearch(document.getElementById("kbSearchInput").value);
+  });
+  document.getElementById("kbSearchInput").addEventListener("keydown", e => {
+    if (e.key === "Enter") doSearch(e.target.value);
+  });
+  document.getElementById("kbSearchInput").addEventListener("input", e => {
+    doSearch(e.target.value);
+  });
+  document.querySelectorAll(".kbSearchTag").forEach(tag => {
+    tag.addEventListener("click", () => {
+      const q = tag.dataset.query;
+      document.getElementById("kbSearchInput").value = q;
+      doSearch(q);
+    });
+  });
+
+  // ── Open article modal ──────────────────────────────────
+  window.openArticle = (id) => {
+    const article = kbArticles.find(a => a.id === id);
+    if (!article) return;
+    document.getElementById("kbArticleModalTitle").textContent   = article.title;
+    document.getElementById("kbArticleModalCategory").textContent = article.meta;
+    document.getElementById("kbArticleModalBody").innerHTML       = article.body;
+    openModal("kbArticleModal");
+  };
+
+  function escHtml(value) {
+    return String(value || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  // ── Ticket KPI cards ────────────────────────────────────
+  function renderTicketKpis() {
+    const tickets = getMyTickets();
+    const total      = tickets.length;
+    const open       = tickets.filter(t => t.status === "open").length;
+    const inProgress = tickets.filter(t => t.status === "in-progress").length;
+    const closed     = tickets.filter(t => t.status === "closed").length;
+    const kpiRow = document.getElementById("ticketKpiRow");
+    kpiRow.innerHTML = [
+      { label: "Total Tickets", value: total, icon: "bi-ticket-perforated", cls: "accentPurple" },
+      { label: "Open",          value: open,  icon: "bi-exclamation-circle", cls: "accentAmber" },
+      { label: "In Progress",   value: inProgress, icon: "bi-arrow-repeat", cls: "accentBlue" },
+      { label: "Closed",        value: closed, icon: "bi-check-circle",     cls: "accentTeal" }
+    ].map(k => `
+      <div class="dashboardCard kpiCard ${k.cls}" style="padding:14px 16px;">
+        <p class="kpiLabel"><i class="bi ${k.icon}" style="margin-right:4px;"></i>${k.label}</p>
+        <p class="kpiValue">${k.value}</p>
+      </div>`).join("");
+  }
+
+  // ── Render ticket list ──────────────────────────────────
+  function renderTickets(filter) {
+    let tickets = getMyTickets();
+    if (filter !== "all") tickets = tickets.filter(t => t.status === filter);
+    const list = document.getElementById("ticketList");
+    if (!tickets.length) {
+      list.innerHTML = `<div style="text-align:center;padding:40px 20px;color:#94a3b8;font-size:13px;"><i class="bi bi-inbox" style="font-size:32px;display:block;margin-bottom:10px;"></i>No tickets yet. Use <strong>Create Ticket</strong> to raise your first request.</div>`;
+      return;
+    }
+    list.innerHTML = tickets.map(t => `
+      <div class="ticketCard" onclick="openTicketDetail('${t.id}')">
+        <div class="ticketStatusDot ${t.status}"></div>
+        <div class="ticketCardMain">
+          <div class="ticketCardTitle">${escHtml(t.title)}</div>
+          <div class="ticketCardMeta">
+            <span class="ticketCardId">${escHtml(t.id)}</span>
+            <span class="ticketCardDate"><i class="bi bi-clock" style="margin-right:3px;"></i>${escHtml(t.lastActivity)}</span>
+          </div>
+          <div class="ticketCardSnippet">${escHtml((t.discussion[t.discussion.length - 1] || {}).text || "No conversation yet.")}</div>
+        </div>
+        <div class="ticketCardRight">
+          <span class="priorityPill ${t.priority.toLowerCase()}">${escHtml(t.priority)}</span>
+          <span class="ticketPill ${t.status}">${statusLabel(t.status)}</span>
+          <span class="ticketMsgCount"><i class="bi bi-chat-left-dots"></i>${t.discussion.length}</span>
+          <i class="bi bi-chevron-right" style="color:#cbd5e1;font-size:13px;"></i>
+        </div>
+      </div>`).join("");
+  }
+
+  // ── Filter tickets ──────────────────────────────────────
+  window.filterTickets = (filter, btn) => {
+    currentTicketFilter = filter;
+    document.querySelectorAll(".ticketFilterTab").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    renderTickets(filter);
+  };
+
+  // ── Status label helper ─────────────────────────────────
+  function statusLabel(s) {
+    return s === "in-progress" ? "In Progress" : s.charAt(0).toUpperCase() + s.slice(1);
+  }
+
+  // ── Open ticket detail ──────────────────────────────────
+  window.openTicketDetail = (id) => {
+    const ticket = getMyTickets().find(t => t.id === id);
+    if (!ticket) return;
+    currentTicketId = id;
+
+    document.getElementById("tdTitle").textContent = ticket.title;
+    document.getElementById("tdMeta").innerHTML = `
+      <span class="ticketCardId">${escHtml(ticket.id)}</span>
+      <span class="ticketPill ${ticket.status}">${statusLabel(ticket.status)}</span>
+      <span class="priorityPill ${ticket.priority.toLowerCase()}">${escHtml(ticket.priority)}</span>
+      <span class="ticketCardDate" style="font-size:11px;color:#94a3b8;">${escHtml(ticket.category)}</span>`;
+
+    renderDiscussion(ticket.discussion);
+
+    const closeBtn  = document.getElementById("tdCloseBtn");
+    const reopenBtn = document.getElementById("tdReopenBtn");
+    const replyForm = document.getElementById("tdReplyForm");
+
+    if (ticket.status === "closed") {
+      closeBtn.style.display  = "none";
+      reopenBtn.style.display = "";
+      replyForm.style.display = "none";
+    } else {
+      closeBtn.style.display  = "";
+      reopenBtn.style.display = "none";
+      replyForm.style.display = "";
+    }
+
+    openModal("ticketDetailModal");
+  };
+
+  function renderDiscussion(msgs) {
+    const thread = document.getElementById("tdDiscussion");
+    thread.innerHTML = msgs.map(m => `
+      <div class="discussionMsg">
+        <div class="discAvatar ${m.role}">${escHtml(m.initials)}</div>
+        <div class="discBubble">
+          <div class="discBubbleMeta">
+            <span class="discAuthor">${escHtml(m.author)}</span>
+            <span class="discRoleBadge ${m.role}">${m.role === "client" ? "You" : "Support"}</span>
+            <span class="discTime">${escHtml(m.time)}</span>
+          </div>
+          <div class="discText">${escHtml(m.text)}</div>
+          ${m.attachment ? `<div class="discAttachment"><i class="bi bi-paperclip"></i>${escHtml(m.attachment)}</div>` : ""}
+        </div>
+      </div>`).join("");
+  }
+
+  // ── Send reply ──────────────────────────────────────────
+  window.sendReply = () => {
+    const text = document.getElementById("tdReplyText").value.trim();
+    if (!text) return;
+    const tickets = getTickets();
+    const idx = tickets.findIndex(t => t.id === currentTicketId && isMyTicket(t));
+    if (idx === -1) return;
+    const ticket = tickets[idx];
+
+    const fileInput = document.getElementById("tdReplyFile");
+    const fileName  = fileInput?.files?.[0]?.name || null;
+    const now = new Date();
+    const timeStr = now.toLocaleDateString("en-IN", { day: "numeric", month: "short" }) +
+                    ", " + now.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
+
+    ticket.discussion.push({
+      author: currentUserName,
+      role: "client",
+      initials: currentUserInitials,
+      time: timeStr,
+      text,
+      attachment: fileName
+    });
+
+    if (ticket.status === "open") ticket.status = "in-progress";
+    ticket.lastActivity = now.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+
+    saveTickets(tickets);
+    document.getElementById("tdReplyText").value = "";
+    clearReplyFile("tdReplyFile", "tdReplyFilePill");
+
+    renderDiscussion(ticket.discussion);
+    renderTickets(currentTicketFilter);
+    renderTicketKpis();
+    updateOpenCount();
+  };
+
+  // ── Close / Reopen ticket ───────────────────────────────
+  window.closeTicket = () => {
+    const tickets = getTickets();
+    const idx = tickets.findIndex(t => t.id === currentTicketId && isMyTicket(t));
+    if (idx === -1) return;
+    const ticket = tickets[idx];
+    ticket.status = "closed";
+    ticket.lastActivity = new Date().toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+    saveTickets(tickets);
+    closeModal("ticketDetailModal");
+    renderTickets(currentTicketFilter);
+    renderTicketKpis();
+    updateOpenCount();
+  };
+
+  window.reopenTicket = () => {
+    const tickets = getTickets();
+    const idx = tickets.findIndex(t => t.id === currentTicketId && isMyTicket(t));
+    if (idx === -1) return;
+    const ticket = tickets[idx];
+    ticket.status = "open";
+    ticket.lastActivity = new Date().toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+    saveTickets(tickets);
+    openTicketDetail(currentTicketId);
+    renderTickets(currentTicketFilter);
+    renderTicketKpis();
+    updateOpenCount();
+  };
+
+  // ── Create ticket ───────────────────────────────────────
+  window.openCreateTicket = () => openModal("createTicketModal");
+
+  window.submitTicket = (e) => {
+    e.preventDefault();
+    const title    = document.getElementById("ticketTitle").value.trim();
+    const category = document.getElementById("ticketCategory").value;
+    const priority = document.getElementById("ticketPriority").value;
+    const desc     = document.getElementById("ticketDescription").value.trim();
+    const fileInput = document.getElementById("ticketFile");
+    const fileName  = fileInput?.files?.[0]?.name || null;
+    if (!title || !category || !priority || !desc) return;
+
+    const tickets = getTickets();
+    const now     = new Date();
+    const timeStr = now.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) +
+                    ", " + now.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
+    const id = "TKT-" + now.getFullYear() + "-" + String(Date.now()).slice(-6);
+
+    const newTicket = {
+      id,
+      title,
+      category,
+      priority,
+      status: "open",
+      createdBy: currentUserName,
+      createdByRole: userRole,
+      createdById: currentUserId,
+      createdByEmail: currentUserEmail || "—",
+      createdByCompany: currentCompany,
+      createdAt: timeStr,
+      lastActivity: now.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }),
+      discussion: [
+        { author: currentUserName, role: "client", initials: currentUserInitials, time: timeStr, text: desc, attachment: fileName }
+      ]
+    };
+
+    tickets.unshift(newTicket);
+    saveTickets(tickets);
+
+    document.getElementById("createTicketForm").reset();
+    document.getElementById("ticketFilePill").style.display = "none";
+    closeModal("createTicketModal");
+    switchTab("tickets");
+    updateOpenCount();
+  };
+
+  // ── File handling ───────────────────────────────────────
+  window.handleTicketFileSelect = () => {
+    const f = document.getElementById("ticketFile").files[0];
+    if (!f) return;
+    document.getElementById("ticketFileName").textContent = f.name;
+    document.getElementById("ticketFilePill").style.display = "";
+  };
+
+  window.clearTicketFile = () => {
+    document.getElementById("ticketFile").value = "";
+    document.getElementById("ticketFilePill").style.display = "none";
+  };
+
+  window.handleReplyFileSelect = (inputId, pillId, nameId) => {
+    const f = document.getElementById(inputId).files[0];
+    if (!f) return;
+    document.getElementById(nameId).textContent = f.name;
+    document.getElementById(pillId).classList.add("has-file");
+  };
+
+  window.clearReplyFile = (inputId, pillId) => {
+    document.getElementById(inputId).value = "";
+    document.getElementById(pillId).classList.remove("has-file");
+  };
+
+  // ── Modal helpers ───────────────────────────────────────
+  window.openModal = (id) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.add("open");
+    el.addEventListener("click", (e) => {
+      if (e.target === el) closeModal(id);
+    }, { once: true });
+  };
+
+  window.closeModal = (id) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.remove("open");
+  };
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      ["createTicketModal", "ticketDetailModal", "kbArticleModal"].forEach(closeModal);
+    }
+  });
+
+  // ── Init ────────────────────────────────────────────────
+  document.addEventListener("DOMContentLoaded", () => {
+    // Render FAQ articles
+    const faqArticles = faqIds.map(id => kbArticles.find(a => a.id === id)).filter(Boolean);
+    document.getElementById("kbFaqGrid").innerHTML = faqArticles.map(articleCardHTML).join("");
+    document.getElementById("panelKb").style.display = "";
+    initRoleUI();
+  });
+
+})();
+</script>
+</body>
+</html>
