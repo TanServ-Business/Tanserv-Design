@@ -91,12 +91,18 @@
           <div class="clUtilBarLargeFill" id="clUtilFill" style="width:0%"></div>
         </div>
       </div>
+      <div class="clUtilCTA">
+        <button type="button" class="clChangeLimitBtn" id="clChangeLimitBtn">
+          <i class="bi bi-pencil-square" aria-hidden="true"></i>
+          Change Credit Limit
+        </button>
+      </div>
     </div>
 
     <!-- Two-column grid -->
     <div class="clDetailGrid">
 
-      <!-- LEFT — Customer info + Risk -->
+      <!-- LEFT — Customer Profile -->
       <div class="clStack">
 
         <div class="clPanel">
@@ -109,93 +115,81 @@
           <div class="clInfoList" id="clInfoList"></div>
         </div>
 
-        <div class="clPanel">
-          <div class="clRiskHeader">
-            <h2 class="clRiskTitle">
-              <i class="bi bi-shield-exclamation" aria-hidden="true" style="color:#ef4444;"></i>
-              Risk Summary
-            </h2>
-          </div>
-          <div id="clRiskBanner"></div>
-          <div class="riskIndicatorList" id="clRiskList"></div>
-        </div>
-
       </div>
 
-      <!-- RIGHT — Suggested limit (top) + Parameter table (bottom) -->
+      <!-- RIGHT — Set limit (hidden) + Combined Risk/Impact panel -->
       <div class="clStack">
 
-        <!-- Suggested limit + set limit form — at top -->
-        <div class="clPanel clSuggestedTopPanel">
-          <div class="clPanelHeader" style="margin-bottom:0;">
+        <!-- Set New Credit Limit (hidden by default, revealed by CTA) -->
+        <div class="clPanel" id="clSetLimitPanel" style="display:none;">
+          <div class="clPanelHeader" style="margin-bottom:14px;">
             <h2 class="clPanelTitle">
-              <i class="bi bi-cpu" aria-hidden="true"></i>
-              Suggested Credit Limit
+              <i class="bi bi-pencil-square" aria-hidden="true"></i>
+              Set New Credit Limit
             </h2>
-            <p class="clPanelSubtitle" style="margin:0;">Adjust weights &amp; ranges in the table below — updates in real time</p>
+            <button type="button" class="clPanelCloseBtn" id="clSetLimitCloseBtn" aria-label="Close">
+              <i class="bi bi-x-lg" aria-hidden="true"></i>
+            </button>
           </div>
-
-          <div class="clSuggestedResult" id="clSuggestedResult">
-            <div>
-              <div class="clSuggestedLabel">Suggested Limit</div>
-              <div class="clSuggestedValue" id="clSuggestedValue">—</div>
-              <div class="clSuggestedMeta" id="clSuggestedMeta">—</div>
-            </div>
-          </div>
-
-          <div class="clEditForm">
+          <div class="clEditForm" style="margin-top:0;padding-top:0;border-top:none;">
             <div class="clEditGroup">
-              <label class="clEditLabel" for="clNewLimit">Set New Credit Limit (Rs.)</label>
+              <label class="clEditLabel" for="clNewLimit">New Credit Limit (Rs.)</label>
               <input type="number" id="clNewLimit" class="clEditInput" placeholder="e.g. 2000000" min="0" step="50000" />
             </div>
-            <div class="clEditGroup" style="max-width:200px;">
-              <label class="clEditLabel" for="clChangeReason">Reason</label>
-              <select id="clChangeReason" class="clEditInput" style="font-size:12px;font-weight:500;">
-                <option value="">Select reason…</option>
-                <option value="Annual Review">Annual Review</option>
-                <option value="Improved Payment History">Improved Payment History</option>
-                <option value="Business Growth">Business Growth</option>
-                <option value="Risk Escalation">Risk Escalation</option>
-                <option value="Management Decision">Management Decision</option>
-                <option value="Other">Other</option>
-              </select>
+            <div class="clEditGroup" style="width:100%;">
+              <label class="clEditLabel" for="clRemarks">Remarks</label>
+              <textarea id="clRemarks" class="clEditInput clRemarksInput" placeholder="Add remarks for this credit limit change…" rows="2"></textarea>
             </div>
-            <button type="button" class="clSaveBtn" id="clSaveBtn">
-              <i class="bi bi-check-lg" aria-hidden="true"></i>
-              Save Limit
+            <button type="button" class="clSaveBtn" id="clViewImpactBtn">
+              <i class="bi bi-bar-chart-line" aria-hidden="true"></i>
+              View Impact
             </button>
-            <span class="clSaveFeedback" id="clSaveFeedback" role="status" aria-live="polite">
-              <i class="bi bi-check-circle-fill"></i> Saved
-            </span>
           </div>
+          <div id="clApprovalStatusWrap"></div>
         </div>
 
-        <!-- Parameter table -->
-        <div class="clPanel">
-          <div class="clPanelHeader">
+        <!-- Combined Risk Summary / Impact Analysis panel -->
+        <div class="clPanel" id="clMainPanel">
+          <div class="clPanelHeader" style="flex-wrap:wrap;gap:12px;">
             <div>
-              <h2 class="clPanelTitle">
-                <i class="bi bi-sliders" aria-hidden="true"></i>
-                Parameter Weights &amp; Ranges
+              <h2 class="clPanelTitle" id="clMainPanelTitle">
+                <i class="bi bi-shield-exclamation" id="clMainPanelIcon" aria-hidden="true" style="color:#ef4444;"></i>
+                <span id="clMainPanelTitleText">Risk Summary</span>
               </h2>
-              <p class="clPanelSubtitle">Weightage drives the credit score. Range flags the customer's data against your thresholds.</p>
+              <p class="clPanelSubtitle" id="clImpactSubtitle">Overview of customer risk indicators</p>
+            </div>
+            <div class="clImpactToggle" id="clImpactToggle">
+              <button class="clImpactToggleBtn is-active" id="btnDefaultView" type="button">Risk Summary</button>
+              <button class="clImpactToggleBtn" id="btnCompareView" type="button">Compare View</button>
             </div>
           </div>
-          <div class="clParamTableWrap">
-            <table class="clParamTable" id="clParamTable">
-              <thead>
-                <tr>
-                  <th style="text-align:left;">Parameter</th>
-                  <th>Weightage</th>
-                  <th>Range</th>
-                  <th>Customer Data</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody id="clParamTableBody">
-                <!-- populated by JS -->
-              </tbody>
-            </table>
+
+          <!-- Risk Summary content (shown by default) -->
+          <div id="clRiskContent">
+            <div id="clRiskBanner"></div>
+            <div class="riskIndicatorList" id="clRiskList"></div>
+          </div>
+
+          <!-- Impact View content (shown after View Impact) -->
+          <div id="clImpactViewContent" style="display:none;">
+            <!-- score row + param cards rendered by JS -->
+          </div>
+
+          <!-- Compare View content (always available) -->
+          <div id="clCompareViewContent" style="display:none;">
+            <!-- compare table rendered by JS -->
+          </div>
+
+          <!-- Submit row (shown after impact is viewed) -->
+          <div id="clImpactSaveRow" style="display:none; margin-top:16px; padding-top:16px; border-top:1px solid #e2e8f4; align-items:center; gap:12px; flex-wrap:wrap;">
+            <button type="button" class="clSaveDirectBtn" id="clSaveDirectBtn">
+              <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+              Save Changes
+            </button>
+            <button type="button" class="clSubmitApprovalBtn" id="clSubmitApprovalBtn">
+              <i class="bi bi-send" aria-hidden="true"></i>
+              Submit for Approval
+            </button>
           </div>
         </div>
 
@@ -205,6 +199,18 @@
   </div><!-- /clCustomerDetail -->
 
 </main>
+
+<!-- Email sent toast notification -->
+<div id="clEmailToast" class="clEmailToast" style="display:none;" role="alert" aria-live="assertive">
+  <div class="clEmailToastIcon"><i class="bi bi-envelope-check-fill"></i></div>
+  <div class="clEmailToastBody">
+    <div class="clEmailToastTitle">Approval request sent</div>
+    <div class="clEmailToastSub" id="clEmailToastSub">Sent for approval</div>
+  </div>
+  <button class="clEmailToastClose" id="clEmailToastClose" type="button" aria-label="Dismiss">
+    <i class="bi bi-x-lg"></i>
+  </button>
+</div>
 
 <script src="../scripts/shared-header.js"></script>
 <script src="../scripts/credit-limit-detail.js"></script>

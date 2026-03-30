@@ -340,6 +340,7 @@
           <a class="submenu-link" href="${resolvePath("pages/dashKAM.html")}" data-module="dashboard-kam">Dashboard - KAM</a>
           <a class="submenu-link" href="${resolvePath("pages/dashKAS.html")}" data-module="dashboard-kas">Dashboard - KAS</a>
           <a class="submenu-link" href="${resolvePath("pages/Dashboard_Supervisor.html")}" data-module="dashboard-supervisor">Dashboard - Supervisor</a>
+          <a class="submenu-link" href="${resolvePath("pages/Dashboard_Admin.html")}" data-module="dashboard-admin">Dashboard - Admin</a>
         </div>
       </li>
       <li class="menu-item">
@@ -393,6 +394,19 @@
         <div class="submenu">
           <a class="submenu-link" href="${resolvePath("pages/commitment.html")}" data-module="commitment-agent">Commitment - Agent</a>
           <a class="submenu-link" href="${resolvePath("pages/CommitmentManager.html")}" data-module="commitment-manager">Commitment - Manager</a>
+        </div>
+      </li>
+      <li class="menu-item">
+        <a class="nav-link" href="#" data-toggle="submenu" aria-expanded="false">
+          <span class="link-content">
+            <i class="bi bi-shield-lock" aria-hidden="true"></i>
+            <span>Credit Limit</span>
+          </span>
+          <i class="bi bi-chevron-down chevron" aria-hidden="true"></i>
+        </a>
+        <div class="submenu">
+          <a class="submenu-link" href="${resolvePath("pages/credit-limit-dashboard.html")}" data-module="credit-limit-dashboard">Portfolio Overview</a>
+          <a class="submenu-link" href="${resolvePath("pages/credit-limit-detail.html")}" data-module="credit-limit-detail">Manage Credit Limits</a>
         </div>
       </li>
     </ul>
@@ -730,6 +744,7 @@
             "dashboard-kam": "pages/dashKAM.html",
             "dashboard-kas": "pages/dashKAS.html",
             "dashboard-supervisor": "pages/Dashboard_Supervisor.html",
+            "dashboard-admin": "pages/Dashboard_Admin.html",
             "issue-tracker": "pages/issuetrackerLP.html",
             "issue-matrix": "bin/IssueTracker/escalationMatrix.html",
             "issue-approver": "bin/IssueTracker/approver-dashboard.html",

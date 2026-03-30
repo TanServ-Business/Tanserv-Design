@@ -1,0 +1,382 @@
+/* =========================================================
+   Admin Dashboard — admin-dashboard.css
+   ========================================================= */
+
+/* ── Main Layout (mirrors agentDashboard) ─────────────────── */
+.adminDashboard {
+  position: relative;
+  min-height: 100vh;
+  padding: 24px 5% 48px;
+  background: linear-gradient(180deg, #f1f5f9 0%, #e7ecf3 55%, #e2e8f0 100%);
+  overflow: hidden;
+}
+
+.adminDashboard::before,
+.adminDashboard::after {
+  content: "";
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(0px);
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.adminDashboard::before {
+  width: 420px;
+  height: 420px;
+  right: -120px;
+  top: -160px;
+  background: radial-gradient(circle at 30% 30%, rgba(92, 37, 141, 0.14), transparent 60%);
+}
+
+.adminDashboard::after {
+  width: 360px;
+  height: 360px;
+  left: -160px;
+  bottom: -140px;
+  background: radial-gradient(circle at 40% 40%, rgba(37, 99, 235, 0.12), transparent 65%);
+}
+
+/* ── Table Section (bottom) ────────────────────────────────── */
+.adminTableSection {
+  position: relative;
+  z-index: 1;
+  margin-top: 18px;
+}
+
+/* ── Admin card header (shared within cards) ──────────────── */
+.adminCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.adminCardTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.adminCardTitle i {
+  font-size: 14px;
+  color: var(--brand, #5c258d);
+}
+
+.adminCardSubtitle {
+  font-size: 11px;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+/* ── Filter tabs ───────────────────────────────────────────── */
+.adminFilterTabs {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.adminFilterTab {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f4;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  letter-spacing: 0.02em;
+}
+
+.adminFilterTab.active,
+.adminFilterTab:hover {
+  background: var(--brand, #5c258d);
+  color: #ffffff;
+  border-color: var(--brand, #5c258d);
+}
+
+/* ── User Session Table ────────────────────────────────────── */
+.userSessionTableWrap {
+  overflow-x: auto;
+}
+
+.userSessionTable {
+  width: 100%;
+  min-width: 860px;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.userSessionTable thead th {
+  background: #f8fafc;
+  padding: 9px 12px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #64748b;
+  border-bottom: 1px solid #e2e8f4;
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.userSessionTable tbody tr {
+  border-bottom: 1px solid #f1f5f9;
+  transition: background 0.12s;
+}
+
+.userSessionTable tbody tr:last-child {
+  border-bottom: none;
+}
+
+.userSessionTable tbody tr:hover {
+  background: #f8fafc;
+}
+
+.userSessionTable tbody td {
+  padding: 10px 12px;
+  color: #334155;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+/* Avatar circle */
+.avatarCircle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--brand, #5c258d), #2563eb);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  letter-spacing: 0.04em;
+}
+
+.userNameCell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.userNameText {
+  font-weight: 700;
+  color: #0f172a;
+  font-size: 12px;
+}
+
+/* Session status pills */
+.sessionPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.sessionPill.online {
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #86efac;
+}
+
+.sessionPill.online::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #22c55e;
+  flex-shrink: 0;
+}
+
+.sessionPill.offline {
+  background: #f1f5f9;
+  color: #64748b;
+  border: 1px solid #e2e8f4;
+}
+
+.sessionPill.offline::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #94a3b8;
+  flex-shrink: 0;
+}
+
+.autoLogoutBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.autoLogoutBadge.none {
+  background: #f1f5f9;
+  color: #94a3b8;
+  border-color: #e2e8f4;
+}
+
+/* ── Activity Feed ─────────────────────────────────────────── */
+.feedCard {
+  display: flex;
+  flex-direction: column;
+}
+
+.feedList {
+  max-height: 560px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  scrollbar-width: thin;
+  scrollbar-color: #e2e8f4 transparent;
+}
+
+.feedList::-webkit-scrollbar {
+  width: 4px;
+}
+
+.feedList::-webkit-scrollbar-thumb {
+  background: #e2e8f4;
+  border-radius: 999px;
+}
+
+.feedItem {
+  display: flex;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid #f1f5f9;
+  align-items: flex-start;
+}
+
+.feedItem:last-child {
+  border-bottom: none;
+}
+
+.feedDotCol {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 4px;
+  flex-shrink: 0;
+}
+
+.feedDot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.feedDot.invoice   { background: #5c258d; }
+.feedDot.customer  { background: #2563eb; }
+.feedDot.user      { background: #0f766e; }
+.feedDot.document  { background: #4f46e5; }
+.feedDot.settings  { background: #d97706; }
+.feedDot.config    { background: #dc2626; }
+
+.feedConnector {
+  width: 1px;
+  flex: 1;
+  background: #e2e8f4;
+  margin-top: 4px;
+  min-height: 18px;
+}
+
+.feedContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.feedTitle {
+  font-size: 12px;
+  font-weight: 600;
+  color: #0f172a;
+  line-height: 1.4;
+}
+
+.feedMeta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 3px;
+  flex-wrap: wrap;
+}
+
+.feedTime {
+  font-size: 10px;
+  color: #94a3b8;
+}
+
+.feedCategory {
+  display: inline-flex;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border: 1px solid;
+}
+
+.feedCategory.invoice  { background: #f3ecfb; color: #5c258d; border-color: #e3d5f5; }
+.feedCategory.customer { background: #dbeafe; color: #1d4ed8; border-color: #bfdbfe; }
+.feedCategory.user     { background: #ccfbf1; color: #0f766e; border-color: #99f6e4; }
+.feedCategory.document { background: #ede9fe; color: #4338ca; border-color: #c4b5fd; }
+.feedCategory.settings { background: #fef3c7; color: #92400e; border-color: #fde68a; }
+.feedCategory.config   { background: #fee2e2; color: #991b1b; border-color: #fecaca; }
+
+/* ── Unassigned Invoice ID badge ──────────────────────────── */
+.invoiceIdBadge {
+  font-family: ui-monospace, 'SF Mono', Consolas, monospace;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--brand, #5c258d);
+  background: var(--brand-lighter, #f6effb);
+  border: 1px solid var(--brand-border, #d7c3ea);
+  padding: 2px 7px;
+  border-radius: 5px;
+}
+
+/* ── Responsive ────────────────────────────────────────────── */
+@media (max-width: 1080px) {
+  .adminDashboard {
+    padding: 18px 3% 40px;
+  }
+}
+
+@media (max-width: 700px) {
+  .adminDashboard {
+    padding: 14px 12px 32px;
+  }
+
+  .adminFilterTabs {
+    display: none;
+  }
+
+  .userSessionTable {
+    min-width: 700px;
+  }
+}

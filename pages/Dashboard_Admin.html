@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard — Inebura Ops UI</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="../css/styles.css" />
+  <link rel="stylesheet" href="../css/agent-dashboard.css" />
+  <link rel="stylesheet" href="../css/admin-dashboard.css" />
+</head>
+<body class="motion-preload"
+  data-root-path="../"
+  data-relationship-name="Inebura HO"
+  data-relationship-badge="HO">
+
+<div data-shared-header></div>
+
+<main class="adminDashboard">
+
+  <!-- ── Hero ──────────────────────────────────────────────── -->
+  <section class="dashboardHero">
+    <div>
+      <div class="heroEyebrow">System Administration</div>
+      <div class="heroTitleRow">
+        <h1>Admin Dashboard</h1>
+        <span class="pill" style="background:rgba(255,255,255,0.85);color:#5c258d;border:1px solid #d7c3ea;font-size:10px;padding:3px 10px;font-weight:700;">Admin Only</span>
+      </div>
+      <div class="heroMeta">
+        <span class="heroTag"><span id="heroActiveUsers">24</span> Active Now</span>
+        <span class="heroTag heroTagRefresh" id="heroDayTag">As of Today</span>
+        <span class="heroTag">48 Total Users</span>
+      </div>
+    </div>
+    <div class="heroActions">
+      <button class="btnSecondary" style="display:flex;align-items:center;gap:6px;" onclick="refreshDashboard()">
+        <i class="bi bi-arrow-clockwise"></i> Refresh
+      </button>
+    </div>
+  </section>
+
+  <!-- ── Top Grid: KPIs (9 cols) + Radial (3 cols) ─────────── -->
+  <section class="dashboardTopGrid">
+    <div class="row g-3">
+
+      <div class="col-12 col-md-9">
+
+        <!-- KPI Row 1: Three large cards -->
+        <div class="row g-3 kpiGrid">
+
+          <!-- Total Invoices — gradient inverted -->
+          <div class="col-12 col-md-4">
+            <article class="dashboardCard kpiCard kpiLavender kpiInverted kpiGradient">
+              <div class="kpiRow">
+                <span class="kpiLabel">Total Invoices</span>
+                <span class="kpiDelta">+3.1%</span>
+              </div>
+              <div class="kpiValue">14,832</div>
+              <div class="kpiSub">Across all customers</div>
+              <div class="kpiSplit">
+                <div class="kpiSplitItem">
+                  <span>This Month</span>
+                  <strong>
+                    <span class="kpiSplitLine">1,247 invoices</span>
+                    <span class="kpiSplitLine">38 today</span>
+                  </strong>
+                </div>
+                <div class="kpiSplitItem">
+                  <span class="kpiDueLabel">Limbo</span>
+                  <strong>
+                    <span class="kpiSplitLine">73 copies</span>
+                    <span class="kpiSplitLine">41 unassigned</span>
+                  </strong>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <!-- Total Customers -->
+          <div class="col-12 col-md-4">
+            <article class="dashboardCard kpiCard kpiLavender">
+              <div class="kpiRow">
+                <span class="kpiLabel">Total Customers</span>
+                <span class="kpiDelta">+0.8%</span>
+              </div>
+              <div class="kpiValue">2,104</div>
+              <div class="kpiProgressRow">
+                <div class="progressWrap" style="flex:1;">
+                  <div class="progressFill" style="--value: 0.898;"></div>
+                </div>
+              </div>
+              <div class="kpiSub">Active: 1,890 (89.8%)</div>
+              <div class="kpiSplit">
+                <div class="kpiSplitItem">
+                  <span>Active</span>
+                  <strong>
+                    <span class="kpiSplitLine">1,890 entities</span>
+                    <span class="kpiSplitLine">17 new (MTD)</span>
+                  </strong>
+                </div>
+                <div class="kpiSplitItem">
+                  <span class="kpiDueLabel">Limbo</span>
+                  <strong>
+                    <span class="kpiSplitLine">19 incomplete</span>
+                    <span class="kpiSplitLine">onboarding</span>
+                  </strong>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <!-- Supporting Docs -->
+          <div class="col-12 col-md-4">
+            <article class="dashboardCard kpiCard kpiLavender">
+              <div class="kpiLabel">Supporting Documents</div>
+              <div class="kpiProgressRow">
+                <div class="kpiValue">42,561</div>
+                <div class="progressWrap">
+                  <div class="progressFill" style="--value: 0.74;"></div>
+                </div>
+              </div>
+              <div class="kpiSub">Attached to invoices</div>
+              <div class="kpiSplit">
+                <div class="kpiSplitItem">
+                  <span>Avg / Invoice</span>
+                  <strong>
+                    <span class="kpiSplitLine">2.87 docs</span>
+                    <span class="kpiSplitLine">124 added today</span>
+                  </strong>
+                </div>
+                <div class="kpiSplitItem">
+                  <span class="kpiDueLabel">In Limbo</span>
+                  <strong>
+                    <span class="kpiSplitLine">58 unlinked</span>
+                    <span class="kpiSplitLine">unclassified</span>
+                  </strong>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <!-- Small KPI: Active Users -->
+          <div class="col-12 col-md-3">
+            <article class="dashboardCard kpiCard">
+              <div class="kpiLabel">Active Users Today</div>
+              <div class="kpiValue">24</div>
+              <div class="kpiSub">of 48 total users · 50%</div>
+            </article>
+          </div>
+
+          <!-- Small KPI: Auto-Logouts -->
+          <div class="col-12 col-md-3">
+            <article class="dashboardCard kpiCard">
+              <div class="kpiLabel">Auto-Logouts Today</div>
+              <div class="kpiValue">11</div>
+              <div class="kpiSub">Session timeout events</div>
+            </article>
+          </div>
+
+          <!-- Small KPI: Total Sessions -->
+          <div class="col-12 col-md-3">
+            <article class="dashboardCard kpiCard">
+              <div class="kpiLabel">Total Sessions</div>
+              <div class="kpiValue">31</div>
+              <div class="kpiSub">Across all users today</div>
+            </article>
+          </div>
+
+          <!-- Small KPI: Longest Session -->
+          <div class="col-12 col-md-3">
+            <article class="dashboardCard kpiCard">
+              <div class="kpiLabel">Longest Session</div>
+              <div class="kpiValue">4h 45m</div>
+              <div class="kpiSub">Manish Tiwari · Agent</div>
+            </article>
+          </div>
+
+        </div><!-- /kpiGrid -->
+
+        <!-- Action Stack: Limbo / Alert items -->
+        <div class="row g-3 actionStack">
+          <div class="col-12 col-md-3">
+            <article class="dashboardCard actionCard accentAmber">
+              <div class="actionMeta">
+                <span>Invoice Copies in Limbo</span>
+                <strong>73</strong>
+                <span>Pending review / assignment</span>
+              </div>
+              <div class="actionIcon"><i class="bi bi-file-earmark-break"></i></div>
+            </article>
+          </div>
+          <div class="col-12 col-md-3">
+            <article class="dashboardCard actionCard accentAmber">
+              <div class="actionMeta">
+                <span>Customers in Limbo</span>
+                <strong>19</strong>
+                <span>Incomplete onboarding</span>
+              </div>
+              <div class="actionIcon"><i class="bi bi-building-exclamation"></i></div>
+            </article>
+          </div>
+          <div class="col-12 col-md-3">
+            <article class="dashboardCard actionCard accentAmber">
+              <div class="actionMeta">
+                <span>Other Docs in Limbo</span>
+                <strong>58</strong>
+                <span>Unlinked / unclassified</span>
+              </div>
+              <div class="actionIcon"><i class="bi bi-folder-x"></i></div>
+            </article>
+          </div>
+          <div class="col-12 col-md-3">
+            <article class="dashboardCard actionCard accentPurple">
+              <div class="actionMeta">
+                <span>Unassigned Invoices</span>
+                <strong>41</strong>
+                <span>No agent assigned yet</span>
+              </div>
+              <div class="actionIcon"><i class="bi bi-file-earmark-minus"></i></div>
+            </article>
+          </div>
+        </div><!-- /actionStack -->
+
+      </div><!-- /col-md-9 -->
+
+      <!-- Right Stack: System Health Radial -->
+      <div class="col-12 col-md-3">
+        <div class="dashboardRightStack">
+          <article class="dashboardCard chartCard card overflow-hidden bg-primary border-0 ovarlay-primary-gradient radialCard" data-chart="systemHealth" data-span="4">
+            <div class="radialCardHeader">
+              <div>
+                <div class="radialTitle">Active Users</div>
+                <div class="radialPercentRow">
+                  <span class="radialPercent">50%</span>
+                  <span class="radialDelta">+4% vs yesterday</span>
+                </div>
+              </div>
+            </div>
+            <div class="radialGaugeWrap">
+              <canvas id="chartSystemHealth"></canvas>
+              <div class="radialGaugeCenter">
+                <div class="radialGaugeValue">24</div>
+                <div class="radialGaugeLabel">Online Now</div>
+              </div>
+            </div>
+            <div class="radialCallout">
+              <strong>11 auto-logouts</strong> today. Session timeout is set to 30 minutes.
+            </div>
+            <div class="radialSummary">
+              <div class="radialSummaryItem">
+                <div class="radialSummaryValue">48</div>
+                <div class="radialSummaryLabel">Total</div>
+              </div>
+              <div class="radialSummaryItem">
+                <div class="radialSummaryValue">31</div>
+                <div class="radialSummaryLabel">Sessions</div>
+              </div>
+              <div class="radialSummaryItem">
+                <div class="radialSummaryValue">11</div>
+                <div class="radialSummaryLabel">Auto-Outs</div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+
+    </div><!-- /row -->
+  </section><!-- /dashboardTopGrid -->
+
+  <!-- ── Chart Grid ─────────────────────────────────────────── -->
+  <section class="chartGrid">
+
+    <!-- Row 1: User Activity by Hour (8) + Activity Breakdown (4) -->
+    <div class="row g-3">
+      <div class="col-12 col-md-8">
+        <article class="dashboardCard chartCard" data-chart="loginsByHour" data-span="8">
+          <div class="chartHeader">
+            <div>
+              <div class="chartTitle">User Activity by Hour</div>
+              <div class="chartMeta">Logins and auto-logouts per hour — today</div>
+            </div>
+            <div class="chartHint">Today</div>
+          </div>
+          <div class="chartCanvasWrap">
+            <canvas id="chartLoginsByHour"></canvas>
+          </div>
+          <div class="chartStats">
+            <div class="chartStat">Peak Hour<strong>9 AM</strong></div>
+            <div class="chartStat">Total Logins<strong>24</strong></div>
+            <div class="chartStat">Auto-Logouts<strong>11</strong></div>
+            <div class="chartStat">Avg Session<strong>3h 12m</strong></div>
+          </div>
+        </article>
+      </div>
+      <div class="col-12 col-md-4">
+        <article class="dashboardCard chartCard" data-chart="activityCategory" data-span="4">
+          <div class="chartHeader">
+            <div>
+              <div class="chartTitle">Activity by Category</div>
+              <div class="chartMeta">Daily feed events — today</div>
+            </div>
+          </div>
+          <div class="chartCanvasWrap">
+            <canvas id="chartActivityCategory"></canvas>
+          </div>
+          <div class="chartStats">
+            <div class="chartStat">Invoices<strong>38</strong></div>
+            <div class="chartStat">Documents<strong>28</strong></div>
+            <div class="chartStat">Customers<strong>17</strong></div>
+          </div>
+        </article>
+      </div>
+    </div>
+
+    <!-- Row 2: Session Duration by User (6) + 7-Day Upload Trend (6) -->
+    <div class="row g-3">
+      <div class="col-12 col-md-6">
+        <article class="dashboardCard chartCard" data-chart="sessionDuration" data-span="6">
+          <div class="chartHeader">
+            <div>
+              <div class="chartTitle">User Session Duration</div>
+              <div class="chartMeta">Highest session time per user — today</div>
+            </div>
+          </div>
+          <div class="chartCanvasWrap">
+            <canvas id="chartSessionDuration"></canvas>
+          </div>
+          <div class="chartStats">
+            <div class="chartStat">Avg Session<strong>3h 12m</strong></div>
+            <div class="chartStat">Longest<strong>4h 45m</strong></div>
+            <div class="chartStat">Shortest<strong>2h 15m</strong></div>
+          </div>
+        </article>
+      </div>
+      <div class="col-12 col-md-6">
+        <article class="dashboardCard chartCard" data-chart="weekTrend" data-span="6">
+          <div class="chartHeader">
+            <div>
+              <div class="chartTitle">7-Day Upload Trend</div>
+              <div class="chartMeta">New invoices, documents and customers per day</div>
+            </div>
+          </div>
+          <div class="chartCanvasWrap">
+            <canvas id="chartWeekTrend"></canvas>
+          </div>
+          <div class="chartStats">
+            <div class="chartStat">Invoices (7d)<strong>158</strong></div>
+            <div class="chartStat">Documents (7d)<strong>371</strong></div>
+            <div class="chartStat">Customers (7d)<strong>17</strong></div>
+          </div>
+        </article>
+      </div>
+    </div>
+
+  </section><!-- /chartGrid -->
+
+  <!-- ── Bottom: Session Table + Activity Feed ──────────────── -->
+  <section class="adminTableSection">
+    <div class="row g-3">
+
+      <!-- User Session Table -->
+      <div class="col-12 col-md-8">
+        <div class="dashboardCard" style="padding:0;overflow:hidden;">
+          <div class="adminCardHeader" style="padding:14px 16px 0;">
+            <div>
+              <div class="adminCardTitle">
+                <i class="bi bi-person-badge"></i>
+                User Session Overview
+              </div>
+              <div class="adminCardSubtitle">Login times, durations and auto-logout events per user</div>
+            </div>
+            <div class="adminFilterTabs">
+              <button class="adminFilterTab active" onclick="filterSessions('today',this)">Today</button>
+              <button class="adminFilterTab" onclick="filterSessions('week',this)">This Week</button>
+              <button class="adminFilterTab" onclick="filterSessions('month',this)">This Month</button>
+            </div>
+          </div>
+          <div class="userSessionTableWrap" style="margin-top:12px;">
+            <table class="userSessionTable">
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>Role</th>
+                  <th>Login Time</th>
+                  <th>Logout Time</th>
+                  <th>Auto-Logouts</th>
+                  <th>Highest Session</th>
+                  <th>Sessions</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="sessionTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Daily Activity Feed -->
+      <div class="col-12 col-md-4">
+        <div class="dashboardCard feedCard" style="padding:0;overflow:hidden;height:100%;">
+          <div class="adminCardHeader" style="padding:14px 16px 0;">
+            <div>
+              <div class="adminCardTitle">
+                <i class="bi bi-activity"></i>
+                Daily Activity Feed
+              </div>
+              <div class="adminCardSubtitle">System events — last 24 hours</div>
+            </div>
+            <span class="pill" style="background:#f3ecfb;color:#5c258d;border:1px solid #e3d5f5;font-size:10px;padding:3px 9px;white-space:nowrap;">Today</span>
+          </div>
+          <div class="feedList" id="feedList" style="padding:8px 16px 16px;"></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../scripts/shared-header.js"></script>
+<script>
+(() => {
+  // ── Brand colours (from CSS vars) ─────────────────────────
+  const brand     = getComputedStyle(document.documentElement).getPropertyValue("--brand").trim()      || "#5c258d";
+  const brandDark = getComputedStyle(document.documentElement).getPropertyValue("--brand-dark").trim() || "#4b1f73";
+
+  Chart.defaults.font.family = getComputedStyle(document.body).fontFamily || "Arial, Helvetica, sans-serif";
+  Chart.defaults.color = "#475569";
+
+  const palette = {
+    purple:      brand,
+    purplePastel:"rgba(92, 37, 141, 0.35)",
+    purpleLight: "rgba(92, 37, 141, 0.18)",
+    blue:        "#2563eb",
+    bluePastel:  "rgba(37, 99, 235, 0.35)",
+    blueLight:   "rgba(37, 99, 235, 0.18)",
+    teal:        "#0f766e",
+    tealPastel:  "rgba(15, 118, 110, 0.35)",
+    amber:       "#d97706",
+    amberPastel: "rgba(217, 119, 6, 0.35)",
+    indigo:      "#4f46e5",
+    red:         "#dc2626",
+    gray:        "#94a3b8"
+  };
+
+  // ── Base Chart Options ────────────────────────────────────
+  const baseOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        labels: { color: "#475569", font: { size: 11 } }
+      },
+      tooltip: {
+        backgroundColor: brandDark,
+        titleColor: "#ffffff",
+        bodyColor: "#ffffff",
+        padding: 10
+      }
+    },
+    scales: {
+      x: {
+        grid: { color: "rgba(148, 163, 184, 0.2)" },
+        ticks: { color: "#64748b", font: { size: 10 } }
+      },
+      y: {
+        grid: { color: "rgba(148, 163, 184, 0.2)" },
+        ticks: { color: "#64748b", font: { size: 10 } }
+      }
+    }
+  };
+
+  // ── Needle plugin (for half-doughnut gauge) ───────────────
+  const needlePlugin = {
+    id: "adminNeedle",
+    afterDatasetsDraw(chart) {
+      const achievedArc = chart.getDatasetMeta(0)?.data?.[0];
+      if (!achievedArc || !chart.$needleVisible) return;
+      const { x, y, innerRadius, outerRadius, endAngle } = achievedArc.getProps(
+        ["x", "y", "innerRadius", "outerRadius", "endAngle"], false
+      );
+      if (![x, y, innerRadius, outerRadius, endAngle].every(Number.isFinite)) return;
+      const startRadius = Math.max(0, innerRadius);
+      const endRadius   = Math.max(startRadius, outerRadius);
+      const startX = x + Math.cos(endAngle) * startRadius;
+      const startY = y + Math.sin(endAngle) * startRadius;
+      const endX   = x + Math.cos(endAngle) * endRadius;
+      const endY   = y + Math.sin(endAngle) * endRadius;
+      const { ctx } = chart;
+      ctx.save();
+      ctx.beginPath();
+      ctx.lineWidth = 2.5;
+      ctx.lineCap = "butt";
+      ctx.strokeStyle = "#dc2626";
+      ctx.moveTo(startX, startY);
+      ctx.lineTo(endX, endY);
+      ctx.stroke();
+      ctx.restore();
+    }
+  };
+
+  // ── Chart registry ────────────────────────────────────────
+  const charts = {};
+
+  const buildChart = (id, config) => {
+    const canvas = document.getElementById(id);
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    const options = { ...baseOptions, ...(config.options || {}) };
+    if (config.type === "doughnut") options.scales = {};
+    charts[id] = new Chart(ctx, {
+      type: config.type,
+      data: config.data,
+      options,
+      plugins: config.plugins || []
+    });
+  };
+
+  // ── DATA: User Sessions ───────────────────────────────────
+  const userSessions = [
+    { name: "Riya Sharma",   initials: "RS", role: "Agent",      login: "08:54 AM", logout: "—",        autoLogout: 0, highSession: "4h 22m", highMin: 262, sessions: 1, online: true  },
+    { name: "Arjun Mehta",   initials: "AM", role: "Manager",    login: "09:02 AM", logout: "01:15 PM", autoLogout: 1, highSession: "4h 13m", highMin: 253, sessions: 2, online: false },
+    { name: "Deepa Nair",    initials: "DN", role: "Supervisor", login: "09:18 AM", logout: "—",        autoLogout: 0, highSession: "3h 55m", highMin: 235, sessions: 1, online: true  },
+    { name: "Vikram Joshi",  initials: "VJ", role: "Agent",      login: "09:30 AM", logout: "12:00 PM", autoLogout: 2, highSession: "2h 30m", highMin: 150, sessions: 3, online: false },
+    { name: "Pooja Iyer",    initials: "PI", role: "KAM",        login: "09:45 AM", logout: "—",        autoLogout: 0, highSession: "3h 10m", highMin: 190, sessions: 1, online: true  },
+    { name: "Rahul Gupta",   initials: "RG", role: "Backend",    login: "10:00 AM", logout: "02:30 PM", autoLogout: 1, highSession: "4h 30m", highMin: 270, sessions: 2, online: false },
+    { name: "Sneha Pillai",  initials: "SP", role: "Agent",      login: "10:15 AM", logout: "—",        autoLogout: 0, highSession: "2h 45m", highMin: 165, sessions: 1, online: true  },
+    { name: "Aditya Kumar",  initials: "AK", role: "KAS",        login: "10:30 AM", logout: "01:00 PM", autoLogout: 3, highSession: "2h 30m", highMin: 150, sessions: 4, online: false },
+    { name: "Kavita Reddy",  initials: "KR", role: "MIS",        login: "10:45 AM", logout: "—",        autoLogout: 0, highSession: "2h 15m", highMin: 135, sessions: 1, online: true  },
+    { name: "Manish Tiwari", initials: "MT", role: "Agent",      login: "11:00 AM", logout: "03:45 PM", autoLogout: 0, highSession: "4h 45m", highMin: 285, sessions: 1, online: false },
+  ];
+
+  // ── DATA: Activity feed events ────────────────────────────
+  const feedEvents = [
+    { type: "invoice",  time: "11:47 AM", title: "New invoice INV-2025-04821 uploaded",           user: "Riya Sharma"   },
+    { type: "customer", time: "11:32 AM", title: "New customer 'Zomato Pvt. Ltd.' created",       user: "Arjun Mehta"   },
+    { type: "document", time: "11:18 AM", title: "3 docs attached to INV-2025-04798",             user: "Deepa Nair"    },
+    { type: "user",     time: "11:04 AM", title: "New user 'Sneha Pillai' created (Agent)",       user: "Admin"         },
+    { type: "invoice",  time: "10:51 AM", title: "INV-2025-04812 marked as collected",            user: "Vikram Joshi"  },
+    { type: "settings", time: "10:38 AM", title: "Session timeout updated to 30 minutes",         user: "Admin"         },
+    { type: "invoice",  time: "10:24 AM", title: "Bulk upload: 12 invoices imported",             user: "System Import" },
+    { type: "customer", time: "10:10 AM", title: "Bikanerwala onboarding completed",              user: "Pooja Iyer"    },
+    { type: "config",   time: "09:58 AM", title: "Email notification config updated",             user: "Admin"         },
+    { type: "document", time: "09:44 AM", title: "PDC scan doc attached to INV-2025-04789",       user: "Rahul Gupta"   },
+    { type: "user",     time: "09:31 AM", title: "Aditya Kumar role changed to KAS",              user: "Admin"         },
+    { type: "invoice",  time: "09:18 AM", title: "New invoice INV-2025-04810 uploaded",           user: "Sneha Pillai"  },
+    { type: "settings", time: "09:05 AM", title: "Credit limit threshold set for Apollo",         user: "Admin"         },
+    { type: "customer", time: "08:52 AM", title: "New customer 'Sun Pharma Ltd.' onboarded",      user: "Arjun Mehta"   },
+    { type: "document", time: "08:40 AM", title: "5 docs reclassified from limbo",               user: "Kavita Reddy"  },
+    { type: "invoice",  time: "08:28 AM", title: "New invoice INV-2025-04801 uploaded",           user: "Manish Tiwari" },
+    { type: "config",   time: "08:15 AM", title: "Backup configuration schedule updated",        user: "Admin"         },
+    { type: "user",     time: "08:05 AM", title: "New user 'Kavita Reddy' created (MIS)",         user: "Admin"         },
+    { type: "document", time: "07:55 AM", title: "Bulk doc scan: 28 files processed",            user: "System"        },
+    { type: "invoice",  time: "07:42 AM", title: "INV-2025-04795 marked as dispute",             user: "System"        },
+  ];
+
+  const categoryLabel = { invoice:"Invoice", customer:"Customer", user:"User", document:"Document", settings:"Settings", config:"Config" };
+
+  // ── CHART 1: System Health Radial (half-doughnut) ─────────
+  (() => {
+    const achieved = 24, total = 48;
+    charts.systemHealth = new Chart(
+      document.getElementById("chartSystemHealth").getContext("2d"),
+      {
+        type: "doughnut",
+        data: {
+          datasets: [{
+            data: [0, total],                       // animated in
+            backgroundColor: [brand, "rgba(255,255,255,0.18)"],
+            borderWidth: 0,
+            circumference: 180,
+            rotation: -90
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          cutout: "68%",
+          plugins: { legend: { display: false }, tooltip: { enabled: false } },
+          animation: {
+            duration: 1400, easing: "easeOutCubic",
+            onComplete() { charts.systemHealth.$needleVisible = true; charts.systemHealth.update("none"); }
+          }
+        },
+        plugins: [needlePlugin]
+      }
+    );
+    // animate to real value
+    requestAnimationFrame(() => {
+      charts.systemHealth.$needleVisible = false;
+      const ds = charts.systemHealth.data.datasets[0];
+      ds.data = [achieved, total - achieved];
+      charts.systemHealth.update();
+    });
+  })();
+
+  // ── CHART 2: User Activity by Hour (grouped bar) ──────────
+  buildChart("chartLoginsByHour", {
+    type: "bar",
+    data: {
+      labels: ["8 AM", "9 AM", "10 AM", "11 AM", "12 PM", "1 PM", "2 PM", "3 PM", "4 PM", "5 PM", "6 PM"],
+      datasets: [
+        {
+          label: "Logins",
+          data: [2, 8, 6, 4, 1, 3, 2, 3, 1, 1, 0],
+          backgroundColor: "rgba(92, 37, 141, 0.75)",
+          borderRadius: 4
+        },
+        {
+          label: "Auto-Logouts",
+          data: [0, 1, 2, 1, 3, 2, 0, 1, 1, 0, 0],
+          backgroundColor: "rgba(239, 68, 68, 0.65)",
+          borderRadius: 4
+        }
+      ]
+    },
+    options: {
+      plugins: {
+        legend: { position: "top", labels: { color: "#475569", font: { size: 11 }, boxWidth: 12 } },
+        tooltip: { backgroundColor: brandDark, titleColor: "#fff", bodyColor: "#fff", padding: 10 }
+      },
+      scales: {
+        x: { grid: { color: "rgba(148,163,184,0.2)" }, ticks: { color: "#64748b", font: { size: 10 } } },
+        y: { grid: { color: "rgba(148,163,184,0.2)" }, ticks: { color: "#64748b", font: { size: 10 } }, beginAtZero: true }
+      }
+    }
+  });
+
+  // ── CHART 3: Activity by Category (doughnut) ──────────────
+  buildChart("chartActivityCategory", {
+    type: "doughnut",
+    data: {
+      labels: ["Invoice", "Document", "Customer", "User", "Settings", "Config"],
+      datasets: [{
+        data: [38, 28, 17, 3, 5, 4],
+        backgroundColor: [palette.purple, palette.indigo, palette.blue, palette.teal, palette.amber, palette.red],
+        borderWidth: 0,
+        hoverOffset: 6
+      }]
+    },
+    options: {
+      cutout: "60%",
+      plugins: {
+        legend: { position: "bottom", labels: { color: "#475569", font: { size: 10 }, boxWidth: 10, padding: 10 } },
+        tooltip: { backgroundColor: brandDark, titleColor: "#fff", bodyColor: "#fff", padding: 10 }
+      }
+    }
+  });
+
+  // ── CHART 4: Session Duration per User (horizontal bar) ───
+  buildChart("chartSessionDuration", {
+    type: "bar",
+    data: {
+      labels: userSessions.map(u => u.name.split(" ")[0] + " " + u.name.split(" ")[1][0] + "."),
+      datasets: [
+        {
+          label: "Session Duration (min)",
+          data: userSessions.map(u => u.highMin),
+          backgroundColor: userSessions.map(u =>
+            u.online ? "rgba(92,37,141,0.72)" : "rgba(148,163,184,0.55)"
+          ),
+          borderRadius: 4,
+          borderSkipped: false
+        }
+      ]
+    },
+    options: {
+      indexAxis: "y",
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: brandDark, titleColor: "#fff", bodyColor: "#fff", padding: 10,
+          callbacks: {
+            label: (ctx) => {
+              const min = ctx.raw;
+              return ` ${Math.floor(min/60)}h ${min%60}m`;
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: "rgba(148,163,184,0.2)" },
+          ticks: {
+            color: "#64748b", font: { size: 10 },
+            callback: (v) => `${Math.floor(v/60)}h ${v%60}m`
+          },
+          min: 0
+        },
+        y: { grid: { display: false }, ticks: { color: "#64748b", font: { size: 10 } } }
+      }
+    }
+  });
+
+  // ── CHART 5: 7-Day Upload Trend (line) ───────────────────
+  buildChart("chartWeekTrend", {
+    type: "line",
+    data: {
+      labels: ["Mon 24", "Tue 25", "Wed 26", "Thu 27", "Fri 28", "Sat 29", "Sun 30"],
+      datasets: [
+        {
+          label: "Invoices",
+          data: [12, 19, 8, 22, 15, 6, 38],
+          borderColor: palette.purple,
+          backgroundColor: palette.purpleLight,
+          fill: true,
+          tension: 0.4,
+          pointRadius: 4,
+          pointBackgroundColor: palette.purple
+        },
+        {
+          label: "Documents",
+          data: [28, 45, 22, 54, 38, 14, 124],
+          borderColor: palette.indigo,
+          backgroundColor: "rgba(79,70,229,0.1)",
+          fill: true,
+          tension: 0.4,
+          pointRadius: 4,
+          pointBackgroundColor: palette.indigo
+        },
+        {
+          label: "Customers",
+          data: [2, 4, 1, 5, 3, 1, 17],
+          borderColor: palette.teal,
+          backgroundColor: palette.tealPastel,
+          fill: false,
+          tension: 0.4,
+          pointRadius: 4,
+          pointBackgroundColor: palette.teal,
+          borderDash: [4, 4]
+        }
+      ]
+    },
+    options: {
+      plugins: {
+        legend: { position: "top", labels: { color: "#475569", font: { size: 11 }, boxWidth: 12 } },
+        tooltip: { backgroundColor: brandDark, titleColor: "#fff", bodyColor: "#fff", padding: 10 }
+      },
+      scales: {
+        x: { grid: { color: "rgba(148,163,184,0.2)" }, ticks: { color: "#64748b", font: { size: 10 } } },
+        y: { grid: { color: "rgba(148,163,184,0.2)" }, ticks: { color: "#64748b", font: { size: 10 } }, beginAtZero: true }
+      }
+    }
+  });
+
+  // ── Render: Session Table ─────────────────────────────────
+  function renderSessionTable(data) {
+    const tbody = document.getElementById("sessionTableBody");
+    if (!tbody) return;
+    tbody.innerHTML = data.map(u => {
+      const alCls = u.autoLogout > 0 ? "" : " none";
+      const statusPill = u.online
+        ? `<span class="sessionPill online">Online</span>`
+        : `<span class="sessionPill offline">Offline</span>`;
+      return `
+        <tr>
+          <td>
+            <div class="userNameCell">
+              <div class="avatarCircle">${u.initials}</div>
+              <div class="userNameText">${u.name}</div>
+            </div>
+          </td>
+          <td><span class="pill" style="background:#f8fafc;color:#475569;border:1px solid #e2e8f4;font-size:10px;padding:3px 9px;">${u.role}</span></td>
+          <td>${u.login}</td>
+          <td style="color:${u.logout==='—'?'#94a3b8':'#334155'};">${u.logout}</td>
+          <td><span class="autoLogoutBadge${alCls}">${u.autoLogout}</span></td>
+          <td><strong style="font-size:12px;color:#0f172a;">${u.highSession}</strong></td>
+          <td style="color:#64748b;">${u.sessions}</td>
+          <td>${statusPill}</td>
+        </tr>`;
+    }).join("");
+  }
+
+  // ── Render: Activity Feed ─────────────────────────────────
+  function renderFeed() {
+    const list = document.getElementById("feedList");
+    if (!list) return;
+    list.innerHTML = feedEvents.map((ev, idx) => {
+      const isLast = idx === feedEvents.length - 1;
+      return `
+        <div class="feedItem">
+          <div class="feedDotCol">
+            <div class="feedDot ${ev.type}"></div>
+            ${!isLast ? '<div class="feedConnector"></div>' : ''}
+          </div>
+          <div class="feedContent">
+            <div class="feedTitle">${ev.title}</div>
+            <div class="feedMeta">
+              <span class="feedTime"><i class="bi bi-clock" style="margin-right:2px;"></i>${ev.time}</span>
+              <span class="feedCategory ${ev.type}">${categoryLabel[ev.type]}</span>
+              <span class="feedTime" style="color:#cbd5e1;">${ev.user}</span>
+            </div>
+          </div>
+        </div>`;
+    }).join("");
+  }
+
+  // ── Counter animation (matches agent dashboard) ───────────
+  const counterSelector = ".kpiValue, .kpiDelta, .actionMeta strong, .radialPercent, .radialGaugeValue, .radialSummaryValue, .chartStat strong";
+
+  const parseCounter = (text) => {
+    const match = text.match(/-?\d[\d,]*(?:\.\d+)?/);
+    if (!match) return null;
+    const raw = match[0];
+    const start = match.index || 0;
+    const end = start + raw.length;
+    const value = Number(raw.replace(/,/g, ""));
+    if (!Number.isFinite(value)) return null;
+    const decimals = raw.includes(".") ? raw.split(".")[1].length : 0;
+    return { prefix: text.slice(0, start), suffix: text.slice(end), value, decimals };
+  };
+
+  const formatCounterValue = (value, decimals) => (
+    decimals
+      ? value.toLocaleString("en-IN", { minimumFractionDigits: decimals, maximumFractionDigits: decimals })
+      : Math.round(value).toLocaleString("en-IN")
+  );
+
+  const animateCounter = (el) => {
+    if (!el || el.dataset.counted === "true") return;
+    const parsed = parseCounter(el.textContent.trim());
+    if (!parsed) return;
+    const { prefix, suffix, value, decimals } = parsed;
+    const duration = 1200;
+    const startTime = performance.now();
+    const tick = (now) => {
+      const progress = Math.min((now - startTime) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      el.textContent = `${prefix}${formatCounterValue(value * eased, decimals)}${suffix}`;
+      if (progress < 1) requestAnimationFrame(tick);
+      else el.textContent = `${prefix}${formatCounterValue(value, decimals)}${suffix}`;
+    };
+    el.dataset.counted = "true";
+    requestAnimationFrame(tick);
+  };
+
+  const animateCountersInCard = (card) => {
+    card.querySelectorAll(counterSelector).forEach(animateCounter);
+  };
+
+  // ── Card motion + counter (IntersectionObserver) ──────────
+  function initCardMotion() {
+    const cards = document.querySelectorAll(".dashboardCard");
+    cards.forEach(card => card.classList.add("cardMotion"));
+    document.querySelectorAll(".dashboardTopGrid .dashboardCard")
+      .forEach(card => card.classList.add("cardMotionTop"));
+
+    requestAnimationFrame(() => {
+      document.body.classList.remove("motion-preload");
+    });
+
+    const isInViewport = (el) => {
+      const r = el.getBoundingClientRect();
+      return r.bottom > 0 && r.top < (window.innerHeight || 0);
+    };
+
+    const animateCard = (card, delay) => {
+      setTimeout(() => {
+        card.classList.add("is-visible");
+        animateCountersInCard(card);
+      }, delay);
+    };
+
+    if ("IntersectionObserver" in window) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return;
+          animateCard(entry.target, 0);
+          observer.unobserve(entry.target);
+        });
+      }, { threshold: 0.12 });
+      cards.forEach(card => observer.observe(card));
+
+      requestAnimationFrame(() => {
+        Array.from(cards).filter(isInViewport).forEach((card, idx) => {
+          animateCard(card, idx * 50);
+        });
+      });
+    } else {
+      cards.forEach(card => card.classList.add("is-visible"));
+    }
+  }
+
+  // ── Hero date ────────────────────────────────────────────
+  function renderHeroDate() {
+    const el = document.getElementById("heroDayTag");
+    if (!el) return;
+    const now = new Date();
+    const opts = { weekday: "short", day: "numeric", month: "short", year: "numeric" };
+    el.textContent = "As of " + now.toLocaleDateString("en-IN", opts);
+  }
+
+  // ── Session filter ───────────────────────────────────────
+  window.filterSessions = (filter, btn) => {
+    document.querySelectorAll(".adminFilterTab").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    renderSessionTable(userSessions); // same mock data for all filters
+  };
+
+  // ── Refresh ──────────────────────────────────────────────
+  window.refreshDashboard = () => {
+    renderSessionTable(userSessions);
+    renderFeed();
+  };
+
+  // ── Init ─────────────────────────────────────────────────
+  document.addEventListener("DOMContentLoaded", () => {
+    renderHeroDate();
+    renderSessionTable(userSessions);
+    renderFeed();
+    initCardMotion();
+  });
+
+})();
+</script>
+</body>
+</html>

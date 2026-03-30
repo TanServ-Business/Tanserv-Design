@@ -1178,8 +1178,8 @@ body.motion-preload .dashboardCard {
 
 .chartStats {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
   margin-top: 6px;
 }
 

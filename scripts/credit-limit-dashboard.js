@@ -21,6 +21,20 @@
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;");
 
+  // ── approval data ─────────────────────────────────────────────
+  const APPROVALS_KEY = "ineburaCLApprovals";
+
+  const loadApprovals = () => {
+    try { return JSON.parse(localStorage.getItem(APPROVALS_KEY) || "[]"); } catch { return []; }
+  };
+  const saveApprovals = (arr) => {
+    try { localStorage.setItem(APPROVALS_KEY, JSON.stringify(arr)); } catch { /* */ }
+  };
+
+  const fmtDate = (iso) => new Date(iso).toLocaleString("en-IN", {
+    day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit"
+  });
+
   // ── mock credit limit data ────────────────────────────────────
   const CL_KEY = "ineburaCreditLimits";
 
@@ -227,6 +241,7 @@
     document.getElementById("kpiOverCount").textContent      = over.length;
     document.getElementById("kpiUnderVal").textContent       = under.length;
     document.getElementById("kpiUnderCount").textContent     = under.length;
+
   };
 
   // ── render table ──────────────────────────────────────────────
@@ -302,6 +317,161 @@
     }).join("");
   };
 
+  // ── approval queue ────────────────────────────────────────────
+  const renderApprovalQueue = () => {
+    const pending   = loadApprovals().filter((a) => a.status === "pending");
+    const section   = document.getElementById("clApprovalsSection");
+    const tbody     = document.getElementById("clApprovalQueueBody");
+    const emptyEl   = document.getElementById("clApprovalEmpty");
+
+    if (!section || !tbody) return;
+
+    section.style.display = pending.length ? "" : "none";
+
+    if (!pending.length) {
+      tbody.innerHTML = "";
+      if (emptyEl) emptyEl.style.display = "";
+      return;
+    }
+    if (emptyEl) emptyEl.style.display = "none";
+
+    const changePct = (curr, next) => Math.round((next - curr) / Math.abs(curr) * 100);
+
+    tbody.innerHTML = pending.map((a) => {
+      const pct     = changePct(a.currentLimit, a.proposedLimit);
+      const isUp    = pct > 0;
+      const color   = isUp ? "color:#15803d" : "color:#b91c1c";
+      const sign    = isUp ? "+" : "";
+      return `
+        <tr>
+          <td>
+            <div style="font-weight:600;color:#0f172a;font-size:13px;">${escHtml(a.custName)}</div>
+            <div style="font-size:11px;color:#94a3b8;">${escHtml(a.custCode)}</div>
+          </td>
+          <td style="font-variant-numeric:tabular-nums;">Rs. ${fmt(a.currentLimit)}</td>
+          <td style="font-weight:700;color:#5c258d;font-variant-numeric:tabular-nums;">Rs. ${fmt(a.proposedLimit)}</td>
+          <td>
+            <div class="approvalLimitChange">
+              <span style="font-size:12px;font-weight:700;${color}">${sign}${pct}%</span>
+            </div>
+          </td>
+          <td style="font-size:12px;color:#64748b;">${escHtml(a.changeReason || "—")}</td>
+          <td style="font-size:11.5px;color:#64748b;white-space:nowrap;">${fmtDate(a.submittedAt)}</td>
+          <td>
+            <div class="approvalActionBtns">
+              <button class="btnApprove" data-id="${escHtml(a.approvalId)}" type="button">
+                <i class="bi bi-check-lg" aria-hidden="true"></i> Approve
+              </button>
+              <button class="btnReject" data-id="${escHtml(a.approvalId)}" type="button">
+                <i class="bi bi-x-lg" aria-hidden="true"></i> Reject
+              </button>
+            </div>
+          </td>
+        </tr>`;
+    }).join("");
+
+    // bind approve/reject buttons
+    tbody.querySelectorAll(".btnApprove").forEach((btn) => {
+      btn.addEventListener("click", () => openReviewModal(btn.dataset.id, "approve"));
+    });
+    tbody.querySelectorAll(".btnReject").forEach((btn) => {
+      btn.addEventListener("click", () => openReviewModal(btn.dataset.id, "reject"));
+    });
+  };
+
+  // ── review modal ──────────────────────────────────────────────
+  let modalApprovalId  = null;
+  let modalAction      = null; // "approve" | "reject"
+
+  const openReviewModal = (approvalId, action) => {
+    const approval = loadApprovals().find((a) => a.approvalId === approvalId);
+    if (!approval) return;
+
+    modalApprovalId = approvalId;
+    modalAction     = action;
+
+    const modal     = document.getElementById("clReviewModal");
+    const titleEl   = document.getElementById("clModalTitleText");
+    const subtitleEl= document.getElementById("clModalSubtitleText");
+    const summaryEl = document.getElementById("clModalSummary");
+    const confirmBtn= document.getElementById("clModalConfirmBtn");
+    const commentEl = document.getElementById("clModalComment");
+
+    if (action === "approve") {
+      titleEl.textContent    = "Approve Credit Limit Change";
+      subtitleEl.textContent = "The new credit limit will be applied immediately.";
+      confirmBtn.className   = "clModalConfirmBtn approve";
+      confirmBtn.textContent = "Approve";
+    } else {
+      titleEl.textContent    = "Reject Credit Limit Change";
+      subtitleEl.textContent = "The proposed limit will not be applied.";
+      confirmBtn.className   = "clModalConfirmBtn reject";
+      confirmBtn.textContent = "Reject";
+    }
+
+    summaryEl.innerHTML = `
+      <div class="smRow"><span class="smKey">Customer</span><span class="smVal">${escHtml(approval.custName)} (${escHtml(approval.custCode)})</span></div>
+      <div class="smRow"><span class="smKey">Current Limit</span><span class="smVal">Rs. ${fmt(approval.currentLimit)}</span></div>
+      <div class="smRow"><span class="smKey">Proposed Limit</span><span class="smVal">Rs. ${fmt(approval.proposedLimit)}</span></div>
+      ${approval.changeReason ? `<div class="smRow"><span class="smKey">Reason</span><span class="smVal">${escHtml(approval.changeReason)}</span></div>` : ""}
+      <div class="smRow"><span class="smKey">Submitted</span><span class="smVal">${fmtDate(approval.submittedAt)}</span></div>`;
+
+    commentEl.value = "";
+    modal.style.display = "flex";
+    setTimeout(() => commentEl.focus(), 80);
+  };
+
+  const closeReviewModal = () => {
+    document.getElementById("clReviewModal").style.display = "none";
+    modalApprovalId = null;
+    modalAction     = null;
+  };
+
+  document.getElementById("clModalCancelBtn")?.addEventListener("click", closeReviewModal);
+  document.getElementById("clModalBackdrop")?.addEventListener("click", closeReviewModal);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && document.getElementById("clReviewModal")?.style.display !== "none") {
+      closeReviewModal();
+    }
+  });
+
+  document.getElementById("clModalConfirmBtn")?.addEventListener("click", () => {
+    if (!modalApprovalId || !modalAction) return;
+
+    const comment  = document.getElementById("clModalComment")?.value.trim() || "";
+    const approvals = loadApprovals();
+    const idx      = approvals.findIndex((a) => a.approvalId === modalApprovalId);
+    if (idx === -1) { closeReviewModal(); return; }
+
+    approvals[idx].status        = modalAction === "approve" ? "approved" : "rejected";
+    approvals[idx].reviewComment = comment;
+    approvals[idx].reviewedAt    = new Date().toISOString();
+    saveApprovals(approvals);
+
+    // if approved: apply the new credit limit in overrides
+    if (modalAction === "approve") {
+      const approval  = approvals[idx];
+      const overrides = (() => { try { return JSON.parse(localStorage.getItem(CL_KEY) || "[]"); } catch { return []; } })();
+      const existing  = overrides.find((o) => o.id === approval.custId);
+      const prevLimit = existing ? (existing.creditLimit || approval.currentLimit) : approval.currentLimit;
+      const newOverrides = overrides.filter((o) => o.id !== approval.custId);
+      newOverrides.push({
+        id:                  approval.custId,
+        creditLimit:         approval.proposedLimit,
+        previousCreditLimit: prevLimit,
+        changeReason:        approval.changeReason,
+        changedAt:           new Date().toISOString(),
+      });
+      try { localStorage.setItem(CL_KEY, JSON.stringify(newOverrides)); } catch { /* */ }
+    }
+
+    closeReviewModal();
+    const data = loadData();
+    renderKPIs(data);
+    renderTable(data);
+    renderApprovalQueue();
+  });
+
   // ── card filter interaction ───────────────────────────────────
   const cards = document.querySelectorAll("[data-filter]");
   cards.forEach((card) => {
@@ -337,6 +507,7 @@
   const data = loadData();
   renderKPIs(data);
   renderTable(data);
+  renderApprovalQueue();
 
   // fade-in cards
   requestAnimationFrame(() => {
