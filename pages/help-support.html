@@ -39,6 +39,7 @@
         <span class="kbSearchTag" data-query="export">Export report</span>
         <span class="kbSearchTag" data-query="password">Password reset</span>
       </div>
+      <div class="kbOrDivider"><span>or</span></div>
       <div class="kbTicketQuickActions">
         <button class="kbTicketActionBtn primary" type="button" onclick="openCreateTicket()">
           <i class="bi bi-plus-lg"></i> Create Ticket
@@ -61,6 +62,9 @@
       <button class="hsTab" data-tab="tickets" id="tabTickets">
         <i class="bi bi-ticket-perforated"></i> My Tickets
         <span class="hsBadge" id="openTicketCount">0</span>
+      </button>
+      <button class="hsTab" data-tab="feedback" id="tabFeedback">
+        <i class="bi bi-chat-square-heart"></i> Feedback
       </button>
     </div>
 
@@ -184,6 +188,89 @@
       </div><!-- /ticketContent -->
 
     </div><!-- /panelTickets -->
+
+    <!-- ── Feedback Panel ──────────────────────────────────── -->
+    <div id="panelFeedback" class="hsPanel" style="display:none;">
+
+      <!-- Success state -->
+      <div id="feedbackSuccess" style="display:none;">
+        <div class="feedbackSuccessCard">
+          <div class="feedbackSuccessIcon"><i class="bi bi-check-circle-fill"></i></div>
+          <div class="feedbackSuccessTitle">Thank you for your feedback!</div>
+          <div class="feedbackSuccessText">Your response has been recorded. We use your feedback to improve the platform experience.</div>
+          <button class="btnPrimary" style="margin-top:20px;" onclick="resetFeedbackForm()">Submit Another</button>
+        </div>
+      </div>
+
+      <!-- Feedback form -->
+      <div id="feedbackFormWrap">
+        <div class="feedbackIntro">
+          <div class="feedbackIntroTitle">Share Your Feedback</div>
+          <div class="feedbackIntroText">Help us improve your experience. Your feedback is reviewed by our product team.</div>
+        </div>
+
+        <!-- Star rating -->
+        <div class="feedbackSection">
+          <div class="kbSectionLabel" style="margin-bottom:12px;">Overall Experience</div>
+          <div class="feedbackStarRow" id="feedbackStarRow">
+            <button class="feedbackStar" data-value="1" type="button"><i class="bi bi-star"></i></button>
+            <button class="feedbackStar" data-value="2" type="button"><i class="bi bi-star"></i></button>
+            <button class="feedbackStar" data-value="3" type="button"><i class="bi bi-star"></i></button>
+            <button class="feedbackStar" data-value="4" type="button"><i class="bi bi-star"></i></button>
+            <button class="feedbackStar" data-value="5" type="button"><i class="bi bi-star"></i></button>
+          </div>
+          <div class="feedbackStarLabel" id="feedbackStarLabel">Select a rating</div>
+        </div>
+
+        <!-- Type, module, subject, message -->
+        <div class="feedbackSection">
+          <div class="hsFormRow" style="margin-bottom:12px;">
+            <div class="hsFormField">
+              <label class="hsLabel" for="feedbackType">Feedback Type</label>
+              <select class="hsSelect" id="feedbackType">
+                <option value="">Select type…</option>
+                <option value="General">General</option>
+                <option value="Feature Request">Feature Request</option>
+                <option value="Bug Report">Bug Report</option>
+                <option value="Compliment">Compliment</option>
+              </select>
+            </div>
+            <div class="hsFormField">
+              <label class="hsLabel" for="feedbackModule">Module / Area</label>
+              <select class="hsSelect" id="feedbackModule">
+                <option value="">Select module…</option>
+                <option value="Dashboard">Dashboard</option>
+                <option value="Invoice &amp; Billing">Invoice &amp; Billing</option>
+                <option value="Payments &amp; Collections">Payments &amp; Collections</option>
+                <option value="Documents &amp; Files">Documents &amp; Files</option>
+                <option value="Account &amp; Users">Account &amp; Users</option>
+                <option value="Reports">Reports</option>
+                <option value="General / Other">General / Other</option>
+              </select>
+            </div>
+          </div>
+          <div class="hsFormField" style="margin-bottom:12px;">
+            <label class="hsLabel" for="feedbackSubject">Subject <span class="feedbackOptionalLabel">(optional)</span></label>
+            <input type="text" class="hsInput" id="feedbackSubject" placeholder="Brief description of your feedback…" maxlength="120" />
+          </div>
+          <div class="hsFormField" style="margin-bottom:0;">
+            <label class="hsLabel" for="feedbackMessage">Your Feedback</label>
+            <textarea class="hsTextarea" id="feedbackMessage" placeholder="Tell us what's working well, what could be improved, or anything else on your mind…" rows="5"></textarea>
+          </div>
+        </div>
+
+        <!-- Submit -->
+        <div class="feedbackFormActions">
+          <button class="btnPrimary" onclick="submitFeedback()">
+            <i class="bi bi-send" style="margin-right:5px;"></i>Submit Feedback
+          </button>
+        </div>
+      </div>
+
+      <!-- Past feedback -->
+      <div id="feedbackHistory"></div>
+
+    </div><!-- /panelFeedback -->
 
   </div><!-- /helpSupportBody -->
 
@@ -673,6 +760,9 @@
       renderTickets(currentTicketFilter);
       renderTicketKpis();
     }
+    if (tabId === "feedback") {
+      renderFeedbackHistory();
+    }
   }
 
   window.switchTab = switchTab;
@@ -1085,6 +1175,110 @@
     }
   });
 
+  // ── Feedback ─────────────────────────────────────────────
+  const FEEDBACK_KEY = "inebura_feedback";
+  let selectedRating = 0;
+  const starLabels = ["", "Poor", "Fair", "Good", "Very Good", "Excellent"];
+
+  function highlightStars(upTo) {
+    document.querySelectorAll(".feedbackStar").forEach(s => {
+      const v = parseInt(s.dataset.value);
+      s.querySelector("i").className = v <= upTo ? "bi bi-star-fill" : "bi bi-star";
+      s.classList.toggle("active", v <= upTo);
+    });
+  }
+
+  const starRow = document.getElementById("feedbackStarRow");
+  const starLbl = document.getElementById("feedbackStarLabel");
+
+  starRow.addEventListener("mouseover", (e) => {
+    const star = e.target.closest(".feedbackStar");
+    if (!star) return;
+    const val = parseInt(star.dataset.value);
+    highlightStars(val);
+    starLbl.textContent = starLabels[val];
+  });
+
+  starRow.addEventListener("mouseout", () => {
+    highlightStars(selectedRating);
+    starLbl.textContent = selectedRating ? starLabels[selectedRating] : "Select a rating";
+  });
+
+  starRow.addEventListener("click", (e) => {
+    const star = e.target.closest(".feedbackStar");
+    if (!star) return;
+    selectedRating = parseInt(star.dataset.value);
+    highlightStars(selectedRating);
+    starLbl.textContent = starLabels[selectedRating];
+  });
+
+  window.submitFeedback = () => {
+    const type    = document.getElementById("feedbackType").value;
+    const module  = document.getElementById("feedbackModule").value;
+    const subject = document.getElementById("feedbackSubject").value.trim();
+    const message = document.getElementById("feedbackMessage").value.trim();
+
+    if (!selectedRating) {
+      starLbl.textContent = "Please select a rating";
+      starLbl.style.color = "#ef4444";
+      return;
+    }
+    if (!message) {
+      document.getElementById("feedbackMessage").focus();
+      return;
+    }
+
+    const allFeedback = JSON.parse(localStorage.getItem(FEEDBACK_KEY) || "[]");
+    const now = new Date();
+    allFeedback.unshift({
+      rating:      selectedRating,
+      type:        type || "General",
+      module:      module || "General / Other",
+      subject,
+      message,
+      submittedBy: currentUserName,
+      submittedAt: now.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) +
+                   ", " + now.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })
+    });
+    localStorage.setItem(FEEDBACK_KEY, JSON.stringify(allFeedback));
+
+    document.getElementById("feedbackFormWrap").style.display = "none";
+    document.getElementById("feedbackSuccess").style.display = "";
+    renderFeedbackHistory();
+  };
+
+  window.resetFeedbackForm = () => {
+    selectedRating = 0;
+    ["feedbackType","feedbackModule","feedbackSubject","feedbackMessage"].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = "";
+    });
+    starLbl.textContent = "Select a rating";
+    starLbl.style.color = "";
+    highlightStars(0);
+    document.getElementById("feedbackSuccess").style.display = "none";
+    document.getElementById("feedbackFormWrap").style.display = "";
+  };
+
+  function renderFeedbackHistory() {
+    const allFeedback = JSON.parse(localStorage.getItem(FEEDBACK_KEY) || "[]");
+    const container = document.getElementById("feedbackHistory");
+    if (!allFeedback.length) { container.innerHTML = ""; return; }
+    container.innerHTML = `
+      <div class="kbSectionLabel" style="margin-bottom:12px;margin-top:32px;">Your Past Feedback</div>
+      ${allFeedback.map(f => `
+        <div class="feedbackHistoryCard">
+          <div class="feedbackHistoryTop">
+            <span class="feedbackHistoryStars">${"★".repeat(f.rating)}${"☆".repeat(5 - f.rating)}</span>
+            <span class="feedbackTypePill">${escHtml(f.type)}</span>
+            <span class="feedbackModulePill">${escHtml(f.module)}</span>
+            <span class="feedbackHistoryDate">${escHtml(f.submittedAt)}</span>
+          </div>
+          ${f.subject ? `<div class="feedbackHistorySubject">${escHtml(f.subject)}</div>` : ""}
+          <div class="feedbackHistoryMsg">${escHtml(f.message)}</div>
+        </div>`).join("")}`;
+  }
+
   // ── Init ────────────────────────────────────────────────
   document.addEventListener("DOMContentLoaded", () => {
     // Render FAQ articles
@@ -1092,6 +1286,7 @@
     document.getElementById("kbFaqGrid").innerHTML = faqArticles.map(articleCardHTML).join("");
     document.getElementById("panelKb").style.display = "";
     initRoleUI();
+    renderFeedbackHistory();
   });
 
 })();

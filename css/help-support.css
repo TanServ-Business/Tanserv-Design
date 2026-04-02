@@ -116,8 +116,32 @@
   background: rgba(255,255,255,0.28);
 }
 
+.kbOrDivider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 12px auto 0;
+  max-width: 320px;
+}
+
+.kbOrDivider::before,
+.kbOrDivider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: rgba(255,255,255,0.25);
+}
+
+.kbOrDivider span {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+}
+
 .kbTicketQuickActions {
-  margin-top: 14px;
+  margin-top: 12px;
   display: inline-flex;
   gap: 10px;
   flex-wrap: wrap;
@@ -164,7 +188,7 @@
   display: flex;
   gap: 4px;
   border-bottom: 2px solid #e2e8f4;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
 }
 
 .hsTab {
@@ -622,7 +646,7 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 12px;
-  margin-bottom: 20px;
+  margin-bottom: 12px;
 }
 
 .ticketTopBar {
@@ -1201,4 +1225,181 @@
     width: 100%;
     justify-content: center;
   }
+}
+
+/* =========================================================
+   Feedback Panel
+   ========================================================= */
+
+.feedbackIntro {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-bottom: 16px;
+}
+
+.feedbackIntroTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 4px;
+}
+
+.feedbackIntroText {
+  font-size: 13px;
+  color: #64748b;
+  line-height: 1.5;
+}
+
+.feedbackSection {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-bottom: 16px;
+}
+
+.feedbackStarRow {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.feedbackStar {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 6px;
+  color: #cbd5e1;
+  font-size: 26px;
+  line-height: 1;
+  transition: color 0.12s, transform 0.1s;
+}
+
+.feedbackStar:hover,
+.feedbackStar.active {
+  color: #f59e0b;
+}
+
+.feedbackStar:hover {
+  transform: scale(1.2);
+}
+
+.feedbackStarLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: #94a3b8;
+  letter-spacing: 0.04em;
+  min-height: 18px;
+  transition: color 0.15s;
+}
+
+.feedbackOptionalLabel {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  color: #94a3b8;
+}
+
+.feedbackFormActions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 4px;
+}
+
+/* Success state */
+.feedbackSuccessCard {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 56px 24px;
+  text-align: center;
+}
+
+.feedbackSuccessIcon {
+  font-size: 52px;
+  color: #10b981;
+  margin-bottom: 16px;
+  line-height: 1;
+}
+
+.feedbackSuccessTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 8px;
+}
+
+.feedbackSuccessText {
+  font-size: 13px;
+  color: #64748b;
+  line-height: 1.6;
+  max-width: 380px;
+  margin: 0 auto;
+}
+
+/* Past feedback history */
+.feedbackHistoryCard {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin-bottom: 12px;
+}
+
+.feedbackHistoryTop {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.feedbackHistoryStars {
+  color: #f59e0b;
+  font-size: 14px;
+  letter-spacing: 1px;
+  flex-shrink: 0;
+}
+
+.feedbackTypePill {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 20px;
+  letter-spacing: 0.04em;
+  background: rgba(92,37,141,0.1);
+  color: #5c258d;
+  flex-shrink: 0;
+}
+
+.feedbackModulePill {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 20px;
+  letter-spacing: 0.04em;
+  background: rgba(59,79,184,0.1);
+  color: #3b4fb8;
+  flex-shrink: 0;
+}
+
+.feedbackHistoryDate {
+  font-size: 11px;
+  color: #94a3b8;
+  margin-left: auto;
+}
+
+.feedbackHistorySubject {
+  font-size: 13px;
+  font-weight: 600;
+  color: #0f172a;
+  margin-bottom: 4px;
+}
+
+.feedbackHistoryMsg {
+  font-size: 13px;
+  color: #475569;
+  line-height: 1.6;
 }

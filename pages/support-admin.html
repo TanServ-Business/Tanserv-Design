@@ -35,6 +35,21 @@
         <h1 style="font-size:22px;font-weight:800;color:#0f172a;margin:0;">Support Admin Portal</h1>
       </div>
 
+      <!-- Panel Tabs -->
+      <div class="saPanelTabs" id="saPanelTabs">
+        <button class="saPanelTab active" data-satab="tickets">
+          <i class="bi bi-ticket-perforated"></i> Tickets
+          <span class="saTabBadge" id="saTabTicketCount">0</span>
+        </button>
+        <button class="saPanelTab" data-satab="feedback">
+          <i class="bi bi-chat-square-heart"></i> Feedback
+          <span class="saTabBadge" id="saTabFeedbackCount">0</span>
+        </button>
+      </div>
+
+      <!-- ── Tickets Panel ──────────────────────────────── -->
+      <div id="panelSaTickets">
+
       <!-- KPI Row -->
       <div class="row g-3 mb-4">
         <div class="col-6 col-md-3">
@@ -99,6 +114,122 @@
         <!-- populated by JS -->
       </div>
 
+      </div><!-- /panelSaTickets -->
+
+      <!-- ── Feedback Analysis Panel ───────────────────── -->
+      <div id="panelSaFeedback" style="display:none;">
+
+        <!-- KPI Row -->
+        <div class="row g-3 mb-4">
+          <div class="col-6 col-md-3">
+            <div class="dashboardCard kpiCard cardMotion">
+              <div class="kpiLabel"><i class="bi bi-chat-square-text me-1"></i>Total Feedback</div>
+              <div class="kpiValue" id="fbKpiTotal">0</div>
+              <div class="kpiSub">All responses</div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="dashboardCard kpiCard cardMotion accentTeal">
+              <div class="kpiLabel"><i class="bi bi-star-half me-1"></i>Avg Rating</div>
+              <div class="kpiValue" id="fbKpiAvg">—</div>
+              <div class="kpiSub">Out of 5 stars</div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="dashboardCard kpiCard cardMotion accentBlue">
+              <div class="kpiLabel"><i class="bi bi-hand-thumbs-up me-1"></i>Positive</div>
+              <div class="kpiValue" id="fbKpiPositive">0</div>
+              <div class="kpiSub">4–5 star ratings</div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="dashboardCard kpiCard cardMotion accentAmber">
+              <div class="kpiLabel"><i class="bi bi-exclamation-circle me-1"></i>Needs Attention</div>
+              <div class="kpiValue" id="fbKpiAttention">0</div>
+              <div class="kpiSub">1–2 star ratings</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Analysis: Module + Type/Rating side by side -->
+        <div class="saFbTwoCol">
+
+          <!-- Module Analysis -->
+          <div class="saFbSection">
+            <div class="saFbSectionTitle">
+              <i class="bi bi-grid-3x3-gap"></i> Module Analysis
+            </div>
+            <div id="saFeedbackModuleGrid"></div>
+          </div>
+
+          <!-- Right col: Type + Rating distribution -->
+          <div style="display:flex;flex-direction:column;gap:16px;">
+
+            <!-- Type Distribution -->
+            <div class="saFbSection">
+              <div class="saFbSectionTitle">
+                <i class="bi bi-pie-chart"></i> By Feedback Type
+              </div>
+              <div id="saFeedbackTypeChart"></div>
+            </div>
+
+            <!-- Rating Distribution -->
+            <div class="saFbSection">
+              <div class="saFbSectionTitle">
+                <i class="bi bi-bar-chart-line"></i> Rating Distribution
+              </div>
+              <div id="saFeedbackRatingChart"></div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- All Feedback (filterable) -->
+        <div class="saFbSection" style="margin-top:16px;">
+          <div class="saFbSectionHeader">
+            <div class="saFbSectionTitle" style="margin-bottom:0;">
+              <i class="bi bi-list-ul"></i> All Feedback
+            </div>
+            <div class="saFbFilters">
+              <details class="filterDropdown" id="fbDropType">
+                <summary>Type <span class="filterBadge" id="fbBadgeType">All</span></summary>
+                <div class="filterMenu">
+                  <button class="filterItem active" type="button" data-fbtype="">All Types</button>
+                  <button class="filterItem" type="button" data-fbtype="General">General</button>
+                  <button class="filterItem" type="button" data-fbtype="Feature Request">Feature Request</button>
+                  <button class="filterItem" type="button" data-fbtype="Bug Report">Bug Report</button>
+                  <button class="filterItem" type="button" data-fbtype="Compliment">Compliment</button>
+                </div>
+              </details>
+              <details class="filterDropdown" id="fbDropModule">
+                <summary>Module <span class="filterBadge" id="fbBadgeModule">All</span></summary>
+                <div class="filterMenu">
+                  <button class="filterItem active" type="button" data-fbmod="">All Modules</button>
+                  <button class="filterItem" type="button" data-fbmod="Dashboard">Dashboard</button>
+                  <button class="filterItem" type="button" data-fbmod="Invoice &amp; Billing">Invoice &amp; Billing</button>
+                  <button class="filterItem" type="button" data-fbmod="Payments &amp; Collections">Payments &amp; Collections</button>
+                  <button class="filterItem" type="button" data-fbmod="Documents &amp; Files">Documents &amp; Files</button>
+                  <button class="filterItem" type="button" data-fbmod="Account &amp; Users">Account &amp; Users</button>
+                  <button class="filterItem" type="button" data-fbmod="Reports">Reports</button>
+                  <button class="filterItem" type="button" data-fbmod="General / Other">General / Other</button>
+                </div>
+              </details>
+              <details class="filterDropdown" id="fbDropSort">
+                <summary>Sort <span class="filterBadge" id="fbBadgeSort">Newest</span></summary>
+                <div class="filterMenu">
+                  <button class="filterItem active" type="button" data-fbsort="newest">Newest First</button>
+                  <button class="filterItem" type="button" data-fbsort="oldest">Oldest First</button>
+                  <button class="filterItem" type="button" data-fbsort="rating-high">Highest Rating</button>
+                  <button class="filterItem" type="button" data-fbsort="rating-low">Lowest Rating</button>
+                </div>
+              </details>
+            </div>
+          </div>
+          <div id="saFeedbackList"></div>
+        </div>
+
+      </div><!-- /panelSaFeedback -->
+
     </div><!-- /saMain -->
   </div><!-- /supportAdminPage -->
 
@@ -111,9 +242,29 @@
       <!-- ── Header bar (full width) ───────────────────── -->
       <div class="saTwoPanelHeader">
         <div class="saTwoPanelTitle" id="saModalTitle">Ticket Details</div>
-        <button class="saTwoPanelClose" id="saModalClose" aria-label="Close">
-          <i class="bi bi-x-lg"></i>
-        </button>
+        <div class="saTwoPanelHeaderActions">
+          <details class="filterDropdown saStatusDropdown" id="saStatusDropdown">
+            <summary>
+              <span class="saHdrStatusDot" id="saHdrStatusDot"></span>
+              Change Status
+              <span class="filterBadge saStatusBadgeHdr" id="saStatusBadgeHdr">—</span>
+            </summary>
+            <div class="filterMenu">
+              <button class="filterItem saStatusItem" type="button" data-newstatus="open">
+                <span class="saHdrStatusDot open"></span> Open
+              </button>
+              <button class="filterItem saStatusItem" type="button" data-newstatus="in-progress">
+                <span class="saHdrStatusDot in-progress"></span> In Progress
+              </button>
+              <button class="filterItem saStatusItem" type="button" data-newstatus="closed">
+                <span class="saHdrStatusDot closed"></span> Closed
+              </button>
+            </div>
+          </details>
+          <button class="saTwoPanelClose" id="saModalClose" aria-label="Close">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
       </div>
 
       <!-- ── Body: left info + right chat ──────────────── -->
@@ -184,26 +335,6 @@
             </div>
           </div>
 
-          <div class="saInfoDivider"></div>
-
-          <!-- Status change -->
-          <div class="saInfoSection">
-            <div class="saInfoSectionLabel">Change Status</div>
-            <select class="saStatusSelect" id="saStatusSelect" style="width:100%;">
-              <option value="">— Select —</option>
-              <option value="open">Open</option>
-              <option value="in-progress">In Progress</option>
-              <option value="closed">Closed</option>
-            </select>
-          </div>
-
-          <!-- Reopen (shown when closed) -->
-          <div class="d-none" id="saReopenWrap" style="margin-top:12px;">
-            <button class="btnSecondary" id="saReopenBtn" style="font-size:12px;padding:7px 18px;width:100%;">
-              <i class="bi bi-arrow-counterclockwise"></i> Reopen Ticket
-            </button>
-          </div>
-
         </div><!-- /left -->
 
         <!-- RIGHT — chat window -->
@@ -231,13 +362,39 @@
 
           <!-- Closed notice -->
           <div class="saChatClosedBar d-none" id="saClosedBar">
-            <i class="bi bi-lock"></i> This ticket is closed. Reopen it to reply.
+            <span><i class="bi bi-lock"></i> This ticket is closed.</span>
+            <button class="saReopenBtn" id="saReopenBtn" type="button">
+              <i class="bi bi-arrow-counterclockwise"></i> Reopen Ticket
+            </button>
           </div>
 
         </div><!-- /right -->
 
       </div><!-- /saTwoPanelBody -->
     </div><!-- /saTwoPanel -->
+  </div>
+
+  <!-- ── Status Change Confirmation ──────────────────────── -->
+  <div class="saConfirmOverlay" id="saStatusConfirm" role="dialog" aria-modal="true">
+    <div class="saConfirmDialog">
+      <div class="saConfirmIconWrap">
+        <i class="bi bi-arrow-repeat saConfirmIcon"></i>
+      </div>
+      <div class="saConfirmTitle">Change Ticket Status?</div>
+      <div class="saConfirmBody">
+        Ticket status will be updated from
+        <span class="saConfirmFromBadge" id="saConfirmFrom"></span>
+        to
+        <span class="saConfirmToBadge" id="saConfirmTo"></span>.
+      </div>
+      <div class="saConfirmNote" id="saConfirmNote"></div>
+      <div class="saConfirmActions">
+        <button class="btnSecondary" id="saConfirmCancel">Cancel</button>
+        <button class="btnPrimary" id="saConfirmOk">
+          <i class="bi bi-check-lg" style="margin-right:5px;"></i>Confirm
+        </button>
+      </div>
+    </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -432,9 +589,10 @@
       const isClosed = t.status === "closed";
       document.getElementById("saReplyFormWrap").classList.toggle("d-none", isClosed);
       document.getElementById("saClosedBar").classList.toggle("d-none", !isClosed);
-      document.getElementById("saReopenWrap").classList.toggle("d-none", !isClosed);
 
-      document.getElementById("saStatusSelect").value = "";
+      // Update header status dropdown
+      updateStatusDropdownUI(t.status);
+
       document.getElementById("saReplyInput").value = "";
       clearFileState();
 
@@ -488,26 +646,10 @@
       tickets[idx].discussion.push(newMsg);
       tickets[idx].lastActivity = new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
 
-      const newStatus = document.getElementById("saStatusSelect").value;
-      if (newStatus) tickets[idx].status = newStatus;
-
       saveTickets(tickets);
       updateKPIs();
       renderList();
       openModal(activeTicketId);   // re-render modal with new message
-    });
-
-    /* ─── Reopen ─────────────────────────────────────────── */
-    document.getElementById("saReopenBtn").addEventListener("click", () => {
-      if (!activeTicketId) return;
-      const tickets = getTickets();
-      const idx = tickets.findIndex(t => t.id === activeTicketId);
-      if (idx === -1) return;
-      tickets[idx].status = "open";
-      saveTickets(tickets);
-      updateKPIs();
-      renderList();
-      openModal(activeTicketId);
     });
 
     /* ─── Send on Enter key ──────────────────────────────── */
@@ -522,6 +664,108 @@
     document.getElementById("saModalClose").addEventListener("click", closeModal);
     document.getElementById("saTicketModal").addEventListener("click", e => {
       if (e.target === document.getElementById("saTicketModal")) closeModal();
+    });
+
+    /* ─── Status dropdown UI helper ──────────────────────── */
+    const statusColors = {
+      open:        { dot: "#f59e0b", badge: "ticketPill open"        },
+      "in-progress": { dot: "#2563eb", badge: "ticketPill in-progress" },
+      closed:      { dot: "#22c55e", badge: "ticketPill closed"      },
+    };
+
+    function updateStatusDropdownUI(status) {
+      const dot    = document.getElementById("saHdrStatusDot");
+      const badge  = document.getElementById("saStatusBadgeHdr");
+      const col    = statusColors[status];
+      dot.style.background = col ? col.dot : "#94a3b8";
+      badge.textContent    = statusLabel[status] || status;
+      badge.className      = "filterBadge saStatusBadgeHdr";
+      if (col) {
+        const pillClass = col.badge.split(" ")[1];
+        badge.classList.add("saStatusBadgeStyled", pillClass);
+      }
+      // Mark current item active in the menu
+      document.querySelectorAll(".saStatusItem").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.newstatus === status);
+      });
+    }
+
+    /* ─── Status change via header dropdown ──────────────── */
+    let pendingStatus = null;
+
+    document.getElementById("saStatusDropdown").addEventListener("click", e => {
+      const btn = e.target.closest(".saStatusItem");
+      if (!btn) return;
+      const newStatus = btn.dataset.newstatus;
+      if (!activeTicketId || newStatus === getCurrentTicketStatus()) {
+        document.getElementById("saStatusDropdown").removeAttribute("open");
+        return;
+      }
+      pendingStatus = newStatus;
+      document.getElementById("saStatusDropdown").removeAttribute("open");
+      openStatusConfirm(getCurrentTicketStatus(), newStatus);
+    });
+
+    function getCurrentTicketStatus() {
+      const t = getTickets().find(x => x.id === activeTicketId);
+      return t ? t.status : "";
+    }
+
+    /* ─── Confirmation dialog ────────────────────────────── */
+    function openStatusConfirm(fromStatus, toStatus) {
+      const fromEl = document.getElementById("saConfirmFrom");
+      const toEl   = document.getElementById("saConfirmTo");
+      const noteEl = document.getElementById("saConfirmNote");
+
+      fromEl.textContent = statusLabel[fromStatus] || fromStatus;
+      fromEl.className   = `saConfirmFromBadge ticketPill ${fromStatus}`;
+      toEl.textContent   = statusLabel[toStatus] || toStatus;
+      toEl.className     = `saConfirmToBadge ticketPill ${toStatus}`;
+
+      const notes = {
+        closed:       "The client will no longer be able to reply until the ticket is reopened.",
+        open:         "The ticket will be moved back to the open queue.",
+        "in-progress": "The ticket will be marked as actively being worked on.",
+      };
+      noteEl.textContent = notes[toStatus] || "";
+      noteEl.style.display = notes[toStatus] ? "" : "none";
+
+      document.getElementById("saStatusConfirm").classList.add("open");
+    }
+
+    document.getElementById("saConfirmCancel").addEventListener("click", () => {
+      document.getElementById("saStatusConfirm").classList.remove("open");
+      pendingStatus = null;
+    });
+
+    document.getElementById("saConfirmOk").addEventListener("click", () => {
+      if (!pendingStatus || !activeTicketId) return;
+      const tickets = getTickets();
+      const idx = tickets.findIndex(t => t.id === activeTicketId);
+      if (idx !== -1) {
+        tickets[idx].status = pendingStatus;
+        tickets[idx].lastActivity = new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+        saveTickets(tickets);
+        updateKPIs();
+        renderList();
+        openModal(activeTicketId);  // re-render modal with updated status
+      }
+      document.getElementById("saStatusConfirm").classList.remove("open");
+      pendingStatus = null;
+    });
+
+    document.getElementById("saStatusConfirm").addEventListener("click", e => {
+      if (e.target === document.getElementById("saStatusConfirm"))  {
+        document.getElementById("saStatusConfirm").classList.remove("open");
+        pendingStatus = null;
+      }
+    });
+
+    /* ─── Reopen button in closed bar ────────────────────── */
+    document.getElementById("saReopenBtn").addEventListener("click", () => {
+      if (!activeTicketId) return;
+      pendingStatus = "open";
+      openStatusConfirm("closed", "open");
     });
 
     /* ─── Filter tabs ────────────────────────────────────── */
@@ -555,6 +799,215 @@
       renderList();
     });
 
+/* ─── Panel tab switching ────────────────────────────── */
+    document.getElementById("saPanelTabs").addEventListener("click", e => {
+      const btn = e.target.closest(".saPanelTab");
+      if (!btn) return;
+      const tab = btn.dataset.satab;
+      document.querySelectorAll(".saPanelTab").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      document.getElementById("panelSaTickets").style.display  = tab === "tickets"  ? "" : "none";
+      document.getElementById("panelSaFeedback").style.display = tab === "feedback" ? "" : "none";
+      if (tab === "feedback") renderFeedbackPanel();
+    });
+
+    /* ─── Feedback data ──────────────────────────────────── */
+    const FEEDBACK_KEY = "inebura_feedback";
+
+    const seedFeedback = [
+      { rating: 5, type: "Compliment",      module: "Dashboard",              subject: "Love the new dashboard",        message: "The layout is very intuitive and helps me quickly see what needs attention.", submittedBy: "Arjun Sharma",  submittedAt: "29 Mar 2026, 10:30 AM" },
+      { rating: 4, type: "General",          module: "Invoice & Billing",       subject: "",                              message: "Invoice upload is smooth. Would appreciate a batch validation feature.", submittedBy: "Priya Nair",    submittedAt: "29 Mar 2026, 02:15 PM" },
+      { rating: 2, type: "Bug Report",       module: "Reports",                 subject: "Export button not working",     message: "Clicking Export on the collections report does nothing. Tried Chrome and Edge.", submittedBy: "Rahul Gupta",   submittedAt: "28 Mar 2026, 04:00 PM" },
+      { rating: 3, type: "Feature Request",  module: "Payments & Collections",  subject: "Bulk PTP entry needed",         message: "It would be great to set PTP for multiple invoices at once instead of one by one.", submittedBy: "Sneha Pillai",  submittedAt: "28 Mar 2026, 11:00 AM" },
+      { rating: 5, type: "Compliment",       module: "Documents & Files",       subject: "",                              message: "Document management is excellent. Love how easy it is to attach and find docs.", submittedBy: "Kiran Menon",   submittedAt: "27 Mar 2026, 09:45 AM" },
+      { rating: 1, type: "Bug Report",       module: "Account & Users",         subject: "User invite emails failing",    message: "When I invite a new user the invite email is not received. Tried 3 times with different emails.", submittedBy: "Priya Nair",    submittedAt: "27 Mar 2026, 03:00 PM" },
+      { rating: 4, type: "Feature Request",  module: "Dashboard",               subject: "Dark mode support",             message: "Would love a dark mode option for late-night work sessions. Eyes get tired.", submittedBy: "Arjun Sharma",  submittedAt: "26 Mar 2026, 05:00 PM" },
+      { rating: 3, type: "General",          module: "Invoice & Billing",       subject: "",                              message: "The aging view is useful but takes a while to load with many invoices.", submittedBy: "Rahul Gupta",   submittedAt: "26 Mar 2026, 10:00 AM" },
+      { rating: 5, type: "Compliment",       module: "Payments & Collections",  subject: "PTP reminders are great",       message: "PTP reminders arriving on time have really helped our collections team stay on top of follow-ups.", submittedBy: "Kiran Menon",   submittedAt: "25 Mar 2026, 02:00 PM" },
+      { rating: 4, type: "General",          module: "Reports",                 subject: "",                              message: "Reports are comprehensive. Adding a week-on-week comparison chart would be a great addition.", submittedBy: "Sneha Pillai",  submittedAt: "25 Mar 2026, 09:30 AM" },
+      { rating: 2, type: "Bug Report",       module: "Documents & Files",       subject: "Limbo filter not persisting",   message: "The filter on Limbo documents doesn't persist when navigating back. Needs fixing.", submittedBy: "Arjun Sharma",  submittedAt: "24 Mar 2026, 11:30 AM" },
+      { rating: 5, type: "Compliment",       module: "General / Other",         subject: "Great product overall",         message: "The platform has significantly improved our collections process. The whole team is very happy.", submittedBy: "Priya Nair",    submittedAt: "24 Mar 2026, 03:15 PM" },
+    ];
+
+    const getFeedback = () => {
+      const stored = localStorage.getItem(FEEDBACK_KEY);
+      if (!stored || !JSON.parse(stored).length) {
+        localStorage.setItem(FEEDBACK_KEY, JSON.stringify(seedFeedback));
+        return seedFeedback;
+      }
+      return JSON.parse(stored);
+    };
+
+    let fbFilterType   = "";
+    let fbFilterModule = "";
+    let fbFilterSort   = "newest";
+
+    const fbTypeColors = {
+      "General":         { bg: "rgba(92,37,141,0.10)",  color: "#5c258d" },
+      "Feature Request": { bg: "rgba(59,79,184,0.10)",  color: "#3b4fb8" },
+      "Bug Report":      { bg: "rgba(220,38,38,0.10)",  color: "#dc2626" },
+      "Compliment":      { bg: "rgba(5,150,105,0.10)",  color: "#059669" },
+    };
+
+    const moduleIcons = {
+      "Dashboard":              "bi-speedometer2",
+      "Invoice & Billing":      "bi-file-text",
+      "Payments & Collections": "bi-cash-stack",
+      "Documents & Files":      "bi-folder2-open",
+      "Account & Users":        "bi-person-gear",
+      "Reports":                "bi-bar-chart-line",
+      "General / Other":        "bi-grid-3x3-gap",
+    };
+
+    const ratingBarColor = r => r >= 4 ? "#10b981" : r >= 3 ? "#f59e0b" : "#ef4444";
+
+    function renderFeedbackPanel() {
+      const allFeedback = getFeedback();
+      const total = allFeedback.length;
+
+      // KPIs
+      const avg      = total ? (allFeedback.reduce((s, f) => s + f.rating, 0) / total) : 0;
+      const positive = allFeedback.filter(f => f.rating >= 4).length;
+      const attn     = allFeedback.filter(f => f.rating <= 2).length;
+
+      document.getElementById("fbKpiTotal").textContent     = total;
+      document.getElementById("fbKpiAvg").textContent       = avg.toFixed(1);
+      document.getElementById("fbKpiPositive").textContent  = positive;
+      document.getElementById("fbKpiAttention").textContent = attn;
+
+      // Module analysis rows
+      const allMods = ["Dashboard","Invoice & Billing","Payments & Collections","Documents & Files","Account & Users","Reports","General / Other"];
+      const modData = allMods.map(mod => {
+        const entries = allFeedback.filter(f => f.module === mod);
+        const modAvg  = entries.length ? entries.reduce((s, f) => s + f.rating, 0) / entries.length : 0;
+        return { mod, count: entries.length, avg: modAvg };
+      }).filter(d => d.count > 0).sort((a, b) => b.count - a.count);
+
+      const maxCount = Math.max(...modData.map(d => d.count), 1);
+
+      document.getElementById("saFeedbackModuleGrid").innerHTML = modData.length
+        ? modData.map(d => {
+            const barPct = Math.round((d.count / maxCount) * 100);
+            const col    = ratingBarColor(d.avg);
+            const stars  = Array.from({ length: 5 }, (_, i) =>
+              `<i class="bi ${i < Math.round(d.avg) ? "bi-star-fill" : "bi-star"}" style="font-size:10px;"></i>`).join("");
+            const icon = moduleIcons[d.mod] || "bi-grid";
+            return `
+              <div class="saModuleRow">
+                <div class="saModuleRowLeft">
+                  <i class="bi ${icon} saModuleIcon"></i>
+                  <span class="saModuleName">${escHtml(d.mod)}</span>
+                </div>
+                <div class="saModuleBarArea">
+                  <div class="saModuleBarTrack">
+                    <div class="saModuleBarFill" style="width:${barPct}%;background:${col};"></div>
+                  </div>
+                  <span class="saModuleAvgLbl" style="color:${col};">${d.avg.toFixed(1)}</span>
+                </div>
+                <div class="saModuleStars" style="color:${col};">${stars}</div>
+                <span class="saModuleCount">${d.count}</span>
+              </div>`;
+          }).join("")
+        : `<p style="color:#94a3b8;font-size:13px;padding:8px 0;">No feedback yet.</p>`;
+
+      // Rating distribution
+      const ratingDist = [5, 4, 3, 2, 1].map(r => ({ r, count: allFeedback.filter(f => f.rating === r).length }));
+      const maxR = Math.max(...ratingDist.map(d => d.count), 1);
+      document.getElementById("saFeedbackRatingChart").innerHTML = ratingDist.map(d => `
+        <div class="saDistRow">
+          <span class="saDistLabel"><i class="bi bi-star-fill" style="color:${ratingBarColor(d.r)};font-size:10px;"></i> ${d.r}</span>
+          <div class="saDistBarTrack"><div class="saDistBarFill" style="width:${Math.round((d.count / maxR) * 100)}%;background:${ratingBarColor(d.r)};"></div></div>
+          <span class="saDistCount">${d.count}</span>
+        </div>`).join("");
+
+      // Type distribution
+      const typeDist = Object.entries(fbTypeColors).map(([type, c]) => ({
+        type, c, count: allFeedback.filter(f => f.type === type).length
+      })).filter(d => d.count > 0);
+      const maxT = Math.max(...typeDist.map(d => d.count), 1);
+      document.getElementById("saFeedbackTypeChart").innerHTML = typeDist.length
+        ? typeDist.map(d => `
+            <div class="saDistRow">
+              <span class="saFbTypeLbl" style="background:${d.c.bg};color:${d.c.color};">${escHtml(d.type)}</span>
+              <div class="saDistBarTrack"><div class="saDistBarFill" style="width:${Math.round((d.count / maxT) * 100)}%;background:${d.c.color};"></div></div>
+              <span class="saDistCount">${d.count} <span class="saDistPct">${Math.round((d.count / total) * 100)}%</span></span>
+            </div>`).join("")
+        : `<p style="color:#94a3b8;font-size:13px;padding:8px 0;">No feedback yet.</p>`;
+
+      renderFeedbackCards(allFeedback);
+    }
+
+    function renderFeedbackCards(allFeedback) {
+      let data = [...allFeedback];
+      if (fbFilterType)   data = data.filter(f => f.type   === fbFilterType);
+      if (fbFilterModule) data = data.filter(f => f.module === fbFilterModule);
+      if (fbFilterSort === "oldest")       data.sort((a, b) => a.submittedAt.localeCompare(b.submittedAt));
+      else if (fbFilterSort === "rating-high") data.sort((a, b) => b.rating - a.rating);
+      else if (fbFilterSort === "rating-low")  data.sort((a, b) => a.rating - b.rating);
+
+      const list = document.getElementById("saFeedbackList");
+      if (!data.length) {
+        list.innerHTML = `<div class="saEmpty" style="padding:32px 0;"><i class="bi bi-inbox"></i><p>No feedback matches the selected filters.</p></div>`;
+        return;
+      }
+      list.innerHTML = data.map(f => {
+        const c      = fbTypeColors[f.type] || { bg: "#f1f5f9", color: "#64748b" };
+        const stars  = Array.from({ length: 5 }, (_, i) =>
+          `<i class="bi ${i < f.rating ? "bi-star-fill" : "bi-star"}" style="color:${i < f.rating ? "#f59e0b" : "#cbd5e1"};font-size:13px;"></i>`).join("");
+        const init   = (f.submittedBy || "U").charAt(0).toUpperCase();
+        return `
+          <div class="saFbCard">
+            <div class="saFbCardTop">
+              <div class="saFbCardStars">${stars}</div>
+              <span class="saFbTypePill" style="background:${c.bg};color:${c.color};">${escHtml(f.type)}</span>
+              <span class="saFbModPill">${escHtml(f.module)}</span>
+              <span class="saFbCardDate">${escHtml(f.submittedAt)}</span>
+            </div>
+            ${f.subject ? `<div class="saFbCardSubject">${escHtml(f.subject)}</div>` : ""}
+            <div class="saFbCardMsg">${escHtml(f.message)}</div>
+            <div class="saFbCardBy">
+              <span class="saFbAvatar">${escHtml(init)}</span>
+              <span class="saFbByName">${escHtml(f.submittedBy)}</span>
+            </div>
+          </div>`;
+      }).join("");
+    }
+
+    const fbSortLabels = { newest: "Newest", oldest: "Oldest", "rating-high": "Top Rated", "rating-low": "Low Rated" };
+
+    document.getElementById("fbDropType").addEventListener("click", e => {
+      const btn = e.target.closest(".filterItem[data-fbtype]");
+      if (!btn) return;
+      fbFilterType = btn.dataset.fbtype;
+      document.getElementById("fbBadgeType").textContent = fbFilterType || "All";
+      document.querySelectorAll("#fbDropType .filterItem").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      document.getElementById("fbDropType").removeAttribute("open");
+      renderFeedbackCards(getFeedback());
+    });
+
+    document.getElementById("fbDropModule").addEventListener("click", e => {
+      const btn = e.target.closest(".filterItem[data-fbmod]");
+      if (!btn) return;
+      fbFilterModule = btn.dataset.fbmod;
+      document.getElementById("fbBadgeModule").textContent = fbFilterModule || "All";
+      document.querySelectorAll("#fbDropModule .filterItem").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      document.getElementById("fbDropModule").removeAttribute("open");
+      renderFeedbackCards(getFeedback());
+    });
+
+    document.getElementById("fbDropSort").addEventListener("click", e => {
+      const btn = e.target.closest(".filterItem[data-fbsort]");
+      if (!btn) return;
+      fbFilterSort = btn.dataset.fbsort;
+      document.getElementById("fbBadgeSort").textContent = fbSortLabels[fbFilterSort] || "Newest";
+      document.querySelectorAll("#fbDropSort .filterItem").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      document.getElementById("fbDropSort").removeAttribute("open");
+      renderFeedbackCards(getFeedback());
+    });
+
 /* ─── Card motion ────────────────────────────────────── */
     const observer = new IntersectionObserver(entries => {
       entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add("is-visible"); observer.unobserve(e.target); } });
@@ -566,6 +1019,9 @@
     if (isSupportAdmin) {
       updateKPIs();
       renderList();
+      const fbCount = getFeedback().length;
+      document.getElementById("saTabFeedbackCount").textContent = fbCount;
+      document.getElementById("saTabTicketCount").textContent   = getTickets().length;
     }
   })();
   </script>

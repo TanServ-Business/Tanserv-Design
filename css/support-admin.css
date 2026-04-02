@@ -340,6 +340,51 @@
   flex-shrink: 0;
 }
 
+.saTwoPanelHeaderActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+/* Status dropdown in header */
+.saStatusDropdown summary {
+  gap: 7px;
+}
+
+.saHdrStatusDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #94a3b8;
+  flex-shrink: 0;
+  display: inline-block;
+  transition: background 0.2s;
+}
+
+.saHdrStatusDot.open        { background: #f59e0b; }
+.saHdrStatusDot.in-progress { background: #2563eb; }
+.saHdrStatusDot.closed      { background: #22c55e; }
+
+.saStatusBadgeHdr { min-width: 76px; text-align: center; }
+
+/* Override ticketPill colors on the badge inside summary */
+.saStatusBadgeStyled.open        { background: #fef3c7; color: #92400e; border-color: #fde68a; }
+.saStatusBadgeStyled.in-progress { background: #dbeafe; color: #1d4ed8; border-color: #bfdbfe; }
+.saStatusBadgeStyled.closed      { background: #dcfce7; color: #166534; border-color: #86efac; }
+
+.saStatusItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.saStatusItem.active {
+  font-weight: 700;
+  color: #5c258d;
+  background: #f9f5ff;
+}
+
 .saTwoPanelTitle {
   font-size: 16px;
   line-height: 1.2;
@@ -578,8 +623,31 @@
   font-weight: 700;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 8px;
   padding: 12px 14px;
+}
+
+.saReopenBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid #166534;
+  background: transparent;
+  color: #166534;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.saReopenBtn:hover {
+  background: #166534;
+  color: #ffffff;
 }
 
 /* ── Empty state ───────────────────────────────────────────── */
@@ -678,3 +746,441 @@
   .saChatInput { order: 3; width: 100%; flex: 1 0 100%; }
   .saChatSendBtn { margin-left: auto; }
 }
+
+/* =========================================================
+   Panel Tabs (Tickets / Feedback)
+   ========================================================= */
+.saPanelTabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 2px solid #e2e8f4;
+  margin-bottom: 24px;
+}
+
+.saPanelTab {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #64748b;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.saPanelTab i { font-size: 14px; }
+
+.saPanelTab:hover { color: #5c258d; }
+
+.saPanelTab.active {
+  color: #5c258d;
+  border-bottom-color: #5c258d;
+}
+
+.saTabBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  background: #f1f5f9;
+  color: #64748b;
+  border: 1px solid #e2e8f4;
+}
+
+.saPanelTab.active .saTabBadge {
+  background: #f3ecfb;
+  color: #5c258d;
+  border-color: #e3d5f5;
+}
+
+/* =========================================================
+   Feedback Analysis Panel
+   ========================================================= */
+
+/* Two-column layout for module + type/rating charts */
+.saFbTwoCol {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 0;
+}
+
+/* Section card */
+.saFbSection {
+  background: #ffffff;
+  border: 1px solid #e2e8f4;
+  border-radius: 12px;
+  padding: 20px 22px;
+}
+
+.saFbSectionTitle {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: #64748b;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.saFbSectionTitle i { font-size: 14px; color: #5c258d; }
+
+/* Section header with filters */
+.saFbSectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.saFbFilters {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+
+/* Module analysis rows */
+.saModuleRow {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) minmax(0,1.4fr) auto auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.saModuleRow:last-child { border-bottom: none; }
+
+.saModuleRowLeft {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+}
+
+.saModuleIcon {
+  font-size: 13px;
+  color: #5c258d;
+  flex-shrink: 0;
+}
+
+.saModuleName {
+  font-size: 12px;
+  font-weight: 600;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.saModuleBarArea {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.saModuleBarTrack {
+  flex: 1;
+  height: 6px;
+  background: #f1f5f9;
+  border-radius: 999px;
+  overflow: hidden;
+  min-width: 40px;
+}
+
+.saModuleBarFill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+.saModuleAvgLbl {
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+  min-width: 22px;
+  text-align: right;
+}
+
+.saModuleStars { display: flex; gap: 1px; flex-shrink: 0; }
+
+.saModuleCount {
+  font-size: 11px;
+  font-weight: 700;
+  color: #94a3b8;
+  text-align: right;
+  min-width: 18px;
+}
+
+/* Distribution bars (type + rating) */
+.saDistRow {
+  display: grid;
+  grid-template-columns: 110px minmax(0,1fr) 52px;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+}
+
+.saDistLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: #334155;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.saDistBarTrack {
+  height: 6px;
+  background: #f1f5f9;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.saDistBarFill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+.saDistCount {
+  font-size: 11px;
+  font-weight: 700;
+  color: #475569;
+  text-align: right;
+}
+
+.saDistPct {
+  font-size: 10px;
+  font-weight: 400;
+  color: #94a3b8;
+}
+
+.saFbTypeLbl {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+/* Feedback cards */
+.saFbCard {
+  background: #f8fafc;
+  border: 1px solid #e2e8f4;
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  transition: border-color 0.15s;
+}
+
+.saFbCard:last-child { margin-bottom: 0; }
+
+.saFbCard:hover { border-color: #c4b5d8; }
+
+.saFbCardTop {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.saFbCardStars { display: flex; gap: 2px; }
+
+.saFbTypePill {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  letter-spacing: 0.04em;
+}
+
+.saFbModPill {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(59,79,184,0.08);
+  color: #3b4fb8;
+}
+
+.saFbCardDate {
+  font-size: 11px;
+  color: #94a3b8;
+  margin-left: auto;
+}
+
+.saFbCardSubject {
+  font-size: 13px;
+  font-weight: 600;
+  color: #0f172a;
+  margin-bottom: 4px;
+}
+
+.saFbCardMsg {
+  font-size: 13px;
+  color: #475569;
+  line-height: 1.6;
+  margin-bottom: 10px;
+}
+
+.saFbCardBy {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.saFbAvatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #5c258d, #3b4fb8);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.saFbByName {
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748b;
+}
+
+/* Responsive */
+@media (max-width: 860px) {
+  .saFbTwoCol { grid-template-columns: 1fr; }
+  .saDistRow { grid-template-columns: 90px minmax(0,1fr) 44px; }
+}
+
+@media (max-width: 700px) {
+  .saFbSectionHeader { flex-direction: column; align-items: stretch; }
+  .saFbFilters { flex-direction: column; }
+  .saFbSelect { width: 100%; }
+  .saModuleRow { grid-template-columns: minmax(0,1fr) minmax(0,1fr) auto; }
+  .saModuleStars { display: none; }
+}
+
+/* =========================================================
+   Status Change Confirmation Dialog
+   ========================================================= */
+.saConfirmOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 440;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease;
+}
+
+.saConfirmOverlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.saConfirmDialog {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 32px 28px 24px;
+  width: min(420px, 100%);
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.22);
+  text-align: center;
+  transform: translateY(8px) scale(0.97);
+  transition: transform 0.2s ease;
+}
+
+.saConfirmOverlay.open .saConfirmDialog {
+  transform: translateY(0) scale(1);
+}
+
+.saConfirmIconWrap {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f3ecfb, #e0e7ff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+}
+
+.saConfirmIcon { font-size: 22px; color: #5c258d; }
+
+.saConfirmTitle {
+  font-size: 16px;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 10px;
+}
+
+.saConfirmBody {
+  font-size: 13px;
+  color: #475569;
+  line-height: 1.6;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.saConfirmFromBadge,
+.saConfirmToBadge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+}
+
+.saConfirmNote {
+  font-size: 12px;
+  color: #64748b;
+  background: #f8fafc;
+  border: 1px solid #e2e8f4;
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin: 0 0 4px;
+  text-align: left;
+  line-height: 1.5;
+}
+
+.saConfirmActions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.saConfirmActions .btnSecondary,
+.saConfirmActions .btnPrimary { min-width: 100px; }
