@@ -1039,8 +1039,11 @@ button.notifyBadge {
   border-radius: 16px;
   width: 100%;
   max-width: 520px;
+  max-height: 90vh;
   box-shadow: 0 24px 50px rgba(15, 23, 42, 0.2);
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
   transform: translateY(12px);
   opacity: 0;
   transition: transform 0.25s ease, opacity 0.25s ease;
@@ -1083,6 +1086,8 @@ button.notifyBadge {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  min-height: 0;
+  overflow-y: auto;
   color: #475569;
   font-size: 13px;
 }
