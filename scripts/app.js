@@ -95,6 +95,7 @@ const managerNotificationsKey = "ineburaManagerNotifications";
 const pdcNotificationKey = "ineburaPdcNotifications";
 const pdcStorageKey = "ineburaPdcRecords";
 const notificationCenterKey = "ineburaNotificationCenter";
+const strategyNotificationsKey = "ineburaStrategyNotifications";
 const invoiceStatusOverridesKey = "ineburaInvoiceStatusOverrides";
 const issueTrackerTotalKey = "issueTrackerTotalIssues";
 const issueTrackerBaseKey = "issueTrackerBaseData";
@@ -102,6 +103,9 @@ const issueTrackerCustomKey = "customIssues";
 const issueTrackerProcessKey = "approval_processes";
 const issueTrackerMatrixKey = "approval_matrices";
 const issueTrackerClearedKey = "issueTrackerDataCleared";
+const strategyAgingBucketOptions = ["0-30", "31-60", "61-90", "90+"];
+const strategyTemplateOptions = ["Payment reminder", "PTP confirmation", "Overdue notice", "Escalation notice"];
+const strategyAttachmentOptions = ["No attachment", "Invoice copy", "Statement of account", "Collection follow-up note"];
 
 const rootPath = (() => {
   const raw = String(document.body.dataset.rootPath || "").trim();
@@ -1102,6 +1106,26 @@ function saveActivityTrailMap(map) {
     localStorage.setItem(activityTrailStorageKey, JSON.stringify(map));
   } catch (err) {
     console.warn("Unable to save activity trail", err);
+  }
+}
+
+function loadStrategyNotifications() {
+  try {
+    const raw = localStorage.getItem(strategyNotificationsKey);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (err) {
+    console.warn("Unable to load strategy notifications", err);
+    return [];
+  }
+}
+
+function saveStrategyNotifications(list) {
+  try {
+    localStorage.setItem(strategyNotificationsKey, JSON.stringify(Array.isArray(list) ? list : []));
+  } catch (err) {
+    console.warn("Unable to save strategy notifications", err);
   }
 }
 
@@ -2801,6 +2825,742 @@ function getBaseFilteredInvoices() {
   });
 }
 
+function createStrategyReminderStep(seed = {}) {
+  const when = String(seed.when || "").trim().toLowerCase() === "after_due" ? "after_due" : "before_due";
+  const parsedDays = Number(seed.days);
+  const days = Number.isFinite(parsedDays) && parsedDays >= 0 ? Math.floor(parsedDays) : 1;
+  const template = strategyTemplateOptions.includes(seed.template) ? seed.template : strategyTemplateOptions[0];
+  const attachment = strategyAttachmentOptions.includes(seed.attachment) ? seed.attachment : strategyAttachmentOptions[0];
+  return {
+    id: `step-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    when,
+    days,
+    template,
+    attachment
+  };
+}
+
+function getSelectedCustomerRecord() {
+  return customersData.find((customer) => customer.id === selectedCustomerId) || null;
+}
+
+function getStrategySubStatusOptions(customer) {
+  if (!customer) return [];
+  return uniqSorted((customer.invoices || []).map((invoice) => invoice.subStatus ?? invoice.status));
+}
+
+function getNormalizedStrategyScope(scope) {
+  return String(scope || "").trim().toLowerCase() === "invoice" ? "invoice" : "customer";
+}
+
+function getNormalizedStrategyStatus(status) {
+  return String(status || "").trim().toLowerCase() === "inactive" ? "inactive" : "active";
+}
+
+function getNormalizedStrategyMode(mode) {
+  return String(mode || "").trim().toLowerCase() === "ongoing" ? "ongoing" : "custom";
+}
+
+function setStrategyListHidden(hidden) {
+  const wrap = document.getElementById("strategyListWrap");
+  if (!wrap) return;
+  wrap.classList.toggle("hidden", Boolean(hidden));
+}
+
+function resetStrategyFormState(customer, strategy = null) {
+  const baseSubStatusOptions = getStrategySubStatusOptions(customer);
+  const persistedSubStatus = Array.isArray(strategy?.invoiceFilters?.subStatus)
+    ? strategy.invoiceFilters.subStatus
+    : [];
+  const subStatusOptions = uniqSorted(baseSubStatusOptions.concat(persistedSubStatus));
+  strategyFormState.subStatusOptions = subStatusOptions;
+
+  if (strategy) {
+    const selectedSubStatus = Array.isArray(strategy.invoiceFilters?.subStatus)
+      ? strategy.invoiceFilters.subStatus.filter((status) => subStatusOptions.includes(status))
+      : subStatusOptions.slice();
+    strategyFormState.selectedSubStatuses = new Set(selectedSubStatus);
+    if (strategyFormState.selectedSubStatuses.size === 0 && subStatusOptions.length > 0) {
+      strategyFormState.selectedSubStatuses = new Set(subStatusOptions);
+    }
+    const selectedAgingBuckets = Array.isArray(strategy.invoiceFilters?.agingBuckets)
+      ? strategy.invoiceFilters.agingBuckets.filter((bucket) => strategyAgingBucketOptions.includes(bucket))
+      : [];
+    strategyFormState.selectedAgingBuckets = new Set(selectedAgingBuckets);
+
+    const reminderSteps = Array.isArray(strategy.reminderSteps)
+      ? strategy.reminderSteps.map((step) => createStrategyReminderStep(step))
+      : [];
+    strategyFormState.reminderSteps = reminderSteps.length > 0 ? reminderSteps : [createStrategyReminderStep()];
+    return;
+  }
+
+  strategyFormState.selectedSubStatuses = new Set(subStatusOptions);
+  strategyFormState.selectedAgingBuckets = new Set();
+  strategyFormState.reminderSteps = [createStrategyReminderStep()];
+}
+
+function setStrategyFormError(message) {
+  const errorEl = document.getElementById("strategyFormError");
+  if (!errorEl) return;
+  if (!message) {
+    errorEl.textContent = "";
+    errorEl.classList.add("hidden");
+    return;
+  }
+  errorEl.textContent = String(message);
+  errorEl.classList.remove("hidden");
+}
+
+function updateStrategyInvoiceScopeHint() {
+  const scopeSelect = document.getElementById("strategyScopeSelect");
+  const hintEl = document.getElementById("strategyInvoiceSelectionHint");
+  if (!scopeSelect || !hintEl) return;
+  const isInvoiceScope = getNormalizedStrategyScope(scopeSelect.value) === "invoice";
+  hintEl.classList.toggle("is-alert", false);
+  if (!isInvoiceScope) {
+    hintEl.textContent = "Strategy will apply to selected customer.";
+    return;
+  }
+  if (strategyFormMeta.mode === "view") {
+    const linkedCount = strategyFormMeta.linkedInvoiceNos.length;
+    hintEl.textContent = `Linked invoices: ${linkedCount}.`;
+    return;
+  }
+
+  const count = selectedInvoiceNos.size;
+  if (count > 0) {
+    hintEl.textContent = `${count} invoice${count === 1 ? "" : "s"} selected in table for this strategy.`;
+    return;
+  }
+
+  if (strategyFormMeta.mode === "edit" && strategyFormMeta.linkedInvoiceNos.length > 0) {
+    hintEl.textContent = `No new invoice selected. Existing linked invoices: ${strategyFormMeta.linkedInvoiceNos.length}.`;
+    return;
+  }
+
+  hintEl.textContent = "Select at least one invoice in table for invoice scope.";
+  hintEl.classList.add("is-alert");
+}
+
+function updateStrategyMultiSelectSummaries() {
+  const subStatusValueEl = document.getElementById("strategySubStatusValue");
+  if (subStatusValueEl) {
+    const total = strategyFormState.subStatusOptions.length;
+    const selected = strategyFormState.selectedSubStatuses.size;
+    let value = "No options";
+    if (total > 0) {
+      if (selected === 0) value = "None selected";
+      else if (selected === total) value = "All selected";
+      else value = `${selected} selected`;
+    }
+    subStatusValueEl.textContent = value;
+  }
+
+  const agingValueEl = document.getElementById("strategyAgingValue");
+  if (agingValueEl) {
+    const total = strategyAgingBucketOptions.length;
+    const selected = strategyFormState.selectedAgingBuckets.size;
+    let value = "None selected";
+    if (selected > 0 && selected < total) value = `${selected} selected`;
+    if (selected === total) value = "All selected";
+    agingValueEl.textContent = value;
+  }
+}
+
+function renderStrategySubStatusOptions() {
+  const menu = document.getElementById("strategySubStatusMenu");
+  if (!menu) return;
+  if (strategyFormState.subStatusOptions.length === 0) {
+    menu.innerHTML = `<div class="strategyHint">No sub status available for this customer.</div>`;
+    updateStrategyMultiSelectSummaries();
+    return;
+  }
+
+  menu.innerHTML = strategyFormState.subStatusOptions.map((status) => {
+    const checked = strategyFormState.selectedSubStatuses.has(status) ? "checked" : "";
+    return `
+      <label class="strategyOption">
+        <input class="strategySubStatusChk" type="checkbox" value="${escapeHtml(status)}" ${checked} />
+        <span>${escapeHtml(status)}</span>
+      </label>
+    `;
+  }).join("");
+
+  updateStrategyMultiSelectSummaries();
+}
+
+function renderStrategyAgingOptions() {
+  const menu = document.getElementById("strategyAgingMenu");
+  if (!menu) return;
+  menu.innerHTML = strategyAgingBucketOptions.map((bucket) => {
+    const checked = strategyFormState.selectedAgingBuckets.has(bucket) ? "checked" : "";
+    return `
+      <label class="strategyOption">
+        <input class="strategyAgingChk" type="checkbox" value="${escapeHtml(bucket)}" ${checked} />
+        <span>${escapeHtml(bucket)}</span>
+      </label>
+    `;
+  }).join("");
+  updateStrategyMultiSelectSummaries();
+}
+
+function renderStrategyReminderSteps() {
+  const list = document.getElementById("strategyReminderStepsList");
+  if (!list) return;
+  const isReadOnly = strategyFormMeta.mode === "view";
+  if (!Array.isArray(strategyFormState.reminderSteps) || strategyFormState.reminderSteps.length === 0) {
+    strategyFormState.reminderSteps = [createStrategyReminderStep()];
+  }
+  const canRemove = strategyFormState.reminderSteps.length > 1;
+  list.innerHTML = strategyFormState.reminderSteps.map((step, index) => {
+    const daysLabel = step.when === "after_due" ? "Days after due" : "Days before due";
+    const removeDisabled = isReadOnly || !canRemove;
+    return `
+      <div class="strategyStep" data-step-id="${escapeHtml(step.id)}">
+        <div class="strategyStepHeader">
+          <div class="strategyStepTitle">Reminder ${index + 1}</div>
+          <button class="strategyDangerBtn" type="button" data-step-remove="${escapeHtml(step.id)}" ${removeDisabled ? "disabled" : ""}>Remove</button>
+        </div>
+        <div class="strategyGrid">
+          <div class="strategyField">
+            <label>When</label>
+            <select class="strategyStepWhen" data-step-id="${escapeHtml(step.id)}" ${isReadOnly ? "disabled" : ""}>
+              <option value="before_due" ${step.when === "before_due" ? "selected" : ""}>before due</option>
+              <option value="after_due" ${step.when === "after_due" ? "selected" : ""}>after due</option>
+            </select>
+          </div>
+          <div class="strategyField">
+            <label class="strategyStepDaysLabel">${daysLabel}</label>
+            <input class="strategyStepDays" data-step-id="${escapeHtml(step.id)}" type="number" min="0" step="1" value="${Number(step.days) || 0}" ${isReadOnly ? "disabled" : ""} />
+          </div>
+          <div class="strategyField">
+            <label>Template</label>
+            <select class="strategyStepTemplate" data-step-id="${escapeHtml(step.id)}" ${isReadOnly ? "disabled" : ""}>
+              ${strategyTemplateOptions.map((template) => (
+                `<option value="${escapeHtml(template)}" ${step.template === template ? "selected" : ""}>${escapeHtml(template)}</option>`
+              )).join("")}
+            </select>
+          </div>
+          <div class="strategyField">
+            <label>Attachments</label>
+            <select class="strategyStepAttachment" data-step-id="${escapeHtml(step.id)}" ${isReadOnly ? "disabled" : ""}>
+              ${strategyAttachmentOptions.map((attachment) => (
+                `<option value="${escapeHtml(attachment)}" ${step.attachment === attachment ? "selected" : ""}>${escapeHtml(attachment)}</option>`
+              )).join("")}
+            </select>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+function toggleStrategyReminderStepsVisibility() {
+  const modeSelect = document.getElementById("strategyModeSelect");
+  const wrap = document.getElementById("strategyReminderStepsWrap");
+  if (!modeSelect || !wrap) return;
+  const isCustom = getNormalizedStrategyMode(modeSelect.value) === "custom";
+  wrap.classList.toggle("hidden", !isCustom);
+}
+
+function closeStrategyMultiSelects() {
+  const subStatusWrap = document.getElementById("strategySubStatusSelectWrap");
+  const agingWrap = document.getElementById("strategyAgingSelectWrap");
+  if (subStatusWrap) subStatusWrap.open = false;
+  if (agingWrap) agingWrap.open = false;
+}
+
+function setStrategyFormMode(mode, strategy = null) {
+  const wrap = document.getElementById("strategyFormWrap");
+  const titleEl = wrap ? wrap.querySelector(".strategyFormTitle") : null;
+  const saveBtn = document.getElementById("strategySaveBtn");
+  const editBtn = document.getElementById("strategyEditBtn");
+  const addStepBtn = document.getElementById("strategyAddStepBtn");
+  strategyFormMeta.mode = mode;
+  strategyFormMeta.strategyId = strategy?.id || null;
+  strategyFormMeta.originalScope = getNormalizedStrategyScope(strategy?.scope || "customer");
+  strategyFormMeta.linkedInvoiceNos = Array.isArray(strategy?.invoiceNos) ? strategy.invoiceNos.slice() : [];
+  const isReadOnly = mode === "view";
+
+  if (wrap) wrap.classList.toggle("is-readonly", isReadOnly);
+  if (titleEl) {
+    if (mode === "view") titleEl.textContent = "Strategy details";
+    else if (mode === "edit") titleEl.textContent = "Edit strategy";
+    else titleEl.textContent = "Strategy";
+  }
+  if (saveBtn) {
+    saveBtn.classList.toggle("hidden", mode === "view");
+    saveBtn.textContent = mode === "edit" ? "Update strategy" : "Save strategy";
+  }
+  if (editBtn) {
+    editBtn.classList.toggle("hidden", mode !== "view");
+  }
+  if (addStepBtn) {
+    addStepBtn.classList.toggle("hidden", mode === "view");
+    addStepBtn.disabled = mode === "view";
+  }
+}
+
+function applyStrategyFormValues(strategy = null) {
+  const nameInput = document.getElementById("strategyNameInput");
+  const reminderTypeSelect = document.getElementById("strategyReminderType");
+  const scopeSelect = document.getElementById("strategyScopeSelect");
+  const statusSelect = document.getElementById("strategyStatusSelect");
+  const modeSelect = document.getElementById("strategyModeSelect");
+  const keyAccountSelect = document.getElementById("strategyKeyAccountSelect");
+
+  if (!strategy) {
+    if (nameInput) nameInput.value = "";
+    if (reminderTypeSelect) reminderTypeSelect.value = "pre due";
+    if (scopeSelect) scopeSelect.value = "customer";
+    if (statusSelect) statusSelect.value = "active";
+    if (modeSelect) modeSelect.value = "custom";
+    if (keyAccountSelect) keyAccountSelect.value = "Yes";
+    return;
+  }
+
+  if (nameInput) nameInput.value = String(strategy.strategyName || "");
+  if (reminderTypeSelect) reminderTypeSelect.value = String(strategy.reminderType || "pre due");
+  if (scopeSelect) scopeSelect.value = getNormalizedStrategyScope(strategy.scope);
+  if (statusSelect) statusSelect.value = getNormalizedStrategyStatus(strategy.status);
+  if (modeSelect) modeSelect.value = getNormalizedStrategyMode(strategy.notificationMode);
+  if (keyAccountSelect) keyAccountSelect.value = String(strategy.keyAccountFilter || "Yes");
+}
+
+function showStrategyForm(show, options = {}) {
+  const wrap = document.getElementById("strategyFormWrap");
+  if (!wrap) return;
+  wrap.classList.toggle("hidden", !show);
+  setStrategyListHidden(show);
+  if (!show) {
+    setStrategyFormMode("create");
+    setStrategyFormError("");
+    closeStrategyMultiSelects();
+    return;
+  }
+
+  const customer = getSelectedCustomerRecord();
+  const requestedMode = String(options.mode || "create").toLowerCase();
+  const strategy = requestedMode === "view" || requestedMode === "edit" ? options.strategy || null : null;
+  const resolvedMode = strategy ? (requestedMode === "edit" ? "edit" : "view") : "create";
+  resetStrategyFormState(customer, strategy);
+  applyStrategyFormValues(strategy);
+  setStrategyFormMode(resolvedMode, strategy);
+
+  setStrategyFormError("");
+  renderStrategySubStatusOptions();
+  renderStrategyAgingOptions();
+  renderStrategyReminderSteps();
+  toggleStrategyReminderStepsVisibility();
+  updateStrategyInvoiceScopeHint();
+  closeStrategyMultiSelects();
+}
+
+function getStrategyListMessageForContext(customerStrategies, activeInvoiceNo) {
+  if (customerStrategies.length === 0) return "No strategies yet.";
+  if (!activeInvoiceNo) return "Select an invoice to view invoice-level strategies.";
+  return "No strategies mapped to the active invoice.";
+}
+
+function formatStrategyDate(value) {
+  const parsed = Date.parse(value || "");
+  if (!Number.isFinite(parsed)) return "-";
+  try {
+    return new Date(parsed).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" });
+  } catch (_) {
+    return new Date(parsed).toLocaleString();
+  }
+}
+
+function getRunningStrategiesForInvoice(invoiceNo, customerId = selectedCustomerId) {
+  if (!invoiceNo || !customerId) return [];
+  const activeStrategies = loadStrategyNotifications().filter((strategy) => (
+    strategy
+    && strategy.customerId === customerId
+    && getNormalizedStrategyStatus(strategy.status) === "active"
+  ));
+
+  return activeStrategies
+    .filter((strategy) => {
+      const scope = getNormalizedStrategyScope(strategy.scope);
+      if (scope === "customer") return true;
+      const invoiceNos = Array.isArray(strategy.invoiceNos) ? strategy.invoiceNos : [];
+      return invoiceNos.includes(invoiceNo);
+    })
+    .sort((a, b) => {
+      const aScopeRank = getNormalizedStrategyScope(a.scope) === "invoice" ? 0 : 1;
+      const bScopeRank = getNormalizedStrategyScope(b.scope) === "invoice" ? 0 : 1;
+      if (aScopeRank !== bScopeRank) return aScopeRank - bScopeRank;
+      const aTime = Date.parse(a?.createdAt || "") || 0;
+      const bTime = Date.parse(b?.createdAt || "") || 0;
+      return bTime - aTime;
+    });
+}
+
+function getRunningStrategyForInvoice(invoiceNo, customerId = selectedCustomerId) {
+  const list = getRunningStrategiesForInvoice(invoiceNo, customerId);
+  return list[0] || null;
+}
+
+function renderStrategyNotifications() {
+  const listEl = document.getElementById("strategyList");
+  const emptyEl = document.getElementById("strategyListEmpty");
+  const formWrap = document.getElementById("strategyFormWrap");
+  const formVisible = Boolean(formWrap && !formWrap.classList.contains("hidden"));
+  if (!listEl || !emptyEl) return;
+  const customer = getSelectedCustomerRecord();
+  if (!customer) {
+    listEl.innerHTML = "";
+    emptyEl.textContent = "No strategies yet.";
+    emptyEl.classList.toggle("hidden", formVisible);
+    setStrategyListHidden(formVisible);
+    return;
+  }
+
+  const allStrategies = loadStrategyNotifications();
+  const customerStrategies = allStrategies
+    .filter((strategy) => strategy && strategy.customerId === customer.id)
+    .sort((a, b) => {
+      const aTime = Date.parse(a?.createdAt || "") || 0;
+      const bTime = Date.parse(b?.createdAt || "") || 0;
+      return bTime - aTime;
+    });
+
+  const activeInvoiceNo = currentInvoiceNoForDocs || "";
+  const visibleStrategies = customerStrategies.filter((strategy) => {
+    const scope = getNormalizedStrategyScope(strategy.scope);
+    if (scope === "customer") return true;
+    if (!activeInvoiceNo) return false;
+    const invoices = Array.isArray(strategy.invoiceNos) ? strategy.invoiceNos : [];
+    return invoices.includes(activeInvoiceNo);
+  });
+
+  if (visibleStrategies.length === 0) {
+    listEl.innerHTML = "";
+    emptyEl.textContent = getStrategyListMessageForContext(customerStrategies, activeInvoiceNo);
+    emptyEl.classList.toggle("hidden", formVisible);
+    setStrategyListHidden(formVisible);
+    return;
+  }
+
+  emptyEl.classList.add("hidden");
+  listEl.innerHTML = visibleStrategies.map((strategy) => {
+    const status = getNormalizedStrategyStatus(strategy.status);
+    const scope = getNormalizedStrategyScope(strategy.scope);
+    const mode = getNormalizedStrategyMode(strategy.notificationMode);
+    const invoices = Array.isArray(strategy.invoiceNos) ? strategy.invoiceNos.filter(Boolean) : [];
+    const reminderSteps = Array.isArray(strategy.reminderSteps) ? strategy.reminderSteps : [];
+    const subStatusFilters = Array.isArray(strategy.invoiceFilters?.subStatus) ? strategy.invoiceFilters.subStatus : [];
+    const agingFilters = Array.isArray(strategy.invoiceFilters?.agingBuckets) ? strategy.invoiceFilters.agingBuckets : [];
+    const visibleInvoiceChips = invoices.slice(0, 3).map((invoiceNo) => (
+      `<span class="strategyScopeInvoiceChip" title="${escapeHtml(invoiceNo)}">${escapeHtml(invoiceNo)}</span>`
+    )).join("");
+    const hiddenCount = Math.max(0, invoices.length - 3);
+    return `
+      <article class="strategyCard">
+        <div class="strategyCardHeader">
+          <div>
+            <div class="strategyName">${escapeHtml(safeText(strategy.strategyName))}</div>
+            <div class="strategyMetaRow">
+              <span class="strategyPill ${status === "active" ? "is-active" : "is-inactive"}">${escapeHtml(status)}</span>
+              <span class="strategyPill">${escapeHtml(scope)}</span>
+              <span class="strategyPill">${escapeHtml(strategy.reminderType || "-")}</span>
+            </div>
+          </div>
+          <div class="strategyCardMetaWrap">
+            <div class="strategyCardMeta">${escapeHtml(formatStrategyDate(strategy.createdAt))}</div>
+            <button class="strategyReadMoreBtn" type="button" data-strategy-show-more="${escapeHtml(strategy.id || "")}">show more</button>
+          </div>
+        </div>
+        <div class="strategyCardMeta">Mode: ${escapeHtml(mode)} | Key account filter: ${escapeHtml(strategy.keyAccountFilter || "-")}</div>
+        <div class="strategyCardMeta">Reminder steps: ${mode === "custom" ? reminderSteps.length : 0} | Sub status: ${subStatusFilters.length} | Aging bucket: ${agingFilters.length}</div>
+        ${scope === "invoice" ? `
+          <div class="strategyScopeInvoices">
+            ${visibleInvoiceChips}
+            ${hiddenCount > 0 ? `<span class="strategyScopeInvoiceChip">+${hiddenCount} more</span>` : ""}
+          </div>
+        ` : ""}
+      </article>
+    `;
+  }).join("");
+  setStrategyListHidden(formVisible);
+}
+
+function wireStrategyNotificationEvents() {
+  const createBtn = document.getElementById("strategyCreateBtn");
+  const headerCreateBtn = document.getElementById("invoiceCreateStrategyBtn");
+  const cancelBtn = document.getElementById("strategyCancelBtn");
+  const editBtn = document.getElementById("strategyEditBtn");
+  const saveBtn = document.getElementById("strategySaveBtn");
+  const modeSelect = document.getElementById("strategyModeSelect");
+  const scopeSelect = document.getElementById("strategyScopeSelect");
+  const addStepBtn = document.getElementById("strategyAddStepBtn");
+  const stepList = document.getElementById("strategyReminderStepsList");
+  const listEl = document.getElementById("strategyList");
+  const subStatusMenu = document.getElementById("strategySubStatusMenu");
+  const agingMenu = document.getElementById("strategyAgingMenu");
+  const subStatusWrap = document.getElementById("strategySubStatusSelectWrap");
+  const agingWrap = document.getElementById("strategyAgingSelectWrap");
+  if (!createBtn || !cancelBtn || !saveBtn) return;
+
+  if (headerCreateBtn) {
+    headerCreateBtn.addEventListener("click", () => {
+      openStrategyCreateFromHeader();
+    });
+  }
+
+  createBtn.addEventListener("click", () => {
+    showStrategyForm(true, { mode: "create" });
+  });
+
+  cancelBtn.addEventListener("click", () => {
+    showStrategyForm(false);
+  });
+
+  if (editBtn) {
+    editBtn.addEventListener("click", () => {
+      if (strategyFormMeta.mode !== "view") return;
+      setStrategyFormMode("edit", {
+        id: strategyFormMeta.strategyId,
+        scope: strategyFormMeta.originalScope,
+        invoiceNos: strategyFormMeta.linkedInvoiceNos
+      });
+      renderStrategyReminderSteps();
+      updateStrategyInvoiceScopeHint();
+    });
+  }
+
+  if (listEl) {
+    listEl.addEventListener("click", (event) => {
+      const showMoreBtn = event.target.closest("[data-strategy-show-more]");
+      if (!showMoreBtn) return;
+      const strategyId = showMoreBtn.getAttribute("data-strategy-show-more") || "";
+      if (!strategyId) return;
+      const strategy = loadStrategyNotifications().find((item) => item && item.id === strategyId);
+      if (!strategy) return;
+      showStrategyForm(true, { mode: "view", strategy });
+    });
+  }
+
+  if (modeSelect) {
+    modeSelect.addEventListener("change", () => {
+      if (strategyFormMeta.mode === "view") return;
+      toggleStrategyReminderStepsVisibility();
+    });
+  }
+
+  if (scopeSelect) {
+    scopeSelect.addEventListener("change", () => {
+      if (strategyFormMeta.mode === "view") return;
+      updateStrategyInvoiceScopeHint();
+    });
+  }
+
+  if (addStepBtn) {
+    addStepBtn.addEventListener("click", () => {
+      if (strategyFormMeta.mode === "view") return;
+      strategyFormState.reminderSteps.push(createStrategyReminderStep());
+      renderStrategyReminderSteps();
+    });
+  }
+
+  if (stepList) {
+    stepList.addEventListener("click", (event) => {
+      if (strategyFormMeta.mode === "view") return;
+      const removeBtn = event.target.closest("[data-step-remove]");
+      if (!removeBtn) return;
+      const stepId = removeBtn.getAttribute("data-step-remove") || "";
+      if (!stepId) return;
+      strategyFormState.reminderSteps = strategyFormState.reminderSteps.filter((step) => step.id !== stepId);
+      if (strategyFormState.reminderSteps.length === 0) {
+        strategyFormState.reminderSteps = [createStrategyReminderStep()];
+      }
+      renderStrategyReminderSteps();
+    });
+
+    stepList.addEventListener("change", (event) => {
+      if (strategyFormMeta.mode === "view") return;
+      const target = event.target;
+      const stepId = target.getAttribute("data-step-id") || "";
+      const step = strategyFormState.reminderSteps.find((item) => item.id === stepId);
+      if (!step) return;
+
+      if (target.classList.contains("strategyStepWhen")) {
+        step.when = target.value === "after_due" ? "after_due" : "before_due";
+        const wrap = target.closest(".strategyStep");
+        const label = wrap ? wrap.querySelector(".strategyStepDaysLabel") : null;
+        if (label) label.textContent = step.when === "after_due" ? "Days after due" : "Days before due";
+        return;
+      }
+
+      if (target.classList.contains("strategyStepDays")) {
+        const parsed = Number(target.value);
+        step.days = Number.isFinite(parsed) && parsed >= 0 ? Math.floor(parsed) : 0;
+        return;
+      }
+
+      if (target.classList.contains("strategyStepTemplate")) {
+        step.template = strategyTemplateOptions.includes(target.value) ? target.value : strategyTemplateOptions[0];
+        return;
+      }
+
+      if (target.classList.contains("strategyStepAttachment")) {
+        step.attachment = strategyAttachmentOptions.includes(target.value) ? target.value : strategyAttachmentOptions[0];
+      }
+    });
+  }
+
+  if (subStatusMenu) {
+    subStatusMenu.addEventListener("change", (event) => {
+      if (strategyFormMeta.mode === "view") return;
+      const checkbox = event.target.closest(".strategySubStatusChk");
+      if (!checkbox) return;
+      const value = checkbox.value;
+      if (checkbox.checked) strategyFormState.selectedSubStatuses.add(value);
+      else strategyFormState.selectedSubStatuses.delete(value);
+      updateStrategyMultiSelectSummaries();
+    });
+  }
+
+  if (agingMenu) {
+    agingMenu.addEventListener("change", (event) => {
+      if (strategyFormMeta.mode === "view") return;
+      const checkbox = event.target.closest(".strategyAgingChk");
+      if (!checkbox) return;
+      const value = checkbox.value;
+      if (checkbox.checked) strategyFormState.selectedAgingBuckets.add(value);
+      else strategyFormState.selectedAgingBuckets.delete(value);
+      updateStrategyMultiSelectSummaries();
+    });
+  }
+
+  if (subStatusWrap && agingWrap) {
+    subStatusWrap.addEventListener("toggle", () => {
+      if (subStatusWrap.open) agingWrap.open = false;
+    });
+    agingWrap.addEventListener("toggle", () => {
+      if (agingWrap.open) subStatusWrap.open = false;
+    });
+  }
+
+  document.addEventListener("click", (event) => {
+    if (subStatusWrap && subStatusWrap.open && !subStatusWrap.contains(event.target)) subStatusWrap.open = false;
+    if (agingWrap && agingWrap.open && !agingWrap.contains(event.target)) agingWrap.open = false;
+  });
+
+  saveBtn.addEventListener("click", () => {
+    const customer = getSelectedCustomerRecord();
+    if (!customer) {
+      setStrategyFormError("Select a customer before creating a strategy.");
+      return;
+    }
+
+    const nameInput = document.getElementById("strategyNameInput");
+    const reminderTypeSelect = document.getElementById("strategyReminderType");
+    const statusSelect = document.getElementById("strategyStatusSelect");
+    const keyAccountSelect = document.getElementById("strategyKeyAccountSelect");
+    const strategyName = String(nameInput?.value || "").trim();
+    const scope = getNormalizedStrategyScope(scopeSelect?.value || "customer");
+    const mode = getNormalizedStrategyMode(modeSelect?.value || "custom");
+
+    if (!strategyName) {
+      setStrategyFormError("Strategy name is required.");
+      return;
+    }
+
+    let invoiceNos = [];
+    if (scope === "invoice") {
+      if (selectedInvoiceNos.size > 0) {
+        invoiceNos = Array.from(selectedInvoiceNos);
+      } else if (strategyFormMeta.mode === "edit" && strategyFormMeta.originalScope === "invoice" && strategyFormMeta.linkedInvoiceNos.length > 0) {
+        invoiceNos = strategyFormMeta.linkedInvoiceNos.slice();
+      } else {
+        setStrategyFormError("Select at least one invoice from the table for invoice scope.");
+        updateStrategyInvoiceScopeHint();
+        return;
+      }
+    }
+
+    if (mode === "custom") {
+      if (!Array.isArray(strategyFormState.reminderSteps) || strategyFormState.reminderSteps.length === 0) {
+        setStrategyFormError("Add at least one reminder step for custom mode.");
+        return;
+      }
+      const invalidStepIndex = strategyFormState.reminderSteps.findIndex((step) => {
+        const parsedDays = Number(step.days);
+        return !Number.isFinite(parsedDays) || parsedDays < 0;
+      });
+      if (invalidStepIndex >= 0) {
+        setStrategyFormError(`Reminder ${invalidStepIndex + 1} needs a valid day value.`);
+        return;
+      }
+    }
+
+    const strategyPayload = {
+      customerId: customer.id,
+      customerName: customer.name || "",
+      scope,
+      invoiceNos,
+      strategyName,
+      reminderType: reminderTypeSelect?.value || "pre due",
+      status: getNormalizedStrategyStatus(statusSelect?.value || "active"),
+      notificationMode: mode,
+      keyAccountFilter: keyAccountSelect?.value || "Yes",
+      reminderSteps: mode === "custom"
+        ? strategyFormState.reminderSteps.map((step) => ({
+            when: step.when === "after_due" ? "after_due" : "before_due",
+            days: Math.max(0, Math.floor(Number(step.days) || 0)),
+            template: strategyTemplateOptions.includes(step.template) ? step.template : strategyTemplateOptions[0],
+            attachment: strategyAttachmentOptions.includes(step.attachment) ? step.attachment : strategyAttachmentOptions[0]
+          }))
+        : [],
+      invoiceFilters: {
+        subStatus: strategyFormState.subStatusOptions.filter((status) => strategyFormState.selectedSubStatuses.has(status)),
+        agingBuckets: strategyAgingBucketOptions.filter((bucket) => strategyFormState.selectedAgingBuckets.has(bucket))
+      }
+    };
+
+    const strategies = loadStrategyNotifications();
+    const isEditing = strategyFormMeta.mode === "edit" && Boolean(strategyFormMeta.strategyId);
+    if (isEditing) {
+      const targetIndex = strategies.findIndex((item) => item && item.id === strategyFormMeta.strategyId);
+      if (targetIndex >= 0) {
+        const existing = strategies[targetIndex];
+        strategies[targetIndex] = {
+          ...existing,
+          ...strategyPayload,
+          id: existing.id,
+          createdAt: existing.createdAt || new Date().toISOString()
+        };
+      } else {
+        strategies.unshift({
+          ...strategyPayload,
+          id: `strategy-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+          createdAt: new Date().toISOString()
+        });
+      }
+    } else {
+      strategies.unshift({
+        ...strategyPayload,
+        id: `strategy-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        createdAt: new Date().toISOString()
+      });
+    }
+
+    saveStrategyNotifications(strategies);
+    showStrategyForm(false);
+    renderStrategyNotifications();
+
+    const message = isEditing
+      ? "Strategy updated successfully."
+      : (scope === "invoice"
+          ? `Strategy created for ${invoiceNos.length} invoice${invoiceNos.length === 1 ? "" : "s"}.`
+          : "Strategy created for selected customer.");
+    showTransientNotification(isEditing ? "Strategy updated" : "Strategy saved", message);
+  });
+}
+
 function setDispositionVisible(show) {
   const panel = document.getElementById("dispositionPanel");
   if (!panel) return;
@@ -3001,6 +3761,49 @@ function openEmailPanel(invNo) {
   }
 }
 
+function openStrategyAccordionPanel() {
+  const strategyCollapseEl = document.getElementById("invoiceStrategyCollapse");
+  if (strategyCollapseEl && window.bootstrap && window.bootstrap.Collapse) {
+    const collapse = window.bootstrap.Collapse.getOrCreateInstance(strategyCollapseEl, { toggle: false });
+    collapse.show();
+  }
+}
+
+function openStrategyCreateFromHeader() {
+  setActiveTab("invoice");
+  ensureFirstInvoiceSelected();
+  openStrategyAccordionPanel();
+  showStrategyForm(true, { mode: "create" });
+  const scopeSelect = document.getElementById("strategyScopeSelect");
+  if (scopeSelect) {
+    scopeSelect.value = selectedInvoiceNos.size > 0 ? "invoice" : "customer";
+    scopeSelect.dispatchEvent(new Event("change", { bubbles: true }));
+  }
+  const nameInput = document.getElementById("strategyNameInput");
+  if (nameInput) nameInput.focus();
+}
+
+function openStrategyDetailsForInvoice(invNo, strategyId = "") {
+  if (!invNo) return;
+  setActiveTab("invoice");
+  if (!selectInvoiceByNo(invNo)) return;
+  openStrategyAccordionPanel();
+
+  let strategy = null;
+  if (strategyId) {
+    strategy = loadStrategyNotifications().find((item) => item && item.id === strategyId) || null;
+  }
+  if (!strategy) {
+    strategy = getRunningStrategyForInvoice(invNo, selectedCustomerId);
+  }
+  if (!strategy) {
+    showTransientNotification("No strategy found", "No running strategy is linked to this invoice.", "error");
+    return;
+  }
+
+  showStrategyForm(true, { mode: "view", strategy });
+}
+
 function closeEmailPanel() {
   emailInvoiceFilter = null;
   setEmailPanelVisible(false);
@@ -3165,6 +3968,7 @@ function selectInvoiceByNo(invNo) {
   if (!invoice) return false;
   renderInvoiceDetails(invoice);
   currentInvoiceNoForDocs = invNo;
+  renderStrategyNotifications();
   renderStoredRemarks(invNo);
   renderStoredActivityTrail(invNo);
   const customer = customersData.find(c => c.id === selectedCustomerId);
@@ -3362,6 +4166,18 @@ let currentCnAdvPdcRows = [];
 let cnAdvPdcSortState = { key: null, dir: null };
 let openCustomerPayModal = null;
 let openCustomerRemarkModal = null;
+let strategyFormState = {
+  subStatusOptions: [],
+  selectedSubStatuses: new Set(),
+  selectedAgingBuckets: new Set(),
+  reminderSteps: []
+};
+let strategyFormMeta = {
+  mode: "create",
+  strategyId: null,
+  originalScope: "customer",
+  linkedInvoiceNos: []
+};
 
 const filterState = {
   invoiceStatus: "__ALL__",
@@ -3874,6 +4690,8 @@ function applyFiltersAndRender() {
   }
   syncSelectAllCheckbox();
   updateBulkBar();
+  renderStrategyNotifications();
+  updateStrategyInvoiceScopeHint();
   updateUnreadEmailToggleCount();
   renderFilterChips();
 }
@@ -3926,7 +4744,9 @@ function renderInvoiceTable(invoices) {
   const actionLabel = isManagerView ? "Add remarks" : "New activity";
   const showAgentIconColumns = !isCustomerLandingView;
   const showStatusColumns = !isCustomerLandingView;
-  const emptyColSpan = showAgentIconColumns && showStatusColumns ? 12 : 8;
+  const customer = getSelectedCustomerRecord();
+  const customerId = customer?.id || selectedCustomerId;
+  const emptyColSpan = showAgentIconColumns && showStatusColumns ? 13 : 8;
 
   (invoices || []).forEach((inv) => {
     const isChecked = selectedInvoiceNos.has(inv.invoiceNo);
@@ -3939,6 +4759,9 @@ function renderInvoiceTable(invoices) {
     const emailTitle = Number(inv.unreadEmailCount || 0) > 0
       ? `Unread emails: ${inv.unreadEmailCount}`
       : "Email panel";
+    const runningStrategy = getRunningStrategyForInvoice(inv.invoiceNo, customerId);
+    const hasRunningStrategy = Boolean(runningStrategy);
+    const strategyTitle = hasRunningStrategy ? "View strategy details" : "No running strategy";
     const actionMarkup = isCustomerLandingView
       ? `
         <div class="invoiceActionGroup">
@@ -3971,6 +4794,17 @@ function renderInvoiceTable(invoices) {
         <span class="iconFlat" role="button" tabindex="0" title="${targetTitle}" data-action="target" data-inv="${inv.invoiceNo}" style="${hasTarget ? "color: #16a34a;" : ""}">
           <i class="bi bi-bullseye" aria-hidden="true"></i>
         </span>
+      </td>
+
+      <td class="colIcon cellCenter">
+        ${hasRunningStrategy
+          ? `<span class="iconFlat" role="button" tabindex="0" title="${strategyTitle}" data-action="strategy" data-inv="${inv.invoiceNo}" data-strategy-id="${escapeHtml(runningStrategy?.id || "")}" style="color:#d97706;">
+              <i class="bi bi-lightning-charge-fill" aria-hidden="true"></i>
+            </span>`
+          : `<span class="iconFlat" aria-hidden="true" title="${strategyTitle}" style="opacity:0; pointer-events:none;">
+              <i class="bi bi-lightning-charge-fill" aria-hidden="true"></i>
+            </span>`
+        }
       </td>` : ""}
 
       <td class="colInv" title="${inv.invoiceNo}">${inv.invoiceNo}</td>
@@ -4130,6 +4964,7 @@ function selectCustomer(customerId) {
   selectedCustomerId = customerId;
 
   selectedInvoiceNos = new Set();
+  showStrategyForm(false);
   emailInvoiceFilter = null;
   currentDocsScope = "customer";
   updateBulkBar();
@@ -6546,6 +7381,7 @@ function wireCustomerPayRemarkEvents() {
       applyFiltersAndRender();
       if (!selectInvoiceByNo(invoice.invoiceNo)) {
         currentInvoiceNoForDocs = invoice.invoiceNo;
+        renderStrategyNotifications();
         renderInvoiceDetails(invoice);
         renderStoredActivityTrail(invoice.invoiceNo);
       }
@@ -6595,6 +7431,7 @@ function wireCustomerPayRemarkEvents() {
       });
 
       currentInvoiceNoForDocs = invNo;
+      renderStrategyNotifications();
       if (!selectInvoiceByNo(invNo)) {
         const invoice = currentInvoicesAll.find((item) => item.invoiceNo === invNo);
         if (invoice) renderInvoiceDetails(invoice);
@@ -6742,6 +7579,7 @@ function wireInvoiceTableEvents() {
         renderInvoiceDetails(invoice);
         setActiveTab("invoice");
         currentInvoiceNoForDocs = invoice.invoiceNo;
+        renderStrategyNotifications();
         const customer = customersData.find(c => c.id === selectedCustomerId);
         if (customer) renderDocsList(customer);
       }
@@ -6752,6 +7590,7 @@ function wireInvoiceTableEvents() {
   if (iconFlat) {
     const action = iconFlat.getAttribute("data-action");
     const invFromIcon = iconFlat.getAttribute("data-inv") || "";
+    const strategyId = iconFlat.getAttribute("data-strategy-id") || "";
     if (action === "email") {
       openEmailPanel(invFromIcon);
       return;
@@ -6762,6 +7601,10 @@ function wireInvoiceTableEvents() {
         const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
         modal.show();
       }
+      return;
+    }
+    if (action === "strategy") {
+      openStrategyDetailsForInvoice(invFromIcon, strategyId);
       return;
     }
   }
@@ -7850,6 +8693,7 @@ document.addEventListener("DOMContentLoaded", () => {
   wireBulkEvents();
   wireFloatingMenuEvents();
   wireNotificationEvents();
+  wireStrategyNotificationEvents();
   wireTargetSummaryEvents();
   wireTodoEvents();
   wireCnAdvPdcEvents();
@@ -7979,6 +8823,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     if (event.key === activityTrailStorageKey) {
       renderStoredActivityTrail(currentInvoiceNoForDocs);
+    }
+    if (event.key === strategyNotificationsKey) {
+      renderStrategyNotifications();
+      updateStrategyInvoiceScopeHint();
     }
     if (event.key === issueTrackerCustomKey) {
       renderStoredActivityTrail(currentInvoiceNoForDocs);

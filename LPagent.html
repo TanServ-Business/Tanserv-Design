@@ -72,7 +72,8 @@
     }
 
     .right .tabPanel[data-tab="invoice"] .accordion-collapse.show .remarksList,
-    .right .tabPanel[data-tab="invoice"] .accordion-collapse.show .activityTrail {
+    .right .tabPanel[data-tab="invoice"] .accordion-collapse.show .activityTrail,
+    .right .tabPanel[data-tab="invoice"] .accordion-collapse.show .strategyNotificationsWrap {
       border: 1px solid #e2e8f4;
       border-radius: 12px;
       background: #ffffff;
@@ -290,6 +291,462 @@
       --event-badge-bg: #f5f3ff;
       --event-badge-text: #5b21b6;
       --event-badge-border: #ddd6fe;
+    }
+
+    .strategyNotificationsWrap {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 10px 12px;
+    }
+
+    .strategyPanelTop {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .strategyPanelTitle {
+      font-weight: 700;
+      font-size: 12px;
+      color: #0f172a;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .strategyCreateBtn {
+      border: 1px solid #cbd5e1;
+      background: #eff6ff;
+      color: #1d4ed8;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 6px 10px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .strategyCreateBtn:hover {
+      background: #dbeafe;
+    }
+
+    .strategyList {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .strategyEmpty {
+      border: 1px dashed #cbd5e1;
+      border-radius: 10px;
+      background: #f8fafc;
+      padding: 10px;
+      font-size: 11px;
+      color: #64748b;
+    }
+
+    .strategyCard {
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      background: #f8fafc;
+      padding: 10px;
+    }
+
+    .strategyCardHeader {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .strategyName {
+      font-size: 12px;
+      font-weight: 700;
+      color: #0f172a;
+      line-height: 1.3;
+    }
+
+    .strategyMetaRow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 4px;
+    }
+
+    .strategyPill {
+      font-size: 10px;
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      color: #334155;
+      border-radius: 999px;
+      padding: 1px 7px;
+      white-space: nowrap;
+    }
+
+    .strategyPill.is-active {
+      color: #166534;
+      border-color: #bbf7d0;
+      background: #f0fdf4;
+    }
+
+    .strategyPill.is-inactive {
+      color: #b91c1c;
+      border-color: #fecaca;
+      background: #fef2f2;
+    }
+
+    .strategyCardMeta {
+      font-size: 10.5px;
+      color: #475569;
+      margin-top: 4px;
+    }
+
+    .strategyCardMetaWrap {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 2px;
+    }
+
+    .strategyReadMoreBtn {
+      border: none;
+      background: transparent;
+      color: #2563eb;
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 0;
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+
+    .strategyReadMoreBtn:hover {
+      text-decoration: underline;
+    }
+
+    .strategyScopeInvoices {
+      margin-top: 6px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+
+    .strategyScopeInvoiceChip {
+      font-size: 10px;
+      border: 1px solid #dbeafe;
+      background: #eff6ff;
+      color: #1e40af;
+      border-radius: 999px;
+      padding: 1px 6px;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .strategyFormWrap {
+      border: 1px solid #dbe3f1;
+      border-radius: 12px;
+      background: #ffffff;
+      padding: 10px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+    }
+
+    .strategyFormHeader {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .strategyFormHeaderActions {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .strategyFormTitle {
+      font-size: 12px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .strategyGhostBtn {
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      color: #475569;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 8px;
+      cursor: pointer;
+    }
+
+    .strategySection {
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      background: #f8fafc;
+      padding: 8px;
+      margin-bottom: 8px;
+    }
+
+    .strategySectionTitle {
+      margin: 0 0 8px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #334155;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .strategyGrid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .strategyField label {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 10.5px;
+      color: #64748b;
+    }
+
+    .strategyField input,
+    .strategyField select {
+      width: 100%;
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      border-radius: 8px;
+      font-size: 11px;
+      color: #0f172a;
+      padding: 6px 8px;
+    }
+
+    .strategyField.is-full {
+      grid-column: 1 / -1;
+    }
+
+    .strategyHint {
+      font-size: 10px;
+      color: #64748b;
+      margin-top: 4px;
+    }
+
+    .strategyHint.is-alert {
+      color: #b91c1c;
+    }
+
+    .strategyMultiSelect {
+      position: relative;
+    }
+
+    .strategyMultiSelect summary {
+      list-style: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      background: #ffffff;
+      padding: 6px 8px;
+      font-size: 11px;
+      color: #0f172a;
+      cursor: pointer;
+    }
+
+    .strategyMultiSelect summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .strategyMultiSelectValue {
+      font-size: 10.5px;
+      color: #475569;
+      margin-left: auto;
+      margin-right: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 55%;
+    }
+
+    .strategyMultiSelect summary::after {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-right: 1.5px solid #64748b;
+      border-bottom: 1.5px solid #64748b;
+      transform: rotate(45deg);
+      margin-top: -2px;
+      flex: 0 0 auto;
+      transition: transform 0.2s ease;
+    }
+
+    .strategyMultiSelect[open] summary::after {
+      transform: rotate(-135deg);
+      margin-top: 2px;
+    }
+
+    .strategyMultiSelectOptions {
+      margin-top: 6px;
+      border: 1px solid #dbe3f1;
+      border-radius: 8px;
+      background: #ffffff;
+      max-height: 170px;
+      overflow: auto;
+      padding: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    #strategySubStatusMenu .strategyOption,
+    #strategyAgingMenu .strategyOption {
+      display: grid;
+      grid-template-columns: 14px minmax(0, 1fr) !important;
+      column-gap: 8px;
+      align-items: center;
+      justify-content: initial !important;
+      direction: ltr !important;
+      font-size: 11px;
+      color: #1f2937;
+      width: 100%;
+      padding: 4px 6px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    #strategySubStatusMenu .strategyOption:hover,
+    #strategyAgingMenu .strategyOption:hover {
+      background: #f1f5f9;
+    }
+
+    #strategySubStatusMenu .strategyOption > input[type="checkbox"],
+    #strategyAgingMenu .strategyOption > input[type="checkbox"] {
+      grid-column: 1;
+      justify-self: start;
+      margin: 0;
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+      order: 0 !important;
+    }
+
+    #strategySubStatusMenu .strategyOption > span,
+    #strategyAgingMenu .strategyOption > span {
+      grid-column: 2;
+      width: 100%;
+      justify-self: stretch;
+      order: 1 !important;
+      text-align: left;
+    }
+
+    .strategyReminderSection {
+      border-top: 1px dashed #dbe3f1;
+      margin-top: 8px;
+      padding-top: 8px;
+    }
+
+    .strategyReminderHeader {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .strategyReminderTitle {
+      font-size: 11px;
+      font-weight: 700;
+      color: #334155;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .strategyStepList {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .strategyStep {
+      border: 1px solid #dbe3f1;
+      border-radius: 10px;
+      background: #ffffff;
+      padding: 8px;
+    }
+
+    .strategyStepHeader {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .strategyStepTitle {
+      font-size: 11px;
+      font-weight: 700;
+      color: #1f2937;
+    }
+
+    .strategyDangerBtn {
+      border: none;
+      background: transparent;
+      color: #dc2626;
+      font-size: 10.5px;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .strategyFormError {
+      margin-bottom: 8px;
+      border: 1px solid #fecaca;
+      border-radius: 8px;
+      background: #fef2f2;
+      color: #b91c1c;
+      font-size: 10.5px;
+      padding: 6px 8px;
+    }
+
+    .strategyFormActions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .strategyPrimaryBtn {
+      border: 1px solid #1d4ed8;
+      background: #1d4ed8;
+      color: #ffffff;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 6px 10px;
+      cursor: pointer;
+    }
+
+    .strategyFormWrap.is-readonly .strategySection input,
+    .strategyFormWrap.is-readonly .strategySection select {
+      background: #f8fafc;
+      color: #475569;
+      border-color: #dbe3f1;
+      pointer-events: none;
+    }
+
+    .strategyFormWrap.is-readonly .strategyMultiSelect {
+      pointer-events: none;
+      opacity: 0.95;
+    }
+
+    @media (max-width: 992px) {
+      .strategyGrid {
+        grid-template-columns: minmax(0, 1fr);
+      }
     }
 
     .pdcFields {
@@ -841,6 +1298,11 @@
             <span>Filter</span>
           </button>
 
+          <button class="filterBtn" type="button" id="invoiceCreateStrategyBtn" title="Strategy">
+            <i class="bi bi-lightning-charge-fill" aria-hidden="true"></i>
+            <span>Strategy</span>
+          </button>
+
           <button class="notifyToggle" type="button" id="filterUnreadEmail" aria-pressed="false">
             <span class="notifyToggleLabel">
               <i class="bi bi-envelope-fill" aria-hidden="true"></i>
@@ -944,6 +1406,7 @@
 
               <th class="colIcon cellCenter" title="Email"><i class="bi bi-envelope-fill" aria-hidden="true"></i></th>
               <th class="colIcon cellCenter" title="Target for the month"><i class="bi bi-bullseye" aria-hidden="true"></i></th>
+              <th class="colIcon cellCenter" title="Running strategy"><i class="bi bi-lightning-charge-fill" aria-hidden="true"></i></th>
 
               <th class="colInv">Invoice</th>
               <th class="colAmtRight">Inv Amt</th>
@@ -1975,6 +2438,135 @@
               </div>
             </div>
           </div>
+
+          <div class="accordion mt-2" id="invoiceStrategyAccordion">
+            <div class="accordion-item" id="invoiceStrategyPanel">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#invoiceStrategyCollapse" aria-expanded="false" aria-controls="invoiceStrategyCollapse">
+                  Strategy Notifications
+                </button>
+              </h2>
+              <div id="invoiceStrategyCollapse" class="accordion-collapse collapse">
+                <div class="accordion-body">
+                  <div class="strategyNotificationsWrap">
+                    <div class="strategyPanelTop">
+                      <div class="strategyPanelTitle">Created strategies</div>
+                      <button class="strategyCreateBtn" type="button" id="strategyCreateBtn">Strategy</button>
+                    </div>
+
+                    <div id="strategyListWrap">
+                      <div class="strategyEmpty" id="strategyListEmpty">No strategies yet.</div>
+                      <div class="strategyList" id="strategyList"></div>
+                    </div>
+
+                    <div class="strategyFormWrap hidden" id="strategyFormWrap">
+                      <div class="strategyFormHeader">
+                        <div class="strategyFormTitle">Strategy</div>
+                        <div class="strategyFormHeaderActions">
+                          <button class="strategyGhostBtn hidden" type="button" id="strategyEditBtn">Edit</button>
+                          <button class="strategyGhostBtn" type="button" id="strategyCancelBtn">Cancel</button>
+                        </div>
+                      </div>
+
+                      <div class="strategyFormError hidden" id="strategyFormError"></div>
+
+                      <div class="strategySection">
+                        <div class="strategySectionTitle">Basic and Target</div>
+                        <div class="strategyGrid">
+                          <div class="strategyField">
+                            <label for="strategyNameInput">Strategy Name</label>
+                            <input id="strategyNameInput" type="text" maxlength="120" placeholder="Enter strategy name" />
+                          </div>
+                          <div class="strategyField">
+                            <label for="strategyReminderType">Reminder Type</label>
+                            <select id="strategyReminderType">
+                              <option value="pre due">pre due</option>
+                              <option value="post due">post due</option>
+                              <option value="both">both</option>
+                            </select>
+                          </div>
+                          <div class="strategyField">
+                            <label for="strategyScopeSelect">Strategy Scope</label>
+                            <select id="strategyScopeSelect">
+                              <option value="customer">customer</option>
+                              <option value="invoice">invoice</option>
+                            </select>
+                            <div class="strategyHint" id="strategyInvoiceSelectionHint">Invoice scope uses currently checked invoices.</div>
+                          </div>
+                          <div class="strategyField">
+                            <label for="strategyStatusSelect">Status</label>
+                            <select id="strategyStatusSelect">
+                              <option value="active">active</option>
+                              <option value="inactive">inactive</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="strategySection">
+                        <div class="strategySectionTitle">Notification Setting</div>
+                        <div class="strategyGrid">
+                          <div class="strategyField">
+                            <label for="strategyModeSelect">Notification Mode</label>
+                            <select id="strategyModeSelect">
+                              <option value="custom">custom</option>
+                              <option value="ongoing">ongoing</option>
+                            </select>
+                          </div>
+                          <div class="strategyField">
+                            <label for="strategyKeyAccountSelect">Key Account Filter</label>
+                            <select id="strategyKeyAccountSelect">
+                              <option value="Yes">Yes</option>
+                              <option value="No">No</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        <div class="strategyReminderSection hidden" id="strategyReminderStepsWrap">
+                          <div class="strategyReminderHeader">
+                            <div class="strategyReminderTitle">Reminder Steps</div>
+                            <button class="strategyGhostBtn" type="button" id="strategyAddStepBtn">Add reminder</button>
+                          </div>
+                          <div class="strategyStepList" id="strategyReminderStepsList"></div>
+                        </div>
+                      </div>
+
+                      <div class="strategySection">
+                        <div class="strategySectionTitle">Invoice Filters</div>
+                        <div class="strategyGrid">
+                          <div class="strategyField is-full">
+                            <label for="strategySubStatusSelectWrap">Sub status</label>
+                            <details class="strategyMultiSelect" id="strategySubStatusSelectWrap">
+                              <summary>
+                                <span>Select sub status</span>
+                                <span class="strategyMultiSelectValue" id="strategySubStatusValue">All selected</span>
+                              </summary>
+                              <div class="strategyMultiSelectOptions" id="strategySubStatusMenu"></div>
+                            </details>
+                          </div>
+
+                          <div class="strategyField is-full">
+                            <label for="strategyAgingSelectWrap">Aging bucket</label>
+                            <details class="strategyMultiSelect" id="strategyAgingSelectWrap">
+                              <summary>
+                                <span>Select aging bucket</span>
+                                <span class="strategyMultiSelectValue" id="strategyAgingValue">None selected</span>
+                              </summary>
+                              <div class="strategyMultiSelectOptions" id="strategyAgingMenu"></div>
+                            </details>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="strategyFormActions">
+                        <button class="strategyPrimaryBtn" type="button" id="strategySaveBtn">Save strategy</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -2074,7 +2666,8 @@
       const invoiceTab = document.querySelector('.tabPanel[data-tab="invoice"]');
       const collapses = [
         document.getElementById("invoiceRemarksCollapse"),
-        document.getElementById("invoiceActivityCollapse")
+        document.getElementById("invoiceActivityCollapse"),
+        document.getElementById("invoiceStrategyCollapse")
       ].filter(Boolean);
 
       if (!invoiceTab || collapses.length === 0) return;
