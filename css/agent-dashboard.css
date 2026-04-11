@@ -1183,6 +1183,11 @@ body.motion-preload .dashboardCard {
   margin-top: 6px;
 }
 
+.chartCard[data-chart="vintage"] .chartStats,
+.chartCard[data-chart="activity"] .chartStats {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .chartStat {
   background: #f8fafc;
   border: 1px solid #e2e8f4;

@@ -417,7 +417,7 @@
     ));
 
     const tenantBrandMap = {
-      apollo: { name: "Apollo", badge: "AP", logo: "assets/apollo-tyres-logo.svg" },
+      apollo: { name: "Apollo", badge: "AP", logo: "assets/apollo-sharkfin-logo.jpeg" },
       bikanerwala: { name: "Bikanerwala", badge: "BK" },
       global_ar: { name: "Global AR", badge: "GA" }
     };
@@ -765,6 +765,9 @@
       const notificationReadAllBtn = document.getElementById("notificationReadAllBtn");
       const commitmentSubmitKey = "ineburaCommitmentSubmissions";
       const commitmentSeenKey = "ineburaCommitmentStatusSeen";
+      const issueTrackerBaseKey = "issueTrackerBaseData";
+      const issueTrackerCustomKey = "customIssues";
+      const issueApprovalRequestKey = "approval_requests";
 
       const loadNotifications = () => {
         const stored = localStorage.getItem(notificationCenterKey);
@@ -777,35 +780,134 @@
         }
       };
 
+      const saveNotifications = (list) => {
+        try {
+          localStorage.setItem(notificationCenterKey, JSON.stringify(Array.isArray(list) ? list : []));
+        } catch (_) {
+          // ignore storage errors
+        }
+      };
+
+      const readStoredArray = (key) => {
+        try {
+          const raw = localStorage.getItem(key);
+          const parsed = JSON.parse(raw || "[]");
+          return Array.isArray(parsed) ? parsed : [];
+        } catch (_) {
+          return [];
+        }
+      };
+
+      const normalizeAudienceUser = (value) => (
+        String(value || "")
+          .toLowerCase()
+          .replace(/<[^>]*>/g, " ")
+          .replace(/\([^)]*\)/g, " ")
+          .replace(/[^a-z0-9]+/g, " ")
+          .trim()
+      );
+
+      const getActiveNotificationUser = () => String(localStorage.getItem("activeUserName") || "").trim();
+
+      const getNotificationAudience = () => {
+        const role = String(localStorage.getItem("activeUserRole") || "").trim().toLowerCase();
+        const roleAlias = {
+          manager: "manager",
+          customer: "customer",
+          agent: "agent",
+          supervisor: "supervisor",
+          kam: "kam",
+          kas: "kas",
+          admin: "admin",
+          ops: "ops",
+          "pdc-ops": "ops",
+          backend: "backend",
+          mis: "mis",
+          "support-admin": "support-admin",
+          "support-admin-lead": "support-admin-lead",
+          "client-admin": "client-admin"
+        };
+        return roleAlias[role] || "agent";
+      };
+
+      const getVisibleNotifications = () => {
+        const audience = getNotificationAudience();
+        const activeUser = normalizeAudienceUser(getActiveNotificationUser());
+        return loadNotifications().filter((note) => {
+          if (note.scheduledFor && !note.sentAt) return false;
+          const audiences = Array.isArray(note.audience)
+            ? note.audience
+            : (note.audience ? [note.audience] : []);
+          const audienceAllowed = audiences.length === 0 || audiences.includes("all") || audiences.includes(audience);
+          if (!audienceAllowed) return false;
+          const userAudiences = Array.isArray(note.audienceUsers)
+            ? note.audienceUsers.map(normalizeAudienceUser).filter(Boolean)
+            : [];
+          if (!userAudiences.length) return true;
+          if (!activeUser) return false;
+          return userAudiences.includes("all") || userAudiences.includes(activeUser);
+        });
+      };
+
       const formatCurrency = (value) => {
         const numeric = Number(value);
         if (!Number.isFinite(numeric)) return "-";
         return `Rs. ${numeric.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
       };
 
-      const buildCommitmentDetails = (note) => {
-        const rows = [
-          ["Invoice No", note.invoiceNo],
-          ["Customer", note.customerName],
-          ["Week", note.week],
-          ["Committed Amount", formatCurrency(note.targetAmount)]
-        ];
-        const content = rows.filter(([, value]) => value && value !== "-");
-        if (!content.length) return "";
-        return `
-          <div class="notificationDetails">
-            <table class="notificationDetailTable">
-              <tbody>
-                ${content.map(([label, value]) => (
-                  `<tr>
-                    <th>${escapeHtml(label)}</th>
-                    <td>${escapeHtml(String(value))}</td>
-                  </tr>`
-                )).join("")}
-              </tbody>
-            </table>
-          </div>
-        `;
+      const getDetailValue = (details, label) => {
+        const key = String(label || "").toLowerCase();
+        const match = (details || []).find((item) => String(item?.label || "").toLowerCase() === key);
+        return match ? String(match.value || "") : "";
+      };
+
+      const formatNotificationTime = (timestamp) => {
+        if (!timestamp) return "-";
+        const date = new Date(timestamp);
+        if (Number.isNaN(date.getTime())) return String(timestamp);
+        return date.toLocaleString("en-IN", {
+          day: "2-digit",
+          month: "short",
+          hour: "2-digit",
+          minute: "2-digit"
+        });
+      };
+
+      const buildNotificationTitle = (note, details) => {
+        const type = String(note.type || "").toLowerCase();
+        const customer = getDetailValue(details, "Customer");
+        const invoice = getDetailValue(details, "Invoice");
+        const visitDate = getDetailValue(details, "Visit date");
+
+        if (type === "visit-approval" || type === "visit-approval-pending" || type === "visit-plan-approved" || type === "visit-replan-required") {
+          const base = type === "visit-plan-approved"
+            ? "Visit plan approved"
+            : (type === "visit-replan-required" ? "Visit plan rejected" : "Visit approval pending");
+          return visitDate ? `${base} - ${visitDate}` : base;
+        }
+        if (type === "todo") return "Todo reminder";
+        if (type === "todo-assigned") return "Task assigned";
+        if (type === "todo-completed-ack") return "Task completed";
+        if (type === "commitment") {
+          return String(note.title || "Commitment update");
+        }
+        if (type === "credit-utilization-breach") return "Credit utilization breach";
+        if (type === "support-ticket-assigned") return "Support ticket assigned";
+        if (type === "support-ticket-update") return "Support ticket updated";
+        if (type === "support-sla-risk") return "Support SLA risk";
+        if (type === "issue-created-manager") return "Issue created";
+        if (type === "issue-manager-approved") return "Issue manager approval";
+        if (type === "issue-approval-forwarded") return "Issue approval forwarded";
+        if (type === "issue-approval-rejected") return "Issue approval rejected";
+        if (type === "issue-resolution-provided") return "Issue resolution provided";
+        if (type === "issue-ticket-closed") return "Issue ticket closed";
+        if (type === "issue-assignment-updated") return "Issue assignment updated";
+        if (type === "issue-approval-process-saved") return "Issue approval process saved";
+        if (type === "issue-remark-added") return "Issue remark added";
+        if (type === "issue-reopened") return "Issue reopened";
+        if (note.title) return String(note.title);
+        if (invoice && customer) return `Update - ${invoice} - ${customer}`;
+        return "Update";
       };
 
       const updateCommitmentNotifications = () => {
@@ -841,6 +943,7 @@
           if (seen[item.invoiceNo] === status) return;
           const statusLabel = status === "rejected" ? "rejected" : "approved";
           notifications.unshift({
+            id: `commitment-status:${item.invoiceNo || "unknown"}:${status}`,
             type: "commitment",
             status,
             title: status === "approved" ? "Commitment Approved" : "Commitment Rejected",
@@ -849,21 +952,786 @@
             customerName: item.customerName || "",
             week: item.week || "",
             targetAmount: item.targetAmount || 0,
-            createdAt: new Date().toLocaleString(),
+            createdAt: new Date().toISOString(),
             read: false
           });
           seen[item.invoiceNo] = status;
           changed = true;
         });
         if (changed) {
-          localStorage.setItem(notificationCenterKey, JSON.stringify(notifications));
+          saveNotifications(notifications);
           localStorage.setItem(commitmentSeenKey, JSON.stringify(seen));
         }
       };
 
+      const appendDummyIssueNotifications = () => {
+        const notifications = loadNotifications();
+        const existingIds = new Set(
+          notifications
+            .map((note) => String(note?.id || "").trim())
+            .filter(Boolean)
+        );
+        const now = Date.now();
+        const makeIso = (offsetMinutes) => new Date(now - (offsetMinutes * 60 * 1000)).toISOString();
+        const dummyItems = [
+          {
+            id: "dummy-issue-assigned-1",
+            type: "issue-assigned",
+            title: "Issue assigned",
+            message: "Issue ISS_2026_1001 assigned to you. Action required.",
+            createdAt: makeIso(2),
+            audience: ["all"],
+            details: [
+              { label: "Issue ID", value: "ISS_2026_1001" },
+              { label: "Customer", value: "Apollo Pharmacy Pvt. Ltd." },
+              { label: "Invoice", value: "INV_2026_1001" },
+              { label: "Action owner", value: "Rohit Malhotra" },
+              { label: "Due by", value: "15 Apr 2026" }
+            ],
+            ctas: [
+              { label: "Open issue", action: "link", href: "pages/issuetrackerLP.html" }
+            ]
+          },
+          {
+            id: "dummy-issue-approval-requested-1",
+            type: "issue-approval-requested",
+            title: "Issue approval requested",
+            message: "Approval required for issue ISS_2026_1002. Please review at your level.",
+            createdAt: makeIso(4),
+            audience: ["all"],
+            details: [
+              { label: "Process", value: "High Value Escalation" },
+              { label: "Matrix", value: "Collections Matrix A" },
+              { label: "Level", value: "2" },
+              { label: "Requested by", value: "Priya Verma" },
+              { label: "SLA", value: "24 hours" }
+            ],
+            ctas: [
+              { label: "Open approval request", action: "link", href: "bin/IssueTracker/approver-dashboard.html" }
+            ]
+          },
+          {
+            id: "dummy-issue-approval-decision-1",
+            type: "issue-approval-decision",
+            title: "Issue approval decision",
+            message: "Issue ISS_2026_1002 approved. Next action assigned.",
+            createdAt: makeIso(6),
+            audience: ["all"],
+            details: [
+              { label: "Decision", value: "Approved" },
+              { label: "By", value: "Sanjay Rao" },
+              { label: "Remarks", value: "Proceed with next level action." },
+              { label: "Next owner", value: "Anoop Sharma" },
+              { label: "Customer", value: "Sunrise Pvt Ltd" },
+              { label: "Invoice", value: "INV_2026_1002" }
+            ],
+            ctas: [
+              { label: "Open issue", action: "link", href: "pages/issuetrackerLP.html" }
+            ]
+          },
+          {
+            id: "dummy-issue-created-manager-1",
+            type: "issue-created-manager",
+            title: "Issue created",
+            message: "Issue ISS_2026_1003 created and awaiting manager review.",
+            createdAt: makeIso(8),
+            audience: ["all"],
+            details: [
+              { label: "Issue ID", value: "ISS_2026_1003" },
+              { label: "Customer", value: "BlueWave Distributors" },
+              { label: "Invoice", value: "INV_2026_1003" },
+              { label: "Created by", value: "Agent" },
+              { label: "Sub-status", value: "Dispute Raised" },
+              { label: "Due by", value: "18 Apr 2026" }
+            ],
+            ctas: [
+              { label: "Open issue", action: "link", href: "pages/issuetrackerLP.html" }
+            ]
+          },
+          {
+            id: "dummy-issue-manager-approved-1",
+            type: "issue-manager-approved",
+            title: "Issue manager approval",
+            message: "Issue ISS_2026_1004 approved by manager.",
+            createdAt: makeIso(10),
+            audience: ["all"],
+            details: [
+              { label: "Issue ID", value: "ISS_2026_1004" },
+              { label: "Approved by", value: "Meera Iyer" },
+              { label: "Approved at", value: "11 Apr 2026, 10:40 AM" },
+              { label: "Next owner", value: "Karthik Iyer" },
+              { label: "Remarks", value: "Approved for escalation workflow." }
+            ],
+            ctas: [
+              { label: "Open issue", action: "link", href: "pages/issuetrackerLP.html" }
+            ]
+          },
+          {
+            id: "dummy-issue-approval-forwarded-1",
+            type: "issue-approval-forwarded",
+            title: "Issue approval forwarded",
+            message: "Approval moved to next level for issue ISS_2026_1004.",
+            createdAt: makeIso(12),
+            audience: ["all"],
+            details: [
+              { label: "Issue ID", value: "ISS_2026_1004" },
+              { label: "Process", value: "High Value Escalation" },
+              { label: "From level", value: "2" },
+              { label: "To level", value: "3" },
+              { label: "Approved by", value: "Manager" },
+              { label: "Next approver", value: "CFO Approver" }
+            ],
+            ctas: [
+              { label: "Open approval request", action: "link", href: "bin/IssueTracker/approver-dashboard.html" }
+            ]
+          },
+          {
+            id: "dummy-issue-approval-rejected-1",
+            type: "issue-approval-rejected",
+            title: "Issue approval rejected",
+            message: "Approval rejected for issue ISS_2026_1005.",
+            createdAt: makeIso(14),
+            audience: ["all"],
+            details: [
+              { label: "Issue ID", value: "ISS_2026_1005" },
+              { label: "Level", value: "2" },
+              { label: "Rejected by", value: "Approver L2" },
+              { label: "Reason", value: "Insufficient supporting documents." },
+              { label: "Next action", value: "Agent rework" }
+            ],
+            ctas: [
+              { label: "Open issue", action: "link", href: "pages/issuetrackerLP.html" }
+            ]
+          },
+          {
+            id: "dummy-issue-resolution-provided-1",
+            type: "issue-resolution-provided",
+            title: "Issue resolution provided",
+            message: "Resolution provided for issue ISS_2026_1006.",
+            createdAt: makeIso(16),
+            audience: ["all"],
+            details: [
+              { label: "Issue ID", value: "ISS_2026_1006" },
+              { label: "Resolution by", value: "Action Owner" },
+              { label: "Resolution summary", value: "Adjusted invoice and shared POD." },
+              { label: "Submitted at", value: "11 Apr 2026, 09:20 AM" }
+            ],
+            ctas: [
+              { label: "Open issue", action: "link", href: "pages/issuetrackerLP.html" }
+            ]
+          },
+          {
+            id: "dummy-issue-ticket-closed-1",
+            type: "issue-ticket-closed",
+            title: "Issue ticket closed",
+            message: "Issue ISS_2026_1007 has been closed.",
+            createdAt: makeIso(18),
+            audience: ["all"],
+            details: [
+              { label: "Issue ID", value: "ISS_2026_1007" },
+              { label: "Closed by", value: "Manager" },
+              { label: "Closed at", value: "11 Apr 2026, 08:35 AM" },
+              { label: "Closure remark", value: "Resolved with customer confirmation." }
+            ],
+            ctas: [
+              { label: "Open issue", action: "link", href: "pages/issuetrackerLP.html" }
+            ]
+          },
+          {
+            id: "dummy-issue-assignment-updated-1",
+            type: "issue-assignment-updated",
+            title: "Issue assignment updated",
+            message: "Issue ISS_2026_1008 assigned to new action owner.",
+            createdAt: makeIso(20),
+            audience: ["all"],
+            details: [
+              { label: "Issue ID", value: "ISS_2026_1008" },
+              { label: "Customer", value: "Apollo Pharmacy Pvt. Ltd." },
+              { label: "Invoice", value: "INV_2026_1008" },
+              { label: "Assigned by", value: "Manager" },
+              { label: "New action owner", value: "Neha Gupta" },
+              { label: "Remark", value: "Reassigned for faster closure." }
+            ],
+            ctas: [
+              { label: "Open issue", action: "link", href: "pages/issuetrackerLP.html" }
+            ]
+          },
+          {
+            id: "dummy-issue-approval-process-saved-1",
+            type: "issue-approval-process-saved",
+            title: "Issue approval process saved",
+            message: "Approval process updated for issue ISS_2026_1009.",
+            createdAt: makeIso(22),
+            audience: ["all"],
+            details: [
+              { label: "Issue ID", value: "ISS_2026_1009" },
+              { label: "Process", value: "Legal Escalation" },
+              { label: "Updated by", value: "Manager" },
+              { label: "Remark", value: "Process selected for compliance review." }
+            ],
+            ctas: [
+              { label: "Open issue", action: "link", href: "pages/issuetrackerLP.html" }
+            ]
+          },
+          {
+            id: "dummy-issue-remark-added-1",
+            type: "issue-remark-added",
+            title: "Issue remark added",
+            message: "New remark added on issue ISS_2026_1010.",
+            createdAt: makeIso(24),
+            audience: ["all"],
+            details: [
+              { label: "Issue ID", value: "ISS_2026_1010" },
+              { label: "Added by", value: "Agent" },
+              { label: "Remark", value: "Customer requested revised due date." }
+            ],
+            ctas: [
+              { label: "Open issue", action: "link", href: "pages/issuetrackerLP.html" }
+            ]
+          },
+          {
+            id: "dummy-issue-reopened-1",
+            type: "issue-reopened",
+            title: "Issue reopened",
+            message: "Issue ISS_2026_1011 has been reopened.",
+            createdAt: makeIso(26),
+            audience: ["all"],
+            details: [
+              { label: "Issue ID", value: "ISS_2026_1011" },
+              { label: "Reopened by", value: "Manager" },
+              { label: "Reopened at", value: "11 Apr 2026, 07:10 AM" },
+              { label: "Remark", value: "Pending final customer confirmation." }
+            ],
+            ctas: [
+              { label: "Open issue", action: "link", href: "pages/issuetrackerLP.html" }
+            ]
+          }
+        ];
+
+        let changed = false;
+        dummyItems.forEach((item) => {
+          if (existingIds.has(item.id)) return;
+          notifications.push({
+            ...item,
+            read: false
+          });
+          existingIds.add(item.id);
+          changed = true;
+        });
+
+        if (changed) saveNotifications(notifications);
+      };
+
+      const syncIssueNotificationsToCenter = () => {
+        const existing = loadNotifications();
+        const byId = new Map(existing.map((note) => [String(note?.id || ""), note]));
+        const upsert = (payload) => {
+          const id = String(payload?.id || "").trim();
+          if (!id) return;
+          const previous = byId.get(id) || {};
+          byId.set(id, {
+            ...previous,
+            ...payload,
+            id,
+            read: Boolean(previous.read)
+          });
+        };
+        const slugToken = (value) => (
+          String(value || "")
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/^-+|-+$/g, "")
+            .slice(0, 80)
+            || "na"
+        );
+        const uniqueRecipients = (...values) => {
+          const seen = new Set();
+          const recipients = [];
+          values.flat().forEach((value) => {
+            const raw = String(value || "").trim();
+            if (!raw) return;
+            const normalized = normalizeAudienceUser(raw);
+            if (!normalized || seen.has(normalized)) return;
+            seen.add(normalized);
+            recipients.push(raw);
+          });
+          return recipients;
+        };
+        const parseBracketValue = (text, fallback) => {
+          const match = String(text || "").match(/\(([^)]+)\)/);
+          return (match?.[1] || fallback || "").trim();
+        };
+        const parseResolutionSummary = (text) => {
+          const source = String(text || "");
+          const resolutionMatch = source.match(/Resolution:\s*([^\n]+)/i);
+          if (resolutionMatch?.[1]) return resolutionMatch[1].trim();
+          return source.split("\n")[0].trim() || "-";
+        };
+        const buildTrailEventKey = (entry, index) => {
+          if (entry?.trailId) return String(entry.trailId);
+          if (entry?.approvalKey) return slugToken(entry.approvalKey);
+          return [
+            slugToken(entry?.type),
+            slugToken(entry?.when),
+            slugToken(entry?.who),
+            slugToken(entry?.what),
+            String(index)
+          ].join(":");
+        };
+        const pushIssueNotification = (payload) => {
+          const id = String(payload?.id || "").trim();
+          const recipients = uniqueRecipients(payload?.audienceUsers || []);
+          if (!id || !payload?.type || !recipients.length) return;
+          upsert({
+            ...payload,
+            id,
+            audience: ["all"],
+            audienceUsers: recipients
+          });
+        };
+
+        const baseInvoices = readStoredArray(issueTrackerBaseKey);
+        const invoiceById = new Map();
+        baseInvoices.forEach((invoiceEntry) => {
+          const invoiceId = String(invoiceEntry?.id || invoiceEntry?.invoiceNo || "").trim();
+          if (!invoiceId) return;
+          invoiceById.set(invoiceId, invoiceEntry || {});
+        });
+
+        const baseIssues = baseInvoices.flatMap((invoiceEntry) => (
+          Array.isArray(invoiceEntry?.issues)
+            ? invoiceEntry.issues.map((issue) => ({
+                ...issue,
+                invoiceNo: issue?.invoiceNo || invoiceEntry?.invoiceNo || invoiceEntry?.id || "",
+                customerName: issue?.customerName || invoiceEntry?.customerName || invoiceEntry?.customer || "",
+                kam: issue?.kam || invoiceEntry?.kam || "",
+                manager: issue?.manager || invoiceEntry?.manager || "",
+                agent: issue?.agent || ""
+              }))
+            : []
+        ));
+        const customIssues = readStoredArray(issueTrackerCustomKey);
+        const issueList = [...baseIssues, ...customIssues].map((issue) => {
+          const invoiceNo = String(issue?.invoiceNo || issue?.invoiceId || "").trim();
+          const invoiceEntry = invoiceNo ? invoiceById.get(invoiceNo) : null;
+          return {
+            ...issue,
+            invoiceNo: invoiceNo || issue?.invoiceNo || "",
+            customerName: issue?.customerName || invoiceEntry?.customerName || invoiceEntry?.customer || "",
+            kam: issue?.kam || invoiceEntry?.kam || "",
+            manager: issue?.manager || invoiceEntry?.manager || "",
+            agent: issue?.agent || "",
+            actionTrail: Array.isArray(issue?.actionTrail) ? issue.actionTrail : []
+          };
+        });
+        const issueById = new Map();
+
+        issueList.forEach((issue) => {
+          const issueId = String(issue?.id || "").trim();
+          if (!issueId) return;
+          const previous = issueById.get(issueId) || {};
+          issueById.set(issueId, {
+            id: issueId,
+            invoiceNo: issue?.invoiceNo || previous.invoiceNo || "",
+            customerName: issue?.customerName || previous.customerName || "",
+            subStatus: issue?.subStatus || previous.subStatus || "",
+            dueBy: issue?.invoiceDueDate || issue?.dueBy || previous.dueBy || "",
+            actionOwner: issue?.actionOwner || previous.actionOwner || "",
+            manager: issue?.manager || previous.manager || "",
+            agent: issue?.agent || previous.agent || "",
+            kam: issue?.kam || previous.kam || "",
+            createdAt: issue?.createdAt || issue?.created || previous.createdAt || "",
+            updatedAt: issue?.updatedAt || previous.updatedAt || "",
+            approvalProcessName: issue?.approvalProcessName || previous.approvalProcessName || "",
+            actionTrail: Array.isArray(issue?.actionTrail) && issue.actionTrail.length
+              ? issue.actionTrail
+              : (Array.isArray(previous.actionTrail) ? previous.actionTrail : [])
+          });
+        });
+
+        issueById.forEach((issue) => {
+          const issueId = issue?.id || "";
+          const managerRaw = issue?.manager || "";
+          const createdAt = issue?.createdAt || issue?.updatedAt || new Date().toISOString();
+
+          if (managerRaw) {
+            pushIssueNotification({
+              id: `issue-created-manager:${issueId}:${slugToken(managerRaw)}`,
+              type: "issue-created-manager",
+              title: "Issue created",
+              message: `Issue ${issueId} created and awaiting manager review.`,
+              createdAt,
+              audienceUsers: [managerRaw],
+              details: [
+                { label: "Issue ID", value: issueId },
+                { label: "Customer", value: issue?.customerName || "-" },
+                { label: "Invoice", value: issue?.invoiceNo || "-" },
+                { label: "Created by", value: issue?.agent || "-" },
+                { label: "Sub-status", value: issue?.subStatus || "-" },
+                { label: "Due by", value: issue?.dueBy || "-" }
+              ],
+              ctas: [
+                { label: "Open issue", action: "link", href: "pages/issuetrackerLP.html" }
+              ]
+            });
+          }
+
+          const assigneeRaw = issue?.actionOwner || "";
+          const assignee = normalizeAudienceUser(assigneeRaw);
+          if (issueId && assignee) {
+            pushIssueNotification({
+              id: `issue-assigned:${issueId}:${assignee}`,
+              type: "issue-assigned",
+              title: "Issue assigned",
+              message: `Issue ${issueId} assigned to you. ${issue?.subStatus || "Action required"}.`,
+              createdAt,
+              audienceUsers: [assigneeRaw],
+              details: [
+                { label: "Issue ID", value: issueId },
+                { label: "Customer", value: issue?.customerName || "-" },
+                { label: "Invoice", value: issue?.invoiceNo || "-" },
+                { label: "Action owner", value: assigneeRaw || "-" },
+                { label: "Due by", value: issue?.dueBy || "-" }
+              ],
+              ctas: [
+                { label: "Open issue", action: "link", href: "pages/issuetrackerLP.html" }
+              ]
+            });
+          }
+
+          const trail = Array.isArray(issue?.actionTrail) ? issue.actionTrail : [];
+          trail.forEach((entry, index) => {
+            const type = String(entry?.type || "").toLowerCase();
+            const whatText = String(entry?.what || "");
+            const what = whatText.toLowerCase();
+            const actor = String(entry?.who || "").trim() || "User";
+            const at = entry?.when || issue?.updatedAt || issue?.createdAt || new Date().toISOString();
+            const trailKey = buildTrailEventKey(entry, index);
+
+            if (type === "assignment" && what.includes("assigned to action owner")) {
+              const newOwner = parseBracketValue(whatText, issue?.actionOwner || "");
+              pushIssueNotification({
+                id: `issue-assignment-updated:${issueId}:${trailKey}`,
+                type: "issue-assignment-updated",
+                title: "Issue assignment updated",
+                message: `Issue ${issueId} assigned to ${newOwner || "action owner"}.`,
+                createdAt: at,
+                audienceUsers: [issue?.agent || "", issue?.manager || "", issue?.kam || "", newOwner],
+                details: [
+                  { label: "Issue ID", value: issueId },
+                  { label: "Customer", value: issue?.customerName || "-" },
+                  { label: "Invoice", value: issue?.invoiceNo || "-" },
+                  { label: "Assigned by", value: actor || "-" },
+                  { label: "New action owner", value: newOwner || issue?.actionOwner || "-" },
+                  { label: "Remark", value: entry?.remark || "-" }
+                ],
+                ctas: [
+                  { label: "Open issue", action: "link", href: "pages/issuetrackerLP.html" }
+                ]
+              });
+            }
+
+            if (type === "assigned" && what.includes("selected approval process")) {
+              const processName = parseBracketValue(whatText, issue?.approvalProcessName || "");
+              pushIssueNotification({
+                id: `issue-approval-process-saved:${issueId}:${trailKey}`,
+                type: "issue-approval-process-saved",
+                title: "Issue approval process saved",
+                message: `Approval process updated for issue ${issueId}.`,
+                createdAt: at,
+                audienceUsers: [issue?.manager || "", issue?.agent || "", issue?.kam || ""],
+                details: [
+                  { label: "Issue ID", value: issueId },
+                  { label: "Process", value: processName || issue?.approvalProcessName || "-" },
+                  { label: "Updated by", value: actor || "-" },
+                  { label: "Remark", value: entry?.remark || "-" }
+                ],
+                ctas: [
+                  { label: "Open issue", action: "link", href: "pages/issuetrackerLP.html" }
+                ]
+              });
+            }
+
+            if (type === "remark" && /^updated remark\b/.test(what)) {
+              pushIssueNotification({
+                id: `issue-remark-added:${issueId}:${trailKey}`,
+                type: "issue-remark-added",
+                title: "Issue remark added",
+                message: `New remark added on issue ${issueId}.`,
+                createdAt: at,
+                audienceUsers: [issue?.actionOwner || ""],
+                details: [
+                  { label: "Issue ID", value: issueId },
+                  { label: "Added by", value: actor || "-" },
+                  { label: "Remark", value: entry?.remark || "-" }
+                ],
+                ctas: [
+                  { label: "Open issue", action: "link", href: "pages/issuetrackerLP.html" }
+                ]
+              });
+            }
+
+            if (type === "approval" && what.includes("approved the issue") && !entry?.approvalKey) {
+              pushIssueNotification({
+                id: `issue-manager-approved:${issueId}:${trailKey}`,
+                type: "issue-manager-approved",
+                title: "Issue manager approval",
+                message: `Issue ${issueId} approved by manager.`,
+                createdAt: at,
+                audienceUsers: [issue?.kam || "", issue?.agent || "", issue?.actionOwner || ""],
+                details: [
+                  { label: "Issue ID", value: issueId },
+                  { label: "Approved by", value: actor || "-" },
+                  { label: "Customer", value: issue?.customerName || "-" },
+                  { label: "Invoice", value: issue?.invoiceNo || "-" },
+                  { label: "Remark", value: entry?.remark || "-" }
+                ],
+                ctas: [
+                  { label: "Open issue", action: "link", href: "pages/issuetrackerLP.html" }
+                ]
+              });
+            }
+
+            if (type === "resolution") {
+              pushIssueNotification({
+                id: `issue-resolution-provided:${issueId}:${trailKey}`,
+                type: "issue-resolution-provided",
+                title: "Issue resolution provided",
+                message: `Resolution provided for issue ${issueId}.`,
+                createdAt: at,
+                audienceUsers: [issue?.agent || "", issue?.manager || ""],
+                details: [
+                  { label: "Issue ID", value: issueId },
+                  { label: "Resolution by", value: actor || "-" },
+                  { label: "Resolution summary", value: parseResolutionSummary(entry?.remark || "") },
+                  { label: "Submitted at", value: at || "-" }
+                ],
+                ctas: [
+                  { label: "Open issue", action: "link", href: "pages/issuetrackerLP.html" }
+                ]
+              });
+            }
+
+            if (type === "closure" && what.includes("closed the issue")) {
+              pushIssueNotification({
+                id: `issue-ticket-closed:${issueId}:${trailKey}`,
+                type: "issue-ticket-closed",
+                title: "Issue ticket closed",
+                message: `Issue ${issueId} has been closed.`,
+                createdAt: at,
+                audienceUsers: [issue?.kam || "", issue?.actionOwner || ""],
+                details: [
+                  { label: "Issue ID", value: issueId },
+                  { label: "Closed by", value: actor || "-" },
+                  { label: "Closed at", value: at || "-" },
+                  { label: "Closure remark", value: entry?.remark || "-" }
+                ],
+                ctas: [
+                  { label: "Open issue", action: "link", href: "pages/issuetrackerLP.html" }
+                ]
+              });
+            }
+
+            if (type === "reopen") {
+              pushIssueNotification({
+                id: `issue-reopened:${issueId}:${trailKey}`,
+                type: "issue-reopened",
+                title: "Issue reopened",
+                message: `Issue ${issueId} has been reopened.`,
+                createdAt: at,
+                audienceUsers: [issue?.agent || "", issue?.manager || "", issue?.kam || "", issue?.actionOwner || ""],
+                details: [
+                  { label: "Issue ID", value: issueId },
+                  { label: "Reopened by", value: actor || "-" },
+                  { label: "Reopened at", value: at || "-" },
+                  { label: "Remark", value: entry?.remark || "-" }
+                ],
+                ctas: [
+                  { label: "Open issue", action: "link", href: "pages/issuetrackerLP.html" }
+                ]
+              });
+            }
+          });
+        });
+
+        const requests = readStoredArray(issueApprovalRequestKey);
+        requests.forEach((req) => {
+          const reqId = String(req?.id || "").trim();
+          if (!reqId) return;
+          const status = String(req?.status || "pending").toLowerCase();
+          const level = Number(req?.currentLevel || 1);
+          const levels = Array.isArray(req?.levels) ? req.levels : [];
+          const levelOwner = levels[level - 1] || {};
+          const ownerTarget = levelOwner.ownerName || levelOwner.ownerEmail || "";
+          const issueId = String(req?.issue?.id || "").trim();
+          const issueContext = issueById.get(issueId) || {};
+          const invoiceContext = (
+            String(req?.invoice?.id || "").trim()
+              ? (invoiceById.get(String(req?.invoice?.id || "").trim()) || {})
+              : {}
+          );
+          const managerUser = issueContext?.manager || req?.issue?.manager || invoiceContext?.manager || "";
+          const agentUser = issueContext?.agent || req?.issue?.agent || "";
+          const kamUser = issueContext?.kam || req?.issue?.kam || invoiceContext?.kam || "";
+          const actionOwnerUser = req?.issue?.actionOwner || issueContext?.actionOwner || "";
+          const issueCustomer = req?.invoice?.customer || issueContext?.customerName || "-";
+          const issueInvoice = req?.invoice?.id || issueContext?.invoiceNo || "-";
+          const submittedEntry = (Array.isArray(req?.trail) ? req.trail : []).find((entry) => (
+            String(entry?.action || "").toLowerCase() === "submitted"
+          ));
+          const decisionEntry = (Array.isArray(req?.trail) ? req.trail : [])
+            .slice()
+            .reverse()
+            .find((entry) => ["approved", "rejected"].includes(String(entry?.action || "").toLowerCase()));
+          const reqTrail = Array.isArray(req?.trail) ? req.trail : [];
+
+          if (status === "pending" && ownerTarget) {
+            const ownerEmail = levelOwner.ownerEmail || "";
+            const ownerHint = ownerEmail || ownerTarget;
+            pushIssueNotification({
+              id: `issue-approval-requested:${reqId}:level-${level}`,
+              type: "issue-approval-requested",
+              title: "Issue approval requested",
+              message: `Approval required for issue ${issueId || "-"}. Please review at your level.`,
+              createdAt: req?.updatedAt || req?.createdAt || new Date().toISOString(),
+              audienceUsers: [ownerTarget],
+              details: [
+                { label: "Process", value: req?.processName || req?.processId || "-" },
+                { label: "Matrix", value: req?.matrixName || "-" },
+                { label: "Level", value: String(level) },
+                { label: "Requested by", value: submittedEntry?.by || "-" },
+                { label: "SLA", value: req?.slaHours ? `${req.slaHours} hours` : "-" }
+              ],
+              ctas: [
+                { label: "Open approval request", action: "link", href: `bin/IssueTracker/approval-request.html?id=${encodeURIComponent(reqId)}&user=${encodeURIComponent(ownerHint)}` }
+              ]
+            });
+          }
+
+          reqTrail.forEach((trailEntry, trailIndex) => {
+            const action = String(trailEntry?.action || "").toLowerCase();
+            if (action !== "approved" && action !== "rejected") return;
+            const entryLevel = Number(trailEntry?.level || 1);
+            const entryAt = trailEntry?.at || req?.updatedAt || req?.createdAt || new Date().toISOString();
+            const actor = String(trailEntry?.by || "").trim() || "Approver";
+            const eventKey = buildTrailEventKey({
+              trailId: trailEntry?.trailId,
+              approvalKey: `${reqId}:${entryLevel}:${entryAt}:${action}`,
+              type: action,
+              who: actor,
+              when: entryAt
+            }, trailIndex);
+
+            if (action === "approved") {
+              const managerNorm = normalizeAudienceUser(managerUser);
+              const actorNorm = normalizeAudienceUser(actor);
+              const isManagerApproval = (managerNorm && actorNorm && managerNorm === actorNorm) || entryLevel === 1;
+              if (isManagerApproval) {
+                pushIssueNotification({
+                  id: `issue-manager-approved:${reqId}:${eventKey}`,
+                  type: "issue-manager-approved",
+                  title: "Issue manager approval",
+                  message: `Issue ${issueId || "-"} approved by manager.`,
+                  createdAt: entryAt,
+                  audienceUsers: [kamUser, agentUser, actionOwnerUser],
+                  details: [
+                    { label: "Issue ID", value: issueId || "-" },
+                    { label: "Approved by", value: actor || "-" },
+                    { label: "Approved at", value: entryAt || "-" },
+                    { label: "Next owner", value: actionOwnerUser || "-" },
+                    { label: "Remarks", value: trailEntry?.remark || "-" }
+                  ],
+                  ctas: [
+                    { label: "Open issue", action: "link", href: "pages/issuetrackerLP.html" }
+                  ]
+                });
+              }
+
+              const nextLevelOwner = levels[entryLevel] || {};
+              const nextTarget = nextLevelOwner.ownerName || nextLevelOwner.ownerEmail || "";
+              if (nextTarget) {
+                const nextHint = nextLevelOwner.ownerEmail || nextTarget;
+                pushIssueNotification({
+                  id: `issue-approval-forwarded:${reqId}:${eventKey}`,
+                  type: "issue-approval-forwarded",
+                  title: "Issue approval forwarded",
+                  message: `Approval moved to next level for issue ${issueId || "-"}.`,
+                  createdAt: entryAt,
+                  audienceUsers: [nextTarget, kamUser, agentUser, actionOwnerUser],
+                  details: [
+                    { label: "Issue ID", value: issueId || "-" },
+                    { label: "Process", value: req?.processName || req?.processId || "-" },
+                    { label: "From level", value: String(entryLevel) },
+                    { label: "To level", value: String(entryLevel + 1) },
+                    { label: "Approved by", value: actor || "-" },
+                    { label: "Next approver", value: nextTarget || "-" }
+                  ],
+                  ctas: [
+                    { label: "Open approval request", action: "link", href: `bin/IssueTracker/approval-request.html?id=${encodeURIComponent(reqId)}&user=${encodeURIComponent(nextHint)}` }
+                  ]
+                });
+              }
+            }
+
+            if (action === "rejected") {
+              pushIssueNotification({
+                id: `issue-approval-rejected:${reqId}:${eventKey}`,
+                type: "issue-approval-rejected",
+                title: "Issue approval rejected",
+                message: `Approval rejected for issue ${issueId || "-"}.`,
+                createdAt: entryAt,
+                audienceUsers: [kamUser, agentUser, actionOwnerUser],
+                details: [
+                  { label: "Issue ID", value: issueId || "-" },
+                  { label: "Level", value: String(entryLevel) },
+                  { label: "Rejected by", value: actor || "-" },
+                  { label: "Reason", value: trailEntry?.remark || "-" },
+                  { label: "Next action", value: actionOwnerUser || "-" }
+                ],
+                ctas: [
+                  { label: "Open issue", action: "link", href: "pages/issuetrackerLP.html" }
+                ]
+              });
+            }
+          });
+
+          if (status === "approved" || status === "rejected") {
+            const decisionAt = req?.updatedAt || req?.reviewedAt || decisionEntry?.at || req?.createdAt || "";
+            pushIssueNotification({
+              id: `issue-approval-decision:${reqId}:${status}:${decisionAt || "latest"}`,
+              type: "issue-approval-decision",
+              title: "Issue approval decision",
+              message: `Issue ${issueId || "-"} ${status}. Next action assigned.`,
+              createdAt: decisionAt || new Date().toISOString(),
+              audienceUsers: [kamUser, agentUser, actionOwnerUser],
+              details: [
+                { label: "Decision", value: status === "approved" ? "Approved" : "Rejected" },
+                { label: "By", value: decisionEntry?.by || "-" },
+                { label: "Remarks", value: decisionEntry?.remark || "-" },
+                { label: "Next owner", value: actionOwnerUser || "-" },
+                { label: "Customer", value: issueCustomer || "-" },
+                { label: "Invoice", value: issueInvoice || "-" }
+              ],
+              ctas: [
+                { label: "Open issue", action: "link", href: "pages/issuetrackerLP.html" }
+              ]
+            });
+          }
+        });
+
+        const next = Array.from(byId.values())
+          .filter((note) => note && String(note.id || "").trim())
+          .sort((a, b) => {
+            const at = new Date(a?.sentAt || a?.createdAt || 0).getTime();
+            const bt = new Date(b?.sentAt || b?.createdAt || 0).getTime();
+            return bt - at;
+          });
+        saveNotifications(next);
+      };
+
       const updateNotificationBadge = () => {
         if (!notificationBellCount) return;
-        const unreadCount = loadNotifications().filter(note => !note.read).length;
+        const unreadCount = getVisibleNotifications().filter(note => !note.read).length;
         notificationBellCount.textContent = String(unreadCount);
         notificationBellCount.classList.toggle("hidden", unreadCount === 0);
         if (notificationReadAllBtn) notificationReadAllBtn.disabled = unreadCount === 0;
@@ -871,34 +1739,134 @@
 
       const renderNotificationPopup = () => {
         if (!notificationList) return;
-        const notes = loadNotifications();
+        const notes = getVisibleNotifications();
         if (notes.length === 0) {
           notificationList.innerHTML = "<div class=\"notificationEmpty\">No notifications yet.</div>";
           return;
         }
+        const typeLabelMap = {
+          pdc: "PDC",
+          "pdc-reminder": "PDC reminder",
+          "pdc-bounced": "PDC",
+          "pdc-handoff": "PDC",
+          commitment: "Commitment",
+          "commitment-approved": "Commitment",
+          "commitment-submitted": "Commitment",
+          "commitment-rejected": "Commitment",
+          "visit-approval": "Visit approval",
+          "visit-approval-pending": "Visit approval",
+          "visit-plan-approved": "Visit approval",
+          "visit-replan-required": "Visit approval",
+          todo: "Todo",
+          "todo-assigned": "Todo",
+          "todo-completed-ack": "Todo",
+          email: "Email",
+          "backend-upload-exception": "Backend",
+          "mis-schedule-failed": "MIS",
+          "issue-assigned": "Issue",
+          "issue-approval-requested": "Issue",
+          "issue-approval-decision": "Issue",
+          "issue-created-manager": "Issue",
+          "issue-manager-approved": "Issue",
+          "issue-approval-forwarded": "Issue",
+          "issue-approval-rejected": "Issue",
+          "issue-resolution-provided": "Issue",
+          "issue-ticket-closed": "Issue",
+          "issue-assignment-updated": "Issue",
+          "issue-approval-process-saved": "Issue",
+          "issue-remark-added": "Issue",
+          "issue-reopened": "Issue",
+          "credit-limit-request": "Credit Limit",
+          "credit-limit-decision": "Credit Limit",
+          "credit-utilization-breach": "Credit Limit",
+          "support-ticket-assigned": "Support",
+          "support-ticket-update": "Support",
+          "support-sla-risk": "Support"
+        };
+
         notificationList.innerHTML = notes.map((note, index) => {
+          const noteId = String(note.id || `note-${index}`);
+          const details = Array.isArray(note.details) ? note.details : [];
+          const legacyCommitmentDetails = String(note.type || "").toLowerCase() === "commitment" && details.length === 0
+            ? [
+                { label: "Invoice", value: note.invoiceNo || "-" },
+                { label: "Customer", value: note.customerName || "-" },
+                { label: "Week", value: note.week || "-" },
+                { label: "Committed Amount", value: formatCurrency(note.targetAmount) }
+              ]
+            : [];
+          const detailRows = details.length ? details : legacyCommitmentDetails;
+          const detailHtml = detailRows.map((detail) => `
+            <div class="notificationDetailRow">
+              <span>${escapeHtml(detail.label || "-")}</span>
+              <strong>${escapeHtml(detail.value || "-")}</strong>
+            </div>
+          `).join("");
+
+          const ctas = Array.isArray(note.ctas) ? note.ctas : [];
+          const type = String(note.type || "").toLowerCase();
+          const invoiceValue = getDetailValue(detailRows, "Invoice") || note.invoiceNo || "";
+          const defaultAction = ctas[0]?.action
+            || ((type === "visit-approval" || type === "visit-approval-pending" || type === "visit-plan-approved" || type === "visit-replan-required") ? "link"
+              : (type === "pdc" || type === "pdc-reminder" || type === "pdc-bounced" || type === "pdc-handoff") ? "open-pdc"
+                : (type === "todo" || type === "todo-assigned" || type === "todo-completed-ack") ? "open-todo"
+                  : type === "email" ? "open-email"
+                    : (type === "commitment" || type === "commitment-approved") ? "open-invoice"
+                      : (type === "commitment-submitted" || type === "commitment-rejected" || type.startsWith("issue-") || type.startsWith("backend-") || type.startsWith("mis-") || type.startsWith("credit-") || type.startsWith("support-")) ? "link"
+                        : "");
+          const defaultHref = ctas[0]?.href
+            || ((type === "visit-approval" || type === "visit-approval-pending") ? "pages/visitmoduleReview.html"
+              : type === "visit-plan-approved" ? "pages/visitmodule.html"
+                : type === "visit-replan-required" ? "pages/visitmodule.html"
+                  : type === "commitment-submitted" ? "pages/CommitmentManager.html"
+                    : (type === "commitment-rejected" || type === "commitment") ? "pages/commitment.html"
+                      : type === "issue-approval-requested" ? "bin/IssueTracker/approver-dashboard.html"
+                        : type === "issue-approval-forwarded" ? "bin/IssueTracker/approver-dashboard.html"
+                          : type.startsWith("issue-") ? "pages/issuetrackerLP.html"
+                            : type === "backend-upload-exception" ? "pages/LPbackend.html"
+                              : type === "mis-schedule-failed" ? "pages/LPmis.html"
+                                : (type === "credit-limit-request" || type === "credit-limit-decision" || type === "credit-utilization-breach") ? "pages/credit-limit-dashboard.html"
+                                  : type === "support-ticket-assigned" ? "pages/support-admin.html"
+                                    : type === "support-ticket-update" ? "pages/help-support.html"
+                                      : type === "support-sla-risk" ? "pages/support-admin.html"
+                                        : "");
+          const ctaList = ctas.length
+            ? ctas
+            : (defaultAction
+              ? [{ label: type === "commitment" ? "Open commitment" : "Open", action: defaultAction, href: defaultHref, invoiceNo: invoiceValue }]
+              : []);
+          const ctaHtml = ctaList.map((cta) => `
+            <button
+              class="notificationCta"
+              type="button"
+              data-action="${escapeHtml(cta.action || "")}"
+              data-href="${escapeHtml(cta.href || "")}"
+              data-inv="${escapeHtml(cta.invoiceNo || "")}"
+              data-note="${escapeHtml(noteId)}"
+            >${escapeHtml(cta.label || "View")}</button>
+          `).join("");
+
           const markButton = note.read
             ? ""
-            : `<button class=\"notificationMarkBtn\" type=\"button\" data-note-index=\"${index}\">Mark as read</button>`;
-          const isCommitment = note.type === "commitment";
-          const status = String(note.status || "").toLowerCase();
-          const statusLabel = status === "rejected" ? "rejected" : "approved";
-          const commitmentMessage = `${note.customerName || "Customer"} commitment ${statusLabel} for ${note.invoiceNo || "-"}`;
-          const cardMessage = isCommitment ? commitmentMessage : (note.message || "-");
-          const pill = isCommitment ? `<span class=\"notificationTag tag-commitment\">Commitment</span>` : "";
-          const details = isCommitment ? buildCommitmentDetails(note) : "";
+            : `<button class=\"notificationMarkBtn\" type=\"button\" data-note-id=\"${escapeHtml(noteId)}\" data-note-index=\"${index}\">Mark as read</button>`;
+          const typeLabel = typeLabelMap[type] || "Update";
+          const typeClass = `tag-${type.replace(/[^a-z0-9]+/g, "-") || "update"}`;
+          const title = buildNotificationTitle(note, detailRows);
+          const cardMessage = String(note.message || "-");
+
           return (
-            `<div class=\"notificationCard${note.read ? " isRead" : ""}\">
+            `<div class=\"notificationCard${note.read ? " isRead" : ""}\" data-note-id=\"${escapeHtml(noteId)}\" data-action=\"${escapeHtml(defaultAction)}\" data-href=\"${escapeHtml(defaultHref)}\" data-inv=\"${escapeHtml(invoiceValue)}\">
               <div class=\"notificationCardHeader\">
-                <div class=\"notificationTitle\">${escapeHtml(note.title || "Update")}</div>
+                <div class=\"notificationTitle\">${escapeHtml(title)}</div>
                 <div class=\"notificationMetaRight\">
-                  ${pill}
-                  <div class=\"notificationTime\">${escapeHtml(note.createdAt || "-")}</div>
+                  <div class=\"notificationTag ${typeClass}\">${escapeHtml(typeLabel)}</div>
+                  <div class=\"notificationTime\">${escapeHtml(formatNotificationTime(note.sentAt || note.createdAt || ""))}</div>
                   ${markButton}
                 </div>
               </div>
               <div class=\"notificationCardBody\">${escapeHtml(cardMessage)}</div>
-              ${details}
+              ${detailHtml ? `<div class=\"notificationDetails\">${detailHtml}</div>` : ""}
+              ${ctaHtml ? `<div class=\"notificationCtas\">${ctaHtml}</div>` : ""}
             </div>`
           );
         }).join("");
@@ -923,6 +1891,10 @@
       if (notificationBellBtn) {
         notificationBellBtn.addEventListener("click", (event) => {
           event.stopPropagation();
+          syncIssueNotificationsToCenter();
+          updateCommitmentNotifications();
+          appendDummyIssueNotifications();
+          updateNotificationBadge();
           toggleNotificationPopup();
         });
       }
@@ -953,16 +1925,49 @@
 
       if (notificationList) {
         notificationList.addEventListener("click", (event) => {
+          const runAction = (action, href) => {
+            const role = String(localStorage.getItem("activeUserRole") || "").trim().toLowerCase();
+            const landingPath = role === "customer" ? "pages/LPcustomer.html" : "LPagent.html";
+            if (action === "open-pdc") {
+              const target = role === "ops" || role === "pdc-ops" ? "pages/PDCOps.html" : "pages/PDCagent.html";
+              window.location.href = resolvePath(target);
+              return;
+            }
+            if (action === "open-todo" || action === "open-email" || action === "open-invoice" || action === "open-disposition") {
+              window.location.href = resolvePath(landingPath);
+              return;
+            }
+            if (href) {
+              window.location.href = resolvePath(href);
+            }
+          };
+
           const markBtn = event.target.closest(".notificationMarkBtn");
-          if (!markBtn) return;
-          const index = Number(markBtn.getAttribute("data-note-index"));
-          if (!Number.isInteger(index)) return;
-          const notes = loadNotifications();
-          if (!notes[index] || notes[index].read) return;
-          notes[index].read = true;
-          localStorage.setItem(notificationCenterKey, JSON.stringify(notes));
-          updateNotificationBadge();
-          renderNotificationPopup();
+          if (markBtn) {
+            const index = Number(markBtn.getAttribute("data-note-index"));
+            const noteId = String(markBtn.getAttribute("data-note-id") || "").trim();
+            const notes = loadNotifications();
+            const updated = notes.map((note, idx) => {
+              const matchById = noteId && String(note.id || "").trim() === noteId;
+              const matchByIndex = !noteId && Number.isInteger(index) && idx === index;
+              return (matchById || matchByIndex) ? { ...note, read: true } : note;
+            });
+            localStorage.setItem(notificationCenterKey, JSON.stringify(updated));
+            updateNotificationBadge();
+            renderNotificationPopup();
+            return;
+          }
+
+          const cta = event.target.closest(".notificationCta");
+          if (cta) {
+            runAction(cta.getAttribute("data-action"), cta.getAttribute("data-href"));
+            return;
+          }
+
+          if (notificationPopup && notificationPopup.classList.contains("expanded")) return;
+          const card = event.target.closest(".notificationCard");
+          if (!card) return;
+          runAction(card.getAttribute("data-action"), card.getAttribute("data-href"));
         });
       }
 
@@ -973,8 +1978,29 @@
         toggleNotificationPopup(false);
       });
 
+      syncIssueNotificationsToCenter();
       updateCommitmentNotifications();
+      appendDummyIssueNotifications();
       updateNotificationBadge();
+
+      window.addEventListener("storage", (event) => {
+        if (!event.key) return;
+        if (
+          event.key === notificationCenterKey
+          || event.key === issueTrackerBaseKey
+          || event.key === issueTrackerCustomKey
+          || event.key === issueApprovalRequestKey
+          || event.key === commitmentSubmitKey
+        ) {
+          syncIssueNotificationsToCenter();
+          updateCommitmentNotifications();
+          appendDummyIssueNotifications();
+          updateNotificationBadge();
+          if (notificationPopup && !notificationPopup.classList.contains("hidden")) {
+            renderNotificationPopup();
+          }
+        }
+      });
     };
 
     renderClientPicker();

@@ -2,7 +2,7 @@
 // Tenant - Relationship branding (prototype wiring)
 // ===============================
 const tenantBrandMap = {
-  apollo: { name: "Apollo", badge: "AP", logo: "assets/apollo-tyres-logo.svg" },
+  apollo: { name: "Apollo", badge: "AP", logo: "assets/apollo-sharkfin-logo.jpeg" },
   bikanerwala: { name: "Bikanerwala", badge: "BK" },
   global_ar: { name: "Global AR", badge: "GA" }
 };
@@ -21,7 +21,16 @@ const userRoleLabels = {
   customer: "Customer",
   manager: "Manager",
   agent_manager: "Agent cum manager",
-  supervisor: "Supervisor"
+  supervisor: "Supervisor",
+  kam: "KAM",
+  kas: "KAS",
+  admin: "Admin",
+  ops: "Ops",
+  backend: "Backend",
+  mis: "MIS",
+  "support-admin": "Support Admin",
+  "support-admin-lead": "Support Admin Lead",
+  "client-admin": "Client Admin"
 };
 
 const userAvatarOptions = [
@@ -91,7 +100,6 @@ const initialAgentParam = urlParams.get("agent");
 const todoStorageKey = "ineburaTodoTasks";
 const remarksStorageKey = "ineburaRemarksByInvoice";
 const activityTrailStorageKey = "ineburaActivityTrailByInvoice";
-const managerNotificationsKey = "ineburaManagerNotifications";
 const pdcNotificationKey = "ineburaPdcNotifications";
 const pdcStorageKey = "ineburaPdcRecords";
 const notificationCenterKey = "ineburaNotificationCenter";
@@ -100,9 +108,14 @@ const invoiceStatusOverridesKey = "ineburaInvoiceStatusOverrides";
 const issueTrackerTotalKey = "issueTrackerTotalIssues";
 const issueTrackerBaseKey = "issueTrackerBaseData";
 const issueTrackerCustomKey = "customIssues";
+const issueApprovalRequestKey = "approval_requests";
 const issueTrackerProcessKey = "approval_processes";
 const issueTrackerMatrixKey = "approval_matrices";
 const issueTrackerClearedKey = "issueTrackerDataCleared";
+const creditLimitOverridesKey = "ineburaCreditLimits";
+const creditLimitApprovalsKey = "ineburaCLApprovals";
+const supportTicketsKey = "inebura_support_tickets";
+const commitmentSubmissionsKey = "ineburaCommitmentSubmissions";
 const strategyAgingBucketOptions = ["0-30", "31-60", "61-90", "90+"];
 const strategyTemplateOptions = ["Payment reminder", "PTP confirmation", "Overdue notice", "Escalation notice"];
 const strategyAttachmentOptions = ["No attachment", "Invoice copy", "Statement of account", "Collection follow-up note"];
@@ -1049,8 +1062,11 @@ function loadTodoTasksFromStorage() {
     if (!Array.isArray(parsed)) return;
     todoTasks = parsed.map((task) => ({
       ...task,
+      assignedBy: task.assignedBy || "",
+      assignedTo: task.assignedTo || task.assignee || "",
       completed: Boolean(task.completed),
-      completedAt: task.completedAt || ""
+      completedAt: task.completedAt || "",
+      completedBy: task.completedBy || ""
     }));
     todoTaskCounter = parsed.reduce((maxId, task) => {
       const idNum = Number(String(task.id || "").replace("task-", ""));
@@ -1267,44 +1283,6 @@ function renderStoredRemarks(invoiceNo) {
   }).join("");
 }
 
-function loadManagerNotifications() {
-  try {
-    const raw = localStorage.getItem(managerNotificationsKey);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch (err) {
-    console.warn("Unable to load notifications", err);
-    return [];
-  }
-}
-
-function saveManagerNotifications(list) {
-  try {
-    localStorage.setItem(managerNotificationsKey, JSON.stringify(list));
-  } catch (err) {
-    console.warn("Unable to save notifications", err);
-  }
-}
-
-function addManagerNotification(notification) {
-  const list = loadManagerNotifications();
-  list.unshift(notification);
-  saveManagerNotifications(list);
-  addNotificationCenterItem({
-    id: notification.id,
-    type: notification.type || "manager",
-    title: "Manager update",
-    message: notification.message || "",
-    createdAt: notification.createdAt,
-    read: notification.read,
-    audience: ["manager"],
-    details: [
-      { label: "Invoice", value: notification.invoiceNo || "-" }
-    ]
-  });
-}
-
 function loadNotificationCenter() {
   try {
     const raw = localStorage.getItem(notificationCenterKey);
@@ -1337,6 +1315,7 @@ function addNotificationCenterItem(note) {
     sentAt: note.sentAt || "",
     read: Boolean(note.read),
     audience: Array.isArray(note.audience) ? note.audience : (note.audience ? [note.audience] : ["all"]),
+    audienceUsers: Array.isArray(note.audienceUsers) ? note.audienceUsers : (note.audienceUsers ? [note.audienceUsers] : []),
     details: Array.isArray(note.details) ? note.details : [],
     ctas: Array.isArray(note.ctas) ? note.ctas : [],
     data: note.data || {}
@@ -1374,22 +1353,57 @@ function normalizeNotificationCenter() {
   return updated;
 }
 
+function normalizeAudienceUser(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/<[^>]*>/g, " ")
+    .replace(/\([^)]*\)/g, " ")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+function getActiveNotificationUser() {
+  return String(localStorage.getItem("activeUserName") || "").trim();
+}
+
 function getNotificationAudience() {
   if (isCustomerLandingView) return "customer";
   if (isManagerView) return "manager";
   const role = String(localStorage.getItem("activeUserRole") || "").trim().toLowerCase();
-  if (role === "manager") return "manager";
-  if (role === "customer") return "customer";
+  const roleAlias = {
+    manager: "manager",
+    customer: "customer",
+    agent: "agent",
+    supervisor: "supervisor",
+    kam: "kam",
+    kas: "kas",
+    admin: "admin",
+    ops: "ops",
+    "pdc-ops": "ops",
+    backend: "backend",
+    mis: "mis",
+    "support-admin": "support-admin",
+    "support-admin-lead": "support-admin-lead",
+    "client-admin": "client-admin"
+  };
+  if (roleAlias[role]) return roleAlias[role];
   return "agent";
 }
 
 function getVisibleNotificationCenter() {
   const audience = getNotificationAudience();
+  const activeUser = normalizeAudienceUser(getActiveNotificationUser());
   return normalizeNotificationCenter().filter((note) => {
     if (note.scheduledFor && !note.sentAt) return false;
     const audiences = Array.isArray(note.audience) ? note.audience : (note.audience ? [note.audience] : []);
-    if (audiences.length === 0) return true;
-    return audiences.includes("all") || audiences.includes(audience);
+    const audienceAllowed = audiences.length === 0 || audiences.includes("all") || audiences.includes(audience);
+    if (!audienceAllowed) return false;
+    const userAudiences = Array.isArray(note.audienceUsers)
+      ? note.audienceUsers.map(normalizeAudienceUser).filter(Boolean)
+      : [];
+    if (!userAudiences.length) return true;
+    if (!activeUser) return false;
+    return userAudiences.includes("all") || userAudiences.includes(activeUser);
   });
 }
 
@@ -1413,22 +1427,6 @@ function syncLegacyNotificationsToCenter() {
   const existingIds = new Set(center.map(note => note.id));
   const additions = [];
 
-  loadManagerNotifications().forEach((note) => {
-    if (!note || existingIds.has(note.id)) return;
-    additions.push({
-      id: note.id,
-      type: note.type || "manager",
-      title: "Manager update",
-      message: note.message || "",
-      createdAt: note.createdAt,
-      read: note.read,
-      audience: ["manager"],
-      details: [
-        { label: "Invoice", value: note.invoiceNo || "-" }
-      ]
-    });
-  });
-
   const pdcRecords = new Map(loadPdcRecords().map(record => [record.id, record]));
   loadPdcNotifications().forEach((note) => {
     if (!note || existingIds.has(note.id)) return;
@@ -1438,27 +1436,74 @@ function syncLegacyNotificationsToCenter() {
     if (recipients.includes("agent")) audience.push("agent");
     if (recipients.includes("pdc mgmt") || recipients.includes("ops")) audience.push("ops");
     if (audience.length === 0) audience.push("agent", "ops");
+    const normalizedStatus = String(note.status || record?.status || "").toLowerCase();
+    const isReminder = note.type === "bank-reminder";
+    let mappedType = "pdc";
+    let mappedTitle = "PDC update";
+    if (isReminder) {
+      mappedType = "pdc-reminder";
+      mappedTitle = "PDC banking reminder";
+    } else if (normalizedStatus.includes("bounce")) {
+      mappedType = "pdc-bounced";
+      mappedTitle = "PDC bounced action required";
+    } else if (normalizedStatus.includes("dispatch") || normalizedStatus.includes("received") || normalizedStatus.includes("banked")) {
+      mappedType = "pdc-handoff";
+      mappedTitle = "PDC status handoff";
+    }
+    const baseDetails = [
+      { label: "Customer", value: record ? `${record.customerName || "-"} (${record.customerCode || "-"})` : "-" },
+      { label: "Invoice", value: record?.invoiceNo || "-" },
+      { label: "Cheque", value: record?.chequeNo || note.pdcId || "-" },
+      { label: "PDC date", value: record?.pdcDate || "-" },
+      { label: "Bank", value: record?.bank || "-" },
+      { label: "Amount", value: record?.amount ? `Rs. ${formatINR(record.amount)}` : "-" },
+      { label: "Status", value: note.status || record?.status || "-" }
+    ];
+    let details = baseDetails;
+    let ctaLabel = "View PDC";
+    const chequeRef = record?.chequeNo || note.pdcId || "-";
+    const statusValue = note.status || record?.status || "-";
+    let fallbackMessage = `PDC update - ${chequeRef}. ${statusValue}.`;
+    if (mappedType === "pdc-reminder") {
+      details = baseDetails.concat([
+        { label: "Due date", value: note.scheduledFor || record?.pdcDate || "-" }
+      ]);
+      fallbackMessage = `PDC reminder - ${chequeRef}. Due for banking.`;
+    } else if (mappedType === "pdc-bounced") {
+      details = [
+        { label: "Cheque no", value: record?.chequeNo || note.pdcId || "-" },
+        { label: "Customer", value: record ? `${record.customerName || "-"} (${record.customerCode || "-"})` : "-" },
+        { label: "Invoice", value: record?.invoiceNo || "-" },
+        { label: "Amount", value: record?.amount ? `Rs. ${formatINR(record.amount)}` : "-" },
+        { label: "Bounce reason", value: note.reason || note.remarks || note.status || "-" },
+        { label: "Next step", value: note.nextStep || "Follow up with customer and update PDC status" }
+      ];
+      ctaLabel = "Open PDC status";
+      fallbackMessage = `Cheque ${chequeRef} bounced. Follow-up required.`;
+    } else if (mappedType === "pdc-handoff") {
+      details = [
+        { label: "From status", value: note.fromStatus || note.previousStatus || "-" },
+        { label: "To status", value: note.status || record?.status || "-" },
+        { label: "Updated by", value: note.updatedBy || note.createdBy || "-" },
+        { label: "Required action", value: note.requiredAction || "Review and proceed with next PDC step" },
+        { label: "Due by", value: note.dueBy || note.scheduledFor || "-" }
+      ];
+      ctaLabel = "Open PDC record";
+      fallbackMessage = `PDC moved to ${statusValue}. Your action is required.`;
+    }
     additions.push({
       id: note.id,
-      type: note.type === "bank-reminder" ? "pdc-reminder" : "pdc",
-      title: note.type === "bank-reminder" ? "PDC banking reminder" : "PDC update",
-      message: note.message || "",
+      type: mappedType,
+      title: mappedTitle,
+      message: note.message || fallbackMessage,
       createdAt: note.createdAt,
       scheduledFor: note.scheduledFor || "",
       sentAt: note.sentAt || "",
       read: note.read,
       audience,
-      details: [
-        { label: "Customer", value: record ? `${record.customerName || "-"} (${record.customerCode || "-"})` : "-" },
-        { label: "Invoice", value: record?.invoiceNo || "-" },
-        { label: "Cheque", value: record?.chequeNo || note.pdcId || "-" },
-        { label: "PDC date", value: record?.pdcDate || "-" },
-        { label: "Bank", value: record?.bank || "-" },
-        { label: "Amount", value: record?.amount ? `Rs. ${formatINR(record.amount)}` : "-" },
-        { label: "Status", value: note.status || record?.status || "-" }
-      ],
+      details,
       ctas: [
-        { label: "View PDC", action: "open-pdc" }
+        { label: ctaLabel, action: "open-pdc" }
       ]
     });
   });
@@ -1470,6 +1515,7 @@ function syncLegacyNotificationsToCenter() {
       todoList.forEach((task) => {
         const todoId = `todo-${task.id}`;
         if (existingIds.has(todoId)) return;
+        const assignee = task.assignedTo || task.assignee || task.owner || "-";
         additions.push({
           id: todoId,
           type: "todo",
@@ -1477,9 +1523,10 @@ function syncLegacyNotificationsToCenter() {
           message: task.text || "Todo update",
           createdAt: task.createdAt || new Date().toISOString(),
           read: Boolean(task.completed),
-          audience: ["agent", "manager"],
+          audience: ["all"],
           details: [
             { label: "Due", value: formatTodoDue(task) },
+            { label: "Assignee", value: assignee },
             { label: "Customer", value: `${task.customerName || "-"} (${task.customerCode || "-"})` },
             { label: "Invoice", value: task.invoice?.invoiceNo || "-" }
           ],
@@ -1498,27 +1545,817 @@ function syncLegacyNotificationsToCenter() {
   }
 }
 
+function summarizeCustomerList(names) {
+  const cleaned = Array.from(new Set((names || []).map((name) => String(name || "").trim()).filter(Boolean)));
+  if (!cleaned.length) return "-";
+  if (cleaned.length <= 3) return cleaned.join(", ");
+  return `${cleaned.slice(0, 3).join(", ")} +${cleaned.length - 3} more`;
+}
+
+function parseLooseDateTime(value) {
+  if (!value) return null;
+  const direct = new Date(value);
+  if (!Number.isNaN(direct.getTime())) return direct;
+  const sanitized = String(value).replace(/\u00a0/g, " ").replace(/,/g, "");
+  const fallback = new Date(sanitized);
+  if (!Number.isNaN(fallback.getTime())) return fallback;
+  return null;
+}
+
+const notificationScopeTypes = new Set([
+  "visit-approval-pending",
+  "visit-plan-approved",
+  "visit-replan-required",
+  "email",
+  "todo",
+  "todo-assigned",
+  "todo-completed-ack",
+  "backend-upload-exception",
+  "mis-schedule-failed",
+  "issue-assigned",
+  "issue-approval-requested",
+  "issue-approval-decision",
+  "issue-created-manager",
+  "issue-manager-approved",
+  "issue-approval-forwarded",
+  "issue-approval-rejected",
+  "issue-resolution-provided",
+  "issue-ticket-closed",
+  "issue-assignment-updated",
+  "issue-approval-process-saved",
+  "issue-remark-added",
+  "issue-reopened",
+  "pdc",
+  "pdc-reminder",
+  "pdc-bounced",
+  "pdc-handoff",
+  "commitment-approved",
+  "commitment-submitted",
+  "commitment-rejected",
+  "credit-limit-request",
+  "credit-limit-decision",
+  "credit-utilization-breach",
+  "support-ticket-assigned",
+  "support-ticket-update",
+  "support-sla-risk"
+]);
+
+function syncIssueNotificationsToCenter() {
+  const additions = [];
+  const slugToken = (value) => (
+    String(value || "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 80)
+      || "na"
+  );
+  const uniqueRecipients = (...values) => {
+    const seen = new Set();
+    const recipients = [];
+    values.flat().forEach((value) => {
+      const raw = String(value || "").trim();
+      if (!raw) return;
+      const normalized = normalizeAudienceUser(raw);
+      if (!normalized || seen.has(normalized)) return;
+      seen.add(normalized);
+      recipients.push(raw);
+    });
+    return recipients;
+  };
+  const parseNewOwnerFromWhat = (text, fallback) => {
+    const match = String(text || "").match(/\(([^)]+)\)/);
+    return (match?.[1] || fallback || "").trim();
+  };
+  const parseResolutionSummary = (text) => {
+    const source = String(text || "");
+    const resolutionMatch = source.match(/Resolution:\s*([^\n]+)/i);
+    if (resolutionMatch?.[1]) return resolutionMatch[1].trim();
+    return source.split("\n")[0].trim() || "-";
+  };
+  const buildTrailEventKey = (entry, index) => {
+    if (entry?.trailId) return String(entry.trailId);
+    if (entry?.approvalKey) return slugToken(entry.approvalKey);
+    return [
+      slugToken(entry?.type),
+      slugToken(entry?.when),
+      slugToken(entry?.who),
+      slugToken(entry?.what),
+      String(index)
+    ].join(":");
+  };
+  const pushIssueNotification = (payload) => {
+    const recipients = uniqueRecipients(payload?.audienceUsers || []);
+    if (!payload?.id || !payload?.type || !recipients.length) return;
+    additions.push({
+      ...payload,
+      audience: ["all"],
+      audienceUsers: recipients
+    });
+  };
+
+  const baseInvoices = readStoredArray(issueTrackerBaseKey);
+  const invoiceById = new Map();
+  baseInvoices.forEach((invoiceEntry) => {
+    const invoiceId = String(invoiceEntry?.id || invoiceEntry?.invoiceNo || "").trim();
+    if (!invoiceId) return;
+    invoiceById.set(invoiceId, invoiceEntry || {});
+  });
+
+  const baseIssues = baseInvoices.flatMap((invoiceEntry) => (
+    Array.isArray(invoiceEntry?.issues)
+      ? invoiceEntry.issues.map((issue) => ({
+          ...issue,
+          invoiceNo: issue?.invoiceNo || invoiceEntry?.invoiceNo || invoiceEntry?.id || "",
+          customerName: issue?.customerName || invoiceEntry?.customerName || invoiceEntry?.customer || "",
+          kam: issue?.kam || invoiceEntry?.kam || "",
+          manager: issue?.manager || invoiceEntry?.manager || "",
+          agent: issue?.agent || ""
+        }))
+      : []
+  ));
+  const customIssues = readStoredArray(issueTrackerCustomKey);
+  const issueList = [...baseIssues, ...customIssues].map((issue) => {
+    const invoiceNo = String(issue?.invoiceNo || issue?.invoiceId || "").trim();
+    const invoiceEntry = invoiceNo ? invoiceById.get(invoiceNo) : null;
+    return {
+      ...issue,
+      invoiceNo: invoiceNo || issue?.invoiceNo || "",
+      customerName: issue?.customerName || invoiceEntry?.customerName || invoiceEntry?.customer || "",
+      kam: issue?.kam || invoiceEntry?.kam || "",
+      manager: issue?.manager || invoiceEntry?.manager || "",
+      agent: issue?.agent || "",
+      actionTrail: Array.isArray(issue?.actionTrail) ? issue.actionTrail : []
+    };
+  });
+  const issueById = new Map();
+
+  issueList.forEach((issue) => {
+    const issueId = String(issue?.id || "").trim();
+    if (!issueId) return;
+    const previous = issueById.get(issueId) || {};
+    const merged = {
+      id: issueId,
+      invoiceNo: issue?.invoiceNo || previous.invoiceNo || "",
+      customerName: issue?.customerName || previous.customerName || "",
+      subStatus: issue?.subStatus || previous.subStatus || "",
+      dueBy: issue?.invoiceDueDate || issue?.dueBy || previous.dueBy || "",
+      actionOwner: issue?.actionOwner || previous.actionOwner || "",
+      manager: issue?.manager || previous.manager || "",
+      agent: issue?.agent || previous.agent || "",
+      kam: issue?.kam || previous.kam || "",
+      createdAt: issue?.createdAt || issue?.created || previous.createdAt || "",
+      updatedAt: issue?.updatedAt || previous.updatedAt || "",
+      approvalProcessName: issue?.approvalProcessName || previous.approvalProcessName || "",
+      actionTrail: Array.isArray(issue?.actionTrail) && issue.actionTrail.length
+        ? issue.actionTrail
+        : (Array.isArray(previous.actionTrail) ? previous.actionTrail : [])
+    };
+    issueById.set(issueId, merged);
+  });
+
+  issueById.forEach((issue) => {
+    const issueId = issue?.id || "";
+    const managerRaw = issue?.manager || "";
+    const createdAt = issue?.createdAt || issue?.updatedAt || new Date().toISOString();
+    if (managerRaw) {
+      pushIssueNotification({
+        id: `issue-created-manager:${issueId}:${slugToken(managerRaw)}`,
+        type: "issue-created-manager",
+        title: "Issue created",
+        message: `Issue ${issueId} created and awaiting manager review.`,
+        createdAt,
+        audienceUsers: [managerRaw],
+        details: [
+          { label: "Issue ID", value: issueId },
+          { label: "Customer", value: issue?.customerName || "-" },
+          { label: "Invoice", value: issue?.invoiceNo || "-" },
+          { label: "Created by", value: issue?.agent || "-" },
+          { label: "Sub-status", value: issue?.subStatus || "-" },
+          { label: "Due by", value: issue?.dueBy || "-" }
+        ],
+        ctas: [
+          { label: "Open issue", action: "link", href: "pages/issuetrackerLP.html" }
+        ]
+      });
+    }
+
+    const assigneeRaw = issue?.actionOwner || "";
+    const assignee = normalizeAudienceUser(assigneeRaw);
+    if (issueId && assignee) {
+      pushIssueNotification({
+        id: `issue-assigned:${issueId}:${assignee}`,
+        type: "issue-assigned",
+        title: "Issue assigned",
+        message: `Issue ${issueId} assigned to you. ${issue?.subStatus || "Action required"}.`,
+        createdAt,
+        audienceUsers: [assigneeRaw],
+        details: [
+          { label: "Issue ID", value: issueId },
+          { label: "Customer", value: issue?.customerName || "-" },
+          { label: "Invoice", value: issue?.invoiceNo || "-" },
+          { label: "Action owner", value: assigneeRaw || "-" },
+          { label: "Due by", value: issue?.dueBy || "-" }
+        ],
+        ctas: [
+          { label: "Open issue", action: "link", href: "pages/issuetrackerLP.html" }
+        ]
+      });
+    }
+
+    const trail = Array.isArray(issue?.actionTrail) ? issue.actionTrail : [];
+    trail.forEach((entry, index) => {
+      const type = String(entry?.type || "").toLowerCase();
+      const whatText = String(entry?.what || "");
+      const what = whatText.toLowerCase();
+      const actor = String(entry?.who || "").trim() || "User";
+      const at = entry?.when || issue?.updatedAt || issue?.createdAt || new Date().toISOString();
+      const trailKey = buildTrailEventKey(entry, index);
+
+      if (type === "assignment" && what.includes("assigned to action owner")) {
+        const newOwner = parseNewOwnerFromWhat(whatText, issue?.actionOwner || "");
+        pushIssueNotification({
+          id: `issue-assignment-updated:${issueId}:${trailKey}`,
+          type: "issue-assignment-updated",
+          title: "Issue assignment updated",
+          message: `Issue ${issueId} assigned to ${newOwner || "action owner"}.`,
+          createdAt: at,
+          audienceUsers: [issue?.agent || "", issue?.manager || "", issue?.kam || "", newOwner],
+          details: [
+            { label: "Issue ID", value: issueId },
+            { label: "Customer", value: issue?.customerName || "-" },
+            { label: "Invoice", value: issue?.invoiceNo || "-" },
+            { label: "Assigned by", value: actor || "-" },
+            { label: "New action owner", value: newOwner || issue?.actionOwner || "-" },
+            { label: "Remark", value: entry?.remark || "-" }
+          ],
+          ctas: [
+            { label: "Open issue", action: "link", href: "pages/issuetrackerLP.html" }
+          ]
+        });
+      }
+
+      if (type === "assigned" && what.includes("selected approval process")) {
+        const processName = parseNewOwnerFromWhat(whatText, issue?.approvalProcessName || "");
+        pushIssueNotification({
+          id: `issue-approval-process-saved:${issueId}:${trailKey}`,
+          type: "issue-approval-process-saved",
+          title: "Issue approval process saved",
+          message: `Approval process updated for issue ${issueId}.`,
+          createdAt: at,
+          audienceUsers: [issue?.manager || "", issue?.agent || "", issue?.kam || ""],
+          details: [
+            { label: "Issue ID", value: issueId },
+            { label: "Process", value: processName || issue?.approvalProcessName || "-" },
+            { label: "Updated by", value: actor || "-" },
+            { label: "Remark", value: entry?.remark || "-" }
+          ],
+          ctas: [
+            { label: "Open issue", action: "link", href: "pages/issuetrackerLP.html" }
+          ]
+        });
+      }
+
+      if (type === "remark" && /^updated remark\b/.test(what)) {
+        pushIssueNotification({
+          id: `issue-remark-added:${issueId}:${trailKey}`,
+          type: "issue-remark-added",
+          title: "Issue remark added",
+          message: `New remark added on issue ${issueId}.`,
+          createdAt: at,
+          audienceUsers: [issue?.actionOwner || ""],
+          details: [
+            { label: "Issue ID", value: issueId },
+            { label: "Added by", value: actor || "-" },
+            { label: "Remark", value: entry?.remark || "-" }
+          ],
+          ctas: [
+            { label: "Open issue", action: "link", href: "pages/issuetrackerLP.html" }
+          ]
+        });
+      }
+
+      if (type === "approval" && what.includes("approved the issue") && !entry?.approvalKey) {
+        pushIssueNotification({
+          id: `issue-manager-approved:${issueId}:${trailKey}`,
+          type: "issue-manager-approved",
+          title: "Issue manager approval",
+          message: `Issue ${issueId} approved by manager.`,
+          createdAt: at,
+          audienceUsers: [issue?.kam || "", issue?.agent || "", issue?.actionOwner || ""],
+          details: [
+            { label: "Issue ID", value: issueId },
+            { label: "Approved by", value: actor || "-" },
+            { label: "Customer", value: issue?.customerName || "-" },
+            { label: "Invoice", value: issue?.invoiceNo || "-" },
+            { label: "Remark", value: entry?.remark || "-" }
+          ],
+          ctas: [
+            { label: "Open issue", action: "link", href: "pages/issuetrackerLP.html" }
+          ]
+        });
+      }
+
+      if (type === "resolution") {
+        pushIssueNotification({
+          id: `issue-resolution-provided:${issueId}:${trailKey}`,
+          type: "issue-resolution-provided",
+          title: "Issue resolution provided",
+          message: `Resolution provided for issue ${issueId}.`,
+          createdAt: at,
+          audienceUsers: [issue?.agent || "", issue?.manager || ""],
+          details: [
+            { label: "Issue ID", value: issueId },
+            { label: "Resolution by", value: actor || "-" },
+            { label: "Resolution summary", value: parseResolutionSummary(entry?.remark || "") },
+            { label: "Submitted at", value: at || "-" }
+          ],
+          ctas: [
+            { label: "Open issue", action: "link", href: "pages/issuetrackerLP.html" }
+          ]
+        });
+      }
+
+      if (type === "closure" && what.includes("closed the issue")) {
+        pushIssueNotification({
+          id: `issue-ticket-closed:${issueId}:${trailKey}`,
+          type: "issue-ticket-closed",
+          title: "Issue ticket closed",
+          message: `Issue ${issueId} has been closed.`,
+          createdAt: at,
+          audienceUsers: [issue?.kam || "", issue?.actionOwner || ""],
+          details: [
+            { label: "Issue ID", value: issueId },
+            { label: "Closed by", value: actor || "-" },
+            { label: "Closed at", value: at || "-" },
+            { label: "Closure remark", value: entry?.remark || "-" }
+          ],
+          ctas: [
+            { label: "Open issue", action: "link", href: "pages/issuetrackerLP.html" }
+          ]
+        });
+      }
+
+      if (type === "reopen") {
+        pushIssueNotification({
+          id: `issue-reopened:${issueId}:${trailKey}`,
+          type: "issue-reopened",
+          title: "Issue reopened",
+          message: `Issue ${issueId} has been reopened.`,
+          createdAt: at,
+          audienceUsers: [issue?.agent || "", issue?.manager || "", issue?.kam || "", issue?.actionOwner || ""],
+          details: [
+            { label: "Issue ID", value: issueId },
+            { label: "Reopened by", value: actor || "-" },
+            { label: "Reopened at", value: at || "-" },
+            { label: "Remark", value: entry?.remark || "-" }
+          ],
+          ctas: [
+            { label: "Open issue", action: "link", href: "pages/issuetrackerLP.html" }
+          ]
+        });
+      }
+    });
+  });
+
+  const requests = readStoredArray(issueApprovalRequestKey);
+  requests.forEach((req) => {
+    const reqId = req?.id || "";
+    if (!reqId) return;
+    const status = String(req?.status || "pending").toLowerCase();
+    const level = Number(req?.currentLevel || 1);
+    const levels = Array.isArray(req?.levels) ? req.levels : [];
+    const levelOwner = levels[level - 1] || {};
+    const ownerTarget = levelOwner.ownerName || levelOwner.ownerEmail || "";
+    const issueId = String(req?.issue?.id || "").trim();
+    const issueContext = issueById.get(issueId) || {};
+    const invoiceContext = (
+      String(req?.invoice?.id || "").trim()
+      ? (invoiceById.get(String(req?.invoice?.id || "").trim()) || {})
+      : {}
+    );
+    const managerUser = issueContext?.manager || req?.issue?.manager || invoiceContext?.manager || "";
+    const agentUser = issueContext?.agent || req?.issue?.agent || "";
+    const kamUser = issueContext?.kam || req?.issue?.kam || invoiceContext?.kam || "";
+    const actionOwnerUser = req?.issue?.actionOwner || issueContext?.actionOwner || "";
+    const issueCustomer = req?.invoice?.customer || issueContext?.customerName || "-";
+    const issueInvoice = req?.invoice?.id || issueContext?.invoiceNo || "-";
+    const submittedEntry = (Array.isArray(req?.trail) ? req.trail : []).find((entry) => (
+      String(entry?.action || "").toLowerCase() === "submitted"
+    ));
+    const decisionEntry = (Array.isArray(req?.trail) ? req.trail : [])
+      .slice()
+      .reverse()
+      .find((entry) => ["approved", "rejected"].includes(String(entry?.action || "").toLowerCase()));
+    const reqTrail = Array.isArray(req?.trail) ? req.trail : [];
+
+    if (status === "pending" && ownerTarget) {
+      const ownerEmail = levelOwner.ownerEmail || "";
+      const ownerHint = ownerEmail || ownerTarget;
+      pushIssueNotification({
+        id: `issue-approval-requested:${reqId}:level-${level}`,
+        type: "issue-approval-requested",
+        title: "Issue approval requested",
+        message: `Approval required for issue ${issueId || "-"}. Please review at your level.`,
+        createdAt: req?.updatedAt || req?.createdAt || new Date().toISOString(),
+        audienceUsers: [ownerTarget],
+        details: [
+          { label: "Process", value: req?.processName || req?.processId || "-" },
+          { label: "Matrix", value: req?.matrixName || "-" },
+          { label: "Level", value: String(level) },
+          { label: "Requested by", value: submittedEntry?.by || "-" },
+          { label: "SLA", value: req?.slaHours ? `${req.slaHours} hours` : "-" }
+        ],
+        ctas: [
+          { label: "Open approval request", action: "link", href: `bin/IssueTracker/approval-request.html?id=${encodeURIComponent(reqId)}&user=${encodeURIComponent(ownerHint)}` }
+        ]
+      });
+    }
+
+    reqTrail.forEach((trailEntry, trailIndex) => {
+      const action = String(trailEntry?.action || "").toLowerCase();
+      if (action !== "approved" && action !== "rejected") return;
+      const entryLevel = Number(trailEntry?.level || 1);
+      const entryAt = trailEntry?.at || req?.updatedAt || req?.createdAt || new Date().toISOString();
+      const actor = String(trailEntry?.by || "").trim() || "Approver";
+      const eventKey = buildTrailEventKey({
+        trailId: trailEntry?.trailId,
+        approvalKey: `${reqId}:${entryLevel}:${entryAt}:${action}`,
+        type: action,
+        who: actor,
+        when: entryAt
+      }, trailIndex);
+
+      if (action === "approved") {
+        const managerNorm = normalizeAudienceUser(managerUser);
+        const actorNorm = normalizeAudienceUser(actor);
+        const isManagerApproval = (managerNorm && actorNorm && managerNorm === actorNorm) || entryLevel === 1;
+        if (isManagerApproval) {
+          pushIssueNotification({
+            id: `issue-manager-approved:${reqId}:${eventKey}`,
+            type: "issue-manager-approved",
+            title: "Issue manager approval",
+            message: `Issue ${issueId || "-"} approved by manager.`,
+            createdAt: entryAt,
+            audienceUsers: [kamUser, agentUser, actionOwnerUser],
+            details: [
+              { label: "Issue ID", value: issueId || "-" },
+              { label: "Approved by", value: actor || "-" },
+              { label: "Approved at", value: entryAt || "-" },
+              { label: "Next owner", value: actionOwnerUser || "-" },
+              { label: "Remarks", value: trailEntry?.remark || "-" }
+            ],
+            ctas: [
+              { label: "Open issue", action: "link", href: "pages/issuetrackerLP.html" }
+            ]
+          });
+        }
+
+        const nextLevelOwner = levels[entryLevel] || {};
+        const nextTarget = nextLevelOwner.ownerName || nextLevelOwner.ownerEmail || "";
+        if (nextTarget) {
+          const nextHint = nextLevelOwner.ownerEmail || nextTarget;
+          pushIssueNotification({
+            id: `issue-approval-forwarded:${reqId}:${eventKey}`,
+            type: "issue-approval-forwarded",
+            title: "Issue approval forwarded",
+            message: `Approval moved to next level for issue ${issueId || "-"}.`,
+            createdAt: entryAt,
+            audienceUsers: [nextTarget, kamUser, agentUser, actionOwnerUser],
+            details: [
+              { label: "Issue ID", value: issueId || "-" },
+              { label: "Process", value: req?.processName || req?.processId || "-" },
+              { label: "From level", value: String(entryLevel) },
+              { label: "To level", value: String(entryLevel + 1) },
+              { label: "Approved by", value: actor || "-" },
+              { label: "Next approver", value: nextTarget || "-" }
+            ],
+            ctas: [
+              { label: "Open approval request", action: "link", href: `bin/IssueTracker/approval-request.html?id=${encodeURIComponent(reqId)}&user=${encodeURIComponent(nextHint)}` }
+            ]
+          });
+        }
+      }
+
+      if (action === "rejected") {
+        pushIssueNotification({
+          id: `issue-approval-rejected:${reqId}:${eventKey}`,
+          type: "issue-approval-rejected",
+          title: "Issue approval rejected",
+          message: `Approval rejected for issue ${issueId || "-"}.`,
+          createdAt: entryAt,
+          audienceUsers: [kamUser, agentUser, actionOwnerUser],
+          details: [
+            { label: "Issue ID", value: issueId || "-" },
+            { label: "Level", value: String(entryLevel) },
+            { label: "Rejected by", value: actor || "-" },
+            { label: "Reason", value: trailEntry?.remark || "-" },
+            { label: "Next action", value: actionOwnerUser || "-" }
+          ],
+          ctas: [
+            { label: "Open issue", action: "link", href: "pages/issuetrackerLP.html" }
+          ]
+        });
+      }
+    });
+
+    if (status === "approved" || status === "rejected") {
+      const decisionAt = req?.updatedAt || req?.reviewedAt || decisionEntry?.at || req?.createdAt || "";
+      pushIssueNotification({
+        id: `issue-approval-decision:${reqId}:${status}:${decisionAt || "latest"}`,
+        type: "issue-approval-decision",
+        title: "Issue approval decision",
+        message: `Issue ${issueId || "-"} ${status}. Next action assigned.`,
+        createdAt: decisionAt || new Date().toISOString(),
+        audienceUsers: [kamUser, agentUser, actionOwnerUser],
+        details: [
+          { label: "Decision", value: status === "approved" ? "Approved" : "Rejected" },
+          { label: "By", value: decisionEntry?.by || "-" },
+          { label: "Remarks", value: decisionEntry?.remark || "-" },
+          { label: "Next owner", value: actionOwnerUser || "-" },
+          { label: "Customer", value: issueCustomer || "-" },
+          { label: "Invoice", value: issueInvoice || "-" }
+        ],
+        ctas: [
+          { label: "Open issue", action: "link", href: "pages/issuetrackerLP.html" }
+        ]
+      });
+    }
+  });
+
+  additions.forEach(addNotificationCenterItem);
+}
+
+function syncCommitmentWorkflowNotifications() {
+  const submissions = readStoredArray(commitmentSubmissionsKey);
+  submissions.forEach((submission) => {
+    const items = Array.isArray(submission?.items) ? submission.items : [];
+    if (!items.length) return;
+    const pendingItems = items.filter((item) => String(item?.approvalStatus || "pending").toLowerCase() === "pending");
+    if (pendingItems.length) {
+      const totalAmount = pendingItems.reduce((sum, item) => sum + Number(item?.targetAmount || 0), 0);
+      const weeks = Array.from(new Set(pendingItems.map((item) => item?.week).filter(Boolean)));
+      const agentName = pendingItems[0]?.agentName || "-";
+      addNotificationCenterItem({
+        id: `commitment-submitted:${submission?.id || submission?.submittedAt || agentName}`,
+        type: "commitment-submitted",
+        title: "Commitment submitted for approval",
+        message: `Commitments submitted for approval. ${pendingItems.length} invoices awaiting review.`,
+        createdAt: submission?.submittedAt || new Date().toISOString(),
+        audience: ["manager"],
+        details: [
+          { label: "Agent", value: agentName },
+          { label: "Invoice count", value: String(pendingItems.length) },
+          { label: "Total amount", value: `Rs. ${formatINR(totalAmount)}` },
+          { label: "Week", value: weeks.join(", ") || "-" }
+        ],
+        ctas: [
+          { label: "Open Commitment Review", action: "link", href: "pages/CommitmentManager.html" }
+        ]
+      });
+    }
+
+    items.forEach((item) => {
+      const status = String(item?.approvalStatus || "pending").toLowerCase();
+      if (status !== "rejected") return;
+      addNotificationCenterItem({
+        id: `commitment-rejected:${item?.invoiceNo || "unknown"}`,
+        type: "commitment-rejected",
+        title: "Commitment rejected",
+        message: "Commitment rejected. Resubmission required.",
+        createdAt: submission?.submittedAt || new Date().toISOString(),
+        audience: ["agent"],
+        audienceUsers: [item?.agentName || ""].filter(Boolean),
+        details: [
+          { label: "Invoice", value: item?.invoiceNo || "-" },
+          { label: "Customer", value: item?.customerName || "-" },
+          { label: "Reject reason", value: item?.remark || "-" },
+          { label: "Rejected by", value: item?.reviewedBy || "-" }
+        ],
+        ctas: [
+          { label: "Open Commitment", action: "link", href: "pages/commitment.html" }
+        ]
+      });
+    });
+  });
+}
+
+function syncCreditLimitNotificationsToCenter() {
+  const approvals = readStoredArray(creditLimitApprovalsKey);
+  approvals.forEach((approval) => {
+    const approvalId = approval?.approvalId || "";
+    const status = String(approval?.status || "").toLowerCase();
+    if (!approvalId) return;
+    if (status === "pending") {
+      addNotificationCenterItem({
+        id: `credit-limit-request:${approvalId}`,
+        type: "credit-limit-request",
+        title: "Credit limit request submitted",
+        message: `Credit limit change pending approval. ${approval?.custName || "Customer"} requested limit update.`,
+        createdAt: approval?.submittedAt || new Date().toISOString(),
+        audience: ["manager", "admin"],
+        details: [
+          { label: "Customer", value: `${approval?.custName || "-"} (${approval?.custCode || "-"})` },
+          { label: "Current limit", value: `Rs. ${formatINR(approval?.currentLimit || 0)}` },
+          { label: "Proposed limit", value: `Rs. ${formatINR(approval?.proposedLimit || 0)}` },
+          { label: "Utilization", value: "-" },
+          { label: "Requested by", value: approval?.requestedBy || "Agent" }
+        ],
+        ctas: [
+          { label: "Review request", action: "link", href: "pages/credit-limit-dashboard.html" }
+        ]
+      });
+    }
+    if (status === "approved" || status === "rejected") {
+      addNotificationCenterItem({
+        id: `credit-limit-decision:${approvalId}:${status}`,
+        type: "credit-limit-decision",
+        title: "Credit limit decision",
+        message: `Credit limit request ${status}. Limit updated.`,
+        createdAt: approval?.reviewedAt || approval?.submittedAt || new Date().toISOString(),
+        audience: ["agent", "manager", "admin"],
+        details: [
+          { label: "Decision", value: status === "approved" ? "Approved" : "Rejected" },
+          { label: "Effective limit", value: `Rs. ${formatINR(approval?.proposedLimit || 0)}` },
+          { label: "Decision by", value: approval?.reviewedBy || "Manager" },
+          { label: "Effective date", value: approval?.reviewedAt || "-" }
+        ],
+        ctas: [
+          { label: "Open customer limit", action: "link", href: `pages/credit-limit-detail.html?id=${encodeURIComponent(approval?.custId || "")}` }
+        ]
+      });
+    }
+  });
+
+  const overrides = readStoredArray(creditLimitOverridesKey);
+  overrides.forEach((entry) => {
+    const creditLimit = Number(entry?.creditLimit || entry?.currentLimit || 0);
+    const outstanding = Number(entry?.outstanding || entry?.totalOutstanding || 0);
+    if (!Number.isFinite(creditLimit) || !Number.isFinite(outstanding) || creditLimit <= 0 || outstanding <= creditLimit) {
+      return;
+    }
+    const customerName = entry?.custName || entry?.name || entry?.customerName || "Customer";
+    const customerCode = entry?.custCode || entry?.code || entry?.customerCode || "-";
+    const utilization = Math.round((outstanding / creditLimit) * 100);
+    const overLimit = Math.max(0, outstanding - creditLimit);
+    const overdueAmount = Number(entry?.overdueAmount || entry?.overdue || 0);
+    const customerKey = entry?.id || entry?.custId || customerCode || customerName;
+
+    addNotificationCenterItem({
+      id: `credit-utilization-breach:${customerKey}`,
+      type: "credit-utilization-breach",
+      title: "Credit utilization breach",
+      message: `Utilization threshold crossed. ${customerName} over limit.`,
+      createdAt: entry?.updatedAt || entry?.changedAt || new Date().toISOString(),
+      audience: ["manager", "supervisor", "kam", "kas"],
+      details: [
+        { label: "Customer", value: `${customerName} (${customerCode})` },
+        { label: "Utilization %", value: `${utilization}%` },
+        { label: "Over-limit amount", value: `Rs. ${formatINR(overLimit)}` },
+        { label: "Overdue", value: overdueAmount > 0 ? `Rs. ${formatINR(overdueAmount)}` : "-" }
+      ],
+      ctas: [
+        { label: "Open Credit Dashboard", action: "link", href: "pages/credit-limit-dashboard.html" }
+      ]
+    });
+  });
+}
+
+function syncSupportNotificationsToCenter() {
+  const tickets = readStoredArray(supportTicketsKey);
+  const prioritySlaHours = { critical: 8, high: 24, medium: 48, low: 72 };
+
+  tickets.forEach((ticket) => {
+    const ticketId = ticket?.id || "";
+    if (!ticketId) return;
+    const priority = String(ticket?.priority || "medium").toLowerCase();
+    const createdAtDate = parseLooseDateTime(ticket?.createdAt) || parseLooseDateTime(ticket?.lastActivity) || new Date();
+    const slaHours = prioritySlaHours[priority] || 48;
+    const slaDueAt = new Date(createdAtDate.getTime() + slaHours * 60 * 60 * 1000);
+    const now = Date.now();
+    const remainingHours = Math.floor((slaDueAt.getTime() - now) / (1000 * 60 * 60));
+    const latestEntry = Array.isArray(ticket?.discussion) && ticket.discussion.length
+      ? ticket.discussion[ticket.discussion.length - 1]
+      : null;
+
+    addNotificationCenterItem({
+      id: `support-ticket-assigned:${ticketId}`,
+      type: "support-ticket-assigned",
+      title: "Support ticket assigned",
+      message: `Ticket ${ticketId} assigned. Action needed from support.`,
+      createdAt: ticket?.createdAt || new Date().toISOString(),
+      audience: ["support-admin"],
+      details: [
+        { label: "Category", value: ticket?.category || "-" },
+        { label: "Priority", value: ticket?.priority || "-" },
+        { label: "SLA due", value: slaDueAt.toLocaleString("en-IN") },
+        { label: "Submitted by", value: ticket?.createdBy || "-" }
+      ],
+      ctas: [
+        { label: "Open ticket", action: "link", href: "pages/support-admin.html" }
+      ]
+    });
+
+    addNotificationCenterItem({
+      id: `support-ticket-update:${ticketId}:${ticket?.status || ""}:${ticket?.lastActivity || ""}`,
+      type: "support-ticket-update",
+      title: "Support ticket updated",
+      message: `Ticket ${ticketId} updated. Status changed to ${ticket?.status || "-"}.`,
+      createdAt: ticket?.lastActivity || ticket?.createdAt || new Date().toISOString(),
+      audience: ["client-admin", "customer"],
+      audienceUsers: [ticket?.createdBy || ""].filter(Boolean),
+      details: [
+        { label: "Status", value: ticket?.status || "-" },
+        { label: "Last update by", value: latestEntry?.author || "-" },
+        { label: "Next step", value: ticket?.status === "closed" ? "Ticket closed" : "Awaiting follow-up" }
+      ],
+      ctas: [
+        { label: "Open my ticket", action: "link", href: "pages/help-support.html" }
+      ]
+    });
+
+    if ((ticket?.status || "").toLowerCase() !== "closed" && remainingHours <= 8) {
+      addNotificationCenterItem({
+        id: `support-sla-risk:${ticketId}:${ticket?.lastActivity || ticket?.createdAt || "current"}`,
+        type: "support-sla-risk",
+        title: "Support SLA risk",
+        message: `Ticket ${ticketId} nearing SLA breach. Escalation recommended.`,
+        createdAt: ticket?.lastActivity || ticket?.createdAt || new Date().toISOString(),
+        audience: ["support-admin-lead", "support-admin"],
+        details: [
+          { label: "Remaining SLA", value: `${Math.max(0, remainingHours)} hours` },
+          { label: "Owner", value: latestEntry?.author || "Support queue" },
+          { label: "Escalation contact", value: "Support Admin Lead" }
+        ],
+        ctas: [
+          { label: "Open escalation ticket", action: "link", href: "pages/support-admin.html" }
+        ]
+      });
+    }
+  });
+}
+
+function syncCrossModuleNotificationsToCenter() {
+  syncIssueNotificationsToCenter();
+  syncCommitmentWorkflowNotifications();
+  syncCreditLimitNotificationsToCenter();
+  syncSupportNotificationsToCenter();
+}
+
+function pruneNotificationCenterToScope() {
+  const current = loadNotificationCenter();
+  const filtered = current.filter((note) => notificationScopeTypes.has(String(note?.type || "").toLowerCase()));
+  if (filtered.length !== current.length) {
+    saveNotificationCenter(filtered);
+  }
+}
+
+function refreshNotificationCenterUi() {
+  updateManagerNotificationBadge();
+  const popup = document.getElementById("notificationPopup");
+  if (popup && !popup.classList.contains("hidden")) {
+    renderNotificationPopup();
+  }
+}
+
+function syncNotificationCenterSources() {
+  syncLegacyNotificationsToCenter();
+  syncCrossModuleNotificationsToCenter();
+  seedNotificationCenter();
+  pruneNotificationCenterToScope();
+  refreshNotificationCenterUi();
+}
+
 function seedNotificationCenter() {
   const list = loadNotificationCenter();
-  const existingIds = new Set(list.map(item => item.id));
   const customer = customersData[0];
   const customerTwo = customersData[1];
   const invoice = customer?.invoices?.[0];
   const invoiceTwo = customerTwo?.invoices?.[1];
   const now = new Date().toISOString();
+  const visitDate = customer?.grnDate || "15 Apr 2026";
+  const visitDateTwo = customerTwo?.grnDate || "17 Apr 2026";
+  const visitCustomers = summarizeCustomerList([
+    customer?.name,
+    customerTwo?.name,
+    customersData[2]?.name,
+    customersData[3]?.name
+  ]);
+  const planCount = 4;
   const seeds = [
     {
       id: "seed-visit-approval",
-      type: "visit-approval",
+      type: "visit-approval-pending",
       title: "Visit approval pending",
-      message: "Visit request awaiting approval from manager.",
+      message: `Visit approval pending - ${visitDate}. ${planCount} plans awaiting review.`,
       createdAt: now,
       audience: ["manager"],
       details: [
-        { label: "Customer", value: customer ? `${customer.name} (${customer.code})` : "-" },
-        { label: "Visit date", value: customer?.grnDate || "-" },
-        { label: "Location", value: customer?.city || "-" },
-        { label: "Requested by", value: customer?.agentName || "-" }
+        { label: "Visit date", value: visitDate },
+        { label: "Plan count", value: String(planCount) },
+        { label: "Customer list", value: visitCustomers },
+        { label: "Requested by", value: customer?.agentName || "-" },
+        { label: "Submitted at", value: new Date(now).toLocaleString("en-IN") }
       ],
       ctas: [
         { label: "Review visit", action: "link", href: "pages/visitmoduleReview.html" }
@@ -1526,19 +2363,39 @@ function seedNotificationCenter() {
     },
     {
       id: "seed-visit-followup",
-      type: "visit-approval",
-      title: "Visit follow-up",
-      message: "Visit report is ready for review.",
+      type: "visit-plan-approved",
+      title: "Visit plan approved",
+      message: `Visit plan approved - ${visitDateTwo}. Approved by Mukesh Mishra.`,
       createdAt: now,
-      audience: ["manager", "agent"],
+      audience: ["agent"],
       details: [
-        { label: "Customer", value: customerTwo ? `${customerTwo.name} (${customerTwo.code})` : "-" },
-        { label: "Visit date", value: customerTwo?.grnDate || "-" },
-        { label: "Location", value: customerTwo?.city || "-" },
-        { label: "Requested by", value: customerTwo?.agentName || "-" }
+        { label: "Visit date", value: visitDateTwo },
+        { label: "Approved by", value: "Mukesh Mishra" },
+        { label: "Plan count", value: "3" },
+        { label: "Customer list", value: summarizeCustomerList([customerTwo?.name, customer?.name, customersData[2]?.name]) },
+        { label: "Remarks", value: "Proceed with planned customer visits." }
       ],
       ctas: [
         { label: "Open visit", action: "link", href: "pages/visitmodule.html" }
+      ]
+    },
+    {
+      id: "seed-visit-replan-required",
+      type: "visit-replan-required",
+      title: "Visit replan required",
+      message: `Visit plan rejected - ${visitDateTwo}. Replan required.`,
+      createdAt: now,
+      audience: ["agent"],
+      details: [
+        { label: "Visit date", value: visitDateTwo },
+        { label: "Rejected by", value: "Mukesh Mishra" },
+        { label: "Reason", value: "Insufficient coverage for high-priority customers." },
+        { label: "Plan count", value: "2" },
+        { label: "Customer list", value: summarizeCustomerList([customer?.name, customerTwo?.name]) },
+        { label: "Resubmit by", value: "Today 06:00 PM" }
+      ],
+      ctas: [
+        { label: "Open Visit Planner", action: "link", href: "pages/visitmodule.html" }
       ]
     },
     {
@@ -1547,7 +2404,7 @@ function seedNotificationCenter() {
       title: "New email received",
       message: `Reply from ${customer?.name || "customer"} about ${invoice?.invoiceNo || "invoice"}.`,
       createdAt: now,
-      audience: ["agent", "manager"],
+      audience: ["all"],
       details: [
         { label: "From", value: customer?.contacts?.[0]?.email || "-" },
         { label: "To", value: "ops@inebura.com" },
@@ -1563,7 +2420,7 @@ function seedNotificationCenter() {
       title: "Email reminder",
       message: `Payment reminder sent to ${customerTwo?.name || "customer"}.`,
       createdAt: now,
-      audience: ["agent", "manager"],
+      audience: ["all"],
       details: [
         { label: "From", value: "ops@inebura.com" },
         { label: "To", value: customerTwo?.contacts?.[0]?.email || "-" },
@@ -1596,21 +2453,139 @@ function seedNotificationCenter() {
       title: "Todo reminder",
       message: "Follow up on pending documents.",
       createdAt: now,
-      audience: ["agent", "manager"],
+      audience: ["all"],
       details: [
         { label: "Due", value: invoice?.dueDate || "-" },
+        { label: "Assignee", value: getActiveNotificationUser() || "-" },
         { label: "Customer", value: customer ? `${customer.name} (${customer.code})` : "-" },
         { label: "Invoice", value: invoice?.invoiceNo || "-" }
       ],
       ctas: [
         { label: "Open todo", action: "open-todo" }
       ]
+    },
+    {
+      id: "seed-backend-upload-exception",
+      type: "backend-upload-exception",
+      title: "Backend upload exception",
+      message: "Upload batch failed validation. 54 records need correction.",
+      createdAt: now,
+      audience: ["backend"],
+      details: [
+        { label: "Upload ID", value: "UPL-10977" },
+        { label: "Upload type", value: "CN/Adv upload" },
+        { label: "Reject count", value: "54" },
+        { label: "Owner", value: "Backend Ops" },
+        { label: "Last run", value: "12 minutes" }
+      ],
+      ctas: [
+        { label: "Open Upload Queue", action: "link", href: "pages/LPbackend.html" }
+      ]
+    },
+    {
+      id: "seed-mis-schedule-failed",
+      type: "mis-schedule-failed",
+      title: "MIS schedule failed",
+      message: "Scheduled report failed. Visit Compliance needs rerun.",
+      createdAt: now,
+      audience: ["mis"],
+      details: [
+        { label: "Schedule", value: "Daily 06:00 PM" },
+        { label: "Report type", value: "Visit report" },
+        { label: "Failure reason", value: "Data source timeout" },
+        { label: "Last success", value: "2026-01-05 17:52" }
+      ],
+      ctas: [
+        { label: "Open Schedule Log", action: "link", href: "pages/LPmis.html" }
+      ]
+    },
+    {
+      id: "seed-credit-utilization-breach",
+      type: "credit-utilization-breach",
+      title: "Credit utilization breach",
+      message: "Utilization threshold crossed. Sunrise Pvt Ltd over limit.",
+      createdAt: now,
+      audience: ["manager", "supervisor", "kam", "kas"],
+      details: [
+        { label: "Customer", value: "Sunrise Pvt Ltd (CUST-033)" },
+        { label: "Utilization %", value: "123%" },
+        { label: "Over-limit amount", value: "Rs. 3,40,000" },
+        { label: "Overdue", value: "Rs. 8,60,000" }
+      ],
+      ctas: [
+        { label: "Open Credit Dashboard", action: "link", href: "pages/credit-limit-dashboard.html" }
+      ]
+    },
+    {
+      id: "seed-support-ticket-assigned",
+      type: "support-ticket-assigned",
+      title: "Support ticket assigned",
+      message: "Ticket TKT-2026-100921 assigned. Action needed from support.",
+      createdAt: now,
+      audience: ["support-admin"],
+      details: [
+        { label: "Category", value: "Feature Request" },
+        { label: "Priority", value: "High" },
+        { label: "SLA due", value: "11 Apr 2026, 10:00 AM" },
+        { label: "Submitted by", value: "Client Admin" }
+      ],
+      ctas: [
+        { label: "Open ticket", action: "link", href: "pages/support-admin.html" }
+      ]
+    },
+    {
+      id: "seed-support-ticket-update",
+      type: "support-ticket-update",
+      title: "Support ticket updated",
+      message: "Ticket TKT-2026-100921 updated. Status changed to in-progress.",
+      createdAt: now,
+      audience: ["client-admin", "customer"],
+      details: [
+        { label: "Status", value: "In Progress" },
+        { label: "Last update by", value: "Support Team" },
+        { label: "Next step", value: "Awaiting additional invoice details" }
+      ],
+      ctas: [
+        { label: "Open my ticket", action: "link", href: "pages/help-support.html" }
+      ]
+    },
+    {
+      id: "seed-support-sla-risk",
+      type: "support-sla-risk",
+      title: "Support SLA risk",
+      message: "Ticket TKT-2026-100921 nearing SLA breach. Escalation recommended.",
+      createdAt: now,
+      audience: ["support-admin-lead", "support-admin"],
+      details: [
+        { label: "Remaining SLA", value: "3 hours" },
+        { label: "Owner", value: "Support Queue" },
+        { label: "Escalation contact", value: "Support Admin Lead" }
+      ],
+      ctas: [
+        { label: "Open escalation ticket", action: "link", href: "pages/support-admin.html" }
+      ]
     }
   ];
 
-  const additions = seeds.filter(item => !existingIds.has(item.id));
-  if (additions.length > 0) {
-    saveNotificationCenter(additions.concat(list));
+  const merged = [...list];
+  let changed = false;
+  seeds.forEach((seed) => {
+    const idx = merged.findIndex((item) => item.id === seed.id);
+    if (idx >= 0) {
+      const existing = merged[idx];
+      const next = { ...existing, ...seed, read: existing.read };
+      if (JSON.stringify(existing) !== JSON.stringify(next)) {
+        merged[idx] = next;
+        changed = true;
+      }
+      return;
+    }
+    merged.unshift(seed);
+    changed = true;
+  });
+
+  if (changed) {
+    saveNotificationCenter(merged);
   }
 }
 
@@ -1754,11 +2729,41 @@ function renderNotificationPopup() {
   const typeLabelMap = {
     pdc: "PDC",
     "pdc-reminder": "PDC reminder",
+    "pdc-bounced": "PDC",
+    "pdc-handoff": "PDC",
     "visit-approval": "Visit approval",
+    "visit-approval-pending": "Visit approval",
+    "visit-plan-approved": "Visit approval",
+    "visit-replan-required": "Visit approval",
     todo: "Todo",
+    "todo-assigned": "Todo",
+    "todo-completed-ack": "Todo",
     email: "Email",
     "customer-payment": "Customer payment",
     "commitment-approved": "Commitment",
+    "commitment-submitted": "Commitment",
+    "commitment-rejected": "Commitment",
+    "issue-assigned": "Issue",
+    "issue-approval-requested": "Issue",
+    "issue-approval-decision": "Issue",
+    "issue-created-manager": "Issue",
+    "issue-manager-approved": "Issue",
+    "issue-approval-forwarded": "Issue",
+    "issue-approval-rejected": "Issue",
+    "issue-resolution-provided": "Issue",
+    "issue-ticket-closed": "Issue",
+    "issue-assignment-updated": "Issue",
+    "issue-approval-process-saved": "Issue",
+    "issue-remark-added": "Issue",
+    "issue-reopened": "Issue",
+    "backend-upload-exception": "Backend",
+    "mis-schedule-failed": "MIS",
+    "credit-limit-request": "Credit Limit",
+    "credit-limit-decision": "Credit Limit",
+    "credit-utilization-breach": "Credit Limit",
+    "support-ticket-assigned": "Support",
+    "support-ticket-update": "Support",
+    "support-sla-risk": "Support",
     "task-completed": "Task",
     manager: "Manager"
   };
@@ -1778,10 +2783,20 @@ function renderNotificationPopup() {
     const customer = getDetailValue(details, "Customer");
     const invoice = getDetailValue(details, "Invoice");
     const cheque = getDetailValue(details, "Cheque");
+    const chequeNo = getDetailValue(details, "Cheque no");
     const subject = getDetailValue(details, "Subject");
     const visitDate = getDetailValue(details, "Visit date");
+    const assignee = getDetailValue(details, "Assignee");
 
-    if (type === "pdc" || type === "pdc-reminder") {
+    if (type === "pdc" || type === "pdc-reminder" || type === "pdc-bounced" || type === "pdc-handoff") {
+      if (type === "pdc-bounced") {
+        const chequeRef = chequeNo || cheque;
+        return chequeRef ? `Cheque ${chequeRef} bounced` : "Cheque bounced";
+      }
+      if (type === "pdc-handoff") {
+        const toStatus = getDetailValue(details, "To status");
+        return toStatus ? `PDC moved to ${toStatus}` : "PDC status handoff";
+      }
       const base = type === "pdc-reminder" ? "PDC reminder" : "PDC update";
       if (cheque && customer) return `${base} - ${cheque} - ${customer}`;
       if (cheque) return `${base} - ${cheque}`;
@@ -1790,12 +2805,11 @@ function renderNotificationPopup() {
       if (customer) return `${base} - ${customer}`;
       return base;
     }
-    if (type === "visit-approval") {
-      const base = "Visit approval";
-      if (customer && visitDate) return `${base} - ${customer} - ${visitDate}`;
-      if (customer) return `${base} - ${customer}`;
-      if (visitDate) return `${base} - ${visitDate}`;
-      return base;
+    if (type === "visit-approval" || type === "visit-approval-pending" || type === "visit-plan-approved" || type === "visit-replan-required") {
+      const base = type === "visit-plan-approved"
+        ? "Visit plan approved"
+        : (type === "visit-replan-required" ? "Visit plan rejected" : "Visit approval pending");
+      return visitDate ? `${base} - ${visitDate}` : base;
     }
     if (type === "email") {
       const base = "Email";
@@ -1805,12 +2819,11 @@ function renderNotificationPopup() {
       return base;
     }
     if (type === "todo") {
-      const base = "Todo reminder";
-      if (customer && invoice) return `${base} - ${customer} - ${invoice}`;
-      if (customer) return `${base} - ${customer}`;
-      if (invoice) return `${base} - ${invoice}`;
-      return base;
+      if (assignee) return `Todo reminder - ${assignee}`;
+      return "Todo reminder";
     }
+    if (type === "todo-assigned") return "Task assigned";
+    if (type === "todo-completed-ack") return "Task completed";
     if (type === "customer-payment") {
       const base = "Customer payment submitted";
       if (invoice && customer) return `${base} - ${invoice} - ${customer}`;
@@ -1825,6 +2838,29 @@ function renderNotificationPopup() {
       if (customer) return `${base} - ${customer}`;
       return base;
     }
+    if (type === "commitment-submitted") return "Commitment submitted for approval";
+    if (type === "commitment-rejected") return "Commitment rejected";
+    if (type === "issue-assigned") return "Issue assigned";
+    if (type === "issue-approval-requested") return "Issue approval requested";
+    if (type === "issue-approval-decision") return "Issue approval decision";
+    if (type === "issue-created-manager") return "Issue created";
+    if (type === "issue-manager-approved") return "Issue manager approval";
+    if (type === "issue-approval-forwarded") return "Issue approval forwarded";
+    if (type === "issue-approval-rejected") return "Issue approval rejected";
+    if (type === "issue-resolution-provided") return "Issue resolution provided";
+    if (type === "issue-ticket-closed") return "Issue ticket closed";
+    if (type === "issue-assignment-updated") return "Issue assignment updated";
+    if (type === "issue-approval-process-saved") return "Issue approval process saved";
+    if (type === "issue-remark-added") return "Issue remark added";
+    if (type === "issue-reopened") return "Issue reopened";
+    if (type === "backend-upload-exception") return "Backend upload exception";
+    if (type === "mis-schedule-failed") return "MIS schedule failed";
+    if (type === "credit-limit-request") return "Credit limit request submitted";
+    if (type === "credit-limit-decision") return "Credit limit decision";
+    if (type === "credit-utilization-breach") return "Credit utilization breach";
+    if (type === "support-ticket-assigned") return "Support ticket assigned";
+    if (type === "support-ticket-update") return "Support ticket updated";
+    if (type === "support-sla-risk") return "Support SLA risk";
     if (type === "task-completed") {
       const base = "Task completed";
       if (invoice && customer) return `${base} - ${invoice} - ${customer}`;
@@ -1858,15 +2894,43 @@ function renderNotificationPopup() {
     const ctas = Array.isArray(note.ctas) ? note.ctas : [];
     const defaultCta = ctas[0] || {};
     const defaultAction = defaultCta.action
-      || (note.type === "visit-approval" ? "link"
-        : (note.type === "pdc" || note.type === "pdc-reminder") ? "open-pdc"
+      || ((note.type === "visit-approval" || note.type === "visit-approval-pending" || note.type === "visit-plan-approved" || note.type === "visit-replan-required") ? "link"
+        : (note.type === "pdc" || note.type === "pdc-reminder" || note.type === "pdc-bounced" || note.type === "pdc-handoff") ? "open-pdc"
           : note.type === "todo" ? "open-todo"
+            : note.type === "todo-assigned" ? "open-todo"
+              : note.type === "todo-completed-ack" ? "open-todo"
             : note.type === "email" ? "open-email"
               : note.type === "customer-payment" ? "open-disposition"
               : note.type === "commitment-approved" ? "open-invoice"
+                : note.type === "commitment-submitted" ? "link"
+                  : note.type === "commitment-rejected" ? "link"
+                    : String(note.type || "").startsWith("issue-") ? "link"
+                          : note.type === "backend-upload-exception" ? "link"
+                            : note.type === "mis-schedule-failed" ? "link"
+                              : note.type === "credit-limit-request" ? "link"
+                                : note.type === "credit-limit-decision" ? "link"
+                                  : note.type === "credit-utilization-breach" ? "link"
+                                    : note.type === "support-ticket-assigned" ? "link"
+                                      : note.type === "support-ticket-update" ? "link"
+                                        : note.type === "support-sla-risk" ? "link"
                 : "");
     const defaultHref = defaultCta.href
-      || (note.type === "visit-approval" ? "pages/visitmoduleReview.html" : "");
+      || ((note.type === "visit-approval" || note.type === "visit-approval-pending") ? "pages/visitmoduleReview.html"
+        : note.type === "visit-plan-approved" ? "pages/visitmodule.html"
+          : note.type === "visit-replan-required" ? "pages/visitmodule.html"
+            : note.type === "commitment-submitted" ? "pages/CommitmentManager.html"
+              : note.type === "commitment-rejected" ? "pages/commitment.html"
+                : note.type === "issue-approval-requested" ? "bin/IssueTracker/approver-dashboard.html"
+                  : String(note.type || "").startsWith("issue-") ? "pages/issuetrackerLP.html"
+                      : note.type === "backend-upload-exception" ? "pages/LPbackend.html"
+                        : note.type === "mis-schedule-failed" ? "pages/LPmis.html"
+                          : note.type === "credit-limit-request" ? "pages/credit-limit-dashboard.html"
+                            : note.type === "credit-limit-decision" ? "pages/credit-limit-dashboard.html"
+                              : note.type === "credit-utilization-breach" ? "pages/credit-limit-dashboard.html"
+                                : note.type === "support-ticket-assigned" ? "pages/support-admin.html"
+                                  : note.type === "support-ticket-update" ? "pages/help-support.html"
+                                    : note.type === "support-sla-risk" ? "pages/support-admin.html"
+                                      : "");
     const defaultInv = defaultCta.invoiceNo || invoiceValue || "";
     const ctaHtml = ctas.map((cta) => `
       <button
@@ -1950,6 +3014,12 @@ function buildInvoiceMeta(invoice) {
 
 function addTodoTask({ text, dueDate, dueTime, customer, invoice, source }) {
   if (!text) return;
+  const activeUser = getActiveNotificationUser() || "User";
+  const defaultAssignee = isManagerView
+    ? (customer?.agentName || activeUser)
+    : activeUser;
+  const assignedTo = defaultAssignee;
+  const assignedBy = activeUser;
   todoTaskCounter += 1;
   todoTasks.unshift({
     id: `task-${todoTaskCounter}`,
@@ -1960,9 +3030,12 @@ function addTodoTask({ text, dueDate, dueTime, customer, invoice, source }) {
     customerCode: customer?.code || "-",
     invoice: buildInvoiceMeta(invoice),
     source: source || "manual",
+    assignedBy,
+    assignedTo,
     createdAt: new Date().toISOString(),
     completed: false,
-    completedAt: ""
+    completedAt: "",
+    completedBy: ""
   });
   saveTodoTasksToStorage();
   renderTodoList();
@@ -1975,9 +3048,10 @@ function addTodoTask({ text, dueDate, dueTime, customer, invoice, source }) {
     title: "New todo",
     message: task.text,
     createdAt: task.createdAt,
-    audience: ["agent", "manager"],
+    audience: ["all"],
     details: [
       { label: "Due", value: formatTodoDue(task) },
+      { label: "Assignee", value: task.assignedTo || "-" },
       { label: "Customer", value: `${task.customerName} (${task.customerCode})` },
       { label: "Invoice", value: task.invoice?.invoiceNo || "-" }
     ],
@@ -1985,6 +3059,28 @@ function addTodoTask({ text, dueDate, dueTime, customer, invoice, source }) {
       { label: "Open todo", action: "open-todo" }
     ]
   });
+
+  if (normalizeAudienceUser(task.assignedTo) && normalizeAudienceUser(task.assignedTo) !== normalizeAudienceUser(task.assignedBy)) {
+    addNotificationCenterItem({
+      id: `todo-assigned:${task.id}:${normalizeAudienceUser(task.assignedTo)}`,
+      type: "todo-assigned",
+      title: "Task assigned",
+      message: `Task assigned - ${task.assignedTo}. ${task.text}`,
+      createdAt: task.createdAt,
+      audience: ["all"],
+      audienceUsers: [task.assignedTo],
+      details: [
+        { label: "Assigned by", value: task.assignedBy || "-" },
+        { label: "Assigned to", value: task.assignedTo || "-" },
+        { label: "Due", value: formatTodoDue(task) },
+        { label: "Customer", value: `${task.customerName} (${task.customerCode})` },
+        { label: "Invoice", value: task.invoice?.invoiceNo || "-" }
+      ],
+      ctas: [
+        { label: "Open todo", action: "open-todo" }
+      ]
+    });
+  }
 }
 
 function formatTodoDue(task) {
@@ -2014,6 +3110,7 @@ function renderTodoList() {
   const buildTaskRow = (task) => {
     const dueLine = `Due ${formatTodoDue(task)}`;
     const customerLine = `Customer ${safeText(task.customerName)} (${safeText(task.customerCode)})`;
+    const assigneeLine = `Assignee ${safeText(task.assignedTo || "-")}`;
     let invoiceLine = "Invoice: -";
     if (task.invoice) {
       const invoiceNo = safeText(task.invoice.invoiceNo);
@@ -2035,6 +3132,7 @@ function renderTodoList() {
         <div>
           <div class="todoTitle">${safeText(task.text)}</div>
           <div class="todoMeta">${dueLine}</div>
+          <div class="todoMeta">${assigneeLine}</div>
           <div class="todoMeta">${customerLine}</div>
           <div class="todoMeta">${invoiceLine}</div>
         </div>
@@ -7314,21 +8412,6 @@ function wireCustomerPayRemarkEvents() {
       const paymentRemark = values.receiptName
         ? `Customer submitted payment details. Receipt: ${values.receiptName}`
         : "Customer submitted payment details.";
-      const dispositionPrefill = {
-        activityType: "Collection",
-        broadStatus: customerBroadStatus,
-        primaryStatus: customerPrimaryStatus,
-        subStatus: customerSubStatus,
-        remarks: paymentRemark,
-        instrumentMode: values.mode,
-        instrumentRef: values.instrumentRef,
-        bank: values.bank,
-        transferDate: values.transferDate,
-        amount: values.amount,
-        tds: values.tds,
-        ld: values.ld,
-        miscRows: values.miscRows
-      };
       const statusPayload = buildStatusTrailPayload({
         activityType: "Collection",
         broadStatus: customerBroadStatus,
@@ -7348,35 +8431,6 @@ function wireCustomerPayRemarkEvents() {
         outstanding: previousOutstanding
       }, timestampIso);
       addActivityTrailEntry(invoice.invoiceNo, statusPayload);
-
-      addNotificationCenterItem({
-        id: `customer-payment:${invoice.invoiceNo}:${timestampIso}`,
-        type: "customer-payment",
-        title: "Customer payment submitted",
-        message: `${customer?.name || "Customer"} submitted payment details for ${invoice.invoiceNo}.`,
-        createdAt: timestampIso,
-        audience: ["agent"],
-        details: [
-          { label: "Customer", value: customer ? `${customer.name} (${customer.code})` : "-" },
-          { label: "Invoice", value: invoice.invoiceNo },
-          { label: "Amount submitted", value: `Rs. ${formatINR(values.totalCollected)}` },
-          { label: "Transfer date", value: values.transferDate || "-" },
-          { label: "Instrument mode", value: values.mode || "-" },
-          { label: "Status", value: `${customerBroadStatus} / ${customerPrimaryStatus} / ${customerSubStatus}` }
-        ],
-        ctas: [
-          { label: "Open activity", action: "open-disposition", invoiceNo: invoice.invoiceNo }
-        ],
-        data: {
-          invoiceNo: invoice.invoiceNo,
-          prefillDisposition: dispositionPrefill,
-          prefillStatus: {
-            broadStatus: customerBroadStatus,
-            primaryStatus: customerPrimaryStatus,
-            subStatus: customerSubStatus
-          }
-        }
-      });
 
       applyFiltersAndRender();
       if (!selectInvoiceByNo(invoice.invoiceNo)) {
@@ -7780,17 +8834,32 @@ function wireTodoEvents() {
       const task = todoTasks.find(entry => entry.id === taskId);
       if (task) {
         const wasCompleted = task.completed;
+        const completedBy = getActiveNotificationUser() || "User";
         task.completed = chk.checked;
         task.completedAt = task.completed ? new Date().toISOString() : "";
-        if (!isManagerView && task.completed && !wasCompleted) {
-          const customerLabel = task.customerName ? ` (${task.customerName})` : "";
-          addManagerNotification({
-            id: `notify-${Date.now()}`,
-            type: "task-completed",
-            message: `Task completed: ${task.text}${customerLabel}`,
-            invoiceNo: task.invoice?.invoiceNo || "",
-            createdAt: new Date().toISOString(),
-            read: false
+        task.completedBy = task.completed ? completedBy : "";
+        const assignee = normalizeAudienceUser(task.assignedTo || "");
+        const assigner = normalizeAudienceUser(task.assignedBy || "");
+        const completer = normalizeAudienceUser(completedBy);
+        if (task.completed && !wasCompleted && assignee && assigner && assignee !== assigner && completer === assignee) {
+          addNotificationCenterItem({
+            id: `todo-completed-ack:${task.id}:${task.completedAt || Date.now()}`,
+            type: "todo-completed-ack",
+            title: "Task completed",
+            message: `Task completed - ${task.assignedTo || "Assignee"}. ${task.text}`,
+            createdAt: task.completedAt || new Date().toISOString(),
+            audience: ["all"],
+            audienceUsers: [task.assignedBy],
+            details: [
+              { label: "Completed by", value: task.completedBy || "-" },
+              { label: "Completed at", value: task.completedAt ? formatNotificationTime(task.completedAt) : "-" },
+              { label: "Original assignee", value: task.assignedTo || "-" },
+              { label: "Customer", value: `${task.customerName || "-"} (${task.customerCode || "-"})` },
+              { label: "Invoice", value: task.invoice?.invoiceNo || "-" }
+            ],
+            ctas: [
+              { label: "Open todo", action: "open-todo" }
+            ]
           });
         }
       }
@@ -8650,9 +9719,6 @@ document.addEventListener("DOMContentLoaded", () => {
   renderUserPopup();
   initUserSelect();
   wireSideNavEvents();
-  syncLegacyNotificationsToCenter();
-  seedNotificationCenter();
-  updateManagerNotificationBadge();
 
   const search = document.getElementById("customerSearch");
   if (search) {
@@ -8697,6 +9763,7 @@ document.addEventListener("DOMContentLoaded", () => {
   wireTargetSummaryEvents();
   wireTodoEvents();
   wireCnAdvPdcEvents();
+  syncNotificationCenterSources();
 
   loadTodoTasksFromStorage();
   updateManagerNotificationBadge();
@@ -8805,14 +9872,24 @@ document.addEventListener("DOMContentLoaded", () => {
     toggleNotificationPopup(false);
   });
 
-    window.addEventListener("storage", (event) => {
-      if (event.key === notificationCenterKey || event.key === managerNotificationsKey || event.key === pdcNotificationKey) {
-        updateManagerNotificationBadge();
-        const popup = document.getElementById("notificationPopup");
-        if (popup && !popup.classList.contains("hidden")) {
-          renderNotificationPopup();
-        }
-      }
+  window.addEventListener("storage", (event) => {
+    const notificationSourceKeys = new Set([
+      pdcNotificationKey,
+      pdcStorageKey,
+      todoStorageKey,
+      issueTrackerBaseKey,
+      issueTrackerCustomKey,
+      issueApprovalRequestKey,
+      commitmentSubmissionsKey,
+      creditLimitApprovalsKey,
+      creditLimitOverridesKey,
+      supportTicketsKey
+    ]);
+    if (event.key === notificationCenterKey) {
+      refreshNotificationCenterUi();
+    } else if (!event.key || notificationSourceKeys.has(event.key)) {
+      syncNotificationCenterSources();
+    }
     if (event.key === todoStorageKey) {
       loadTodoTasksFromStorage();
       renderTodoList();

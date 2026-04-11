@@ -605,14 +605,16 @@ button.notifyBadge {
   right: 0;
   top: calc(100% + 8px);
   width: 280px;
-  max-height: 320px;
-  overflow: auto;
+  max-height: 420px;
+  overflow: hidden;
   background: #ffffff;
   border: 1px solid #e2e8f4;
   border-radius: 12px;
   box-shadow: 0 14px 30px rgba(15, 23, 42, 0.18);
   padding: 8px;
   z-index: 120;
+  display: flex;
+  flex-direction: column;
 }
 
 .userPopup {
@@ -805,6 +807,17 @@ button.notifyBadge {
   letter-spacing: 0.06em;
   color: #64748b;
   margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex: 0 0 auto;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #eef1f7;
+  background: #ffffff;
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 
 .notificationHeaderActions {
@@ -839,7 +852,32 @@ button.notifyBadge {
 .notificationPopupList {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
+  overflow: auto;
+  flex: 1;
+  padding-top: 2px;
+}
+
+.notificationPopup.expanded {
+  width: min(520px, 92vw);
+  max-height: min(620px, 80vh);
+}
+
+.notificationExpandBtn {
+  border: 1px solid #e2e8f4;
+  background: #ffffff;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+}
+
+.notificationExpandBtn:hover {
+  border-color: var(--brand-border);
+  color: var(--brand-dark);
 }
 
 .notificationCard {
@@ -894,6 +932,112 @@ button.notifyBadge {
   border: 1px solid #ddd6fe;
 }
 
+.notificationTag.tag-pdc {
+  background: #e0f2fe;
+  color: #075985;
+  border: 1px solid #bae6fd;
+}
+
+.notificationTag.tag-pdc-reminder {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.notificationTag.tag-pdc-bounced {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.notificationTag.tag-pdc-handoff {
+  background: #e0f2fe;
+  color: #075985;
+  border: 1px solid #bae6fd;
+}
+
+.notificationTag.tag-visit-approval,
+.notificationTag.tag-visit-approval-pending,
+.notificationTag.tag-visit-plan-approved,
+.notificationTag.tag-visit-replan-required {
+  background: #ecfdf3;
+  color: #0f766e;
+  border: 1px solid #a7f3d0;
+}
+
+.notificationTag.tag-todo,
+.notificationTag.tag-todo-assigned,
+.notificationTag.tag-todo-completed-ack {
+  background: #fef9c3;
+  color: #854d0e;
+  border: 1px solid #fde047;
+}
+
+.notificationTag.tag-email {
+  background: #ede9fe;
+  color: #5b21b6;
+  border: 1px solid #c4b5fd;
+}
+
+.notificationTag.tag-commitment-approved,
+.notificationTag.tag-commitment-submitted {
+  background: #ede9fe;
+  color: #5b21b6;
+  border: 1px solid #ddd6fe;
+}
+
+.notificationTag.tag-commitment-rejected {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.notificationTag.tag-issue-assigned,
+.notificationTag.tag-issue-approval-requested,
+.notificationTag.tag-issue-approval-decision,
+.notificationTag.tag-issue-created-manager,
+.notificationTag.tag-issue-manager-approved,
+.notificationTag.tag-issue-approval-forwarded,
+.notificationTag.tag-issue-approval-rejected,
+.notificationTag.tag-issue-resolution-provided,
+.notificationTag.tag-issue-ticket-closed,
+.notificationTag.tag-issue-assignment-updated,
+.notificationTag.tag-issue-approval-process-saved,
+.notificationTag.tag-issue-remark-added,
+.notificationTag.tag-issue-reopened {
+  background: #ffedd5;
+  color: #9a3412;
+  border: 1px solid #fed7aa;
+}
+
+.notificationTag.tag-backend-upload-exception {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.notificationTag.tag-mis-schedule-failed {
+  background: #e2e8f0;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+}
+
+.notificationTag.tag-credit-limit-request,
+.notificationTag.tag-credit-limit-decision,
+.notificationTag.tag-credit-utilization-breach {
+  background: #fce7f3;
+  color: #9d174d;
+  border: 1px solid #fbcfe8;
+}
+
+.notificationTag.tag-support-ticket-assigned,
+.notificationTag.tag-support-ticket-update,
+.notificationTag.tag-support-sla-risk {
+  background: #dbeafe;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+}
+
 .notificationCardBody {
   font-size: 12px;
   color: #475569;
@@ -930,6 +1074,17 @@ button.notifyBadge {
 
 .notificationPopup:not(.expanded) .notificationDetails {
   display: none;
+}
+
+.notificationPopup:not(.expanded) .notificationCtas {
+  display: none;
+}
+
+.notificationPopup:not(.expanded) .notificationCardBody {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .notificationMarkBtn {
