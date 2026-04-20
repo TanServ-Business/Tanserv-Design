@@ -2683,6 +2683,7 @@ button.notifyBadge {
 .colIcon { width: 44px; }
 .colInv {width: 80px;}
 .colDate {width: 90px;}
+.colAging {width: 72px; text-align: right;}
 .colShort {width: 100px;}
 .colStatus {width: 150px;}
 .colActions {width: 125px;}
@@ -2694,6 +2695,11 @@ button.notifyBadge {
 
 .invoiceTable td.colStatus {
   overflow: visible;
+}
+
+.invoiceTable td.colDate.dueDateOverdue {
+  color: #dc2626;
+  font-weight: 700;
 }
 
 .iconFlat {
@@ -2733,6 +2739,168 @@ button.notifyBadge {
   min-width: 16px;
   text-align: center;
   border: 1px solid #d7c3ea;
+}
+
+/* Agent landing: icon rail collapses to colored dots and expands on hover */
+.invoiceTable--iconPeek {
+  --peek-dot-size: 9px;
+  --peek-col-collapsed: 22px;
+  --peek-col-expanded: 44px;
+}
+
+.invoiceTable--iconPeek .colIcon {
+  width: var(--peek-col-collapsed);
+  overflow: visible;
+  padding-left: 0;
+  padding-right: 0;
+  transition: width 0.2s ease;
+}
+
+.invoiceTable--iconPeek thead .colIcon {
+  position: relative;
+}
+
+.invoiceTable--iconPeek .colIcon .iconFlat,
+.invoiceTable--iconPeek .colIcon .iconWrap,
+.invoiceTable--iconPeek .colIcon .badgeCount {
+  transition: all 0.2s ease;
+}
+
+.invoiceTable--iconPeek:not(:has(.colIcon:hover)) thead .colIcon i {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.invoiceTable--iconPeek:not(:has(.colIcon:hover)) thead .colIcon::after {
+  content: "";
+  display: block;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: var(--peek-dot-size);
+  height: var(--peek-dot-size);
+  border-radius: 999px;
+  background: #cbd5e1;
+}
+
+.invoiceTable--iconPeek:not(:has(.colIcon:hover)) tbody .colIcon .iconWrap {
+  width: var(--peek-dot-size);
+  height: var(--peek-dot-size);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  line-height: 0;
+}
+
+.invoiceTable--iconPeek:not(:has(.colIcon:hover)) tbody .colIcon .iconFlat {
+  width: var(--peek-dot-size);
+  height: var(--peek-dot-size);
+  border-radius: 999px;
+  font-size: 0;
+  background: #cbd5e1;
+  color: transparent !important;
+  pointer-events: none;
+  cursor: default;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.invoiceTable--iconPeek:not(:has(.colIcon:hover)) tbody .colIconMail.is-active .iconFlat {
+  background: #8b5cf6;
+}
+
+.invoiceTable--iconPeek:not(:has(.colIcon:hover)) tbody .colIconTarget.is-active .iconFlat {
+  background: #16a34a;
+}
+
+.invoiceTable--iconPeek:not(:has(.colIcon:hover)) tbody .colIconStrategy.is-active .iconFlat {
+  background: #d97706;
+}
+
+.invoiceTable--iconPeek:not(:has(.colIcon:hover)) tbody .colIcon .iconFlat i {
+  opacity: 0;
+}
+
+.invoiceTable--iconPeek:not(:has(.colIcon:hover)) tbody .colIcon .badgeCount {
+  opacity: 0;
+  transform: scale(0.75);
+  pointer-events: none;
+}
+
+.invoiceTable--iconPeek:has(.colIcon:hover) .colIcon {
+  width: var(--peek-col-expanded);
+}
+
+.invoiceTable--iconPeek:has(.colIcon:hover) thead .colIcon i {
+  opacity: 1;
+  visibility: visible;
+}
+
+.invoiceTable--iconPeek:has(.colIcon:hover) thead .colIcon::after {
+  display: none;
+}
+
+.invoiceTable--iconPeek:has(.colIcon:hover) tbody .colIcon .iconWrap {
+  width: auto;
+  height: auto;
+}
+
+.invoiceTable--iconPeek:has(.colIcon:hover) tbody .colIcon .iconFlat {
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+  font-size: 13px;
+  background: transparent;
+  color: inherit !important;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.invoiceTable--iconPeek:has(.colIcon:hover) tbody .colIcon .iconFlat i {
+  opacity: 1;
+}
+
+.invoiceTable--iconPeek:has(.colIcon:hover) tbody .colIcon .badgeCount {
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: auto;
+}
+
+@media (hover: none) {
+  .invoiceTable--iconPeek .colIcon {
+    width: 44px;
+  }
+
+  .invoiceTable--iconPeek thead .colIcon::after {
+    display: none;
+  }
+
+  .invoiceTable--iconPeek thead .colIcon i {
+    opacity: 1;
+  }
+
+  .invoiceTable--iconPeek tbody .colIcon .iconFlat {
+    width: 24px;
+    height: 24px;
+    border-radius: 8px;
+    font-size: 13px;
+    background: transparent;
+    color: inherit !important;
+    pointer-events: auto;
+  }
+
+  .invoiceTable--iconPeek tbody .colIcon .iconFlat i {
+    opacity: 1;
+  }
+
+  .invoiceTable--iconPeek tbody .colIcon .badgeCount {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+  }
 }
 
 .pill {

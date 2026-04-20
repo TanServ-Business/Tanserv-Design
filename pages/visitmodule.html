@@ -566,6 +566,41 @@
       cursor: pointer;
     }
 
+    .planBtnSmall:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+    }
+
+    .managerSuggestPanel {
+      border: 1px solid #bfdbfe;
+      border-radius: 12px;
+      background: #eff6ff;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .managerSuggestPanelHeader {
+      font-size: 11px;
+      font-weight: 700;
+      color: #1e3a8a;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 0 2px;
+    }
+
+    .managerSuggestPanel .searchResults {
+      border-color: #bfdbfe;
+      max-height: 140px;
+    }
+
+    .managerSuggestHint {
+      font-size: 11px;
+      color: #475569;
+      padding: 0 2px;
+    }
+
     .planRemoveBtn {
       border: 1px solid #fecaca;
       background: #fee2e2;
@@ -592,6 +627,93 @@
       padding: 8px 10px;
       border-radius: 10px;
       font-size: 12px;
+    }
+
+    .plannerHint {
+      margin: 0 0 8px;
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    .planTableLegend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 0 0 10px;
+    }
+
+    .visitTag {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .visitTag.suggested {
+      color: #1e3a8a;
+      background: #dbeafe;
+    }
+
+    .suggestionNote {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid #bfdbfe;
+      background: #eff6ff;
+      color: #1e3a8a;
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    .managerSuggestedRow td {
+      background: #eff6ff;
+    }
+
+    .managerRemarkSummary {
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid #dbe3f0;
+      background: #f8fafc;
+      font-size: 12px;
+      color: #334155;
+    }
+
+    .visitStatusPill {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 3px 10px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .visitStatusPill.planned {
+      color: #166534;
+      background: #dcfce7;
+    }
+
+    .visitStatusPill.notVisited {
+      color: #991b1b;
+      background: #fee2e2;
+      font-size: 9px;
+      padding: 2px 8px;
+    }
+
+    .visitStatusPill.unplanned {
+      color: #92400e;
+      background: #fef3c7;
     }
 
     @media (max-width: 1100px) {
@@ -700,21 +822,26 @@
           <div class="planHeader">
             <h2>Plans for <span id="selectedDateLabel">-</span></h2>
           </div>
+          <div class="plannerHint">Hint: manager-suggested customers are appended in blue rows for this date.</div>
+          <div class="planTableLegend">
+            <span class="visitTag suggested">Manager Suggested</span>
+          </div>
           <table class="planTable">
             <thead>
               <tr>
+                <th>Cust code</th>
                 <th>Customer name</th>
-                <th>Customer code</th>
-                <th>Reason for visit</th>
+                <th>Visit reason</th>
                 <th>Agent</th>
                 <th>Manager</th>
                 <th>KAM</th>
                 <th>KAS</th>
-                <th>Manager remark</th>
+                <th>Visit status</th>
               </tr>
             </thead>
             <tbody id="planTableBody"></tbody>
           </table>
+          <div class="managerRemarkSummary" id="managerRemarkSummary">Manager remark: -</div>
         </div>
       </section>
     </aside>
@@ -770,6 +897,11 @@
           <input id="customerSearchInput" type="text" placeholder="Search by customer name or code..." />
         </div>
         <div class="searchResults" id="customerSearchResults"></div>
+        <div class="managerSuggestPanel" id="managerSuggestedCustomersWrap">
+          <div class="managerSuggestPanelHeader">Manager suggested customers</div>
+          <div class="managerSuggestHint">Suggestions are for this plan date. Use Add to include them.</div>
+          <div class="searchResults" id="managerSuggestedCustomersList"></div>
+        </div>
         <div class="visitTableCard">
           <h4>Selected visits</h4>
           <table class="planTableSmall">
@@ -868,6 +1000,7 @@
     const calendarMonthEl = document.getElementById("calendarMonth");
     const selectedDateLabel = document.getElementById("selectedDateLabel");
     const planTableBody = document.getElementById("planTableBody");
+    const managerRemarkSummary = document.getElementById("managerRemarkSummary");
     const clockEl = document.getElementById("visitClock");
     const statOnTime = document.getElementById("statOnTime");
     const statApproval = document.getElementById("statApproval");
@@ -888,6 +1021,8 @@
     const visitSection = document.getElementById("visitSection");
     const customerSearchInput = document.getElementById("customerSearchInput");
     const customerSearchResults = document.getElementById("customerSearchResults");
+    const managerSuggestedCustomersWrap = document.getElementById("managerSuggestedCustomersWrap");
+    const managerSuggestedCustomersList = document.getElementById("managerSuggestedCustomersList");
     const selectedCustomersBody = document.getElementById("selectedCustomersBody");
     const planError = document.getElementById("planError");
     const calendarWeekdaysEl = document.getElementById("calendarWeekdays");
@@ -903,6 +1038,225 @@
       const [year, month, day] = dateKey.split("-").map(Number);
       const date = new Date(year, month - 1, day);
       return `${monthNames[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+    };
+
+    const managerSuggestionsKey = "ineburaVisitManagerSuggestions";
+    const activityTrailStorageKey = "ineburaActivityTrailByInvoice";
+    const invoiceStorageKey = "ineburaInvoiceData";
+    const syncedAgentPlansKey = "ineburaVisitPlanSyncAbhishek";
+    const syncedAgentName = "Abhishek Sharma";
+
+    const normalizeText = (value) => String(value || "")
+      .toLowerCase()
+      .replace(/<[^>]*>/g, " ")
+      .replace(/[^a-z0-9]/g, "")
+      .trim();
+
+    const readJson = (key, fallback) => {
+      try {
+        const raw = localStorage.getItem(key);
+        if (!raw) return fallback;
+        const parsed = JSON.parse(raw);
+        return parsed == null ? fallback : parsed;
+      } catch (_) {
+        return fallback;
+      }
+    };
+
+    const saveJson = (key, value) => {
+      try {
+        localStorage.setItem(key, JSON.stringify(value));
+      } catch (_) {
+        // Ignore storage write failures in demo mode.
+      }
+    };
+
+    const isSyncedAgent = (agentName) => normalizeText(agentName) === normalizeText(syncedAgentName);
+
+    const getSyncedAgentStore = () => {
+      const snapshot = readJson(syncedAgentPlansKey, {});
+      const byDate = snapshot && typeof snapshot === "object" && snapshot.byDate && typeof snapshot.byDate === "object"
+        ? snapshot.byDate
+        : {};
+      return { byDate };
+    };
+
+    const cloneLabelList = (labels) => (Array.isArray(labels) ? labels : []).map((entry) => (
+      entry && typeof entry === "object" ? { ...entry } : entry
+    ));
+
+    const buildSyncedAgentByDateFromMemory = () => {
+      const byDate = {};
+      Object.keys(samplePlans).forEach((dateKey) => {
+        const plans = (Array.isArray(samplePlans[dateKey]) ? samplePlans[dateKey] : [])
+          .filter((plan) => isSyncedAgent(plan?.agent))
+          .map((plan) => ({ ...plan, agent: syncedAgentName }));
+        if (!plans.length) return;
+        byDate[dateKey] = {
+          plans,
+          labels: cloneLabelList(sampleLabels[dateKey]),
+          planState: String(planStateByDate[dateKey] || "")
+        };
+      });
+      return byDate;
+    };
+
+    const persistSyncedAgentPlans = () => {
+      saveJson(syncedAgentPlansKey, {
+        version: 1,
+        agentName: syncedAgentName,
+        byDate: buildSyncedAgentByDateFromMemory(),
+        updatedAt: new Date().toISOString()
+      });
+    };
+
+    const initializeSyncedAgentPlansIfMissing = () => {
+      const { byDate } = getSyncedAgentStore();
+      if (Object.keys(byDate).length) return;
+      persistSyncedAgentPlans();
+    };
+
+    const removeSyncedAgentPlansFromMemory = () => {
+      Object.keys(samplePlans).forEach((dateKey) => {
+        const filtered = (Array.isArray(samplePlans[dateKey]) ? samplePlans[dateKey] : [])
+          .filter((plan) => !isSyncedAgent(plan?.agent));
+        if (filtered.length) samplePlans[dateKey] = filtered;
+        else delete samplePlans[dateKey];
+      });
+    };
+
+    const applySyncedAgentPlansToMemory = () => {
+      const { byDate } = getSyncedAgentStore();
+      if (!Object.keys(byDate).length) return;
+      removeSyncedAgentPlansFromMemory();
+      Object.entries(byDate).forEach(([dateKey, entry]) => {
+        const plans = (Array.isArray(entry?.plans) ? entry.plans : [])
+          .map((plan) => ({ ...(plan && typeof plan === "object" ? plan : {}), agent: syncedAgentName }))
+          .filter((plan) => String(plan.customer || plan.code || "").trim());
+        if (plans.length) {
+          const existing = Array.isArray(samplePlans[dateKey]) ? samplePlans[dateKey] : [];
+          samplePlans[dateKey] = existing.concat(plans);
+        }
+        if (Array.isArray(entry?.labels)) {
+          sampleLabels[dateKey] = cloneLabelList(entry.labels);
+        }
+        if (typeof entry?.planState === "string" && entry.planState) {
+          planStateByDate[dateKey] = entry.planState;
+        }
+      });
+    };
+
+    const getPlanOwnerForSave = () => {
+      const role = String(localStorage.getItem("activeUserRole") || "").trim().toLowerCase();
+      if (role === "agent") return syncedAgentName;
+      return "";
+    };
+
+    const getSuggestionsForDate = (dateKey) => {
+      const all = readJson(managerSuggestionsKey, []);
+      if (!Array.isArray(all)) return [];
+      const role = String(localStorage.getItem("activeUserRole") || "").trim().toLowerCase();
+      const activeNameNorm = role === "agent"
+        ? normalizeText(syncedAgentName)
+        : normalizeText(localStorage.getItem("activeUserName") || "");
+      return all.filter((entry) => {
+        if (String(entry?.targetDate || "") !== dateKey) return false;
+        if (role === "agent") {
+          return normalizeText(entry?.agentName) === activeNameNorm;
+        }
+        return true;
+      });
+    };
+
+    const getDateKeyFromTimestamp = (timestamp) => {
+      const parsed = Date.parse(String(timestamp || ""));
+      if (Number.isNaN(parsed)) return "";
+      const date = new Date(parsed);
+      return makeDateKey(date.getFullYear(), date.getMonth(), date.getDate());
+    };
+
+    const getInvoiceCustomerMap = () => {
+      const snapshot = readJson(invoiceStorageKey, []);
+      const map = new Map();
+      (Array.isArray(snapshot) ? snapshot : []).forEach((item) => {
+        const invoiceNo = String(item?.invoiceNo || "").trim();
+        if (!invoiceNo) return;
+        map.set(invoiceNo, {
+          customer: String(item?.customerName || "").trim(),
+          code: String(item?.customerCode || "").trim()
+        });
+      });
+      return map;
+    };
+
+    const getActivityTrailMap = () => {
+      const snapshot = readJson(activityTrailStorageKey, {});
+      return snapshot && typeof snapshot === "object" ? snapshot : {};
+    };
+
+    const getVisitedCustomerKeysByAgentForDate = (dateKey) => {
+      const invoiceMap = getInvoiceCustomerMap();
+      const activityMap = getActivityTrailMap();
+      const visitedByAgent = new Map();
+      Object.entries(activityMap).forEach(([invoiceNo, entries]) => {
+        const customerInfo = invoiceMap.get(invoiceNo);
+        if (!customerInfo) return;
+        const customerKey = normalizeText(customerInfo.customer) || normalizeText(customerInfo.code);
+        if (!customerKey) return;
+        (Array.isArray(entries) ? entries : []).forEach((entry) => {
+          if (!entry || entry.type !== "status") return;
+          const data = entry.data || {};
+          if (String(data.activityType || "").trim().toLowerCase() !== "visited") return;
+          if (getDateKeyFromTimestamp(entry.at || entry.when) !== dateKey) return;
+          const agentKey = normalizeText(data.actorName || "");
+          if (!agentKey) return;
+          if (!visitedByAgent.has(agentKey)) visitedByAgent.set(agentKey, new Set());
+          visitedByAgent.get(agentKey).add(customerKey);
+        });
+      });
+      return visitedByAgent;
+    };
+
+    const getPlanSuggestionCandidates = (dateKey) => {
+      const candidates = new Map();
+      const keyFor = (item) => normalizeText(item?.code || "") || normalizeText(item?.customer || "");
+
+      customerDirectory.forEach((item) => {
+        const key = keyFor(item);
+        if (!key) return;
+        candidates.set(key, { ...item, isManagerSuggested: false, candidateKey: key });
+      });
+
+      const activeUserName = String(localStorage.getItem("activeUserName") || "").trim() || "Agent";
+      const fallbackOwner = customerDirectory[0] || {};
+
+      getSuggestionsForDate(dateKey).forEach((entry) => {
+        const customers = Array.isArray(entry?.customers) ? entry.customers : [];
+        customers.forEach((item) => {
+          const customer = String(item?.customer || "").trim();
+          const code = String(item?.code || "").trim();
+          if (!customer && !code) return;
+          const key = normalizeText(code) || normalizeText(customer);
+          const existing = candidates.get(key);
+          if (existing) {
+            existing.isManagerSuggested = true;
+            candidates.set(key, existing);
+            return;
+          }
+          candidates.set(key, {
+            customer: customer || code,
+            code: code || "",
+            agent: String(entry?.agentName || activeUserName),
+            manager: String(entry?.createdBy || fallbackOwner.manager || "Manager"),
+            kam: String(fallbackOwner.kam || "-"),
+            kas: String(fallbackOwner.kas || "-"),
+            isManagerSuggested: true,
+            candidateKey: key
+          });
+        });
+      });
+
+      return Array.from(candidates.values());
     };
 
     const isHolidayDate = (dateKey) => {
@@ -925,6 +1279,27 @@
     const shortfallReasonsByDate = {};
     let currentPlanDateKey = null;
     let selectedCustomers = new Map();
+    let currentSearchCandidateMap = new Map();
+    let currentManagerSuggestedMap = new Map();
+
+    initializeSyncedAgentPlansIfMissing();
+    applySyncedAgentPlansToMemory();
+
+    const findFirstDateWithAgentInCurrentMonth = (agentName) => {
+      const target = normalizeText(agentName);
+      if (!target) return "";
+      const monthPrefix = `${currentYear}-${pad(currentMonth + 1)}-`;
+      const matches = Object.keys(samplePlans)
+        .filter((dateKey) => dateKey.startsWith(monthPrefix))
+        .filter((dateKey) => (samplePlans[dateKey] || []).some((plan) => normalizeText(plan?.agent) === target))
+        .sort();
+      return matches[0] || "";
+    };
+
+    const initialSyncedDate = findFirstDateWithAgentInCurrentMonth(syncedAgentName);
+    if (initialSyncedDate) {
+      selectedDateKey = initialSyncedDate;
+    }
 
     const updateStats = () => {
       const prefix = `${currentYear}-${pad(currentMonth + 1)}-`;
@@ -1007,6 +1382,7 @@
     const renderSelectedCustomers = () => {
       if (!selectedCustomersBody) return;
       const rows = Array.from(selectedCustomers.values()).map(item => {
+        const itemKey = String(item._key || item.code || normalizeText(item.customer));
         const optionsMarkup = [
           `<option value="">Select reason</option>`,
           ...visitReasons.map(reason => `
@@ -1017,7 +1393,7 @@
           <tr>
             <td>${item.customer}</td>
             <td>
-              <select class="planReasonSelect" data-code="${item.code}">
+              <select class="planReasonSelect" data-key="${itemKey}">
                 ${optionsMarkup}
               </select>
             </td>
@@ -1025,7 +1401,7 @@
             <td>${item.manager}</td>
             <td>${item.kam}</td>
             <td>${item.kas}</td>
-            <td><button class="planRemoveBtn" type="button" data-action="remove" data-code="${item.code}">Remove</button></td>
+            <td><button class="planRemoveBtn" type="button" data-action="remove" data-key="${itemKey}">Remove</button></td>
           </tr>
         `;
       });
@@ -1037,11 +1413,20 @@
 
     const renderSearchResults = () => {
       if (!customerSearchResults) return;
+      const planDate = currentPlanDateKey || selectedDateKey;
       const query = (customerSearchInput?.value || "").trim().toLowerCase();
-      const results = customerDirectory.filter(item => {
-        if (selectedCustomers.has(item.code)) return false;
+      const results = getPlanSuggestionCandidates(planDate).filter(item => {
+        const key = String(item.candidateKey || "");
+        if (selectedCustomers.has(key)) return false;
         if (!query) return true;
         return item.customer.toLowerCase().includes(query) || item.code.toLowerCase().includes(query);
+      }).sort((a, b) => Number(b.isManagerSuggested) - Number(a.isManagerSuggested));
+
+      currentSearchCandidateMap = new Map();
+      results.forEach((item) => {
+        const key = String(item.candidateKey || "");
+        if (!key) return;
+        currentSearchCandidateMap.set(key, item);
       });
 
       if (results.length === 0) {
@@ -1053,11 +1438,53 @@
         <div class="searchItem">
           <div>
             <div class="searchItemName">${item.customer}</div>
-            <div class="searchItemCode">${item.code}</div>
+            <div class="searchItemCode">${item.code}${item.isManagerSuggested ? " • Manager suggested" : ""}</div>
           </div>
-          <button class="planBtnSmall" type="button" data-action="add" data-code="${item.code}">Add</button>
+          <button class="planBtnSmall" type="button" data-action="add" data-candidate-key="${item.candidateKey}">Add</button>
         </div>
       `).join("");
+    };
+
+    const renderManagerSuggestedCustomers = () => {
+      if (!managerSuggestedCustomersWrap || !managerSuggestedCustomersList) return;
+      const planDate = currentPlanDateKey || selectedDateKey;
+      const suggestions = getPlanSuggestionCandidates(planDate)
+        .filter((item) => item.isManagerSuggested)
+        .sort((a, b) => String(a.customer || "").localeCompare(String(b.customer || "")));
+
+      managerSuggestedCustomersWrap.classList.toggle("hidden", suggestions.length === 0);
+      currentManagerSuggestedMap = new Map();
+      suggestions.forEach((item) => {
+        const key = String(item.candidateKey || "");
+        if (!key) return;
+        currentManagerSuggestedMap.set(key, item);
+      });
+
+      if (!suggestions.length) {
+        managerSuggestedCustomersList.innerHTML = `<div class="searchItem"><span class="searchItemCode">No manager suggestions for this date.</span></div>`;
+        return;
+      }
+
+      managerSuggestedCustomersList.innerHTML = suggestions.map((item) => {
+        const key = String(item.candidateKey || "");
+        const isAdded = selectedCustomers.has(key);
+        return `
+          <div class="searchItem">
+            <div>
+              <div class="searchItemName">${item.customer}</div>
+              <div class="searchItemCode">${item.code || "-"}</div>
+            </div>
+            <button
+              class="planBtnSmall"
+              type="button"
+              data-action="add-suggested"
+              data-candidate-key="${key}"
+              ${isAdded ? "disabled" : ""}>
+              ${isAdded ? "Added" : "Add"}
+            </button>
+          </div>
+        `;
+      }).join("");
     };
 
     const updatePlanTypeUI = () => {
@@ -1092,7 +1519,8 @@
 
       selectedCustomers = new Map();
       visits.forEach((plan) => {
-        selectedCustomers.set(plan.code, { ...plan });
+        const key = String(plan.code || normalizeText(plan.customer));
+        selectedCustomers.set(key, { ...plan, _key: key });
       });
 
       if (leaveReason) leaveReason.value = leaveReasonsByDate[dateKey] || "";
@@ -1107,6 +1535,7 @@
       updatePlanTypeUI();
       updateShortfallVisibility();
       renderSearchResults();
+      renderManagerSuggestedCustomers();
       renderSelectedCustomers();
 
       planModalOverlay.classList.remove("hidden");
@@ -1122,13 +1551,79 @@
     const renderPlanTable = (dateKey) => {
       selectedDateLabel.textContent = formatReadableDate(dateKey);
       const plans = samplePlans[dateKey] || [];
+      const suggestions = getSuggestionsForDate(dateKey);
       const isHoliday = isHolidayDate(dateKey);
       const filteredPlans = isHoliday ? [] : plans;
+      const visitedByAgent = getVisitedCustomerKeysByAgentForDate(dateKey);
+      const plannedKeys = new Set();
+      const suggestionKey = (customer, agent) => `${normalizeText(customer)}::${normalizeText(agent)}`;
+      const suggestionRows = [];
 
-      if (!filteredPlans.length) {
+      suggestions.forEach((entry) => {
+        const customers = Array.isArray(entry?.customers) ? entry.customers : [];
+        customers.forEach((item) => {
+          const customer = String(item?.customer || "").trim();
+          const code = String(item?.code || "").trim();
+          if (!customer) return;
+          const agent = String(entry?.agentName || "").trim();
+          const key = suggestionKey(customer, agent);
+          suggestionRows.push({
+            key,
+            customer,
+            code,
+            agent: agent || "-",
+            manager: String(entry?.createdBy || "Manager"),
+            remark: String(entry?.managerRemark || "").trim()
+          });
+        });
+      });
+
+      const plannedWithSuggestion = filteredPlans.map((plan) => {
+        const key = suggestionKey(plan.customer, plan.agent);
+        plannedKeys.add(key);
+        const isSuggested = suggestionRows.some((row) => row.key === key);
+        const agentKey = normalizeText(plan.agent);
+        const customerKey = normalizeText(plan.customer) || normalizeText(plan.code);
+        const isVisited = Boolean(agentKey && customerKey && visitedByAgent.get(agentKey)?.has(customerKey));
+        const visitStatus = isVisited ? "Planned" : "Not Visited";
+        return { ...plan, visitStatus, rowClass: isSuggested ? "managerSuggestedRow" : "" };
+      });
+
+      const suggestedOnlyRows = suggestionRows
+        .filter((row) => !plannedKeys.has(row.key))
+        .map((row) => ({
+          customer: row.customer,
+          code: row.code || "-",
+          reason: "Manager suggested visit",
+          agent: row.agent || "-",
+          manager: row.manager || "-",
+          kam: "-",
+          kas: "-",
+          visitStatus: "Unplanned",
+          rowClass: "managerSuggestedRow"
+        }));
+
+      const rowsToRender = plannedWithSuggestion.concat(suggestedOnlyRows);
+      const remarks = [];
+      filteredPlans.forEach((plan) => {
+        const remark = String(plan?.managerRemark || "").trim();
+        if (remark) remarks.push(remark);
+      });
+      suggestions.forEach((entry) => {
+        const remark = String(entry?.managerRemark || "").trim();
+        if (remark) remarks.push(remark);
+      });
+      const uniqueRemarks = Array.from(new Set(remarks));
+      if (managerRemarkSummary) {
+        managerRemarkSummary.textContent = uniqueRemarks.length
+          ? `Manager remark: ${uniqueRemarks.join(" | ")}`
+          : "Manager remark: -";
+      }
+
+      if (!rowsToRender.length) {
         const message = isHoliday
           ? "Holiday - no visits scheduled."
-          : "No visits scheduled for this day.";
+          : "No visits or manager suggestions for this day.";
         planTableBody.innerHTML = `
           <tr>
             <td colspan="8" style="color:#94a3b8;">${message}</td>
@@ -1137,18 +1632,28 @@
         return;
       }
 
-      planTableBody.innerHTML = filteredPlans.map(plan => `
-        <tr>
-          <td>${plan.customer}</td>
+      planTableBody.innerHTML = rowsToRender.map(plan => `
+        <tr class="${plan.rowClass || ""}">
           <td>${plan.code}</td>
+          <td>${plan.customer}</td>
           <td>${plan.reason}</td>
           <td>${plan.agent}</td>
           <td>${plan.manager}</td>
           <td>${plan.kam}</td>
           <td>${plan.kas}</td>
-          <td>${plan.managerRemark ? plan.managerRemark : "-"}</td>
+          <td>${renderVisitStatusPill(plan.visitStatus)}</td>
         </tr>
       `).join("");
+    };
+
+    const renderVisitStatusPill = (status) => {
+      const label = String(status || "").trim();
+      if (!label) return "-";
+      const key = normalizeText(label);
+      let className = "planned";
+      if (key === "notvisited") className = "notVisited";
+      if (key === "unplanned") className = "unplanned";
+      return `<span class="visitStatusPill ${className}">${label}</span>`;
     };
 
     const selectDate = (dateKey) => {
@@ -1362,6 +1867,7 @@
       if (!currentPlanDateKey) return;
       const dateKey = currentPlanDateKey;
       const type = planTypeSelect ? planTypeSelect.value : "visit";
+      const planOwner = getPlanOwnerForSave();
       const needsShortfall = shouldRequireShortfall(dateKey);
       const errors = [];
 
@@ -1403,7 +1909,7 @@
           customer: item.customer,
           code: item.code,
           reason: String(item.reason || "").trim(),
-          agent: item.agent,
+          agent: planOwner || item.agent,
           manager: item.manager,
           kam: item.kam,
           kas: item.kas,
@@ -1436,6 +1942,10 @@
       samplePlans[dateKey] = visits;
       sampleLabels[dateKey] = labels;
       planStateByDate[dateKey] = isSubmit ? "submitted" : "draft";
+      const syncTouched = isSyncedAgent(planOwner) || visits.some((plan) => isSyncedAgent(plan?.agent));
+      if (syncTouched) {
+        persistSyncedAgentPlans();
+      }
 
       updateStats();
       renderCalendar();
@@ -1459,11 +1969,26 @@
       customerSearchResults.addEventListener("click", (event) => {
         const btn = event.target.closest("button[data-action='add']");
         if (!btn) return;
-        const code = btn.getAttribute("data-code");
-        const customer = customerDirectory.find(item => item.code === code);
-        if (!customer) return;
-        selectedCustomers.set(code, { ...customer, reason: "" });
+        const key = btn.getAttribute("data-candidate-key") || "";
+        const customer = currentSearchCandidateMap.get(key);
+        if (!customer || !key) return;
+        selectedCustomers.set(key, { ...customer, _key: key, reason: "" });
         renderSearchResults();
+        renderManagerSuggestedCustomers();
+        renderSelectedCustomers();
+      });
+    }
+    if (managerSuggestedCustomersList) {
+      managerSuggestedCustomersList.addEventListener("click", (event) => {
+        const btn = event.target.closest("button[data-action='add-suggested']");
+        if (!btn || btn.disabled) return;
+        const key = btn.getAttribute("data-candidate-key") || "";
+        if (!key) return;
+        const customer = currentManagerSuggestedMap.get(key);
+        if (!customer) return;
+        selectedCustomers.set(key, { ...customer, _key: key, reason: "" });
+        renderSearchResults();
+        renderManagerSuggestedCustomers();
         renderSelectedCustomers();
       });
     }
@@ -1472,18 +1997,19 @@
       selectedCustomersBody.addEventListener("click", (event) => {
         const btn = event.target.closest("button[data-action='remove']");
         if (!btn) return;
-        const code = btn.getAttribute("data-code");
-        if (code) selectedCustomers.delete(code);
+        const key = btn.getAttribute("data-key");
+        if (key) selectedCustomers.delete(key);
         renderSearchResults();
+        renderManagerSuggestedCustomers();
         renderSelectedCustomers();
       });
 
       selectedCustomersBody.addEventListener("change", (event) => {
         const select = event.target.closest(".planReasonSelect");
         if (!select) return;
-        const code = select.getAttribute("data-code");
-        if (!code) return;
-        const entry = selectedCustomers.get(code);
+        const key = select.getAttribute("data-key");
+        if (!key) return;
+        const entry = selectedCustomers.get(key);
         if (entry) entry.reason = select.value;
       });
     }
@@ -1538,6 +2064,7 @@
       }
       selectedDateKey = makeDateKey(currentYear, currentMonth, 1);
       seedPlansForMonth(currentYear, currentMonth);
+      applySyncedAgentPlansToMemory();
       updateStats();
       renderCalendar();
       renderPlanTable(selectedDateKey);
@@ -1551,6 +2078,7 @@
       }
       selectedDateKey = makeDateKey(currentYear, currentMonth, 1);
       seedPlansForMonth(currentYear, currentMonth);
+      applySyncedAgentPlansToMemory();
       updateStats();
       renderCalendar();
       renderPlanTable(selectedDateKey);
@@ -1595,23 +2123,48 @@
 
       const allUsers = [...headerUserDirectory.agents, ...headerUserDirectory.managers];
       const storedName = localStorage.getItem("activeUserName");
-      const fallbackName = headerUserDirectory.agents[0];
-      const selectedName = allUsers.includes(storedName) ? storedName : fallbackName;
+      const fallbackName = headerUserDirectory.agents.includes(syncedAgentName)
+        ? syncedAgentName
+        : headerUserDirectory.agents[0];
+      let selectedName = allUsers.includes(storedName) ? storedName : fallbackName;
+      let role = headerUserDirectory.managers.includes(selectedName) ? "manager" : "agent";
+      if (role === "agent") {
+        selectedName = syncedAgentName;
+      }
 
       userSelect.value = selectedName;
-      const role = headerUserDirectory.managers.includes(selectedName) ? "manager" : "agent";
       localStorage.setItem("activeUserName", selectedName);
       localStorage.setItem("activeUserRole", role);
       updateUserMenuVisibility(role);
 
       userSelect.addEventListener("change", () => {
-        const name = userSelect.value;
-        const nextRole = headerUserDirectory.managers.includes(name) ? "manager" : "agent";
-        localStorage.setItem("activeUserName", name);
+        const chosenName = userSelect.value;
+        const nextRole = headerUserDirectory.managers.includes(chosenName) ? "manager" : "agent";
+        const effectiveName = nextRole === "agent" ? syncedAgentName : chosenName;
+        userSelect.value = effectiveName;
+        localStorage.setItem("activeUserName", effectiveName);
         localStorage.setItem("activeUserRole", nextRole);
         updateUserMenuVisibility(nextRole);
       });
     };
+
+    window.addEventListener("storage", (event) => {
+      if (!event || event.storageArea !== localStorage) return;
+      if (event.key !== syncedAgentPlansKey && event.key !== managerSuggestionsKey) return;
+      applySyncedAgentPlansToMemory();
+      const selectedPlans = samplePlans[selectedDateKey] || [];
+      if (!selectedPlans.length) {
+        const syncedDate = findFirstDateWithAgentInCurrentMonth(syncedAgentName);
+        if (syncedDate) selectedDateKey = syncedDate;
+      }
+      updateStats();
+      renderCalendar();
+      renderPlanTable(selectedDateKey);
+      if (planModalOverlay && !planModalOverlay.classList.contains("hidden")) {
+        renderSearchResults();
+        renderManagerSuggestedCustomers();
+      }
+    });
 
     initUserSelect();
     updateStats();
@@ -1624,4 +2177,3 @@
 
 </body>
 </html>
-

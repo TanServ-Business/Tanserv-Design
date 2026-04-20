@@ -826,6 +826,35 @@ if (isCustomerLandingView) {
   }
 }
 
+const shortMonthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const formatShortDate = (dateValue) => {
+  if (!(dateValue instanceof Date) || Number.isNaN(dateValue.getTime())) return "";
+  const day = String(dateValue.getDate()).padStart(2, "0");
+  const month = shortMonthNames[dateValue.getMonth()] || "";
+  const year = dateValue.getFullYear();
+  return `${day} ${month} ${year}`;
+};
+
+const rebalanceInvoiceDueDates = (records, referenceDate = new Date(2026, 3, 17)) => {
+  if (!Array.isArray(records) || !(referenceDate instanceof Date) || Number.isNaN(referenceDate.getTime())) return;
+  const baseDate = new Date(referenceDate.getFullYear(), referenceDate.getMonth(), referenceDate.getDate());
+  let invoiceIndex = 0;
+  records.forEach((customer) => {
+    (customer?.invoices || []).forEach((invoice) => {
+      const beforeToday = invoiceIndex % 2 === 0;
+      const offsetMagnitude = beforeToday
+        ? 3 + ((invoiceIndex % 5) * 4)
+        : 3 + ((invoiceIndex % 5) * 5);
+      const offset = beforeToday ? -offsetMagnitude : offsetMagnitude;
+      const adjustedDate = new Date(baseDate);
+      adjustedDate.setDate(baseDate.getDate() + offset);
+      invoice.dueDate = formatShortDate(adjustedDate);
+      invoiceIndex += 1;
+    });
+  });
+};
+
+rebalanceInvoiceDueDates(customersData);
 applyInvoiceStatusOverrides(customersData);
 
 customersData.forEach(customer => {
@@ -3521,7 +3550,9 @@ function buildStatusTrailPayload(data, timestamp) {
       pdcRows: data.pdcRows,
       pdcOpsUser: data.pdcOpsUser,
       dispatchDetails: data.dispatchDetails,
-      totalCollected: data.totalCollected
+      totalCollected: data.totalCollected,
+      actorName: data.actorName || "",
+      actorRole: data.actorRole || ""
     }
   };
 }
@@ -5842,9 +5873,15 @@ function renderInvoiceTable(invoices) {
   const actionLabel = isManagerView ? "Add remarks" : "New activity";
   const showAgentIconColumns = !isCustomerLandingView;
   const showStatusColumns = !isCustomerLandingView;
+  const showAgingColumn = /(?:^|\/)LPagent\.html$/i.test(window.location.pathname || "");
+  const agingColorPalette = ["#2563eb", "#0f766e", "#7c3aed", "#b45309", "#be185d", "#166534"];
   const customer = getSelectedCustomerRecord();
   const customerId = customer?.id || selectedCustomerId;
-  const emptyColSpan = showAgentIconColumns && showStatusColumns ? 13 : 8;
+  const emptyColSpan = showAgentIconColumns && showStatusColumns
+    ? (showAgingColumn ? 14 : 13)
+    : (showAgingColumn ? 9 : 8);
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
   (invoices || []).forEach((inv) => {
     const isChecked = selectedInvoiceNos.has(inv.invoiceNo);
@@ -5853,13 +5890,26 @@ function renderInvoiceTable(invoices) {
 
     const targetTitle = `Target: Rs.${formatINR(inv.targetForMonth)} (≤ Invoice)`;
 
+    const hasUnreadEmail = Number(inv.unreadEmailCount || 0) > 0;
     const hasTarget = Number(inv.targetForMonth || 0) > 0;
-    const emailTitle = Number(inv.unreadEmailCount || 0) > 0
+    const emailTitle = hasUnreadEmail
       ? `Unread emails: ${inv.unreadEmailCount}`
       : "Email panel";
     const runningStrategy = getRunningStrategyForInvoice(inv.invoiceNo, customerId);
     const hasRunningStrategy = Boolean(runningStrategy);
+    const hasStrategyAccent = hasRunningStrategy || hashStringToIndex(String(inv.invoiceNo || ""), 3) === 0;
     const strategyTitle = hasRunningStrategy ? "View strategy details" : "No running strategy";
+    const dueDateObj = parseInvoiceDateValue(inv.dueDate);
+    const dueDate = dueDateObj
+      ? new Date(dueDateObj.getFullYear(), dueDateObj.getMonth(), dueDateObj.getDate())
+      : null;
+    const agingDays = dueDate ? Math.max(0, Math.floor((today.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24))) : null;
+    const isOverdueDueDate = Boolean(dueDate && dueDate < today);
+    const agingValue = agingDays == null ? "-" : String(agingDays);
+    const agingColor = agingDays == null
+      ? ""
+      : agingColorPalette[hashStringToIndex(`${inv.invoiceNo || ""}-aging`, agingColorPalette.length)];
+    const agingStyleAttr = agingColor ? ` style="color:${agingColor}; font-weight:700;"` : "";
     const actionMarkup = isCustomerLandingView
       ? `
         <div class="invoiceActionGroup">
@@ -5879,30 +5929,34 @@ function renderInvoiceTable(invoices) {
       </td>
 
       ${showAgentIconColumns ? `
-      <td class="colIcon cellCenter">
+      <td class="colIcon colIconMail cellCenter ${hasUnreadEmail ? "is-active" : "is-inactive"}">
         <span class="iconWrap">
-          <span class="iconFlat" role="button" tabindex="0" title="${emailTitle}" data-action="email" data-inv="${inv.invoiceNo}">
+          <span class="iconFlat" role="button" tabindex="0" title="${emailTitle}" data-action="email" data-inv="${inv.invoiceNo}" style="color:${hasUnreadEmail ? "#7c3aed" : "#94a3b8"};">
             <i class="bi bi-envelope-fill" aria-hidden="true"></i>
           </span>
           ${Number(inv.unreadEmailCount || 0) > 0 ? `<span class="badgeCount">${inv.unreadEmailCount}</span>` : ``}
         </span>
       </td>
 
-      <td class="colIcon cellCenter">
-        <span class="iconFlat" role="button" tabindex="0" title="${targetTitle}" data-action="target" data-inv="${inv.invoiceNo}" style="${hasTarget ? "color: #16a34a;" : ""}">
-          <i class="bi bi-bullseye" aria-hidden="true"></i>
+      <td class="colIcon colIconTarget cellCenter ${hasTarget ? "is-active" : "is-inactive"}">
+        <span class="iconWrap">
+          <span class="iconFlat" role="button" tabindex="0" title="${targetTitle}" data-action="target" data-inv="${inv.invoiceNo}" style="color:${hasTarget ? "#16a34a" : "#94a3b8"};">
+            <i class="bi bi-bullseye" aria-hidden="true"></i>
+          </span>
         </span>
       </td>
 
-      <td class="colIcon cellCenter">
-        ${hasRunningStrategy
-          ? `<span class="iconFlat" role="button" tabindex="0" title="${strategyTitle}" data-action="strategy" data-inv="${inv.invoiceNo}" data-strategy-id="${escapeHtml(runningStrategy?.id || "")}" style="color:#d97706;">
-              <i class="bi bi-lightning-charge-fill" aria-hidden="true"></i>
-            </span>`
-          : `<span class="iconFlat" aria-hidden="true" title="${strategyTitle}" style="opacity:0; pointer-events:none;">
-              <i class="bi bi-lightning-charge-fill" aria-hidden="true"></i>
-            </span>`
-        }
+      <td class="colIcon colIconStrategy cellCenter ${hasStrategyAccent ? "is-active" : "is-inactive"}">
+        <span class="iconWrap">
+          ${hasRunningStrategy
+            ? `<span class="iconFlat" role="button" tabindex="0" title="${strategyTitle}" data-action="strategy" data-inv="${inv.invoiceNo}" data-strategy-id="${escapeHtml(runningStrategy?.id || "")}" style="color:#d97706;">
+                <i class="bi bi-lightning-charge-fill" aria-hidden="true"></i>
+              </span>`
+            : `<span class="iconFlat" aria-hidden="true" title="${strategyTitle}" style="color:${hasStrategyAccent ? "#d97706" : "#94a3b8"}; pointer-events:none;">
+                <i class="bi bi-lightning-charge-fill" aria-hidden="true"></i>
+              </span>`
+          }
+        </span>
       </td>` : ""}
 
       <td class="colInv" title="${inv.invoiceNo}">${inv.invoiceNo}</td>
@@ -5910,7 +5964,8 @@ function renderInvoiceTable(invoices) {
       <td class="colAmtRight" title="Rs.${formatINR(inv.amountForMonth)}">Rs.${formatINR(inv.amountForMonth)}</td>
       <td class="colAmtRight" title="Rs.${formatINR(inv.netDueAmount)}">Rs.${formatINR(inv.netDueAmount)}</td>
       <td class="colDate" title="${inv.invoiceDate}">${inv.invoiceDate}</td>
-      <td class="colDate" title="${inv.dueDate}">${inv.dueDate}</td>
+      <td class="colDate ${isOverdueDueDate ? "dueDateOverdue" : ""}" title="${inv.dueDate}">${inv.dueDate}</td>
+      ${showAgingColumn ? `<td class="colAging" title="${agingValue}"${agingStyleAttr}>${agingValue}</td>` : ""}
       ${showStatusColumns ? `
       <td class="colShort" title="${inv.primaryStatus}">${inv.primaryStatus}</td>
       <td class="colStatus" title="${subStatus}">
@@ -7489,6 +7544,10 @@ function wireDispositionActivityEvents() {
       hour: "2-digit",
       minute: "2-digit"
     });
+    const actorName = String(localStorage.getItem("activeUserName") || "").trim()
+      || (isCustomerLandingView ? "Customer" : "Agent");
+    const actorRole = String(localStorage.getItem("activeUserRole") || "").trim().toLowerCase()
+      || (isCustomerLandingView ? "customer" : "agent");
 
     if (isManagerView) {
       if (remarkText) {
@@ -7599,7 +7658,9 @@ function wireDispositionActivityEvents() {
       pdcOpsUser: pdcOpsUserName,
       dispatchDetails,
       totalCollected,
-      outstanding
+      outstanding,
+      actorName,
+      actorRole
     };
 
     const submitActivity = () => {
@@ -8428,7 +8489,9 @@ function wireCustomerPayRemarkEvents() {
         ld: values.ld,
         miscRows: values.miscRows,
         totalCollected: values.totalCollected,
-        outstanding: previousOutstanding
+        outstanding: previousOutstanding,
+        actorName: String(localStorage.getItem("activeUserName") || "").trim() || "Customer",
+        actorRole: String(localStorage.getItem("activeUserRole") || "").trim().toLowerCase() || "customer"
       }, timestampIso);
       addActivityTrailEntry(invoice.invoiceNo, statusPayload);
 

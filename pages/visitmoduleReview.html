@@ -837,6 +837,66 @@
       background: #ffffff;
     }
 
+    .inputWithClear {
+      position: relative;
+    }
+
+    .inputWithClear input {
+      width: 100%;
+      padding-right: 34px;
+    }
+
+    .clearBtn {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      border: none;
+      background: transparent;
+      color: #94a3b8;
+      cursor: pointer;
+      padding: 4px;
+      display: none;
+    }
+
+    .clearBtn.visible {
+      display: inline-flex;
+    }
+
+    .suggestionBox {
+      border: 1px solid #e2e8f4;
+      border-radius: 12px;
+      background: #ffffff;
+      box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+      max-height: 180px;
+      overflow: auto;
+      padding: 6px;
+      display: none;
+      margin-top: 6px;
+    }
+
+    .suggestionItem {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      border-radius: 10px;
+      padding: 6px 8px;
+      cursor: pointer;
+      font-size: 12px;
+      color: #0f172a;
+    }
+
+    .suggestionItem:hover {
+      background: #f1f5f9;
+    }
+
+    .suggestionCode {
+      font-size: 11px;
+      font-weight: 700;
+      color: #94a3b8;
+    }
+
     .callingNotice {
       padding: 10px 12px;
       border-radius: 12px;
@@ -962,6 +1022,280 @@
       font-size: 12px;
     }
 
+    .managerSuggestionCard {
+      border: 1px solid #e2e8f4;
+      border-radius: 12px;
+      padding: 10px;
+      background: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .reviewDecisionLayout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+    }
+
+    .reviewDecisionLeft,
+    .reviewDecisionRight {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .suggestionCollapse {
+      border: 1px solid #e2e8f4;
+      border-radius: 10px;
+      background: #ffffff;
+      padding: 8px;
+    }
+
+    .suggestionCollapse summary {
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 700;
+      color: #334155;
+      list-style: none;
+    }
+
+    .suggestionCollapse summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .suggestionCollapseBody {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .managerSuggestionTitle {
+      font-size: 12px;
+      font-weight: 700;
+      color: #334155;
+      letter-spacing: 0.02em;
+    }
+
+    .managerSuggestionGrid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .managerSuggestionSelected {
+      min-height: 36px;
+      border: 1px dashed #cbd5e1;
+      border-radius: 10px;
+      padding: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      background: #ffffff;
+    }
+
+    .suggestionPill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      border: 1px solid #bfdbfe;
+      background: #eff6ff;
+      color: #1e3a8a;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 8px;
+    }
+
+    .suggestionPill button {
+      border: none;
+      background: transparent;
+      color: #1e3a8a;
+      font-size: 11px;
+      padding: 0;
+      cursor: pointer;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .planTableLegend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 2px 0 8px;
+    }
+
+    .visitStatusPill {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .visitStatusPill.visited {
+      color: #166534;
+      background: #dcfce7;
+    }
+
+    .visitStatusPill.planned {
+      color: #166534;
+      background: #dcfce7;
+    }
+
+    .visitStatusPill.notVisited {
+      color: #991b1b;
+      background: #fee2e2;
+      font-size: 9px;
+      padding: 2px 7px;
+    }
+
+    .visitStatusPill.unplanned {
+      color: #92400e;
+      background: #fef3c7;
+    }
+
+    .visitStatusPill.suggested {
+      color: #1e3a8a;
+      background: #dbeafe;
+    }
+
+    .managerSuggestedRow td {
+      background: #eff6ff;
+    }
+
+    .activitySummary {
+      font-size: 11px;
+      color: #334155;
+      line-height: 1.35;
+    }
+
+    .visitDetailsModalOverlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.55);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 80;
+    }
+
+    .visitDetailsModal {
+      width: 100%;
+      max-width: 1120px;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 24px 50px rgba(15, 23, 42, 0.22);
+      max-height: 90vh;
+      overflow: auto;
+    }
+
+    .visitDetailsHeader {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px 18px;
+      border-bottom: 1px solid #e2e8f4;
+    }
+
+    .visitDetailsHeader h3 {
+      margin: 0;
+      font-size: 18px;
+      color: #0f172a;
+    }
+
+    .visitDetailsHeader p {
+      margin: 6px 0 0;
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    .visitDetailsBody {
+      padding: 16px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .visitDetailsCounts {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 8px;
+    }
+
+    .visitDetailsCountCard {
+      border: 1px solid #e2e8f4;
+      border-radius: 10px;
+      background: #f8fafc;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .visitDetailsCountCard span {
+      font-size: 11px;
+      color: #64748b;
+    }
+
+    .visitDetailsCountCard strong {
+      font-size: 18px;
+      color: #0f172a;
+      line-height: 1.1;
+    }
+
+    .visitDetailsSection {
+      border: 1px solid #e2e8f4;
+      border-radius: 12px;
+      padding: 10px;
+      background: #ffffff;
+    }
+
+    .visitDetailsSection h4 {
+      margin: 0 0 8px;
+      font-size: 13px;
+      color: #0f172a;
+    }
+
+    .visitDetailsList {
+      margin: 0;
+      padding-left: 18px;
+      color: #334155;
+      font-size: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .visitDetailsTable {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    .visitDetailsTable th,
+    .visitDetailsTable td {
+      border: 1px solid #e2e8f4;
+      padding: 8px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .visitDetailsTable th {
+      background: #f8fafc;
+      color: #334155;
+      font-weight: 700;
+    }
+
     @media (max-width: 1100px) {
       .visitLayout {
         grid-template-columns: 1fr;
@@ -990,6 +1324,18 @@
 
       .calendarDay {
         min-height: 76px;
+      }
+
+      .managerSuggestionGrid {
+        grid-template-columns: 1fr;
+      }
+
+      .visitDetailsCounts {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .reviewDecisionLayout {
+        grid-template-columns: 1fr;
       }
     }
 
@@ -1120,6 +1466,7 @@
                   </div>
                 </div>
               </div>
+              <button class="btnCTA" type="button" id="viewDetailsBtn">Review Plan</button>
             </div>
           </div>
           <div class="agentSelectCard">
@@ -1137,29 +1484,16 @@
           <div class="reviewAgentMeta">
             <span class="reviewAgentName" id="reviewAgentName">Agent: -</span>
           </div>
-          <div class="reviewRemarkRow">
-            <label for="reviewRemark">Manager remark</label>
-            <textarea id="reviewRemark" rows="2" placeholder="Add remark for the agent..."></textarea>
-            <div class="reviewError hidden" id="reviewError"></div>
-          </div>
-          <div class="reviewActions" id="reviewActions">
-            <div class="reviewActionButtons">
-              <button class="statusBtn pending" type="button" data-status="Pending">Pending</button>
-              <button class="statusBtn approved" type="button" data-status="Approved">Accepted</button>
-              <button class="statusBtn rejected" type="button" data-status="Rejected">Rejected</button>
-            </div>
-            <button class="btn btn-primary btn-sm reviewSubmitBtn" type="button" id="reviewSubmitBtn">Submit</button>
-          </div>
           <table class="planTable">
             <thead>
               <tr>
+                <th>Cust code</th>
                 <th>Customer name</th>
-                <th>Customer code</th>
-                <th>Reason for visit</th>
+                <th>Visit reason</th>
                 <th>Agent</th>
-                <th>Manager</th>
                 <th>KAM</th>
                 <th>KAS</th>
+                <th>Visit status</th>
               </tr>
             </thead>
             <tbody id="planTableBody"></tbody>
@@ -1169,6 +1503,78 @@
     </aside>
   </div>
 </main>
+
+<div class="visitDetailsModalOverlay hidden" id="visitDetailsModalOverlay" aria-hidden="true">
+  <div class="visitDetailsModal" role="dialog" aria-modal="true" aria-labelledby="visitDetailsTitle">
+    <div class="visitDetailsHeader">
+      <div>
+        <h3 id="visitDetailsTitle">Visit Details</h3>
+        <p id="visitDetailsContext">Reviewing -</p>
+      </div>
+      <button class="iconBtn" type="button" id="visitDetailsClose" aria-label="Close details dialog">
+        <i class="bi bi-x-lg" aria-hidden="true"></i>
+      </button>
+    </div>
+    <div class="visitDetailsBody">
+      <div class="visitDetailsCounts" id="visitDetailsCounts"></div>
+      <div class="visitDetailsSection">
+        <h4>Visit Summary</h4>
+        <table class="visitDetailsTable">
+          <thead>
+            <tr>
+              <th>Customer code</th>
+              <th>Customer name</th>
+              <th>Visit reason</th>
+              <th>KAM</th>
+              <th>KAS</th>
+              <th>Activity</th>
+              <th>Visit Type</th>
+            </tr>
+          </thead>
+          <tbody id="visitDetailsTableBody"></tbody>
+        </table>
+      </div>
+      <div class="managerSuggestionCard" id="reviewActions">
+        <div class="managerSuggestionTitle">Review Plan</div>
+        <div class="reviewDecisionLayout">
+          <div class="reviewDecisionLeft">
+            <div class="planFieldRow">
+              <label for="suggestionCustomerInput">Suggest customer</label>
+              <div class="inputWithClear">
+                <input id="suggestionCustomerInput" type="text" placeholder="Search customer..." autocomplete="off" />
+                <button class="clearBtn" type="button" id="suggestionCustomerClear" aria-label="Clear customer search">
+                  <i class="bi bi-x-lg" aria-hidden="true"></i>
+                </button>
+              </div>
+              <div class="suggestionBox" id="suggestionCustomerResults"></div>
+            </div>
+            <div class="managerSuggestionSelected" id="suggestionSelectedList">
+              <span style="color:#94a3b8; font-size:12px;">No suggested customers selected.</span>
+            </div>
+          </div>
+          <div class="reviewDecisionRight">
+            <div class="planFieldRow">
+              <label for="reviewDecisionInput">Visit decision</label>
+              <div class="inputWithClear">
+                <input id="reviewDecisionInput" type="text" placeholder="Select decision..." autocomplete="off" />
+                <button class="clearBtn" type="button" id="reviewDecisionClear" aria-label="Clear visit decision">
+                  <i class="bi bi-x-lg" aria-hidden="true"></i>
+                </button>
+              </div>
+              <div class="suggestionBox" id="reviewDecisionResults"></div>
+            </div>
+            <div class="reviewRemarkRow">
+              <label for="reviewRemark">Manager remark</label>
+              <textarea id="reviewRemark" rows="3" placeholder="Add remark for the agent..."></textarea>
+              <div class="reviewError hidden" id="reviewError"></div>
+            </div>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-sm reviewSubmitBtn" type="button" id="reviewSubmitBtn">Submit</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <div class="planModalOverlay hidden" id="planModalOverlay" aria-hidden="true">
   <div class="planModal" role="dialog" aria-modal="true" aria-labelledby="planModalTitle">
@@ -1227,7 +1633,6 @@
                 <th>Customer</th>
                 <th>Reason</th>
                 <th>Agent</th>
-                <th>Manager</th>
                 <th>KAM</th>
                 <th>KAS</th>
                 <th></th>
@@ -1425,6 +1830,20 @@
     const sideNavOverlay = document.getElementById("sideNavOverlay");
     const sideNav = document.getElementById("sideNav");
     const sideNavClose = document.getElementById("sideNavClose");
+    const viewDetailsBtn = document.getElementById("viewDetailsBtn");
+    const visitDetailsModalOverlay = document.getElementById("visitDetailsModalOverlay");
+    const visitDetailsClose = document.getElementById("visitDetailsClose");
+    const visitDetailsContext = document.getElementById("visitDetailsContext");
+    const visitDetailsCounts = document.getElementById("visitDetailsCounts");
+    const visitDetailsTableBody = document.getElementById("visitDetailsTableBody");
+    const reviewDecisionInput = document.getElementById("reviewDecisionInput");
+    const reviewDecisionResults = document.getElementById("reviewDecisionResults");
+    const reviewDecisionClear = document.getElementById("reviewDecisionClear");
+    const suggestionTargetDate = document.getElementById("suggestionTargetDate");
+    const suggestionCustomerInput = document.getElementById("suggestionCustomerInput");
+    const suggestionCustomerResults = document.getElementById("suggestionCustomerResults");
+    const suggestionCustomerClear = document.getElementById("suggestionCustomerClear");
+    const suggestionSelectedList = document.getElementById("suggestionSelectedList");
 
     const closePlanFilter = () => {
       if (!planFilterDropdown || !planFilterBtn) return;
@@ -1446,6 +1865,301 @@
       const first = parts[0] ? parts[0][0] : "";
       const last = parts.length > 1 ? parts[parts.length - 1][0] : "";
       return `${first}${last}`.toUpperCase();
+    };
+
+    const activityTrailStorageKey = "ineburaActivityTrailByInvoice";
+    const invoiceStorageKey = "ineburaInvoiceData";
+    const managerSuggestionsKey = "ineburaVisitManagerSuggestions";
+    const syncedAgentPlansKey = "ineburaVisitPlanSyncAbhishek";
+    const syncedAgentName = "Abhishek Sharma";
+
+    const normalizeText = (value) => String(value || "")
+      .toLowerCase()
+      .replace(/<[^>]*>/g, " ")
+      .replace(/[^a-z0-9]/g, "")
+      .trim();
+
+    const escapeHtml = (value) => String(value || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+
+    const reviewDecisionOptions = [
+      { value: "Pending", label: "Pending" },
+      { value: "Approved", label: "Accepted" },
+      { value: "Rejected", label: "Rejected" }
+    ];
+
+    const getDecisionLabel = (value) => {
+      const option = reviewDecisionOptions.find((item) => item.value === value);
+      return option ? option.label : "";
+    };
+
+    const readJson = (key, fallback) => {
+      try {
+        const raw = localStorage.getItem(key);
+        if (!raw) return fallback;
+        const parsed = JSON.parse(raw);
+        return parsed == null ? fallback : parsed;
+      } catch (_) {
+        return fallback;
+      }
+    };
+
+    const saveJson = (key, value) => {
+      try {
+        localStorage.setItem(key, JSON.stringify(value));
+      } catch (_) {
+        // Ignore storage write failures in demo mode.
+      }
+    };
+
+    const isSyncedAgent = (agentName) => normalizeText(agentName) === normalizeText(syncedAgentName);
+
+    const getSyncedAgentStore = () => {
+      const snapshot = readJson(syncedAgentPlansKey, {});
+      const byDate = snapshot && typeof snapshot === "object" && snapshot.byDate && typeof snapshot.byDate === "object"
+        ? snapshot.byDate
+        : {};
+      return { byDate };
+    };
+
+    const cloneLabelList = (labels) => (Array.isArray(labels) ? labels : []).map((entry) => (
+      entry && typeof entry === "object" ? { ...entry } : entry
+    ));
+
+    const buildSyncedAgentByDateFromMemory = () => {
+      const byDate = {};
+      Object.keys(samplePlans).forEach((dateKey) => {
+        const plans = (Array.isArray(samplePlans[dateKey]) ? samplePlans[dateKey] : [])
+          .filter((plan) => isSyncedAgent(plan?.agent))
+          .map((plan) => ({ ...plan, agent: syncedAgentName }));
+        if (!plans.length) return;
+        byDate[dateKey] = {
+          plans,
+          labels: cloneLabelList(sampleLabels[dateKey]),
+          planState: String(planStateByDate[dateKey] || "")
+        };
+      });
+      return byDate;
+    };
+
+    const persistSyncedAgentPlans = () => {
+      saveJson(syncedAgentPlansKey, {
+        version: 1,
+        agentName: syncedAgentName,
+        byDate: buildSyncedAgentByDateFromMemory(),
+        updatedAt: new Date().toISOString()
+      });
+    };
+
+    const initializeSyncedAgentPlansIfMissing = () => {
+      const { byDate } = getSyncedAgentStore();
+      if (Object.keys(byDate).length) return;
+      persistSyncedAgentPlans();
+    };
+
+    const removeSyncedAgentPlansFromMemory = () => {
+      Object.keys(samplePlans).forEach((dateKey) => {
+        const filtered = (Array.isArray(samplePlans[dateKey]) ? samplePlans[dateKey] : [])
+          .filter((plan) => !isSyncedAgent(plan?.agent));
+        if (filtered.length) samplePlans[dateKey] = filtered;
+        else delete samplePlans[dateKey];
+      });
+    };
+
+    const applySyncedAgentPlansToMemory = () => {
+      const { byDate } = getSyncedAgentStore();
+      if (!Object.keys(byDate).length) return;
+      removeSyncedAgentPlansFromMemory();
+      Object.entries(byDate).forEach(([dateKey, entry]) => {
+        const plans = (Array.isArray(entry?.plans) ? entry.plans : [])
+          .map((plan) => ({ ...(plan && typeof plan === "object" ? plan : {}), agent: syncedAgentName }))
+          .filter((plan) => String(plan.customer || plan.code || "").trim());
+        if (plans.length) {
+          const existing = Array.isArray(samplePlans[dateKey]) ? samplePlans[dateKey] : [];
+          samplePlans[dateKey] = existing.concat(plans);
+        }
+        if (Array.isArray(entry?.labels)) {
+          sampleLabels[dateKey] = cloneLabelList(entry.labels);
+        }
+        if (typeof entry?.planState === "string" && entry.planState) {
+          planStateByDate[dateKey] = entry.planState;
+        }
+      });
+    };
+
+    const getTodayKey = () => {
+      const now = new Date();
+      return makeDateKey(now.getFullYear(), now.getMonth(), now.getDate());
+    };
+
+    const getDateKeyFromTimestamp = (timestamp) => {
+      const parsed = Date.parse(String(timestamp || ""));
+      if (Number.isNaN(parsed)) return "";
+      const date = new Date(parsed);
+      return makeDateKey(date.getFullYear(), date.getMonth(), date.getDate());
+    };
+
+    const getInvoiceCustomerMap = () => {
+      const snapshot = readJson(invoiceStorageKey, []);
+      const map = new Map();
+      (Array.isArray(snapshot) ? snapshot : []).forEach((item) => {
+        const invoiceNo = String(item?.invoiceNo || "").trim();
+        if (!invoiceNo) return;
+        map.set(invoiceNo, {
+          customer: String(item?.customerName || "").trim(),
+          code: String(item?.customerCode || "").trim()
+        });
+      });
+      return map;
+    };
+
+    const getActivityTrailMap = () => {
+      const map = readJson(activityTrailStorageKey, {});
+      return map && typeof map === "object" ? map : {};
+    };
+
+    const getSuggestionsStore = () => {
+      const list = readJson(managerSuggestionsKey, []);
+      return Array.isArray(list) ? list : [];
+    };
+
+    const saveSuggestionsStore = (items) => {
+      saveJson(managerSuggestionsKey, Array.isArray(items) ? items : []);
+    };
+
+    const getSuggestionsForAgentDate = (agentName, dateKey) => {
+      const agentNorm = normalizeText(agentName);
+      return getSuggestionsStore().filter((entry) => {
+        const entryAgent = normalizeText(entry?.agentName);
+        const targetDate = String(entry?.targetDate || "");
+        return entryAgent === agentNorm && targetDate === dateKey;
+      });
+    };
+
+    const getSuggestedCustomerMap = (agentName, dateKey) => {
+      const map = new Map();
+      getSuggestionsForAgentDate(agentName, dateKey).forEach((entry) => {
+        const customers = Array.isArray(entry?.customers) ? entry.customers : [];
+        customers.forEach((item) => {
+          const customer = String(item?.customer || "").trim();
+          const code = String(item?.code || "").trim();
+          const key = normalizeText(customer) || normalizeText(code);
+          if (!key) return;
+          map.set(key, { customer, code, suggestionId: entry.id || "" });
+        });
+      });
+      return map;
+    };
+
+    const getSuggestionCustomerCandidates = () => {
+      if (Array.isArray(suggestionCustomerCandidatesCache)) {
+        return suggestionCustomerCandidatesCache;
+      }
+      const merged = new Map();
+      customerDirectory.forEach((item) => {
+        const customer = String(item.customer || "").trim();
+        const code = String(item.code || "").trim();
+        const key = normalizeText(customer) || normalizeText(code);
+        if (!key || merged.has(key)) return;
+        merged.set(key, { customer, code });
+      });
+
+      const invoices = readJson(invoiceStorageKey, []);
+      (Array.isArray(invoices) ? invoices : []).forEach((item) => {
+        const customer = String(item?.customerName || "").trim();
+        const code = String(item?.customerCode || "").trim();
+        const key = normalizeText(customer) || normalizeText(code);
+        if (!key || merged.has(key)) return;
+        merged.set(key, { customer, code });
+      });
+
+      suggestionCustomerCandidatesCache = Array.from(merged.values())
+        .sort((a, b) => a.customer.localeCompare(b.customer));
+      return suggestionCustomerCandidatesCache;
+    };
+
+    const createTagMarkup = (label, className) => `<span class="visitStatusPill ${className}">${label}</span>`;
+
+    const buildActivityInsights = (dateKey, agentName, plannedRows) => {
+      const planned = Array.isArray(plannedRows) ? plannedRows : [];
+      const invoiceCustomerMap = getInvoiceCustomerMap();
+      const activityMap = getActivityTrailMap();
+      const agentNorm = normalizeText(agentName);
+
+      const visitedByCustomer = new Map();
+      const latestActivityByCustomer = new Map();
+      const plannedKeys = new Set();
+      planned.forEach((plan) => {
+        const key = normalizeText(plan?.customer) || normalizeText(plan?.code);
+        if (key) plannedKeys.add(key);
+      });
+
+      Object.entries(activityMap).forEach(([invoiceNo, entries]) => {
+        const customerInfo = invoiceCustomerMap.get(invoiceNo);
+        if (!customerInfo) return;
+        const customerKey = normalizeText(customerInfo.customer) || normalizeText(customerInfo.code);
+        if (!customerKey) return;
+        const list = Array.isArray(entries) ? entries : [];
+        list.forEach((entry) => {
+          if (!entry || entry.type !== "status") return;
+          const data = entry.data || {};
+          const entryDate = getDateKeyFromTimestamp(entry.at || entry.when);
+          if (entryDate !== dateKey) return;
+          const actorName = normalizeText(data.actorName || "");
+          if (!agentNorm || !actorName || actorName !== agentNorm) return;
+
+          const atTime = Date.parse(entry.at || entry.when || "") || 0;
+          const activityType = String(data.activityType || "").trim();
+          const subStatus = String(data.subStatus || "").trim();
+          const currentSummary = latestActivityByCustomer.get(customerKey);
+          if (!currentSummary || atTime > currentSummary.time) {
+            latestActivityByCustomer.set(customerKey, {
+              customer: customerInfo.customer || "",
+              code: customerInfo.code || "",
+              activityType,
+              subStatus,
+              time: atTime
+            });
+          }
+
+          const visited = String(activityType).toLowerCase() === "visited";
+          if (visited) {
+            const existing = visitedByCustomer.get(customerKey);
+            if (!existing || atTime > existing.time) {
+              visitedByCustomer.set(customerKey, {
+                customer: customerInfo.customer || "",
+                code: customerInfo.code || "",
+                time: atTime
+              });
+            }
+          }
+        });
+      });
+
+      const unplannedVisited = [];
+      visitedByCustomer.forEach((item, key) => {
+        if (plannedKeys.has(key)) return;
+        unplannedVisited.push({
+          customer: item.customer || "-",
+          code: item.code || "-",
+          reason: "Unplanned (from activity)",
+          agent: agentName || "-",
+          manager: "-",
+          kam: "-",
+          kas: "-",
+          customerKey: key
+        });
+      });
+
+      return {
+        visitedByCustomer,
+        latestActivityByCustomer,
+        unplannedVisited
+      };
     };
 
     const getAgentListFromPlans = () => {
@@ -1525,6 +2239,23 @@
       }
     };
 
+    const resetSuggestionDraft = () => {
+      selectedSuggestionCustomers = new Map();
+      if (suggestionCustomerInput) suggestionCustomerInput.value = "";
+      if (suggestionCustomerClear) suggestionCustomerClear.classList.remove("visible");
+      if (suggestionCustomerResults) {
+        suggestionCustomerResults.style.display = "none";
+        suggestionCustomerResults.innerHTML = "";
+      }
+      renderSuggestionSelected();
+      renderSuggestionCustomerOptions("", false);
+    };
+
+    const syncSuggestionTargetDate = () => {
+      if (!suggestionTargetDate) return;
+      suggestionTargetDate.textContent = formatReadableDate(selectedDateKey);
+    };
+
     const renderAgentBadgeList = () => {
       if (!reviewAgentList) return;
       const query = (reviewAgentSearchInput?.value || "").trim().toLowerCase();
@@ -1592,6 +2323,7 @@
       if (calendarAgentFilter) calendarAgentFilter.value = calendarAgentName;
       updateCalendarClearState();
       activeAgentName = "";
+      resetSuggestionDraft();
       updateReviewAgentLabel();
       pendingReviewStatus = "";
       if (reviewRemark) reviewRemark.value = "";
@@ -1610,6 +2342,7 @@
       activeAgentName = agentName || "";
       if (calendarAgentFilter) calendarAgentFilter.value = calendarAgentName;
       updateCalendarClearState();
+      resetSuggestionDraft();
       updateReviewAgentLabel();
       renderAgentBadgeList();
       syncReviewDraft();
@@ -1620,6 +2353,7 @@
 
     const setActiveAgent = (agentName) => {
       activeAgentName = agentName || "";
+      resetSuggestionDraft();
       updateReviewAgentLabel();
       renderAgentBadgeList();
       syncReviewDraft();
@@ -1628,24 +2362,48 @@
     };
 
     const updateReviewActionsState = () => {
-      if (!reviewActions) return;
       const hasAgent = Boolean(activeAgentName);
       const plans = hasAgent ? getPlansForAgent(selectedDateKey, activeAgentName) : [];
       const status = pendingReviewStatus || "";
-      const normalizedStatus = String(status).toLowerCase();
       const isHoliday = isHolidayDate(selectedDateKey);
-      reviewActions.querySelectorAll(".statusBtn").forEach((btn) => {
-        const btnStatus = btn.getAttribute("data-status") || "";
-        const isActive = hasAgent && status && btnStatus.toLowerCase() === normalizedStatus;
-        btn.classList.toggle("active", isActive);
-        btn.setAttribute("aria-pressed", isActive ? "true" : "false");
-        btn.disabled = isHoliday || !hasAgent || plans.length === 0;
-      });
+      const isDisabled = isHoliday || !hasAgent || plans.length === 0;
+      if (reviewDecisionInput) {
+        reviewDecisionInput.disabled = isDisabled;
+        const nextLabel = getDecisionLabel(status);
+        const isEditingDecision = document.activeElement === reviewDecisionInput;
+        const shouldSyncValue = !isEditingDecision || Boolean(status) || !String(reviewDecisionInput.value || "").trim();
+        if (shouldSyncValue && reviewDecisionInput.value !== nextLabel) {
+          reviewDecisionInput.value = nextLabel;
+        }
+      }
+      if (reviewDecisionClear) {
+        reviewDecisionClear.disabled = isDisabled;
+        const shouldShowClear = !isDisabled && Boolean((reviewDecisionInput?.value || "").trim());
+        reviewDecisionClear.classList.toggle("visible", shouldShowClear);
+      }
+      if (reviewDecisionResults && isDisabled) {
+        reviewDecisionResults.style.display = "none";
+        reviewDecisionResults.innerHTML = "";
+      }
       if (reviewSubmitBtn) {
-        reviewSubmitBtn.disabled = isHoliday || !hasAgent || plans.length === 0 || !pendingReviewStatus;
+        reviewSubmitBtn.disabled = isDisabled || !pendingReviewStatus;
       }
       if (reviewRemark) {
-        reviewRemark.disabled = isHoliday || !hasAgent || plans.length === 0;
+        reviewRemark.disabled = isDisabled;
+      }
+      if (viewDetailsBtn) {
+        viewDetailsBtn.disabled = !hasAgent;
+      }
+      if (suggestionCustomerInput) {
+        suggestionCustomerInput.disabled = isDisabled;
+      }
+      if (suggestionCustomerClear) {
+        suggestionCustomerClear.disabled = isDisabled;
+        if (isDisabled) suggestionCustomerClear.classList.remove("visible");
+      }
+      if (suggestionCustomerResults && isDisabled) {
+        suggestionCustomerResults.style.display = "none";
+        suggestionCustomerResults.innerHTML = "";
       }
     };
 
@@ -1665,6 +2423,9 @@
       if (!updated) return;
       pendingReviewStatus = status;
       planStateByDate[selectedDateKey] = "submitted";
+      if (isSyncedAgent(activeAgentName)) {
+        persistSyncedAgentPlans();
+      }
       updateStats();
       renderCalendar();
       renderPlanTable(selectedDateKey);
@@ -1695,6 +2456,23 @@
     let calendarAgentName = "";
     let pendingReviewStatus = "";
     let agentDirectory = [];
+    let selectedSuggestionCustomers = new Map();
+    let suggestionCustomerCandidatesCache = null;
+    let currentReviewInsights = null;
+
+    initializeSyncedAgentPlansIfMissing();
+    applySyncedAgentPlansToMemory();
+
+    const findFirstDateWithAgentInCurrentMonth = (agentName) => {
+      const target = normalizeText(agentName);
+      if (!target) return "";
+      const monthPrefix = `${currentYear}-${pad(currentMonth + 1)}-`;
+      const matches = Object.keys(samplePlans)
+        .filter((dateKey) => dateKey.startsWith(monthPrefix))
+        .filter((dateKey) => (samplePlans[dateKey] || []).some((plan) => normalizeText(plan?.agent) === target))
+        .sort();
+      return matches[0] || "";
+    };
 
     const updateStats = () => {
       const prefix = `${currentYear}-${pad(currentMonth + 1)}-`;
@@ -1810,7 +2588,6 @@
               </select>
             </td>
             <td>${item.agent}</td>
-            <td>${item.manager}</td>
             <td>${item.kam}</td>
             <td>${item.kas}</td>
             <td><button class="planRemoveBtn" type="button" data-action="remove" data-code="${item.code}">Remove</button></td>
@@ -1820,7 +2597,7 @@
 
       selectedCustomersBody.innerHTML = rows.length
         ? rows.join("")
-        : `<tr><td colspan="7" style="color:#94a3b8;">No customers selected.</td></tr>`;
+        : `<tr><td colspan="6" style="color:#94a3b8;">No customers selected.</td></tr>`;
     };
 
     const renderSearchResults = () => {
@@ -1846,6 +2623,273 @@
           <button class="planBtnSmall" type="button" data-action="add" data-code="${item.code}">Add</button>
         </div>
       `).join("");
+    };
+
+    const renderSuggestionSelected = () => {
+      if (!suggestionSelectedList) return;
+      const rows = Array.from(selectedSuggestionCustomers.values());
+      if (!rows.length) {
+        suggestionSelectedList.innerHTML = `<span style="color:#94a3b8; font-size:12px;">No suggested customers selected.</span>`;
+        return;
+      }
+      suggestionSelectedList.innerHTML = rows.map((item) => `
+        <span class="suggestionPill">
+          ${item.customer}${item.code ? ` (${item.code})` : ""}
+          <button type="button" data-suggestion-remove="${item.key}" aria-label="Remove suggested customer">x</button>
+        </span>
+      `).join("");
+    };
+
+    const renderSuggestionCustomerOptions = (queryText = "", openDropdown = false) => {
+      if (!suggestionCustomerResults) return;
+      if (suggestionCustomerInput && suggestionCustomerInput.disabled) {
+        suggestionCustomerResults.style.display = "none";
+        suggestionCustomerResults.innerHTML = "";
+        return;
+      }
+      const query = String(queryText || "").trim().toLowerCase();
+      if (!query) {
+        if (suggestionCustomerClear) suggestionCustomerClear.classList.remove("visible");
+        suggestionCustomerResults.style.display = "none";
+        suggestionCustomerResults.innerHTML = "";
+        return;
+      }
+      const candidates = getSuggestionCustomerCandidates();
+      const available = candidates.filter((item) => {
+        const key = normalizeText(item.customer) || normalizeText(item.code);
+        if (selectedSuggestionCustomers.has(key)) return false;
+        return true;
+      });
+      const matches = available
+        .filter((item) => item.customer.toLowerCase().includes(query) || item.code.toLowerCase().includes(query))
+        .slice(0, 50);
+      if (!matches.length) {
+        suggestionCustomerResults.innerHTML = `<div style="padding:6px 8px; font-size:12px; color:#94a3b8;">No matches found.</div>`;
+        suggestionCustomerResults.style.display = "block";
+        if (suggestionCustomerClear) suggestionCustomerClear.classList.add("visible");
+        return;
+      }
+      suggestionCustomerResults.innerHTML = matches.map((item) => {
+        const key = normalizeText(item.customer) || normalizeText(item.code);
+        const label = item.code ? `${item.customer} (${item.code})` : item.customer;
+        return `
+          <div class="suggestionItem" data-suggestion-key="${key}">
+            <span>${escapeHtml(label)}</span>
+          </div>
+        `;
+      }).join("");
+      suggestionCustomerResults.style.display = "block";
+      if (suggestionCustomerClear) suggestionCustomerClear.classList.add("visible");
+    };
+
+    const renderReviewDecisionOptions = (queryText = "", openDropdown = false) => {
+      if (!reviewDecisionResults) return;
+      if (reviewDecisionInput && reviewDecisionInput.disabled) {
+        reviewDecisionResults.style.display = "none";
+        reviewDecisionResults.innerHTML = "";
+        return;
+      }
+      const query = String(queryText || "").trim().toLowerCase();
+      if (reviewDecisionClear) {
+        reviewDecisionClear.classList.toggle("visible", Boolean(query || pendingReviewStatus));
+      }
+      if (!openDropdown && !query) {
+        reviewDecisionResults.style.display = "none";
+        reviewDecisionResults.innerHTML = "";
+        return;
+      }
+      const matches = query
+        ? reviewDecisionOptions.filter((item) =>
+          item.label.toLowerCase().includes(query) || item.value.toLowerCase().includes(query))
+        : reviewDecisionOptions;
+      if (!matches.length) {
+        reviewDecisionResults.innerHTML = `<div style="padding:6px 8px; font-size:12px; color:#94a3b8;">No matches found.</div>`;
+        reviewDecisionResults.style.display = "block";
+        return;
+      }
+      reviewDecisionResults.innerHTML = matches.map((item) => `
+        <div class="suggestionItem" data-review-decision="${item.value}">
+          <span>${escapeHtml(item.label)}</span>
+        </div>
+      `).join("");
+      reviewDecisionResults.style.display = "block";
+    };
+
+    const setReviewDecision = (value) => {
+      const selected = reviewDecisionOptions.find((item) => item.value === value) || null;
+      pendingReviewStatus = selected ? selected.value : "";
+      if (reviewDecisionInput) {
+        reviewDecisionInput.value = selected ? selected.label : "";
+      }
+      if (reviewError) {
+        reviewError.textContent = "";
+        reviewError.classList.add("hidden");
+      }
+      if (reviewDecisionClear) {
+        reviewDecisionClear.classList.toggle("visible", Boolean(selected));
+      }
+      if (reviewDecisionResults) {
+        reviewDecisionResults.style.display = "none";
+      }
+      updateReviewActionsState();
+    };
+
+    const addSuggestionCustomerByKey = (key) => {
+      const normalizedKey = String(key || "").trim();
+      if (!normalizedKey || selectedSuggestionCustomers.has(normalizedKey)) return;
+      const candidates = getSuggestionCustomerCandidates();
+      const match = candidates.find((item) => {
+        const itemKey = normalizeText(item.customer) || normalizeText(item.code);
+        return itemKey === normalizedKey;
+      });
+      if (!match) return;
+      selectedSuggestionCustomers.set(normalizedKey, {
+        key: normalizedKey,
+        customer: match.customer,
+        code: match.code || ""
+      });
+      renderSuggestionSelected();
+      if (suggestionCustomerInput) {
+        suggestionCustomerInput.value = match.code ? `${match.customer} (${match.code})` : match.customer;
+      }
+      if (suggestionCustomerResults) {
+        suggestionCustomerResults.style.display = "none";
+        suggestionCustomerResults.innerHTML = "";
+      }
+      if (suggestionCustomerClear) suggestionCustomerClear.classList.add("visible");
+    };
+
+    const getTableInsightsForDateAgent = (dateKey, agentName) => {
+      const planned = getPlansForAgent(dateKey, agentName).map((plan) => {
+        const customerKey = normalizeText(plan?.customer) || normalizeText(plan?.code);
+        return { ...plan, customerKey };
+      });
+      const activityInsights = buildActivityInsights(dateKey, agentName, planned);
+      const suggestedCustomers = getSuggestedCustomerMap(agentName, dateKey);
+
+      const plannedRows = planned.map((plan) => {
+        const key = plan.customerKey;
+        const visited = key ? activityInsights.visitedByCustomer.has(key) : false;
+        const latest = key ? activityInsights.latestActivityByCustomer.get(key) : null;
+        const isSuggested = key ? suggestedCustomers.has(key) : false;
+        const tags = [];
+        tags.push(visited ? createTagMarkup("Visited", "visited") : createTagMarkup("Not Visited", "notVisited"));
+        return {
+          ...plan,
+          tags,
+          visited,
+          isSuggested,
+          latestActivity: latest,
+          rowClass: isSuggested ? "managerSuggestedRow" : ""
+        };
+      });
+
+      const unplannedRows = activityInsights.unplannedVisited.map((item) => {
+        const latest = activityInsights.latestActivityByCustomer.get(item.customerKey) || null;
+        const isSuggested = suggestedCustomers.has(item.customerKey);
+        const tags = [createTagMarkup("Unplanned", "unplanned"), createTagMarkup("Visited", "visited")];
+        return {
+          ...item,
+          tags,
+          visited: true,
+          isSuggested,
+          latestActivity: latest,
+          rowClass: isSuggested ? "managerSuggestedRow" : ""
+        };
+      });
+
+      const combinedRows = plannedRows.concat(unplannedRows);
+      return {
+        combinedRows,
+        plannedRows,
+        unplannedRows,
+        suggestedCustomers: Array.from(suggestedCustomers.values()),
+        counts: {
+          planned: plannedRows.length,
+          visited: plannedRows.filter((row) => row.visited).length,
+          notVisited: plannedRows.filter((row) => !row.visited).length,
+          unplanned: unplannedRows.length,
+          suggested: suggestedCustomers.size
+        }
+      };
+    };
+
+    const formatActivitySummary = (summary) => {
+      if (!summary) return "-";
+      const pieces = [];
+      if (summary.activityType) pieces.push(summary.activityType);
+      if (summary.subStatus) pieces.push(summary.subStatus);
+      if (!pieces.length) return "-";
+      return `${pieces.join(" / ")}`;
+    };
+
+    const createVisitTypePill = (type) => {
+      const key = normalizeText(type);
+      if (key === "unplanned") return `<span class="visitStatusPill unplanned">Unplanned</span>`;
+      if (key === "notvisit" || key === "notvisited") return `<span class="visitStatusPill notVisited">Not Visit</span>`;
+      return `<span class="visitStatusPill planned">Planned</span>`;
+    };
+
+    const renderVisitDetailsModalContent = (insights) => {
+      if (!visitDetailsContext || !visitDetailsCounts || !visitDetailsTableBody) return;
+      const contextDate = formatReadableDate(selectedDateKey);
+      visitDetailsContext.textContent = activeAgentName
+        ? `${activeAgentName} • ${contextDate}`
+        : contextDate;
+
+      const counts = insights?.counts || { planned: 0, visited: 0, notVisited: 0, unplanned: 0, suggested: 0 };
+      visitDetailsCounts.innerHTML = `
+        <div class="visitDetailsCountCard"><span>Planned</span><strong>${counts.planned}</strong></div>
+        <div class="visitDetailsCountCard"><span>Visited</span><strong>${counts.visited}</strong></div>
+        <div class="visitDetailsCountCard"><span>Not Visited</span><strong>${counts.notVisited}</strong></div>
+        <div class="visitDetailsCountCard"><span>Unplanned</span><strong>${counts.unplanned}</strong></div>
+      `;
+
+      const plannedRows = (insights?.plannedRows || [])
+        .filter((row) => row.visited)
+        .map((row) => ({ ...row, visitType: "planned" }));
+      const unplannedRows = (insights?.unplannedRows || [])
+        .map((row) => ({ ...row, visitType: "unplanned" }));
+      const notVisitedRows = (insights?.plannedRows || [])
+        .filter((row) => !row.visited)
+        .map((row) => ({ ...row, visitType: "notVisited" }));
+
+      const summaryRows = plannedRows.concat(unplannedRows, notVisitedRows);
+      if (!summaryRows.length) {
+        visitDetailsTableBody.innerHTML = `
+          <tr>
+            <td colspan="7" style="color:#94a3b8;">No visit data available for this selection.</td>
+          </tr>
+        `;
+        return;
+      }
+
+      visitDetailsTableBody.innerHTML = summaryRows.map((row) => `
+        <tr class="${row.rowClass || ""}">
+          <td>${row.code || "-"}</td>
+          <td>${row.customer || "-"}</td>
+          <td>${row.reason || "-"}</td>
+          <td>${row.kam || "-"}</td>
+          <td>${row.kas || "-"}</td>
+          <td>${formatActivitySummary(row.latestActivity)}</td>
+          <td>${createVisitTypePill(row.visitType)}</td>
+        </tr>
+      `).join("");
+    };
+
+    const openVisitDetailsModal = () => {
+      if (!visitDetailsModalOverlay) return;
+      const insights = currentReviewInsights || getTableInsightsForDateAgent(selectedDateKey, activeAgentName);
+      renderSuggestionCustomerOptions();
+      renderVisitDetailsModalContent(insights);
+      visitDetailsModalOverlay.classList.remove("hidden");
+      visitDetailsModalOverlay.setAttribute("aria-hidden", "false");
+    };
+
+    const closeVisitDetailsModal = () => {
+      if (!visitDetailsModalOverlay) return;
+      visitDetailsModalOverlay.classList.add("hidden");
+      visitDetailsModalOverlay.setAttribute("aria-hidden", "true");
     };
 
     const updatePlanTypeUI = () => {
@@ -1911,9 +2955,9 @@
       selectedDateLabel.textContent = formatReadableDate(dateKey);
       const isHoliday = isHolidayDate(dateKey);
       renderAgentBadgeList();
-      const plans = activeAgentName ? getPlansForAgent(dateKey, activeAgentName) : [];
 
       if (!activeAgentName) {
+        currentReviewInsights = null;
         planTableBody.innerHTML = `
           <tr>
             <td colspan="7" style="color:#94a3b8;">Select an agent to review plans for this day.</td>
@@ -1923,9 +2967,11 @@
         return;
       }
 
-      const filteredPlans = isHoliday ? [] : plans;
+      const insights = getTableInsightsForDateAgent(dateKey, activeAgentName);
+      currentReviewInsights = insights;
+      const filteredRows = isHoliday ? [] : insights.combinedRows;
 
-      if (!filteredPlans.length) {
+      if (!filteredRows.length) {
         const message = isHoliday
           ? "Holiday - no visits scheduled."
           : "No visits scheduled for this agent.";
@@ -1938,15 +2984,15 @@
         return;
       }
 
-      planTableBody.innerHTML = filteredPlans.map(plan => `
-        <tr>
-          <td>${plan.customer}</td>
+      planTableBody.innerHTML = filteredRows.map(plan => `
+        <tr class="${plan.rowClass || ""}">
           <td>${plan.code}</td>
+          <td>${plan.customer}</td>
           <td>${plan.reason}</td>
           <td>${plan.agent}</td>
-          <td>${plan.manager}</td>
           <td>${plan.kam}</td>
           <td>${plan.kas}</td>
+          <td>${(plan.tags || []).join(" ") || "-"}</td>
         </tr>
       `).join("");
       updateReviewActionsState();
@@ -1954,6 +3000,8 @@
 
     const selectDate = (dateKey) => {
       selectedDateKey = dateKey;
+      resetSuggestionDraft();
+      syncSuggestionTargetDate();
       renderAgentBadgeList();
       if (activeAgentName) {
         syncReviewDraft();
@@ -2174,6 +3222,7 @@
           planBtn.addEventListener("click", (event) => {
             event.stopPropagation();
             selectedDateKey = dateKey;
+            syncSuggestionTargetDate();
             if (calendarAgentName) {
               setActiveAgent(calendarAgentName);
             } else {
@@ -2228,6 +3277,7 @@
       if (!currentPlanDateKey) return;
       const dateKey = currentPlanDateKey;
       const type = planTypeSelect ? planTypeSelect.value : "visit";
+      const planOwner = String(localStorage.getItem("activeUserName") || "").trim();
       const needsShortfall = shouldRequireShortfall(dateKey);
       const errors = [];
 
@@ -2302,6 +3352,10 @@
       samplePlans[dateKey] = visits;
       sampleLabels[dateKey] = labels;
       planStateByDate[dateKey] = isSubmit ? "submitted" : "draft";
+      const syncTouched = isSyncedAgent(planOwner) || visits.some((plan) => isSyncedAgent(plan?.agent));
+      if (syncTouched) {
+        persistSyncedAgentPlans();
+      }
 
       updateStats();
       renderCalendar();
@@ -2351,6 +3405,89 @@
         if (!code) return;
         const entry = selectedCustomers.get(code);
         if (entry) entry.reason = select.value;
+      });
+    }
+
+    if (suggestionCustomerInput) {
+      suggestionCustomerInput.addEventListener("input", () => {
+        renderSuggestionCustomerOptions(suggestionCustomerInput.value, true);
+      });
+      suggestionCustomerInput.addEventListener("focus", () => {
+        renderSuggestionCustomerOptions(suggestionCustomerInput.value, true);
+      });
+    }
+    if (suggestionCustomerClear) {
+      suggestionCustomerClear.addEventListener("click", () => {
+        if (!suggestionCustomerInput) return;
+        suggestionCustomerInput.value = "";
+        suggestionCustomerInput.focus();
+        if (suggestionCustomerResults) {
+          suggestionCustomerResults.style.display = "none";
+          suggestionCustomerResults.innerHTML = "";
+        }
+        suggestionCustomerClear.classList.remove("visible");
+      });
+    }
+    if (suggestionCustomerResults) {
+      suggestionCustomerResults.addEventListener("click", (event) => {
+        const item = event.target.closest("[data-suggestion-key]");
+        if (!item) return;
+        const key = item.getAttribute("data-suggestion-key") || "";
+        addSuggestionCustomerByKey(key);
+      });
+    }
+    if (suggestionSelectedList) {
+      suggestionSelectedList.addEventListener("click", (event) => {
+        const btn = event.target.closest("[data-suggestion-remove]");
+        if (!btn) return;
+        const key = btn.getAttribute("data-suggestion-remove") || "";
+        if (!key) return;
+        selectedSuggestionCustomers.delete(key);
+        renderSuggestionSelected();
+        const query = suggestionCustomerInput ? suggestionCustomerInput.value : "";
+        renderSuggestionCustomerOptions(query, false);
+      });
+    }
+    if (reviewDecisionInput) {
+      reviewDecisionInput.addEventListener("input", () => {
+        const query = reviewDecisionInput.value || "";
+        const exact = reviewDecisionOptions.find((item) => item.label.toLowerCase() === query.trim().toLowerCase());
+        pendingReviewStatus = exact ? exact.value : "";
+        updateReviewActionsState();
+        renderReviewDecisionOptions(query, true);
+      });
+      reviewDecisionInput.addEventListener("focus", () => {
+        renderReviewDecisionOptions(reviewDecisionInput.value, true);
+      });
+    }
+    if (reviewDecisionClear) {
+      reviewDecisionClear.addEventListener("click", () => {
+        setReviewDecision("");
+        if (!reviewDecisionInput) return;
+        reviewDecisionInput.focus();
+        renderReviewDecisionOptions("", true);
+      });
+    }
+    if (reviewDecisionResults) {
+      reviewDecisionResults.addEventListener("click", (event) => {
+        const item = event.target.closest("[data-review-decision]");
+        if (!item) return;
+        const value = item.getAttribute("data-review-decision") || "";
+        setReviewDecision(value);
+      });
+    }
+
+    if (viewDetailsBtn) {
+      viewDetailsBtn.addEventListener("click", () => {
+        openVisitDetailsModal();
+      });
+    }
+    if (visitDetailsClose) {
+      visitDetailsClose.addEventListener("click", closeVisitDetailsModal);
+    }
+    if (visitDetailsModalOverlay) {
+      visitDetailsModalOverlay.addEventListener("click", (event) => {
+        if (event.target === visitDetailsModalOverlay) closeVisitDetailsModal();
       });
     }
 
@@ -2465,34 +3602,71 @@
       if (planFilterDropdown.contains(event.target)) return;
       closePlanFilter();
     });
-    document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape") closePlanFilter();
+    document.addEventListener("click", (event) => {
+      if (!suggestionCustomerInput || !suggestionCustomerResults) return;
+      const clearClicked = Boolean(suggestionCustomerClear && suggestionCustomerClear.contains(event.target));
+      if (clearClicked) return;
+      if (suggestionCustomerInput.contains(event.target) || suggestionCustomerResults.contains(event.target)) return;
+      suggestionCustomerResults.style.display = "none";
     });
-    if (reviewActions) {
-      reviewActions.addEventListener("click", (event) => {
-        const btn = event.target.closest(".statusBtn");
-        if (!btn || btn.disabled) return;
-        pendingReviewStatus = btn.getAttribute("data-status") || "";
-        if (reviewError) {
-          reviewError.textContent = "";
-          reviewError.classList.add("hidden");
-        }
-        updateReviewActionsState();
-      });
-    }
+    document.addEventListener("click", (event) => {
+      if (!reviewDecisionInput || !reviewDecisionResults) return;
+      const clearClicked = Boolean(reviewDecisionClear && reviewDecisionClear.contains(event.target));
+      if (clearClicked) return;
+      if (reviewDecisionInput.contains(event.target) || reviewDecisionResults.contains(event.target)) return;
+      reviewDecisionResults.style.display = "none";
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        closePlanFilter();
+        closeVisitDetailsModal();
+      }
+    });
     if (reviewSubmitBtn) {
       reviewSubmitBtn.addEventListener("click", () => {
         if (!activeAgentName || !selectedDateKey) return;
         const plans = getPlansForAgent(selectedDateKey, activeAgentName);
         if (!plans.length || !pendingReviewStatus) {
           if (reviewError) {
-            reviewError.textContent = "Select a status before submitting.";
+            reviewError.textContent = "Select a visit decision before submitting.";
             reviewError.classList.remove("hidden");
           }
           return;
         }
         const remarkValue = reviewRemark ? reviewRemark.value.trim() : "";
+        const suggestionDate = String(selectedDateKey || "").trim();
+        const suggestionItems = Array.from(selectedSuggestionCustomers.values());
+        const todayKey = getTodayKey();
+
+        if (suggestionItems.length > 0 && suggestionDate < todayKey) {
+          if (reviewError) {
+            reviewError.textContent = "Suggestions cannot be saved for past dates.";
+            reviewError.classList.remove("hidden");
+          }
+          return;
+        }
+
+        if (suggestionItems.length > 0) {
+          const allSuggestions = getSuggestionsStore();
+          allSuggestions.push({
+            id: `sugg-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+            agentName: activeAgentName,
+            reviewDate: selectedDateKey,
+            decisionStatus: pendingReviewStatus,
+            managerRemark: remarkValue,
+            targetDate: suggestionDate,
+            customers: suggestionItems.map((item) => ({
+              customer: item.customer,
+              code: item.code
+            })),
+            createdAt: new Date().toISOString(),
+            createdBy: String(localStorage.getItem("activeUserName") || "Manager").trim() || "Manager"
+          });
+          saveSuggestionsStore(allSuggestions);
+        }
+
         updatePlanStatus(pendingReviewStatus, remarkValue);
+        resetSuggestionDraft();
       });
     }
 
@@ -2504,6 +3678,9 @@
       }
       selectedDateKey = makeDateKey(currentYear, currentMonth, 1);
       activeAgentName = "";
+      resetSuggestionDraft();
+      syncSuggestionTargetDate();
+      closeVisitDetailsModal();
       updateReviewAgentLabel();
       pendingReviewStatus = "";
       if (reviewRemark) reviewRemark.value = "";
@@ -2512,7 +3689,16 @@
         reviewError.classList.add("hidden");
       }
       seedPlansForMonth(currentYear, currentMonth);
+      applySyncedAgentPlansToMemory();
       updateAgentDirectory();
+      const syncedDate = findFirstDateWithAgentInCurrentMonth(syncedAgentName);
+      if (syncedDate) selectedDateKey = syncedDate;
+      calendarAgentName = syncedAgentName;
+      activeAgentName = syncedAgentName;
+      if (calendarAgentFilter) calendarAgentFilter.value = calendarAgentName;
+      syncSuggestionTargetDate();
+      updateReviewAgentLabel();
+      syncReviewDraft();
       updateStats();
       renderCalendar();
       renderPlanTable(selectedDateKey);
@@ -2526,6 +3712,9 @@
       }
       selectedDateKey = makeDateKey(currentYear, currentMonth, 1);
       activeAgentName = "";
+      resetSuggestionDraft();
+      syncSuggestionTargetDate();
+      closeVisitDetailsModal();
       updateReviewAgentLabel();
       pendingReviewStatus = "";
       if (reviewRemark) reviewRemark.value = "";
@@ -2534,7 +3723,16 @@
         reviewError.classList.add("hidden");
       }
       seedPlansForMonth(currentYear, currentMonth);
+      applySyncedAgentPlansToMemory();
       updateAgentDirectory();
+      const syncedDate = findFirstDateWithAgentInCurrentMonth(syncedAgentName);
+      if (syncedDate) selectedDateKey = syncedDate;
+      calendarAgentName = syncedAgentName;
+      activeAgentName = syncedAgentName;
+      if (calendarAgentFilter) calendarAgentFilter.value = calendarAgentName;
+      syncSuggestionTargetDate();
+      updateReviewAgentLabel();
+      syncReviewDraft();
       updateStats();
       renderCalendar();
       renderPlanTable(selectedDateKey);
@@ -2597,8 +3795,39 @@
       });
     };
 
+    window.addEventListener("storage", (event) => {
+      if (!event || event.storageArea !== localStorage) return;
+      if (event.key === invoiceStorageKey) {
+        suggestionCustomerCandidatesCache = null;
+      }
+      if (event.key !== syncedAgentPlansKey
+        && event.key !== managerSuggestionsKey
+        && event.key !== activityTrailStorageKey
+        && event.key !== invoiceStorageKey) {
+        return;
+      }
+      applySyncedAgentPlansToMemory();
+      const syncedDate = findFirstDateWithAgentInCurrentMonth(syncedAgentName);
+      if (syncedDate && !(samplePlans[selectedDateKey] || []).length) {
+        selectedDateKey = syncedDate;
+      }
+      updateAgentDirectory();
+      updateStats();
+      renderCalendar();
+      renderPlanTable(selectedDateKey);
+    });
+
     initUserSelect();
+    const initialSyncedDate = findFirstDateWithAgentInCurrentMonth(syncedAgentName);
+    if (initialSyncedDate) selectedDateKey = initialSyncedDate;
+    calendarAgentName = syncedAgentName;
+    activeAgentName = syncedAgentName;
+    if (calendarAgentFilter) calendarAgentFilter.value = calendarAgentName;
+    syncSuggestionTargetDate();
+    renderSuggestionCustomerOptions();
     updateAgentDirectory();
+    updateReviewAgentLabel();
+    syncReviewDraft();
     updateCalendarClearState();
     updateStats();
     renderCalendar();
@@ -2610,4 +3839,3 @@
 
 </body>
 </html>
-
