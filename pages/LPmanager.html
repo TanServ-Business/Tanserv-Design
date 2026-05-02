@@ -459,50 +459,11 @@
       </table>
     </section>
 
-    <aside class="panelCard managerTodoPanel hidden" id="managerTodoPanel">
-      <div class="todoPanel">
-        <div class="todoHeader">
-          <div>
-            <h4>To do list</h4>
-            <p>Track tasks and follow-ups.</p>
-          </div>
-          <span class="todoCountPill" id="todoCountPill">0</span>
-        </div>
-
-        <div class="todoList" id="todoList"></div>
-
-        <button class="todoCompletedToggle" type="button" id="todoCompletedToggle">0 completed tasks</button>
-
-        <div class="todoComposer todoComposerSticky">
-          <div class="todoComposerRow">
-            <input type="text" id="todoInput" placeholder="Add a task..." />
-            <button class="todoGhostBtn" type="button" data-action="toggle-extras" aria-label="Task details">
-              <i class="bi bi-info-circle" aria-hidden="true"></i>
-            </button>
-            <button class="todoAddBtn" type="button" id="todoAddBtn">Add</button>
-          </div>
-          <div class="todoExtras hidden" id="todoExtras">
-            <div class="todoField">
-              <label for="todoDueDate">Due date</label>
-              <input type="date" id="todoDueDate" />
-            </div>
-            <div class="todoField">
-              <label for="todoDueTime">Due time</label>
-              <input type="time" id="todoDueTime" />
-            </div>
-            <div class="todoField">
-              <label for="todoInvoiceInput">Invoice</label>
-              <input type="text" id="todoInvoiceInput" placeholder="Invoice number (optional)" />
-            </div>
-          </div>
-        </div>
-      </div>
-    </aside>
-
   </div>
 </main>
 
   <script src="../scripts/shared-header.js"></script>
+  <script src="../scripts/customer-notes.js"></script>
 <script>
   (() => {
     const agentData = [
@@ -1070,4 +1031,3 @@
 </script>
 </body>
 </html>
-
