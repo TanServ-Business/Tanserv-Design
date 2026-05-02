@@ -180,6 +180,20 @@
       color: #6b7280;
     }
 
+    .eventStatusMeta {
+      font-size: 11px;
+      font-weight: 700;
+      color: rgb(33, 61, 140);
+      line-height: 1.25;
+    }
+
+    .eventStatusTime {
+      margin-top: 2px;
+      font-size: 10.5px;
+      font-weight: 500;
+      color: #64748b;
+    }
+
     .eventTemplate {
       font-size: 10.5px;
       color: #64748b;
@@ -1197,6 +1211,7 @@
     }
   </style>
   <script defer src="scripts/app.js"></script>
+  <script defer src="scripts/customer-notes.js"></script>
 </head>
 <body data-root-path="" data-relationship-name="Apollo" data-relationship-badge="AP" data-relationship-logo-src="assets/apollo-sharkfin-logo.jpeg">
 
@@ -2401,7 +2416,8 @@
                       <summary>
                         <div>
                           <div class="eventTitle">Invoice update</div>
-                          <div class="eventMeta">Status change - Primary: Follow-up - Updated by Ops</div>
+                          <div class="eventMeta eventStatusMeta">Follow-up</div>
+                          <div class="eventMeta eventStatusTime">12-11-25, 09:42:am</div>
                         </div>
                         <span class="eventBadge">Status</span>
                       </summary>
@@ -2414,6 +2430,7 @@
                         <div>
                           <div class="eventTitle">Push notification</div>
                           <div class="eventTemplate">PTP missed</div>
+                          <div class="eventMeta">12-11-25, 09:45:am</div>
                         </div>
                         <span class="eventBadge">Notification sent</span>
                       </summary>
@@ -2426,7 +2443,7 @@
                       <summary>
                         <div>
                           <div class="eventTitle">Issue tracker</div>
-                          <div class="eventMeta">Dispute logged - Ticket updated</div>
+                          <div class="eventMeta">Dispute logged - Ticket updated | 07-11-25, 07:10:pm</div>
                         </div>
                         <span class="eventBadge">Ticket updated</span>
                       </summary>
@@ -2651,9 +2668,7 @@
       </div>
 
       <div class="tabPanel" data-tab="notes">
-        <h4>Notes</h4>
-        <div class="kv"><span>Notes &amp; reminders</span><strong>-</strong></div>
-        <textarea class="notesTextarea" placeholder="Add a quick note..."></textarea>
+        <div class="customerNotesSection" data-customer-notes data-notes-context-source="agent-landing"></div>
       </div>
     </div>
   </aside>

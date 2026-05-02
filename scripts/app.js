@@ -1188,17 +1188,30 @@ function addActivityTrailEntry(invoiceNo, payload) {
 
 function buildActivityTrailNode(payload) {
   if (!payload || !payload.type) return null;
-  if (payload.type === "status") return buildStatusUpdateEntry(payload.data || {});
+  if (payload.type === "status") {
+    const statusData = payload.data || {};
+    return buildStatusUpdateEntry({
+      ...statusData,
+      performedAt: statusData.performedAt || payload.at || payload.when
+    });
+  }
   if (payload.type === "issue") {
     const event = payload.event || {};
     return buildIssueTrailEntry({
       ...event,
       title: "Issue tracker update",
       badge: "Issue tracker update",
-      eventClass: "event-issue"
+      eventClass: "event-issue",
+      performedAt: payload.at || payload.when
     });
   }
-  if (payload.type === "email") return buildEmailTrailEntry(payload.data || {});
+  if (payload.type === "email") {
+    const emailData = payload.data || {};
+    return buildEmailTrailEntry({
+      ...emailData,
+      performedAt: emailData.performedAt || payload.at || payload.when
+    });
+  }
   return null;
 }
 
@@ -3308,12 +3321,39 @@ function renderCnAdvPdcTable(rows) {
   `).join("");
 }
 
+function formatActivityTrailDateTime(value) {
+  const parsed = Date.parse(value || "");
+  if (!Number.isFinite(parsed)) return "";
+  const date = new Date(parsed);
+  if (Number.isNaN(date.getTime())) return "";
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = String(date.getFullYear()).slice(-2);
+  let hours = date.getHours();
+  const meridiem = hours >= 12 ? "pm" : "am";
+  hours %= 12;
+  if (hours === 0) hours = 12;
+  const hour = String(hours).padStart(2, "0");
+  const minute = String(date.getMinutes()).padStart(2, "0");
+  return `${day}-${month}-${year}, ${hour}:${minute}:${meridiem}`;
+}
+
+function withActivityTrailTimestamp(meta, at) {
+  const baseMeta = String(meta || "").trim();
+  const stamp = formatActivityTrailDateTime(at);
+  if (!stamp) return baseMeta;
+  if (!baseMeta) return stamp;
+  return `${baseMeta} | ${stamp}`;
+}
+
 function buildStatusUpdateEntry(data) {
   const details = document.createElement("details");
   details.className = "activityEvent event-invoice-update";
 
   const subStatusLabel = safeText(data.subStatus);
-  const summaryMeta = `Sub Status: ${subStatusLabel}`;
+  const statusTimestamp = formatActivityTrailDateTime(
+    data.performedAt || data.at || data.updatedAt || data.createdAt
+  );
 
   const detailItems = [
     { label: "Activity type", value: safeText(data.activityType) },
@@ -3393,7 +3433,8 @@ function buildStatusUpdateEntry(data) {
     <summary>
       <div>
         <div class="eventTitle">Invoice update</div>
-        <div class="eventMeta">${summaryMeta}</div>
+        <div class="eventMeta eventStatusMeta">${subStatusLabel}</div>
+        ${statusTimestamp ? `<div class="eventMeta eventStatusTime">${safeText(statusTimestamp)}</div>` : ""}
       </div>
       <span class="eventBadge">Status</span>
     </summary>
@@ -3410,15 +3451,16 @@ function buildStatusUpdateEntry(data) {
   return details;
 }
 
-function buildIssueTrailEntry({ title, meta, badge, lines, eventClass }) {
+function buildIssueTrailEntry({ title, meta, badge, lines, eventClass, performedAt }) {
   const details = document.createElement("details");
   details.className = `activityEvent ${eventClass || "event-issue"}`;
   const safeLines = Array.isArray(lines) ? lines : [];
+  const summaryMeta = withActivityTrailTimestamp(meta, performedAt);
   details.innerHTML = `
     <summary>
       <div>
         <div class="eventTitle">${safeText(title)}</div>
-        <div class="eventMeta">${safeText(meta)}</div>
+        <div class="eventMeta">${safeText(summaryMeta)}</div>
       </div>
       <span class="eventBadge">${safeText(badge)}</span>
     </summary>
@@ -3483,7 +3525,8 @@ function buildIssueTrackerEvent(issue, entry, extra) {
 function buildEmailTrailEntry(data) {
   const to = safeText(data.to);
   const subject = safeText(data.subject);
-  const meta = subject !== "-" ? subject : (to !== "-" ? `To: ${to}` : "Email sent");
+  const metaBase = subject !== "-" ? subject : (to !== "-" ? `To: ${to}` : "Email sent");
+  const meta = withActivityTrailTimestamp(metaBase, data.performedAt || data.at || data.sentAt);
   const payload = encodeURIComponent(JSON.stringify({
     to: data.to || "",
     cc: data.cc || "",
@@ -3551,6 +3594,7 @@ function buildStatusTrailPayload(data, timestamp) {
       pdcOpsUser: data.pdcOpsUser,
       dispatchDetails: data.dispatchDetails,
       totalCollected: data.totalCollected,
+      performedAt: nowIso,
       actorName: data.actorName || "",
       actorRole: data.actorRole || ""
     }
@@ -7753,6 +7797,7 @@ function wireDispositionActivityEvents() {
           title: "Issue tracker update",
           meta: `${issue.id} - created issue from activity`,
           badge: "Issue",
+          performedAt: activityTimestamp,
           lines: [
             { label: "Invoice", value: invNo || "-" },
             { label: "Action Owner", value: actionOwner || "-" },
@@ -7857,6 +7902,7 @@ function wireDispositionActivityEvents() {
             title: "Issue tracker update",
             meta: `${issue.id} - submitted for approval (${req.processName || processId})`,
             badge: "Issue",
+            performedAt: nowIso,
             lines: [
               { label: "Process", value: req.processName || processId },
               { label: "Matrix", value: matrixName || "-" },
