@@ -1286,6 +1286,7 @@ function renderStoredActivityTrail(invoiceNo) {
           : "-",
         body: payload.body || "-"
       }]);
+      hideEmailTakeActionCard();
     });
   }
 }
@@ -3879,6 +3880,138 @@ function renderEmailConversation(id, entries) {
   el.innerHTML = formatEmailConversationHtml(entries);
 }
 
+function hideEmailTakeActionCard() {
+  const card = document.getElementById("emailTakeActionCard");
+  if (!card) return;
+  card.classList.add("hidden");
+  card.innerHTML = "";
+  delete card.dataset.suggestion;
+}
+
+function parseEmailPaymentSuggestion(item) {
+  if (!item) return null;
+  const isInbound = Boolean(item.querySelector(".emailDirectionInbound"));
+  if (!isInbound) return null;
+
+  const customer = customersData.find(c => c.id === selectedCustomerId) || null;
+  const body = normalizeEmailText(item.getAttribute("data-body") || "");
+  const subject = item.getAttribute("data-subject") || "";
+  const haystack = `${subject}\n${body}`;
+  const structuredType = String(item.getAttribute("data-action-type") || "").trim().toLowerCase();
+  const mentionsPayment = /\b(?:paid|payment\s+(?:made|done|completed|received)|made\s+the\s+payment|transaction|instrument|utr|neft|rtgs|cheque)\b/i.test(haystack);
+  if (structuredType !== "collection" && !mentionsPayment) return null;
+
+  const textMatch = (regex) => {
+    const match = haystack.match(regex);
+    return match && match[1] ? String(match[1]).trim().replace(/[.,;]+$/, "") : "";
+  };
+
+  const invoiceNo = item.getAttribute("data-action-invoice")
+    || textMatch(/\b(?:invoice|inv(?:oice)?\s*no\.?)\s*[:#-]?\s*(INV-[A-Z0-9-]+)/i)
+    || textMatch(/\b(INV-[A-Z0-9-]+)\b/i)
+    || currentInvoiceNoForDocs
+    || "";
+  const invoice = invoiceNo ? currentInvoicesAll.find(inv => inv.invoiceNo === invoiceNo) : null;
+  const amountRaw = item.getAttribute("data-action-amount")
+    || textMatch(/\bamount\s*[:#-]?\s*(?:rs\.?|inr)?\s*([0-9,]+(?:\.\d{1,2})?)/i);
+  const instrumentMode = item.getAttribute("data-action-instrument-mode")
+    || textMatch(/\binstrument\s*mode\s*[:#-]?\s*([A-Za-z ]+)/i)
+    || textMatch(/\b(NEFT|RTGS|Cheque|Demand Draft)\b/i)
+    || "NEFT";
+  const instrumentRef = item.getAttribute("data-action-instrument-ref")
+    || textMatch(/\b(?:instrument\s*ref(?:erence)?\s*no\.?|ref(?:erence)?\s*no\.?|utr)\s*[:#-]?\s*([A-Z0-9-]+)/i);
+  const bank = item.getAttribute("data-action-bank")
+    || textMatch(/\bbank\s*[:#-]?\s*([A-Za-z ]+?)(?:\.|,|;|\n|$)/i);
+  const transferDate = item.getAttribute("data-action-transfer-date")
+    || textMatch(/\b(?:date\s*of\s*transaction|transaction\s*date|transfer\s*date)\s*[:#-]?\s*([0-9]{4}-[0-9]{2}-[0-9]{2})/i);
+  const displayDate = item.getAttribute("data-action-display-date") || transferDate || "-";
+  const numericAmount = amountRaw ? parseAmount(amountRaw) : 0;
+
+  return {
+    customerCode: item.getAttribute("data-action-customer-code") || customer?.code || "-",
+    customerName: item.getAttribute("data-action-customer-name") || customer?.name || "-",
+    invoiceNo,
+    activityType: "Collection",
+    broadStatus: "Collection Done",
+    primaryStatus: "Collected",
+    subStatus: "Paid by customer",
+    instrumentMode,
+    instrumentRef,
+    bank,
+    transferDate,
+    displayDate,
+    amount: numericAmount > 0 ? String(numericAmount) : "",
+    amountLabel: numericAmount > 0 ? `Rs. ${formatINR(numericAmount)}` : safeText(amountRaw || invoice?.netDueAmount || "-")
+  };
+}
+
+function renderEmailTakeActionCard(suggestion) {
+  const card = document.getElementById("emailTakeActionCard");
+  if (!card) return;
+  if (!suggestion || !suggestion.invoiceNo) {
+    hideEmailTakeActionCard();
+    return;
+  }
+
+  const payload = encodeURIComponent(JSON.stringify(suggestion));
+  const field = (label, value, options = {}) => `
+    <div class="emailTakeActionField">
+      <span>${escapeHtml(label)}</span>
+      ${options.pill
+        ? `<strong><span class="emailTakeActionPill">${escapeHtml(safeText(value))}</span></strong>`
+        : `<strong>${escapeHtml(safeText(value))}</strong>`}
+    </div>
+  `;
+
+  card.dataset.suggestion = payload;
+  card.innerHTML = `
+    <div class="emailTakeActionHeader">
+      <div>
+        <div class="emailTakeActionEyebrow">Suggested Action</div>
+        <div class="emailTakeActionTitle">Suggested collection activity</div>
+      </div>
+      <button class="emailTakeActionBtn" type="button" data-email-take-action="${payload}">Take Action</button>
+    </div>
+    <div class="emailTakeActionGrid">
+      ${field("Customer Code", suggestion.customerCode)}
+      ${field("Customer Name", suggestion.customerName)}
+      ${field("Invoice Number", suggestion.invoiceNo)}
+      ${field("Suitable Activity", suggestion.activityType, { pill: true })}
+      ${field("Broad Status", suggestion.broadStatus, { pill: true })}
+      ${field("Primary Status", suggestion.primaryStatus, { pill: true })}
+      ${field("Sub Status", suggestion.subStatus, { pill: true })}
+      ${field("Instrument Mode", suggestion.instrumentMode)}
+      ${field("Instrument Ref No", suggestion.instrumentRef)}
+      ${field("Bank", suggestion.bank)}
+      ${field("Date of Transaction", suggestion.displayDate)}
+      ${field("Amount", suggestion.amountLabel)}
+    </div>
+  `;
+  card.classList.remove("hidden");
+}
+
+function applyEmailTakeActionSuggestion(suggestion) {
+  if (!suggestion || !suggestion.invoiceNo) return;
+  const refText = suggestion.instrumentRef ? ` Ref: ${suggestion.instrumentRef}.` : "";
+  const bankText = suggestion.bank ? ` Bank: ${suggestion.bank}.` : "";
+  const dateText = suggestion.displayDate && suggestion.displayDate !== "-" ? ` Transaction date: ${suggestion.displayDate}.` : "";
+  const prefill = {
+    activityType: suggestion.activityType || "Collection",
+    broadStatus: suggestion.broadStatus || "Collection Done",
+    primaryStatus: suggestion.primaryStatus || "Collected",
+    subStatus: suggestion.subStatus || "Paid by customer",
+    instrumentMode: suggestion.instrumentMode || "NEFT",
+    instrumentRef: suggestion.instrumentRef || "",
+    bank: suggestion.bank || "",
+    transferDate: suggestion.transferDate || "",
+    amount: suggestion.amount || "",
+    tds: "",
+    ld: "",
+    remarks: `Payment confirmation received by email for ${suggestion.invoiceNo}.${refText}${bankText}${dateText}`
+  };
+  openDispositionForSingleInvoice(suggestion.invoiceNo, prefill);
+}
+
 function getInvoicePoNumber(invoice) {
   if (!invoice) return "-";
   return invoice.poNumber ? String(invoice.poNumber) : `PO-${invoice.invoiceNo}`;
@@ -4979,6 +5112,7 @@ function openStrategyDetailsForInvoice(invNo, strategyId = "") {
 
 function closeEmailPanel() {
   emailInvoiceFilter = null;
+  hideEmailTakeActionCard();
   setEmailPanelVisible(false);
   applyFiltersAndRender();
 }
@@ -6572,6 +6706,7 @@ function wireEmailPanelEvents() {
     setDetailValue("emailDetailDate", "-");
     setDetailValue("emailDetailTime", "-");
     renderEmailConversation("emailDetailBody", []);
+    hideEmailTakeActionCard();
   };
 
   const showEmailDetail = (item) => {
@@ -6594,6 +6729,7 @@ function wireEmailPanelEvents() {
     setDetailValue("emailDetailTime", item.getAttribute("data-time") || "-");
 
     renderEmailConversation("emailDetailBody", buildConversationTrail(item));
+    renderEmailTakeActionCard(parseEmailPaymentSuggestion(item));
 
     if (detailEmpty) detailEmpty.classList.add("hidden");
     if (detailContent) detailContent.classList.remove("hidden");
@@ -6612,6 +6748,7 @@ function wireEmailPanelEvents() {
     if (composePanel) composePanel.classList.remove("hidden");
     if (detailEmpty) detailEmpty.classList.add("hidden");
     if (detailContent) detailContent.classList.add("hidden");
+    hideEmailTakeActionCard();
     document.querySelectorAll(".emailItem.active").forEach(item => item.classList.remove("active"));
   };
 
@@ -6751,6 +6888,15 @@ function wireEmailPanelEvents() {
   });
 
   document.addEventListener("click", (e) => {
+    const takeActionBtn = e.target.closest(".emailTakeActionBtn[data-email-take-action]");
+    if (takeActionBtn) {
+      const raw = takeActionBtn.getAttribute("data-email-take-action") || "";
+      try {
+        applyEmailTakeActionSuggestion(JSON.parse(decodeURIComponent(raw)));
+      } catch (_) {}
+      return;
+    }
+
     const replyAll = e.target.closest(".emailActionIcon[data-email-action='reply-all']");
     if (replyAll) {
       openReplyAll();

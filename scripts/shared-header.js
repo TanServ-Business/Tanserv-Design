@@ -276,6 +276,7 @@
         <div class="submenu">
           <a class="submenu-link" href="${resolvePath("pages/visitmodule.html")}" data-module="visit">Visit Module</a>
           <a class="submenu-link" href="${resolvePath("pages/visitmoduleReview.html")}" data-module="visit-review">Visit Module Review</a>
+          <a class="submenu-link" href="${resolvePath("pages/visitmoduleReview.html")}" data-module="visit-manager-plan">Manager Visit Plan</a>
         </div>
       </li>
       <li class="menu-item">
@@ -369,6 +370,14 @@
           <a class="submenu-link" href="${resolvePath("pages/commitment.html")}" data-module="commitment-agent">Commitment - Agent</a>
           <a class="submenu-link" href="${resolvePath("pages/CommitmentManager.html")}" data-module="commitment-manager">Commitment - Manager</a>
         </div>
+      </li>
+      <li class="menu-item">
+        <a class="nav-link" href="${resolvePath("pages/ai-activity-center.html")}" data-module="ai-activity-center">
+          <span class="link-content">
+            <i class="bi bi-stars" aria-hidden="true"></i>
+            <span>AI Activity Center</span>
+          </span>
+        </a>
       </li>
       <li class="menu-item">
         <a class="nav-link" href="#" data-toggle="submenu" aria-expanded="false">
@@ -715,6 +724,7 @@
           const destinations = {
             visit: "pages/visitmodule.html",
             "visit-review": "pages/visitmoduleReview.html",
+            "visit-manager-plan": "pages/visitmoduleReview.html",
             landing: landingDestination,
             "landing-agent": "LPagent.html",
             "landing-customer": "pages/LPcustomer.html",
@@ -741,6 +751,7 @@
             "pdc-ops": "pages/PDCOps.html",
             "commitment-agent": "pages/commitment.html",
             "commitment-manager": "pages/CommitmentManager.html",
+            "ai-activity-center": "pages/ai-activity-center.html",
             "help-support": "pages/help-support.html",
             "support-admin": "pages/support-admin.html"
           };

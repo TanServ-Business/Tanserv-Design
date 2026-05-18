@@ -11,6 +11,11 @@
 
   <link rel="stylesheet" href="../css/styles.css" />
   <style>
+    body {
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
     .visitMain {
       max-width: none;
       margin: 0;
@@ -677,14 +682,211 @@
       background: #eff6ff;
     }
 
-    .managerRemarkSummary {
+    .detailCard {
       margin-top: 10px;
-      padding: 10px 12px;
-      border-radius: 10px;
       border: 1px solid #dbe3f0;
+      border-radius: 12px;
       background: #f8fafc;
+      padding: 10px 12px;
+    }
+
+    .detailCard h3 {
+      margin: 0 0 8px;
       font-size: 12px;
+      color: #1e293b;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .detailCard textarea {
+      width: 100%;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 12px;
+      resize: vertical;
+      min-height: 74px;
+      background: #ffffff;
+      color: #111827;
+    }
+
+    .detailCardActions {
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .detailHint {
+      font-size: 11px;
+      color: #64748b;
+    }
+
+    .trailTableWrap {
+      max-height: 260px;
+      overflow: auto;
+      border-left: 2px solid #dbe3f0;
+      padding-left: 12px;
+    }
+
+    .timelineItem {
+      position: relative;
+      background: #ffffff;
+      border: 1px solid #dbe3f0;
+      border-radius: 10px;
+      padding: 8px 10px;
+      margin-bottom: 8px;
+    }
+
+    .timelineItem::before {
+      content: "";
+      position: absolute;
+      left: -18px;
+      top: 12px;
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--brand);
+      border: 1px solid #ffffff;
+      box-shadow: 0 0 0 2px #dbe3f0;
+    }
+
+    .timelineItem.tone-new {
+      background: #f3e8ff;
+      border-color: #d8b4fe;
+    }
+
+    .timelineItem.tone-new::before {
+      background: #7e22ce;
+    }
+
+    .timelineItem.tone-approved {
+      background: #dcfce7;
+      border-color: #86efac;
+    }
+
+    .timelineItem.tone-approved::before {
+      background: #16a34a;
+    }
+
+    .timelineItem.tone-pending {
+      background: #fef9c3;
+      border-color: #fde047;
+    }
+
+    .timelineItem.tone-pending::before {
+      background: #ca8a04;
+    }
+
+    .timelineItem.tone-absent {
+      background: #ffedd5;
+      border-color: #fdba74;
+    }
+
+    .timelineItem.tone-absent::before {
+      background: #ea580c;
+    }
+
+    .timelineItem.tone-remark {
+      background: #e0f2fe;
+      border-color: #7dd3fc;
+    }
+
+    .timelineItem.tone-remark::before {
+      background: #0284c7;
+    }
+
+    .timelineMeta {
+      font-size: 10px;
+      color: #64748b;
+      margin-bottom: 4px;
+    }
+
+    .timelineAction {
+      font-size: 12px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 4px;
+    }
+
+    .timelineDetails {
+      font-size: 11.5px;
       color: #334155;
+    }
+
+    .customerPills {
+      margin-top: 7px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .customerPill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      border: 1px solid #d1d5db;
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 10.5px;
+      font-weight: 600;
+      background: #ffffff;
+      color: #111827;
+    }
+
+    .customerPill.added {
+      background: #dcfce7;
+      border-color: #86efac;
+      color: #166534;
+    }
+
+    .customerPill.removed {
+      background: #fee2e2;
+      border-color: #fca5a5;
+      color: #991b1b;
+    }
+
+    .customerPill.suggestedAdd {
+      background: #dbeafe;
+      border-color: #93c5fd;
+      color: #1d4ed8;
+    }
+
+    .customerPill.suggestedRemove {
+      background: #fee2e2;
+      border-color: #fca5a5;
+      color: #991b1b;
+    }
+
+    .customerPillIcon {
+      font-size: 10px;
+      line-height: 1;
+      font-weight: 800;
+    }
+
+    .remarksList {
+      margin-top: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 120px;
+      overflow: auto;
+    }
+
+    .remarkItem {
+      border: 1px dashed #cbd5e1;
+      border-radius: 8px;
+      padding: 6px 8px;
+      background: #ffffff;
+      font-size: 11.5px;
+      color: #334155;
+    }
+
+    .remarkItemMeta {
+      font-size: 10px;
+      color: #64748b;
+      margin-bottom: 2px;
     }
 
     .visitStatusPill {
@@ -714,6 +916,12 @@
     .visitStatusPill.unplanned {
       color: #92400e;
       background: #fef3c7;
+    }
+
+    .officeTag {
+      background: #ede9fe;
+      color: #5b21b6;
+      border-color: #c4b5fd;
     }
 
     @media (max-width: 1100px) {
@@ -841,7 +1049,18 @@
             </thead>
             <tbody id="planTableBody"></tbody>
           </table>
-          <div class="managerRemarkSummary" id="managerRemarkSummary">Manager remark: -</div>
+          <div class="detailCard">
+            <h3>Remarks</h3>
+            <textarea id="dailyRemarkInput" rows="3" placeholder="Add remark for this day plan..."></textarea>
+            <div class="detailCardActions">
+              <span class="detailHint" id="dailyRemarkMeta">Remarks scope: this date and agent.</span>
+              <button class="btn btn-sm btn-primary" type="button" id="dailyRemarkSaveBtn">Add Remark</button>
+            </div>
+          </div>
+          <div class="detailCard">
+            <h3>Activity Trail</h3>
+            <div class="trailTableWrap" id="visitPlanTrailBody"></div>
+          </div>
         </div>
       </section>
     </aside>
@@ -866,6 +1085,7 @@
           <option value="visit">Visit</option>
           <option value="calling">Calling</option>
           <option value="both">Both</option>
+          <option value="office">Office Work</option>
           <option value="leave">Leave</option>
         </select>
       </div>
@@ -884,6 +1104,10 @@
       <div class="planFieldRow hidden" id="leaveWrap">
         <label for="leaveReason">Leave reason (required)</label>
         <textarea id="leaveReason" rows="2" placeholder="Add leave reason..."></textarea>
+      </div>
+      <div class="planFieldRow hidden" id="officeWrap">
+        <label for="officeReason">Office work reason (required)</label>
+        <textarea id="officeReason" rows="2" placeholder="Add office work reason..."></textarea>
       </div>
 
       <div class="callingNotice hidden" id="callingNotice">
@@ -956,42 +1180,6 @@
       const monthKey = `${year}-${pad(month + 1)}`;
       if (seededMonths.has(monthKey)) return;
       seededMonths.add(monthKey);
-
-      const addPlan = (day, plan) => {
-        const key = makeDateKey(year, month, day);
-        if (!samplePlans[key]) samplePlans[key] = [];
-        samplePlans[key].push(plan);
-      };
-
-      addPlan(3, { customer: "Apollo Pharmacy", code: "CUST-001", reason: "Onsite audit", agent: "Aditi Sharma", manager: "Mukesh Mishra", kam: "Neha Kapoor", kas: "Arjun Rao", status: "Approved", onTime: true });
-      addPlan(5, { customer: "BlueWave", code: "CUST-014", reason: "Collections follow-up", agent: "Manish Kumar", manager: "Mukesh Mishra", kam: "Riya Malhotra", kas: "Vikram Iyer", status: "Pending", onTime: false });
-      addPlan(8, { customer: "Sunrise Pvt", code: "CUST-033", reason: "Dispute resolution", agent: "Palak Choudhary", manager: "Mukesh Mishra", kam: "Anil Thomas", kas: "Dev Patel", status: "Approved", onTime: true });
-      addPlan(12, { customer: "Apollo Pharmacy", code: "CUST-001", reason: "Credit review", agent: "Abhishek Sharma", manager: "Mukesh Mishra", kam: "Neha Kapoor", kas: "Arjun Rao", status: "Rejected", onTime: false });
-      addPlan(24, { customer: "Sunrise Pvt", code: "CUST-033", reason: "PTP confirmation", agent: "Sakshi Sharma", manager: "Mukesh Mishra", kam: "Anil Thomas", kas: "Dev Patel", status: "Pending", onTime: true });
-
-      sampleLabels[makeDateKey(year, month, 3)] = [
-        { label: "Apollo Pharmacy", type: "customer" }
-      ];
-      sampleLabels[makeDateKey(year, month, 5)] = [
-        { label: "BlueWave", type: "customer" }
-      ];
-      sampleLabels[makeDateKey(year, month, 8)] = [
-        { label: "Sunrise Pvt", type: "customer" }
-      ];
-      sampleLabels[makeDateKey(year, month, 12)] = [
-        { label: "Apollo Pharmacy", type: "customer" }
-      ];
-      sampleLabels[makeDateKey(year, month, 15)] = [
-        { label: "On Leave", type: "leave" }
-      ];
-      sampleLabels[makeDateKey(year, month, 24)] = [
-        { label: "Sunrise Pvt", type: "customer" }
-      ];
-
-      [3, 5, 8, 12, 18, 24].forEach((day) => {
-        const key = makeDateKey(year, month, day);
-        if (!planStateByDate[key]) planStateByDate[key] = "submitted";
-      });
     };
 
     seedPlansForMonth(currentYear, currentMonth);
@@ -1000,7 +1188,10 @@
     const calendarMonthEl = document.getElementById("calendarMonth");
     const selectedDateLabel = document.getElementById("selectedDateLabel");
     const planTableBody = document.getElementById("planTableBody");
-    const managerRemarkSummary = document.getElementById("managerRemarkSummary");
+    const dailyRemarkInput = document.getElementById("dailyRemarkInput");
+    const dailyRemarkSaveBtn = document.getElementById("dailyRemarkSaveBtn");
+    const dailyRemarkMeta = document.getElementById("dailyRemarkMeta");
+    const visitPlanTrailBody = document.getElementById("visitPlanTrailBody");
     const clockEl = document.getElementById("visitClock");
     const statOnTime = document.getElementById("statOnTime");
     const statApproval = document.getElementById("statApproval");
@@ -1017,6 +1208,8 @@
     const shortfallReason = document.getElementById("shortfallReason");
     const leaveWrap = document.getElementById("leaveWrap");
     const leaveReason = document.getElementById("leaveReason");
+    const officeWrap = document.getElementById("officeWrap");
+    const officeReason = document.getElementById("officeReason");
     const callingNotice = document.getElementById("callingNotice");
     const visitSection = document.getElementById("visitSection");
     const customerSearchInput = document.getElementById("customerSearchInput");
@@ -1044,6 +1237,11 @@
     const activityTrailStorageKey = "ineburaActivityTrailByInvoice";
     const invoiceStorageKey = "ineburaInvoiceData";
     const syncedAgentPlansKey = "ineburaVisitPlanSyncAbhishek";
+    const visitPlanResetKey = "ineburaVisitPlansClearedV1";
+    const visitTrailResetKey = "ineburaVisitTrailClearedV1";
+    const suggestionCleanupKey = "ineburaSuggestionCleanupMay7May8V2";
+    const visitPlanActionTrailKey = "ineburaVisitPlanActionTrail";
+    const visitDayRemarksKey = "ineburaVisitDayRemarks";
     const syncedAgentName = "Abhishek Sharma";
 
     const normalizeText = (value) => String(value || "")
@@ -1071,14 +1269,190 @@
       }
     };
 
+    const clearStoredVisitPlansOnce = () => {
+      try {
+        if (localStorage.getItem(visitPlanResetKey) === "done") return;
+        saveJson(syncedAgentPlansKey, {
+          version: 2,
+          agentName: syncedAgentName,
+          byDate: {},
+          updatedAt: new Date().toISOString()
+        });
+        localStorage.setItem(visitPlanResetKey, "done");
+      } catch (_) {
+        // Ignore storage reset failures in demo mode.
+      }
+    };
+
+    const clearStoredVisitTrailOnce = () => {
+      try {
+        if (localStorage.getItem(visitTrailResetKey) === "done") return;
+        saveJson(visitPlanActionTrailKey, []);
+        saveJson(visitDayRemarksKey, {});
+        localStorage.setItem(visitTrailResetKey, "done");
+      } catch (_) {
+        // Ignore trail reset failures in demo mode.
+      }
+    };
+
+    const clearMay7May8ManagerSuggestionsOnce = () => {
+      try {
+        if (localStorage.getItem(suggestionCleanupKey) === "done") return;
+        const all = readJson(managerSuggestionsKey, []);
+        const filtered = (Array.isArray(all) ? all : []).filter((entry) => {
+          const targetDate = String(entry?.targetDate || "").trim();
+          const reviewDate = String(entry?.reviewDate || "").trim();
+          const isMay7 = targetDate === "2026-05-07" || reviewDate === "2026-05-07";
+          const isMay8 = targetDate === "2026-05-08" || reviewDate === "2026-05-08";
+          return !isMay7 && !isMay8;
+        });
+        saveJson(managerSuggestionsKey, filtered);
+        localStorage.setItem(suggestionCleanupKey, "done");
+      } catch (_) {
+        // Ignore suggestion cleanup failures in demo mode.
+      }
+    };
+
+    const formatTrailTime = (value) => {
+      const parsed = Date.parse(String(value || ""));
+      if (Number.isNaN(parsed)) return "-";
+      return new Date(parsed).toLocaleString("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+    };
+
+    const toAgentKey = (agentName) => normalizeText(agentName || "");
+
+    const getActorContext = () => {
+      const actorName = String(localStorage.getItem("activeUserName") || "").trim() || syncedAgentName;
+      const actorRole = String(localStorage.getItem("activeUserRole") || "").trim().toLowerCase() || "agent";
+      return { actorName, actorRole };
+    };
+
+    const getContextAgentForDate = (dateKey) => {
+      const plans = Array.isArray(samplePlans[dateKey]) ? samplePlans[dateKey] : [];
+      const firstPlanAgent = plans.find((plan) => String(plan?.agent || "").trim())?.agent || "";
+      const { actorName, actorRole } = getActorContext();
+      if (actorRole === "agent") return syncedAgentName;
+      return firstPlanAgent || actorName || syncedAgentName;
+    };
+
+    const getPlanActionTrail = () => {
+      const snapshot = readJson(visitPlanActionTrailKey, []);
+      return Array.isArray(snapshot) ? snapshot : [];
+    };
+
+    const appendPlanActionTrailEntry = (entry) => {
+      if (!entry || !entry.dateKey) return;
+      const list = getPlanActionTrail();
+      list.unshift(entry);
+      saveJson(visitPlanActionTrailKey, list.slice(0, 600));
+    };
+
+    const logPlanAction = (actionType, details, opts = {}) => {
+      const allowedPlanChangeActions = new Set([
+        "Plan Status Updated"
+      ]);
+      if (!allowedPlanChangeActions.has(String(actionType || "").trim())) return;
+      const { actorName, actorRole } = getActorContext();
+      const dateKey = String(opts.dateKey || selectedDateKey || "").trim();
+      const targetAgent = String(opts.targetAgent || getContextAgentForDate(dateKey) || "").trim();
+      if (!dateKey || !targetAgent) return;
+      appendPlanActionTrailEntry({
+        id: `plan:${Date.now()}:${Math.floor(Math.random() * 10000)}`,
+        at: new Date().toISOString(),
+        dateKey,
+        targetAgent,
+        actorName,
+        actorRole,
+        actionType: String(actionType || "Updated"),
+        details: String(details || "").trim(),
+        planStatus: String(opts.planStatus || "").trim(),
+        remark: String(opts.remark || "").trim(),
+        customerChanges: Array.isArray(opts.customerChanges)
+          ? opts.customerChanges.map((item) => ({
+              name: String(item?.name || "").trim(),
+              state: String(item?.state || "").trim().toLowerCase()
+            }))
+          : []
+      });
+    };
+
+    const getDayRemarksMap = () => {
+      const snapshot = readJson(visitDayRemarksKey, {});
+      return snapshot && typeof snapshot === "object" ? snapshot : {};
+    };
+
+    const getRemarkRecord = (dateKey, agentName) => {
+      const map = getDayRemarksMap();
+      const agentKey = toAgentKey(agentName);
+      const dayBucket = map[dateKey];
+      if (!dayBucket || typeof dayBucket !== "object") return {};
+      const record = dayBucket[agentKey];
+      return record && typeof record === "object" ? record : {};
+    };
+
+    const saveRemarkRecord = (dateKey, agentName, role, text) => {
+      const key = toAgentKey(agentName);
+      if (!dateKey || !key) return;
+      const actorName = String(localStorage.getItem("activeUserName") || "").trim() || syncedAgentName;
+      const nextText = String(text || "").trim();
+      if (!nextText) return;
+      const map = getDayRemarksMap();
+      if (!map[dateKey] || typeof map[dateKey] !== "object") map[dateKey] = {};
+      const existing = map[dateKey][key] && typeof map[dateKey][key] === "object" ? map[dateKey][key] : {};
+      const existingRemarks = Array.isArray(existing.remarks) ? existing.remarks.slice() : [];
+      if (!existingRemarks.length) {
+        const legacyManager = String(existing.managerRemark || "").trim();
+        const legacyAgent = String(existing.agentRemark || "").trim();
+        if (legacyManager) {
+          existingRemarks.push({
+            id: `legacy-manager-${dateKey}-${key}`,
+            at: existing.updatedAt || new Date().toISOString(),
+            text: legacyManager,
+            actorName: "Manager",
+            actorRole: "manager"
+          });
+        }
+        if (legacyAgent) {
+          existingRemarks.push({
+            id: `legacy-agent-${dateKey}-${key}`,
+            at: existing.updatedAt || new Date().toISOString(),
+            text: legacyAgent,
+            actorName: "Agent",
+            actorRole: "agent"
+          });
+        }
+      }
+      existingRemarks.push({
+        id: `remark:${Date.now()}:${Math.floor(Math.random() * 10000)}`,
+        at: new Date().toISOString(),
+        text: nextText,
+        actorName,
+        actorRole: role
+      });
+      map[dateKey][key] = {
+        ...existing,
+        remarks: existingRemarks.slice(-200),
+        updatedAt: new Date().toISOString(),
+        updatedBy: actorName
+      };
+      saveJson(visitDayRemarksKey, map);
+    };
+
     const isSyncedAgent = (agentName) => normalizeText(agentName) === normalizeText(syncedAgentName);
 
     const getSyncedAgentStore = () => {
       const snapshot = readJson(syncedAgentPlansKey, {});
+      const version = Number(snapshot && typeof snapshot === "object" ? snapshot.version : 1) || 1;
       const byDate = snapshot && typeof snapshot === "object" && snapshot.byDate && typeof snapshot.byDate === "object"
         ? snapshot.byDate
         : {};
-      return { byDate };
+      return { byDate, version };
     };
 
     const cloneLabelList = (labels) => (Array.isArray(labels) ? labels : []).map((entry) => (
@@ -1089,13 +1463,20 @@
       const byDate = {};
       Object.keys(samplePlans).forEach((dateKey) => {
         const plans = (Array.isArray(samplePlans[dateKey]) ? samplePlans[dateKey] : [])
-          .filter((plan) => isSyncedAgent(plan?.agent))
-          .map((plan) => ({ ...plan, agent: syncedAgentName }));
-        if (!plans.length) return;
+          .map((plan) => ({ ...(plan && typeof plan === "object" ? plan : {}) }));
+        const labels = cloneLabelList(sampleLabels[dateKey]);
+        const planState = String(planStateByDate[dateKey] || "");
+        const leaveReason = String(leaveReasonsByDate[dateKey] || "");
+        const officeReason = String(officeReasonsByDate[dateKey] || "");
+        const shortfallReasonText = String(shortfallReasonsByDate[dateKey] || "");
+        if (!plans.length && !labels.length && !planState && !leaveReason && !officeReason && !shortfallReasonText) return;
         byDate[dateKey] = {
           plans,
-          labels: cloneLabelList(sampleLabels[dateKey]),
-          planState: String(planStateByDate[dateKey] || "")
+          labels,
+          planState,
+          leaveReason,
+          officeReason,
+          shortfallReason: shortfallReasonText
         };
       });
       return byDate;
@@ -1103,7 +1484,7 @@
 
     const persistSyncedAgentPlans = () => {
       saveJson(syncedAgentPlansKey, {
-        version: 1,
+        version: 2,
         agentName: syncedAgentName,
         byDate: buildSyncedAgentByDateFromMemory(),
         updatedAt: new Date().toISOString()
@@ -1116,26 +1497,47 @@
       persistSyncedAgentPlans();
     };
 
-    const removeSyncedAgentPlansFromMemory = () => {
-      Object.keys(samplePlans).forEach((dateKey) => {
-        const filtered = (Array.isArray(samplePlans[dateKey]) ? samplePlans[dateKey] : [])
-          .filter((plan) => !isSyncedAgent(plan?.agent));
-        if (filtered.length) samplePlans[dateKey] = filtered;
-        else delete samplePlans[dateKey];
-      });
-    };
-
     const applySyncedAgentPlansToMemory = () => {
-      const { byDate } = getSyncedAgentStore();
+      const { byDate, version } = getSyncedAgentStore();
       if (!Object.keys(byDate).length) return;
-      removeSyncedAgentPlansFromMemory();
+      if (version < 2) {
+        Object.keys(samplePlans).forEach((dateKey) => {
+          const filtered = (Array.isArray(samplePlans[dateKey]) ? samplePlans[dateKey] : [])
+            .filter((plan) => !isSyncedAgent(plan?.agent));
+          if (filtered.length) samplePlans[dateKey] = filtered;
+          else delete samplePlans[dateKey];
+        });
+        Object.entries(byDate).forEach(([dateKey, entry]) => {
+          const plans = (Array.isArray(entry?.plans) ? entry.plans : [])
+            .map((plan) => ({ ...(plan && typeof plan === "object" ? plan : {}), agent: syncedAgentName }))
+            .filter((plan) => String(plan.customer || plan.code || "").trim());
+          if (plans.length) {
+            const existing = Array.isArray(samplePlans[dateKey]) ? samplePlans[dateKey] : [];
+            samplePlans[dateKey] = existing.concat(plans);
+          }
+          if (Array.isArray(entry?.labels)) sampleLabels[dateKey] = cloneLabelList(entry.labels);
+          if (typeof entry?.planState === "string" && entry.planState) planStateByDate[dateKey] = entry.planState;
+          const leaveReason = String(entry?.leaveReason || "").trim();
+          const officeReason = String(entry?.officeReason || "").trim();
+          const shortfallReasonText = String(entry?.shortfallReason || "").trim();
+          if (leaveReason) leaveReasonsByDate[dateKey] = leaveReason;
+          if (officeReason) officeReasonsByDate[dateKey] = officeReason;
+          if (shortfallReasonText) shortfallReasonsByDate[dateKey] = shortfallReasonText;
+        });
+        return;
+      }
+      Object.keys(samplePlans).forEach((dateKey) => delete samplePlans[dateKey]);
+      Object.keys(sampleLabels).forEach((dateKey) => delete sampleLabels[dateKey]);
+      Object.keys(planStateByDate).forEach((dateKey) => delete planStateByDate[dateKey]);
+      Object.keys(leaveReasonsByDate).forEach((dateKey) => delete leaveReasonsByDate[dateKey]);
+      Object.keys(officeReasonsByDate).forEach((dateKey) => delete officeReasonsByDate[dateKey]);
+      Object.keys(shortfallReasonsByDate).forEach((dateKey) => delete shortfallReasonsByDate[dateKey]);
       Object.entries(byDate).forEach(([dateKey, entry]) => {
         const plans = (Array.isArray(entry?.plans) ? entry.plans : [])
-          .map((plan) => ({ ...(plan && typeof plan === "object" ? plan : {}), agent: syncedAgentName }))
+          .map((plan) => ({ ...(plan && typeof plan === "object" ? plan : {}) }))
           .filter((plan) => String(plan.customer || plan.code || "").trim());
         if (plans.length) {
-          const existing = Array.isArray(samplePlans[dateKey]) ? samplePlans[dateKey] : [];
-          samplePlans[dateKey] = existing.concat(plans);
+          samplePlans[dateKey] = plans;
         }
         if (Array.isArray(entry?.labels)) {
           sampleLabels[dateKey] = cloneLabelList(entry.labels);
@@ -1143,6 +1545,12 @@
         if (typeof entry?.planState === "string" && entry.planState) {
           planStateByDate[dateKey] = entry.planState;
         }
+        const leaveReason = String(entry?.leaveReason || "").trim();
+        const officeReason = String(entry?.officeReason || "").trim();
+        const shortfallReasonText = String(entry?.shortfallReason || "").trim();
+        if (leaveReason) leaveReasonsByDate[dateKey] = leaveReason;
+        if (officeReason) officeReasonsByDate[dateKey] = officeReason;
+        if (shortfallReasonText) shortfallReasonsByDate[dateKey] = shortfallReasonText;
       });
     };
 
@@ -1150,6 +1558,17 @@
       const role = String(localStorage.getItem("activeUserRole") || "").trim().toLowerCase();
       if (role === "agent") return syncedAgentName;
       return "";
+    };
+
+    const getSubmittingAgentForDate = (dateKey) => {
+      return String(getPlanOwnerForSave() || getContextAgentForDate(dateKey) || syncedAgentName).trim();
+    };
+
+    const getPlansForAgentOnDate = (dateKey, agentName) => {
+      const list = Array.isArray(samplePlans[dateKey]) ? samplePlans[dateKey] : [];
+      const target = normalizeText(agentName || "");
+      if (!target) return list;
+      return list.filter((plan) => normalizeText(plan?.agent || "") === target);
     };
 
     const getSuggestionsForDate = (dateKey) => {
@@ -1217,6 +1636,167 @@
       return visitedByAgent;
     };
 
+    const getVisitedSubStatusByAgentCustomerForDate = (dateKey) => {
+      const invoiceMap = getInvoiceCustomerMap();
+      const activityMap = getActivityTrailMap();
+      const latestByAgentCustomer = new Map();
+      Object.entries(activityMap).forEach(([invoiceNo, entries]) => {
+        const customerInfo = invoiceMap.get(invoiceNo);
+        if (!customerInfo) return;
+        const customerKey = normalizeText(customerInfo.customer) || normalizeText(customerInfo.code);
+        if (!customerKey) return;
+        (Array.isArray(entries) ? entries : []).forEach((entry) => {
+          if (!entry || entry.type !== "status") return;
+          const data = entry.data || {};
+          if (String(data.activityType || "").trim().toLowerCase() !== "visited") return;
+          if (getDateKeyFromTimestamp(entry.at || entry.when) !== dateKey) return;
+          const agentKey = normalizeText(data.actorName || "");
+          if (!agentKey) return;
+          const mapKey = `${agentKey}::${customerKey}`;
+          const atTime = Date.parse(entry.at || entry.when || data.performedAt || "") || 0;
+          const current = latestByAgentCustomer.get(mapKey);
+          if (current && current.time >= atTime) return;
+          latestByAgentCustomer.set(mapKey, {
+            subStatus: String(data.subStatus || "").trim(),
+            time: atTime
+          });
+        });
+      });
+      return latestByAgentCustomer;
+    };
+
+    const renderVisitPlanTrail = () => {
+      if (!visitPlanTrailBody) return;
+      const dateKey = selectedDateKey;
+      const targetAgent = getContextAgentForDate(dateKey);
+      const agentKey = normalizeText(targetAgent);
+      const escapeHtml = (value) => String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+      const normalizePlanStatus = (value) => {
+        const key = normalizeText(value || "");
+        if (key === "newplansubmitted") return "New plan submitted";
+        if (key === "updatedplan") return "Updated Plan";
+        if (key.includes("approve")) return "Approved";
+        if (key.includes("pending")) return "Pending";
+        if (key.includes("reject") || key.includes("absent") || key.includes("leave")) return "Rejected";
+        return "";
+      };
+      const statusRows = getPlanActionTrail()
+        .filter((entry) => String(entry?.dateKey || "") === dateKey)
+        .filter((entry) => !agentKey || normalizeText(entry?.targetAgent || "") === agentKey)
+        .filter((entry) => {
+          const actionType = String(entry?.actionType || "").trim();
+          return actionType === "Plan Status Updated" || actionType === "Review Submitted";
+        })
+        .map((entry) => {
+          const parsedStatus = normalizePlanStatus(entry?.planStatus || entry?.details || "");
+          if (!parsedStatus) return null;
+          return {
+            kind: "status",
+            status: parsedStatus,
+            remark: String(entry?.remark || "").trim(),
+            customerChanges: Array.isArray(entry?.customerChanges) ? entry.customerChanges : [],
+            at: entry.at,
+            actorName: entry.actorName,
+            actorRole: entry.actorRole
+          };
+        })
+        .filter(Boolean);
+      const remarkRows = (Array.isArray(getRemarkRecord(dateKey, targetAgent)?.remarks)
+        ? getRemarkRecord(dateKey, targetAgent).remarks
+        : []).map((entry) => ({
+          kind: "remark",
+          remark: String(entry?.text || "").trim(),
+          at: entry.at,
+          actorName: entry?.actorName,
+          actorRole: entry?.actorRole
+        }));
+      const rows = statusRows
+        .concat(remarkRows)
+        .sort((a, b) => (Date.parse(b.at || "") || 0) - (Date.parse(a.at || "") || 0))
+        .slice(0, 120);
+
+      const getTrailToneClass = (entry) => {
+        if (entry?.kind === "remark") return "tone-remark";
+        const statusKey = normalizeText(entry?.status || "");
+        if (statusKey === "newplansubmitted" || statusKey === "updatedplan") return "tone-new";
+        if (statusKey === "approved") return "tone-approved";
+        if (statusKey === "pending") return "tone-pending";
+        return "tone-absent";
+      };
+
+      const renderCustomerPills = (entry) => {
+        const pills = Array.isArray(entry?.customerChanges) ? entry.customerChanges : [];
+        if (!pills.length) return "";
+        const iconFor = (state) => {
+          if (state === "added") return "✓";
+          if (state === "removed") return "✕";
+          if (state === "suggested-add") return "+";
+          if (state === "suggested-remove") return "-";
+          return "";
+        };
+        const classFor = (state) => {
+          if (state === "added") return "added";
+          if (state === "removed") return "removed";
+          if (state === "suggested-add") return "suggestedAdd";
+          if (state === "suggested-remove") return "suggestedRemove";
+          return "unchanged";
+        };
+        return `
+          <div class="customerPills">
+            ${pills.map((pill) => {
+              const state = String(pill?.state || "unchanged").toLowerCase();
+              const icon = iconFor(state);
+              return `
+                <span class="customerPill ${classFor(state)}">
+                  ${icon ? `<span class="customerPillIcon">${icon}</span>` : ""}
+                  <span>${escapeHtml(pill?.name || "-")}</span>
+                </span>
+              `;
+            }).join("")}
+          </div>
+        `;
+      };
+
+      if (!rows.length) {
+        visitPlanTrailBody.innerHTML = `
+          <div class="timelineItem">
+            <div class="timelineDetails" style="color:#94a3b8;">No visit-plan activity for this day.</div>
+          </div>
+        `;
+        return;
+      }
+      visitPlanTrailBody.innerHTML = rows.map((entry) => `
+        <div class="timelineItem ${getTrailToneClass(entry)}">
+          <div class="timelineMeta">${formatTrailTime(entry.at)} • ${entry.actorName || "-"} (${entry.actorRole || "-"})</div>
+          ${entry.kind === "status"
+            ? `${normalizeText(entry.status) === "newplansubmitted" || normalizeText(entry.status) === "updatedplan"
+                ? `<div class="timelineAction">${entry.status}</div>`
+                : `<div class="timelineAction">Plan status: ${entry.status}</div>`
+              }<div class="timelineDetails">Remarks: ${escapeHtml(entry.remark || "")}</div>${renderCustomerPills(entry)}`
+            : `<div class="timelineDetails">Remark: ${escapeHtml(entry.remark || "")}</div>`
+          }
+        </div>
+      `).join("");
+    };
+
+    const renderDailyRemark = () => {
+      if (!dailyRemarkInput) return;
+      const dateKey = selectedDateKey;
+      const targetAgent = getContextAgentForDate(dateKey);
+      const record = getRemarkRecord(dateKey, targetAgent);
+      const remarks = Array.isArray(record?.remarks) ? record.remarks : [];
+      dailyRemarkInput.value = "";
+      if (dailyRemarkMeta) {
+        dailyRemarkMeta.textContent = `Remarks scope: ${formatReadableDate(dateKey)} • ${targetAgent || "-"} • ${remarks.length} remark(s)`;
+      }
+      dailyRemarkInput.placeholder = "Add remark (multiple remarks can be added during the day)...";
+    };
+
     const getPlanSuggestionCandidates = (dateKey) => {
       const candidates = new Map();
       const keyFor = (item) => normalizeText(item?.code || "") || normalizeText(item?.customer || "");
@@ -1259,6 +1839,26 @@
       return Array.from(candidates.values());
     };
 
+    const getPlanRemovalSuggestionCandidates = (dateKey) => {
+      const candidates = new Map();
+      getSuggestionsForDate(dateKey).forEach((entry) => {
+        const removals = Array.isArray(entry?.removeCustomers) ? entry.removeCustomers : [];
+        removals.forEach((item) => {
+          const customer = String(item?.customer || "").trim();
+          const code = String(item?.code || "").trim();
+          if (!customer && !code) return;
+          const key = normalizeText(code) || normalizeText(customer);
+          if (!key || candidates.has(key)) return;
+          candidates.set(key, {
+            customer: customer || code,
+            code: code || "",
+            candidateKey: key
+          });
+        });
+      });
+      return Array.from(candidates.values());
+    };
+
     const isHolidayDate = (dateKey) => {
       if (!dateKey || dateKey === "-") return false;
       const [year, month, day] = dateKey.split("-").map(Number);
@@ -1271,17 +1871,24 @@
     const customerDirectory = [
       { customer: "Apollo Pharmacy", code: "CUST-001", agent: "Aditi Sharma", manager: "Mukesh Mishra", kam: "Neha Kapoor", kas: "Arjun Rao" },
       { customer: "BlueWave", code: "CUST-014", agent: "Manish Kumar", manager: "Mukesh Mishra", kam: "Riya Malhotra", kas: "Vikram Iyer" },
-      { customer: "Sunrise Pvt", code: "CUST-033", agent: "Palak Choudhary", manager: "Mukesh Mishra", kam: "Anil Thomas", kas: "Dev Patel" }
+      { customer: "Sunrise Pvt", code: "CUST-033", agent: "Palak Choudhary", manager: "Mukesh Mishra", kam: "Anil Thomas", kas: "Dev Patel" },
+      { customer: "Michelin Tyres", code: "CUST-089", agent: "Abhishek Sharma", manager: "Mukesh Mishra", kam: "Vikas Rao", kas: "Meera Joshi" },
+      { customer: "Motherson Wires", code: "CUST-090", agent: "Sakshi Sharma", manager: "Mukesh Mishra", kam: "Shreya Nair", kas: "Kunal Shah" }
     ];
     const visitReasons = ["Collection follow up", "Invoice Submission", "BC", "TDS"];
 
     const leaveReasonsByDate = {};
+    const officeReasonsByDate = {};
     const shortfallReasonsByDate = {};
     let currentPlanDateKey = null;
     let selectedCustomers = new Map();
     let currentSearchCandidateMap = new Map();
     let currentManagerSuggestedMap = new Map();
+    let currentManagerRemoveSuggestedMap = new Map();
 
+    clearStoredVisitPlansOnce();
+    clearStoredVisitTrailOnce();
+    clearMay7May8ManagerSuggestionsOnce();
     initializeSyncedAgentPlansIfMissing();
     applySyncedAgentPlansToMemory();
 
@@ -1451,21 +2058,29 @@
       const suggestions = getPlanSuggestionCandidates(planDate)
         .filter((item) => item.isManagerSuggested)
         .sort((a, b) => String(a.customer || "").localeCompare(String(b.customer || "")));
+      const removalSuggestions = getPlanRemovalSuggestionCandidates(planDate)
+        .sort((a, b) => String(a.customer || "").localeCompare(String(b.customer || "")));
 
-      managerSuggestedCustomersWrap.classList.toggle("hidden", suggestions.length === 0);
+      managerSuggestedCustomersWrap.classList.toggle("hidden", suggestions.length === 0 && removalSuggestions.length === 0);
       currentManagerSuggestedMap = new Map();
+      currentManagerRemoveSuggestedMap = new Map();
       suggestions.forEach((item) => {
         const key = String(item.candidateKey || "");
         if (!key) return;
         currentManagerSuggestedMap.set(key, item);
       });
+      removalSuggestions.forEach((item) => {
+        const key = String(item.candidateKey || "");
+        if (!key) return;
+        currentManagerRemoveSuggestedMap.set(key, item);
+      });
 
-      if (!suggestions.length) {
+      if (!suggestions.length && !removalSuggestions.length) {
         managerSuggestedCustomersList.innerHTML = `<div class="searchItem"><span class="searchItemCode">No manager suggestions for this date.</span></div>`;
         return;
       }
 
-      managerSuggestedCustomersList.innerHTML = suggestions.map((item) => {
+      const addMarkup = suggestions.map((item) => {
         const key = String(item.candidateKey || "");
         const isAdded = selectedCustomers.has(key);
         return `
@@ -1485,6 +2100,30 @@
           </div>
         `;
       }).join("");
+      const removeMarkup = removalSuggestions.map((item) => {
+        const key = String(item.candidateKey || "");
+        const existsInPlan = selectedCustomers.has(key);
+        return `
+          <div class="searchItem">
+            <div>
+              <div class="searchItemName">${item.customer}</div>
+              <div class="searchItemCode">${item.code || "-"} • Manager suggested remove</div>
+            </div>
+            <button
+              class="planRemoveBtn"
+              type="button"
+              data-action="remove-suggested"
+              data-candidate-key="${key}"
+              ${existsInPlan ? "" : "disabled"}>
+              ${existsInPlan ? "Remove" : "Removed"}
+            </button>
+          </div>
+        `;
+      }).join("");
+      managerSuggestedCustomersList.innerHTML = `
+        ${addMarkup ? `<div class="suggestionNote">Suggested additions</div>${addMarkup}` : ""}
+        ${removeMarkup ? `<div class="suggestionNote">Suggested removals</div>${removeMarkup}` : ""}
+      `;
     };
 
     const updatePlanTypeUI = () => {
@@ -1492,9 +2131,10 @@
       if (visitSection) visitSection.classList.toggle("hidden", !(type === "visit" || type === "both"));
       if (callingNotice) callingNotice.classList.toggle("hidden", !(type === "calling" || type === "both"));
       if (leaveWrap) leaveWrap.classList.toggle("hidden", type !== "leave");
+      if (officeWrap) officeWrap.classList.toggle("hidden", type !== "office");
       if (planModalSubmit) {
         const simulate = simulateSubmitToggle ? simulateSubmitToggle.checked : false;
-        const showSubmit = type !== "leave" && (simulate || shouldShowSubmitButton(currentPlanDateKey, type));
+        const showSubmit = type !== "leave" && type !== "office" && (simulate || shouldShowSubmitButton(currentPlanDateKey, type));
         planModalSubmit.classList.toggle("hidden", !showSubmit);
       }
     };
@@ -1503,14 +2143,18 @@
       if (!planModalOverlay) return;
       currentPlanDateKey = dateKey;
       if (planDateLabel) planDateLabel.textContent = formatReadableDate(dateKey);
+      logPlanAction("Plan Modal Opened", "Opened plan editor.", { dateKey });
+      const submittingAgent = getSubmittingAgentForDate(dateKey);
 
       const labels = sampleLabels[dateKey] || [];
       const hasLeave = labels.some(entry => typeof entry === "object" && entry.type === "leave");
+      const hasOffice = labels.some(entry => typeof entry === "object" && entry.type === "office");
       const hasCalling = labels.some(entry => typeof entry === "object" && entry.type === "call");
-      const visits = samplePlans[dateKey] || [];
+      const visits = getPlansForAgentOnDate(dateKey, submittingAgent);
 
       let planType = "visit";
       if (hasLeave) planType = "leave";
+      else if (hasOffice) planType = "office";
       else if (hasCalling && visits.length > 0) planType = "both";
       else if (hasCalling) planType = "calling";
       else if (visits.length > 0) planType = "visit";
@@ -1520,11 +2164,12 @@
       selectedCustomers = new Map();
       visits.forEach((plan) => {
         const key = String(plan.code || normalizeText(plan.customer));
-        selectedCustomers.set(key, { ...plan, _key: key });
+        selectedCustomers.set(key, { ...plan, _key: key, agent: submittingAgent });
       });
 
-      if (leaveReason) leaveReason.value = leaveReasonsByDate[dateKey] || "";
-      if (shortfallReason) shortfallReason.value = shortfallReasonsByDate[dateKey] || "";
+      if (leaveReason) leaveReason.value = "";
+      if (officeReason) officeReason.value = "";
+      if (shortfallReason) shortfallReason.value = "";
       if (customerSearchInput) customerSearchInput.value = "";
 
       if (planError) {
@@ -1550,11 +2195,13 @@
 
     const renderPlanTable = (dateKey) => {
       selectedDateLabel.textContent = formatReadableDate(dateKey);
-      const plans = samplePlans[dateKey] || [];
+      const contextAgent = getSubmittingAgentForDate(dateKey);
+      const plans = getPlansForAgentOnDate(dateKey, contextAgent);
       const suggestions = getSuggestionsForDate(dateKey);
       const isHoliday = isHolidayDate(dateKey);
       const filteredPlans = isHoliday ? [] : plans;
       const visitedByAgent = getVisitedCustomerKeysByAgentForDate(dateKey);
+      const visitedSubStatusByAgentCustomer = getVisitedSubStatusByAgentCustomerForDate(dateKey);
       const plannedKeys = new Set();
       const suggestionKey = (customer, agent) => `${normalizeText(customer)}::${normalizeText(agent)}`;
       const suggestionRows = [];
@@ -1584,45 +2231,46 @@
         const isSuggested = suggestionRows.some((row) => row.key === key);
         const agentKey = normalizeText(plan.agent);
         const customerKey = normalizeText(plan.customer) || normalizeText(plan.code);
+        const subStatusKey = `${agentKey}::${customerKey}`;
+        const overriddenReason = visitedSubStatusByAgentCustomer.get(subStatusKey)?.subStatus || "";
         const isVisited = Boolean(agentKey && customerKey && visitedByAgent.get(agentKey)?.has(customerKey));
         const visitStatus = isVisited ? "Planned" : "Not Visited";
-        return { ...plan, visitStatus, rowClass: isSuggested ? "managerSuggestedRow" : "" };
+        return {
+          ...plan,
+          reason: overriddenReason || plan.reason,
+          visitStatus,
+          rowClass: isSuggested ? "managerSuggestedRow" : ""
+        };
       });
 
       const suggestedOnlyRows = suggestionRows
         .filter((row) => !plannedKeys.has(row.key))
-        .map((row) => ({
-          customer: row.customer,
-          code: row.code || "-",
-          reason: "Manager suggested visit",
-          agent: row.agent || "-",
-          manager: row.manager || "-",
-          kam: "-",
-          kas: "-",
-          visitStatus: "Unplanned",
-          rowClass: "managerSuggestedRow"
-        }));
+        .map((row) => {
+          const agentKey = normalizeText(row.agent || "");
+          const customerKey = normalizeText(row.customer) || normalizeText(row.code);
+          const overrideKey = `${agentKey}::${customerKey}`;
+          const overriddenReason = visitedSubStatusByAgentCustomer.get(overrideKey)?.subStatus || "";
+          return {
+            customer: row.customer,
+            code: row.code || "-",
+            reason: overriddenReason || "Manager suggested visit",
+            agent: row.agent || "-",
+            manager: row.manager || "-",
+            kam: "-",
+            kas: "-",
+            visitStatus: "Unplanned",
+            rowClass: "managerSuggestedRow"
+          };
+        });
 
       const rowsToRender = plannedWithSuggestion.concat(suggestedOnlyRows);
-      const remarks = [];
-      filteredPlans.forEach((plan) => {
-        const remark = String(plan?.managerRemark || "").trim();
-        if (remark) remarks.push(remark);
-      });
-      suggestions.forEach((entry) => {
-        const remark = String(entry?.managerRemark || "").trim();
-        if (remark) remarks.push(remark);
-      });
-      const uniqueRemarks = Array.from(new Set(remarks));
-      if (managerRemarkSummary) {
-        managerRemarkSummary.textContent = uniqueRemarks.length
-          ? `Manager remark: ${uniqueRemarks.join(" | ")}`
-          : "Manager remark: -";
-      }
 
       if (!rowsToRender.length) {
+        const officeReasonText = String(officeReasonsByDate[dateKey] || "").trim();
         const message = isHoliday
           ? "Holiday - no visits scheduled."
+          : officeReasonText
+            ? `Office work planned: ${officeReasonText}`
           : "No visits or manager suggestions for this day.";
         planTableBody.innerHTML = `
           <tr>
@@ -1657,9 +2305,16 @@
     };
 
     const selectDate = (dateKey) => {
+      const previousDate = selectedDateKey;
       selectedDateKey = dateKey;
       renderCalendar();
       renderPlanTable(dateKey);
+      renderDailyRemark();
+      renderVisitPlanTrail();
+      if (previousDate !== dateKey) {
+        logPlanAction("Date Selected", `Opened plan context for ${formatReadableDate(dateKey)}.`, { dateKey });
+        renderVisitPlanTrail();
+      }
     };
 
     const updateClock = () => {
@@ -1807,6 +2462,7 @@
             const tag = document.createElement("span");
             tag.className = "customerTag";
             if (type === "leave") tag.classList.add("onLeaveTag");
+            if (type === "office") tag.classList.add("officeTag");
             tag.textContent = label;
             labelWrap.appendChild(tag);
           });
@@ -1867,7 +2523,12 @@
       if (!currentPlanDateKey) return;
       const dateKey = currentPlanDateKey;
       const type = planTypeSelect ? planTypeSelect.value : "visit";
-      const planOwner = getPlanOwnerForSave();
+      const planOwner = getSubmittingAgentForDate(dateKey);
+      const hadExistingPlan = Boolean(
+        getPlansForAgentOnDate(dateKey, planOwner).length ||
+        (Array.isArray(sampleLabels[dateKey]) && sampleLabels[dateKey].length) ||
+        String(planStateByDate[dateKey] || "").trim()
+      );
       const needsShortfall = shouldRequireShortfall(dateKey);
       const errors = [];
 
@@ -1876,6 +2537,9 @@
       }
       if (type === "leave" && (!leaveReason || leaveReason.value.trim() === "")) {
         errors.push("Leave reason is required.");
+      }
+      if (type === "office" && (!officeReason || officeReason.value.trim() === "")) {
+        errors.push("Office work reason is required.");
       }
       if (type === "visit" || type === "both") {
         if (selectedCustomers.size === 0) {
@@ -1902,6 +2566,7 @@
 
       const labels = [];
       let visits = [];
+      const previousVisits = getPlansForAgentOnDate(dateKey, planOwner);
 
       if (type === "visit" || type === "both") {
         const onTime = !needsShortfall;
@@ -1909,7 +2574,7 @@
           customer: item.customer,
           code: item.code,
           reason: String(item.reason || "").trim(),
-          agent: planOwner || item.agent,
+          agent: planOwner,
           manager: item.manager,
           kam: item.kam,
           kas: item.kas,
@@ -1927,10 +2592,22 @@
       if (type === "leave") {
         labels.push({ label: "On Leave", type: "leave" });
         if (leaveReason) leaveReasonsByDate[dateKey] = leaveReason.value.trim();
+        if (officeReason) officeReason.value = "";
+        delete officeReasonsByDate[dateKey];
+        visits = [];
+      } else if (type === "office") {
+        labels.push({ label: "Office Work", type: "office" });
+        if (officeReason) officeReasonsByDate[dateKey] = officeReason.value.trim();
+        if (leaveReason) leaveReason.value = "";
+        delete leaveReasonsByDate[dateKey];
         visits = [];
       } else if (leaveReason) {
         leaveReason.value = "";
         delete leaveReasonsByDate[dateKey];
+        if (officeReason) {
+          officeReason.value = "";
+        }
+        delete officeReasonsByDate[dateKey];
       }
 
       if (needsShortfall && shortfallReason) {
@@ -1939,17 +2616,55 @@
         delete shortfallReasonsByDate[dateKey];
       }
 
-      samplePlans[dateKey] = visits;
+      const preservedOtherAgentPlans = (Array.isArray(samplePlans[dateKey]) ? samplePlans[dateKey] : [])
+        .filter((plan) => normalizeText(plan?.agent || "") !== normalizeText(planOwner));
+      samplePlans[dateKey] = preservedOtherAgentPlans.concat(visits);
       sampleLabels[dateKey] = labels;
       planStateByDate[dateKey] = isSubmit ? "submitted" : "draft";
-      const syncTouched = isSyncedAgent(planOwner) || visits.some((plan) => isSyncedAgent(plan?.agent));
-      if (syncTouched) {
-        persistSyncedAgentPlans();
-      }
+      const shortfallText = needsShortfall && shortfallReason ? shortfallReason.value.trim() : "";
+      const agentStatusLabel = isSubmit && !hadExistingPlan ? "New plan submitted" : "Updated Plan";
+      const toCustomerMap = (list) => {
+        const map = new Map();
+        (Array.isArray(list) ? list : []).forEach((item) => {
+          const code = String(item?.code || "").trim();
+          const customer = String(item?.customer || "").trim();
+          const key = normalizeText(code) || normalizeText(customer);
+          if (!key) return;
+          map.set(key, customer || code || "-");
+        });
+        return map;
+      };
+      const previousCustomerMap = toCustomerMap(previousVisits);
+      const currentCustomerMap = toCustomerMap(visits);
+      const allKeys = Array.from(new Set([
+        ...Array.from(previousCustomerMap.keys()),
+        ...Array.from(currentCustomerMap.keys())
+      ]));
+      const customerChanges = allKeys.map((key) => {
+        const existedBefore = previousCustomerMap.has(key);
+        const existsNow = currentCustomerMap.has(key);
+        let state = "unchanged";
+        if (!existedBefore && existsNow) state = "added";
+        else if (existedBefore && !existsNow) state = "removed";
+        return {
+          name: currentCustomerMap.get(key) || previousCustomerMap.get(key) || "-",
+          state
+        };
+      }).sort((a, b) => String(a.name).localeCompare(String(b.name)));
+      logPlanAction("Plan Status Updated", `${agentStatusLabel} for ${planOwner || getContextAgentForDate(dateKey)}.`, {
+        dateKey,
+        targetAgent: planOwner || getContextAgentForDate(dateKey),
+        planStatus: agentStatusLabel,
+        remark: shortfallText,
+        customerChanges
+      });
+      persistSyncedAgentPlans();
 
       updateStats();
       renderCalendar();
       renderPlanTable(dateKey);
+      renderDailyRemark();
+      renderVisitPlanTrail();
       closePlanModal();
     };
 
@@ -1972,24 +2687,54 @@
         const key = btn.getAttribute("data-candidate-key") || "";
         const customer = currentSearchCandidateMap.get(key);
         if (!customer || !key) return;
-        selectedCustomers.set(key, { ...customer, _key: key, reason: "" });
+        const submittingAgent = getSubmittingAgentForDate(currentPlanDateKey || selectedDateKey);
+        selectedCustomers.set(key, { ...customer, _key: key, reason: "", agent: submittingAgent });
+        logPlanAction("Customer Added", `${customer.customer} (${customer.code || "-"}) added to plan.`, {
+          dateKey: currentPlanDateKey || selectedDateKey,
+          targetAgent: submittingAgent || getContextAgentForDate(currentPlanDateKey || selectedDateKey)
+        });
         renderSearchResults();
         renderManagerSuggestedCustomers();
         renderSelectedCustomers();
+        renderVisitPlanTrail();
       });
     }
     if (managerSuggestedCustomersList) {
       managerSuggestedCustomersList.addEventListener("click", (event) => {
         const btn = event.target.closest("button[data-action='add-suggested']");
-        if (!btn || btn.disabled) return;
-        const key = btn.getAttribute("data-candidate-key") || "";
-        if (!key) return;
+        if (btn && !btn.disabled) {
+          const key = btn.getAttribute("data-candidate-key") || "";
+          if (!key) return;
         const customer = currentManagerSuggestedMap.get(key);
         if (!customer) return;
-        selectedCustomers.set(key, { ...customer, _key: key, reason: "" });
+        const submittingAgent = getSubmittingAgentForDate(currentPlanDateKey || selectedDateKey);
+        selectedCustomers.set(key, { ...customer, _key: key, reason: "", agent: submittingAgent });
+        logPlanAction("Suggested Customer Added", `${customer.customer} (${customer.code || "-"}) added from manager suggestion.`, {
+          dateKey: currentPlanDateKey || selectedDateKey,
+          targetAgent: submittingAgent || getContextAgentForDate(currentPlanDateKey || selectedDateKey)
+        });
+          renderSearchResults();
+          renderManagerSuggestedCustomers();
+          renderSelectedCustomers();
+          renderVisitPlanTrail();
+          return;
+        }
+        const removeBtn = event.target.closest("button[data-action='remove-suggested']");
+        if (!removeBtn || removeBtn.disabled) return;
+        const removeKey = removeBtn.getAttribute("data-candidate-key") || "";
+        if (!removeKey) return;
+        const removedCustomer = selectedCustomers.get(removeKey);
+        selectedCustomers.delete(removeKey);
+        if (removedCustomer) {
+          logPlanAction("Customer Removed", `${removedCustomer.customer || "-"} removed from plan from manager suggestion.`, {
+            dateKey: currentPlanDateKey || selectedDateKey,
+            targetAgent: removedCustomer.agent || getContextAgentForDate(currentPlanDateKey || selectedDateKey)
+          });
+        }
         renderSearchResults();
         renderManagerSuggestedCustomers();
         renderSelectedCustomers();
+        renderVisitPlanTrail();
       });
     }
 
@@ -1998,7 +2743,17 @@
         const btn = event.target.closest("button[data-action='remove']");
         if (!btn) return;
         const key = btn.getAttribute("data-key");
-        if (key) selectedCustomers.delete(key);
+        if (key) {
+          const removed = selectedCustomers.get(key);
+          selectedCustomers.delete(key);
+          if (removed) {
+            logPlanAction("Customer Removed", `${removed.customer} removed from plan.`, {
+              dateKey: currentPlanDateKey || selectedDateKey,
+              targetAgent: removed.agent || getContextAgentForDate(currentPlanDateKey || selectedDateKey)
+            });
+            renderVisitPlanTrail();
+          }
+        }
         renderSearchResults();
         renderManagerSuggestedCustomers();
         renderSelectedCustomers();
@@ -2010,7 +2765,28 @@
         const key = select.getAttribute("data-key");
         if (!key) return;
         const entry = selectedCustomers.get(key);
-        if (entry) entry.reason = select.value;
+        if (entry) {
+          entry.reason = select.value;
+          logPlanAction("Visit Reason Updated", `${entry.customer}: ${select.value || "-"}.`, {
+            dateKey: currentPlanDateKey || selectedDateKey,
+            targetAgent: entry.agent || getContextAgentForDate(currentPlanDateKey || selectedDateKey)
+          });
+          renderVisitPlanTrail();
+        }
+      });
+    }
+
+    if (dailyRemarkSaveBtn) {
+      dailyRemarkSaveBtn.addEventListener("click", () => {
+        const { actorRole } = getActorContext();
+        const dateKey = selectedDateKey;
+        const targetAgent = getContextAgentForDate(dateKey);
+        const remarkText = String(dailyRemarkInput?.value || "").trim();
+        if (!remarkText) return;
+        saveRemarkRecord(dateKey, targetAgent, actorRole, remarkText);
+        renderDailyRemark();
+        renderPlanTable(dateKey);
+        renderVisitPlanTrail();
       });
     }
 
@@ -2150,7 +2926,12 @@
 
     window.addEventListener("storage", (event) => {
       if (!event || event.storageArea !== localStorage) return;
-      if (event.key !== syncedAgentPlansKey && event.key !== managerSuggestionsKey) return;
+      if (event.key !== syncedAgentPlansKey
+        && event.key !== managerSuggestionsKey
+        && event.key !== visitPlanActionTrailKey
+        && event.key !== visitDayRemarksKey
+        && event.key !== activityTrailStorageKey
+        && event.key !== invoiceStorageKey) return;
       applySyncedAgentPlansToMemory();
       const selectedPlans = samplePlans[selectedDateKey] || [];
       if (!selectedPlans.length) {
@@ -2160,6 +2941,8 @@
       updateStats();
       renderCalendar();
       renderPlanTable(selectedDateKey);
+      renderDailyRemark();
+      renderVisitPlanTrail();
       if (planModalOverlay && !planModalOverlay.classList.contains("hidden")) {
         renderSearchResults();
         renderManagerSuggestedCustomers();
@@ -2170,6 +2953,8 @@
     updateStats();
     renderCalendar();
     renderPlanTable(selectedDateKey);
+    renderDailyRemark();
+    renderVisitPlanTrail();
     updateClock();
     setInterval(updateClock, 1000);
   })();

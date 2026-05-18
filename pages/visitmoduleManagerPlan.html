@@ -1,0 +1,1651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inebura Ops UI - Manager Visit Plan</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="../css/styles.css" />
+
+  <style>
+    body {
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    .visitMain {
+      max-width: none;
+      margin: 0;
+      padding: 24px 28px 40px;
+      width: 100%;
+    }
+
+    .visitHeader {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .visitHeader h1 {
+      font-size: 22px;
+      margin: 0;
+      color: #111827;
+    }
+
+    .visitHeader p {
+      margin: 4px 0 0;
+      color: #64748b;
+      font-size: 13px;
+    }
+
+    .visitClock {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+      background: #ffffff;
+      border: 1px solid #e2e8f4;
+      border-radius: 12px;
+      padding: 8px 12px;
+      min-width: 160px;
+    }
+
+    .visitClock span {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #94a3b8;
+    }
+
+    .visitClock strong {
+      font-size: 16px;
+      color: #111827;
+    }
+
+    .visitStats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .visitCard {
+      background: #ffffff;
+      border: 1px solid #e2e8f4;
+      border-radius: 14px;
+      padding: 14px 16px;
+      box-shadow: 0 10px 20px rgba(15, 23, 42, 0.04);
+    }
+
+    .visitCard span {
+      display: block;
+      color: #64748b;
+      font-size: 12px;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .visitCard strong {
+      font-size: 20px;
+      color: #111827;
+    }
+
+    .visitLayout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr);
+      gap: 16px;
+      align-items: start;
+      margin-bottom: 20px;
+    }
+
+    .visitSidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .calendarCard {
+      background: #ffffff;
+      border: 1px solid #e2e8f4;
+      border-radius: 18px;
+      padding: 16px;
+      width: 100%;
+      box-shadow: 0 12px 26px rgba(15, 23, 42, 0.06);
+    }
+
+    .calendarHeader {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .calendarTitle {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .calendarTitle strong {
+      font-size: 18px;
+      color: #111827;
+    }
+
+    .calendarTitle span {
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    .calendarActions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .calendarActions .form-select {
+      border-radius: 10px;
+      min-width: 160px;
+    }
+
+    .calendarNavBtn {
+      border: 1px solid #e2e8f4;
+      background: #f8fafc;
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .calendarWeekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      margin-bottom: 6px;
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #94a3b8;
+      letter-spacing: 0.04em;
+    }
+
+    .calendarGrid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+    }
+
+    .calendarDay {
+      border: 1px solid #dbe3f0;
+      border-radius: 12px;
+      padding: 8px;
+      min-height: 88px;
+      background: #f7f7f778;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      cursor: pointer;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .calendarDay:hover {
+      border-color: var(--brand-border);
+      box-shadow: 0 6px 16px rgba(92, 37, 141, 0.08);
+    }
+
+    .calendarDay.is-empty {
+      background: transparent;
+      border: 1px dashed #e2e8f4;
+      cursor: default;
+      box-shadow: none;
+    }
+
+    .calendarDay.selected {
+      border-color: var(--brand);
+      box-shadow: 0 0 0 2px rgba(92, 37, 141, 0.15);
+    }
+
+    .calendarDay.holiday {
+      background: #eff6ff;
+      border-color: #c7d2fe;
+    }
+
+    .calendarDay.onLeave {
+      background: #ffdcdc;
+      border-color: #991b1b;
+    }
+
+    .calendarDay.submittedApproved {
+      background: #dcfce7;
+      border-color: #86efac;
+    }
+
+    .calendarDay.submittedPending {
+      background: #fef9c3;
+      border-color: #f59e0b;
+    }
+
+    .calendarDay.rejected {
+      background: #fd8d28;
+      border-color: #ce5400;
+    }
+
+    .calendarDay.today:not(.submittedApproved):not(.submittedPending):not(.rejected):not(.onLeave):not(.holiday) {
+      border-color: #c4b5fd;
+      background: #ede9fe;
+      box-shadow: 0 0 0 2px rgba(196, 181, 253, 0.35);
+    }
+
+    .calendarDay.selected.today:not(.submittedApproved):not(.submittedPending):not(.rejected):not(.onLeave):not(.holiday) {
+      box-shadow: 0 0 0 2px rgba(92, 37, 141, 0.2), 0 0 0 4px rgba(196, 181, 253, 0.35);
+    }
+
+    .dayTop {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .dayNumber {
+      font-weight: 700;
+      font-size: 13px;
+      color: #111827;
+    }
+
+    .dayLabels {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .customerTag {
+      font-size: 10.5px;
+      font-weight: 600;
+      padding: 3px 6px;
+      border-radius: 8px;
+      background: var(--brand);
+      color: #ffffff;
+      border: 1px solid var(--brand-dark);
+      width: fit-content;
+      max-width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .holidayTag {
+      background: #dbeafe;
+      color: #1e40af;
+      border-color: #bfdbfe;
+    }
+
+    .onLeaveTag {
+      background: #c61d1d;
+      color: #ffc8c8;
+    }
+
+    .calendarLegend {
+      margin-top: 12px;
+      border: 1px solid #e2e8f4;
+      border-radius: 12px;
+      background: #ffffff;
+      padding: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 11px;
+      color: #475569;
+    }
+
+    .legendItem {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .legendDot {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+      border: 1px solid #dbe3f0;
+      display: inline-block;
+    }
+
+    .legendDot.approved { background: #dcfce7; border-color: #86efac; }
+    .legendDot.pending { background: #fef9c3; border-color: #f59e0b; }
+    .legendDot.rejected { background: #fd8d28; border-color: #ce5400; }
+    .legendDot.leave { background: #ffdcdc; border-color: #991b1b; }
+    .legendDot.holiday { background: #eff6ff; border-color: #c7d2fe; }
+    .legendDot.today { background: #ede9fe; border-color: #c4b5fd; }
+
+    .planCard {
+      background: #ffffff;
+      border: 1px solid #e2e8f4;
+      border-radius: 16px;
+      padding: 16px;
+      width: 100%;
+      box-shadow: 0 12px 24px rgba(15, 23, 42, 0.05);
+      overflow-x: auto;
+    }
+
+    .planHeader {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      gap: 10px;
+    }
+
+    .planHeader h2 {
+      margin: 0;
+      font-size: 16px;
+      color: #111827;
+    }
+
+    .statusBadge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+
+    .status-approved {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .status-pending {
+      background: #e0f2fe;
+      color: #0c4a6e;
+    }
+
+    .agentFilterBar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #e2e8f4;
+      border-radius: 10px;
+      padding: 8px 10px;
+      background: #f8fafc;
+    }
+
+    .agentFilterBar label {
+      margin: 0;
+      color: #475569;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .agentFilterBar select {
+      min-width: 180px;
+      border-radius: 10px;
+      border: 1px solid #dbe3f0;
+      font-size: 12px;
+    }
+
+    .sectionLabel {
+      margin: 10px 0 6px;
+      font-size: 12px;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      font-weight: 700;
+    }
+
+    .searchWrap {
+      position: relative;
+    }
+
+    .searchWrap .form-control {
+      border-radius: 10px;
+    }
+
+    .searchResults {
+      margin-top: 8px;
+      border: 1px solid #e2e8f4;
+      border-radius: 12px;
+      background: #ffffff;
+      max-height: 200px;
+      overflow: auto;
+      padding: 6px;
+    }
+
+    .searchItem {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 6px 8px;
+      border-radius: 10px;
+      border: none;
+      background: transparent;
+      width: 100%;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .searchItem + .searchItem {
+      margin-top: 4px;
+    }
+
+    .searchItem:hover {
+      background: #f8fafc;
+    }
+
+    .searchItemName {
+      font-size: 12px;
+      font-weight: 600;
+      color: #111827;
+      margin-bottom: 1px;
+    }
+
+    .searchItemCode {
+      font-size: 11px;
+      color: #64748b;
+    }
+
+    .withAgentBadge {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      background: #e2e8f0;
+      color: #334155;
+      border: 1px solid #cbd5e1;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      margin-top: 4px;
+    }
+
+    .planBtnSmall {
+      border: 1px solid var(--brand-border);
+      background: var(--brand-lighter);
+      color: var(--brand-dark);
+      border-radius: 8px;
+      padding: 4px 8px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .planTable {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+      margin-top: 10px;
+    }
+
+    .planTable th,
+    .planTable td {
+      padding: 10px 8px;
+      border-bottom: 1px dashed #e2e8f4;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .planTable th {
+      color: #64748b;
+      font-weight: 700;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .planReasonSelect,
+    .companionSelect {
+      width: 100%;
+      border: 1px solid #e2e8f4;
+      border-radius: 8px;
+      padding: 6px 8px;
+      font-size: 12px;
+      background: #ffffff;
+    }
+
+    .companionCell {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .companionBadge {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      background: #ede9fe;
+      color: #5b21b6;
+      border: 1px solid #c4b5fd;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      width: fit-content;
+    }
+
+    .removeRowBtn {
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      border: 1px solid #fecaca;
+      background: #fee2e2;
+      color: #991b1b;
+      font-weight: 700;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .tableMeta {
+      margin-top: 8px;
+      font-size: 11px;
+      color: #64748b;
+    }
+
+    .detailCard {
+      margin-top: 10px;
+      border: 1px solid #dbe3f0;
+      border-radius: 12px;
+      background: #f8fafc;
+      padding: 10px 12px;
+    }
+
+    .detailCard h3 {
+      margin: 0 0 8px;
+      font-size: 12px;
+      color: #1e293b;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .detailCard textarea {
+      width: 100%;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 12px;
+      resize: vertical;
+      min-height: 74px;
+      background: #ffffff;
+      color: #111827;
+    }
+
+    .detailCardActions {
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .detailHint {
+      font-size: 11px;
+      color: #64748b;
+    }
+
+    .trailTableWrap {
+      max-height: 260px;
+      overflow: auto;
+      border-left: 2px solid #dbe3f0;
+      padding-left: 12px;
+    }
+
+    .timelineItem {
+      position: relative;
+      background: #ffffff;
+      border: 1px solid #dbe3f0;
+      border-radius: 10px;
+      padding: 8px 10px;
+      margin-bottom: 8px;
+    }
+
+    .timelineItem::before {
+      content: "";
+      position: absolute;
+      left: -18px;
+      top: 12px;
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--brand);
+      border: 1px solid #ffffff;
+      box-shadow: 0 0 0 2px #dbe3f0;
+    }
+
+    .timelineItem.tone-new {
+      background: #f3e8ff;
+      border-color: #d8b4fe;
+    }
+
+    .timelineItem.tone-new::before {
+      background: #7e22ce;
+    }
+
+    .timelineItem.tone-approved {
+      background: #dcfce7;
+      border-color: #86efac;
+    }
+
+    .timelineItem.tone-approved::before {
+      background: #16a34a;
+    }
+
+    .timelineItem.tone-pending {
+      background: #fef9c3;
+      border-color: #fde047;
+    }
+
+    .timelineItem.tone-pending::before {
+      background: #ca8a04;
+    }
+
+    .timelineItem.tone-remark {
+      background: #e0f2fe;
+      border-color: #7dd3fc;
+    }
+
+    .timelineItem.tone-remark::before {
+      background: #0284c7;
+    }
+
+    .timelineMeta {
+      font-size: 10px;
+      color: #64748b;
+      margin-bottom: 4px;
+    }
+
+    .timelineAction {
+      font-size: 12px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 2px;
+    }
+
+    .timelineDetails {
+      font-size: 12px;
+      color: #334155;
+    }
+
+    .panelActions {
+      margin-top: 12px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .submitBtn {
+      background: var(--brand);
+      border-color: var(--brand-dark);
+      color: #ffffff;
+    }
+
+    .submitBtn:hover {
+      background: var(--brand-dark);
+      color: #ffffff;
+    }
+
+    .submitToast {
+      margin-top: 10px;
+      padding: 10px 12px;
+      border: 1px solid #86efac;
+      border-radius: 10px;
+      background: #dcfce7;
+      color: #166534;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .submitToast button {
+      border: none;
+      background: transparent;
+      color: #166534;
+      font-size: 14px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 1100px) {
+      .visitLayout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .visitHeader {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .visitStats {
+        grid-template-columns: repeat(1, minmax(0, 1fr));
+      }
+
+      .calendarActions {
+        flex-wrap: wrap;
+        justify-content: flex-start;
+      }
+
+      .calendarCard,
+      .planCard {
+        padding: 12px;
+      }
+
+      .calendarDay {
+        min-height: 76px;
+      }
+
+      .agentFilterBar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .agentFilterBar select {
+        width: 100%;
+      }
+
+      .planTable {
+        min-width: 700px;
+      }
+    }
+  </style>
+</head>
+<body data-root-path="../" data-relationship-name="Apollo" data-relationship-badge="AP" data-relationship-logo-src="assets/apollo-sharkfin-logo.jpeg">
+  <div data-shared-header></div>
+
+  <main class="visitMain">
+    <div class="visitHeader">
+      <div>
+        <h1>Plan your visits, assign companions, and submit to your supervisor</h1>
+        <p>Manager Visit Plan</p>
+      </div>
+      <div class="visitClock">
+        <span>Local Time</span>
+        <strong id="visitClock">--:--:-- --</strong>
+      </div>
+    </div>
+
+    <section class="visitStats">
+      <div class="visitCard">
+        <span>Visits Planned This Month</span>
+        <strong id="statVisitsPlanned">0</strong>
+      </div>
+      <div class="visitCard">
+        <span>Pending Submission to Supervisor</span>
+        <strong id="statPendingSubmission">0</strong>
+      </div>
+      <div class="visitCard">
+        <span>Approved by Supervisor</span>
+        <strong id="statApprovedBySupervisor">0</strong>
+      </div>
+    </section>
+
+    <div class="visitLayout">
+      <div class="visitPrimary">
+        <section class="calendarSection">
+          <div class="calendarCard">
+            <div class="calendarHeader">
+              <div class="calendarTitle">
+                <strong id="calendarMonth">Month</strong>
+                <span>Select a day to build your visit plan.</span>
+              </div>
+              <div class="calendarActions">
+                <select id="calendarViewSelect" class="form-select form-select-sm">
+                  <option value="month">Month view</option>
+                  <option value="week">Weekly view</option>
+                  <option value="workweek">Work week</option>
+                </select>
+                <button class="calendarNavBtn" type="button" id="prevMonthBtn" aria-label="Previous month">
+                  <i class="bi bi-chevron-left" aria-hidden="true"></i>
+                </button>
+                <button class="calendarNavBtn" type="button" id="nextMonthBtn" aria-label="Next month">
+                  <i class="bi bi-chevron-right" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+            <div class="calendarWeekdays" id="calendarWeekdays">
+              <div>Sun</div>
+              <div>Mon</div>
+              <div>Tue</div>
+              <div>Wed</div>
+              <div>Thu</div>
+              <div>Fri</div>
+              <div>Sat</div>
+            </div>
+            <div class="calendarGrid" id="calendarGrid"></div>
+          </div>
+          <div class="calendarLegend">
+            <span class="legendItem"><span class="legendDot approved"></span>Submitted + Approved</span>
+            <span class="legendItem"><span class="legendDot pending"></span>Submitted + Pending</span>
+            <span class="legendItem"><span class="legendDot rejected"></span>Rejected</span>
+            <span class="legendItem"><span class="legendDot leave"></span>On Leave</span>
+            <span class="legendItem"><span class="legendDot holiday"></span>Holiday</span>
+            <span class="legendItem"><span class="legendDot today"></span>Today</span>
+          </div>
+        </section>
+      </div>
+
+      <aside class="visitSidebar">
+        <section class="planSection">
+          <div class="planCard">
+            <div class="planHeader">
+              <div>
+                <h2 id="selectedDateLabel">-</h2>
+                <p style="margin:4px 0 0; color:#64748b; font-size:12px;">Manager plan builder</p>
+              </div>
+              <span id="planStatusBadge" class="statusBadge status-pending">Pending</span>
+            </div>
+
+            <div class="agentFilterBar">
+              <label for="agentCompanionFilter">Filter customers by agent visiting today</label>
+              <select id="agentCompanionFilter" class="form-select form-select-sm"></select>
+            </div>
+
+            <div class="sectionLabel">Add customers to your plan</div>
+            <div class="searchWrap">
+              <input id="customerSearchInput" class="form-control form-control-sm" type="text" placeholder="Search by customer name or code..." autocomplete="off" />
+            </div>
+            <div class="searchResults" id="customerSearchResults"></div>
+
+            <table class="planTable">
+              <thead>
+                <tr>
+                  <th>Customer Code</th>
+                  <th>Customer Name</th>
+                  <th>Visit Reason</th>
+                  <th>Companion Agent</th>
+                  <th>Remove</th>
+                </tr>
+              </thead>
+              <tbody id="managerPlanTableBody"></tbody>
+            </table>
+            <div class="tableMeta" id="planRowCountMeta">0 customers in today's plan</div>
+
+            <div class="detailCard">
+              <h3>Remarks</h3>
+              <textarea id="managerRemarkInput" rows="3" placeholder="Add a note for your supervisor..."></textarea>
+              <div class="detailCardActions">
+                <span class="detailHint" id="remarkMeta">Remarks scope: selected date.</span>
+                <button class="btn btn-sm btn-primary" type="button" id="addRemarkBtn">Add Remark</button>
+              </div>
+            </div>
+
+            <div class="detailCard">
+              <h3>Activity Trail</h3>
+              <div class="trailTableWrap" id="managerTrailBody"></div>
+            </div>
+
+            <div class="panelActions">
+              <button class="btn btn-outline-secondary btn-sm" type="button" id="saveDraftBtn">Save Draft</button>
+              <button class="btn btn-sm submitBtn" type="button" id="submitSupervisorBtn">Submit to Supervisor</button>
+            </div>
+
+            <div id="submitToast" class="submitToast hidden">
+              <span id="submitToastText">Plan submitted.</span>
+              <button type="button" id="dismissSubmitToast" aria-label="Dismiss">&times;</button>
+            </div>
+          </div>
+        </section>
+      </aside>
+    </div>
+  </main>
+
+  <script src="../scripts/shared-header.js"></script>
+  <script>
+    (() => {
+      const monthNames = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+      ];
+
+      const visitReasons = ["Collection follow up", "Invoice Submission", "BC", "TDS"];
+      const reportingAgents = [
+        "All Agents",
+        "Aditi Sharma",
+        "Abhishek Sharma",
+        "Palak Choudhary",
+        "Manish Kumar",
+        "Sakshi Sharma"
+      ];
+
+      const activeManager = { name: "Manish Kumar", supervisor: "Mukesh Mishra" };
+
+      const customerDirectory = [
+        { customer: "Apollo Pharmacy", code: "CUST-001", agent: "Aditi Sharma", manager: "Manish Kumar", kam: "Neha Kapoor", kas: "Arjun Rao" },
+        { customer: "BlueWave", code: "CUST-014", agent: "Manish Kumar", manager: "Manish Kumar", kam: "Riya Malhotra", kas: "Vikram Iyer" },
+        { customer: "Sunrise Pvt", code: "CUST-033", agent: "Palak Choudhary", manager: "Manish Kumar", kam: "Anil Thomas", kas: "Dev Patel" },
+        { customer: "Michelin Tyres", code: "CUST-089", agent: "Abhishek Sharma", manager: "Manish Kumar", kam: "Vikas Rao", kas: "Meera Joshi" },
+        { customer: "Motherson Wires", code: "CUST-090", agent: "Sakshi Sharma", manager: "Manish Kumar", kam: "Shreya Nair", kas: "Kunal Shah" },
+        { customer: "Tata Chemicals", code: "CUST-045", agent: "Aditi Sharma", manager: "Manish Kumar", kam: "Neha Kapoor", kas: "Arjun Rao" },
+        { customer: "Lupin Limited", code: "CUST-062", agent: "Abhishek Sharma", manager: "Manish Kumar", kam: "Vikas Rao", kas: "Meera Joshi" }
+      ];
+
+      // Demo roster for agent plans (not manager's own plan data).
+      const agentVisitsByDate = {
+        "2025-05-09": [
+          { agent: "Aditi Sharma", code: "CUST-001" },
+          { agent: "Aditi Sharma", code: "CUST-045" },
+          { agent: "Abhishek Sharma", code: "CUST-089" },
+          { agent: "Abhishek Sharma", code: "CUST-062" },
+          { agent: "Palak Choudhary", code: "CUST-033" }
+        ]
+      };
+
+      const storageKeys = {
+        planByDate: "ineburaManagerPlanByDate",
+        planStatus: "ineburaManagerPlanStatus",
+        remarks: "ineburaManagerPlanRemarks",
+        trail: "ineburaManagerPlanTrail"
+      };
+
+      const pad = (value) => String(value).padStart(2, "0");
+      const makeDateKey = (year, month, day) => `${year}-${pad(month + 1)}-${pad(day)}`;
+      const today = new Date();
+      const todayKey = makeDateKey(today.getFullYear(), today.getMonth(), today.getDate());
+
+      let currentYear = today.getFullYear();
+      let currentMonth = today.getMonth();
+      let selectedDateKey = todayKey;
+      let selectedAgentFilter = "All Agents";
+
+      const calendarGrid = document.getElementById("calendarGrid");
+      const calendarMonthEl = document.getElementById("calendarMonth");
+      const calendarViewSelect = document.getElementById("calendarViewSelect");
+      const calendarWeekdaysEl = document.getElementById("calendarWeekdays");
+      const clockEl = document.getElementById("visitClock");
+      const selectedDateLabelEl = document.getElementById("selectedDateLabel");
+      const planStatusBadge = document.getElementById("planStatusBadge");
+      const agentFilterEl = document.getElementById("agentCompanionFilter");
+      const customerSearchInput = document.getElementById("customerSearchInput");
+      const customerSearchResults = document.getElementById("customerSearchResults");
+      const managerPlanTableBody = document.getElementById("managerPlanTableBody");
+      const planRowCountMeta = document.getElementById("planRowCountMeta");
+      const managerRemarkInput = document.getElementById("managerRemarkInput");
+      const remarkMeta = document.getElementById("remarkMeta");
+      const addRemarkBtn = document.getElementById("addRemarkBtn");
+      const managerTrailBody = document.getElementById("managerTrailBody");
+      const saveDraftBtn = document.getElementById("saveDraftBtn");
+      const submitSupervisorBtn = document.getElementById("submitSupervisorBtn");
+      const submitToast = document.getElementById("submitToast");
+      const submitToastText = document.getElementById("submitToastText");
+      const dismissSubmitToast = document.getElementById("dismissSubmitToast");
+
+      const statVisitsPlanned = document.getElementById("statVisitsPlanned");
+      const statPendingSubmission = document.getElementById("statPendingSubmission");
+      const statApprovedBySupervisor = document.getElementById("statApprovedBySupervisor");
+
+      const normalizeText = (value) => String(value || "")
+        .toLowerCase()
+        .replace(/<[^>]*>/g, " ")
+        .replace(/[^a-z0-9]/g, "")
+        .trim();
+
+      const escapeHtml = (value) => String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/\"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+
+      const readJson = (key, fallback) => {
+        try {
+          const raw = localStorage.getItem(key);
+          if (!raw) return fallback;
+          const parsed = JSON.parse(raw);
+          return parsed == null ? fallback : parsed;
+        } catch (_) {
+          return fallback;
+        }
+      };
+
+      const saveJson = (key, value) => {
+        try {
+          localStorage.setItem(key, JSON.stringify(value));
+        } catch (_) {
+          // Ignore localStorage failures in prototype mode.
+        }
+      };
+
+      const ensureUserContext = () => {
+        const existingName = String(localStorage.getItem("activeUserName") || "").trim();
+        const existingRole = String(localStorage.getItem("activeUserRole") || "").trim().toLowerCase();
+        if (!existingName) localStorage.setItem("activeUserName", activeManager.name);
+        if (!existingRole) localStorage.setItem("activeUserRole", "manager");
+      };
+
+      ensureUserContext();
+
+      let managerPlanByDate = readJson(storageKeys.planByDate, {});
+      let managerPlanStatus = readJson(storageKeys.planStatus, {});
+      let managerPlanRemarks = readJson(storageKeys.remarks, {});
+      let managerPlanTrail = readJson(storageKeys.trail, []);
+
+      const getActorName = () => String(localStorage.getItem("activeUserName") || activeManager.name).trim() || activeManager.name;
+
+      const getRowsForDate = (dateKey) => {
+        const rows = managerPlanByDate[dateKey];
+        return Array.isArray(rows) ? rows : [];
+      };
+
+      const getRemarksForDate = (dateKey) => {
+        const remarks = managerPlanRemarks[dateKey];
+        return Array.isArray(remarks) ? remarks : [];
+      };
+
+      const persistState = () => {
+        saveJson(storageKeys.planByDate, managerPlanByDate);
+        saveJson(storageKeys.planStatus, managerPlanStatus);
+        saveJson(storageKeys.remarks, managerPlanRemarks);
+        saveJson(storageKeys.trail, managerPlanTrail);
+      };
+
+      const getDisplayStatus = (dateKey) => {
+        const value = String(managerPlanStatus[dateKey] || "").trim().toLowerCase();
+        if (value === "approved") return "Approved";
+        if (value === "submitted" || value === "submitted to supervisor") return "Submitted to Supervisor";
+        if (value === "rejected") return "Rejected";
+        if (value === "onleave" || value === "on leave") return "On Leave";
+        return "Pending";
+      };
+
+      const getStatusClassName = (displayStatus) => {
+        if (displayStatus === "Approved") return "status-approved";
+        return "status-pending";
+      };
+
+      const formatReadableDate = (dateKey) => {
+        const [year, month, day] = String(dateKey || "").split("-").map(Number);
+        if (!year || !month || !day) return "-";
+        const date = new Date(year, month - 1, day);
+        const weekday = date.toLocaleDateString("en-IN", { weekday: "long" });
+        const monthName = date.toLocaleDateString("en-IN", { month: "long" });
+        const suffix = (n) => {
+          if (n >= 11 && n <= 13) return "th";
+          const r = n % 10;
+          if (r === 1) return "st";
+          if (r === 2) return "nd";
+          if (r === 3) return "rd";
+          return "th";
+        };
+        return `${weekday}, ${day}${suffix(day)} ${monthName} ${year}`;
+      };
+
+      const formatTrailTime = (iso) => {
+        const parsed = Date.parse(String(iso || ""));
+        if (Number.isNaN(parsed)) return "-";
+        return new Date(parsed).toLocaleString("en-IN", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit"
+        });
+      };
+
+      const addTrailEntry = (action, details, tone = "tone-new", dateKey = selectedDateKey) => {
+        managerPlanTrail.unshift({
+          id: `trail:${Date.now()}:${Math.floor(Math.random() * 10000)}`,
+          at: new Date().toISOString(),
+          actorName: getActorName(),
+          dateKey,
+          action,
+          details,
+          tone
+        });
+        managerPlanTrail = managerPlanTrail.slice(0, 400);
+      };
+
+      const getDateKey = (date) => makeDateKey(date.getFullYear(), date.getMonth(), date.getDate());
+
+      const isHolidayDate = (dateKey) => {
+        if (!dateKey) return false;
+        const [year, month, day] = dateKey.split("-").map(Number);
+        const date = new Date(year, month - 1, day);
+        return date.getDay() === 0 || (date.getMonth() === 0 && date.getDate() === 26);
+      };
+
+      const getCustomersPlannedByAgentsForDate = (dateKey) => {
+        const roster = Array.isArray(agentVisitsByDate[dateKey]) ? agentVisitsByDate[dateKey] : [];
+        if (!roster.length) return [];
+        const allowedCodeByAgent = new Map();
+        roster.forEach((item) => {
+          if (!allowedCodeByAgent.has(item.agent)) allowedCodeByAgent.set(item.agent, new Set());
+          allowedCodeByAgent.get(item.agent).add(item.code);
+        });
+
+        return customerDirectory.filter((entry) => {
+          if (entry.manager !== activeManager.name) return false;
+          const byAgentCodes = allowedCodeByAgent.get(entry.agent);
+          return Boolean(byAgentCodes && byAgentCodes.has(entry.code));
+        });
+      };
+
+      const getFilteredCustomersForDate = (dateKey) => {
+        const base = getCustomersPlannedByAgentsForDate(dateKey);
+        if (selectedAgentFilter === "All Agents") return base;
+        return base.filter((item) => item.agent === selectedAgentFilter);
+      };
+
+      const getPlanSuggestionCandidates = (queryText) => {
+        const query = String(queryText || "").trim().toLowerCase();
+        const rows = getRowsForDate(selectedDateKey);
+        const selectedCodes = new Set(rows.map((item) => item.code));
+        return getFilteredCustomersForDate(selectedDateKey)
+          .filter((item) => !selectedCodes.has(item.code))
+          .filter((item) => {
+            if (!query) return true;
+            return item.customer.toLowerCase().includes(query) || item.code.toLowerCase().includes(query);
+          })
+          .slice(0, 30);
+      };
+
+      const updateClock = () => {
+        const now = new Date();
+        let hours = now.getHours();
+        const minutes = pad(now.getMinutes());
+        const seconds = pad(now.getSeconds());
+        const period = hours >= 12 ? "PM" : "AM";
+        hours = hours % 12;
+        hours = hours === 0 ? 12 : hours;
+        clockEl.textContent = `${pad(hours)}:${minutes}:${seconds} ${period}`;
+      };
+
+      const renderStats = () => {
+        const prefix = `${currentYear}-${pad(currentMonth + 1)}-`;
+        const monthDateKeys = Object.keys(managerPlanByDate).filter((key) => key.startsWith(prefix));
+
+        let visitsPlanned = 0;
+        let pendingSubmission = 0;
+        let approved = 0;
+
+        monthDateKeys.forEach((dateKey) => {
+          const rows = getRowsForDate(dateKey);
+          visitsPlanned += rows.length;
+          if (!rows.length) return;
+
+          const status = getDisplayStatus(dateKey);
+          if (status === "Approved") {
+            approved += 1;
+          } else if (status !== "Submitted to Supervisor") {
+            pendingSubmission += 1;
+          }
+        });
+
+        statVisitsPlanned.textContent = String(visitsPlanned);
+        statPendingSubmission.textContent = String(pendingSubmission);
+        statApprovedBySupervisor.textContent = String(approved);
+      };
+
+      const renderSearchResults = () => {
+        const query = customerSearchInput.value || "";
+        const suggestions = getPlanSuggestionCandidates(query);
+
+        if (!suggestions.length) {
+          customerSearchResults.innerHTML = `
+            <div class="searchItem" style="cursor:default;">
+              <span class="searchItemCode">No customers available for this date/filter.</span>
+            </div>
+          `;
+          return;
+        }
+
+        customerSearchResults.innerHTML = suggestions.map((item) => `
+          <div class="searchItem">
+            <div>
+              <div class="searchItemName">${escapeHtml(item.customer)}</div>
+              <div class="searchItemCode">${escapeHtml(item.code)}</div>
+              <span class="withAgentBadge">with ${escapeHtml(item.agent)}</span>
+            </div>
+            <button class="planBtnSmall" type="button" data-action="add" data-code="${escapeHtml(item.code)}">+ Add</button>
+          </div>
+        `).join("");
+      };
+
+      const renderPlanTable = () => {
+        const rows = getRowsForDate(selectedDateKey);
+
+        if (!rows.length) {
+          managerPlanTableBody.innerHTML = `
+            <tr>
+              <td colspan="5" style="color:#94a3b8;">No customers added yet. Use the search above to add customers to your plan.</td>
+            </tr>
+          `;
+          planRowCountMeta.textContent = "0 customers in today's plan";
+          return;
+        }
+
+        managerPlanTableBody.innerHTML = rows.map((row) => {
+          const reasonOptions = visitReasons.map((reason) => `
+            <option value="${escapeHtml(reason)}" ${row.reason === reason ? "selected" : ""}>${escapeHtml(reason)}</option>
+          `).join("");
+
+          const companionOptions = reportingAgents
+            .filter((agent) => agent !== "All Agents")
+            .map((agent) => `
+              <option value="${escapeHtml(agent)}" ${row.companionAgent === agent ? "selected" : ""}>${escapeHtml(agent)}</option>
+            `).join("");
+
+          return `
+            <tr>
+              <td>${escapeHtml(row.code)}</td>
+              <td>${escapeHtml(row.customer)}</td>
+              <td>
+                <select class="planReasonSelect" data-code="${escapeHtml(row.code)}" aria-label="Visit reason">
+                  <option value="">Select reason</option>
+                  ${reasonOptions}
+                </select>
+              </td>
+              <td>
+                <div class="companionCell">
+                  <span class="companionBadge" id="companionBadge-${escapeHtml(row.code)}">${escapeHtml(row.companionAgent || "-")}</span>
+                  <select class="companionSelect" data-code="${escapeHtml(row.code)}" aria-label="Companion agent">
+                    ${companionOptions}
+                  </select>
+                </div>
+              </td>
+              <td>
+                <button class="removeRowBtn" type="button" data-action="remove" data-code="${escapeHtml(row.code)}" aria-label="Remove row">&times;</button>
+              </td>
+            </tr>
+          `;
+        }).join("");
+
+        planRowCountMeta.textContent = `${rows.length} customer${rows.length === 1 ? "" : "s"} in today's plan`;
+      };
+
+      const renderRemarkMeta = () => {
+        const remarks = getRemarksForDate(selectedDateKey);
+        remarkMeta.textContent = `Remarks scope: ${formatReadableDate(selectedDateKey)} | ${remarks.length} remark(s)`;
+      };
+
+      const renderTrail = () => {
+        const rows = managerPlanTrail.filter((entry) => entry.dateKey === selectedDateKey);
+
+        if (!rows.length) {
+          managerTrailBody.innerHTML = `
+            <div class="timelineItem">
+              <div class="timelineDetails" style="color:#94a3b8;">No activity for this day yet.</div>
+            </div>
+          `;
+          return;
+        }
+
+        managerTrailBody.innerHTML = rows.map((entry) => `
+          <div class="timelineItem ${escapeHtml(entry.tone || "tone-new")}">
+            <div class="timelineMeta">${escapeHtml(formatTrailTime(entry.at))} | ${escapeHtml(entry.actorName || "-")}</div>
+            <div class="timelineAction">${escapeHtml(entry.action || "Update")}</div>
+            <div class="timelineDetails">${escapeHtml(entry.details || "")}</div>
+          </div>
+        `).join("");
+      };
+
+      const renderStatusHeader = () => {
+        selectedDateLabelEl.textContent = formatReadableDate(selectedDateKey);
+        const status = getDisplayStatus(selectedDateKey);
+        planStatusBadge.textContent = status;
+        planStatusBadge.classList.remove("status-approved", "status-pending");
+        planStatusBadge.classList.add(getStatusClassName(status));
+      };
+
+      const renderCalendar = () => {
+        const viewMode = calendarViewSelect.value;
+
+        let baseDate = new Date(currentYear, currentMonth, 1);
+        if (viewMode !== "month" && selectedDateKey) {
+          const [year, month, day] = selectedDateKey.split("-").map(Number);
+          baseDate = new Date(year, month - 1, day);
+        }
+
+        const weekdayLabels = viewMode === "workweek"
+          ? ["Mon", "Tue", "Wed", "Thu", "Fri"]
+          : ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+        calendarWeekdaysEl.innerHTML = weekdayLabels.map((label) => `<div>${label}</div>`).join("");
+        calendarWeekdaysEl.style.gridTemplateColumns = `repeat(${weekdayLabels.length}, 1fr)`;
+        calendarGrid.style.gridTemplateColumns = `repeat(${weekdayLabels.length}, 1fr)`;
+        calendarMonthEl.textContent = `${monthNames[baseDate.getMonth()]} ${baseDate.getFullYear()}`;
+        calendarGrid.innerHTML = "";
+
+        const renderDayCell = (dayDate) => {
+          const dateKey = makeDateKey(dayDate.getFullYear(), dayDate.getMonth(), dayDate.getDate());
+          const dayEl = document.createElement("div");
+          dayEl.className = "calendarDay";
+
+          if (dateKey === selectedDateKey) dayEl.classList.add("selected");
+          if (dateKey === todayKey) dayEl.classList.add("today");
+
+          const displayStatus = getDisplayStatus(dateKey);
+          const rows = getRowsForDate(dateKey);
+
+          const isHoliday = isHolidayDate(dateKey);
+          if (isHoliday) dayEl.classList.add("holiday");
+          if (displayStatus === "On Leave") dayEl.classList.add("onLeave");
+          if (displayStatus === "Rejected") dayEl.classList.add("rejected");
+          if (displayStatus === "Approved") dayEl.classList.add("submittedApproved");
+          if (displayStatus === "Submitted to Supervisor" || (displayStatus === "Pending" && rows.length > 0)) {
+            dayEl.classList.add("submittedPending");
+          }
+
+          dayEl.innerHTML = `
+            <div class="dayTop">
+              <span class="dayNumber">${dayDate.getDate()}</span>
+            </div>
+            <div class="dayLabels"></div>
+          `;
+
+          const labelWrap = dayEl.querySelector(".dayLabels");
+          if (isHoliday) {
+            const holidayTag = document.createElement("span");
+            holidayTag.className = "customerTag holidayTag";
+            holidayTag.textContent = dayDate.getDay() === 0 ? "Holiday" : "Republic Day";
+            labelWrap.appendChild(holidayTag);
+          }
+
+          if (displayStatus === "On Leave") {
+            const leaveTag = document.createElement("span");
+            leaveTag.className = "customerTag onLeaveTag";
+            leaveTag.textContent = "On Leave";
+            labelWrap.appendChild(leaveTag);
+          }
+
+          const maxTags = 2;
+          rows.slice(0, maxTags).forEach((row) => {
+            const tag = document.createElement("span");
+            tag.className = "customerTag";
+            tag.textContent = row.customer;
+            labelWrap.appendChild(tag);
+          });
+
+          if (rows.length > maxTags) {
+            const extra = document.createElement("span");
+            extra.className = "customerTag";
+            extra.textContent = `+${rows.length - maxTags} more`;
+            labelWrap.appendChild(extra);
+          }
+
+          dayEl.addEventListener("click", () => {
+            selectedDateKey = dateKey;
+            renderAll();
+          });
+
+          calendarGrid.appendChild(dayEl);
+        };
+
+        if (viewMode === "month") {
+          const firstDay = new Date(baseDate.getFullYear(), baseDate.getMonth(), 1);
+          const startOffset = firstDay.getDay();
+          const daysInMonth = new Date(baseDate.getFullYear(), baseDate.getMonth() + 1, 0).getDate();
+
+          for (let i = 0; i < startOffset; i += 1) {
+            const empty = document.createElement("div");
+            empty.className = "calendarDay is-empty";
+            calendarGrid.appendChild(empty);
+          }
+
+          for (let day = 1; day <= daysInMonth; day += 1) {
+            renderDayCell(new Date(baseDate.getFullYear(), baseDate.getMonth(), day));
+          }
+          return;
+        }
+
+        const weekStart = new Date(baseDate);
+        const currentDay = weekStart.getDay();
+        if (viewMode === "workweek") {
+          const diff = currentDay === 0 ? -6 : 1 - currentDay;
+          weekStart.setDate(weekStart.getDate() + diff);
+        } else {
+          weekStart.setDate(weekStart.getDate() - currentDay);
+        }
+
+        const totalDays = viewMode === "workweek" ? 5 : 7;
+        for (let i = 0; i < totalDays; i += 1) {
+          const date = new Date(weekStart);
+          date.setDate(weekStart.getDate() + i);
+          renderDayCell(date);
+        }
+      };
+
+      const renderAgentFilter = () => {
+        agentFilterEl.innerHTML = reportingAgents
+          .map((name) => `<option value="${escapeHtml(name)}" ${name === selectedAgentFilter ? "selected" : ""}>${escapeHtml(name)}</option>`)
+          .join("");
+      };
+
+      const saveDraft = () => {
+        if (submitToast) submitToast.classList.add("hidden");
+        persistState();
+        addTrailEntry("Draft Saved", "Current plan saved as draft.", "tone-pending", selectedDateKey);
+        persistState();
+        renderAll();
+      };
+
+      const submitPlanToSupervisor = () => {
+        const rows = getRowsForDate(selectedDateKey);
+        if (!rows.length) {
+          addTrailEntry("Submission Skipped", "Add at least one customer before submission.", "tone-pending", selectedDateKey);
+          persistState();
+          renderAll();
+          return;
+        }
+
+        managerPlanStatus[selectedDateKey] = "Submitted to Supervisor";
+        addTrailEntry(
+          "Plan Submitted",
+          `Plan submitted to ${activeManager.supervisor} (Supervisor).`,
+          "tone-approved",
+          selectedDateKey
+        );
+
+        submitToastText.textContent = `Plan submitted to ${activeManager.supervisor} (Supervisor)`;
+        submitToast.classList.remove("hidden");
+
+        persistState();
+        renderAll();
+      };
+
+      const updateManagerNavLinkVisibility = () => {
+        const role = String(localStorage.getItem("activeUserRole") || "").trim().toLowerCase();
+        const links = document.querySelectorAll('[data-module="visit-review"]');
+        links.forEach((link) => {
+          if (!(link instanceof HTMLElement)) return;
+          if (role !== "manager") {
+            link.style.display = "none";
+            return;
+          }
+          link.style.display = "";
+          link.textContent = "Manager Visit Plan";
+          link.setAttribute("href", "visitmoduleManagerPlan.html");
+          link.setAttribute("data-module", "visit-manager-plan");
+        });
+      };
+
+      const renderAll = () => {
+        renderStatusHeader();
+        renderCalendar();
+        renderStats();
+        renderSearchResults();
+        renderPlanTable();
+        renderRemarkMeta();
+        renderTrail();
+      };
+
+      customerSearchResults.addEventListener("click", (event) => {
+        const addBtn = event.target.closest('button[data-action="add"]');
+        if (!addBtn) return;
+
+        const code = String(addBtn.getAttribute("data-code") || "").trim();
+        if (!code) return;
+
+        const candidate = getFilteredCustomersForDate(selectedDateKey).find((item) => item.code === code);
+        if (!candidate) return;
+
+        const existingRows = getRowsForDate(selectedDateKey);
+        if (existingRows.some((item) => item.code === candidate.code)) return;
+
+        const defaultCompanion = selectedAgentFilter === "All Agents" ? candidate.agent : selectedAgentFilter;
+        const nextRow = {
+          code: candidate.code,
+          customer: candidate.customer,
+          agent: candidate.agent,
+          reason: "",
+          companionAgent: defaultCompanion
+        };
+
+        managerPlanByDate[selectedDateKey] = existingRows.concat(nextRow);
+        addTrailEntry("Customer Added", `${candidate.customer} (${candidate.code}) added to plan.`, "tone-new", selectedDateKey);
+        persistState();
+        renderAll();
+      });
+
+      managerPlanTableBody.addEventListener("click", (event) => {
+        const removeBtn = event.target.closest('button[data-action="remove"]');
+        if (!removeBtn) return;
+
+        const code = String(removeBtn.getAttribute("data-code") || "").trim();
+        if (!code) return;
+
+        const rows = getRowsForDate(selectedDateKey);
+        const removed = rows.find((item) => item.code === code);
+        managerPlanByDate[selectedDateKey] = rows.filter((item) => item.code !== code);
+
+        if (removed) {
+          addTrailEntry("Customer Removed", `${removed.customer} (${removed.code}) removed from plan.`, "tone-pending", selectedDateKey);
+        }
+
+        persistState();
+        renderAll();
+      });
+
+      managerPlanTableBody.addEventListener("change", (event) => {
+        const reasonSelect = event.target.closest(".planReasonSelect");
+        const companionSelect = event.target.closest(".companionSelect");
+        if (!reasonSelect && !companionSelect) return;
+
+        const code = String((reasonSelect || companionSelect).getAttribute("data-code") || "").trim();
+        if (!code) return;
+
+        const rows = getRowsForDate(selectedDateKey).map((row) => ({ ...row }));
+        const target = rows.find((row) => row.code === code);
+        if (!target) return;
+
+        if (reasonSelect) {
+          const previous = target.reason;
+          target.reason = reasonSelect.value;
+          if (previous !== target.reason) {
+            addTrailEntry(
+              "Reason Changed",
+              `${target.customer} reason changed to ${target.reason || "(empty)"}.`,
+              "tone-pending",
+              selectedDateKey
+            );
+          }
+        }
+
+        if (companionSelect) {
+          const previous = target.companionAgent;
+          target.companionAgent = companionSelect.value;
+          if (previous !== target.companionAgent) {
+            addTrailEntry(
+              "Companion Changed",
+              `${target.customer} companion set to ${target.companionAgent}.`,
+              "tone-pending",
+              selectedDateKey
+            );
+          }
+        }
+
+        managerPlanByDate[selectedDateKey] = rows;
+        persistState();
+        renderAll();
+      });
+
+      customerSearchInput.addEventListener("input", renderSearchResults);
+
+      agentFilterEl.addEventListener("change", () => {
+        selectedAgentFilter = agentFilterEl.value;
+        renderSearchResults();
+      });
+
+      addRemarkBtn.addEventListener("click", () => {
+        const remark = String(managerRemarkInput.value || "").trim();
+        if (!remark) return;
+
+        const remarks = getRemarksForDate(selectedDateKey).slice();
+        remarks.push({
+          id: `remark:${Date.now()}`,
+          at: new Date().toISOString(),
+          text: remark,
+          actorName: getActorName()
+        });
+        managerPlanRemarks[selectedDateKey] = remarks;
+
+        addTrailEntry("Remark Added", remark, "tone-remark", selectedDateKey);
+
+        managerRemarkInput.value = "";
+        persistState();
+        renderAll();
+      });
+
+      saveDraftBtn.addEventListener("click", saveDraft);
+      submitSupervisorBtn.addEventListener("click", submitPlanToSupervisor);
+      dismissSubmitToast.addEventListener("click", () => submitToast.classList.add("hidden"));
+
+      calendarViewSelect.addEventListener("change", renderCalendar);
+
+      document.getElementById("prevMonthBtn").addEventListener("click", () => {
+        currentMonth -= 1;
+        if (currentMonth < 0) {
+          currentMonth = 11;
+          currentYear -= 1;
+        }
+        selectedDateKey = makeDateKey(currentYear, currentMonth, 1);
+        renderAll();
+      });
+
+      document.getElementById("nextMonthBtn").addEventListener("click", () => {
+        currentMonth += 1;
+        if (currentMonth > 11) {
+          currentMonth = 0;
+          currentYear += 1;
+        }
+        selectedDateKey = makeDateKey(currentYear, currentMonth, 1);
+        renderAll();
+      });
+
+      window.addEventListener("storage", (event) => {
+        if (!event || event.storageArea !== localStorage) return;
+        if (!Object.values(storageKeys).includes(event.key)) return;
+        managerPlanByDate = readJson(storageKeys.planByDate, {});
+        managerPlanStatus = readJson(storageKeys.planStatus, {});
+        managerPlanRemarks = readJson(storageKeys.remarks, {});
+        managerPlanTrail = readJson(storageKeys.trail, []);
+        renderAll();
+      });
+
+      updateManagerNavLinkVisibility();
+      renderAgentFilter();
+      updateClock();
+      setInterval(updateClock, 1000);
+      renderAll();
+    })();
+  </script>
+</body>
+</html>
