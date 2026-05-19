@@ -422,6 +422,26 @@
       right: 0px;
     }
 
+    .agentBadge.hasManagerTagAlong::before {
+      content: "\F4D9";
+      font-family: "bootstrap-icons";
+      position: absolute;
+      width: 13px;
+      height: 13px;
+      border-radius: 999px;
+      background: #2563eb;
+      color: #ffffff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8px;
+      line-height: 1;
+      top: -4px;
+      right: -4px;
+      border: 1px solid #ffffff;
+      box-shadow: 0 2px 4px rgba(15, 23, 42, 0.18);
+    }
+
     .agentSelectCard {
       width: 100%;
       border: 1px solid #e2e8f4;
@@ -596,6 +616,72 @@
       color: #ffffff;
       border: 1px solid var(--brand-dark);
       width: fit-content;
+    }
+
+    .customerTag.hasManagerTagAlong {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #1d4ed8;
+      border-color: #1e40af;
+    }
+
+    .managerTagAlongIcon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      line-height: 1;
+    }
+
+    .planStateBadge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      width: fit-content;
+      border-radius: 999px;
+      padding: 2px 7px;
+      font-size: 9.5px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+
+    .planStateBadge.draft {
+      background: #fff7ed;
+      border-color: #fed7aa;
+      color: #c2410c;
+    }
+
+    .planStateBadge.submitted {
+      background: #ecfdf5;
+      border-color: #86efac;
+      color: #166534;
+    }
+
+    .selectedDateTitle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .tagAlongCheck {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10.5px;
+      font-weight: 700;
+      color: #1d4ed8;
+      margin-left: 6px;
+      white-space: nowrap;
+    }
+
+    .tagAlongCheck input {
+      accent-color: #2563eb;
     }
 
     .holidayTag {
@@ -1747,7 +1833,7 @@
         <div class="planCard">
           <div class="planHeader">
             <div>
-              <h2>Review plan for <span id="selectedDateLabel">-</span></h2>
+              <h2 class="selectedDateTitle">Review plan for <span id="selectedDateLabel">-</span> <span id="selectedPlanStateBadge"></span></h2>
               <p id="reviewAgentLabel" style="margin:4px 0 0; color:#64748b; font-size:12px;">Select an agent to review their plan.</p>
             </div>
             <div class="planHeaderActions">
@@ -2028,6 +2114,7 @@
     const sampleLabels = {};
     const seededMonths = new Set();
     const planStateByDate = {};
+    const planStateByDateAgent = {};
 
     const seedPlansForMonth = (year, month) => {
       const monthKey = `${year}-${pad(month + 1)}`;
@@ -2040,6 +2127,7 @@
     const calendarGrid = document.getElementById("calendarGrid");
     const calendarMonthEl = document.getElementById("calendarMonth");
     const selectedDateLabel = document.getElementById("selectedDateLabel");
+    const selectedPlanStateBadge = document.getElementById("selectedPlanStateBadge");
     const planTableBody = document.getElementById("planTableBody");
     const clockEl = document.getElementById("visitClock");
     const statOnTime = document.getElementById("statOnTime");
@@ -2273,7 +2361,11 @@
 
     const logPlanAction = (actionType, details, opts = {}) => {
       const allowedPlanTrailActions = new Set([
-        "Plan Status Updated"
+        "Plan Status Updated",
+        "Suggestions Saved",
+        "Manager Tag Along Added",
+        "Manager Tag Along Changed",
+        "Manager Tag Along Removed"
       ]);
       if (!allowedPlanTrailActions.has(String(actionType || "").trim())) return;
       const { actorName, actorRole } = getActorContext();
@@ -2387,9 +2479,37 @@
         .filter((entry) => !agentKey || normalizeText(entry?.targetAgent || "") === agentKey)
         .filter((entry) => {
           const actionType = String(entry?.actionType || "").trim();
-          return actionType === "Plan Status Updated" || actionType === "Review Submitted";
+          return actionType === "Plan Status Updated"
+            || actionType === "Suggestions Saved"
+            || actionType === "Review Submitted"
+            || actionType.startsWith("Manager Tag Along");
         })
         .map((entry) => {
+          const actionType = String(entry?.actionType || "").trim();
+          if (actionType === "Suggestions Saved") {
+            return {
+              kind: "suggestion",
+              status: "Manager suggested customer",
+              details: String(entry?.details || "").trim(),
+              remark: String(entry?.remark || "").trim(),
+              customerChanges: Array.isArray(entry?.customerChanges) ? entry.customerChanges : [],
+              at: entry.at,
+              actorName: entry.actorName,
+              actorRole: entry.actorRole
+            };
+          }
+          if (actionType.startsWith("Manager Tag Along")) {
+            return {
+              kind: "tag-along",
+              status: actionType,
+              details: String(entry?.details || "").trim(),
+              remark: String(entry?.remark || "").trim(),
+              customerChanges: [],
+              at: entry.at,
+              actorName: entry.actorName,
+              actorRole: entry.actorRole
+            };
+          }
           const parsedStatus = normalizePlanStatus(entry?.planStatus || entry?.details || "");
           if (!parsedStatus) return null;
           return {
@@ -2419,6 +2539,8 @@
 
       const getTrailToneClass = (entry) => {
         if (entry?.kind === "remark") return "tone-remark";
+        if (entry?.kind === "suggestion") return "tone-new";
+        if (entry?.kind === "tag-along") return "tone-approved";
         const statusKey = normalizeText(entry?.status || "");
         if (statusKey === "newplansubmitted" || statusKey === "updatedplan") return "tone-new";
         if (statusKey === "approved") return "tone-approved";
@@ -2475,6 +2597,10 @@
                 ? `<div class="timelineAction">${entry.status}</div>`
                 : `<div class="timelineAction">Plan status: ${entry.status}</div>`
               }<div class="timelineDetails">Remark: ${escapeHtml(entry.remark || "")}</div>${renderCustomerPills(entry)}`
+            : entry.kind === "suggestion"
+              ? `<div class="timelineAction">${escapeHtml(entry.status)}</div><div class="timelineDetails">${escapeHtml(entry.details || "")}</div>${renderCustomerPills(entry)}`
+            : entry.kind === "tag-along"
+              ? `<div class="timelineAction">${escapeHtml(entry.status)}</div><div class="timelineDetails">${escapeHtml(entry.details || "")}</div>`
             : `<div class="timelineDetails">Remark: ${escapeHtml(entry.remark || "")}</div>`
           }
         </div>
@@ -2519,11 +2645,15 @@
         const leaveReason = String(leaveReasonsByDate[dateKey] || "");
         const officeReason = String(officeReasonsByDate[dateKey] || "");
         const shortfallReasonText = String(shortfallReasonsByDate[dateKey] || "");
-        if (!plans.length && !labels.length && !planState && !leaveReason && !officeReason && !shortfallReasonText) return;
+        const agentPlanStateMap = planStateByDateAgent[dateKey] && typeof planStateByDateAgent[dateKey] === "object"
+          ? { ...planStateByDateAgent[dateKey] }
+          : {};
+        if (!plans.length && !labels.length && !planState && !Object.keys(agentPlanStateMap).length && !leaveReason && !officeReason && !shortfallReasonText) return;
         byDate[dateKey] = {
           plans,
           labels,
           planState,
+          planStateByAgent: agentPlanStateMap,
           leaveReason,
           officeReason,
           shortfallReason: shortfallReasonText
@@ -2567,6 +2697,9 @@
           }
           if (Array.isArray(entry?.labels)) sampleLabels[dateKey] = cloneLabelList(entry.labels);
           if (typeof entry?.planState === "string" && entry.planState) planStateByDate[dateKey] = entry.planState;
+          if (entry?.planStateByAgent && typeof entry.planStateByAgent === "object") {
+            planStateByDateAgent[dateKey] = { ...entry.planStateByAgent };
+          }
           const leaveReason = String(entry?.leaveReason || "").trim();
           const officeReason = String(entry?.officeReason || "").trim();
           const shortfallReasonText = String(entry?.shortfallReason || "").trim();
@@ -2579,6 +2712,7 @@
       Object.keys(samplePlans).forEach((dateKey) => delete samplePlans[dateKey]);
       Object.keys(sampleLabels).forEach((dateKey) => delete sampleLabels[dateKey]);
       Object.keys(planStateByDate).forEach((dateKey) => delete planStateByDate[dateKey]);
+      Object.keys(planStateByDateAgent).forEach((dateKey) => delete planStateByDateAgent[dateKey]);
       Object.keys(leaveReasonsByDate).forEach((dateKey) => delete leaveReasonsByDate[dateKey]);
       Object.keys(officeReasonsByDate).forEach((dateKey) => delete officeReasonsByDate[dateKey]);
       Object.keys(shortfallReasonsByDate).forEach((dateKey) => delete shortfallReasonsByDate[dateKey]);
@@ -2594,6 +2728,9 @@
         }
         if (typeof entry?.planState === "string" && entry.planState) {
           planStateByDate[dateKey] = entry.planState;
+        }
+        if (entry?.planStateByAgent && typeof entry.planStateByAgent === "object") {
+          planStateByDateAgent[dateKey] = { ...entry.planStateByAgent };
         }
         const leaveReason = String(entry?.leaveReason || "").trim();
         const officeReason = String(entry?.officeReason || "").trim();
@@ -2662,7 +2799,14 @@
           const code = String(item?.code || "").trim();
           const key = normalizeText(customer) || normalizeText(code);
           if (!key) return;
-          map.set(key, { customer, code, suggestionId: entry.id || "" });
+          map.set(key, {
+            customer,
+            code,
+            suggestionId: entry.id || "",
+            managerTagAlong: Boolean(item?.managerTagAlong),
+            tagAlongManager: String(item?.tagAlongManager || "").trim(),
+            tagAlongSource: String(item?.tagAlongSource || "").trim()
+          });
         });
       });
       return map;
@@ -2868,6 +3012,49 @@
       return list.filter((plan) => normalizeText(plan?.agent || "") === target);
     };
 
+    const getPlanStateAgentKey = (agentName) => normalizeText(agentName || "");
+
+    const getPlanSubmissionState = (dateKey, agentName) => {
+      const dateMap = planStateByDateAgent[dateKey] && typeof planStateByDateAgent[dateKey] === "object"
+        ? planStateByDateAgent[dateKey]
+        : {};
+      const agentKey = getPlanStateAgentKey(agentName);
+      const state = String(agentKey ? dateMap[agentKey] || "" : "").trim().toLowerCase();
+      return state || String(planStateByDate[dateKey] || "").trim().toLowerCase();
+    };
+
+    const setPlanSubmissionState = (dateKey, agentName, state) => {
+      const normalizedState = String(state || "").trim().toLowerCase();
+      const agentKey = getPlanStateAgentKey(agentName);
+      if (!dateKey || !normalizedState) return;
+      if (!planStateByDateAgent[dateKey] || typeof planStateByDateAgent[dateKey] !== "object") {
+        planStateByDateAgent[dateKey] = {};
+      }
+      if (agentKey) planStateByDateAgent[dateKey][agentKey] = normalizedState;
+      planStateByDate[dateKey] = normalizedState;
+    };
+
+    const getPlanStateBadgeMarkup = (state) => {
+      const normalized = String(state || "").trim().toLowerCase();
+      if (!normalized) return "";
+      const label = normalized === "submitted" ? "Submitted" : normalized === "draft" ? "Draft" : "";
+      if (!label) return "";
+      const icon = normalized === "submitted" ? "bi-send-check-fill" : "bi-pencil-square";
+      return `<span class="planStateBadge ${normalized}" title="Plan state: ${label}"><i class="bi ${icon}" aria-hidden="true"></i>${label}</span>`;
+    };
+
+    const renderSelectedPlanStateBadge = () => {
+      if (!selectedPlanStateBadge) return;
+      const state = activeAgentName ? getPlanSubmissionState(selectedDateKey, activeAgentName) : "";
+      selectedPlanStateBadge.innerHTML = getPlanStateBadgeMarkup(state);
+    };
+
+    const hasManagerTagAlong = (item) => Boolean(item && item.managerTagAlong);
+
+    const managerTagAlongIconMarkup = () => `<span class="managerTagAlongIcon" title="Manager tagging along"><i class="bi bi-person-check-fill" aria-hidden="true"></i></span>`;
+
+    const hasManagerTagAlongForPlans = (plans) => (Array.isArray(plans) ? plans : []).some((plan) => hasManagerTagAlong(plan));
+
     const getSuggestionsForDate = (dateKey) => {
       const all = readJson(managerSuggestionsKey, []);
       if (!Array.isArray(all)) return [];
@@ -2954,6 +3141,60 @@
       return normalizeText(code) || normalizeText(customer);
     };
 
+    const clearStoredManagerTagAlongForDate = (dateKey, managerName, suggestionsList = null, agentName = "") => {
+      const managerNorm = normalizeText(managerName);
+      const agentNorm = normalizeText(agentName);
+      const plans = Array.isArray(samplePlans[dateKey]) ? samplePlans[dateKey] : [];
+      plans.forEach((plan) => {
+        if (agentNorm && normalizeText(plan?.agent || "") !== agentNorm) return;
+        const planManagerNorm = normalizeText(plan?.tagAlongManager || managerName);
+        if (!managerNorm || planManagerNorm === managerNorm) {
+          delete plan.managerTagAlong;
+          delete plan.tagAlongManager;
+          delete plan.tagAlongSource;
+        }
+      });
+      const store = Array.isArray(suggestionsList) ? suggestionsList : getSuggestionsStore();
+      store.forEach((entry) => {
+        if (String(entry?.targetDate || "") !== dateKey) return;
+        if (agentNorm && normalizeText(entry?.agentName || "") !== agentNorm) return;
+        const customers = Array.isArray(entry?.customers) ? entry.customers : [];
+        customers.forEach((item) => {
+          const itemManagerNorm = normalizeText(item?.tagAlongManager || entry?.createdBy || managerName);
+          if (!managerNorm || itemManagerNorm === managerNorm) {
+            delete item.managerTagAlong;
+            delete item.tagAlongManager;
+            delete item.tagAlongSource;
+          }
+        });
+      });
+      return store;
+    };
+
+    const getStoredManagerTagAlongForDate = (dateKey, managerName, agentName = "") => {
+      const managerNorm = normalizeText(managerName);
+      const agentNorm = normalizeText(agentName);
+      const map = new Map();
+      (Array.isArray(samplePlans[dateKey]) ? samplePlans[dateKey] : [])
+        .filter((plan) => (!agentNorm || normalizeText(plan?.agent || "") === agentNorm)
+          && hasManagerTagAlong(plan)
+          && (!managerNorm || normalizeText(plan?.tagAlongManager || managerName) === managerNorm))
+        .forEach((plan) => {
+          const draft = makeManagerTagAlongDraft(plan, "existing-plan");
+          if (draft.key) map.set(getManagerTagAlongSelectionKey(draft.source, draft.key), draft);
+        });
+      getSuggestionsStore()
+        .filter((entry) => String(entry?.targetDate || "") === dateKey)
+        .filter((entry) => !agentNorm || normalizeText(entry?.agentName || "") === agentNorm)
+        .flatMap((entry) => Array.isArray(entry?.customers) ? entry.customers : [])
+        .filter((item) => hasManagerTagAlong(item) && (!managerNorm || normalizeText(item?.tagAlongManager || managerName) === managerNorm))
+        .forEach((item) => {
+          const draft = makeManagerTagAlongDraft(item, "manager-suggestion");
+          if (draft.key) map.set(getManagerTagAlongSelectionKey(draft.source, draft.key), draft);
+        });
+      return map;
+    };
+
     const getAgentsForDate = () => getAllAgentsList();
 
     const getRemarkForPlans = (plans) => {
@@ -2971,6 +3212,7 @@
         reviewError.textContent = "";
         reviewError.classList.add("hidden");
       }
+      hydrateSelectedManagerTagAlong();
       renderDailyRemark();
       renderVisitPlanTrail();
       renderPlanCustomerAdjustList();
@@ -2993,6 +3235,8 @@
     const resetSuggestionDraft = () => {
       selectedSuggestionCustomers = new Map();
       selectedRemovedPlanCustomers = new Map();
+      selectedManagerTagAlongMap = new Map();
+      managerTagAlongDirty = false;
       if (suggestionCustomerInput) suggestionCustomerInput.value = "";
       if (suggestionCustomerClear) suggestionCustomerClear.classList.remove("visible");
       if (suggestionCustomerResults) {
@@ -3003,6 +3247,52 @@
       renderPlanCustomerAdjustList();
       renderSuggestionCustomerOptions("", false);
       updateReviewActionsState();
+    };
+
+    const getManagerTagAlongManagerName = () => String(localStorage.getItem("activeUserName") || "Manager").trim() || "Manager";
+
+    const getManagerTagAlongSelectionKey = (source, key) => `${source}::${key}`;
+
+    const makeManagerTagAlongDraft = (item, source) => ({
+      key: String(item?.key || getPlanCustomerKey(item) || "").trim(),
+      customer: String(item?.customer || "").trim(),
+      code: String(item?.code || "").trim(),
+      source,
+      tagAlongManager: getManagerTagAlongManagerName()
+    });
+
+    const setManagerTagAlongDraft = (item, source) => {
+      const next = makeManagerTagAlongDraft(item, source);
+      if (!next.key) return;
+      const selectionKey = getManagerTagAlongSelectionKey(next.source, next.key);
+      if (selectedManagerTagAlongMap.has(selectionKey)) {
+        selectedManagerTagAlongMap.delete(selectionKey);
+      } else {
+        selectedManagerTagAlongMap.set(selectionKey, next);
+      }
+      managerTagAlongDirty = true;
+      renderSuggestionSelected();
+      renderPlanCustomerAdjustList();
+      updateReviewActionsState();
+    };
+
+    const hydrateSelectedManagerTagAlong = () => {
+      selectedManagerTagAlongMap = new Map();
+      managerTagAlongDirty = false;
+      if (!activeAgentName || !selectedDateKey) return;
+      getPlansForAgent(selectedDateKey, activeAgentName)
+        .filter((plan) => hasManagerTagAlong(plan))
+        .forEach((plan) => {
+          const draft = makeManagerTagAlongDraft(plan, "existing-plan");
+          if (draft.key) selectedManagerTagAlongMap.set(getManagerTagAlongSelectionKey(draft.source, draft.key), draft);
+        });
+      getSuggestionsForAgentDate(activeAgentName, selectedDateKey)
+        .flatMap((entry) => Array.isArray(entry?.customers) ? entry.customers : [])
+        .filter((item) => hasManagerTagAlong(item))
+        .forEach((item) => {
+          const draft = makeManagerTagAlongDraft(item, "manager-suggestion");
+          if (draft.key) selectedManagerTagAlongMap.set(getManagerTagAlongSelectionKey(draft.source, draft.key), draft);
+        });
     };
 
     const syncSuggestionTargetDate = () => {
@@ -3025,9 +3315,10 @@
         const plans = getPlansForAgent(selectedDateKey, agent);
         const statusClass = getStatusClass(getStatusForPlans(plans));
         const needsAction = !statusClass && hasManagerActionFlag(plans);
+        const hasTagAlong = hasManagerTagAlongForPlans(plans);
         const isActive = agent === activeAgentName;
         return `
-          <button class="agentBadge agentBadgeBtn ${statusClass} ${needsAction ? "needsAction" : ""} ${isActive ? "isActive" : ""}" type="button" data-agent="${agent}" title="${agent}">
+          <button class="agentBadge agentBadgeBtn ${statusClass} ${needsAction ? "needsAction" : ""} ${hasTagAlong ? "hasManagerTagAlong" : ""} ${isActive ? "isActive" : ""}" type="button" data-agent="${agent}" title="${hasTagAlong ? `${agent} • Manager tagging along` : agent}">
             ${getInitials(agent)}
           </button>
         `;
@@ -3128,13 +3419,14 @@
       const plans = hasAgent ? getPlansForAgent(selectedDateKey, activeAgentName) : [];
       const hasPlanRows = plans.length > 0;
       const hasSuggestions = selectedSuggestionCustomers.size > 0 || selectedRemovedPlanCustomers.size > 0;
+      const hasTagAlongChange = managerTagAlongDirty;
       const hasDecision = Boolean(String(pendingReviewStatus || "").trim());
       const status = pendingReviewStatus || "";
       const isNonWorkingDay = isNonWorkingDate(selectedDateKey);
       const areControlsDisabled = !hasAgent || isNonWorkingDay;
       const canSubmit = hasAgent
         && !isNonWorkingDay
-        && ((hasPlanRows && hasDecision) || hasSuggestions);
+        && ((hasPlanRows && hasDecision) || hasSuggestions || hasTagAlongChange);
       if (reviewDecisionInput) {
         reviewDecisionInput.disabled = areControlsDisabled;
         const nextLabel = getDecisionLabel(status);
@@ -3190,7 +3482,7 @@
       });
       if (!updated) return;
       pendingReviewStatus = status;
-      planStateByDate[selectedDateKey] = "submitted";
+      setPlanSubmissionState(selectedDateKey, activeAgentName, "submitted");
       persistSyncedAgentPlans();
       updateStats();
       renderCalendar();
@@ -3243,6 +3535,8 @@
     let agentDirectory = [];
     let selectedSuggestionCustomers = new Map();
     let selectedRemovedPlanCustomers = new Map();
+    let selectedManagerTagAlongMap = new Map();
+    let managerTagAlongDirty = false;
     let suggestionCustomerCandidatesCache = null;
     let currentReviewInsights = null;
 
@@ -3520,6 +3814,11 @@
       suggestionSelectedList.innerHTML = rows.map((item) => `
         <span class="suggestionPill">
           ${item.customer}${item.code ? ` (${item.code})` : ""}
+          <label class="tagAlongCheck" title="Manager tagging along">
+            <input type="checkbox" data-tag-along-source="manager-suggestion" data-tag-along-key="${item.key}" ${selectedManagerTagAlongMap.has(getManagerTagAlongSelectionKey("manager-suggestion", item.key)) ? "checked" : ""} />
+            <i class="bi bi-person-check-fill" aria-hidden="true"></i>
+            Tag along
+          </label>
           <button type="button" data-suggestion-remove="${item.key}" aria-label="Remove suggested customer">x</button>
         </span>
       `).join("");
@@ -3552,6 +3851,11 @@
         return `
           <span class="suggestionPill planAdjustPill ${isRemoved ? "isRemoved" : ""}">
             ${escapeHtml(item.customer)}${item.code ? ` (${escapeHtml(item.code)})` : ""}
+            <label class="tagAlongCheck" title="Manager tagging along">
+              <input type="checkbox" data-tag-along-source="existing-plan" data-tag-along-key="${item.key}" ${selectedManagerTagAlongMap.has(getManagerTagAlongSelectionKey("existing-plan", item.key)) ? "checked" : ""} />
+              <i class="bi bi-person-check-fill" aria-hidden="true"></i>
+              Tag along
+            </label>
             <button type="button" data-plan-remove-key="${item.key}" aria-label="${isRemoved ? "Undo remove" : "Remove from plan"}">
               ${isRemoved ? "Undo" : "-"}
             </button>
@@ -3709,10 +4013,14 @@
         const visited = key ? activityInsights.visitedByCustomer.has(key) : false;
         const latest = key ? activityInsights.latestActivityByCustomer.get(key) : null;
         const isSuggested = key ? suggestedCustomers.has(key) : false;
+        const suggestion = isSuggested ? suggestedCustomers.get(key) : null;
         const tags = [];
         tags.push(visited ? createTagMarkup("Visited", "visited") : createTagMarkup("Not Visited", "notVisited"));
         return {
           ...plan,
+          managerTagAlong: hasManagerTagAlong(plan) || Boolean(suggestion?.managerTagAlong),
+          tagAlongManager: plan.tagAlongManager || suggestion?.tagAlongManager || "",
+          tagAlongSource: plan.tagAlongSource || suggestion?.tagAlongSource || "",
           reason: reasonOverride || plan.reason,
           tags,
           visited,
@@ -3725,12 +4033,16 @@
       const unplannedRows = activityInsights.unplannedVisited.map((item) => {
         const latest = activityInsights.latestActivityByCustomer.get(item.customerKey) || null;
         const isSuggested = suggestedCustomers.has(item.customerKey);
+        const suggestion = isSuggested ? suggestedCustomers.get(item.customerKey) : null;
         const agentKey = normalizeText(item?.agent);
         const overrideKey = `${agentKey}::${item.customerKey || ""}`;
         const reasonOverride = visitedSubStatusByAgentCustomer.get(overrideKey)?.subStatus || "";
         const tags = [createTagMarkup("Unplanned", "unplanned"), createTagMarkup("Visited", "visited")];
         return {
           ...item,
+          managerTagAlong: Boolean(suggestion?.managerTagAlong),
+          tagAlongManager: suggestion?.tagAlongManager || "",
+          tagAlongSource: suggestion?.tagAlongSource || "",
           reason: reasonOverride || item.reason,
           tags,
           visited: true,
@@ -3908,6 +4220,7 @@
     const renderPlanTable = (dateKey) => {
       selectedDateLabel.textContent = formatReadableDate(dateKey);
       const isHoliday = isHolidayDate(dateKey);
+      renderSelectedPlanStateBadge();
       renderDailyRemark();
       renderVisitPlanTrail();
       renderAgentBadgeList();
@@ -3946,7 +4259,7 @@
       planTableBody.innerHTML = filteredRows.map(plan => `
         <tr class="${plan.rowClass || ""}">
           <td>${plan.code}</td>
-          <td>${plan.customer}</td>
+          <td>${hasManagerTagAlong(plan) ? managerTagAlongIconMarkup() : ""}${plan.customer}</td>
           <td>${plan.reason}</td>
           <td>${plan.agent}</td>
           <td>${plan.kam}</td>
@@ -4079,6 +4392,7 @@
           ? plans.filter(plan => plan.agent === selectedCalendarAgent)
           : plans;
         const showActionButtons = !isPastDay && !isSunday && !isRepublicDay;
+        const canOpenPlanningModal = isAgentRole();
         const isSubmitWindowDay = (dateKey === todayKey && submitWindowToday)
           || (dateKey === tomorrowKey && submitWindowTomorrow);
         const isDarkPlanBtn = dateKey === todayKey || isSubmitWindowDay;
@@ -4099,24 +4413,29 @@
         let actionMarkup = "";
         if (showActionButtons) {
           if (isAgentView) {
-            actionMarkup = `
-              <div class="dayActions">
-                <button class="planBtn plusPill ${isDarkPlanBtn ? "isSubmitWindow" : ""}" type="button" data-date="${dateKey}" data-action="plan-plus" aria-label="Plan for selected agent">
+            const planPill = canOpenPlanningModal
+              ? `<button class="planBtn plusPill ${isDarkPlanBtn ? "isSubmitWindow" : ""}" type="button" data-date="${dateKey}" data-action="plan-plus" aria-label="Plan for selected agent">
                   <i class="bi bi-plus-lg" aria-hidden="true"></i>
-                </button>
-                <button class="planBtn approvePill" type="button" data-date="${dateKey}" data-action="approve" aria-label="Review approval for selected agent">
+                </button>`
+              : "";
+            const approvePill = !isAgentRole()
+              ? `<button class="planBtn approvePill" type="button" data-date="${dateKey}" data-action="approve" aria-label="Review approval for selected agent">
                   <i class="bi bi-check2-circle" aria-hidden="true"></i>
-                </button>
-              </div>
-            `;
-          } else {
+                </button>`
+              : "";
+            actionMarkup = planPill || approvePill ? `<div class="dayActions">${planPill}${approvePill}</div>` : "";
+          } else if (canOpenPlanningModal) {
             actionMarkup = `<div class="dayActions"><button class="planBtn ${isDarkPlanBtn ? "isSubmitWindow" : ""}" type="button" data-date="${dateKey}" data-action="plan">Plan</button></div>`;
           }
         }
 
+        const stateForBadge = isAgentView ? getPlanSubmissionState(dateKey, selectedCalendarAgent) : "";
+        const stateMarkup = getPlanStateBadgeMarkup(stateForBadge);
+
         dayEl.innerHTML = `
           <div class="dayTop">
             <span class="dayNumber">${dayDate.getDate()}</span>
+            ${stateMarkup}
             ${actionMarkup}
           </div>
           <div class="dayLabels"></div>
@@ -4154,8 +4473,9 @@
               const badge = document.createElement("span");
               const statusClass = getStatusClass(getStatusForPlans(agentPlansForDay));
               const needsAction = !statusClass && hasManagerActionFlag(agentPlansForDay);
-              badge.className = `agentBadge ${statusClass} ${needsAction ? "needsAction" : ""}`.trim();
-              badge.title = agent;
+              const hasTagAlong = hasManagerTagAlongForPlans(agentPlansForDay);
+              badge.className = `agentBadge ${statusClass} ${needsAction ? "needsAction" : ""} ${hasTagAlong ? "hasManagerTagAlong" : ""}`.trim();
+              badge.title = hasTagAlong ? `${agent} • Manager tagging along` : agent;
               badge.textContent = getInitials(agent);
               labelWrap.appendChild(badge);
             });
@@ -4200,8 +4520,11 @@
           });
           customerSet.forEach((customer) => {
             const tag = document.createElement("span");
-            tag.className = "customerTag";
-            tag.textContent = customer;
+            const plan = agentPlans.find((item) => item.customer === customer);
+            const hasTagAlong = hasManagerTagAlong(plan);
+            tag.className = `customerTag ${hasTagAlong ? "hasManagerTagAlong" : ""}`.trim();
+            tag.title = hasTagAlong ? "Manager tagging along" : "";
+            tag.innerHTML = `${hasTagAlong ? managerTagAlongIconMarkup() : ""}${escapeHtml(customer)}`;
             labelWrap.appendChild(tag);
           });
         }
@@ -4370,7 +4693,7 @@
         .filter((plan) => normalizeText(plan?.agent || "") !== normalizeText(planOwner));
       samplePlans[dateKey] = preservedOtherAgentPlans.concat(visits);
       sampleLabels[dateKey] = labels;
-      planStateByDate[dateKey] = isSubmit ? "submitted" : "draft";
+      setPlanSubmissionState(dateKey, planOwner, isSubmit ? "submitted" : "draft");
       const shortfallText = needsShortfall && shortfallReason ? shortfallReason.value.trim() : "";
       const agentStatusLabel = isSubmit && !hadExistingPlan ? "New plan submitted" : "Updated Plan";
       const toCustomerMap = (list) => {
@@ -4537,6 +4860,13 @@
       });
     }
     if (suggestionSelectedList) {
+      suggestionSelectedList.addEventListener("change", (event) => {
+        const checkbox = event.target.closest("input[data-tag-along-source='manager-suggestion']");
+        if (!checkbox) return;
+        const key = String(checkbox.getAttribute("data-tag-along-key") || "").trim();
+        const item = selectedSuggestionCustomers.get(key);
+        if (item) setManagerTagAlongDraft(item, "manager-suggestion");
+      });
       suggestionSelectedList.addEventListener("click", (event) => {
         const btn = event.target.closest("[data-suggestion-remove]");
         if (!btn) return;
@@ -4544,6 +4874,11 @@
         if (!key) return;
         const removed = selectedSuggestionCustomers.get(key);
         selectedSuggestionCustomers.delete(key);
+        const selectionKey = getManagerTagAlongSelectionKey("manager-suggestion", key);
+        if (selectedManagerTagAlongMap.has(selectionKey)) {
+          selectedManagerTagAlongMap.delete(selectionKey);
+          managerTagAlongDirty = true;
+        }
         if (removed) {
           logPlanAction("Suggestion Removed", `${removed.customer} removed from suggestions.`, {
             dateKey: selectedDateKey,
@@ -4558,6 +4893,15 @@
       });
     }
     if (planCustomerAdjustList) {
+      planCustomerAdjustList.addEventListener("change", (event) => {
+        const checkbox = event.target.closest("input[data-tag-along-source='existing-plan']");
+        if (!checkbox) return;
+        const key = String(checkbox.getAttribute("data-tag-along-key") || "").trim();
+        if (!key) return;
+        const plans = activeAgentName ? getPlansForAgent(selectedDateKey, activeAgentName) : [];
+        const match = plans.find((plan) => getPlanCustomerKey(plan) === key);
+        if (match) setManagerTagAlongDraft({ ...match, key }, "existing-plan");
+      });
       planCustomerAdjustList.addEventListener("click", (event) => {
         const btn = event.target.closest("[data-plan-remove-key]");
         if (!btn) return;
@@ -4574,6 +4918,11 @@
             customer: String(match?.customer || "").trim(),
             code: String(match?.code || "").trim()
           });
+          const selectionKey = getManagerTagAlongSelectionKey("existing-plan", key);
+          if (selectedManagerTagAlongMap.has(selectionKey)) {
+            selectedManagerTagAlongMap.delete(selectionKey);
+            managerTagAlongDirty = true;
+          }
         }
         renderPlanCustomerAdjustList();
         updateReviewActionsState();
@@ -4763,6 +5112,7 @@
         const removedPlanItems = Array.from(selectedRemovedPlanCustomers.values());
         const hasPlanRows = plans.length > 0;
         const hasSuggestions = suggestionItems.length > 0 || removedPlanItems.length > 0;
+        const hasTagAlongChange = managerTagAlongDirty;
         const selectedDecision = String(pendingReviewStatus || "").trim();
         const suggestionDecisionStatus = selectedDecision || "Pending";
         const todayKey = getTodayKey();
@@ -4784,7 +5134,7 @@
           return;
         }
 
-        if (!hasSuggestions && !hasPlanRows) {
+        if (!hasSuggestions && !hasPlanRows && !hasTagAlongChange) {
           if (reviewError) {
             reviewError.textContent = "Add at least one customer suggestion before submitting.";
             reviewError.classList.remove("hidden");
@@ -4792,7 +5142,7 @@
           return;
         }
 
-        if (!hasSuggestions && !selectedDecision) {
+        if (!hasSuggestions && !hasTagAlongChange && !selectedDecision) {
           if (reviewError) {
             reviewError.textContent = "Select a visit decision before submitting.";
             reviewError.classList.remove("hidden");
@@ -4804,8 +5154,26 @@
           reviewError.classList.add("hidden");
         }
 
+        const managerName = getManagerTagAlongManagerName();
+        const tagAlongItems = Array.from(selectedManagerTagAlongMap.values());
+        const previousTagAlongMap = getStoredManagerTagAlongForDate(selectedDateKey, managerName, activeAgentName);
+        const allSuggestions = hasTagAlongChange
+          ? clearStoredManagerTagAlongForDate(selectedDateKey, managerName, getSuggestionsStore(), activeAgentName)
+          : getSuggestionsStore();
+        if (hasTagAlongChange) {
+          tagAlongItems
+            .filter((item) => item.source === "existing-plan")
+            .forEach((item) => {
+              const targetPlan = plans.find((plan) => getPlanCustomerKey(plan) === item.key);
+              if (targetPlan) {
+                targetPlan.managerTagAlong = true;
+                targetPlan.tagAlongManager = managerName;
+                targetPlan.tagAlongSource = "existing-plan";
+              }
+            });
+        }
+
         if (hasSuggestions) {
-          const allSuggestions = getSuggestionsStore();
           allSuggestions.push({
             id: `sugg-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
             agentName: activeAgentName,
@@ -4815,7 +5183,10 @@
             targetDate: suggestionDate,
             customers: suggestionItems.map((item) => ({
               customer: item.customer,
-              code: item.code
+              code: item.code,
+              managerTagAlong: selectedManagerTagAlongMap.has(getManagerTagAlongSelectionKey("manager-suggestion", item.key)),
+              tagAlongManager: selectedManagerTagAlongMap.has(getManagerTagAlongSelectionKey("manager-suggestion", item.key)) ? managerName : "",
+              tagAlongSource: selectedManagerTagAlongMap.has(getManagerTagAlongSelectionKey("manager-suggestion", item.key)) ? "manager-suggestion" : ""
             })),
             removeCustomers: removedPlanItems.map((item) => ({
               customer: item.customer,
@@ -4824,11 +5195,33 @@
             createdAt: new Date().toISOString(),
             createdBy: String(localStorage.getItem("activeUserName") || "Manager").trim() || "Manager"
           });
-          saveSuggestionsStore(allSuggestions);
           const suggestionSummary = `${suggestionItems.length} add, ${removedPlanItems.length} remove suggestion(s) saved.`;
           logPlanAction("Suggestions Saved", suggestionSummary, {
             dateKey: selectedDateKey,
-            targetAgent: activeAgentName
+            targetAgent: activeAgentName,
+            customerChanges: suggestionItems.map((item) => ({
+              name: item.customer || item.code || "-",
+              state: "suggested-add"
+            })).concat(removedPlanItems.map((item) => ({
+              name: item.customer || item.code || "-",
+              state: "suggested-remove"
+            })))
+          });
+        }
+        saveSuggestionsStore(allSuggestions);
+        if (hasTagAlongChange) {
+          const previousCount = previousTagAlongMap.size;
+          const nextCount = tagAlongItems.length;
+          const actionType = nextCount
+            ? (previousCount ? "Manager Tag Along Changed" : "Manager Tag Along Added")
+            : "Manager Tag Along Removed";
+          const details = nextCount
+            ? `${managerName} tagging along with ${tagAlongItems.map((item) => `${item.customer || item.code || "-"} (${item.source === "manager-suggestion" ? "suggested customer" : "existing plan"})`).join(", ")}.`
+            : `${managerName} removed tag-along for ${activeAgentName}.`;
+          logPlanAction(actionType, details, {
+            dateKey: selectedDateKey,
+            targetAgent: activeAgentName,
+            remark: nextCount ? "multi-select" : ""
           });
         }
 
@@ -4889,6 +5282,8 @@
           renderVisitPlanTrail();
         }
         resetSuggestionDraft();
+        hydrateSelectedManagerTagAlong();
+        renderSuggestionSelected();
         renderPlanCustomerAdjustList();
         renderDailyRemark();
         renderVisitPlanTrail();
