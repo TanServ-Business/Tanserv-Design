@@ -324,22 +324,14 @@
       border-color: var(--brand-dark);
     }
 
-    .planBtn.plusPill {
-      min-width: 30px;
-      padding: 4px 6px;
-      font-size: 12px;
-      letter-spacing: 0;
-      text-transform: none;
-    }
-
-    .planBtn.approvePill {
+    .planBtn.reviewPill {
       min-width: 30px;
       padding: 4px 6px;
       font-size: 12px;
       letter-spacing: 0;
       text-transform: none;
       border-color: #93c5fd;
-      background: #dbeafe;
+      background: #eff6ff;
       color: #1d4ed8;
     }
 
@@ -4413,17 +4405,12 @@
         let actionMarkup = "";
         if (showActionButtons) {
           if (isAgentView) {
-            const planPill = canOpenPlanningModal
-              ? `<button class="planBtn plusPill ${isDarkPlanBtn ? "isSubmitWindow" : ""}" type="button" data-date="${dateKey}" data-action="plan-plus" aria-label="Plan for selected agent">
-                  <i class="bi bi-plus-lg" aria-hidden="true"></i>
+            const reviewPill = !isAgentRole()
+              ? `<button class="planBtn reviewPill" type="button" data-date="${dateKey}" data-action="review-plan" aria-label="Review plan for selected agent" title="Review plan">
+                  <i class="bi bi-clipboard2-check" aria-hidden="true"></i>
                 </button>`
               : "";
-            const approvePill = !isAgentRole()
-              ? `<button class="planBtn approvePill" type="button" data-date="${dateKey}" data-action="approve" aria-label="Review approval for selected agent">
-                  <i class="bi bi-check2-circle" aria-hidden="true"></i>
-                </button>`
-              : "";
-            actionMarkup = planPill || approvePill ? `<div class="dayActions">${planPill}${approvePill}</div>` : "";
+            actionMarkup = reviewPill ? `<div class="dayActions">${reviewPill}</div>` : "";
           } else if (canOpenPlanningModal) {
             actionMarkup = `<div class="dayActions"><button class="planBtn ${isDarkPlanBtn ? "isSubmitWindow" : ""}" type="button" data-date="${dateKey}" data-action="plan">Plan</button></div>`;
           }
@@ -4552,6 +4539,10 @@
               if (planSection) {
                 planSection.scrollIntoView({ behavior: "smooth", block: "start" });
               }
+              return;
+            }
+            if (action === "review-plan") {
+              openVisitDetailsModal();
               return;
             }
             openPlanModal(dateKey);
