@@ -1,235 +1,248 @@
 (() => {
   const actionTypeMeta = {
-    status: { label: "Invoice update", icon: "bi-arrow-repeat" },
-    reply: { label: "Email reply", icon: "bi-reply" },
-    reminder: { label: "Reminder email", icon: "bi-bell" }
+    activity: { label: "Activity", icon: "bi-check2-circle" },
+    email: { label: "Email", icon: "bi-envelope" },
+    reminder: { label: "Reminder", icon: "bi-bell" },
+    visit: { label: "Visit", icon: "bi-geo-alt" }
   };
 
   const actions = [
     {
-      id: "ai-10291-status",
+      id: "ai-10291-activity-ptp",
       invoiceNo: "INV-10291",
       customer: "Apollo Pharmacy Pvt Ltd",
       agent: "Aditi Sharma",
       manager: "Rohit Mehra",
-      kam: "Neha Kapoor",
-      kas: "Arjun Rao",
       invoiceAmount: 124000,
       netDue: 98000,
       invoiceDate: "12 Oct 2025",
       dueDate: "05 Nov 2025",
-      aging: "0-30",
-      overdueText: "7 days overdue",
-      currentStatus: "Submitted and tracking",
-      primaryStatus: "No Due",
-      subStatus: "Within Credit Period/Days",
-      previousStatus: "PTP",
-      recommendedStatus: "PTP follow-up required",
-      type: "status",
+      primaryStatus: "PTP",
+      subStatus: "PTP",
+      previousStatus: "Within Credit Period/Days",
+      type: "activity",
+      label: "Call Back/Email Follow up",
+      source: "Activity - PTP",
+      evidence: "PTP date was recorded for 28 May 2026 and the invoice is still open.",
+      actionDetail: "Create a follow-up activity on the invoice and keep the status mapped to the disposition sheet.",
+      scheduledAt: "28 May 2026, 10:00 AM",
       confidence: 92,
-      risk: "High",
-      recommendation: "Move invoice to PTP follow-up required and create a same-day call task.",
-      summary: "The customer missed the promised payment date and asked for a revised timeline without payment proof.",
-      expectedOutcome: "The invoice trail reflects the missed commitment and the agent gets a concrete follow-up action.",
-      actionDetail: "Update invoice status to PTP follow-up required. Add activity note: customer missed payment commitment and requested revised date.",
+      risk: "Medium",
       email: null,
       timeline: [
         ["12 Nov 2025, 09:42 AM", "Email received", "Customer asked for revised payment date."],
         ["11 Nov 2025, 04:30 PM", "Reminder sent", "PTP reminder shared with invoice copy."],
-        ["07 Nov 2025, 11:32 AM", "Manager remark", "Confirm receipt of updated invoice copy."]
+        ["07 Nov 2025, 11:32 AM", "Activity", "PTP captured by agent."]
       ]
     },
     {
-      id: "ai-10211-reply",
+      id: "ai-10291-email-draft",
+      invoiceNo: "INV-10291",
+      customer: "Apollo Pharmacy Pvt Ltd",
+      agent: "Aditi Sharma",
+      manager: "Rohit Mehra",
+      invoiceAmount: 124000,
+      netDue: 98000,
+      invoiceDate: "12 Oct 2025",
+      dueDate: "05 Nov 2025",
+      primaryStatus: "PTP",
+      subStatus: "PTP",
+      previousStatus: "PTP",
+      type: "email",
+      label: "Draft response",
+      source: "Email",
+      evidence: "Customer asked for a revised payment timeline without payment proof.",
+      actionDetail: "Open an AI drafted reply asking for confirmed payment date and payment proof once processed.",
+      scheduledAt: "28 May 2026, 10:05 AM",
+      confidence: 86,
+      risk: "Low",
+      email: {
+        from: "Aditi Sharma <aditi@inebura.com>",
+        to: "finance@apollopharmacy.com",
+        cc: "Rohit Mehra <rohit.mehra@inebura.com>",
+        subject: "Payment timeline confirmation for INV-10291",
+        attachments: "Invoice_INV-10291.pdf",
+        body: "Dear Team,\n\nPlease confirm the revised payment date for INV-10291 and share payment proof once processed.\n\nRegards,\nAditi Sharma"
+      },
+      timeline: [
+        ["12 Nov 2025, 09:42 AM", "Email received", "Customer asked for revised payment date."],
+        ["11 Nov 2025, 04:30 PM", "Reminder sent", "PTP reminder shared."]
+      ]
+    },
+    {
+      id: "ai-10211-activity-dc",
       invoiceNo: "INV-10211",
       customer: "Apollo Pharmacy Pvt Ltd",
       agent: "Aditi Sharma",
       manager: "Rohit Mehra",
-      kam: "Neha Kapoor",
-      kas: "Arjun Rao",
       invoiceAmount: 210000,
       netDue: 210000,
       invoiceDate: "22 Sep 2025",
       dueDate: "06 Oct 2025",
-      aging: "31-60",
-      overdueText: "37 days overdue",
-      currentStatus: "Not submitted and untouched",
       primaryStatus: "Further Docs Required",
-      subStatus: "Invoice Copy Required",
-      previousStatus: "Customer requested invoice copy",
-      recommendedStatus: "Docs shared - awaiting confirmation",
-      type: "reply",
-      confidence: 88,
+      subStatus: "Delivery Challan Required",
+      previousStatus: "Invoice Copy Required",
+      type: "activity",
+      label: "Delivery Challan Required",
+      source: "Email",
+      evidence: "Customer wrote that INV-10211 cannot be processed because the delivery challan is missing.",
+      actionDetail: "Prefill activity as Delivery Challan Required and create the document support workflow.",
+      scheduledAt: "Today, 02:00 PM",
+      confidence: 91,
       risk: "Medium",
-      recommendation: "Reply to the customer with invoice copy and ask for confirmation of receipt.",
-      summary: "The inbound email explicitly asks for the invoice PDF before payment processing can continue.",
-      expectedOutcome: "Customer receives the missing document and the invoice can move out of further-docs-required status.",
-      actionDetail: "Send the prepared email reply and attach Invoice_INV-10211.pdf.",
+      email: null,
+      timeline: [
+        ["10 Nov 2025, 03:26 PM", "Email received", "Customer requested delivery challan copy."],
+        ["08 Nov 2025, 03:28 PM", "Invoice trail", "Invoice still marked as document required."]
+      ]
+    },
+    {
+      id: "ai-10211-email-draft",
+      invoiceNo: "INV-10211",
+      customer: "Apollo Pharmacy Pvt Ltd",
+      agent: "Aditi Sharma",
+      manager: "Rohit Mehra",
+      invoiceAmount: 210000,
+      netDue: 210000,
+      invoiceDate: "22 Sep 2025",
+      dueDate: "06 Oct 2025",
+      primaryStatus: "Further Docs Required",
+      subStatus: "Delivery Challan Required",
+      previousStatus: "Invoice Copy Required",
+      type: "email",
+      label: "Draft response",
+      source: "Email",
+      evidence: "Inbound email asks for delivery challan before invoice processing.",
+      actionDetail: "Open a drafted reply acknowledging the request and confirming that the challan copy will be shared.",
+      scheduledAt: "Today, 02:05 PM",
+      confidence: 88,
+      risk: "Low",
       email: {
         from: "Aditi Sharma <aditi@inebura.com>",
         to: "Anita Nair <finance@apollopharmacy.com>",
         cc: "Rohit Mehra <rohit.mehra@inebura.com>",
-        subject: "Invoice copy for INV-10211",
-        attachments: "Invoice_INV-10211.pdf",
-        body: "Dear Anita,\n\nPlease find attached the invoice copy for INV-10211 as requested.\n\nKindly confirm receipt and share the expected payment processing date so we can update the invoice record.\n\nRegards,\nAditi Sharma"
+        subject: "Delivery challan for INV-10211",
+        attachments: "Delivery_Challan_INV-10211.pdf",
+        body: "Dear Anita,\n\nWe have noted the delivery challan requirement for INV-10211. We will share the challan copy and confirm dispatch details shortly.\n\nRegards,\nAditi Sharma"
       },
       timeline: [
-        ["12 Nov 2025, 10:15 AM", "Email received", "Customer requested invoice copy."],
-        ["08 Nov 2025, 03:28 PM", "Invoice trail", "Invoice still marked as not submitted."],
+        ["10 Nov 2025, 03:26 PM", "Email received", "Delivery challan requested."],
         ["06 Oct 2025", "Due date passed", "Invoice entered overdue bucket."]
       ]
     },
     {
-      id: "ai-10433-reminder",
-      invoiceNo: "INV-10433",
+      id: "ai-10211-visit-dc",
+      invoiceNo: "INV-10211",
       customer: "Apollo Pharmacy Pvt Ltd",
       agent: "Aditi Sharma",
       manager: "Rohit Mehra",
-      kam: "Neha Kapoor",
-      kas: "Arjun Rao",
-      invoiceAmount: 98000,
-      netDue: 45000,
-      invoiceDate: "25 Oct 2025",
-      dueDate: "08 Nov 2025",
-      aging: "0-30",
-      overdueText: "4 days overdue",
-      currentStatus: "Submitted and tracking",
-      primaryStatus: "Guidance",
-      subStatus: "Recommended For Legal",
-      previousStatus: "Reminder sent",
-      recommendedStatus: "Escalation reminder pending approval",
-      type: "reminder",
-      confidence: 79,
-      risk: "High",
-      recommendation: "Send escalation reminder with invoice copy and request payment proof or dispute reason.",
-      summary: "The invoice is overdue, legal guidance has been recommended, and the last reminder has no response.",
-      expectedOutcome: "Creates a documented final follow-up before legal escalation.",
-      actionDetail: "Send an escalation reminder and keep the invoice in review until the customer replies.",
-      email: {
-        from: "Aditi Sharma <aditi@inebura.com>",
-        to: "finance@apollopharmacy.com",
-        cc: "Rohit Mehra <rohit.mehra@inebura.com>",
-        subject: "Urgent payment follow-up for INV-10433",
-        attachments: "Invoice_INV-10433.pdf",
-        body: "Dear Team,\n\nThis is an urgent follow-up for INV-10433. The invoice is overdue and we have not received payment confirmation after the previous reminder.\n\nPlease share payment proof or a clear dispute reason by end of day so we can update the invoice status accordingly.\n\nRegards,\nAditi Sharma"
-      },
+      invoiceAmount: 210000,
+      netDue: 210000,
+      invoiceDate: "22 Sep 2025",
+      dueDate: "06 Oct 2025",
+      primaryStatus: "Further Docs Required",
+      subStatus: "Delivery Challan Required",
+      previousStatus: "Invoice Copy Required",
+      type: "visit",
+      label: "Invoice Submission",
+      source: "Email",
+      evidence: "Customer requested delivery challan support; a visit can close the document gap.",
+      actionDetail: "Suggest customer in visit planner with reason Invoice Submission.",
+      scheduledAt: "Next plan date",
+      confidence: 80,
+      risk: "Low",
+      email: null,
       timeline: [
-        ["10 Nov 2025, 11:06 AM", "Reminder sent", "Payment reminder shared."],
-        ["08 Nov 2025", "Due date passed", "No payment received."],
-        ["07 Nov 2025, 07:10 PM", "Issue tracker", "Escalation note created."]
+        ["10 Nov 2025, 03:26 PM", "Email received", "Delivery challan missing."],
+        ["Visit module", "AI suggestion", "Submit Delivery Challan as requested."]
       ]
     },
     {
-      id: "ai-10270-reminder",
-      invoiceNo: "INV-10270",
+      id: "ai-10308-activity-collected",
+      invoiceNo: "INV-10308",
       customer: "Apollo Pharmacy Pvt Ltd",
       agent: "Aditi Sharma",
       manager: "Rohit Mehra",
-      kam: "Neha Kapoor",
-      kas: "Arjun Rao",
-      invoiceAmount: 86400,
-      netDue: 86400,
-      invoiceDate: "01 Nov 2025",
-      dueDate: "16 Nov 2025",
-      aging: "Not due",
-      overdueText: "4 days to due",
-      currentStatus: "Submitted and tracking",
-      primaryStatus: "Part Collected",
-      subStatus: "Part Payment Made",
-      previousStatus: "Part payment recorded",
-      recommendedStatus: "Pre-due reminder scheduled",
-      type: "reminder",
+      invoiceAmount: 95000,
+      netDue: 42000,
+      invoiceDate: "04 Nov 2025",
+      dueDate: "12 Nov 2025",
+      primaryStatus: "PTP",
+      subStatus: "PTP",
+      previousStatus: "Call Back",
+      type: "activity",
+      label: "Collected",
+      source: "Activity - PTP",
+      evidence: "Future PTP date exists for this invoice and collection closure is the next possible disposition when payment is confirmed.",
+      actionDetail: "Open activity panel prefilled as Collection Done / Collected / Collected.",
+      scheduledAt: "28 May 2026, 05:00 PM",
       confidence: 84,
       risk: "Low",
-      recommendation: "Send a polite pre-due reminder for the remaining balance.",
-      summary: "Partial payment is recorded and the due date is approaching within the reminder window.",
-      expectedOutcome: "Improves on-time collection probability without using an escalation tone.",
-      actionDetail: "Send a pre-due reminder with the invoice copy attached.",
+      email: null,
+      timeline: [
+        ["Activity", "PTP", "PTP date is 28 May 2026."],
+        ["AI suggestion", "Activity panel", "Collected pill shown for PTP follow-up."]
+      ]
+    },
+    {
+      id: "ai-10308-reminder",
+      invoiceNo: "INV-10308",
+      customer: "Apollo Pharmacy Pvt Ltd",
+      agent: "Aditi Sharma",
+      manager: "Rohit Mehra",
+      invoiceAmount: 95000,
+      netDue: 42000,
+      invoiceDate: "04 Nov 2025",
+      dueDate: "12 Nov 2025",
+      primaryStatus: "PTP",
+      subStatus: "PTP",
+      previousStatus: "Call Back",
+      type: "reminder",
+      label: "Send reminder",
+      source: "Activity - PTP",
+      evidence: "PTP date is 28 May 2026 and invoice is still open.",
+      actionDetail: "Send scheduled reminder email asking customer to confirm once payment is processed.",
+      scheduledAt: "28 May 2026, 09:00 AM",
+      confidence: 87,
+      risk: "Low",
       email: {
         from: "Aditi Sharma <aditi@inebura.com>",
         to: "finance@apollopharmacy.com",
         cc: "-",
-        subject: "Payment reminder for INV-10270",
-        attachments: "Invoice_INV-10270.pdf",
-        body: "Dear Team,\n\nThis is a gentle reminder that Rs. 86,400 remains due for INV-10270 by 16 Nov 2025.\n\nPlease confirm the payment schedule or share payment proof once processed.\n\nRegards,\nAditi Sharma"
+        subject: "Payment reminder for INV-10308",
+        attachments: "Invoice_INV-10308.pdf",
+        body: "Dear Team,\n\nThis is a reminder for the payment committed for INV-10308 on 28 May 2026. Please confirm once processed.\n\nRegards,\nAditi Sharma"
       },
       timeline: [
-        ["09 Nov 2025, 11:06 AM", "Email sent", "Prior payment reminder shared."],
-        ["06 Nov 2025", "Payment update", "Part payment recorded."],
-        ["01 Nov 2025", "Invoice created", "Invoice submitted for tracking."]
+        ["Activity", "PTP", "Payment commitment date recorded."],
+        ["Reminder", "Scheduled", "Reminder will run unless revoked."]
       ]
     },
     {
-      id: "ai-20518-status",
-      invoiceNo: "INV-20518",
-      customer: "Blue Star Limited",
-      agent: "Manish Kumar",
-      manager: "Rohit Mehra",
-      kam: "Mukesh Mishra",
-      kas: "Riya Sen",
-      invoiceAmount: 342000,
-      netDue: 342000,
-      invoiceDate: "19 Sep 2025",
-      dueDate: "19 Oct 2025",
-      aging: "0-30",
-      overdueText: "24 days overdue",
-      currentStatus: "Collection In Progress",
-      primaryStatus: "Collection In Progress",
-      subStatus: "Call Back",
-      previousStatus: "Call Back",
-      recommendedStatus: "Escalate to manager review",
-      type: "status",
-      confidence: 81,
-      risk: "Medium",
-      recommendation: "Escalate invoice for manager review because callback attempts have not produced a payment date.",
-      summary: "Three callback attempts are logged and no PTP or dispute reason has been captured.",
-      expectedOutcome: "Manager can decide whether to apply a stronger reminder or field visit.",
-      actionDetail: "Add manager review flag and status note after repeated unsuccessful callbacks.",
-      email: null,
-      timeline: [
-        ["12 Nov 2025, 01:20 PM", "Call back", "No answer from finance contact."],
-        ["10 Nov 2025, 05:05 PM", "Call back", "Customer asked to call later."],
-        ["07 Nov 2025, 02:15 PM", "Call back", "No PTP captured."]
-      ]
-    },
-    {
-      id: "ai-30402-reply",
+      id: "ai-30402-visit-cheque",
       invoiceNo: "INV-30402",
       customer: "Varun Beverages",
       agent: "Palak Choudhary",
       manager: "Mukesh Mishra",
-      kam: "Neha Kapoor",
-      kas: "Arjun Rao",
       invoiceAmount: 152000,
       netDue: 152000,
       invoiceDate: "18 Nov 2025",
       dueDate: "02 Dec 2025",
-      aging: "Not due",
-      overdueText: "20 days to due",
-      currentStatus: "Submitted and tracking",
       primaryStatus: "Collection In Progress",
       subStatus: "PDC Given",
       previousStatus: "PDC Given",
-      recommendedStatus: "PDC confirmation awaited",
-      type: "reply",
-      confidence: 76,
+      type: "visit",
+      label: "Collection follow up",
+      source: "Email",
+      evidence: "Customer asked the agent to collect cheques and share receipt confirmation.",
+      actionDetail: "Suggest customer in visit planner with reason Collection follow up.",
+      scheduledAt: "Next plan date",
+      confidence: 82,
       risk: "Low",
-      recommendation: "Reply with PDC receipt confirmation request and ask for courier details.",
-      summary: "Customer says PDC has been dispatched but did not include courier reference.",
-      expectedOutcome: "PDC tracking details are captured before due date.",
-      actionDetail: "Send reply asking for courier partner and tracking number.",
-      email: {
-        from: "Palak Choudhary <palak@inebura.com>",
-        to: "collections@varunbeverages.com",
-        cc: "-",
-        subject: "PDC tracking details for INV-30402",
-        attachments: "No attachment",
-        body: "Dear Team,\n\nThank you for confirming PDC dispatch for INV-30402.\n\nPlease share the courier partner and tracking number so we can update the invoice record and monitor receipt.\n\nRegards,\nPalak Choudhary"
-      },
+      email: null,
       timeline: [
-        ["12 Nov 2025, 12:01 PM", "Email received", "Customer confirmed PDC dispatch."],
-        ["10 Nov 2025, 09:35 AM", "Status update", "PDC given marked by agent."],
-        ["08 Nov 2025, 04:10 PM", "Reminder sent", "Requested PDC confirmation."]
+        ["12 Nov 2025, 12:01 PM", "Email received", "Customer confirmed cheque/PDC collection request."],
+        ["Visit module", "AI suggestion", "Customer asked to collect cheques."]
       ]
     }
   ];
@@ -237,11 +250,13 @@
   const state = {
     role: "agent",
     activeAgent: "Aditi Sharma",
-    expandedId: "",
+    expandedInvoice: "",
+    activeActionByInvoice: {},
     drawerId: "",
     drawerView: "email",
     search: "",
     actionType: "all",
+    scheduleState: "all",
     decisions: loadDecisions()
   };
 
@@ -264,7 +279,8 @@
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;");
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
   }
 
   function formatINR(value) {
@@ -272,7 +288,23 @@
   }
 
   function getDecision(action) {
-    return state.decisions[action.id] || { state: "pending", reason: "", reviewer: "", decidedAt: "" };
+    const decision = state.decisions[action.id] || { state: "scheduled", reason: "", reviewer: "", decidedAt: "" };
+    if (decision.state === "approved") return { ...decision, state: "scheduled" };
+    if (decision.state === "rejected") return { ...decision, state: "revoked" };
+    if (!["scheduled", "revoked", "later"].includes(decision.state)) return { ...decision, state: "scheduled" };
+    return decision;
+  }
+
+  function getScheduleLabel(action) {
+    const decision = getDecision(action);
+    if (decision.state === "revoked") return "Revoked";
+    if (decision.state === "later") return "Review later";
+    return "Scheduled";
+  }
+
+  function isActionVisibleBySchedule(action) {
+    if (state.scheduleState === "all") return true;
+    return getDecision(action).state === state.scheduleState;
   }
 
   function getScopedActions() {
@@ -284,21 +316,51 @@
 
   function getVisibleActions() {
     const query = state.search.trim().toLowerCase();
-    const base = getScopedActions();
-
-    return base.filter((action) => {
+    return getScopedActions().filter((action) => {
       if (state.actionType !== "all" && action.type !== state.actionType) return false;
+      if (!isActionVisibleBySchedule(action)) return false;
       if (!query) return true;
       return [
         action.invoiceNo,
         action.customer,
         action.agent,
-        action.currentStatus,
         action.primaryStatus,
         action.subStatus,
-        action.recommendation
+        action.previousStatus,
+        action.label,
+        action.source,
+        action.evidence,
+        action.actionDetail
       ].some((value) => String(value).toLowerCase().includes(query));
     });
+  }
+
+  function groupByInvoice(list) {
+    const map = new Map();
+    list.forEach((action) => {
+      if (!map.has(action.invoiceNo)) {
+        map.set(action.invoiceNo, {
+          invoiceNo: action.invoiceNo,
+          customer: action.customer,
+          agent: action.agent,
+          manager: action.manager,
+          invoiceAmount: action.invoiceAmount,
+          netDue: action.netDue,
+          invoiceDate: action.invoiceDate,
+          dueDate: action.dueDate,
+          primaryStatus: action.primaryStatus,
+          subStatus: action.subStatus,
+          previousStatus: action.previousStatus,
+          actions: []
+        });
+      }
+      map.get(action.invoiceNo).actions.push(action);
+    });
+    return Array.from(map.values());
+  }
+
+  function getVisibleInvoices() {
+    return groupByInvoice(getVisibleActions());
   }
 
   function renderAgentStrip() {
@@ -326,15 +388,15 @@
     const strip = document.getElementById("aiMetricStrip");
     if (!strip) return;
     const scoped = getScopedActions();
-    const pending = scoped.filter((action) => getDecision(action).state === "pending").length;
-    const high = scoped.filter((action) => action.risk === "High").length;
-    const replies = scoped.filter((action) => action.type === "reply").length;
-    const reminders = scoped.filter((action) => action.type === "reminder").length;
+    const scheduled = scoped.filter((action) => getDecision(action).state === "scheduled").length;
+    const revoked = scoped.filter((action) => getDecision(action).state === "revoked").length;
+    const email = scoped.filter((action) => action.type === "email" || action.type === "reminder").length;
+    const visits = scoped.filter((action) => action.type === "visit").length;
     strip.innerHTML = [
-      ["Pending", pending],
-      ["High Risk", high],
-      ["Email Replies", replies],
-      ["Reminders", reminders]
+      ["Scheduled", scheduled],
+      ["Revoked", revoked],
+      ["Email actions", email],
+      ["Visit suggestions", visits]
     ].map(([label, value]) => `
       <span class="aiMetricChip">
         <strong>${value}</strong>
@@ -348,115 +410,170 @@
     const subtitle = document.getElementById("aiTableSubtitle");
     if (!tbody) return;
 
-    const visible = getVisibleActions();
+    const visibleInvoices = getVisibleInvoices();
+    const visibleActions = getVisibleActions();
     const scopeLabel = state.role === "manager"
       ? (state.activeAgent === "all" ? "all agents" : state.activeAgent)
       : state.activeAgent;
 
     if (subtitle) {
-      subtitle.textContent = `${visible.length} AI actionable invoices for ${scopeLabel}`;
+      subtitle.textContent = `${visibleInvoices.length} invoices, ${visibleActions.length} AI actions for ${scopeLabel}`;
     }
 
-    if (!visible.length) {
-      tbody.innerHTML = `<tr><td class="aiEmptyRow" colspan="16">No invoices match the current view.</td></tr>`;
+    if (!visibleInvoices.length) {
+      tbody.innerHTML = `<tr><td class="aiEmptyRow" colspan="12">No invoices match the current view.</td></tr>`;
       return;
     }
 
-    tbody.innerHTML = visible.map((action) => tableRow(action)).join("");
+    tbody.innerHTML = visibleInvoices.map((invoice) => tableRow(invoice)).join("");
   }
 
-  function tableRow(action) {
-    const decision = getDecision(action);
-    const meta = actionTypeMeta[action.type];
-    const selected = action.id === state.expandedId ? "is-selected" : "";
+  function tableRow(invoice) {
+    const selected = invoice.invoiceNo === state.expandedInvoice ? "is-selected" : "";
     return `
-      <tr class="${selected}" data-action-id="${escapeHtml(action.id)}" tabindex="0">
-        <td><span class="aiCellStrong">${escapeHtml(action.invoiceNo)}</span></td>
-        <td>${escapeHtml(action.customer)}</td>
-        <td>${escapeHtml(action.agent)}</td>
-        <td class="numericCell">Rs. ${formatINR(action.invoiceAmount)}</td>
-        <td class="numericCell">Rs. ${formatINR(action.netDue)}</td>
-        <td>${escapeHtml(action.invoiceDate)}</td>
-        <td>${escapeHtml(action.dueDate)}</td>
-        <td>${escapeHtml(action.overdueText)}</td>
-        <td>${escapeHtml(action.currentStatus)}</td>
-        <td>${escapeHtml(action.primaryStatus)}</td>
-        <td>${escapeHtml(action.subStatus)}</td>
-        <td>${escapeHtml(action.previousStatus)}</td>
-        <td><span class="aiPill ${escapeHtml(action.type)}"><i class="bi ${meta.icon}" aria-hidden="true"></i>${escapeHtml(meta.label)}</span></td>
-        <td>${action.confidence}%</td>
-        <td><span class="aiPill ${escapeHtml(action.risk.toLowerCase())}">${escapeHtml(action.risk)}</span></td>
+      <tr class="${selected}" data-invoice-no="${escapeHtml(invoice.invoiceNo)}" tabindex="0">
+        <td><span class="aiCellStrong">${escapeHtml(invoice.invoiceNo)}</span></td>
+        <td>${escapeHtml(invoice.customer)}</td>
+        <td class="numericCell">Rs. ${formatINR(invoice.invoiceAmount)}</td>
+        <td class="numericCell">Rs. ${formatINR(invoice.netDue)}</td>
+        <td>${escapeHtml(invoice.invoiceDate)}</td>
+        <td>${escapeHtml(invoice.dueDate)}</td>
+        <td>${escapeHtml(invoice.primaryStatus)}</td>
+        <td>${escapeHtml(invoice.subStatus)}</td>
+        <td>${escapeHtml(invoice.previousStatus)}</td>
+        <td>${renderActionSummary(invoice.actions)}</td>
+        <td>${renderScheduleSummary(invoice.actions)}</td>
         <td>
-          <button type="button" class="aiReviewBtn" data-review-id="${escapeHtml(action.id)}">
+          <button type="button" class="aiReviewBtn" data-review-invoice="${escapeHtml(invoice.invoiceNo)}">
             Review
           </button>
-          <span class="aiPill ${escapeHtml(decision.state)}">${decision.state === "approved" ? "Allowed" : escapeHtml(decision.state)}</span>
         </td>
       </tr>
-      ${action.id === state.expandedId ? expandedRow(action) : ""}
+      ${invoice.invoiceNo === state.expandedInvoice ? expandedRow(invoice) : ""}
     `;
   }
 
-  function expandedRow(action) {
-    const decision = getDecision(action);
+  function renderActionSummary(invoiceActions) {
+    const counts = invoiceActions.reduce((acc, action) => {
+      acc[action.type] = (acc[action.type] || 0) + 1;
+      return acc;
+    }, {});
+    return Object.entries(counts).map(([type, count]) => {
+      const meta = actionTypeMeta[type] || actionTypeMeta.activity;
+      return `<span class="aiPill ${escapeHtml(type)}"><i class="bi ${meta.icon}" aria-hidden="true"></i>${escapeHtml(meta.label)}${count > 1 ? ` ${count}` : ""}</span>`;
+    }).join(" ");
+  }
+
+  function renderScheduleSummary(invoiceActions) {
+    const scheduled = invoiceActions.filter((action) => getDecision(action).state === "scheduled").length;
+    const revoked = invoiceActions.filter((action) => getDecision(action).state === "revoked").length;
+    const later = invoiceActions.filter((action) => getDecision(action).state === "later").length;
+    return `
+      <span class="aiPill scheduled">${scheduled} scheduled</span>
+      ${revoked ? `<span class="aiPill revoked">${revoked} revoked</span>` : ""}
+      ${later ? `<span class="aiPill later">${later} later</span>` : ""}
+    `;
+  }
+
+  function expandedRow(invoice) {
+    const activeAction = getActiveAction(invoice);
     return `
       <tr class="aiExpandedRow">
-        <td colspan="16">
+        <td colspan="12">
           <div class="aiExpandedPanel">
-            <div class="aiExpandedGrid">
-              <div class="aiExpandedBox">
-                <h3>AI summary</h3>
-                <p><strong>Found:</strong> ${escapeHtml(action.summary)}</p>
-                <p><strong>Expected outcome:</strong> ${escapeHtml(action.expectedOutcome)}</p>
+            <div class="aiSuggestionReview">
+              <div>
+                <h3>AI suggested actions</h3>
+                <p>These actions are scheduled and will run unless revoked.</p>
               </div>
-              <div class="aiExpandedBox">
-                <h3>AI action</h3>
-                <p>${escapeHtml(action.recommendation)}</p>
-                ${compactEmail(action)}
+              <div class="aiSuggestionPillRow">
+                ${invoice.actions.map((action) => actionPill(action, activeAction)).join("")}
               </div>
             </div>
-            <div class="aiExpandedActions">
-              <button type="button" class="aiGhostBtn" data-drawer="evidence" data-id="${escapeHtml(action.id)}">
-                <i class="bi bi-clipboard-data" aria-hidden="true"></i>
-                View evidence
-              </button>
-              <button type="button" class="aiGhostBtn" data-drawer="history" data-id="${escapeHtml(action.id)}">
-                <i class="bi bi-clock-history" aria-hidden="true"></i>
-                Activity trail
-              </button>
-              ${action.email ? `
-                <button type="button" class="aiGhostBtn" data-drawer="email" data-id="${escapeHtml(action.id)}">
-                  <i class="bi bi-envelope-paper" aria-hidden="true"></i>
-                  View full email
-                </button>
-              ` : ""}
-              <span class="aiExpandedSpacer"></span>
-              <button type="button" class="aiDecisionBtn approve" data-decision="approved" data-id="${escapeHtml(action.id)}">
-                <i class="bi bi-check2" aria-hidden="true"></i>
-                Allow
-              </button>
-              <button type="button" class="aiDecisionBtn reject" data-open-reject="${escapeHtml(action.id)}">
-                <i class="bi bi-x-lg" aria-hidden="true"></i>
-                Reject
-              </button>
-              <button type="button" class="aiDecisionBtn later" data-decision="later" data-id="${escapeHtml(action.id)}">
-                <i class="bi bi-bookmark" aria-hidden="true"></i>
-                Review later
-              </button>
-            </div>
-            <div class="aiRejectBox" id="aiRejectBox-${escapeHtml(action.id)}">
-              <textarea data-reject-reason="${escapeHtml(action.id)}" placeholder="Add rejection reason...">${escapeHtml(decision.reason || "")}</textarea>
-              <button type="button" class="aiDecisionBtn reject" data-decision="rejected" data-id="${escapeHtml(action.id)}">Confirm rejection</button>
-            </div>
+            ${activeAction ? actionDetailPanel(activeAction) : ""}
           </div>
         </td>
       </tr>
     `;
   }
 
+  function getActiveAction(invoice) {
+    const activeId = state.activeActionByInvoice[invoice.invoiceNo];
+    return invoice.actions.find((action) => action.id === activeId) || invoice.actions[0] || null;
+  }
+
+  function actionPill(action, activeAction) {
+    const meta = actionTypeMeta[action.type] || actionTypeMeta.activity;
+    const isActive = activeAction?.id === action.id ? "is-active" : "";
+    const stateLabel = getScheduleLabel(action);
+    return `
+      <button type="button" class="aiActionPill ${isActive}" data-action-pill="${escapeHtml(action.id)}">
+        <i class="bi ${meta.icon}" aria-hidden="true"></i>
+        <span>${escapeHtml(action.label)}</span>
+        <em>${escapeHtml(stateLabel)}</em>
+      </button>
+    `;
+  }
+
+  function actionDetailPanel(action) {
+    const decision = getDecision(action);
+    const meta = actionTypeMeta[action.type] || actionTypeMeta.activity;
+    return `
+      <div class="aiActionDetailPanel">
+        <div class="aiActionDetailHead">
+          <div>
+            <span class="aiPill ${escapeHtml(action.type)}"><i class="bi ${meta.icon}" aria-hidden="true"></i>${escapeHtml(meta.label)}</span>
+            <h3>${escapeHtml(action.label)}</h3>
+            <p>${escapeHtml(getScheduleLabel(action))} for ${escapeHtml(action.scheduledAt || "next available slot")}</p>
+          </div>
+          <span class="aiPill ${escapeHtml(decision.state)}">${escapeHtml(getScheduleLabel(action))}</span>
+        </div>
+        <div class="aiDetailGrid">
+          ${kv("Source", action.source)}
+          ${kv("Evidence", action.evidence)}
+          ${kv("Action that will happen", action.actionDetail)}
+          ${kv("Confidence / Risk", `${action.confidence}% / ${action.risk}`)}
+        </div>
+        ${compactEmail(action)}
+        <div class="aiTimeline compact">
+          ${action.timeline.map(([time, title, body]) => `
+            <div class="aiTimelineItem">
+              <strong>${escapeHtml(title)}</strong>
+              <span>${escapeHtml(time)} | ${escapeHtml(body)}</span>
+            </div>
+          `).join("")}
+        </div>
+        <div class="aiExpandedActions">
+          <button type="button" class="aiDecisionBtn approve" data-decision="scheduled" data-id="${escapeHtml(action.id)}">
+            <i class="bi bi-check2" aria-hidden="true"></i>
+            Keep scheduled
+          </button>
+          ${action.email ? `
+            <button type="button" class="aiGhostBtn" data-drawer="email" data-id="${escapeHtml(action.id)}">
+              <i class="bi bi-envelope-paper" aria-hidden="true"></i>
+              View email
+            </button>
+          ` : ""}
+          <button type="button" class="aiDecisionBtn later" data-decision="later" data-id="${escapeHtml(action.id)}">
+            <i class="bi bi-bookmark" aria-hidden="true"></i>
+            Review later
+          </button>
+          <button type="button" class="aiDecisionBtn reject" data-open-reject="${escapeHtml(action.id)}">
+            <i class="bi bi-x-lg" aria-hidden="true"></i>
+            Revoke
+          </button>
+        </div>
+        <div class="aiRejectBox" id="aiRejectBox-${escapeHtml(action.id)}">
+          <textarea data-reject-reason="${escapeHtml(action.id)}" placeholder="Reason for revoking this scheduled action...">${escapeHtml(decision.reason || "")}</textarea>
+          <button type="button" class="aiDecisionBtn reject" data-decision="revoked" data-id="${escapeHtml(action.id)}">Confirm revoke</button>
+        </div>
+      </div>
+    `;
+  }
+
   function compactEmail(action) {
     if (!action.email) {
-      return `<p><strong>Email:</strong> No customer email will be sent.</p>`;
+      return `<div class="aiCompactEmail"><strong>Email:</strong> No customer email will be sent for this action.</div>`;
     }
 
     return `
@@ -477,23 +594,6 @@
       <div class="aiKv">
         <span>${escapeHtml(label)}</span>
         <strong>${escapeHtml(value)}</strong>
-      </div>
-    `;
-  }
-
-  function renderDecisionHistory(action, decision) {
-    if (!decision.decidedAt) {
-      return `
-        <div class="aiTimelineItem">
-          <strong>AI recommendation generated</strong>
-          <span>Pending human review | ${escapeHtml(action.recommendation)}</span>
-        </div>
-      `;
-    }
-    return `
-      <div class="aiTimelineItem">
-        <strong>${decision.state === "approved" ? "Action allowed" : decision.state === "rejected" ? "Action rejected" : "Marked review later"}</strong>
-        <span>${escapeHtml(decision.decidedAt)} | ${escapeHtml(decision.reviewer || "Reviewer")}${decision.reason ? ` | Reason: ${escapeHtml(decision.reason)}` : ""}</span>
       </div>
     `;
   }
@@ -528,7 +628,7 @@
       button.addEventListener("click", () => {
         state.role = button.dataset.role || "agent";
         state.activeAgent = state.role === "manager" ? "all" : "Aditi Sharma";
-        state.expandedId = "";
+        state.expandedInvoice = "";
         closeDrawer();
         document.querySelectorAll("[data-role]").forEach((item) => {
           const active = item.dataset.role === state.role;
@@ -541,17 +641,37 @@
 
     const search = document.getElementById("aiSearchInput");
     const actionFilter = document.getElementById("aiActionFilter");
+    const scheduleFilter = document.getElementById("aiScheduleFilter");
 
     if (search) search.addEventListener("input", () => { state.search = search.value; renderTable(); });
-    if (actionFilter) actionFilter.addEventListener("change", () => { state.actionType = actionFilter.value; state.expandedId = ""; renderTable(); });
+    if (actionFilter) actionFilter.addEventListener("change", () => {
+      state.actionType = actionFilter.value;
+      state.expandedInvoice = "";
+      renderTable();
+    });
+    if (scheduleFilter) scheduleFilter.addEventListener("change", () => {
+      state.scheduleState = scheduleFilter.value;
+      state.expandedInvoice = "";
+      renderTable();
+    });
 
     document.addEventListener("click", (event) => {
       const agentChip = event.target.closest("[data-agent]");
       if (agentChip) {
         state.activeAgent = agentChip.dataset.agent || "all";
-        state.expandedId = "";
+        state.expandedInvoice = "";
         closeDrawer();
         renderAll();
+        return;
+      }
+
+      const actionPill = event.target.closest("[data-action-pill]");
+      if (actionPill) {
+        const action = actions.find((item) => item.id === actionPill.dataset.actionPill);
+        if (action) {
+          state.activeActionByInvoice[action.invoiceNo] = action.id;
+          renderTable();
+        }
         return;
       }
 
@@ -582,27 +702,33 @@
         event.stopPropagation();
         const id = decisionButton.dataset.id;
         const nextState = decisionButton.dataset.decision;
-        const reason = nextState === "rejected"
-          ? (document.querySelector(`[data-reject-reason="${CSS.escape(id)}"]`)?.value || "Rejected by reviewer")
+        const reason = nextState === "revoked"
+          ? (document.querySelector(`[data-reject-reason="${CSS.escape(id)}"]`)?.value || "Revoked by reviewer")
           : "";
         setDecision(id, nextState, reason);
         return;
       }
 
-      const row = event.target.closest("[data-action-id]");
+      const reviewButton = event.target.closest("[data-review-invoice]");
+      if (reviewButton) {
+        const nextInvoice = reviewButton.dataset.reviewInvoice || "";
+        state.expandedInvoice = state.expandedInvoice === nextInvoice ? "" : nextInvoice;
+        renderTable();
+        return;
+      }
+
+      const row = event.target.closest("[data-invoice-no]");
       if (row) {
-        const reviewButton = event.target.closest("[data-review-id]");
-        const nextId = reviewButton?.dataset.reviewId || row.dataset.actionId || "";
-        state.expandedId = state.expandedId === nextId ? "" : nextId;
+        state.expandedInvoice = state.expandedInvoice === row.dataset.invoiceNo ? "" : row.dataset.invoiceNo || "";
         renderTable();
       }
     });
 
     document.addEventListener("keydown", (event) => {
       if (event.key !== "Enter") return;
-      const row = event.target.closest("[data-action-id]");
+      const row = event.target.closest("[data-invoice-no]");
       if (!row) return;
-      state.expandedId = row.dataset.actionId || "";
+      state.expandedInvoice = row.dataset.invoiceNo || "";
       renderTable();
     });
   }
@@ -618,65 +744,20 @@
     drawer.innerHTML = `
       <div class="aiDrawerHeader">
         <div>
-          <div class="aiEyebrow">${drawerTitle()}</div>
+          <div class="aiEyebrow">Email Preview</div>
           <h2>${escapeHtml(action.invoiceNo)}</h2>
-          <p>${escapeHtml(action.customer)} | ${escapeHtml(action.agent)}</p>
+          <p>${escapeHtml(action.customer)} | ${escapeHtml(action.label)}</p>
         </div>
         <button type="button" class="aiIconBtn" data-drawer-close aria-label="Close details">
           <i class="bi bi-x-lg" aria-hidden="true"></i>
         </button>
       </div>
-      ${drawerBody(action)}
-    `;
-  }
-
-  function drawerTitle() {
-    if (state.drawerView === "history") return "Activity Trail";
-    if (state.drawerView === "evidence") return "AI Evidence";
-    return "Email Preview";
-  }
-
-  function drawerBody(action) {
-    if (state.drawerView === "history") {
-      return `
-        <div class="aiTimeline">
-          ${renderDecisionHistory(action, getDecision(action))}
-          ${action.timeline.map(([time, title, body]) => `
-            <div class="aiTimelineItem">
-              <strong>${escapeHtml(title)}</strong>
-              <span>${escapeHtml(time)} | ${escapeHtml(body)}</span>
-            </div>
-          `).join("")}
-        </div>
-      `;
-    }
-
-    if (state.drawerView === "evidence") {
-      return `
-        <div class="aiDetailGrid is-drawer">
-          ${kv("Invoice amount", `Rs. ${formatINR(action.invoiceAmount)}`)}
-          ${kv("Net due", `Rs. ${formatINR(action.netDue)}`)}
-          ${kv("Invoice date", action.invoiceDate)}
-          ${kv("Due date", action.dueDate)}
-          ${kv("Current status", action.currentStatus)}
-          ${kv("Previous status", action.previousStatus)}
-          ${kv("Recommended status", action.recommendedStatus)}
-          ${kv("Confidence / Risk", `${action.confidence}% / ${action.risk}`)}
-        </div>
+      ${action.email ? renderFullEmail(action) : `
         <div class="aiReviewBox">
-          <h3>AI reasoning</h3>
-          <p><strong>Found:</strong> ${escapeHtml(action.summary)}</p>
-          <p><strong>Action:</strong> ${escapeHtml(action.actionDetail)}</p>
-          <p><strong>Expected outcome:</strong> ${escapeHtml(action.expectedOutcome)}</p>
+          <h3>No email for this action</h3>
+          <p>This recommendation updates workflow only. No customer email will be sent.</p>
         </div>
-      `;
-    }
-
-    return action.email ? renderFullEmail(action) : `
-      <div class="aiReviewBox">
-        <h3>No email for this action</h3>
-        <p>This AI recommendation updates invoice workflow only. No customer email will be sent.</p>
-      </div>
+      `}
     `;
   }
 

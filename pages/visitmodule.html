@@ -454,6 +454,11 @@
       color: #0c4a6e;
     }
 
+    @keyframes slideUp {
+      from { transform: translateY(12px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
     .planModalOverlay {
       position: fixed;
       inset: 0;
@@ -473,6 +478,16 @@
       max-height: 90vh;
       overflow: auto;
       box-shadow: 0 24px 50px rgba(15, 23, 42, 0.2);
+    }
+
+    .planModalOverlay.hasShortfallPanel {
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+    }
+
+    .planModalOverlay.hasShortfallPanel .planModal {
+      max-width: 820px;
     }
 
     .planModalHeader {
@@ -510,6 +525,143 @@
       padding: 14px 18px;
       border-top: 1px solid #e2e8f4;
       background: #f8fafc;
+    }
+
+    .previousShortfallPanel {
+      width: min(520px, 100%);
+      max-height: 90vh;
+      overflow: auto;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 24px 50px rgba(15, 23, 42, 0.2);
+      border: 1px solid #e2e8f4;
+      animation: slideUp 0.25s ease;
+    }
+
+    .previousShortfallHeader {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      border-bottom: 1px solid #e2e8f4;
+      background: #ffffff;
+    }
+
+    .previousShortfallHeader h3 {
+      margin: 0;
+      font-size: 16px;
+      color: #111827;
+    }
+
+    .previousShortfallHeader p {
+      margin: 4px 0 0;
+      color: #475569;
+      font-size: 12px;
+    }
+
+    .previousShortfallBody {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      color: #475569;
+      font-size: 13px;
+    }
+
+    .previousShortfallCounts {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .previousShortfallCountCard {
+      border: 1px solid #e2e8f4;
+      border-radius: 14px;
+      background: #ffffff;
+      padding: 14px;
+    }
+
+    .previousShortfallCountCard:first-child {
+      background: #f3f0ff;
+    }
+
+    .previousShortfallCountCard span {
+      display: block;
+      color: #64748b;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .previousShortfallCountCard strong {
+      display: block;
+      margin-top: 4px;
+      color: #111827;
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    .previousShortfallTableWrap {
+      border: 1px solid #e2e8f4;
+      border-radius: 12px;
+      overflow: auto;
+    }
+
+    .previousShortfallFooter {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      padding: 12px 16px;
+      border-top: 1px solid #e2e8f4;
+      background: #f8fafc;
+    }
+
+    .previousShortfallFooter .btnPrimary {
+      background: #4b1f73;
+      color: #ffffff;
+      border: 1px solid #3b1759;
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-weight: 700;
+    }
+
+    .previousShortfallFooter .btnSecondary {
+      background: #ffffff;
+      color: var(--brand-dark);
+      border: 1px solid var(--brand-border);
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-weight: 700;
+    }
+
+    .previousShortfallHeader .closeBtn {
+      border: 1px solid #e2e8f4;
+      background: #ffffff;
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .previousShortfallField.invalid textarea {
+      border-color: #fca5a5;
+      box-shadow: 0 0 0 2px rgba(248, 113, 113, 0.2);
+    }
+
+    .previousShortfallField .fieldError {
+      display: none;
+      color: #b91c1c;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .previousShortfallField.invalid .fieldError {
+      display: block;
     }
 
     .planFieldRow {
@@ -666,6 +818,32 @@
       font-size: 11px;
       color: #475569;
       padding: 0 2px;
+    }
+
+    .aiSuggestedVisitPanel {
+      border-color: #ddd6fe;
+      background: #fbf8ff;
+    }
+
+    .aiSuggestedVisitPanel .searchResults {
+      border-color: #ddd6fe;
+    }
+
+    .aiReasonBtn {
+      width: 18px;
+      height: 18px;
+      border: 1px solid #cbd5e1;
+      border-radius: 999px;
+      background: #ffffff;
+      color: #475569;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      font-size: 10px;
+      font-weight: 900;
+      line-height: 1;
+      cursor: help;
     }
 
     .planRemoveBtn {
@@ -968,6 +1146,11 @@
       background: #dcfce7;
     }
 
+    .visitStatusPill.visited {
+      color: #075985;
+      background: #dbeafe;
+    }
+
     .visitStatusPill.notVisited {
       color: #991b1b;
       background: #fee2e2;
@@ -978,6 +1161,27 @@
     .visitStatusPill.unplanned {
       color: #92400e;
       background: #fef3c7;
+    }
+
+    @media (max-width: 1180px) {
+      .planModalOverlay.hasShortfallPanel {
+        align-items: flex-start;
+        justify-content: flex-start;
+        flex-direction: column;
+        overflow: auto;
+      }
+
+      .planModalOverlay.hasShortfallPanel .planModal,
+      .previousShortfallPanel {
+        max-width: 100%;
+        max-height: none;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .previousShortfallCounts {
+        grid-template-columns: 1fr;
+      }
     }
 
     .officeTag {
@@ -1158,6 +1362,12 @@
           Simulate submit window (demo)
         </label>
       </div>
+      <div class="planFieldRow">
+        <label>
+          <input type="checkbox" id="simulatePreviousShortfallToggle" />
+          Simulating previous day shortfall
+        </label>
+      </div>
 
       <div class="planFieldRow hidden" id="shortfallWrap">
         <label for="shortfallReason">Shortfall reason (required after 2:30 PM)</label>
@@ -1189,6 +1399,11 @@
           <div class="managerSuggestHint">Suggestions are for this plan date. Use Add to include them.</div>
           <div class="searchResults" id="managerSuggestedCustomersList"></div>
         </div>
+        <div class="managerSuggestPanel aiSuggestedVisitPanel hidden" id="aiSuggestedVisitsWrap">
+          <div class="managerSuggestPanelHeader">AI suggested visits</div>
+          <div class="managerSuggestHint">Workflow suggestions for faster invoice collection.</div>
+          <div class="searchResults" id="aiSuggestedVisitsList"></div>
+        </div>
         <div class="visitTableCard">
           <h4>Selected visits</h4>
           <table class="planTableSmall">
@@ -1208,6 +1423,11 @@
         </div>
       </div>
 
+      <div class="planFieldRow">
+        <label for="planRemarkInput">Remark</label>
+        <textarea id="planRemarkInput" rows="2" placeholder="Add remark for this plan..."></textarea>
+      </div>
+
       <div class="planError hidden" id="planError"></div>
     </div>
     <div class="planModalFooter">
@@ -1216,6 +1436,41 @@
       <button class="btn btn-primary" type="button" id="planModalSave">Save plan</button>
     </div>
   </div>
+  <aside class="previousShortfallPanel hidden" id="previousShortfallPanel" aria-live="polite">
+    <div class="previousShortfallHeader">
+      <div>
+        <h3>Plan for <span id="previousShortfallDateLabel">-</span></h3>
+        <p>Capture why the previous working-day commitment had a visit shortfall.</p>
+      </div>
+      <button class="closeBtn" type="button" id="previousShortfallClose" aria-label="Close shortfall panel">
+        <i class="bi bi-x-lg" aria-hidden="true"></i>
+      </button>
+    </div>
+    <div class="previousShortfallBody">
+      <div class="previousShortfallCounts" id="previousShortfallCounts"></div>
+      <div class="previousShortfallTableWrap">
+        <table class="planTableSmall">
+          <thead>
+            <tr>
+              <th>Customer Code</th>
+              <th>Customer Name</th>
+              <th>Visit Status</th>
+            </tr>
+          </thead>
+          <tbody id="previousShortfallTableBody"></tbody>
+        </table>
+      </div>
+      <div class="planFieldRow previousShortfallField" id="previousShortfallField">
+        <label for="previousShortfallReason">Shortfall reason <span aria-hidden="true">*</span></label>
+        <textarea id="previousShortfallReason" rows="3" required aria-required="true" placeholder="Explain why planned visits were not completed..."></textarea>
+        <span class="fieldError hidden" id="previousShortfallError">Shortfall reason is required before submitting the plan.</span>
+      </div>
+    </div>
+    <div class="previousShortfallFooter">
+      <button class="btnSecondary" type="button" id="previousShortfallCancel">Cancel</button>
+      <button class="btnPrimary" type="button" id="previousShortfallSubmit">Submit plan</button>
+    </div>
+  </aside>
 </div>
 
   <script src="../scripts/shared-header.js"></script>
@@ -1269,20 +1524,34 @@
     const planDateLabel = document.getElementById("planDateLabel");
     const planTypeSelect = document.getElementById("planTypeSelect");
     const simulateSubmitToggle = document.getElementById("simulateSubmitToggle");
+    const simulatePreviousShortfallToggle = document.getElementById("simulatePreviousShortfallToggle");
     const shortfallWrap = document.getElementById("shortfallWrap");
     const shortfallReason = document.getElementById("shortfallReason");
     const leaveWrap = document.getElementById("leaveWrap");
     const leaveReason = document.getElementById("leaveReason");
     const officeWrap = document.getElementById("officeWrap");
     const officeReason = document.getElementById("officeReason");
+    const planRemarkInput = document.getElementById("planRemarkInput");
     const callingNotice = document.getElementById("callingNotice");
     const visitSection = document.getElementById("visitSection");
     const customerSearchInput = document.getElementById("customerSearchInput");
     const customerSearchResults = document.getElementById("customerSearchResults");
     const managerSuggestedCustomersWrap = document.getElementById("managerSuggestedCustomersWrap");
     const managerSuggestedCustomersList = document.getElementById("managerSuggestedCustomersList");
+    const aiSuggestedVisitsWrap = document.getElementById("aiSuggestedVisitsWrap");
+    const aiSuggestedVisitsList = document.getElementById("aiSuggestedVisitsList");
     const selectedCustomersBody = document.getElementById("selectedCustomersBody");
     const planError = document.getElementById("planError");
+    const previousShortfallPanel = document.getElementById("previousShortfallPanel");
+    const previousShortfallDateLabel = document.getElementById("previousShortfallDateLabel");
+    const previousShortfallClose = document.getElementById("previousShortfallClose");
+    const previousShortfallCancel = document.getElementById("previousShortfallCancel");
+    const previousShortfallSubmit = document.getElementById("previousShortfallSubmit");
+    const previousShortfallCounts = document.getElementById("previousShortfallCounts");
+    const previousShortfallTableBody = document.getElementById("previousShortfallTableBody");
+    const previousShortfallField = document.getElementById("previousShortfallField");
+    const previousShortfallReason = document.getElementById("previousShortfallReason");
+    const previousShortfallError = document.getElementById("previousShortfallError");
     const calendarWeekdaysEl = document.getElementById("calendarWeekdays");
     const calendarViewSelect = document.getElementById("calendarViewSelect");
     const calendarCustomerFilter = document.getElementById("calendarCustomerFilter");
@@ -1314,6 +1583,13 @@
       .replace(/<[^>]*>/g, " ")
       .replace(/[^a-z0-9]/g, "")
       .trim();
+
+    const escapeHtml = (value) => String(value || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
 
     const getPlanStateBadgeMarkup = (state) => {
       const normalized = String(state || "").trim().toLowerCase();
@@ -1733,6 +2009,180 @@
       return snapshot && typeof snapshot === "object" ? snapshot : {};
     };
 
+    const normalizeDateKey = (value) => {
+      if (!value) return "";
+      const parsed = Date.parse(String(value));
+      if (Number.isNaN(parsed)) return "";
+      const date = new Date(parsed);
+      return makeDateKey(date.getFullYear(), date.getMonth(), date.getDate());
+    };
+
+    const isFutureOrToday = (dateKey) => {
+      if (!dateKey) return false;
+      const now = new Date();
+      const todayKey = makeDateKey(now.getFullYear(), now.getMonth(), now.getDate());
+      return dateKey >= todayKey;
+    };
+
+    const findDirectoryCustomer = (invoiceRow) => {
+      const codeKey = normalizeText(invoiceRow?.customerCode || "");
+      const nameKey = normalizeText(invoiceRow?.customerName || "");
+      return customerDirectory.find((item) => (
+        (codeKey && normalizeText(item.code) === codeKey)
+        || (nameKey && normalizeText(item.customer) === nameKey)
+      )) || null;
+    };
+
+    const getAiSuggestedVisitsForDate = (dateKey) => {
+      if (!dateKey || !isFutureOrToday(dateKey)) return [];
+      const invoices = readJson(invoiceStorageKey, []);
+      const invoiceRows = Array.isArray(invoices) && invoices.length
+        ? invoices
+        : [{
+            customerName: "Apollo Pharmacy",
+            customerCode: "CUST-001",
+            invoiceNo: "INV-10308",
+            primaryStatus: "PTP",
+            status: "PTP",
+            ptpDate: "2026-05-28"
+          }];
+      const activityMap = getActivityTrailMap();
+      const plannedKeys = new Set((getPlansForAgentOnDate(dateKey, getSubmittingAgentForDate(dateKey)) || [])
+        .map((plan) => normalizeText(plan.code) || normalizeText(plan.customer))
+        .filter(Boolean));
+      const suggestions = new Map();
+
+      const upsertSuggestion = (row, source, reason, visitReason) => {
+        const directory = findDirectoryCustomer(row);
+        const code = String(row?.customerCode || directory?.code || "").trim();
+        const customer = String(row?.customerName || directory?.customer || "").trim();
+        const key = normalizeText(code) || normalizeText(customer);
+        if (!key || plannedKeys.has(key) || suggestions.has(key)) return;
+        suggestions.set(key, {
+          customer: directory?.customer || customer || code,
+          code,
+          agent: directory?.agent || syncedAgentName,
+          manager: directory?.manager || "Mukesh Mishra",
+          kam: directory?.kam || "-",
+          kas: directory?.kas || "-",
+          reason: visitReason || "Collection follow up",
+          aiReason: `Source: ${source}. ${reason}`,
+          candidateKey: key,
+          source
+        });
+      };
+
+      const entryText = (entry) => {
+        const data = entry?.data || {};
+        return [
+          data.subject,
+          data.body,
+          data.remarks,
+          data.subStatus,
+          data.primaryStatus,
+          data.broadStatus,
+          data.activityType
+        ].filter(Boolean).join(" ");
+      };
+
+      invoiceRows.forEach((row) => {
+        const invoiceNo = String(row?.invoiceNo || "").trim();
+        const entries = Array.isArray(activityMap[invoiceNo]) ? activityMap[invoiceNo] : [];
+        const latestPtp = entries.find((entry) => {
+          const data = entry?.data || {};
+          const primary = String(data.primaryStatus || "").toLowerCase();
+          const sub = String(data.subStatus || "").toLowerCase();
+          return entry?.type === "status" && (primary === "ptp" || sub.includes("ptp")) && normalizeDateKey(data.ptpDate) === dateKey;
+        });
+        const rowPtpDate = normalizeDateKey(row?.ptpDate);
+        if (latestPtp || rowPtpDate === dateKey) {
+          upsertSuggestion(
+            row,
+            "Activity - PTP",
+            `PTP for this date${invoiceNo ? ` on ${invoiceNo}` : ""}.`,
+            "Collection follow up"
+          );
+          return;
+        }
+
+        const emailChequeRequest = entries.find((entry) => {
+          if (entry?.type !== "email") return false;
+          const text = entryText(entry).toLowerCase();
+          const asksForChequeCollection = /\b(?:collect|pickup|pick\s*up|receive|take)\b/.test(text)
+            && /\b(?:cheque|cheques|pdc)\b/.test(text);
+          return asksForChequeCollection;
+        });
+        if (emailChequeRequest) {
+          upsertSuggestion(
+            row,
+            "Email",
+            `Customer asked to collect cheques${invoiceNo ? ` for ${invoiceNo}` : ""}.`,
+            "Collection follow up"
+          );
+          return;
+        }
+
+        const deliveryEmail = entries.find((entry) => {
+          if (entry?.type !== "email") return false;
+          return /\b(?:delivery\s+challan|dc\s+copy|challan\s+(?:missing|required)|document\s+(?:missing|required))\b/i.test(entryText(entry));
+        });
+        const hasDeliveryActivity = entries.some((entry) => {
+          if (entry?.type !== "status") return false;
+          const text = entryText(entry).toLowerCase();
+          return text.includes("delivery challan");
+        }) || String(row?.status || row?.subStatus || "").toLowerCase().includes("delivery challan");
+        if (deliveryEmail || hasDeliveryActivity) {
+          upsertSuggestion(
+            row,
+            deliveryEmail ? "Email" : "Activity - Issue",
+            `Submit Delivery Challan as requested${invoiceNo ? ` for ${invoiceNo}` : ""}.`,
+            "Invoice Submission"
+          );
+          return;
+        }
+
+        const followUpActivity = entries.find((entry) => {
+          if (entry?.type !== "status") return false;
+          const text = entryText(entry).toLowerCase();
+          return text.includes("follow up visit")
+            || text.includes("follow-up visit")
+            || text.includes("call back/email follow up")
+            || (String(entry?.data?.activityType || "").toLowerCase() === "visited" && text.includes("follow"));
+        });
+        if (followUpActivity) {
+          upsertSuggestion(
+            row,
+            "Activity - Follow-up visit",
+            `Follow-up visit required${invoiceNo ? ` for ${invoiceNo}` : ""}.`,
+            "Collection follow up"
+          );
+          return;
+        }
+
+        const rowStatusText = [
+          row?.invoiceStatus,
+          row?.status,
+          row?.subStatus,
+          row?.primaryStatus
+        ].filter(Boolean).join(" ").toLowerCase();
+        const needsInvoiceSubmission = rowStatusText.includes("not submitted")
+          || rowStatusText.includes("invoice submission")
+          || rowStatusText.includes("invoice copy required");
+        if (needsInvoiceSubmission) {
+          upsertSuggestion(
+            row,
+            "Invoice status",
+            `Invoice submission pending${invoiceNo ? ` for ${invoiceNo}` : ""}.`,
+            "Invoice Submission"
+          );
+        }
+      });
+
+      return Array.from(suggestions.values())
+        .sort((a, b) => String(a.customer || "").localeCompare(String(b.customer || "")))
+        .slice(0, 4);
+    };
+
     const getVisitedCustomerKeysByAgentForDate = (dateKey) => {
       const invoiceMap = getInvoiceCustomerMap();
       const activityMap = getActivityTrailMap();
@@ -1783,6 +2233,96 @@
         });
       });
       return latestByAgentCustomer;
+    };
+
+    const getPreviousWorkingDayKey = (dateKey) => {
+      if (!dateKey || dateKey === "-") return "";
+      const [year, month, day] = dateKey.split("-").map(Number);
+      if ([year, month, day].some(Number.isNaN)) return "";
+      const date = new Date(year, month - 1, day);
+      let guard = 0;
+      do {
+        date.setDate(date.getDate() - 1);
+        guard += 1;
+      } while (guard < 14 && isHolidayDate(makeDateKey(date.getFullYear(), date.getMonth(), date.getDate())));
+      return makeDateKey(date.getFullYear(), date.getMonth(), date.getDate());
+    };
+
+    const getVisitedActivityCustomersForAgentOnDate = (dateKey, agentName) => {
+      const invoiceMap = getInvoiceCustomerMap();
+      const activityMap = getActivityTrailMap();
+      const targetAgentKey = normalizeText(agentName || "");
+      const latestByCustomer = new Map();
+      Object.entries(activityMap).forEach(([invoiceNo, entries]) => {
+        const customerInfo = invoiceMap.get(invoiceNo);
+        if (!customerInfo) return;
+        const customerName = String(customerInfo.customer || "").trim();
+        const customerCode = String(customerInfo.code || "").trim();
+        const primaryKey = normalizeText(customerCode) || normalizeText(customerName);
+        if (!primaryKey) return;
+        (Array.isArray(entries) ? entries : []).forEach((entry) => {
+          if (!entry || entry.type !== "status") return;
+          const data = entry.data || {};
+          if (String(data.activityType || "").trim().toLowerCase() !== "visited") return;
+          if (getDateKeyFromTimestamp(entry.at || entry.when) !== dateKey) return;
+          if (targetAgentKey && normalizeText(data.actorName || "") !== targetAgentKey) return;
+          const atTime = Date.parse(entry.at || entry.when || data.performedAt || "") || 0;
+          const existing = latestByCustomer.get(primaryKey);
+          if (existing && existing.time >= atTime) return;
+          latestByCustomer.set(primaryKey, {
+            code: customerCode || "-",
+            customer: customerName || customerCode || "-",
+            time: atTime
+          });
+        });
+      });
+      return Array.from(latestByCustomer.values());
+    };
+
+    const buildPreviousShortfallSummary = (planDateKey, agentName) => {
+      const previousDateKey = getPreviousWorkingDayKey(planDateKey);
+      const planned = getPlansForAgentOnDate(previousDateKey, agentName);
+      const visitedRows = getVisitedActivityCustomersForAgentOnDate(previousDateKey, agentName);
+      const visitedAliases = new Set();
+      visitedRows.forEach((row) => {
+        const codeKey = normalizeText(row.code || "");
+        const customerKey = normalizeText(row.customer || "");
+        if (codeKey) visitedAliases.add(codeKey);
+        if (customerKey) visitedAliases.add(customerKey);
+      });
+      const plannedAliases = new Set();
+      const plannedRows = planned.map((plan) => {
+        const codeKey = normalizeText(plan.code || "");
+        const customerKey = normalizeText(plan.customer || "");
+        if (codeKey) plannedAliases.add(codeKey);
+        if (customerKey) plannedAliases.add(customerKey);
+        const visited = Boolean((codeKey && visitedAliases.has(codeKey)) || (customerKey && visitedAliases.has(customerKey)));
+        return {
+          code: String(plan.code || "-"),
+          customer: String(plan.customer || "-"),
+          status: visited ? "Visited" : "Not Visited"
+        };
+      });
+      const unplannedRows = visitedRows
+        .filter((row) => {
+          const codeKey = normalizeText(row.code || "");
+          const customerKey = normalizeText(row.customer || "");
+          return !((codeKey && plannedAliases.has(codeKey)) || (customerKey && plannedAliases.has(customerKey)));
+        })
+        .map((row) => ({
+          code: String(row.code || "-"),
+          customer: String(row.customer || "-"),
+          status: "Unplanned"
+        }));
+      return {
+        previousDateKey,
+        counts: {
+          planned: plannedRows.length,
+          visited: plannedRows.filter((row) => row.status === "Visited").length,
+          unplanned: unplannedRows.length
+        },
+        rows: plannedRows.concat(unplannedRows)
+      };
     };
 
     const renderVisitPlanTrail = () => {
@@ -2029,6 +2569,7 @@
     let currentSearchCandidateMap = new Map();
     let currentManagerSuggestedMap = new Map();
     let currentManagerRemoveSuggestedMap = new Map();
+    let currentAiSuggestedMap = new Map();
 
     clearStoredVisitPlansOnce();
     clearStoredVisitTrailOnce();
@@ -2270,6 +2811,140 @@
       `;
     };
 
+    const renderAiSuggestedVisits = () => {
+      if (!aiSuggestedVisitsWrap || !aiSuggestedVisitsList) return;
+      const planDate = currentPlanDateKey || selectedDateKey;
+      const suggestions = getAiSuggestedVisitsForDate(planDate);
+      aiSuggestedVisitsWrap.classList.toggle("hidden", suggestions.length === 0);
+      currentAiSuggestedMap = new Map();
+      suggestions.forEach((item) => {
+        const key = String(item.candidateKey || "");
+        if (key) currentAiSuggestedMap.set(key, item);
+      });
+      if (!suggestions.length) {
+        aiSuggestedVisitsList.innerHTML = "";
+        return;
+      }
+      aiSuggestedVisitsList.innerHTML = suggestions.map((item) => {
+        const key = String(item.candidateKey || "");
+        const isAdded = selectedCustomers.has(key);
+        const reason = item.aiReason || "Source: AI. Suggested next visit.";
+        return `
+          <div class="searchItem">
+            <div>
+              <div class="searchItemName">${escapeHtml(item.customer)}</div>
+              <div class="searchItemCode">${escapeHtml(item.code || "-")} • ${escapeHtml(item.source || "AI")}</div>
+            </div>
+            <div style="display:inline-flex; align-items:center; gap:4px;">
+              <button class="aiReasonBtn" type="button" title="${escapeHtml(reason)}" data-ai-reason="${escapeHtml(reason)}" aria-label="Why suggested">i</button>
+              <button
+                class="planBtnSmall"
+                type="button"
+                data-action="add-ai-suggested"
+                data-candidate-key="${escapeHtml(key)}"
+                ${isAdded ? "disabled" : ""}>
+                ${isAdded ? "Added" : "Add"}
+              </button>
+            </div>
+          </div>
+        `;
+      }).join("");
+    };
+
+    const isPreviousShortfallPanelOpen = () => (
+      previousShortfallPanel && !previousShortfallPanel.classList.contains("hidden")
+    );
+
+    const hidePreviousShortfallError = () => {
+      if (previousShortfallField) previousShortfallField.classList.remove("invalid");
+      if (previousShortfallReason) previousShortfallReason.setAttribute("aria-invalid", "false");
+      if (previousShortfallError) {
+        previousShortfallError.textContent = "";
+        previousShortfallError.classList.add("hidden");
+      }
+    };
+
+    const showPreviousShortfallError = (message) => {
+      if (previousShortfallField) previousShortfallField.classList.add("invalid");
+      if (previousShortfallReason) {
+        previousShortfallReason.setAttribute("aria-invalid", "true");
+        previousShortfallReason.focus();
+      }
+      if (previousShortfallError) {
+        previousShortfallError.textContent = message;
+        previousShortfallError.classList.remove("hidden");
+      }
+    };
+
+    const closePreviousShortfallPanel = () => {
+      if (previousShortfallPanel) previousShortfallPanel.classList.add("hidden");
+      if (planModalOverlay) planModalOverlay.classList.remove("hasShortfallPanel");
+      hidePreviousShortfallError();
+    };
+
+    const renderPreviousShortfallPanel = (dateKey, agentName) => {
+      if (!previousShortfallPanel || !previousShortfallCounts || !previousShortfallTableBody) return null;
+      const summary = buildPreviousShortfallSummary(dateKey, agentName);
+      if (previousShortfallDateLabel) {
+        previousShortfallDateLabel.textContent = formatReadableDate(summary.previousDateKey);
+      }
+      previousShortfallCounts.innerHTML = `
+        <div class="previousShortfallCountCard"><span>Visit planned</span><strong>${summary.counts.planned}</strong></div>
+        <div class="previousShortfallCountCard"><span>Visited</span><strong>${summary.counts.visited}</strong></div>
+        <div class="previousShortfallCountCard"><span>Unplanned visits</span><strong>${summary.counts.unplanned}</strong></div>
+      `;
+      previousShortfallTableBody.innerHTML = summary.rows.length
+        ? summary.rows.map((row) => `
+          <tr>
+            <td>${escapeHtml(row.code || "-")}</td>
+            <td>${escapeHtml(row.customer || "-")}</td>
+            <td>${renderVisitStatusPill(row.status)}</td>
+          </tr>
+        `).join("")
+        : `<tr><td colspan="3" style="color:#94a3b8;">No planned or unplanned visits found for this day.</td></tr>`;
+      if (previousShortfallReason) {
+        previousShortfallReason.value = String(shortfallReasonsByDate[summary.previousDateKey] || "").trim();
+      }
+      hidePreviousShortfallError();
+      return summary;
+    };
+
+    const openPreviousShortfallPanel = (dateKey, agentName) => {
+      const summary = renderPreviousShortfallPanel(dateKey, agentName);
+      if (!summary || !previousShortfallPanel) return false;
+      previousShortfallPanel.dataset.dateKey = summary.previousDateKey || "";
+      previousShortfallPanel.dataset.agentName = String(agentName || "");
+      previousShortfallPanel.classList.remove("hidden");
+      if (planModalOverlay) planModalOverlay.classList.add("hasShortfallPanel");
+      if (previousShortfallReason) previousShortfallReason.focus();
+      return true;
+    };
+
+    const persistPreviousShortfallReason = () => {
+      if (!previousShortfallPanel) return false;
+      const reason = String(previousShortfallReason?.value || "").trim();
+      if (!reason) {
+        showPreviousShortfallError("Shortfall reason is required before submitting the plan.");
+        return false;
+      }
+      const previousDateKey = String(previousShortfallPanel.dataset.dateKey || "").trim();
+      const agentName = String(previousShortfallPanel.dataset.agentName || getSubmittingAgentForDate(currentPlanDateKey || selectedDateKey)).trim();
+      if (!previousDateKey || !agentName) {
+        showPreviousShortfallError("Unable to identify the previous working-day plan context.");
+        return false;
+      }
+      shortfallReasonsByDate[previousDateKey] = reason;
+      const { actorRole } = getActorContext();
+      saveRemarkRecord(previousDateKey, agentName, actorRole, `Shortfall reason: ${reason}`);
+      hidePreviousShortfallError();
+      return true;
+    };
+
+    const submitPlanWithPreviousShortfall = () => {
+      if (!persistPreviousShortfallReason()) return;
+      savePlan(true, { skipPreviousShortfall: true });
+    };
+
     const updatePlanTypeUI = () => {
       const type = planTypeSelect ? planTypeSelect.value : "visit";
       if (visitSection) visitSection.classList.toggle("hidden", !(type === "visit" || type === "both"));
@@ -2314,6 +2989,10 @@
       if (leaveReason) leaveReason.value = "";
       if (officeReason) officeReason.value = "";
       if (shortfallReason) shortfallReason.value = "";
+      if (planRemarkInput) planRemarkInput.value = "";
+      if (simulatePreviousShortfallToggle) simulatePreviousShortfallToggle.checked = false;
+      if (previousShortfallReason) previousShortfallReason.value = "";
+      closePreviousShortfallPanel();
       if (customerSearchInput) customerSearchInput.value = "";
 
       if (planError) {
@@ -2325,6 +3004,7 @@
       updateShortfallVisibility();
       renderSearchResults();
       renderManagerSuggestedCustomers();
+      renderAiSuggestedVisits();
       renderSelectedCustomers();
 
       planModalOverlay.classList.remove("hidden");
@@ -2333,6 +3013,7 @@
 
     const closePlanModal = () => {
       if (!planModalOverlay) return;
+      closePreviousShortfallPanel();
       planModalOverlay.classList.add("hidden");
       planModalOverlay.setAttribute("aria-hidden", "true");
     };
@@ -2462,6 +3143,7 @@
       if (!label) return "-";
       const key = normalizeText(label);
       let className = "planned";
+      if (key === "visited") className = "visited";
       if (key === "notvisited") className = "notVisited";
       if (key === "unplanned") className = "unplanned";
       return `<span class="visitStatusPill ${className}">${label}</span>`;
@@ -2702,7 +3384,7 @@
       }
     };
 
-    const savePlan = (isSubmit) => {
+    const savePlan = (isSubmit, options = {}) => {
       if (!currentPlanDateKey) return;
       const dateKey = currentPlanDateKey;
       const type = planTypeSelect ? planTypeSelect.value : "visit";
@@ -2745,6 +3427,15 @@
       if (planError) {
         planError.textContent = "";
         planError.classList.add("hidden");
+      }
+
+      if (isSubmit && !options.skipPreviousShortfall && simulatePreviousShortfallToggle?.checked) {
+        if (isPreviousShortfallPanelOpen()) {
+          submitPlanWithPreviousShortfall();
+          return;
+        }
+        openPreviousShortfallPanel(dateKey, planOwner);
+        return;
       }
 
       const labels = [];
@@ -2805,6 +3496,11 @@
       sampleLabels[dateKey] = labels;
       setPlanSubmissionState(dateKey, planOwner, isSubmit ? "submitted" : "draft");
       const shortfallText = needsShortfall && shortfallReason ? shortfallReason.value.trim() : "";
+      const planRemarkText = planRemarkInput ? planRemarkInput.value.trim() : "";
+      if (planRemarkText) {
+        const { actorRole } = getActorContext();
+        saveRemarkRecord(dateKey, planOwner, actorRole, planRemarkText);
+      }
       const agentStatusLabel = isSubmit && !hadExistingPlan ? "New plan submitted" : "Updated Plan";
       const toCustomerMap = (list) => {
         const map = new Map();
@@ -2859,6 +3555,12 @@
       simulateSubmitToggle.addEventListener("change", updatePlanTypeUI);
     }
 
+    if (simulatePreviousShortfallToggle) {
+      simulatePreviousShortfallToggle.addEventListener("change", () => {
+        if (!simulatePreviousShortfallToggle.checked) closePreviousShortfallPanel();
+      });
+    }
+
     if (customerSearchInput) {
       customerSearchInput.addEventListener("input", renderSearchResults);
     }
@@ -2878,6 +3580,7 @@
         });
         renderSearchResults();
         renderManagerSuggestedCustomers();
+        renderAiSuggestedVisits();
         renderSelectedCustomers();
         renderVisitPlanTrail();
       });
@@ -2895,9 +3598,10 @@
         logPlanAction("Suggested Customer Added", `${customer.customer} (${customer.code || "-"}) added from manager suggestion.`, {
           dateKey: currentPlanDateKey || selectedDateKey,
           targetAgent: submittingAgent || getContextAgentForDate(currentPlanDateKey || selectedDateKey)
-        });
+          });
           renderSearchResults();
           renderManagerSuggestedCustomers();
+          renderAiSuggestedVisits();
           renderSelectedCustomers();
           renderVisitPlanTrail();
           return;
@@ -2916,6 +3620,38 @@
         }
         renderSearchResults();
         renderManagerSuggestedCustomers();
+        renderAiSuggestedVisits();
+        renderSelectedCustomers();
+        renderVisitPlanTrail();
+      });
+    }
+
+    if (aiSuggestedVisitsList) {
+      aiSuggestedVisitsList.addEventListener("click", (event) => {
+        const reasonBtn = event.target.closest(".aiReasonBtn[data-ai-reason]");
+        if (reasonBtn) {
+          window.alert(reasonBtn.getAttribute("data-ai-reason") || "Source: AI. Suggested next visit.");
+          return;
+        }
+        const btn = event.target.closest("button[data-action='add-ai-suggested']");
+        if (!btn || btn.disabled) return;
+        const key = btn.getAttribute("data-candidate-key") || "";
+        const customer = currentAiSuggestedMap.get(key);
+        if (!customer || !key) return;
+        const submittingAgent = getSubmittingAgentForDate(currentPlanDateKey || selectedDateKey);
+        selectedCustomers.set(key, {
+          ...customer,
+          _key: key,
+          reason: customer.reason || "Collection follow up",
+          agent: submittingAgent
+        });
+        logPlanAction("AI Suggested Customer Added", `${customer.customer} (${customer.code || "-"}) added from AI suggestion.`, {
+          dateKey: currentPlanDateKey || selectedDateKey,
+          targetAgent: submittingAgent || getContextAgentForDate(currentPlanDateKey || selectedDateKey)
+        });
+        renderSearchResults();
+        renderManagerSuggestedCustomers();
+        renderAiSuggestedVisits();
         renderSelectedCustomers();
         renderVisitPlanTrail();
       });
@@ -2939,6 +3675,7 @@
         }
         renderSearchResults();
         renderManagerSuggestedCustomers();
+        renderAiSuggestedVisits();
         renderSelectedCustomers();
       });
 
@@ -2977,6 +3714,14 @@
     if (planModalCancel) planModalCancel.addEventListener("click", closePlanModal);
     if (planModalSave) planModalSave.addEventListener("click", () => savePlan(false));
     if (planModalSubmit) planModalSubmit.addEventListener("click", () => savePlan(true));
+    if (previousShortfallClose) previousShortfallClose.addEventListener("click", closePreviousShortfallPanel);
+    if (previousShortfallCancel) previousShortfallCancel.addEventListener("click", closePreviousShortfallPanel);
+    if (previousShortfallSubmit) previousShortfallSubmit.addEventListener("click", submitPlanWithPreviousShortfall);
+    if (previousShortfallReason) {
+      previousShortfallReason.addEventListener("input", () => {
+        if (previousShortfallReason.value.trim()) hidePreviousShortfallError();
+      });
+    }
 
     if (menuBtn) menuBtn.addEventListener("click", toggleSideNav);
     if (sideNavClose) sideNavClose.addEventListener("click", closeSideNav);
@@ -3129,6 +3874,7 @@
       if (planModalOverlay && !planModalOverlay.classList.contains("hidden")) {
         renderSearchResults();
         renderManagerSuggestedCustomers();
+        renderAiSuggestedVisits();
       }
     });
 

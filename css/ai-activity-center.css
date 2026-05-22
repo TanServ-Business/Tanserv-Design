@@ -207,7 +207,7 @@
 
 .aiInvoiceTable {
   width: 100%;
-  min-width: 1500px;
+  min-width: 1080px;
   border-collapse: collapse;
   table-layout: fixed;
   font-size: 12px;
@@ -253,33 +253,25 @@
 .aiInvoiceTable th:nth-child(2),
 .aiInvoiceTable td:nth-child(2) { width: 190px; }
 .aiInvoiceTable th:nth-child(3),
-.aiInvoiceTable td:nth-child(3) { width: 130px; }
+.aiInvoiceTable td:nth-child(3),
 .aiInvoiceTable th:nth-child(4),
-.aiInvoiceTable td:nth-child(4),
+.aiInvoiceTable td:nth-child(4) { width: 105px; }
 .aiInvoiceTable th:nth-child(5),
-.aiInvoiceTable td:nth-child(5) { width: 105px; }
+.aiInvoiceTable td:nth-child(5),
 .aiInvoiceTable th:nth-child(6),
-.aiInvoiceTable td:nth-child(6),
+.aiInvoiceTable td:nth-child(6) { width: 92px; }
 .aiInvoiceTable th:nth-child(7),
-.aiInvoiceTable td:nth-child(7) { width: 95px; }
+.aiInvoiceTable td:nth-child(7),
 .aiInvoiceTable th:nth-child(8),
-.aiInvoiceTable td:nth-child(8) { width: 82px; }
+.aiInvoiceTable td:nth-child(8),
 .aiInvoiceTable th:nth-child(9),
-.aiInvoiceTable td:nth-child(9),
+.aiInvoiceTable td:nth-child(9) { width: 140px; }
 .aiInvoiceTable th:nth-child(10),
-.aiInvoiceTable td:nth-child(10),
+.aiInvoiceTable td:nth-child(10) { width: 185px; }
 .aiInvoiceTable th:nth-child(11),
-.aiInvoiceTable td:nth-child(11),
+.aiInvoiceTable td:nth-child(11) { width: 140px; }
 .aiInvoiceTable th:nth-child(12),
-.aiInvoiceTable td:nth-child(12) { width: 150px; }
-.aiInvoiceTable th:nth-child(13),
-.aiInvoiceTable td:nth-child(13) { width: 145px; }
-.aiInvoiceTable th:nth-child(14),
-.aiInvoiceTable td:nth-child(14),
-.aiInvoiceTable th:nth-child(15),
-.aiInvoiceTable td:nth-child(15),
-.aiInvoiceTable th:nth-child(16),
-.aiInvoiceTable td:nth-child(16) { width: 90px; }
+.aiInvoiceTable td:nth-child(12) { width: 88px; }
 
 .numericCell {
   text-align: right !important;
@@ -328,6 +320,9 @@
 }
 
 .aiPill.status { background: #eef2ff; border-color: #c7d2fe; color: #3730a3; }
+.aiPill.activity { background: #eef2ff; border-color: #c7d2fe; color: #3730a3; }
+.aiPill.email { background: #ecfeff; border-color: #a5f3fc; color: #0e7490; }
+.aiPill.visit { background: #f0fdf4; border-color: #bbf7d0; color: #166534; }
 .aiPill.reply { background: #ecfeff; border-color: #a5f3fc; color: #0e7490; }
 .aiPill.reminder { background: #fff7ed; border-color: #fed7aa; color: #c2410c; }
 .aiPill.high { background: #fff1f2; border-color: #fecdd3; color: #be123c; }
@@ -335,6 +330,8 @@
 .aiPill.low { background: #ecfdf3; border-color: #bbf7d0; color: #15803d; }
 .aiPill.approved { background: #dcfce7; border-color: #86efac; color: #166534; }
 .aiPill.rejected { background: #fee2e2; border-color: #fecaca; color: #991b1b; }
+.aiPill.scheduled { background: #dcfce7; border-color: #86efac; color: #166534; }
+.aiPill.revoked { background: #fee2e2; border-color: #fecaca; color: #991b1b; }
 .aiPill.pending { background: #f1f5f9; border-color: #cbd5e1; color: #334155; }
 .aiPill.later { background: #fef9c3; border-color: #fde68a; color: #92400e; }
 
@@ -432,6 +429,82 @@
 
 .aiExpandedBox p:last-child {
   margin-bottom: 0;
+}
+
+.aiSuggestionReview {
+  display: grid;
+  gap: 8px;
+}
+
+.aiSuggestionReview h3,
+.aiActionDetailHead h3 {
+  margin: 0;
+  font-size: 14px;
+  color: #111827;
+}
+
+.aiSuggestionReview p,
+.aiActionDetailHead p {
+  margin: 3px 0 0;
+  font-size: 12px;
+  color: #64748b;
+}
+
+.aiSuggestionPillRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.aiActionPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid #dbe4f0;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #334155;
+  padding: 6px 9px;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.aiActionPill i {
+  color: #5c258d;
+}
+
+.aiActionPill em {
+  color: #64748b;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.aiActionPill.is-active {
+  background: #f6effb;
+  border-color: #d7c3ea;
+  color: #4b1f73;
+}
+
+.aiActionDetailPanel {
+  display: grid;
+  gap: 10px;
+  border: 1px solid #e2e8f4;
+  border-radius: 12px;
+  background: #ffffff;
+  padding: 12px;
+}
+
+.aiActionDetailHead {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.aiTimeline.compact {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
 
 .aiExpandedActions {

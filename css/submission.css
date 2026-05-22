@@ -464,6 +464,44 @@
   margin: 0 auto 12px;
 }
 
+.submissionEmailDraftPanel {
+  margin: 10px 0 14px;
+}
+
+.submissionEmailDraftCard {
+  border: 1px solid #dbeafe;
+  border-radius: 10px;
+  background: #f8fbff;
+  padding: 12px;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
+}
+
+.submissionEmailDraftHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.submissionEmailDraftHead h3 {
+  margin: 0;
+  font-size: 14px;
+  color: #0f172a;
+}
+
+.submissionEmailDraftGrid {
+  display: grid;
+  gap: 10px;
+}
+
+.submissionEmailDraftActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 10px;
+}
+
 @media (max-width: 1100px) {
   .submissionGrid {
     grid-template-columns: 1fr;
@@ -491,6 +529,11 @@
   .filtersRight {
     margin-left: 0;
     justify-content: flex-start;
+  }
+  .submissionForm,
+  .submissionFormPanel .panelTitle,
+  .submissionEmailDraftPanel {
+    width: 100%;
   }
 }
 .submissionGrid {

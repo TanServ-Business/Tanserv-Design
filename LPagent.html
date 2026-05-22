@@ -1784,9 +1784,9 @@
               <details class="emailThread">
                 <summary class="emailThreadSummary">
                   <div class="emailThreadSummaryMain">
-                    <span class="emailThreadCount">1 mail</span>
-                    <div class="emailThreadTitle">Apollo Pharmacy | Due date revision</div>
-                    <div class="emailThreadPreview">Client shared a PO update and asked for due date revision against the invoice.</div>
+                    <span class="emailThreadCount">2 mails</span>
+                    <div class="emailThreadTitle">Apollo Pharmacy | Document issue</div>
+                    <div class="emailThreadPreview">Client reported a delivery challan issue and asked for supporting documents.</div>
                   </div>
                   <div class="emailThreadSummaryMeta">
                     <span class="emailThreadLatest">10 Nov 2025</span>
@@ -1796,7 +1796,26 @@
                   </div>
                 </summary>
                 <div class="emailThreadTrail">
-                  <div class="emailItem" data-from="Client - Finance &lt;finance@apollopharmacy.com&gt;" data-to="Ops Agent &lt;ops@inebura.com&gt;" data-cc="Anita Nair &lt;collections@apollopharmacy.com&gt;" data-subject="Re: Due date change request" data-body="Sharing updated PO copy. Please revise due date accordingly.\\n\\nThanks,\\nFinance Team" data-attachments="PO_Update.pdf" data-date="10 Nov 2025" data-time="02:14 PM" data-mailbox="Inbox" data-thread="Apollo Pharmacy | Due date revision">
+                  <div class="emailItem" data-from="Client - Finance &lt;finance@apollopharmacy.com&gt;" data-to="Ops Agent &lt;ops@inebura.com&gt;" data-cc="Anita Nair &lt;collections@apollopharmacy.com&gt;" data-subject="Delivery challan required for INV-10211" data-body="Hello Team,\\n\\nWe are unable to process invoice INV-10211 because the delivery challan is missing in our records. Please share the delivery challan copy and confirm dispatch details.\\n\\nRegards,\\nFinance Team" data-attachments="-" data-date="10 Nov 2025" data-time="03:26 PM" data-mailbox="Inbox" data-thread="Apollo Pharmacy | Document issue" data-action-type="delivery-challan" data-action-customer-code="CUST-001" data-action-customer-name="Apollo Pharmachy Pvt. Ltd." data-action-invoice="INV-10211">
+                    <div class="emailRow">
+                      <span class="emailDirection emailDirectionInbound">Inbound</span>
+                      <div class="emailStampRow">
+                        <span><i class="bi bi-calendar3" aria-hidden="true"></i> 10 Nov 2025</span>
+                        <span><i class="bi bi-clock" aria-hidden="true"></i> 03:26 PM</span>
+                      </div>
+                    </div>
+                    <div class="emailMeta">
+                      <span class="emailLabel">From</span>
+                      <span class="emailValue">Client - Finance</span>
+                    </div>
+                    <div class="emailMeta">
+                      <span class="emailLabel">To</span>
+                      <span class="emailValue">Ops Agent</span>
+                    </div>
+                    <div class="emailSubject">Delivery challan required for INV-10211</div>
+                    <div class="emailPreview">Unable to process INV-10211 because the delivery challan is missing in customer records.</div>
+                  </div>
+                  <div class="emailItem" data-from="Client - Finance &lt;finance@apollopharmacy.com&gt;" data-to="Ops Agent &lt;ops@inebura.com&gt;" data-cc="Anita Nair &lt;collections@apollopharmacy.com&gt;" data-subject="Re: Due date change request" data-body="Sharing updated PO copy. Please revise due date accordingly.\\n\\nThanks,\\nFinance Team" data-attachments="PO_Update.pdf" data-date="10 Nov 2025" data-time="02:14 PM" data-mailbox="Inbox" data-thread="Apollo Pharmacy | Document issue">
                     <div class="emailRow">
                       <span class="emailDirection emailDirectionInbound">Inbound</span>
                       <div class="emailStampRow">
@@ -1986,9 +2005,9 @@
                 <strong id="emailDetailFrom">-</strong>
               </div>
             </div>
+            <div id="emailTakeActionCard" class="aiSuggestionStrip hidden"></div>
           </div>
           <div id="emailDetailBody" class="emailConversationPanel">-</div>
-          <div id="emailTakeActionCard" class="emailTakeActionCard hidden"></div>
         </div>
         <div class="emailCompose hidden" id="emailComposePanel">
           <div class="emailComposeRow">
@@ -2084,6 +2103,8 @@
         <div class="dispositionInvoiceList" id="dispositionInvoiceList"></div>
       </div>
 
+      <div id="activityAiSuggestionStrip" class="aiSuggestionStrip hidden"></div>
+
       <div class="grid2">
         <div>
           <label>Activity type</label>
@@ -2096,40 +2117,24 @@
         </div>
 
         <div>
-          <label>Broad Status</label>
-          <select id="broadStatusSelect">
-            <option>Red Flag</option>
-            <option>External Dependency</option>
-            <option>Collection Done</option>
-            <option>Work in Progress</option>
+          <label>Sub Status</label>
+          <select id="subStatusSelect">
           </select>
+        </div>
+
+        <div>
+          <label>Broad Status</label>
+          <select id="broadStatusSelect" disabled></select>
         </div>
 
         <div>
           <label>Primary status</label>
-          <select id="primaryStatusSelect">
-            <option>Follow-up</option>
-            <option>Reminder</option>
-            <option>Dispute</option>
-            <option>PTP</option>
-            <option>Escalation</option>
-            <option>Collection In Progress</option>
-            <option>Collected</option>
-          </select>
+          <select id="primaryStatusSelect" disabled></select>
         </div>
 
-        <div>
-          <label>Sub Status</label>
-          <select id="subStatusSelect">
-            <option selected>No Response</option>
-            <option>Collection</option>
-            <option>Paid by customer</option>
-            <option>Collected</option>
-            <option>PTP Set</option>
-            <option>Dispute Raised</option>
-            <option>PDC given</option>
-            <option>Delivery Challan Required</option>
-          </select>
+        <div id="ptpDateFieldWrap" class="hidden">
+          <label for="ptpDateInput">PTP date</label>
+          <input type="date" id="ptpDateInput" />
         </div>
       </div>
 

@@ -19,7 +19,7 @@
     <div>
       <div class="aiEyebrow">AI Activity Center</div>
       <h1>AI invoice action review</h1>
-      <p>Review invoice-based AI recommendations before status updates or customer emails are sent.</p>
+      <p>Review scheduled AI workflow suggestions per invoice. Actions remain scheduled unless explicitly revoked.</p>
     </div>
     <div class="aiRoleToggle" role="group" aria-label="Role view">
       <button type="button" class="aiRoleBtn is-active" data-role="agent" aria-pressed="true">
@@ -37,18 +37,25 @@
     <div class="aiTableToolbar">
       <div>
         <div class="aiPanelTitle">Actionable invoices</div>
-        <p id="aiTableSubtitle">All AI actions awaiting review</p>
+        <p id="aiTableSubtitle">All scheduled AI actions by invoice</p>
       </div>
       <div class="aiToolbarActions">
         <label class="aiSearchField">
           <i class="bi bi-search" aria-hidden="true"></i>
-          <input type="search" id="aiSearchInput" placeholder="Search invoice, customer, agent..." />
+          <input type="search" id="aiSearchInput" placeholder="Search invoice, customer, action..." />
         </label>
         <select id="aiActionFilter" aria-label="Action type">
           <option value="all">All actions</option>
-          <option value="status">Invoice updates</option>
-          <option value="reply">Email replies</option>
+          <option value="activity">Activity updates</option>
+          <option value="email">Email actions</option>
+          <option value="visit">Visit suggestions</option>
           <option value="reminder">Reminder emails</option>
+        </select>
+        <select id="aiScheduleFilter" aria-label="Schedule status">
+          <option value="all">All schedule states</option>
+          <option value="scheduled">Scheduled</option>
+          <option value="revoked">Revoked</option>
+          <option value="later">Review later</option>
         </select>
       </div>
     </div>
@@ -66,19 +73,15 @@
           <tr>
             <th>Invoice</th>
             <th>Customer</th>
-            <th>Agent</th>
             <th class="numericCell">Inv Amt</th>
             <th class="numericCell">Net Due</th>
             <th>Inv Dt</th>
             <th>Due Dt</th>
-            <th>Aging</th>
-            <th>Current Status</th>
             <th>Primary Status</th>
             <th>Sub Status</th>
             <th>Previous Status</th>
-            <th>AI Action</th>
-            <th>Confidence</th>
-            <th>Risk</th>
+            <th>AI Actions</th>
+            <th>Schedule</th>
             <th>Review</th>
           </tr>
         </thead>

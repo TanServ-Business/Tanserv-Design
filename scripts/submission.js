@@ -45,6 +45,16 @@
   const submissionDate = document.getElementById("submissionDate");
   const sentTo = document.getElementById("sentTo");
   const submissionRemarks = document.getElementById("submissionRemarks");
+  const submissionAiSuggestions = document.getElementById("submissionAiSuggestions");
+  const submissionAiSuggestionList = document.getElementById("submissionAiSuggestionList");
+  const submissionEmailDraftModal = document.getElementById("submissionEmailDraftModal");
+  const submissionEmailDraftClose = document.getElementById("submissionEmailDraftClose");
+  const submissionEmailDraftSend = document.getElementById("submissionEmailDraftSend");
+  const submissionEmailTo = document.getElementById("submissionEmailTo");
+  const submissionEmailCc = document.getElementById("submissionEmailCc");
+  const submissionEmailSubject = document.getElementById("submissionEmailSubject");
+  const submissionEmailBody = document.getElementById("submissionEmailBody");
+  const submissionEmailAttachments = document.getElementById("submissionEmailAttachments");
 
   const invoices = [
     { code: "CUST-1001", name: "Apollo Tyres", invoiceNo: "INV-10432", status: "Open", value: 86400 },
@@ -78,6 +88,58 @@
   let appliedEnd = null;
   let calendarMonth = new Date();
   calendarMonth.setDate(1);
+
+  const submissionHistory = {
+    "CUST-1001": {
+      mode: "email",
+      label: "Submit via email",
+      icon: "bi-envelope",
+      activityType: "emailed",
+      submissionStatus: "Submitted",
+      submissionSubStatus: "Vendor helpdesk",
+      submissionType: "Emailed",
+      sentTo: "ap.submissions@apollo.example",
+      customerEmail: "finance@apollo.example",
+      evidence: "Last 3 Apollo Tyres invoices were submitted digitally to ap.submissions@apollo.example."
+    },
+    "CUST-1002": {
+      mode: "portal",
+      label: "Submit via portal",
+      icon: "bi-cloud-arrow-up",
+      activityType: "no activity",
+      submissionStatus: "Submitted",
+      submissionSubStatus: "Vendor portal",
+      submissionType: "Vendor portal",
+      sentTo: "BlueWave vendor portal",
+      customerEmail: "accounts@bluewave.example",
+      evidence: "Previous BlueWave submissions were uploaded through the vendor portal."
+    },
+    "CUST-1004": {
+      mode: "physical",
+      label: "Physical handover",
+      icon: "bi-person-check",
+      activityType: "visited",
+      submissionStatus: "Submitted",
+      submissionSubStatus: "Submitted to others",
+      submissionType: "Physical Submission",
+      sentTo: "R. Krishnan - Accounts Desk",
+      customerEmail: "accounts@sundarammotors.example",
+      evidence: "Past Sundaram Motors invoices were physically handed over to the accounts desk."
+    }
+  };
+
+  const fallbackSubmissionPattern = {
+    mode: "email",
+    label: "Submit via email",
+    icon: "bi-envelope",
+    activityType: "emailed",
+    submissionStatus: "Submitted",
+    submissionSubStatus: "Vendor helpdesk",
+    submissionType: "Emailed",
+    sentTo: "customer.accounts@example.com",
+    customerEmail: "customer.accounts@example.com",
+    evidence: "No customer-specific submission history is available, so email submission is suggested as the safest default."
+  };
 
   const fmtCurrency = (n) => new Intl.NumberFormat("en-IN", {
     style: "currency",
@@ -155,6 +217,7 @@
     if (submissionFormPanel) {
       submissionFormPanel.classList.toggle("hidden", !isFormOpen);
     }
+    renderSubmissionAiSuggestions();
   };
 
   const updateCards = () => {
@@ -170,7 +233,7 @@
 
   const updateQuickInfo = () => {
     if (!quickInfoList) return;
-    const channels = ["Physical Submission", "Emailed", "Couriered"];
+    const channels = ["Physical Submission", "Emailed", "Vendor portal", "Couriered"];
     const counts = channels.map((channel) => ({
       label: channel,
       count: invoices.filter((row) => row.submissionType.toLowerCase() === channel.toLowerCase()).length
@@ -298,6 +361,222 @@
       .replace(/'/g, "&#39;")
   );
 
+  const getRowsByInvoiceNos = (invoiceNos) => (
+    invoices.filter((row) => invoiceNos.includes(row.invoiceNo))
+  );
+
+  const getSubmissionPattern = (row) => {
+    if (!row) return fallbackSubmissionPattern;
+    return submissionHistory[row.code] || {
+      ...fallbackSubmissionPattern,
+      evidence: `No stored pattern exists for ${row.name}; email submission is suggested as the default.`
+    };
+  };
+
+  const getActiveSubmissionRows = () => (
+    activeInvoiceIds.length ? getRowsByInvoiceNos(activeInvoiceIds) : []
+  );
+
+  const getCommonSubmissionPattern = (rows) => {
+    if (!rows.length) return null;
+    const patterns = rows.map(getSubmissionPattern);
+    const firstMode = patterns[0].mode;
+    const sameMode = patterns.every((pattern) => pattern.mode === firstMode);
+    if (!sameMode) return null;
+    return {
+      ...patterns[0],
+      evidence: rows.length === 1
+        ? patterns[0].evidence
+        : `Selected invoices share the ${patterns[0].submissionType} submission pattern.`
+    };
+  };
+
+  const isSubmissionFormUntouched = () => (
+    !activityType.value.trim()
+    && !submissionStatus.value.trim()
+    && !submissionSubStatus.value.trim()
+    && !submissionType.value.trim()
+    && !sentTo.value.trim()
+  );
+
+  const setSelectValue = (select, value) => {
+    if (!select || !value) return;
+    select.value = value;
+  };
+
+  const applySubmissionSuggestion = (pattern, rows) => {
+    if (!pattern || !rows.length) return;
+    setSelectValue(activityType, pattern.activityType);
+    setSelectValue(submissionStatus, pattern.submissionStatus);
+    setSelectValue(submissionSubStatus, pattern.submissionSubStatus);
+    if (submissionType) submissionType.value = pattern.submissionType || "";
+    if (submissionDate && !submissionDate.value) submissionDate.value = formatDateKey(new Date());
+    if (sentTo) sentTo.value = pattern.sentTo || "";
+    if (invoiceType && !invoiceType.value) invoiceType.value = "Tax";
+    if (submissionRemarks) {
+      const invoiceText = rows.map((row) => row.invoiceNo).join(", ");
+      submissionRemarks.value = `AI suggestion applied from past submission pattern. Invoice(s) ${invoiceText} to be submitted through ${pattern.submissionType}.`;
+    }
+    if (formMessage) {
+      formMessage.textContent = "AI suggestion applied. Review and click Submit to update activity.";
+    }
+  };
+
+  const currentOrSuggestedSubmissionContext = (rows, pattern) => {
+    const values = readFormValues();
+    const resolved = pattern || getCommonSubmissionPattern(rows) || getSubmissionPattern(rows[0]);
+    return {
+      activityType: values.activityType || resolved.activityType,
+      submissionStatus: values.submissionStatus || resolved.submissionStatus,
+      submissionSubStatus: values.submissionSubStatus || resolved.submissionSubStatus,
+      submissionType: values.submissionType || resolved.submissionType,
+      submissionDate: values.submissionDate || formatDateKey(new Date()),
+      sentTo: values.sentTo || resolved.sentTo,
+      remarks: values.remarks,
+      customerEmail: resolved.customerEmail,
+      pattern: resolved
+    };
+  };
+
+  const buildSubmissionEmailPayload = (rows, pattern) => {
+    const context = currentOrSuggestedSubmissionContext(rows, pattern);
+    const invoiceNos = rows.map((row) => row.invoiceNo);
+    const firstRow = rows[0] || {};
+    const invoiceLabel = invoiceNos.length === 1 ? invoiceNos[0] : invoiceNos.join(", ");
+    const medium = context.submissionType || "the selected submission medium";
+    const sentLine = context.sentTo ? ` The submission reference/recipient is ${context.sentTo}.` : "";
+    return {
+      invoiceNo: invoiceNos[0] || "",
+      invoiceNos,
+      to: context.customerEmail || "",
+      cc: "",
+      subject: `Invoice submission confirmation - ${invoiceLabel}`,
+      body: `Hello,\n\nThis is to confirm that invoice${invoiceNos.length === 1 ? "" : "s"} ${invoiceLabel} ${invoiceNos.length === 1 ? "has" : "have"} been shared through ${medium}.${sentLine}\n\nPlease confirm once received.\n\nRegards,\nCollections Team`,
+      attachments: invoiceNos.map((invoiceNo) => `Invoice_${invoiceNo}.pdf`).join(", "),
+      customerCode: firstRow.code || "",
+      customerName: firstRow.name || "",
+      source: "Submission module"
+    };
+  };
+
+  const closeSubmissionEmailDraftPopup = () => {
+    if (!submissionEmailDraftModal) return;
+    submissionEmailDraftModal.classList.add("hidden");
+    submissionEmailDraftModal.setAttribute("aria-hidden", "true");
+  };
+
+  const openSubmissionEmailDraftPopup = (rows, pattern) => {
+    if (!rows.length || !submissionEmailDraftModal) return;
+    const resolvedPattern = pattern || getCommonSubmissionPattern(rows) || getSubmissionPattern(rows[0]);
+    if (isSubmissionFormUntouched() && resolvedPattern) {
+      applySubmissionSuggestion(resolvedPattern, rows);
+    }
+    const payload = buildSubmissionEmailPayload(rows, pattern);
+    if (submissionEmailTo) submissionEmailTo.value = payload.to || "";
+    if (submissionEmailCc) submissionEmailCc.value = payload.cc || "";
+    if (submissionEmailSubject) submissionEmailSubject.value = payload.subject || "";
+    if (submissionEmailBody) submissionEmailBody.value = payload.body || "";
+    if (submissionEmailAttachments) submissionEmailAttachments.value = payload.attachments || "";
+    submissionEmailDraftModal.classList.remove("hidden");
+    submissionEmailDraftModal.setAttribute("aria-hidden", "false");
+    if (submissionEmailSubject) submissionEmailSubject.focus();
+  };
+
+  const createReasonPopover = (reason) => {
+    const popover = document.createElement("span");
+    popover.className = "aiReasonPopover hidden";
+    popover.setAttribute("role", "status");
+    popover.textContent = reason;
+    return popover;
+  };
+
+  const renderSubmissionAiSuggestions = () => {
+    if (!submissionAiSuggestions || !submissionAiSuggestionList) return;
+    const rows = getActiveSubmissionRows();
+    submissionAiSuggestionList.innerHTML = "";
+    if (!isFormOpen || !rows.length) {
+      submissionAiSuggestions.classList.add("hidden");
+      submissionAiSuggestions.setAttribute("aria-hidden", "true");
+      return;
+    }
+
+    const pattern = getCommonSubmissionPattern(rows);
+    const uniqueCustomers = new Set(rows.map((row) => row.code));
+    const isSameCustomerSelection = uniqueCustomers.size === 1;
+    const suggestions = [];
+    if (pattern) {
+      suggestions.push({
+        label: pattern.label,
+        icon: pattern.icon,
+        action: () => applySubmissionSuggestion(pattern, rows),
+        reason: `Source: Past submission history. ${pattern.evidence} Will do: Prefill submission activity as ${pattern.submissionType}.`
+      });
+      suggestions.push({
+        label: "Send confirmation email",
+        icon: "bi-envelope-check",
+        action: () => openSubmissionEmailDraftPopup(rows, pattern),
+        reason: `Source: Submission workflow. Invoice submission is expected through ${pattern.submissionType}. Will do: Open prefilled confirmation draft with recipients set.`
+      });
+    } else if (!isSameCustomerSelection) {
+      const perRowPatterns = rows.map(getSubmissionPattern);
+      const modes = new Set(perRowPatterns.map((entry) => entry.mode));
+      if (modes.size === 1) {
+        const commonPattern = {
+          ...perRowPatterns[0],
+          evidence: `Selected invoices share the ${perRowPatterns[0].submissionType} submission pattern.`
+        };
+        suggestions.push({
+          label: "Send confirmation email",
+          icon: "bi-envelope-check",
+          action: () => openSubmissionEmailDraftPopup(rows, commonPattern),
+          reason: `Source: Submission workflow. Selected invoices share ${commonPattern.submissionType}. Will do: Open one confirmation draft for selected invoices.`
+        });
+      }
+    }
+
+    if (!suggestions.length) {
+      submissionAiSuggestions.classList.add("hidden");
+      submissionAiSuggestions.setAttribute("aria-hidden", "true");
+      return;
+    }
+
+    suggestions.forEach((suggestion) => {
+      const item = document.createElement("span");
+      item.className = "aiSuggestionItem";
+      const pill = document.createElement("span");
+      pill.className = "aiSuggestionPill";
+      const actionBtn = document.createElement("button");
+      actionBtn.type = "button";
+      actionBtn.className = "aiSuggestionAction";
+      const icon = document.createElement("i");
+      icon.className = `bi ${suggestion.icon}`;
+      icon.setAttribute("aria-hidden", "true");
+      actionBtn.appendChild(icon);
+      actionBtn.appendChild(document.createTextNode(` ${suggestion.label}`));
+      actionBtn.addEventListener("click", suggestion.action);
+      const reasonBtn = document.createElement("button");
+      reasonBtn.type = "button";
+      reasonBtn.className = "aiReasonBtn";
+      reasonBtn.setAttribute("aria-label", "Why suggested");
+      reasonBtn.textContent = "i";
+      const popover = createReasonPopover(suggestion.reason);
+      reasonBtn.addEventListener("click", (event) => {
+        event.stopPropagation();
+        submissionAiSuggestionList.querySelectorAll(".aiReasonPopover").forEach((node) => {
+          if (node !== popover) node.classList.add("hidden");
+        });
+        popover.classList.toggle("hidden");
+      });
+      pill.appendChild(actionBtn);
+      pill.appendChild(reasonBtn);
+      item.appendChild(pill);
+      item.appendChild(popover);
+      submissionAiSuggestionList.appendChild(item);
+    });
+    submissionAiSuggestions.classList.remove("hidden");
+    submissionAiSuggestions.setAttribute("aria-hidden", "false");
+  };
+
   const customerIndex = () => {
     const map = new Map();
     invoices.forEach((row) => {
@@ -377,10 +656,15 @@
   };
 
   const closeForm = () => {
+    closeSubmissionEmailDraftPopup();
     isFormOpen = false;
     activeInvoiceIds = [];
     selected.clear();
     if (formMessage) formMessage.textContent = "";
+    if (submissionAiSuggestions) {
+      submissionAiSuggestions.classList.add("hidden");
+      submissionAiSuggestions.setAttribute("aria-hidden", "true");
+    }
     renderTable();
   };
 
@@ -459,6 +743,24 @@
     });
   }
 
+  if (submissionEmailDraftClose) {
+    submissionEmailDraftClose.addEventListener("click", () => {
+      closeSubmissionEmailDraftPopup();
+    });
+  }
+
+  if (submissionEmailDraftSend) {
+    submissionEmailDraftSend.addEventListener("click", () => {
+      const invoiceLabel = getActiveSubmissionRows().map((row) => row.invoiceNo).join(", ");
+      closeSubmissionEmailDraftPopup();
+      if (formMessage) {
+        formMessage.textContent = invoiceLabel
+          ? `Confirmation email prepared/sent for ${invoiceLabel}.`
+          : "Confirmation email prepared/sent.";
+      }
+    });
+  }
+
   if (clearFormBtn) {
     clearFormBtn.addEventListener("click", () => {
       activityType.value = "";
@@ -470,6 +772,7 @@
       sentTo.value = "";
       submissionRemarks.value = "";
       if (formMessage) formMessage.textContent = "";
+      renderSubmissionAiSuggestions();
     });
   }
 
@@ -643,6 +946,14 @@
     if (wrap && !wrap.contains(event.target)) {
       hideCustomerSuggestions();
     }
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!submissionAiSuggestionList) return;
+    if (event.target.closest(".aiSuggestionItem")) return;
+    submissionAiSuggestionList.querySelectorAll(".aiReasonPopover").forEach((node) => {
+      node.classList.add("hidden");
+    });
   });
 
   document.addEventListener("click", (event) => {

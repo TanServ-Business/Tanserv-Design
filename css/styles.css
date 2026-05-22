@@ -4268,6 +4268,116 @@ textarea { min-height: 70px; resize: vertical; }
   margin: 14px 0;
 }
 
+.aiSuggestionStrip {
+  border: 1px solid #dbeafe;
+  border-radius: 10px;
+  background: #f8fbff;
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.aiSuggestionHeader {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #1e40af;
+  font-size: 10.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.aiSuggestionPills {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.aiSuggestionItem {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.aiSuggestionPill {
+  border: 1px solid #bfdbfe;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #1d4ed8;
+  padding: 2px 3px 2px 8px;
+  font-size: 10.5px;
+  line-height: 1.2;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.aiSuggestionAction {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  padding: 2px 0;
+  font-size: inherit;
+  line-height: inherit;
+  font-weight: inherit;
+  cursor: pointer;
+}
+
+.aiSuggestionPill:hover,
+.aiSuggestionPill:has(.aiSuggestionAction:hover) {
+  background: #eff6ff;
+}
+
+.aiReasonBtn {
+  width: 16px;
+  height: 16px;
+  border: 1px solid #cbd5e1;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #475569;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1;
+  cursor: help;
+}
+
+.aiReasonBtn:hover {
+  border-color: #93c5fd;
+  color: #1d4ed8;
+  background: #eff6ff;
+}
+
+.aiReasonPopover {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 20;
+  width: max-content;
+  max-width: 260px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.14);
+  padding: 7px 9px;
+  color: #334155;
+  font-size: 11px;
+  line-height: 1.35;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
 .emailTakeActionCard {
   border: 1px solid #bfdbfe;
   border-left: 3px solid #2563eb;

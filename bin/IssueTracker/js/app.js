@@ -244,6 +244,8 @@
   const archivedList = document.getElementById('archived-issue-list');
   const issueReasonList = document.getElementById('issue-reason-list');
   const detailView = document.getElementById('detail-view');
+  const issueAiSuggestions = document.getElementById('issue-ai-suggestions');
+  const issueAiSuggestionList = document.getElementById('issue-ai-suggestion-list');
   const generatedTimeEl = document.getElementById('generated-time');
   const issuePanelTitle = document.getElementById('issue-panel-title');
   const issuePanelSubtitle = document.getElementById('issue-panel-subtitle');
@@ -268,8 +270,8 @@
   const roleSelect = document.getElementById('role-select');
   const ROLE_STORAGE_KEY = 'issue_tracker_role';
   const ROLE_ACTIONS = {
-    agent: ['assign-btn', 'email-btn', 'approval-process-btn', 'close-btn'],
-    manager: ['approve-btn', 'assign-btn', 'email-btn', 'approval-process-btn'],
+    agent: ['assign-btn', 'email-btn', 'approval-process-btn', 'close-btn', 'reopen-btn'],
+    manager: ['approve-btn', 'assign-btn', 'email-btn', 'approval-process-btn', 'reopen-btn'],
     'action-owner': ['assign-btn', 'resolution-btn']
   };
   let currentRole = 'agent';
@@ -374,8 +376,13 @@
     if (opts.persist) {
       try { localStorage.setItem(ROLE_STORAGE_KEY, normalized); } catch (_) {}
     }
+    const selectedIssue = getSelectedIssue();
     if (opts.resetPanels) resetActionPanels();
-    applyRoleToActions(currentRole, getSelectedIssue());
+    applyRoleToActions(currentRole, selectedIssue);
+    if (isDetailPage && selectedInvoiceId && selectedIssue) {
+      const selectedInvoice = data.find((item) => item.id === selectedInvoiceId) || null;
+      renderDetails(selectedInvoice, selectedIssue);
+    }
   }
 
   if (roleSelect) {
@@ -717,6 +724,226 @@
       subStatus: issue.subStatus || '',
       actionOwner: issue.actionOwner || ''
     };
+  }
+
+  function toMockEmail(name) {
+    const cleaned = String(name || '')
+      .replace(/\s*<[^>]*@[^>]*>\s*/g, ' ')
+      .replace(/\s*\([^)]*@[^)]*\)\s*/g, ' ')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '.')
+      .replace(/^\.+|\.+$/g, '');
+    return cleaned ? `${cleaned}@example.com` : 'collections.manager@example.com';
+  }
+
+  function getIssueTrailEntries(issue, type) {
+    const expectedType = String(type || '').toLowerCase();
+    const entries = Array.isArray(issue?.actionTrail) ? issue.actionTrail.slice() : [];
+    return entries
+      .filter((entry) => {
+        if (!expectedType) return true;
+        return String(entry?.type || '').toLowerCase() === expectedType;
+      })
+      .sort((a, b) => (Date.parse(b?.when || '') || 0) - (Date.parse(a?.when || '') || 0));
+  }
+
+  function getLatestIssueTrailEntry(issue, matcher) {
+    const entries = getIssueTrailEntries(issue);
+    if (typeof matcher !== 'function') {
+      return entries[0] || null;
+    }
+    return entries.find(matcher) || null;
+  }
+
+  function getIssueOpenDays(issue) {
+    if (!issue?.created) return 0;
+    return daysBetween(issue.created, new Date()) + 1;
+  }
+
+  function getSuggestedApprovalProcessForIssue(issue) {
+    const seed = seedApprovalDataIfMissing();
+    const processes = Array.isArray(seed.processes) ? seed.processes : [];
+    if (!processes.length) return null;
+    const subStatus = String(issue?.subStatus || '').toLowerCase();
+    const title = String(issue?.title || '').toLowerCase();
+    if (subStatus.includes('delivery challan') || title.includes('challan')) {
+      return processes.find((process) => process.id === 'PROC_DELIVERY_CHALLAN') || processes[0];
+    }
+    if (
+      subStatus.includes('purchase order') ||
+      subStatus.includes('po ') ||
+      title.includes('po ')
+    ) {
+      return processes.find((process) => process.id === 'PROC_PO_APPROVAL') || processes[0];
+    }
+    return processes.find((process) => process.id === 'PROC_INV_DELAY') || processes[0];
+  }
+
+  function getSuggestedActionOwner(issue, invoice) {
+    const currentOwner = formatActionOwner(issue?.actionOwner || '');
+    const candidates = [
+      formatActionOwner(issue?.manager || ''),
+      formatActionOwner(invoice?.manager || ''),
+      formatActionOwner(issue?.agent || ''),
+      ...users.map((name) => formatActionOwner(name))
+    ];
+    return candidates.find((name) => name && name !== currentOwner) || currentOwner || formatActionOwner(users[0] || '');
+  }
+
+  function getIssueAiSuggestions(issue, invoice, role) {
+    if (!issue) return [];
+    const allowed = new Set(ROLE_ACTIONS[role] || ROLE_ACTIONS.agent);
+    const suggestions = [];
+    const statusLower = String(issue.status || '').trim().toLowerCase();
+    const isClosed = statusLower === 'resolved' || statusLower === 'closed';
+    const approvalSummary = getApprovalSummary(issue.id);
+    const latestEmail = getLatestIssueTrailEntry(issue, (entry) => String(entry?.type || '').toLowerCase() === 'email');
+    const latestResolution = getLatestIssueTrailEntry(issue, (entry) => String(entry?.type || '').toLowerCase() === 'resolution');
+    const latestAssignment = getLatestIssueTrailEntry(issue, (entry) => String(entry?.type || '').toLowerCase() === 'assignment');
+    const latestClosure = getLatestIssueTrailEntry(issue, (entry) => String(entry?.type || '').toLowerCase() === 'closure');
+    const closureTime = Date.parse(latestClosure?.when || '') || 0;
+    const latestFollowUpAfterClose = closureTime
+      ? getLatestIssueTrailEntry(issue, (entry) => (Date.parse(entry?.when || '') || 0) > closureTime)
+      : null;
+    const daysOpen = getIssueOpenDays(issue);
+    const currentOwner = formatActionOwner(issue.actionOwner || '');
+    const suggestedOwner = getSuggestedActionOwner(issue, invoice);
+    const suggestedProcess = getSuggestedApprovalProcessForIssue(issue);
+    const pendingApproval = approvalSummary && String(approvalSummary.status || '').toLowerCase() === 'pending';
+
+    const pushSuggestion = (suggestion) => {
+      if (!suggestions.some((item) => item.kind === suggestion.kind)) {
+        suggestions.push(suggestion);
+      }
+    };
+
+    if (allowed.has('reopen-btn') && isClosed && latestFollowUpAfterClose) {
+      pushSuggestion({
+        kind: 'reopen-issue',
+        label: 'Reopen issue',
+        source: 'Action Trail',
+        evidence: `${latestFollowUpAfterClose.who || 'A user'} added a ${latestFollowUpAfterClose.type || 'follow-up'} after closure.`,
+        actionSummary: 'Open the reopen flow with a draft remark referencing the new follow-up.',
+        prefill: {
+          remark: `AI suggestion: reopen because ${latestFollowUpAfterClose.who || 'the user'} added ${latestFollowUpAfterClose.type || 'a follow-up'} after closure.`
+        }
+      });
+    }
+
+    if (!isClosed && allowed.has('assign-btn') && !currentOwner) {
+      pushSuggestion({
+        kind: 'assign-owner',
+        label: 'Assign owner',
+        source: 'Issue status',
+        evidence: 'No action owner is assigned for this issue yet.',
+        actionSummary: `Open assignment with ${suggestedOwner} selected and a draft handoff remark.`,
+        prefill: {
+          owner: suggestedOwner,
+          remark: `AI suggestion: assign this issue to ${suggestedOwner} for ${issue.subStatus || 'the current issue'} follow-up.`
+        }
+      });
+    }
+
+    if (!isClosed && allowed.has('approval-process-btn') && !issue.approvalProcessId && suggestedProcess) {
+      pushSuggestion({
+        kind: 'select-approval-process',
+        label: 'Select approval',
+        source: 'Issue workflow',
+        evidence: `${issue.subStatus || 'This issue'} does not have an approval process selected.`,
+        actionSummary: `Open approval process selection with ${suggestedProcess.process || suggestedProcess.id} preselected.`,
+        prefill: {
+          processId: suggestedProcess.id,
+          processName: suggestedProcess.process || suggestedProcess.id,
+          remark: `AI suggestion: use ${suggestedProcess.process || suggestedProcess.id} for ${issue.subStatus || 'this issue'}.`
+        }
+      });
+    }
+
+    if (!isClosed && allowed.has('resolution-btn') && currentOwner && !latestResolution) {
+      pushSuggestion({
+        kind: 'request-resolution',
+        label: 'Request resolution',
+        source: 'Issue status',
+        evidence: `${currentOwner} is assigned and no resolution has been submitted yet.`,
+        actionSummary: 'Open the resolution panel with a draft summary and remark for supporting documents.',
+        prefill: {
+          resolutionText: `Upload the supporting documents for ${issue.subStatus || 'this issue'} and confirm readiness for closure.`,
+          remark: `AI suggestion: resolution requested because ${issue.subStatus || 'the issue'} is still open.`
+        }
+      });
+    }
+
+    const shouldEscalate = !isClosed && allowed.has('email-btn') && (
+      (pendingApproval && daysOpen >= 5) ||
+      (!latestEmail && daysOpen >= 10) ||
+      (latestEmail && daysOpen >= 7)
+    );
+    if (!isClosed && allowed.has('email-btn')) {
+      if (shouldEscalate) {
+        const escalationTarget = approvalSummary?.levels?.find((level) => level.level === approvalSummary.currentLevel)?.ownerEmail
+          || toMockEmail(issue.manager || invoice?.manager || 'collections manager');
+        pushSuggestion({
+          kind: 'send-escalation-email',
+          label: 'Escalate email',
+          source: pendingApproval ? 'Approval status' : 'Action Trail',
+          evidence: pendingApproval
+            ? `Approval is pending${approvalSummary.currentLevel ? ` at level ${approvalSummary.currentLevel}` : ''} and the issue has been open for ${daysOpen} days.`
+            : `A follow-up email is already logged and the issue is still open after ${daysOpen} days.`,
+          actionSummary: 'Open the email panel in escalate mode with recipients and a draft escalation remark.',
+          prefill: {
+            emailType: 'escalate',
+            recipients: escalationTarget,
+            remark: `AI suggestion: escalate ${issue.id} for ${invoice?.id || 'the invoice'} because ${issue.subStatus || 'the issue'} is still pending.`
+          }
+        });
+      } else {
+        pushSuggestion({
+          kind: 'send-reminder-email',
+          label: 'Send reminder',
+          source: latestAssignment ? 'Action Trail' : 'Issue status',
+          evidence: latestAssignment
+            ? `Assigned follow-up is in progress and no fresh reminder email is logged.`
+            : `${issue.subStatus || 'This issue'} is still open and needs a customer follow-up.`,
+          actionSummary: 'Open the email panel in reminder mode with a draft follow-up remark.',
+          prefill: {
+            emailType: 'reminder',
+            recipients: '',
+            remark: `AI suggestion: send a reminder for ${issue.id} on ${invoice?.id || 'the invoice'} regarding ${issue.subStatus || 'the open issue'}.`
+          }
+        });
+      }
+    }
+
+    if (!isClosed && allowed.has('close-btn') && (statusLower === 'resolution provided' || !!latestResolution)) {
+      const resolutionWhen = latestResolution?.when ? fmtDate(latestResolution.when) : 'the latest action trail entry';
+      pushSuggestion({
+        kind: 'close-issue',
+        label: 'Close issue',
+        source: 'Action Trail',
+        evidence: `Resolution is already available from ${resolutionWhen}.`,
+        actionSummary: 'Open the close flow with a draft closure remark.',
+        prefill: {
+          remark: `AI suggestion: close this issue because the resolution for ${issue.subStatus || 'the issue'} has been submitted.`
+        }
+      });
+    }
+
+    if (!suggestions.length && !isClosed && allowed.has('email-btn')) {
+      pushSuggestion({
+        kind: 'send-reminder-email',
+        label: 'Send reminder',
+        source: 'Issue status',
+        evidence: `${issue.subStatus || 'This issue'} remains open and needs a follow-up update.`,
+        actionSummary: 'Open the email panel with a draft reminder remark.',
+        prefill: {
+          emailType: 'reminder',
+          recipients: '',
+          remark: `AI suggestion: follow up on ${issue.id} for ${issue.subStatus || 'this issue'}.`
+        }
+      });
+    }
+
+    return suggestions;
   }
 
   function loadCustomIssues() {
@@ -1328,6 +1555,10 @@
       // Hide action launcher and action section when no issue
       const launcher = document.getElementById('action-launcher');
       const actionPanel = document.getElementById('action-panel');
+      if (issueAiSuggestions) {
+        issueAiSuggestions.classList.add('hidden');
+        issueAiSuggestions.setAttribute('aria-hidden', 'true');
+      }
       if (launcher) launcher.classList.add('hidden');
       if (actionPanel) { actionPanel.classList.add('hidden'); actionPanel.setAttribute('aria-hidden','true'); }
       return;
@@ -1378,14 +1609,24 @@
     const launcher = document.getElementById('action-launcher');
     const newActionBtn = document.getElementById('new-action-btn');
     const actionPanel = document.getElementById('action-panel');
-    if (launcher && newActionBtn && actionPanel) {
-      launcher.classList.remove('hidden');
-      actionPanel.classList.add('hidden');
-      actionPanel.setAttribute('aria-hidden','true');
-      newActionBtn.onclick = () => {
+    function showActionPanel() {
+      if (actionPanel) {
         actionPanel.classList.remove('hidden');
-        actionPanel.setAttribute('aria-hidden','false');
-        launcher.classList.add('hidden');
+        actionPanel.setAttribute('aria-hidden', 'false');
+      }
+      if (launcher) launcher.classList.add('hidden');
+    }
+    function showActionLauncher() {
+      if (launcher) launcher.classList.remove('hidden');
+      if (actionPanel) {
+        actionPanel.classList.add('hidden');
+        actionPanel.setAttribute('aria-hidden', 'true');
+      }
+    }
+    if (launcher && newActionBtn && actionPanel) {
+      showActionLauncher();
+      newActionBtn.onclick = () => {
+        showActionPanel();
       };
     }
 
@@ -1618,12 +1859,74 @@
       return !!(el && !el.classList.contains('hidden'));
     }
 
+    function closeIssueAiReasonPopovers() {
+      if (!issueAiSuggestionList) return;
+      issueAiSuggestionList.querySelectorAll('.aiSuggestionItem.is-reason-open').forEach((node) => {
+        node.classList.remove('is-reason-open');
+        const popover = node.querySelector('.aiReasonPopover');
+        if (popover) {
+          popover.classList.add('hidden');
+          popover.setAttribute('aria-hidden', 'true');
+        }
+      });
+    }
+
+    function closeAssignPanel() {
+      if (assignPanel) {
+        assignPanel.classList.add('hidden');
+        assignPanel.setAttribute('aria-hidden', 'true');
+      }
+      if (form) form.classList.remove('hidden');
+    }
+
+    function openAssignPanel() {
+      showActionPanel();
+      closeIssueAiReasonPopovers();
+      closeRemark();
+      if (emailPanel) { emailPanel.classList.add('hidden'); emailPanel.setAttribute('aria-hidden','true'); }
+      if (resolutionPanel) { resolutionPanel.classList.add('hidden'); resolutionPanel.setAttribute('aria-hidden','true'); }
+      if (approvalProcessPanel) { approvalProcessPanel.classList.add('hidden'); approvalProcessPanel.setAttribute('aria-hidden','true'); }
+      ensureAssignOptions();
+      if (assignPanel) {
+        assignPanel.classList.remove('hidden');
+        assignPanel.setAttribute('aria-hidden', 'false');
+      }
+      if (assignRemark) assignRemark.value = '';
+      if (form) form.classList.add('hidden');
+    }
+
+    function closeEmailPanel() {
+      if (emailPanel) {
+        emailPanel.classList.add('hidden');
+        emailPanel.setAttribute('aria-hidden', 'true');
+      }
+      if (form) form.classList.remove('hidden');
+    }
+
+    function openApprovalProcessPanel() {
+      showActionPanel();
+      closeIssueAiReasonPopovers();
+      populateProcessOptions();
+      closeAssignPanel();
+      if (emailPanel) { emailPanel.classList.add('hidden'); emailPanel.setAttribute('aria-hidden','true'); }
+      if (resolutionPanel) { resolutionPanel.classList.add('hidden'); resolutionPanel.setAttribute('aria-hidden','true'); }
+      closeRemark();
+      if (approvalProcessPanel) {
+        approvalProcessPanel.classList.remove('hidden');
+        approvalProcessPanel.setAttribute('aria-hidden', 'false');
+      }
+      if (form) form.classList.add('hidden');
+      if (approvalProcessRemark) approvalProcessRemark.value = '';
+    }
+
     // Helper to open/close generic remark prompt
     let pendingAction = null; // { type: 'approval'|'email'|'closure', buttonEl: HTMLElement }
     function openRemark(type, buttonEl) {
+      showActionPanel();
+      closeIssueAiReasonPopovers();
       // Ensure only one remark UI is visible at any time
-      if (assignPanel) { assignPanel.classList.add('hidden'); assignPanel.setAttribute('aria-hidden', 'true'); }
-      if (emailPanel) { emailPanel.classList.add('hidden'); emailPanel.setAttribute('aria-hidden', 'true'); }
+      closeAssignPanel();
+      closeEmailPanel();
       if (resolutionPanel) { resolutionPanel.classList.add('hidden'); resolutionPanel.setAttribute('aria-hidden', 'true'); }
       if (approvalProcessPanel) { approvalProcessPanel.classList.add('hidden'); approvalProcessPanel.setAttribute('aria-hidden', 'true'); }
       if (form) form.classList.add('hidden');
@@ -1766,25 +2069,12 @@
     if (assignBtn) {
       assignBtn.onclick = () => {
         if (isVisible(assignPanel)) {
-          assignPanel.classList.add('hidden');
-          assignPanel.setAttribute('aria-hidden', 'true');
-          if (form) form.classList.remove('hidden');
+          closeAssignPanel();
           clearHighlights();
           return;
         }
         highlightButton(assignBtn);
-        if (assignPanel) {
-          // Ensure only one remark UI at a time: close generic remark if open
-          closeRemark();
-          if (emailPanel) { emailPanel.classList.add('hidden'); emailPanel.setAttribute('aria-hidden','true'); }
-          if (resolutionPanel) { resolutionPanel.classList.add('hidden'); resolutionPanel.setAttribute('aria-hidden','true'); }
-          if (approvalProcessPanel) { approvalProcessPanel.classList.add('hidden'); approvalProcessPanel.setAttribute('aria-hidden','true'); }
-          ensureAssignOptions();
-          assignPanel.classList.remove('hidden');
-          assignPanel.setAttribute('aria-hidden', 'false');
-          if (assignRemark) assignRemark.value = '';
-          if (form) form.classList.add('hidden');
-        }
+        openAssignPanel();
       };
     }
     if (assignConfirm) {
@@ -1800,8 +2090,7 @@
         if (issue.isCustom) {
           persistCustomIssue(issue, invoice);
         }
-        if (assignPanel) { assignPanel.classList.add('hidden'); assignPanel.setAttribute('aria-hidden', 'true'); }
-        if (form) form.classList.remove('hidden');
+        closeAssignPanel();
         clearHighlights();
         if (assignBtn) assignBtn.classList.add('is-active');
         refreshIssueListFor(invoice, issue.id);
@@ -1810,8 +2099,7 @@
     }
     if (assignCancel) {
       assignCancel.onclick = () => {
-        if (assignPanel) { assignPanel.classList.add('hidden'); assignPanel.setAttribute('aria-hidden', 'true'); }
-        if (form) form.classList.remove('hidden');
+        closeAssignPanel();
         clearHighlights();
       };
     }
@@ -1824,8 +2112,10 @@
       emailEscRow.setAttribute('aria-hidden', String(!isEsc));
     }
     function openEmailPanel() {
+      showActionPanel();
+      closeIssueAiReasonPopovers();
       // ensure single panel visible
-      if (assignPanel) { assignPanel.classList.add('hidden'); assignPanel.setAttribute('aria-hidden','true'); }
+      closeAssignPanel();
       if (resolutionPanel) { resolutionPanel.classList.add('hidden'); resolutionPanel.setAttribute('aria-hidden','true'); }
       if (approvalProcessPanel) { approvalProcessPanel.classList.add('hidden'); approvalProcessPanel.setAttribute('aria-hidden','true'); }
       closeRemark();
@@ -1846,8 +2136,7 @@
     if (emailBtn) {
       emailBtn.onclick = () => {
         if (isVisible(emailPanel)) {
-          if (emailPanel) { emailPanel.classList.add('hidden'); emailPanel.setAttribute('aria-hidden','true'); }
-          if (form) form.classList.remove('hidden');
+          closeEmailPanel();
           clearHighlights();
           return;
         }
@@ -1857,16 +2146,17 @@
     }
     if (emailCancel) {
       emailCancel.onclick = () => {
-        if (emailPanel) { emailPanel.classList.add('hidden'); emailPanel.setAttribute('aria-hidden','true'); }
-        if (form) form.classList.remove('hidden');
+        closeEmailPanel();
         clearHighlights();
         if (emailBtn) emailBtn.focus();
       };
     }
 
     function openResolutionPanel() {
-      if (assignPanel) { assignPanel.classList.add('hidden'); assignPanel.setAttribute('aria-hidden','true'); }
-      if (emailPanel) { emailPanel.classList.add('hidden'); emailPanel.setAttribute('aria-hidden','true'); }
+      showActionPanel();
+      closeIssueAiReasonPopovers();
+      closeAssignPanel();
+      closeEmailPanel();
       if (approvalProcessPanel) { approvalProcessPanel.classList.add('hidden'); approvalProcessPanel.setAttribute('aria-hidden','true'); }
       closeRemark();
       if (form) form.classList.add('hidden');
@@ -1953,17 +2243,7 @@
           return;
         }
         highlightButton(approvalProcessBtn);
-        populateProcessOptions();
-        if (assignPanel) { assignPanel.classList.add('hidden'); assignPanel.setAttribute('aria-hidden','true'); }
-        if (emailPanel) { emailPanel.classList.add('hidden'); emailPanel.setAttribute('aria-hidden','true'); }
-        if (resolutionPanel) { resolutionPanel.classList.add('hidden'); resolutionPanel.setAttribute('aria-hidden','true'); }
-        closeRemark();
-        if (approvalProcessPanel) {
-          approvalProcessPanel.classList.remove('hidden');
-          approvalProcessPanel.setAttribute('aria-hidden', 'false');
-          if (form) form.classList.add('hidden');
-          if (approvalProcessRemark) approvalProcessRemark.value = '';
-        }
+        openApprovalProcessPanel();
       };
     }
 
@@ -2000,7 +2280,147 @@
       };
     }
 
+    function runIssueAiSuggestion(suggestion) {
+      if (!suggestion) return;
+      closeIssueAiReasonPopovers();
+      switch (suggestion.kind) {
+        case 'assign-owner':
+          highlightButton(assignBtn);
+          openAssignPanel();
+          ensureAssignOptions();
+          if (assignOwnerSel && suggestion.prefill?.owner) {
+            assignOwnerSel.value = suggestion.prefill.owner;
+          }
+          if (assignRemark) assignRemark.value = suggestion.prefill?.remark || '';
+          break;
+        case 'select-approval-process':
+          highlightButton(approvalProcessBtn);
+          openApprovalProcessPanel();
+          if (processSelect && suggestion.prefill?.processId) {
+            processSelect.value = suggestion.prefill.processId;
+          }
+          if (approvalProcessRemark) approvalProcessRemark.value = suggestion.prefill?.remark || '';
+          break;
+        case 'send-escalation-email':
+        case 'send-reminder-email':
+          highlightButton(emailBtn);
+          openEmailPanel();
+          if (emailTypeSel) {
+            emailTypeSel.value = suggestion.prefill?.emailType || 'reminder';
+          }
+          setEmailEscRowVisibility();
+          if (emailRecipients) emailRecipients.value = suggestion.prefill?.recipients || '';
+          if (emailRemarkText) emailRemarkText.value = suggestion.prefill?.remark || '';
+          break;
+        case 'request-resolution':
+          highlightButton(resolutionBtn);
+          openResolutionPanel();
+          if (resolutionText) resolutionText.value = suggestion.prefill?.resolutionText || '';
+          if (resolutionRemark) resolutionRemark.value = suggestion.prefill?.remark || '';
+          break;
+        case 'close-issue':
+          highlightButton(closeBtn);
+          openRemark('closure', closeBtn);
+          if (actionRemarkText) actionRemarkText.value = suggestion.prefill?.remark || '';
+          break;
+        case 'reopen-issue':
+          highlightButton(reopenBtn);
+          openRemark('reopen', reopenBtn);
+          if (actionRemarkText) actionRemarkText.value = suggestion.prefill?.remark || '';
+          break;
+        default:
+          break;
+      }
+    }
+
+    function renderIssueAiSuggestions() {
+      if (!issueAiSuggestions || !issueAiSuggestionList) return;
+      const suggestions = getIssueAiSuggestions(issue, invoice, currentRole);
+      const suggestionIcons = {
+        'assign-owner': 'bi-person-check',
+        'select-approval-process': 'bi-diagram-3',
+        'send-reminder-email': 'bi-envelope',
+        'send-escalation-email': 'bi-exclamation-triangle',
+        'request-resolution': 'bi-file-earmark-check',
+        'close-issue': 'bi-check2-circle',
+        'reopen-issue': 'bi-arrow-counterclockwise'
+      };
+      issueAiSuggestionList.innerHTML = '';
+      closeIssueAiReasonPopovers();
+      if (!suggestions.length) {
+        issueAiSuggestions.classList.add('hidden');
+        issueAiSuggestions.setAttribute('aria-hidden', 'true');
+        return;
+      }
+      issueAiSuggestions.classList.remove('hidden');
+      issueAiSuggestions.setAttribute('aria-hidden', 'false');
+
+      suggestions.forEach((suggestion) => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'aiSuggestionItem';
+
+        const pill = document.createElement('span');
+        pill.className = 'aiSuggestionPill';
+
+        const actionBtn = document.createElement('button');
+        actionBtn.type = 'button';
+        actionBtn.className = 'aiSuggestionAction';
+        if (suggestionIcons[suggestion.kind]) {
+          const iconEl = document.createElement('i');
+          iconEl.className = `bi ${suggestionIcons[suggestion.kind]}`;
+          iconEl.setAttribute('aria-hidden', 'true');
+          actionBtn.appendChild(iconEl);
+          actionBtn.appendChild(document.createTextNode(' '));
+        }
+        actionBtn.appendChild(document.createTextNode(suggestion.label));
+        actionBtn.addEventListener('click', () => {
+          runIssueAiSuggestion(suggestion);
+        });
+
+        const reasonBtn = document.createElement('button');
+        reasonBtn.type = 'button';
+        reasonBtn.className = 'aiReasonBtn';
+        reasonBtn.setAttribute('aria-label', `Why ${suggestion.label}?`);
+        reasonBtn.textContent = 'i';
+
+        const popover = document.createElement('div');
+        popover.className = 'aiReasonPopover hidden';
+        popover.setAttribute('aria-hidden', 'true');
+        const sourceLabel = document.createElement('strong');
+        sourceLabel.textContent = 'Source:';
+        popover.appendChild(sourceLabel);
+        popover.appendChild(document.createTextNode(` ${suggestion.source}`));
+        popover.appendChild(document.createElement('br'));
+        const evidenceLabel = document.createElement('strong');
+        evidenceLabel.textContent = 'Evidence:';
+        popover.appendChild(evidenceLabel);
+        popover.appendChild(document.createTextNode(` ${suggestion.evidence}`));
+        popover.appendChild(document.createElement('br'));
+        const actionLabel = document.createElement('strong');
+        actionLabel.textContent = 'Will do:';
+        popover.appendChild(actionLabel);
+        popover.appendChild(document.createTextNode(` ${suggestion.actionSummary}`));
+
+        reasonBtn.addEventListener('click', (event) => {
+          event.stopPropagation();
+          const isOpen = wrapper.classList.contains('is-reason-open');
+          closeIssueAiReasonPopovers();
+          if (isOpen) return;
+          wrapper.classList.add('is-reason-open');
+          popover.classList.remove('hidden');
+          popover.setAttribute('aria-hidden', 'false');
+        });
+
+        pill.appendChild(actionBtn);
+        pill.appendChild(reasonBtn);
+        wrapper.appendChild(pill);
+        wrapper.appendChild(popover);
+        issueAiSuggestionList.appendChild(wrapper);
+      });
+    }
+
     applyRoleToActions(currentRole, issue);
+    renderIssueAiSuggestions();
 
     if (reopenBtn) {
       reopenBtn.onclick = () => {
@@ -2060,8 +2480,7 @@
           persistCustomIssue(issue, invoice);
         }
         // close panel and refresh
-        if (emailPanel) { emailPanel.classList.add('hidden'); emailPanel.setAttribute('aria-hidden','true'); }
-        if (form) form.classList.remove('hidden');
+        closeEmailPanel();
         clearHighlights();
         if (emailBtn) emailBtn.classList.add('is-active');
         try { window.alert(kind === 'reminder' ? 'Mock: Reminder email re-sent.' : 'Mock: Escalation email sent.'); } catch(_e) {}

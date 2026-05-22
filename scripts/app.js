@@ -118,6 +118,78 @@ const supportTicketsKey = "inebura_support_tickets";
 const commitmentSubmissionsKey = "ineburaCommitmentSubmissions";
 const strategyAgingBucketOptions = ["0-30", "31-60", "61-90", "90+"];
 const strategyTemplateOptions = ["Payment reminder", "PTP confirmation", "Overdue notice", "Escalation notice"];
+const dispositionActivityTypeOptions = ["Visited", "Emailed", "Called", "Collection"];
+const invoiceDispositionRows = [
+  { broadStatus: "Work In Progress", primaryStatus: "No Due", subStatus: "Within Credit Period/Days" },
+  { broadStatus: "Work In Progress", primaryStatus: "No Due", subStatus: "LC Payment" },
+  { broadStatus: "Work In Progress", primaryStatus: "No Due", subStatus: "As Per Payment Terms" },
+  { broadStatus: "Work In Progress", primaryStatus: "No Due", subStatus: "Retention Amount" },
+  { broadStatus: "Work In Progress", primaryStatus: "No Due", subStatus: "SD Amount" },
+  { broadStatus: "Work In Progress", primaryStatus: "Part Collected", subStatus: "Part Payment through LC done" },
+  { broadStatus: "Work In Progress", primaryStatus: "Part Collected", subStatus: "Part Payment Made" },
+  { broadStatus: "Work In Progress", primaryStatus: "PTP", subStatus: "PTP" },
+  { broadStatus: "Work In Progress", primaryStatus: "Collection In Progress", subStatus: "Funds Issue" },
+  { broadStatus: "Work In Progress", primaryStatus: "Collection In Progress", subStatus: "PDC Given" },
+  { broadStatus: "Work In Progress", primaryStatus: "Collection In Progress", subStatus: "Call Back" },
+  { broadStatus: "Work In Progress", primaryStatus: "Collection In Progress", subStatus: "Cold Call" },
+  { broadStatus: "Work In Progress", primaryStatus: "Collection In Progress", subStatus: "Issue With Address Mentioned" },
+  { broadStatus: "Work In Progress", primaryStatus: "Collection In Progress", subStatus: "Recon Required" },
+  { broadStatus: "Work In Progress", primaryStatus: "Collection In Progress", subStatus: "Not my Invoice" },
+  { broadStatus: "Work In Progress", primaryStatus: "Collection In Progress", subStatus: "Call Back/Email Follow up" },
+  { broadStatus: "Work In Progress", primaryStatus: "Invoice Assignment", subStatus: "Assign the Invoice to Others" },
+  { broadStatus: "Red Flag", primaryStatus: "Guidance", subStatus: "Company Closed/Shut down" },
+  { broadStatus: "Red Flag", primaryStatus: "Guidance", subStatus: "Recommended For Legal" },
+  { broadStatus: "Red Flag", primaryStatus: "Guidance", subStatus: "Office Closed/Shut Down" },
+  { broadStatus: "Red Flag", primaryStatus: "Guidance", subStatus: "Shifted - Address Not Found" },
+  { broadStatus: "Red Flag", primaryStatus: "Guidance", subStatus: "Fix Dunning letter strategy" },
+  { broadStatus: "Red Flag", primaryStatus: "Guidance", subStatus: "Send Pre-Legal Letter" },
+  { broadStatus: "External dependency", primaryStatus: "Further Docs Required", subStatus: "Invoice Copy Required" },
+  { broadStatus: "External dependency", primaryStatus: "Further Docs Required", subStatus: "PO (Purchase Order) Copy Required" },
+  { broadStatus: "External dependency", primaryStatus: "Further Docs Required", subStatus: "Service/PM Report Required" },
+  { broadStatus: "External dependency", primaryStatus: "Further Docs Required", subStatus: "Compliance Docs (Salary, PF, Attendance & ESI) required" },
+  { broadStatus: "External dependency", primaryStatus: "Further Docs Required", subStatus: "Indeminity Bond Required" },
+  { broadStatus: "External dependency", primaryStatus: "Further Docs Required", subStatus: "BG/PBG Required" },
+  { broadStatus: "External dependency", primaryStatus: "Further Docs Required", subStatus: "GST Challan/ GST Certifcate by CA Required" },
+  { broadStatus: "External dependency", primaryStatus: "Further Docs Required", subStatus: "Delivery Challan Required" },
+  { broadStatus: "External dependency", primaryStatus: "Further Docs Required", subStatus: "Statutory Docs(PAN, GST Registration, Turnover Certifcate ) Required" },
+  { broadStatus: "External dependency", primaryStatus: "Further Action Required", subStatus: "Wrong/Incorrect Billing" },
+  { broadStatus: "External dependency", primaryStatus: "Further Action Required", subStatus: "Payment Wrongly Adjusted" },
+  { broadStatus: "External dependency", primaryStatus: "Further Action Required", subStatus: "PO Cancelled/Contract Terminated" },
+  { broadStatus: "External dependency", primaryStatus: "Further Action Required", subStatus: "Proposed For Write-Off" },
+  { broadStatus: "External dependency", primaryStatus: "Further Action Required", subStatus: "Credit Note To Be Issued" },
+  { broadStatus: "External dependency", primaryStatus: "Further Action Required", subStatus: "Vendor Portal Issue" },
+  { broadStatus: "External dependency", primaryStatus: "Further Action Required", subStatus: "Reversal & Re-Bill" },
+  { broadStatus: "External dependency", primaryStatus: "Further Action Required", subStatus: "Tax Issue On The Invoice" },
+  { broadStatus: "External dependency", primaryStatus: "Further Action Required", subStatus: "Customized Invoice Required" },
+  { broadStatus: "External dependency", primaryStatus: "Further Action Required", subStatus: "Discount Required" },
+  { broadStatus: "External dependency", primaryStatus: "Further Action Required", subStatus: "Customer deduction" },
+  { broadStatus: "External dependency", primaryStatus: "Further Action Required", subStatus: "Proposed for Cancellation" },
+  { broadStatus: "External dependency", primaryStatus: "Material Delivery Issues", subStatus: "Material Not Received" },
+  { broadStatus: "External dependency", primaryStatus: "Material Delivery Issues", subStatus: "Partial Material Received" },
+  { broadStatus: "External dependency", primaryStatus: "Material Delivery Issues", subStatus: "Damaged Material Received" },
+  { broadStatus: "External dependency", primaryStatus: "Material Delivery Issues", subStatus: "Late Shipment" },
+  { broadStatus: "External dependency", primaryStatus: "Material Delivery Issues", subStatus: "Wrong Material Delivered" },
+  { broadStatus: "External dependency", primaryStatus: "Material Delivery Issues", subStatus: "Material Delivered To Wrong Site" },
+  { broadStatus: "External dependency", primaryStatus: "Material Delivery Issues", subStatus: "Material Recalled/Returned" },
+  { broadStatus: "External dependency", primaryStatus: "Service Related Issues", subStatus: "PM Pending" },
+  { broadStatus: "External dependency", primaryStatus: "Service Related Issues", subStatus: "Equipment Not Working" },
+  { broadStatus: "External dependency", primaryStatus: "Service Related Issues", subStatus: "Call Not Attended" },
+  { broadStatus: "External dependency", primaryStatus: "Service Related Issues", subStatus: "Turnkey Project Issues" },
+  { broadStatus: "External dependency", primaryStatus: "Service Related Issues", subStatus: "Unsatisfactory Service Report By Customer" },
+  { broadStatus: "External dependency", primaryStatus: "Service Related Issues", subStatus: "Installation Pending" },
+  { broadStatus: "External dependency", primaryStatus: "Service Related Issues", subStatus: "Commissioning Pending" },
+  { broadStatus: "External dependency", primaryStatus: "Service Related Issues", subStatus: "Inspection Pending" },
+  { broadStatus: "Collection Done", primaryStatus: "Collected", subStatus: "Collected" }
+];
+const dispositionSubStatusAliases = {
+  "paid by customer": "Collected",
+  "collection": "Call Back/Email Follow up",
+  "ptp set": "PTP",
+  "pdc given": "PDC Given",
+  "pdc given ": "PDC Given",
+  "no response": "Cold Call",
+  "dispute raised": "Wrong/Incorrect Billing"
+};
 const strategyAttachmentOptions = ["No attachment", "Invoice copy", "Statement of account", "Collection follow-up note"];
 
 const rootPath = (() => {
@@ -320,6 +392,7 @@ const customersData = [
         dueDate: "12 Nov 2025",
         primaryStatus: "PTP",
         status: "PTP",
+        ptpDate: "2026-05-28",
         targetForMonth: 42000,
         unreadEmailCount: 1
       },
@@ -761,11 +834,13 @@ function upsertInvoiceStatusOverride(invoiceNo, payload) {
   if (!invoiceNo || !payload || typeof payload !== "object") return;
   const map = loadInvoiceStatusOverrides();
   const existing = map[invoiceNo] && typeof map[invoiceNo] === "object" ? map[invoiceNo] : {};
+  const row = findDispositionRowByStatuses(payload);
   const next = {
-    broadStatus: payload.broadStatus || existing.broadStatus || "",
-    primaryStatus: payload.primaryStatus || existing.primaryStatus || "",
-    subStatus: payload.subStatus || existing.subStatus || "",
-    status: payload.status || payload.subStatus || existing.status || "",
+    broadStatus: row?.broadStatus || payload.broadStatus || existing.broadStatus || "",
+    primaryStatus: row?.primaryStatus || payload.primaryStatus || existing.primaryStatus || "",
+    subStatus: row?.subStatus || payload.subStatus || existing.subStatus || "",
+    status: row?.subStatus || payload.status || payload.subStatus || existing.status || "",
+    ptpDate: payload.ptpDate || existing.ptpDate || "",
     updatedAt: payload.updatedAt || new Date().toISOString(),
     updatedBy: payload.updatedBy || existing.updatedBy || ""
   };
@@ -781,11 +856,13 @@ function applyInvoiceStatusOverrides(records) {
     (customer?.invoices || []).forEach((invoice) => {
       const override = map[invoice?.invoiceNo];
       if (!override || typeof override !== "object") return;
-      if (override.broadStatus) invoice.broadStatus = override.broadStatus;
-      if (override.primaryStatus) invoice.primaryStatus = override.primaryStatus;
-      if (override.subStatus) invoice.subStatus = override.subStatus;
-      if (override.status || override.subStatus) {
-        invoice.status = override.status || override.subStatus;
+      const row = findDispositionRowByStatuses(override);
+      if (row?.broadStatus || override.broadStatus) invoice.broadStatus = row?.broadStatus || override.broadStatus;
+      if (row?.primaryStatus || override.primaryStatus) invoice.primaryStatus = row?.primaryStatus || override.primaryStatus;
+      if (row?.subStatus || override.subStatus) invoice.subStatus = row?.subStatus || override.subStatus;
+      if (override.ptpDate) invoice.ptpDate = override.ptpDate;
+      if (row?.subStatus || override.status || override.subStatus) {
+        invoice.status = row?.subStatus || override.status || override.subStatus;
       }
     });
   });
@@ -3350,16 +3427,20 @@ function withActivityTrailTimestamp(meta, at) {
 function buildStatusUpdateEntry(data) {
   const details = document.createElement("details");
   details.className = "activityEvent event-invoice-update";
+  const dispositionRow = findDispositionRowByStatuses(data);
+  const displayBroadStatus = dispositionRow?.broadStatus || data.broadStatus;
+  const displayPrimaryStatus = dispositionRow?.primaryStatus || data.primaryStatus;
+  const displaySubStatus = dispositionRow?.subStatus || data.subStatus;
 
-  const subStatusLabel = safeText(data.subStatus);
+  const subStatusLabel = safeText(displaySubStatus);
   const statusTimestamp = formatActivityTrailDateTime(
     data.performedAt || data.at || data.updatedAt || data.createdAt
   );
 
   const detailItems = [
     { label: "Activity type", value: safeText(data.activityType) },
-    { label: "Broad Status", value: safeText(data.broadStatus) },
-    { label: "Primary status", value: safeText(data.primaryStatus) },
+    { label: "Broad Status", value: safeText(displayBroadStatus) },
+    { label: "Primary status", value: safeText(displayPrimaryStatus) },
     { label: "Sub Status", value: subStatusLabel }
   ];
 
@@ -3367,8 +3448,13 @@ function buildStatusUpdateEntry(data) {
     detailItems.unshift({ label: "Invoices", value: data.invoices.join(", ") });
   }
 
+  if (data.ptpDate) {
+    detailItems.push({ label: "PTP date", value: safeText(data.ptpDate) });
+  }
+
   const isCollectionTrailEvent = (
-    ["Collection", "Paid by customer", "Collected"].includes(String(data.subStatus || "").trim())
+    String(displaySubStatus || "").trim() === "Collected"
+    || String(displayBroadStatus || "").trim() === "Collection Done"
     || String(data.activityType || "").trim() === "Collection"
   );
 
@@ -3395,7 +3481,7 @@ function buildStatusUpdateEntry(data) {
     }
   }
 
-  if (data.subStatus === "PDC given") {
+  if (normalizeDispositionKey(displaySubStatus) === "pdc given") {
     const pdcRows = Array.isArray(data.pdcRows) ? data.pdcRows : [];
     const dispatch = data.dispatchDetails || {};
     const dispatchParts = [
@@ -3572,15 +3658,16 @@ function buildEmailTrailEntry(data) {
 
 function buildStatusTrailPayload(data, timestamp) {
   const nowIso = timestamp || new Date().toISOString();
+  const dispositionRow = findDispositionRowByStatuses(data);
   return {
     id: `status:${nowIso}`,
     at: nowIso,
     type: "status",
     data: {
       activityType: data.activityType,
-      broadStatus: data.broadStatus,
-      primaryStatus: data.primaryStatus,
-      subStatus: data.subStatus,
+      broadStatus: dispositionRow?.broadStatus || data.broadStatus,
+      primaryStatus: dispositionRow?.primaryStatus || data.primaryStatus,
+      subStatus: dispositionRow?.subStatus || data.subStatus,
       remarks: data.remarks,
       invoices: data.invoices,
       instrumentMode: data.instrumentMode,
@@ -3590,6 +3677,7 @@ function buildStatusTrailPayload(data, timestamp) {
       amount: data.amount,
       tds: data.tds,
       ld: data.ld,
+      ptpDate: data.ptpDate,
       miscRows: data.miscRows,
       pdcRows: data.pdcRows,
       pdcOpsUser: data.pdcOpsUser,
@@ -3754,6 +3842,114 @@ function uniqSorted(values) {
     .sort((a, b) => String(a).localeCompare(String(b)));
 }
 
+function normalizeDispositionKey(value) {
+  return String(value || "").trim().replace(/\s+/g, " ").toLowerCase();
+}
+
+function findDispositionRowBySubStatus(subStatus) {
+  const normalized = normalizeDispositionKey(subStatus);
+  if (!normalized) return null;
+  const alias = dispositionSubStatusAliases[normalized] || subStatus;
+  const aliasKey = normalizeDispositionKey(alias);
+  return invoiceDispositionRows.find(row => normalizeDispositionKey(row.subStatus) === aliasKey) || null;
+}
+
+function findDispositionRowByStatuses(prefill = {}) {
+  const subStatusRow = findDispositionRowBySubStatus(prefill.subStatus);
+  if (subStatusRow) return subStatusRow;
+  const broad = normalizeDispositionKey(prefill.broadStatus);
+  const primary = normalizeDispositionKey(prefill.primaryStatus);
+  if (!broad && !primary) return null;
+  return invoiceDispositionRows.find(row => {
+    const broadMatches = !broad || normalizeDispositionKey(row.broadStatus) === broad;
+    const primaryMatches = !primary || normalizeDispositionKey(row.primaryStatus) === primary;
+    return broadMatches && primaryMatches;
+  }) || null;
+}
+
+function resolveDispositionRow(preferredSubStatus, fallbackSubStatuses = []) {
+  const candidates = [preferredSubStatus].concat(fallbackSubStatuses || []);
+  for (const candidate of candidates) {
+    const row = findDispositionRowBySubStatus(candidate);
+    if (row) return row;
+  }
+  return invoiceDispositionRows[0] || null;
+}
+
+function normalizeDispositionPrefill(prefill = {}, fallbackSubStatuses = []) {
+  const shouldResolveFallback = Boolean(prefill.subStatus)
+    || (Array.isArray(fallbackSubStatuses) && fallbackSubStatuses.length > 0);
+  const row = findDispositionRowByStatuses(prefill)
+    || (shouldResolveFallback ? resolveDispositionRow(prefill.subStatus, fallbackSubStatuses) : null);
+  if (!row) return { ...prefill };
+  return {
+    ...prefill,
+    broadStatus: row.broadStatus,
+    primaryStatus: row.primaryStatus,
+    subStatus: row.subStatus
+  };
+}
+
+function setSelectOptions(selectEl, values, selectedValue = "", placeholder = "") {
+  if (!selectEl) return;
+  const selectedKey = normalizeDispositionKey(selectedValue);
+  const options = [];
+  if (placeholder) {
+    options.push(`<option value="">${escapeHtml(placeholder)}</option>`);
+  }
+  values.forEach((value) => {
+    const isSelected = normalizeDispositionKey(value) === selectedKey;
+    options.push(`<option value="${escapeHtml(value)}"${isSelected ? " selected" : ""}>${escapeHtml(value)}</option>`);
+  });
+  selectEl.innerHTML = options.join("");
+}
+
+function populateDispositionDropdowns(selected = {}) {
+  const activityTypeSelect = document.getElementById("activityTypeSelect");
+  const broadStatusSelect = document.getElementById("broadStatusSelect");
+  const primaryStatusSelect = document.getElementById("primaryStatusSelect");
+  const subStatusSelect = document.getElementById("subStatusSelect");
+  const row = findDispositionRowByStatuses(selected);
+  setSelectOptions(
+    activityTypeSelect,
+    dispositionActivityTypeOptions,
+    selected.activityType || activityTypeSelect?.value || dispositionActivityTypeOptions[0]
+  );
+  setSelectOptions(
+    subStatusSelect,
+    invoiceDispositionRows.map(item => item.subStatus),
+    row?.subStatus || selected.subStatus || subStatusSelect?.value || "",
+    "Select sub status"
+  );
+  setSelectOptions(
+    broadStatusSelect,
+    uniqSorted(invoiceDispositionRows.map(item => item.broadStatus)),
+    row?.broadStatus || selected.broadStatus || "",
+    "Auto-filled"
+  );
+  setSelectOptions(
+    primaryStatusSelect,
+    uniqSorted(invoiceDispositionRows.map(item => item.primaryStatus)),
+    row?.primaryStatus || selected.primaryStatus || "",
+    "Auto-filled"
+  );
+}
+
+function syncDispositionStatusFromSubStatus() {
+  const broadStatusSelect = document.getElementById("broadStatusSelect");
+  const primaryStatusSelect = document.getElementById("primaryStatusSelect");
+  const subStatusSelect = document.getElementById("subStatusSelect");
+  const row = findDispositionRowBySubStatus(subStatusSelect?.value);
+  if (!row) {
+    if (broadStatusSelect) broadStatusSelect.value = "";
+    if (primaryStatusSelect) primaryStatusSelect.value = "";
+    return null;
+  }
+  if (broadStatusSelect) broadStatusSelect.value = row.broadStatus;
+  if (primaryStatusSelect) primaryStatusSelect.value = row.primaryStatus;
+  return row;
+}
+
 function safeText(value) {
   if (value === undefined || value === null || value === "") return "-";
   return String(value);
@@ -3880,12 +4076,94 @@ function renderEmailConversation(id, entries) {
   el.innerHTML = formatEmailConversationHtml(entries);
 }
 
+function buildAiPayload(payload) {
+  return encodeURIComponent(JSON.stringify(payload || {}));
+}
+
+function readAiPayload(raw) {
+  try {
+    return JSON.parse(decodeURIComponent(raw || ""));
+  } catch (_) {
+    return {};
+  }
+}
+
+function renderAiSuggestionStrip(target, suggestions, options = {}) {
+  const el = typeof target === "string" ? document.getElementById(target) : target;
+  if (!el) return;
+  const list = Array.isArray(suggestions) ? suggestions.filter(Boolean) : [];
+  if (list.length === 0) {
+    el.classList.add("hidden");
+    el.innerHTML = "";
+    return;
+  }
+  const label = options.label || "AI Suggestions";
+  el.className = `${options.className || "aiSuggestionStrip"}`;
+  el.innerHTML = `
+    <div class="aiSuggestionHeader">
+      <i class="bi bi-stars" aria-hidden="true"></i>
+      <span>${escapeHtml(label)}</span>
+    </div>
+    <div class="aiSuggestionPills">
+      ${list.map((item) => {
+        const reason = String(item.reason || "Source: AI. Suggested next action.").trim();
+        const payload = buildAiPayload(item.payload || {});
+        return `
+          <span class="aiSuggestionItem">
+            <span class="aiSuggestionPill">
+            <button class="aiSuggestionAction" type="button" data-ai-action="${escapeHtml(item.action || "")}" data-ai-payload="${payload}">
+              ${item.icon ? `<i class="bi ${escapeHtml(item.icon)}" aria-hidden="true"></i>` : ""}
+              ${escapeHtml(item.label || "Action")}
+            </button>
+              <button class="aiReasonBtn" type="button" title="${escapeHtml(reason)}" data-ai-reason="${escapeHtml(reason)}" aria-label="Why suggested">i</button>
+            </span>
+            <span class="aiReasonPopover hidden" role="status">${escapeHtml(reason)}</span>
+          </span>
+        `;
+      }).join("")}
+    </div>
+  `;
+  el.classList.remove("hidden");
+}
+
 function hideEmailTakeActionCard() {
   const card = document.getElementById("emailTakeActionCard");
   if (!card) return;
   card.classList.add("hidden");
   card.innerHTML = "";
   delete card.dataset.suggestion;
+}
+
+function openEmailComposeDraft(payload = {}) {
+  const invoiceNo = payload.invoiceNo || currentInvoiceNoForDocs || "";
+  if (invoiceNo) currentInvoiceNoForDocs = invoiceNo;
+  emailInvoiceFilter = invoiceNo ? [invoiceNo] : null;
+  setEmailPanelVisible(true);
+  applyFiltersAndRender();
+
+  const panel = document.getElementById("emailPanel");
+  if (!panel) return;
+  const detailEmpty = document.getElementById("emailDetailEmpty");
+  const detailContent = document.getElementById("emailDetailContent");
+  const composePanel = document.getElementById("emailComposePanel");
+  const composeTo = document.getElementById("emailComposeTo");
+  const composeCc = document.getElementById("emailComposeCc");
+  const composeFrom = document.getElementById("emailComposeFrom");
+  const composeSubject = document.getElementById("emailComposeSubject");
+  const composeBody = document.getElementById("emailComposeBody");
+  const composeAttachments = document.getElementById("emailComposeAttachments");
+
+  if (composePanel) composePanel.classList.remove("hidden");
+  if (detailEmpty) detailEmpty.classList.add("hidden");
+  if (detailContent) detailContent.classList.add("hidden");
+  hideEmailTakeActionCard();
+  panel.querySelectorAll(".emailItem.active").forEach(item => item.classList.remove("active"));
+  if (composeTo) composeTo.value = payload.to || "";
+  if (composeCc) composeCc.value = payload.cc || "";
+  if (composeFrom && payload.from) composeFrom.value = payload.from;
+  if (composeSubject) composeSubject.value = payload.subject || "";
+  if (composeBody) composeBody.value = payload.body || "";
+  if (composeAttachments) composeAttachments.value = payload.attachments || "";
 }
 
 function parseEmailPaymentSuggestion(item) {
@@ -3934,60 +4212,141 @@ function parseEmailPaymentSuggestion(item) {
     activityType: "Collection",
     broadStatus: "Collection Done",
     primaryStatus: "Collected",
-    subStatus: "Paid by customer",
+    subStatus: "Collected",
     instrumentMode,
     instrumentRef,
     bank,
     transferDate,
     displayDate,
     amount: numericAmount > 0 ? String(numericAmount) : "",
-    amountLabel: numericAmount > 0 ? `Rs. ${formatINR(numericAmount)}` : safeText(amountRaw || invoice?.netDueAmount || "-")
+    amountLabel: numericAmount > 0 ? `Rs. ${formatINR(numericAmount)}` : safeText(amountRaw || invoice?.netDueAmount || "-"),
+    reason: `Source: Email. Customer confirmed payment for ${invoiceNo || "the invoice"}${numericAmount > 0 ? ` worth Rs. ${formatINR(numericAmount)}` : ""}.`
   };
 }
 
-function renderEmailTakeActionCard(suggestion) {
-  const card = document.getElementById("emailTakeActionCard");
-  if (!card) return;
-  if (!suggestion || !suggestion.invoiceNo) {
+function parseEmailIssueSuggestion(item) {
+  if (!item) return null;
+  const isInbound = Boolean(item.querySelector(".emailDirectionInbound"));
+  if (!isInbound) return null;
+  const customer = customersData.find(c => c.id === selectedCustomerId) || null;
+  const body = normalizeEmailText(item.getAttribute("data-body") || "");
+  const subject = item.getAttribute("data-subject") || "";
+  const haystack = `${subject}\n${body}`;
+  const structuredType = String(item.getAttribute("data-action-type") || "").trim().toLowerCase();
+  const mentionsDeliveryChallan = structuredType === "delivery-challan"
+    || /\b(?:delivery\s+challan|dc\s+copy|challan\s+(?:missing|required)|document\s+(?:missing|required))\b/i.test(haystack);
+  if (!mentionsDeliveryChallan) return null;
+
+  const textMatch = (regex) => {
+    const match = haystack.match(regex);
+    return match && match[1] ? String(match[1]).trim().replace(/[.,;]+$/, "") : "";
+  };
+  const invoiceNo = item.getAttribute("data-action-invoice")
+    || textMatch(/\b(?:invoice|inv(?:oice)?\s*no\.?)\s*[:#-]?\s*(INV-[A-Z0-9-]+)/i)
+    || textMatch(/\b(INV-[A-Z0-9-]+)\b/i)
+    || currentInvoiceNoForDocs
+    || "";
+  const dispositionRow = resolveDispositionRow("Delivery Challan Required");
+  return {
+    customerCode: item.getAttribute("data-action-customer-code") || customer?.code || "-",
+    customerName: item.getAttribute("data-action-customer-name") || customer?.name || "-",
+    invoiceNo,
+    activityType: "Emailed",
+    broadStatus: dispositionRow?.broadStatus || "External dependency",
+    primaryStatus: dispositionRow?.primaryStatus || "Further Docs Required",
+    subStatus: dispositionRow?.subStatus || "Delivery Challan Required",
+    to: item.getAttribute("data-from") || "",
+    cc: item.getAttribute("data-cc") || "",
+    subject: item.getAttribute("data-subject") || "",
+    reason: `Source: Email. Customer mentioned delivery challan issue for ${invoiceNo || "the invoice"}.`
+  };
+}
+
+function buildEmailResponseSuggestion(item) {
+  if (!item) return null;
+  const body = normalizeEmailText(item.getAttribute("data-body") || "");
+  const subject = item.getAttribute("data-subject") || "";
+  const haystack = `${subject}\n${body}`;
+  const textMatch = (regex) => {
+    const match = haystack.match(regex);
+    return match && match[1] ? String(match[1]).trim().replace(/[.,;]+$/, "") : "";
+  };
+  const invoiceNo = item.getAttribute("data-action-invoice")
+    || textMatch(/\b(?:invoice|inv(?:oice)?\s*no\.?)\s*[:#-]?\s*(INV-[A-Z0-9-]+)/i)
+    || textMatch(/\b(INV-[A-Z0-9-]+)\b/i)
+    || currentInvoiceNoForDocs
+    || "";
+  const isInbound = Boolean(item.querySelector(".emailDirectionInbound"));
+  const isSystem = Boolean(item.querySelector(".emailDirectionSystem"));
+  const replyTo = isInbound
+    ? (item.getAttribute("data-from") || "")
+    : (item.getAttribute("data-to") || "");
+  const cc = item.getAttribute("data-cc") || "";
+  const replySubject = subject && subject.trim().toLowerCase().startsWith("re:")
+    ? subject
+    : `Re: ${subject || (invoiceNo ? `Invoice ${invoiceNo}` : "Customer update")}`;
+  const mentionsPayment = /\b(?:paid|payment\s+(?:made|done|completed|received)|made\s+the\s+payment|transaction|instrument|utr|neft|rtgs|cheque)\b/i.test(haystack);
+  const mentionsDeliveryChallan = /\b(?:delivery\s+challan|dc\s+copy|challan\s+(?:missing|required)|document\s+(?:missing|required))\b/i.test(haystack);
+  let draftBody = `Hello,\n\nThank you for the update${invoiceNo ? ` on ${invoiceNo}` : ""}. We will review and revert shortly.\n\nRegards,\nCollections Team`;
+  if (mentionsPayment) {
+    draftBody = `Hello,\n\nThank you for confirming the payment${invoiceNo ? ` for ${invoiceNo}` : ""}. We are validating the instrument details and will update the collection status shortly.\n\nRegards,\nCollections Team`;
+  } else if (mentionsDeliveryChallan) {
+    draftBody = `Hello,\n\nWe have noted the delivery challan requirement${invoiceNo ? ` for ${invoiceNo}` : ""}. We will share the document copy and confirm dispatch details shortly.\n\nRegards,\nCollections Team`;
+  } else if (isSystem) {
+    draftBody = `Hello,\n\nWe are reviewing the system alert${invoiceNo ? ` for ${invoiceNo}` : ""} and will share the next update shortly.\n\nRegards,\nCollections Team`;
+  }
+
+  return {
+    suggestionType: "email-response",
+    invoiceNo,
+    to: replyTo,
+    cc,
+    subject: replySubject,
+    body: draftBody,
+    reason: `Source: Email. AI drafted a response for ${invoiceNo || "the selected email"} based on the latest message.`
+  };
+}
+
+function renderEmailTakeActionCard(suggestions) {
+  const list = Array.isArray(suggestions) ? suggestions.filter(Boolean) : (suggestions ? [suggestions] : []);
+  if (list.length === 0) {
     hideEmailTakeActionCard();
     return;
   }
-
-  const payload = encodeURIComponent(JSON.stringify(suggestion));
-  const field = (label, value, options = {}) => `
-    <div class="emailTakeActionField">
-      <span>${escapeHtml(label)}</span>
-      ${options.pill
-        ? `<strong><span class="emailTakeActionPill">${escapeHtml(safeText(value))}</span></strong>`
-        : `<strong>${escapeHtml(safeText(value))}</strong>`}
-    </div>
-  `;
-
-  card.dataset.suggestion = payload;
-  card.innerHTML = `
-    <div class="emailTakeActionHeader">
-      <div>
-        <div class="emailTakeActionEyebrow">Suggested Action</div>
-        <div class="emailTakeActionTitle">Suggested collection activity</div>
-      </div>
-      <button class="emailTakeActionBtn" type="button" data-email-take-action="${payload}">Take Action</button>
-    </div>
-    <div class="emailTakeActionGrid">
-      ${field("Customer Code", suggestion.customerCode)}
-      ${field("Customer Name", suggestion.customerName)}
-      ${field("Invoice Number", suggestion.invoiceNo)}
-      ${field("Suitable Activity", suggestion.activityType, { pill: true })}
-      ${field("Broad Status", suggestion.broadStatus, { pill: true })}
-      ${field("Primary Status", suggestion.primaryStatus, { pill: true })}
-      ${field("Sub Status", suggestion.subStatus, { pill: true })}
-      ${field("Instrument Mode", suggestion.instrumentMode)}
-      ${field("Instrument Ref No", suggestion.instrumentRef)}
-      ${field("Bank", suggestion.bank)}
-      ${field("Date of Transaction", suggestion.displayDate)}
-      ${field("Amount", suggestion.amountLabel)}
-    </div>
-  `;
-  card.classList.remove("hidden");
+  const actions = [];
+  list.forEach((suggestion) => {
+    if (suggestion.suggestionType === "email-response") {
+      actions.push({
+        label: "Draft response",
+        icon: "bi-envelope",
+        action: "email-edit-ai-response",
+        reason: suggestion.reason || "Source: Email. AI drafted a response for this email.",
+        payload: suggestion
+      });
+      return;
+    }
+    const dispositionRow = findDispositionRowBySubStatus(suggestion.subStatus);
+    if (dispositionRow?.subStatus === "Collected") {
+      actions.push({
+        label: dispositionRow.subStatus,
+        icon: "bi-check2-circle",
+        action: "email-payment-collected",
+        reason: suggestion.reason || `Source: Email. Customer confirmed payment for ${suggestion.invoiceNo || "the invoice"}.`,
+        payload: suggestion
+      });
+      return;
+    }
+    if (dispositionRow && suggestion.reason && /delivery challan/i.test(suggestion.reason)) {
+      actions.push({
+        label: dispositionRow.subStatus,
+        icon: "bi-check2-circle",
+        action: "email-need-delivery-challan",
+        reason: suggestion.reason,
+        payload: suggestion
+      });
+    }
+  });
+  renderAiSuggestionStrip("emailTakeActionCard", actions);
 }
 
 function applyEmailTakeActionSuggestion(suggestion) {
@@ -3999,7 +4358,7 @@ function applyEmailTakeActionSuggestion(suggestion) {
     activityType: suggestion.activityType || "Collection",
     broadStatus: suggestion.broadStatus || "Collection Done",
     primaryStatus: suggestion.primaryStatus || "Collected",
-    subStatus: suggestion.subStatus || "Paid by customer",
+    subStatus: suggestion.subStatus || "Collected",
     instrumentMode: suggestion.instrumentMode || "NEFT",
     instrumentRef: suggestion.instrumentRef || "",
     bank: suggestion.bank || "",
@@ -4010,6 +4369,310 @@ function applyEmailTakeActionSuggestion(suggestion) {
     remarks: `Payment confirmation received by email for ${suggestion.invoiceNo}.${refText}${bankText}${dateText}`
   };
   openDispositionForSingleInvoice(suggestion.invoiceNo, prefill);
+}
+
+function applyEmailIssueSuggestion(suggestion) {
+  if (!suggestion || !suggestion.invoiceNo) return;
+  openDispositionForSingleInvoice(suggestion.invoiceNo, {
+    activityType: suggestion.activityType || "Emailed",
+    broadStatus: suggestion.broadStatus || "External dependency",
+    primaryStatus: suggestion.primaryStatus || "Further Docs Required",
+    subStatus: suggestion.subStatus || "Delivery Challan Required",
+    remarks: `Customer email indicates delivery challan is required for ${suggestion.invoiceNo}.`
+  });
+}
+
+function getInvoiceContextByNo(invoiceNo) {
+  if (!invoiceNo) return { customer: null, invoice: null };
+  for (const customer of customersData) {
+    const invoice = (customer.invoices || []).find((item) => item.invoiceNo === invoiceNo);
+    if (invoice) return { customer, invoice };
+  }
+  return { customer: null, invoice: null };
+}
+
+function formatIsoDate(value) {
+  const date = parseInvoiceDateValue(value);
+  if (!date) return "";
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function isFutureDateValue(value) {
+  const date = parseInvoiceDateValue(value);
+  if (!date) return false;
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const target = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  return target > today;
+}
+
+function getLatestPtpSignal(invoiceNo) {
+  if (!invoiceNo) return null;
+  const { customer, invoice } = getInvoiceContextByNo(invoiceNo);
+  const entries = Array.isArray(loadActivityTrailMap()[invoiceNo]) ? loadActivityTrailMap()[invoiceNo] : [];
+  const latestTrail = entries.find((entry) => {
+    const data = entry?.data || {};
+    const primary = String(data.primaryStatus || "").trim().toLowerCase();
+    const sub = String(data.subStatus || "").trim().toLowerCase();
+    return entry?.type === "status"
+      && (primary === "ptp" || sub.includes("ptp"))
+      && data.ptpDate
+      && isFutureDateValue(data.ptpDate);
+  });
+  const trailData = latestTrail?.data || null;
+  const invoicePtpDate = invoice?.ptpDate || "";
+  const ptpDate = trailData?.ptpDate || (isFutureDateValue(invoicePtpDate) ? invoicePtpDate : "");
+  const hasPtpStatus = String(invoice?.primaryStatus || "").trim().toLowerCase() === "ptp"
+    || String(invoice?.status || invoice?.subStatus || "").trim().toLowerCase().includes("ptp");
+  if (!ptpDate || (!trailData && !hasPtpStatus)) return null;
+  const amount = Number(invoice?.netDueAmount || 0);
+  return {
+    invoiceNo,
+    customerCode: customer?.code || "-",
+    customerName: customer?.name || "-",
+    ptpDate: formatIsoDate(ptpDate) || ptpDate,
+    amount,
+    to: (customer?.contacts || []).find(contact => contact.useEmailForCommunication !== false && contact.email)?.email
+      || customer?.contacts?.[0]?.email
+      || "",
+    reason: `Source: Activity - PTP. PTP date is ${formatIsoDate(ptpDate) || ptpDate} and invoice ${invoiceNo} is still open${amount > 0 ? ` for Rs. ${formatINR(amount)}` : ""}.`
+  };
+}
+
+function renderActivityAiSuggestions() {
+  const invoiceNo = dispositionInvoiceList && dispositionInvoiceList.length > 0
+    ? dispositionInvoiceList[0]
+    : currentInvoiceNoForDocs;
+  const signal = getLatestPtpSignal(invoiceNo);
+  if (signal) {
+    renderAiSuggestionStrip("activityAiSuggestionStrip", [
+      {
+        label: "Collected",
+        icon: "bi-check2-circle",
+        action: "activity-collected",
+        reason: signal.reason,
+        payload: signal
+      },
+      {
+        label: "Send reminder",
+        icon: "bi-envelope",
+        action: "activity-send-reminder",
+        reason: signal.reason,
+        payload: signal
+      },
+      {
+        label: "Edit reminder",
+        icon: "bi-pencil-square",
+        action: "activity-edit-reminder",
+        reason: signal.reason,
+        payload: signal
+      }
+    ]);
+    return;
+  }
+
+  const { customer, invoice } = getInvoiceContextByNo(invoiceNo);
+  if (!invoice) {
+    renderAiSuggestionStrip("activityAiSuggestionStrip", []);
+    return;
+  }
+  const subStatus = String(invoice.subStatus || invoice.status || "").trim();
+  const primaryStatus = String(invoice.primaryStatus || "").trim();
+  const dueAmount = Number(invoice.netDueAmount || 0);
+  const to = (customer?.contacts || []).find(contact => contact.useEmailForCommunication !== false && contact.email)?.email
+    || customer?.contacts?.[0]?.email
+    || "";
+  const basePayload = {
+    invoiceNo,
+    to,
+    customerName: customer?.name || "",
+    customerCode: customer?.code || "",
+    amount: dueAmount
+  };
+  const lowerStatus = `${primaryStatus} ${subStatus}`.toLowerCase();
+  const actions = [];
+
+  if (lowerStatus.includes("delivery challan") || lowerStatus.includes("invoice copy") || lowerStatus.includes("docs")) {
+    const reason = `Source: Invoice status. ${invoiceNo} is waiting on document support: ${subStatus || primaryStatus}.`;
+    actions.push({
+      label: "Need Delivery Challan",
+      icon: "bi-file-earmark-text",
+      action: "activity-prefill-disposition",
+      reason,
+      payload: {
+        ...basePayload,
+        prefill: {
+          activityType: "Emailed",
+          broadStatus: "External dependency",
+          primaryStatus: "Further Docs Required",
+          subStatus: "Delivery Challan Required",
+          remarks: `AI suggestion applied for ${invoiceNo}: document follow-up required.`
+        }
+      }
+    });
+    actions.push({
+      label: "Send email",
+      icon: "bi-envelope",
+      action: "activity-send-email",
+      reason,
+      payload: {
+        ...basePayload,
+        subject: `Document required for ${invoiceNo}`,
+        body: `Hello,\n\nPlease share the required document support for ${invoiceNo} so we can proceed with collection closure.\n\nRegards,\nCollections Team`
+      }
+    });
+  } else if (lowerStatus.includes("part collected") || lowerStatus.includes("part payment")) {
+    const reason = `Source: Invoice status. ${invoiceNo} is partially collected and still has Rs. ${formatINR(dueAmount)} due.`;
+    actions.push({
+      label: "Collect balance",
+      icon: "bi-cash-coin",
+      action: "activity-prefill-disposition",
+      reason,
+      payload: {
+        ...basePayload,
+        prefill: {
+          activityType: "Collection",
+          broadStatus: "Work In Progress",
+          primaryStatus: "Collection In Progress",
+          subStatus: "Call Back/Email Follow up",
+          remarks: `AI suggestion applied for ${invoiceNo}: follow up for balance payment.`
+        }
+      }
+    });
+  } else if (lowerStatus.includes("collected") || dueAmount <= 0) {
+    const reason = `Source: Invoice status. ${invoiceNo} appears collected; send closure confirmation to the customer.`;
+    actions.push({
+      label: "Send closure email",
+      icon: "bi-envelope-check",
+      action: "activity-send-email",
+      reason,
+      payload: {
+        ...basePayload,
+        subject: `Payment closure confirmation for ${invoiceNo}`,
+        body: `Hello,\n\nThank you. We have noted the payment closure for ${invoiceNo}.\n\nRegards,\nCollections Team`
+      }
+    });
+  } else if (lowerStatus.includes("no due") || lowerStatus.includes("within credit") || lowerStatus.includes("payment terms")) {
+    const reason = `Source: Invoice status. ${invoiceNo} is not overdue yet; send a soft pre-due reminder to improve collection timing.`;
+    actions.push({
+      label: "Send soft reminder",
+      icon: "bi-envelope",
+      action: "activity-send-email",
+      reason,
+      payload: {
+        ...basePayload,
+        subject: `Upcoming payment reminder for ${invoiceNo}`,
+        body: `Hello,\n\nThis is a soft reminder for ${invoiceNo}. Please confirm the expected payment date as per agreed terms.\n\nRegards,\nCollections Team`
+      }
+    });
+  } else if (dueAmount >= 100000) {
+    const reason = `Source: Invoice status. ${invoiceNo} has high outstanding value of Rs. ${formatINR(dueAmount)}; prioritize direct follow-up.`;
+    actions.push({
+      label: "Call follow-up",
+      icon: "bi-telephone",
+      action: "activity-prefill-disposition",
+      reason,
+      payload: {
+        ...basePayload,
+        prefill: {
+          activityType: "Called",
+          broadStatus: "Work In Progress",
+          primaryStatus: "Collection In Progress",
+          subStatus: "Call Back",
+          remarks: `AI suggestion applied for ${invoiceNo}: high-value invoice follow-up.`
+        }
+      }
+    });
+  }
+
+  if (actions.length === 0) {
+    const reason = `Source: Invoice status. ${invoiceNo} is open with current status ${subStatus || primaryStatus || "available"}; next best step is customer follow-up.`;
+    actions.push({
+      label: "Send email",
+      icon: "bi-envelope",
+      action: "activity-send-email",
+      reason,
+      payload: {
+        ...basePayload,
+        subject: `Follow-up for ${invoiceNo}`,
+        body: `Hello,\n\nPlease share the latest payment update for ${invoiceNo}.\n\nRegards,\nCollections Team`
+      }
+    });
+  }
+
+  renderAiSuggestionStrip("activityAiSuggestionStrip", actions);
+}
+
+function handleAiSuggestionAction(action, payload = {}) {
+  if (!action) return false;
+  if (action === "email-payment-collected") {
+    applyEmailTakeActionSuggestion(payload);
+    return true;
+  }
+  if (action === "email-need-delivery-challan") {
+    applyEmailIssueSuggestion(payload);
+    return true;
+  }
+  if (action === "email-edit-ai-response") {
+    const subject = payload.subject || `Re: ${payload.invoiceNo || "Customer update"}`;
+    openEmailComposeDraft({
+      invoiceNo: payload.invoiceNo || "",
+      to: payload.to || "",
+      cc: payload.cc || "",
+      subject: subject.startsWith("Re:") ? subject : `Re: ${subject}`,
+      body: payload.body || `Hello,\n\nThank you for the update${payload.invoiceNo ? ` on ${payload.invoiceNo}` : ""}. We will review and revert shortly.\n\nRegards,\nCollections Team`
+    });
+    return true;
+  }
+  if (action === "activity-collected") {
+    applyDispositionPrefill({
+      activityType: "Collection",
+      broadStatus: "Collection Done",
+      primaryStatus: "Collected",
+      subStatus: "Collected",
+      instrumentMode: "NEFT",
+      remarks: `AI suggestion applied for ${payload.invoiceNo || "invoice"} based on future PTP.`
+    });
+    refreshCollectionTotals();
+    return true;
+  }
+  if (action === "activity-prefill-disposition") {
+    applyDispositionPrefill(payload.prefill || {});
+    refreshCollectionTotals();
+    return true;
+  }
+  if (action === "activity-send-email") {
+    openEmailComposeDraft({
+      invoiceNo: payload.invoiceNo || "",
+      to: payload.to || "",
+      subject: payload.subject || `Follow-up for ${payload.invoiceNo || "invoice"}`,
+      body: payload.body || `Hello,\n\nPlease share the latest update for ${payload.invoiceNo || "the invoice"}.\n\nRegards,\nCollections Team`
+    });
+    return true;
+  }
+  if (action === "activity-send-reminder") {
+    openEmailComposeDraft({
+      invoiceNo: payload.invoiceNo || "",
+      to: payload.to || "",
+      subject: `Payment reminder for ${payload.invoiceNo || "invoice"}`,
+      body: `Hello,\n\nThis is a reminder for the payment committed for ${payload.invoiceNo || "the invoice"}${payload.ptpDate ? ` on ${payload.ptpDate}` : ""}. Please confirm once processed.\n\nRegards,\nCollections Team`
+    });
+    return true;
+  }
+  if (action === "activity-edit-reminder") {
+    if (payload.invoiceNo) {
+      currentInvoiceNoForDocs = payload.invoiceNo;
+      selectedInvoiceNos = new Set([payload.invoiceNo]);
+    }
+    setActiveTab("invoice");
+    openStrategyAccordionPanel();
+    showStrategyForm(true, { mode: "create" });
+    return true;
+  }
+  return false;
 }
 
 function getInvoicePoNumber(invoice) {
@@ -4881,6 +5544,8 @@ function setDispositionVisible(show) {
 
 function applyDispositionPrefill(prefill) {
   if (!prefill || typeof prefill !== "object") return;
+  const normalizedPrefill = normalizeDispositionPrefill(prefill);
+  populateDispositionDropdowns(normalizedPrefill);
   const activityTypeSelect = document.getElementById("activityTypeSelect");
   const broadStatusSelect = document.getElementById("broadStatusSelect");
   const primaryStatusSelect = document.getElementById("primaryStatusSelect");
@@ -4892,6 +5557,7 @@ function applyDispositionPrefill(prefill) {
   const amountInput = document.getElementById("collectionAmount");
   const tdsInput = document.getElementById("collectionTds");
   const ldInput = document.getElementById("collectionLd");
+  const ptpDateInput = document.getElementById("ptpDateInput");
   const miscList = document.getElementById("collectionMiscList");
   const addMiscBtn = document.getElementById("addMiscModeBtn");
   const remarksInput = document.getElementById("activityRemarks");
@@ -4907,11 +5573,12 @@ function applyDispositionPrefill(prefill) {
     inputEl.dispatchEvent(new Event(eventName, { bubbles: true }));
   };
 
-  setSelectValue(activityTypeSelect, prefill.activityType);
-  setSelectValue(broadStatusSelect, prefill.broadStatus);
-  setSelectValue(primaryStatusSelect, prefill.primaryStatus);
-  setSelectValue(subStatusSelect, prefill.subStatus);
-  setSelectValue(instrumentModeSelect, prefill.instrumentMode);
+  setSelectValue(activityTypeSelect, normalizedPrefill.activityType);
+  setSelectValue(broadStatusSelect, normalizedPrefill.broadStatus);
+  setSelectValue(primaryStatusSelect, normalizedPrefill.primaryStatus);
+  setSelectValue(subStatusSelect, normalizedPrefill.subStatus);
+  syncDispositionStatusFromSubStatus();
+  setSelectValue(instrumentModeSelect, normalizedPrefill.instrumentMode);
 
   if (instrumentModeSelect) {
     instrumentModeSelect.dispatchEvent(new Event("change", { bubbles: true }));
@@ -4919,7 +5586,7 @@ function applyDispositionPrefill(prefill) {
 
   const isMiscMode = String(instrumentModeSelect?.value || "").trim() === "Miscellenious";
   if (isMiscMode) {
-    const rows = Array.isArray(prefill.miscRows) ? prefill.miscRows : [];
+    const rows = Array.isArray(normalizedPrefill.miscRows) ? normalizedPrefill.miscRows : [];
     if (miscList && rows.length > 0) {
       miscList.innerHTML = "";
       rows.forEach(() => {
@@ -4948,16 +5615,18 @@ function applyDispositionPrefill(prefill) {
       });
     }
   } else {
-    setInputValue(instrumentRefInput, prefill.instrumentRef, "change");
-    setInputValue(bankInput, prefill.bank, "change");
-    setInputValue(transferDateInput, prefill.transferDate, "change");
-    setInputValue(amountInput, prefill.amount);
-    setInputValue(tdsInput, prefill.tds);
-    setInputValue(ldInput, prefill.ld);
+    setInputValue(instrumentRefInput, normalizedPrefill.instrumentRef, "change");
+    setInputValue(bankInput, normalizedPrefill.bank, "change");
+    setInputValue(transferDateInput, normalizedPrefill.transferDate, "change");
+    setInputValue(amountInput, normalizedPrefill.amount);
+    setInputValue(tdsInput, normalizedPrefill.tds);
+    setInputValue(ldInput, normalizedPrefill.ld);
   }
 
-  if (remarksInput && String(prefill.remarks || "").trim()) {
-    setInputValue(remarksInput, prefill.remarks);
+  setInputValue(ptpDateInput, normalizedPrefill.ptpDate, "change");
+
+  if (remarksInput && String(normalizedPrefill.remarks || "").trim()) {
+    setInputValue(remarksInput, normalizedPrefill.remarks);
   }
 
   if (activityTypeSelect) {
@@ -4974,16 +5643,17 @@ function getLatestCustomerPaymentPrefill(invoiceNo) {
   const entries = Array.isArray(trailMap[invoiceNo]) ? trailMap[invoiceNo] : [];
   const latest = entries.find((entry) => {
     if (!entry || entry.type !== "status" || !entry.data) return false;
-    return String(entry.data.subStatus || "").trim() === "Paid by customer";
+    const row = findDispositionRowBySubStatus(entry.data.subStatus);
+    return row?.subStatus === "Collected";
   });
   if (!latest || !latest.data) return null;
 
   const data = latest.data;
   return {
     activityType: "Collection",
-    broadStatus: data.broadStatus || "Work in Progress",
-    primaryStatus: data.primaryStatus || "Collection In Progress",
-    subStatus: data.subStatus || "Paid by customer",
+    broadStatus: data.broadStatus || "Collection Done",
+    primaryStatus: data.primaryStatus || "Collected",
+    subStatus: data.subStatus || "Collected",
     remarks: data.remarks || "",
     instrumentMode: data.instrumentMode || "NEFT",
     instrumentRef: data.instrumentRef || "",
@@ -5031,6 +5701,7 @@ function openDispositionForSingleInvoice(invNo, prefill = null) {
   setDispositionReadOnly(isManagerView);
   renderDispositionInvoiceList();
   applyDispositionPrefill(prefill || getLatestCustomerPaymentPrefill(invNo));
+  renderActivityAiSuggestions();
   refreshCollectionTotals();
   applyFiltersAndRender();
 }
@@ -5041,6 +5712,7 @@ function openDispositionForBulkInvoices(invoiceNos) {
   setDispositionVisible(true);
   setDispositionReadOnly(isManagerView);
   renderDispositionInvoiceList();
+  renderActivityAiSuggestions();
   refreshCollectionTotals();
   applyFiltersAndRender();
 }
@@ -6729,7 +7401,11 @@ function wireEmailPanelEvents() {
     setDetailValue("emailDetailTime", item.getAttribute("data-time") || "-");
 
     renderEmailConversation("emailDetailBody", buildConversationTrail(item));
-    renderEmailTakeActionCard(parseEmailPaymentSuggestion(item));
+    renderEmailTakeActionCard([
+      buildEmailResponseSuggestion(item),
+      parseEmailPaymentSuggestion(item),
+      parseEmailIssueSuggestion(item)
+    ]);
 
     if (detailEmpty) detailEmpty.classList.add("hidden");
     if (detailContent) detailContent.classList.remove("hidden");
@@ -6888,6 +7564,28 @@ function wireEmailPanelEvents() {
   });
 
   document.addEventListener("click", (e) => {
+    const reasonBtn = e.target.closest(".aiReasonBtn[data-ai-reason]");
+    if (reasonBtn) {
+      const item = reasonBtn.closest(".aiSuggestionItem");
+      const popover = item ? item.querySelector(".aiReasonPopover") : null;
+      document.querySelectorAll(".aiReasonPopover").forEach((el) => {
+        if (el !== popover) el.classList.add("hidden");
+      });
+      if (popover) popover.classList.toggle("hidden");
+      return;
+    }
+
+    if (!e.target.closest(".aiSuggestionItem")) {
+      document.querySelectorAll(".aiReasonPopover").forEach((el) => el.classList.add("hidden"));
+    }
+
+    const aiActionBtn = e.target.closest(".aiSuggestionAction[data-ai-action]");
+    if (aiActionBtn) {
+      const action = aiActionBtn.getAttribute("data-ai-action") || "";
+      const payload = readAiPayload(aiActionBtn.getAttribute("data-ai-payload") || "");
+      if (handleAiSuggestionAction(action, payload)) return;
+    }
+
     const takeActionBtn = e.target.closest(".emailTakeActionBtn[data-email-take-action]");
     if (takeActionBtn) {
       const raw = takeActionBtn.getAttribute("data-email-take-action") || "";
@@ -7030,6 +7728,8 @@ function wireEmailPanelEvents() {
 
 function wireDispositionActivityEvents() {
   const activityTypeSelect = document.getElementById("activityTypeSelect");
+  const broadStatusSelect = document.getElementById("broadStatusSelect");
+  const primaryStatusSelect = document.getElementById("primaryStatusSelect");
   const subStatusSelect = document.getElementById("subStatusSelect");
   const collectionFields = document.getElementById("collectionFields");
   const submitBtn = document.getElementById("submitActivityBtn");
@@ -7057,6 +7757,8 @@ function wireDispositionActivityEvents() {
   const pdcDispatchDate = document.getElementById("pdcDispatchDate");
   const pdcTrackingNo = document.getElementById("pdcTrackingNo");
   const pdcDispatchMode = document.getElementById("pdcDispatchMode");
+  const ptpDateWrap = document.getElementById("ptpDateFieldWrap");
+  const ptpDateInput = document.getElementById("ptpDateInput");
   const dispatchModalEl = document.getElementById("pdcDispatchConfirmModal");
   const dispatchAddBtn = document.getElementById("pdcDispatchAddDetailBtn");
   const dispatchProceedBtn = document.getElementById("pdcDispatchProceedBtn");
@@ -7088,14 +7790,20 @@ function wireDispositionActivityEvents() {
     "Citibank",
     "Standard Chartered"
   ];
-  const defaultSubStatus = "No Response";
+  populateDispositionDropdowns();
+  syncDispositionStatusFromSubStatus();
+
+  const defaultSubStatus = "";
   let pendingPdcSubmission = null;
-  const collectionSubStatuses = new Set(["Collection", "Paid by customer", "Collected"]);
+  const collectionSubStatuses = new Set(["Collected"]);
 
   const isCollectionFlowSelected = () => {
     const selectedSubStatus = String(subStatusSelect?.value || "").trim();
     const selectedActivityType = String(activityTypeSelect?.value || "").trim();
-    return collectionSubStatuses.has(selectedSubStatus) || selectedActivityType === "Collection";
+    const selectedBroadStatus = String(broadStatusSelect?.value || "").trim();
+    return collectionSubStatuses.has(selectedSubStatus)
+      || selectedActivityType === "Collection"
+      || selectedBroadStatus === "Collection Done";
   };
 
   const showError = (message) => {
@@ -7575,11 +8283,13 @@ function wireDispositionActivityEvents() {
         invoice.subStatus = status;
         if (options.primaryStatus) invoice.primaryStatus = options.primaryStatus;
         if (options.broadStatus) invoice.broadStatus = options.broadStatus;
+        if (options.ptpDate) invoice.ptpDate = options.ptpDate;
         upsertInvoiceStatusOverride(invNo, {
           broadStatus: options.broadStatus || invoice.broadStatus || "",
           primaryStatus: options.primaryStatus || invoice.primaryStatus || "",
           subStatus: status || invoice.subStatus || "",
           status: status || invoice.status || "",
+          ptpDate: options.ptpDate || invoice.ptpDate || "",
           updatedAt,
           updatedBy
         });
@@ -7613,7 +8323,7 @@ function wireDispositionActivityEvents() {
 
   const togglePdcFields = () => {
     if (!subStatusSelect || !pdcFields) return;
-    const isPdc = subStatusSelect.value === "PDC given";
+    const isPdc = String(subStatusSelect.value || "").trim().toLowerCase() === "pdc given";
     pdcFields.classList.toggle("hidden", !isPdc);
     if (!isPdc) {
       clearPdcError();
@@ -7631,23 +8341,43 @@ function wireDispositionActivityEvents() {
     deliveryChallanFields.classList.toggle("hidden", !isDeliveryChallan);
   };
 
+  const isPtpSelected = () => {
+    const primary = String(primaryStatusSelect?.value || "").trim().toLowerCase();
+    const sub = String(subStatusSelect?.value || "").trim().toLowerCase();
+    return primary === "ptp" || sub.includes("ptp");
+  };
+
+  const togglePtpDateField = () => {
+    if (!ptpDateWrap) return;
+    const show = isPtpSelected();
+    ptpDateWrap.classList.toggle("hidden", !show);
+    if (!show && ptpDateInput) ptpDateInput.value = "";
+  };
+
   wireBankSuggestion(document.getElementById("collectionBank"));
 
   if (subStatusSelect) {
     subStatusSelect.addEventListener("change", () => {
+      syncDispositionStatusFromSubStatus();
       toggleCollectionFields();
       togglePdcFields();
       toggleDeliveryChallanFields();
+      togglePtpDateField();
     });
     toggleCollectionFields();
     togglePdcFields();
     toggleDeliveryChallanFields();
+    togglePtpDateField();
   }
 
   if (activityTypeSelect) {
     activityTypeSelect.addEventListener("change", () => {
       toggleCollectionFields();
     });
+  }
+
+  if (primaryStatusSelect) {
+    primaryStatusSelect.addEventListener("change", togglePtpDateField);
   }
 
   if (instrumentModeSelect) {
@@ -7786,8 +8516,13 @@ function wireDispositionActivityEvents() {
     clearError();
     clearPdcError();
     const subStatus = getValue("subStatusSelect");
+    const dispositionRow = syncDispositionStatusFromSubStatus();
+    if (!dispositionRow) {
+      showError("Select a valid sub status.");
+      return;
+    }
     const isCollection = isCollectionFlowSelected();
-    const isPdcGiven = subStatus === "PDC given";
+    const isPdcGiven = normalizeDispositionKey(subStatus) === "pdc given";
     const instrumentMode = getValue("collectionInstrumentMode");
     const isMisc = instrumentMode === "Miscellenious";
     const outstanding = getOutstandingAmount();
@@ -7831,9 +8566,9 @@ function wireDispositionActivityEvents() {
 
     const data = {
       activityType: getValue("activityTypeSelect"),
-      broadStatus: getValue("broadStatusSelect"),
-      primaryStatus: getValue("primaryStatusSelect"),
-      subStatus,
+      broadStatus: dispositionRow.broadStatus,
+      primaryStatus: dispositionRow.primaryStatus,
+      subStatus: dispositionRow.subStatus,
       remarks: remarkText,
       invoices,
       instrumentMode,
@@ -7843,6 +8578,7 @@ function wireDispositionActivityEvents() {
       amount: getValue("collectionAmount"),
       tds: getValue("collectionTds"),
       ld: getValue("collectionLd"),
+      ptpDate: getValue("ptpDateInput"),
       miscRows,
       pdcRows,
       pdcOpsUser: pdcOpsUserName,
@@ -8103,10 +8839,11 @@ function wireDispositionActivityEvents() {
         addPdcRecords(pdcRecords);
       }
 
-      if (subStatus && invoices.length > 0) {
-        updateInvoiceStatuses(invoices, subStatus, {
+      if (data.subStatus && invoices.length > 0) {
+        updateInvoiceStatuses(invoices, data.subStatus, {
           broadStatus: data.broadStatus,
           primaryStatus: data.primaryStatus,
+          ptpDate: data.ptpDate,
           updatedBy: isCustomerLandingView ? "customer" : "agent",
           updatedAt: activityTimestamp
         });
@@ -8150,8 +8887,9 @@ function wireDispositionActivityEvents() {
       resetSelect("subStatusSelect", defaultSubStatus);
       resetSelect("actionOwnerSelect");
       resetSelect("approvalProcessSelect");
+      syncDispositionStatusFromSubStatus();
 
-      ["activityRemarks", "collectionInstrumentRef", "collectionBank", "collectionTransferDate", "collectionAmount", "collectionTds", "collectionLd", "pdcOpsUser", "pdcCourierName", "pdcDispatchDate", "pdcTrackingNo", "pdcDispatchMode"]
+      ["activityRemarks", "collectionInstrumentRef", "collectionBank", "collectionTransferDate", "collectionAmount", "collectionTds", "collectionLd", "ptpDateInput", "pdcOpsUser", "pdcCourierName", "pdcDispatchDate", "pdcTrackingNo", "pdcDispatchMode"]
         .forEach((id) => {
           const el = document.getElementById(id);
           if (el) el.value = "";
@@ -8644,9 +9382,9 @@ function wireCustomerPayRemarkEvents() {
       const previousOutstanding = Number(invoice.netDueAmount || 0);
       const updatedOutstanding = Math.max(0, previousOutstanding - values.totalCollected);
       const timestampIso = new Date().toISOString();
-      const customerBroadStatus = "Work in Progress";
-      const customerPrimaryStatus = "Collection In Progress";
-      const customerSubStatus = "Paid by customer";
+      const customerBroadStatus = "Collection Done";
+      const customerPrimaryStatus = "Collected";
+      const customerSubStatus = "Collected";
       invoice.netDueAmount = Number(updatedOutstanding.toFixed(2));
       invoice.broadStatus = customerBroadStatus;
       invoice.primaryStatus = customerPrimaryStatus;
@@ -10212,8 +10950,17 @@ document.addEventListener("DOMContentLoaded", () => {
       invoiceNo: invoice.invoiceNo,
       invoiceDate: invoice.invoiceDate || "",
       invoiceValue: Number(invoice.invoiceAmount) || 0,
+      netDueAmount: Number(invoice.netDueAmount) || 0,
       dueDate: invoice.dueDate || "",
-      amountForMonth: Number(invoice.amountForMonth) || 0
+      amountForMonth: Number(invoice.amountForMonth) || 0,
+      primaryStatus: invoice.primaryStatus || "",
+      subStatus: invoice.subStatus || "",
+      status: invoice.status || "",
+      ptpDate: invoice.ptpDate || "",
+      agentName: customer.agentName || "",
+      managerName: customer.managerName || "",
+      kamName: customer.kamName || "",
+      kasName: customer.kasName || ""
     }))
   ));
   localStorage.setItem(invoiceStorageKey, JSON.stringify(invoiceSnapshot));
