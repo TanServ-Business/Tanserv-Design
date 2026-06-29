@@ -1251,6 +1251,133 @@ function saveStrategyNotifications(list) {
   }
 }
 
+function buildSeedStrategyNotifications() {
+  const makeFutureIso = (hoursFromNow) => new Date(Date.now() + (hoursFromNow * 60 * 60 * 1000)).toISOString();
+  return [
+    {
+      id: "seed-strategy-apollo-customer-followup",
+      customerId: "c1",
+      customerName: "Apollo Pharmachy Pvt. Ltd.",
+      scope: "customer",
+      invoiceNos: [],
+      strategyName: "Apollo customer follow-up cadence",
+      reminderType: "both",
+      status: "active",
+      notificationMode: "custom",
+      keyAccountFilter: "Yes",
+      reminderSteps: [
+        { when: "before_due", days: 2, template: "Payment reminder", attachment: "Statement of account" }
+      ],
+      invoiceFilters: {
+        subStatus: ["Within Credit Period/Days", "PTP"],
+        agingBuckets: ["0-30", "31-60"]
+      },
+      nextNotificationByInvoice: {
+        "INV-10291": { scheduledAt: makeFutureIso(6), template: "Payment reminder" },
+        "INV-10308": { scheduledAt: makeFutureIso(10), template: "Overdue notice" }
+      },
+      createdAt: new Date(Date.now() - (36 * 60 * 60 * 1000)).toISOString()
+    },
+    {
+      id: "seed-strategy-apollo-ptp-invoice",
+      customerId: "c1",
+      customerName: "Apollo Pharmachy Pvt. Ltd.",
+      scope: "invoice",
+      invoiceNos: ["INV-10308"],
+      strategyName: "Apollo PTP confirmation sequence",
+      reminderType: "post due",
+      status: "active",
+      notificationMode: "custom",
+      keyAccountFilter: "Yes",
+      reminderSteps: [
+        { when: "after_due", days: 1, template: "PTP confirmation", attachment: "Invoice copy" }
+      ],
+      invoiceFilters: {
+        subStatus: ["PTP"],
+        agingBuckets: ["0-30"]
+      },
+      nextNotificationByInvoice: {
+        "INV-10308": { scheduledAt: makeFutureIso(2), template: "PTP confirmation" }
+      },
+      createdAt: new Date(Date.now() - (12 * 60 * 60 * 1000)).toISOString()
+    },
+    {
+      id: "seed-strategy-bluewave-escalation",
+      customerId: "c2",
+      customerName: "BlueWave",
+      scope: "customer",
+      invoiceNos: [],
+      strategyName: "BlueWave overdue escalation",
+      reminderType: "post due",
+      status: "active",
+      notificationMode: "custom",
+      keyAccountFilter: "No",
+      reminderSteps: [
+        { when: "after_due", days: 3, template: "Escalation notice", attachment: "Collection follow-up note" }
+      ],
+      invoiceFilters: {
+        subStatus: ["Part Payment through LC done", "Wrong/Incorrect Billing"],
+        agingBuckets: ["31-60", "61-90"]
+      },
+      nextNotificationByInvoice: {
+        "INV-22018": { scheduledAt: makeFutureIso(18), template: "Escalation notice" },
+        "INV-22063": { scheduledAt: makeFutureIso(26), template: "Overdue notice" }
+      },
+      createdAt: new Date(Date.now() - (60 * 60 * 1000)).toISOString()
+    },
+    {
+      id: "seed-strategy-apollo-history-only",
+      customerId: "c1",
+      customerName: "Apollo Pharmachy Pvt. Ltd.",
+      scope: "invoice",
+      invoiceNos: ["INV-10211"],
+      strategyName: "Apollo documents chase",
+      reminderType: "post due",
+      status: "active",
+      notificationMode: "custom",
+      keyAccountFilter: "No",
+      reminderSteps: [
+        { when: "after_due", days: 5, template: "Payment reminder", attachment: "Invoice copy" }
+      ],
+      invoiceFilters: {
+        subStatus: ["Invoice Copy Required"],
+        agingBuckets: ["61-90"]
+      },
+      nextNotificationByInvoice: {
+        "INV-10211": { scheduledAt: new Date(Date.now() - (24 * 60 * 60 * 1000)).toISOString(), template: "Payment reminder" }
+      },
+      createdAt: new Date(Date.now() - (72 * 60 * 60 * 1000)).toISOString()
+    }
+  ];
+}
+
+function getSeedStrategyIds() {
+  return new Set(buildSeedStrategyNotifications().map((seed) => String(seed.id || "")));
+}
+
+function seedStrategyNotifications() {
+  if (!/(?:^|\/)LPagent\.html$/i.test(window.location.pathname || "")) {
+    return loadStrategyNotifications();
+  }
+  const existing = loadStrategyNotifications();
+  const existingById = new Map(existing.map((item) => [String(item?.id || ""), item]));
+  const refreshedSeeds = buildSeedStrategyNotifications().map((seed) => {
+    const current = existingById.get(seed.id);
+    if (!current) return seed;
+    return {
+      ...current,
+      nextNotificationByInvoice: seed.nextNotificationByInvoice
+    };
+  });
+  const seedIds = getSeedStrategyIds();
+  const merged = [
+    ...refreshedSeeds,
+    ...existing.filter((item) => !seedIds.has(String(item?.id || "")))
+  ];
+  saveStrategyNotifications(merged);
+  return merged;
+}
+
 function addActivityTrailEntry(invoiceNo, payload) {
   if (!invoiceNo || !payload) return;
   const map = loadActivityTrailMap();
@@ -4830,6 +4957,81 @@ function getNormalizedStrategyMode(mode) {
   return String(mode || "").trim().toLowerCase() === "ongoing" ? "ongoing" : "custom";
 }
 
+function getStrategyExcludedInvoiceNos(strategy) {
+  return Array.isArray(strategy?.excludedInvoiceNos) ? strategy.excludedInvoiceNos.filter(Boolean) : [];
+}
+
+function dedupeArray(values) {
+  return [...new Set((values || []).filter(Boolean))];
+}
+
+function isInvoiceExcludedFromStrategy(strategy, invoiceNo) {
+  if (!strategy || !invoiceNo) return false;
+  return getStrategyExcludedInvoiceNos(strategy).includes(invoiceNo);
+}
+
+function getStrategyDisplayTemplate(strategy, invoiceNo = "") {
+  const nextNotification = invoiceNo ? getStrategyScheduledNotificationForInvoice(strategy, invoiceNo) : null;
+  if (nextNotification?.template) return nextNotification.template;
+  const reminderTemplates = Array.isArray(strategy?.reminderSteps)
+    ? strategy.reminderSteps.map((step) => String(step?.template || "").trim()).filter(Boolean)
+    : [];
+  return reminderTemplates[0] || "-";
+}
+
+function doesStrategyApplyToInvoice(strategy, invoiceNo, customerId = selectedCustomerId) {
+  if (!strategy || !invoiceNo || !customerId) return false;
+  if (strategy.customerId !== customerId) return false;
+  if (isInvoiceExcludedFromStrategy(strategy, invoiceNo)) return false;
+  const scope = getNormalizedStrategyScope(strategy.scope);
+  if (scope === "customer") return true;
+  const invoiceNos = Array.isArray(strategy.invoiceNos) ? strategy.invoiceNos : [];
+  return invoiceNos.includes(invoiceNo);
+}
+
+function getStrategyScheduledNotificationForInvoice(strategy, invoiceNo) {
+  if (!strategy || !invoiceNo) return null;
+  const nextByInvoice = strategy.nextNotificationByInvoice;
+  if (!nextByInvoice || typeof nextByInvoice !== "object") return null;
+  const entry = nextByInvoice[invoiceNo];
+  if (!entry || typeof entry !== "object") return null;
+  const scheduledAt = String(entry.scheduledAt || "");
+  const scheduledAtMs = Date.parse(scheduledAt);
+  if (!Number.isFinite(scheduledAtMs) || scheduledAtMs <= Date.now()) return null;
+  return {
+    scheduledAt,
+    scheduledAtMs,
+    template: String(entry.template || "").trim() || "-"
+  };
+}
+
+function getScheduledRunningStrategiesForInvoice(invoiceNo, customerId = selectedCustomerId) {
+  if (!invoiceNo || !customerId) return [];
+  return loadStrategyNotifications()
+    .filter((strategy) => (
+      strategy
+      && getNormalizedStrategyStatus(strategy.status) === "active"
+      && doesStrategyApplyToInvoice(strategy, invoiceNo, customerId)
+    ))
+    .map((strategy) => {
+      const nextNotification = getStrategyScheduledNotificationForInvoice(strategy, invoiceNo);
+      if (!nextNotification) return null;
+      return { strategy, nextNotification };
+    })
+    .filter(Boolean)
+    .sort((a, b) => {
+      const aScopeRank = getNormalizedStrategyScope(a.strategy.scope) === "invoice" ? 0 : 1;
+      const bScopeRank = getNormalizedStrategyScope(b.strategy.scope) === "invoice" ? 0 : 1;
+      if (aScopeRank !== bScopeRank) return aScopeRank - bScopeRank;
+      if (a.nextNotification.scheduledAtMs !== b.nextNotification.scheduledAtMs) {
+        return a.nextNotification.scheduledAtMs - b.nextNotification.scheduledAtMs;
+      }
+      const aTime = Date.parse(a.strategy?.createdAt || "") || 0;
+      const bTime = Date.parse(b.strategy?.createdAt || "") || 0;
+      return bTime - aTime;
+    });
+}
+
 function setStrategyListHidden(hidden) {
   const wrap = document.getElementById("strategyListWrap");
   if (!wrap) return;
@@ -5151,12 +5353,7 @@ function getRunningStrategiesForInvoice(invoiceNo, customerId = selectedCustomer
   ));
 
   return activeStrategies
-    .filter((strategy) => {
-      const scope = getNormalizedStrategyScope(strategy.scope);
-      if (scope === "customer") return true;
-      const invoiceNos = Array.isArray(strategy.invoiceNos) ? strategy.invoiceNos : [];
-      return invoiceNos.includes(invoiceNo);
-    })
+    .filter((strategy) => doesStrategyApplyToInvoice(strategy, invoiceNo, customerId))
     .sort((a, b) => {
       const aScopeRank = getNormalizedStrategyScope(a.scope) === "invoice" ? 0 : 1;
       const bScopeRank = getNormalizedStrategyScope(b.scope) === "invoice" ? 0 : 1;
@@ -5172,6 +5369,173 @@ function getRunningStrategyForInvoice(invoiceNo, customerId = selectedCustomerId
   return list[0] || null;
 }
 
+function getStrategyReminderTone(reminderType) {
+  const value = String(reminderType || "").trim().toLowerCase();
+  if (value === "pre due") return "is-reminder-pre";
+  if (value === "post due") return "is-reminder-post";
+  if (value === "both") return "is-reminder-both";
+  return "";
+}
+
+function getNextStrategyEmailsForCustomer(customerId = selectedCustomerId, limit = 5) {
+  const customer = customersData.find((item) => item.id === customerId);
+  if (!customer) return [];
+  const validInvoiceNos = new Set((customer.invoices || []).map((invoice) => invoice.invoiceNo));
+
+  return loadStrategyNotifications()
+    .filter((strategy) => (
+      strategy
+      && strategy.customerId === customerId
+      && getNormalizedStrategyStatus(strategy.status) === "active"
+      && strategy.nextNotificationByInvoice
+      && typeof strategy.nextNotificationByInvoice === "object"
+    ))
+    .flatMap((strategy) => (
+      Object.entries(strategy.nextNotificationByInvoice || {}).map(([invoiceNo, nextNotification]) => ({
+        strategy,
+        invoiceNo,
+        nextNotification
+      }))
+    ))
+    .filter(({ strategy, invoiceNo, nextNotification }) => (
+      validInvoiceNos.has(invoiceNo)
+      && doesStrategyApplyToInvoice(strategy, invoiceNo, customerId)
+      && nextNotification
+      && Number.isFinite(Date.parse(nextNotification.scheduledAt || ""))
+      && Date.parse(nextNotification.scheduledAt || "") > Date.now()
+    ))
+    .sort((a, b) => {
+      const aTime = Date.parse(a.nextNotification.scheduledAt || "") || 0;
+      const bTime = Date.parse(b.nextNotification.scheduledAt || "") || 0;
+      return aTime - bTime;
+    })
+    .slice(0, Math.max(0, limit))
+    .map(({ strategy, invoiceNo, nextNotification }) => ({
+      strategyId: String(strategy?.id || ""),
+      strategyName: safeText(strategy?.strategyName || "-"),
+      scope: getNormalizedStrategyScope(strategy?.scope),
+      invoiceNo,
+      scheduledAtLabel: formatStrategyDate(nextNotification?.scheduledAt),
+      template: safeText(nextNotification?.template || "-")
+    }));
+}
+
+function getStrategyPanelMessage(customerStrategies, activeInvoiceNo) {
+  if (strategyPanelMode === "running") {
+    if (!activeInvoiceNo) return "Select an invoice to view running strategies.";
+    return "No running strategies scheduled for this invoice.";
+  }
+  if (strategyPanelMode === "customer_active") {
+    return "No active strategies found for this customer.";
+  }
+  return getStrategyListMessageForContext(customerStrategies, activeInvoiceNo);
+}
+
+function getVisibleStrategiesForPanel(customerStrategies, activeInvoiceNo, customerId) {
+  if (strategyPanelMode === "running") {
+    if (!activeInvoiceNo) return [];
+    return getScheduledRunningStrategiesForInvoice(activeInvoiceNo, customerId).map(({ strategy }) => strategy);
+  }
+
+  if (strategyPanelMode === "customer_active") {
+    return customerStrategies.filter((strategy) => getNormalizedStrategyStatus(strategy.status) === "active");
+  }
+
+  return customerStrategies.filter((strategy) => {
+    const scope = getNormalizedStrategyScope(strategy.scope);
+    if (scope === "customer") return true;
+    if (!activeInvoiceNo) return false;
+    return doesStrategyApplyToInvoice(strategy, activeInvoiceNo, customerId);
+  });
+}
+
+function getNextStrategyEmailsForInvoice(invoiceNo, customerId = selectedCustomerId, limit = 5) {
+  if (!invoiceNo || !customerId) return [];
+  return getScheduledRunningStrategiesForInvoice(invoiceNo, customerId)
+    .slice(0, Math.max(0, limit))
+    .map(({ strategy, nextNotification }) => ({
+      strategyId: String(strategy?.id || ""),
+      strategyName: safeText(strategy?.strategyName || "-"),
+      scope: getNormalizedStrategyScope(strategy?.scope),
+      scheduledAtLabel: formatStrategyDate(nextNotification?.scheduledAt),
+      template: safeText(nextNotification?.template || "-")
+    }));
+}
+
+function renderStrategyPanelContext(activeInvoiceNo) {
+  const contextEl = document.getElementById("strategyPanelContext");
+  const titleEl = document.getElementById("strategyPanelTitle");
+  if (!contextEl) return;
+  const customer = getSelectedCustomerRecord();
+
+  if (titleEl) {
+    titleEl.textContent = strategyPanelMode === "running"
+      ? "Running strategies"
+      : strategyPanelMode === "customer_active"
+        ? "Customer active strategies"
+        : "Created strategies";
+  }
+
+  if (strategyPanelMode === "customer_active" && customer) {
+    const actionCopy = activeInvoiceNo
+      ? `<button class="strategyPanelContextBtn" type="button" data-strategy-panel-mode="all">Show invoice view</button>`
+      : "";
+    contextEl.innerHTML = `<div><strong>Active strategies for ${escapeHtml(customer.name || "-")}</strong><br />Customer-level view across every active strategy linked to this account.</div>${actionCopy}`;
+    contextEl.classList.remove("hidden");
+    return;
+  }
+
+  if (!activeInvoiceNo) {
+    contextEl.classList.add("hidden");
+    contextEl.innerHTML = "";
+    return;
+  }
+
+  const contextCopy = strategyPanelMode === "running"
+    ? `<div><strong>Running strategies for ${escapeHtml(activeInvoiceNo)}</strong><br />Invoice-focused view with scheduled notifications and exclusion actions.</div>`
+    : `<div><strong>Created strategies for ${escapeHtml(activeInvoiceNo)}</strong><br />Showing every strategy currently mapped to this invoice or customer.</div>`;
+  const actionCopy = strategyPanelMode === "running"
+    ? `<button class="strategyPanelContextBtn" type="button" data-strategy-panel-mode="all">Show all</button>`
+    : `<button class="strategyPanelContextBtn" type="button" data-strategy-panel-mode="running">Show running</button>`;
+
+  contextEl.innerHTML = `${contextCopy}${actionCopy}`;
+  contextEl.classList.remove("hidden");
+}
+
+function renderStrategyNextEmailSummary(invoiceNo, customerId = selectedCustomerId) {
+  const summaryEl = document.getElementById("strategyNextEmailSummary");
+  if (!summaryEl) return;
+  const emails = strategyPanelMode === "customer_active"
+    ? getNextStrategyEmailsForCustomer(customerId, 5)
+    : getNextStrategyEmailsForInvoice(invoiceNo, customerId, 5);
+  if (!emails.length) {
+    summaryEl.classList.add("hidden");
+    summaryEl.innerHTML = "";
+    return;
+  }
+
+  summaryEl.innerHTML = `
+    <div class="strategyNextEmailHead">
+      <div class="strategyNextEmailTitle">Next Emails</div>
+      <div class="strategyNextEmailCount">${emails.length} shown</div>
+    </div>
+    <div class="strategyNextEmailList">
+      ${emails.map((item) => `
+        <div class="strategyNextEmailItem">
+          <div class="strategyNextEmailIcon">
+            <i class="bi bi-envelope-fill" aria-hidden="true"></i>
+          </div>
+          <div class="strategyNextEmailMeta">
+            <div class="strategyNextEmailPrimary">${escapeHtml(item.scheduledAtLabel)} · ${escapeHtml(item.template)}</div>
+            <div class="strategyNextEmailSecondary">${escapeHtml(item.strategyName)} · ${escapeHtml(item.scope)}${item.invoiceNo ? ` · ${escapeHtml(item.invoiceNo)}` : ""}</div>
+          </div>
+        </div>
+      `).join("")}
+    </div>
+  `;
+  summaryEl.classList.remove("hidden");
+}
+
 function renderStrategyNotifications() {
   const listEl = document.getElementById("strategyList");
   const emptyEl = document.getElementById("strategyListEmpty");
@@ -5183,6 +5547,8 @@ function renderStrategyNotifications() {
     listEl.innerHTML = "";
     emptyEl.textContent = "No strategies yet.";
     emptyEl.classList.toggle("hidden", formVisible);
+    renderStrategyPanelContext("");
+    renderStrategyNextEmailSummary("");
     setStrategyListHidden(formVisible);
     return;
   }
@@ -5197,17 +5563,13 @@ function renderStrategyNotifications() {
     });
 
   const activeInvoiceNo = currentInvoiceNoForDocs || "";
-  const visibleStrategies = customerStrategies.filter((strategy) => {
-    const scope = getNormalizedStrategyScope(strategy.scope);
-    if (scope === "customer") return true;
-    if (!activeInvoiceNo) return false;
-    const invoices = Array.isArray(strategy.invoiceNos) ? strategy.invoiceNos : [];
-    return invoices.includes(activeInvoiceNo);
-  });
+  const visibleStrategies = getVisibleStrategiesForPanel(customerStrategies, activeInvoiceNo, customer.id);
+  renderStrategyPanelContext(activeInvoiceNo);
+  renderStrategyNextEmailSummary(activeInvoiceNo, customer.id);
 
   if (visibleStrategies.length === 0) {
     listEl.innerHTML = "";
-    emptyEl.textContent = getStrategyListMessageForContext(customerStrategies, activeInvoiceNo);
+    emptyEl.textContent = getStrategyPanelMessage(customerStrategies, activeInvoiceNo);
     emptyEl.classList.toggle("hidden", formVisible);
     setStrategyListHidden(formVisible);
     return;
@@ -5215,41 +5577,79 @@ function renderStrategyNotifications() {
 
   emptyEl.classList.add("hidden");
   listEl.innerHTML = visibleStrategies.map((strategy) => {
-    const status = getNormalizedStrategyStatus(strategy.status);
-    const scope = getNormalizedStrategyScope(strategy.scope);
-    const mode = getNormalizedStrategyMode(strategy.notificationMode);
-    const invoices = Array.isArray(strategy.invoiceNos) ? strategy.invoiceNos.filter(Boolean) : [];
-    const reminderSteps = Array.isArray(strategy.reminderSteps) ? strategy.reminderSteps : [];
-    const subStatusFilters = Array.isArray(strategy.invoiceFilters?.subStatus) ? strategy.invoiceFilters.subStatus : [];
-    const agingFilters = Array.isArray(strategy.invoiceFilters?.agingBuckets) ? strategy.invoiceFilters.agingBuckets : [];
-    const visibleInvoiceChips = invoices.slice(0, 3).map((invoiceNo) => (
-      `<span class="strategyScopeInvoiceChip" title="${escapeHtml(invoiceNo)}">${escapeHtml(invoiceNo)}</span>`
-    )).join("");
-    const hiddenCount = Math.max(0, invoices.length - 3);
+    const data = getStrategyPresentationData(strategy, { invoiceNo: activeInvoiceNo, customer });
+    const templateLabel = getStrategyDisplayTemplate(strategy, activeInvoiceNo);
+    const showExclude = Boolean(
+      activeInvoiceNo
+      && strategyPanelMode !== "customer_active"
+      && doesStrategyApplyToInvoice(strategy, activeInvoiceNo, customer.id)
+    );
+    const invoiceCountLabel = data.scope === "invoice"
+      ? `${data.invoiceCount} linked invoice${data.invoiceCount === 1 ? "" : "s"}`
+      : "Customer-wide coverage";
+    const nextSummary = data.hasNextNotification
+      ? `${data.nextScheduledAtLabel} · ${data.nextTemplate}`
+      : strategyPanelMode === "customer_active"
+        ? "Uses customer schedule summary above."
+        : data.nextScheduledAtLabel;
+    const scopeClass = data.scope === "invoice" ? "is-invoice" : "is-customer";
+    const reminderToneClass = getStrategyReminderTone(data.reminderType);
+
     return `
-      <article class="strategyCard">
-        <div class="strategyCardHeader">
+      <article class="strategySummaryCard ${scopeClass}">
+        <div class="strategySummaryHeader">
           <div>
-            <div class="strategyName">${escapeHtml(safeText(strategy.strategyName))}</div>
-            <div class="strategyMetaRow">
-              <span class="strategyPill ${status === "active" ? "is-active" : "is-inactive"}">${escapeHtml(status)}</span>
-              <span class="strategyPill">${escapeHtml(scope)}</span>
-              <span class="strategyPill">${escapeHtml(strategy.reminderType || "-")}</span>
+            <div class="strategySummaryTitle">${escapeHtml(data.strategyName)}</div>
+            <div class="strategySummaryPills">
+              <span class="strategySummaryPill ${data.status === "active" ? "is-active" : "is-inactive"}">${escapeHtml(data.status)}</span>
+              <span class="strategySummaryPill">${escapeHtml(data.scope)}</span>
+              <span class="strategySummaryPill ${reminderToneClass}">${escapeHtml(data.reminderType)}</span>
             </div>
           </div>
-          <div class="strategyCardMetaWrap">
-            <div class="strategyCardMeta">${escapeHtml(formatStrategyDate(strategy.createdAt))}</div>
-            <button class="strategyReadMoreBtn" type="button" data-strategy-show-more="${escapeHtml(strategy.id || "")}">show more</button>
+          <div class="strategySummaryMeta">
+            <div class="strategySummaryCreated">
+              <strong>Created</strong>
+              ${escapeHtml(data.createdAtLabel)}
+            </div>
+            <button class="strategySummaryLink" type="button" data-strategy-show-more="${escapeHtml(data.id)}">Show more</button>
           </div>
         </div>
-        <div class="strategyCardMeta">Mode: ${escapeHtml(mode)} | Key account filter: ${escapeHtml(strategy.keyAccountFilter || "-")}</div>
-        <div class="strategyCardMeta">Reminder steps: ${mode === "custom" ? reminderSteps.length : 0} | Sub status: ${subStatusFilters.length} | Aging bucket: ${agingFilters.length}</div>
-        ${scope === "invoice" ? `
-          <div class="strategyScopeInvoices">
-            ${visibleInvoiceChips}
-            ${hiddenCount > 0 ? `<span class="strategyScopeInvoiceChip">+${hiddenCount} more</span>` : ""}
+        <div class="strategySummaryRows">
+          <div class="strategySummaryRow">
+            <div class="strategySummaryKey">Template</div>
+            <div class="strategySummaryValue">${escapeHtml(templateLabel)}</div>
           </div>
-        ` : ""}
+          <div class="strategySummaryRow">
+            <div class="strategySummaryKey">Notification Mode</div>
+            <div class="strategySummaryValue">${escapeHtml(data.notificationMode)}</div>
+          </div>
+          <div class="strategySummaryRow">
+            <div class="strategySummaryKey">Key Account Filter</div>
+            <div class="strategySummaryValue">${escapeHtml(data.keyAccountFilter)}</div>
+          </div>
+          <div class="strategySummaryRow">
+            <div class="strategySummaryKey">Coverage</div>
+            <div class="strategySummaryValue">${escapeHtml(invoiceCountLabel)}</div>
+          </div>
+          <div class="strategySummaryRow">
+            <div class="strategySummaryKey">Status Filters</div>
+            <div class="strategySummaryValue">${escapeHtml(data.subStatusSummary)}</div>
+          </div>
+          <div class="strategySummaryRow">
+            <div class="strategySummaryKey">Next Mail</div>
+            <div class="strategySummaryValue ${data.hasNextNotification ? "" : "is-muted"}">${escapeHtml(nextSummary)}</div>
+          </div>
+        </div>
+        <div class="strategySummaryFooter">
+          <div class="strategySummaryFooterInfo">
+            ${data.scope === "invoice"
+              ? `Linked invoice set for this strategy: ${escapeHtml(String(data.invoiceCount))}`
+              : "Customer strategy spanning eligible invoices on this account."}
+          </div>
+          <div class="strategyCardActionsInline">
+            ${showExclude ? `<button class="strategyExcludeBtn" type="button" data-strategy-exclude="${escapeHtml(data.id)}" data-invoice-no="${escapeHtml(activeInvoiceNo)}">Exclude invoice</button>` : ""}
+          </div>
+        </div>
       </article>
     `;
   }).join("");
@@ -5302,6 +5702,44 @@ function wireStrategyNotificationEvents() {
 
   if (listEl) {
     listEl.addEventListener("click", (event) => {
+      const excludeBtn = event.target.closest("[data-strategy-exclude]");
+      if (excludeBtn) {
+        const strategyId = excludeBtn.getAttribute("data-strategy-exclude") || "";
+        const invoiceNo = excludeBtn.getAttribute("data-invoice-no") || "";
+        if (!strategyId || !invoiceNo) return;
+
+        const strategies = loadStrategyNotifications();
+        const targetIndex = strategies.findIndex((item) => item && item.id === strategyId);
+        if (targetIndex < 0) return;
+
+        const strategy = strategies[targetIndex];
+        const scope = getNormalizedStrategyScope(strategy.scope);
+        if (scope === "invoice") {
+          const remainingInvoices = (Array.isArray(strategy.invoiceNos) ? strategy.invoiceNos : []).filter((value) => value !== invoiceNo);
+          if (remainingInvoices.length === 0) {
+            strategies.splice(targetIndex, 1);
+          } else {
+            strategies[targetIndex] = {
+              ...strategy,
+              invoiceNos: remainingInvoices
+            };
+          }
+        } else {
+          const excludedInvoiceNos = dedupeArray([...(Array.isArray(strategy.excludedInvoiceNos) ? strategy.excludedInvoiceNos : []), invoiceNo]);
+          strategies[targetIndex] = {
+            ...strategy,
+            excludedInvoiceNos
+          };
+        }
+
+        saveStrategyNotifications(strategies);
+        renderStrategyNotifications();
+        applyFiltersAndRender();
+        syncRunningStrategyModalIfOpen();
+        showTransientNotification("Invoice excluded", `${invoiceNo} was excluded from ${strategy.strategyName || "the strategy"}.`);
+        return;
+      }
+
       const showMoreBtn = event.target.closest("[data-strategy-show-more]");
       if (!showMoreBtn) return;
       const strategyId = showMoreBtn.getAttribute("data-strategy-show-more") || "";
@@ -5418,6 +5856,14 @@ function wireStrategyNotificationEvents() {
     if (agingWrap && agingWrap.open && !agingWrap.contains(event.target)) agingWrap.open = false;
   });
 
+  document.addEventListener("click", (event) => {
+    const panelModeBtn = event.target.closest("[data-strategy-panel-mode]");
+    if (!panelModeBtn) return;
+    strategyPanelMode = panelModeBtn.getAttribute("data-strategy-panel-mode") === "running" ? "running" : "all";
+    showStrategyForm(false);
+    renderStrategyNotifications();
+  });
+
   saveBtn.addEventListener("click", () => {
     const customer = getSelectedCustomerRecord();
     if (!customer) {
@@ -5520,6 +5966,8 @@ function wireStrategyNotificationEvents() {
     saveStrategyNotifications(strategies);
     showStrategyForm(false);
     renderStrategyNotifications();
+    applyFiltersAndRender();
+    syncRunningStrategyModalIfOpen();
 
     const message = isEditing
       ? "Strategy updated successfully."
@@ -5527,6 +5975,31 @@ function wireStrategyNotificationEvents() {
           ? `Strategy created for ${invoiceNos.length} invoice${invoiceNos.length === 1 ? "" : "s"}.`
           : "Strategy created for selected customer.");
     showTransientNotification(isEditing ? "Strategy updated" : "Strategy saved", message);
+  });
+}
+
+function wireRunningStrategyModalEvents() {
+  const modalEl = document.getElementById("runningStrategyModal");
+  const prevBtn = document.getElementById("runningStrategyPrevBtn");
+  const nextBtn = document.getElementById("runningStrategyNextBtn");
+  if (!modalEl || !prevBtn || !nextBtn) return;
+
+  prevBtn.addEventListener("click", () => {
+    if (runningStrategyModalIndex <= 0) return;
+    runningStrategyModalIndex -= 1;
+    renderRunningStrategyModal();
+  });
+
+  nextBtn.addEventListener("click", () => {
+    if (runningStrategyModalIndex >= runningStrategyModalItems.length - 1) return;
+    runningStrategyModalIndex += 1;
+    renderRunningStrategyModal();
+  });
+
+  modalEl.addEventListener("hidden.bs.modal", () => {
+    runningStrategyModalInvoiceNo = "";
+    runningStrategyModalItems = [];
+    runningStrategyModalIndex = 0;
   });
 }
 
@@ -5751,14 +6224,182 @@ function openStrategyCreateFromHeader() {
   setActiveTab("invoice");
   ensureFirstInvoiceSelected();
   openStrategyAccordionPanel();
-  showStrategyForm(true, { mode: "create" });
-  const scopeSelect = document.getElementById("strategyScopeSelect");
-  if (scopeSelect) {
-    scopeSelect.value = selectedInvoiceNos.size > 0 ? "invoice" : "customer";
-    scopeSelect.dispatchEvent(new Event("change", { bubbles: true }));
+  strategyPanelMode = "customer_active";
+  showStrategyForm(false);
+  renderStrategyNotifications();
+}
+
+function formatStrategyFilterSummary(values, emptyLabel = "-") {
+  const list = Array.isArray(values) ? values.filter(Boolean) : [];
+  if (list.length === 0) return emptyLabel;
+  return list.join(", ");
+}
+
+function getStrategyPresentationData(strategy, options = {}) {
+  const invoiceNo = String(options.invoiceNo || "").trim();
+  const customer = options.customer || customersData.find((item) => item.id === strategy?.customerId) || null;
+  const scope = getNormalizedStrategyScope(strategy?.scope);
+  const status = getNormalizedStrategyStatus(strategy?.status);
+  const mode = getNormalizedStrategyMode(strategy?.notificationMode);
+  const invoiceNos = Array.isArray(strategy?.invoiceNos) ? strategy.invoiceNos.filter(Boolean) : [];
+  const filters = strategy?.invoiceFilters || {};
+  const nextNotification = invoiceNo ? getStrategyScheduledNotificationForInvoice(strategy, invoiceNo) : null;
+
+  return {
+    id: String(strategy?.id || ""),
+    strategyName: safeText(strategy?.strategyName || "-"),
+    scope,
+    status,
+    reminderType: safeText(strategy?.reminderType || "-"),
+    notificationMode: mode,
+    keyAccountFilter: safeText(strategy?.keyAccountFilter || "-"),
+    invoiceNos,
+    invoiceCount: invoiceNos.length,
+    subStatusSummary: formatStrategyFilterSummary(filters.subStatus),
+    agingSummary: formatStrategyFilterSummary(filters.agingBuckets),
+    createdAtLabel: formatStrategyDate(strategy?.createdAt),
+    customerName: safeText(strategy?.customerName || customer?.name || "-"),
+    hasNextNotification: Boolean(nextNotification),
+    nextScheduledAtLabel: nextNotification
+      ? formatStrategyDate(nextNotification.scheduledAt)
+      : (invoiceNo ? "No future email scheduled for selected invoice." : "Select an invoice to view the next scheduled email."),
+    nextTemplate: nextNotification ? safeText(nextNotification.template || "-") : "-"
+  };
+}
+
+function getRunningStrategyModalData(invoiceNo, customerId = selectedCustomerId) {
+  const customer = customersData.find((item) => item.id === customerId) || null;
+  return getScheduledRunningStrategiesForInvoice(invoiceNo, customerId).map(({ strategy, nextNotification }) => {
+    return {
+      ...getStrategyPresentationData(strategy, { invoiceNo, customer }),
+      nextScheduledAtLabel: formatStrategyDate(nextNotification.scheduledAt),
+      nextTemplate: safeText(nextNotification.template || "-"),
+      hasNextNotification: true
+    };
+  });
+}
+
+function renderRunningStrategyModal() {
+  const invoiceEl = document.getElementById("runningStrategyInvoiceNo");
+  const customerEl = document.getElementById("runningStrategyCustomerName");
+  const contentEl = document.getElementById("runningStrategyModalContent");
+  const pagerEl = document.getElementById("runningStrategyPager");
+  const pagerMetaEl = document.getElementById("runningStrategyPagerMeta");
+  const prevBtn = document.getElementById("runningStrategyPrevBtn");
+  const nextBtn = document.getElementById("runningStrategyNextBtn");
+  if (!invoiceEl || !customerEl || !contentEl || !pagerEl || !pagerMetaEl || !prevBtn || !nextBtn) return;
+
+  const current = runningStrategyModalItems[runningStrategyModalIndex] || null;
+  invoiceEl.textContent = runningStrategyModalInvoiceNo || "-";
+  customerEl.textContent = current?.customerName || "-";
+
+  const hasPager = runningStrategyModalItems.length > 1;
+  pagerEl.classList.toggle("hidden", !hasPager);
+  pagerMetaEl.textContent = `${runningStrategyModalIndex + 1} / ${Math.max(1, runningStrategyModalItems.length)}`;
+  prevBtn.disabled = runningStrategyModalIndex <= 0;
+  nextBtn.disabled = runningStrategyModalIndex >= runningStrategyModalItems.length - 1;
+
+  if (!current) {
+    contentEl.className = "runningStrategyEmpty";
+    contentEl.innerHTML = "No running strategy found.";
+    return;
   }
-  const nameInput = document.getElementById("strategyNameInput");
-  if (nameInput) nameInput.focus();
+
+  const invoiceChips = current.scope === "invoice"
+    ? (current.invoiceNos.length > 0
+        ? current.invoiceNos.map((invoiceNo) => `<span class="runningStrategyInvoiceChip">${escapeHtml(invoiceNo)}</span>`).join("")
+        : `<span class="runningStrategyInvoiceChip">No linked invoice</span>`)
+    : `<span class="runningStrategyInvoiceChip">Applies to customer invoices</span>`;
+
+  contentEl.className = "runningStrategyCard";
+  contentEl.innerHTML = `
+    <div class="runningStrategyTop">
+      <div class="runningStrategyTitleWrap">
+        <div class="runningStrategyTitle">${escapeHtml(current.strategyName)}</div>
+        <div class="runningStrategyMetaRow">
+          <span class="runningStrategyPill is-active">${escapeHtml(current.status)}</span>
+          <span class="runningStrategyPill">${escapeHtml(current.scope)}</span>
+          <span class="runningStrategyPill">${escapeHtml(current.reminderType)}</span>
+        </div>
+      </div>
+      <div class="runningStrategyInfo">
+        <div class="runningStrategyInfoLabel">Created</div>
+        <div class="runningStrategyInfoValue">${escapeHtml(current.createdAtLabel)}</div>
+      </div>
+    </div>
+    <div class="runningStrategyGrid">
+      <div class="runningStrategyInfo">
+        <div class="runningStrategyInfoLabel">Notification Mode</div>
+        <div class="runningStrategyInfoValue">${escapeHtml(current.notificationMode)}</div>
+      </div>
+      <div class="runningStrategyInfo">
+        <div class="runningStrategyInfoLabel">Key Account Filter</div>
+        <div class="runningStrategyInfoValue">${escapeHtml(current.keyAccountFilter)}</div>
+      </div>
+      <div class="runningStrategyInfo">
+        <div class="runningStrategyInfoLabel">Sub-status Filters</div>
+        <div class="runningStrategyInfoValue">${escapeHtml(current.subStatusSummary)}</div>
+      </div>
+      <div class="runningStrategyInfo">
+        <div class="runningStrategyInfoLabel">Aging Buckets</div>
+        <div class="runningStrategyInfoValue">${escapeHtml(current.agingSummary)}</div>
+      </div>
+      <div class="runningStrategyInfo">
+        <div class="runningStrategyInfoLabel">Linked Invoices</div>
+        <div class="runningStrategyInfoValue">${current.scope === "invoice" ? escapeHtml(String(current.invoiceCount)) : "Customer scope"}</div>
+      </div>
+      <div class="runningStrategyInfo">
+        <div class="runningStrategyInfoLabel">Invoice Coverage</div>
+        <div class="runningStrategyInvoiceChips">${invoiceChips}</div>
+      </div>
+    </div>
+    <hr class="runningStrategyDivider" />
+    <div class="runningStrategyScheduleSection">
+      <div class="runningStrategyScheduleTitle">Next Email</div>
+      <div class="runningStrategyScheduleRow">
+        <div class="runningStrategyScheduleIcon">
+          <i class="bi bi-envelope-fill" aria-hidden="true"></i>
+        </div>
+        <div class="runningStrategyScheduleText">
+          <div class="runningStrategyScheduleLine"><strong>Sending:</strong> ${escapeHtml(current.nextScheduledAtLabel)}</div>
+          <div class="runningStrategyScheduleLine"><strong>Template:</strong> ${escapeHtml(current.nextTemplate)}</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function openRunningStrategyModalForInvoice(invNo) {
+  if (!invNo) return;
+  if (!openInvoiceContext(invNo)) return;
+  runningStrategyModalInvoiceNo = invNo;
+  runningStrategyModalItems = getRunningStrategyModalData(invNo, selectedCustomerId);
+  runningStrategyModalIndex = 0;
+
+  if (runningStrategyModalItems.length === 0) return;
+
+  renderRunningStrategyModal();
+  const modalEl = document.getElementById("runningStrategyModal");
+  if (modalEl && typeof bootstrap !== "undefined") {
+    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+    modal.show();
+  }
+}
+
+function syncRunningStrategyModalIfOpen() {
+  const modalEl = document.getElementById("runningStrategyModal");
+  if (!modalEl || !runningStrategyModalInvoiceNo) return;
+  if (!modalEl.classList.contains("show")) return;
+
+  runningStrategyModalItems = getRunningStrategyModalData(runningStrategyModalInvoiceNo, selectedCustomerId);
+  if (runningStrategyModalItems.length === 0) {
+    const modal = typeof bootstrap !== "undefined" ? bootstrap.Modal.getInstance(modalEl) : null;
+    if (modal) modal.hide();
+    return;
+  }
+
+  runningStrategyModalIndex = Math.min(runningStrategyModalIndex, runningStrategyModalItems.length - 1);
+  renderRunningStrategyModal();
 }
 
 function openStrategyDetailsForInvoice(invNo, strategyId = "") {
@@ -5766,20 +6407,22 @@ function openStrategyDetailsForInvoice(invNo, strategyId = "") {
   setActiveTab("invoice");
   if (!selectInvoiceByNo(invNo)) return;
   openStrategyAccordionPanel();
+  strategyPanelMode = "running";
+  showStrategyForm(false);
+  renderStrategyNotifications();
 
-  let strategy = null;
   if (strategyId) {
-    strategy = loadStrategyNotifications().find((item) => item && item.id === strategyId) || null;
-  }
-  if (!strategy) {
-    strategy = getRunningStrategyForInvoice(invNo, selectedCustomerId);
-  }
-  if (!strategy) {
-    showTransientNotification("No strategy found", "No running strategy is linked to this invoice.", "error");
-    return;
+    const strategy = loadStrategyNotifications().find((item) => item && item.id === strategyId) || null;
+    if (strategy) {
+      showStrategyForm(true, { mode: "view", strategy });
+      return;
+    }
   }
 
-  showStrategyForm(true, { mode: "view", strategy });
+  const runningList = getScheduledRunningStrategiesForInvoice(invNo, selectedCustomerId);
+  if (runningList.length === 0) {
+    showTransientNotification("No strategy found", "No running strategy is linked to this invoice.", "error");
+  }
 }
 
 function closeEmailPanel() {
@@ -5947,6 +6590,7 @@ function selectInvoiceByNo(invNo) {
   if (!invoice) return false;
   renderInvoiceDetails(invoice);
   currentInvoiceNoForDocs = invNo;
+  strategyPanelMode = "all";
   renderStrategyNotifications();
   renderStoredRemarks(invNo);
   renderStoredActivityTrail(invNo);
@@ -6157,6 +6801,10 @@ let strategyFormMeta = {
   originalScope: "customer",
   linkedInvoiceNos: []
 };
+let strategyPanelMode = "all";
+let runningStrategyModalInvoiceNo = "";
+let runningStrategyModalItems = [];
+let runningStrategyModalIndex = 0;
 
 const filterState = {
   invoiceStatus: "__ALL__",
@@ -6745,10 +7393,10 @@ function renderInvoiceTable(invoices) {
     const emailTitle = hasUnreadEmail
       ? `Unread emails: ${inv.unreadEmailCount}`
       : "Email panel";
-    const runningStrategy = getRunningStrategyForInvoice(inv.invoiceNo, customerId);
-    const hasRunningStrategy = Boolean(runningStrategy);
-    const hasStrategyAccent = hasRunningStrategy || hashStringToIndex(String(inv.invoiceNo || ""), 3) === 0;
-    const strategyTitle = hasRunningStrategy ? "View strategy details" : "No running strategy";
+    const runningStrategies = getScheduledRunningStrategiesForInvoice(inv.invoiceNo, customerId);
+    const hasRunningStrategy = runningStrategies.length > 0;
+    const hasStrategyAccent = hasRunningStrategy;
+    const strategyTitle = hasRunningStrategy ? "View running strategy details" : "No scheduled running strategy";
     const dueDateObj = parseInvoiceDateValue(inv.dueDate);
     const dueDate = dueDateObj
       ? new Date(dueDateObj.getFullYear(), dueDateObj.getMonth(), dueDateObj.getDate())
@@ -6799,7 +7447,7 @@ function renderInvoiceTable(invoices) {
       <td class="colIcon colIconStrategy cellCenter ${hasStrategyAccent ? "is-active" : "is-inactive"}">
         <span class="iconWrap">
           ${hasRunningStrategy
-            ? `<span class="iconFlat" role="button" tabindex="0" title="${strategyTitle}" data-action="strategy" data-inv="${inv.invoiceNo}" data-strategy-id="${escapeHtml(runningStrategy?.id || "")}" style="color:#d97706;">
+            ? `<span class="iconFlat" role="button" tabindex="0" title="${strategyTitle}" data-action="strategy" data-inv="${inv.invoiceNo}" style="color:#d97706;">
                 <i class="bi bi-lightning-charge-fill" aria-hidden="true"></i>
               </span>`
             : `<span class="iconFlat" aria-hidden="true" title="${strategyTitle}" style="color:${hasStrategyAccent ? "#d97706" : "#94a3b8"}; pointer-events:none;">
@@ -6967,6 +7615,7 @@ function selectCustomer(customerId) {
   selectedCustomerId = customerId;
 
   selectedInvoiceNos = new Set();
+  strategyPanelMode = "all";
   showStrategyForm(false);
   emailInvoiceFilter = null;
   currentDocsScope = "customer";
@@ -9609,6 +10258,14 @@ function wireInvoiceTableEvents() {
     }
   });
 
+  tbody.addEventListener("keydown", (e) => {
+    const iconBtn = e.target.closest(".iconFlat[role='button']");
+    if (!iconBtn) return;
+    if (e.key !== "Enter" && e.key !== " ") return;
+    e.preventDefault();
+    iconBtn.click();
+  });
+
   tbody.addEventListener("click", (e) => {
     const btn = e.target.closest("button");
     const iconFlat = e.target.closest(".iconFlat");
@@ -9626,6 +10283,7 @@ function wireInvoiceTableEvents() {
         renderInvoiceDetails(invoice);
         setActiveTab("invoice");
         currentInvoiceNoForDocs = invoice.invoiceNo;
+        strategyPanelMode = "all";
         renderStrategyNotifications();
         const customer = customersData.find(c => c.id === selectedCustomerId);
         if (customer) renderDocsList(customer);
@@ -9637,7 +10295,6 @@ function wireInvoiceTableEvents() {
   if (iconFlat) {
     const action = iconFlat.getAttribute("data-action");
     const invFromIcon = iconFlat.getAttribute("data-inv") || "";
-    const strategyId = iconFlat.getAttribute("data-strategy-id") || "";
     if (action === "email") {
       openEmailPanel(invFromIcon);
       return;
@@ -9651,7 +10308,7 @@ function wireInvoiceTableEvents() {
       return;
     }
     if (action === "strategy") {
-      openStrategyDetailsForInvoice(invFromIcon, strategyId);
+      openRunningStrategyModalForInvoice(invFromIcon);
       return;
     }
   }
@@ -10036,6 +10693,8 @@ function renderDirectoryList() {
       const metaParts = [`Company: ${customer.name}`, `Email: ${email}`, `Phone: ${phone}`];
       return {
         name: nameParts.join(" ") || customer.name,
+        email,
+        useEmailForCommunication: contact.useEmailForCommunication === true,
         meta: metaParts.join(" | "),
         group: "customer",
         tagLabel: "Customer",
@@ -10046,6 +10705,8 @@ function renderDirectoryList() {
 
   const internalContacts = headerDirectoryContacts.internal.map((entry) => ({
     name: entry.name,
+    email: entry.email,
+    useEmailForCommunication: entry.useEmailForCommunication === true,
     meta: [`Email: ${entry.email || "-"}`, `Phone: ${entry.phone || "-"}`].join(" | "),
     group: "internal",
     tagLabel: "Internal",
@@ -10055,6 +10716,29 @@ function renderDirectoryList() {
   const entries = [...customerContacts, ...internalContacts].sort(
     (a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" })
   );
+
+  const hasDirectoryEmail = (value) => {
+    const normalized = String(value || "").trim();
+    return normalized !== "" && normalized !== "-";
+  };
+
+  const buildEmailBadge = (entry) => {
+    if (!hasDirectoryEmail(entry.email)) return null;
+    const isActive = entry.useEmailForCommunication === true;
+    const label = isActive
+      ? "Email communication enabled"
+      : "Email available but communication disabled";
+    const badge = document.createElement("span");
+    badge.className = `directoryEmailBadge ${isActive ? "is-active" : "is-inactive"}`;
+    badge.setAttribute("role", "img");
+    badge.setAttribute("aria-label", label);
+    badge.setAttribute("title", label);
+    const icon = document.createElement("i");
+    icon.className = "bi bi-envelope-fill";
+    icon.setAttribute("aria-hidden", "true");
+    badge.appendChild(icon);
+    return badge;
+  };
 
   const buildEntry = (entry) => {
     const row = document.createElement("div");
@@ -10082,9 +10766,14 @@ function renderDirectoryList() {
     const tag = document.createElement("span");
     tag.className = `directoryTag ${entry.tagClass}`;
     tag.textContent = entry.tagLabel;
+    const statusStack = document.createElement("div");
+    statusStack.className = "directoryStatusStack";
+    statusStack.appendChild(tag);
+    const emailBadge = buildEmailBadge(entry);
+    if (emailBadge) statusStack.appendChild(emailBadge);
 
     row.appendChild(body);
-    row.appendChild(tag);
+    row.appendChild(statusStack);
     return row;
   };
 
@@ -10897,6 +11586,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (event.key === strategyNotificationsKey) {
       renderStrategyNotifications();
       updateStrategyInvoiceScopeHint();
+      applyFiltersAndRender();
+      syncRunningStrategyModalIfOpen();
     }
     if (event.key === issueTrackerCustomKey) {
       renderStoredActivityTrail(currentInvoiceNoForDocs);
@@ -10942,6 +11633,8 @@ document.addEventListener("DOMContentLoaded", () => {
     bulkNew.textContent = "Add remarks";
   }
 
+  seedStrategyNotifications();
+
   const invoiceStorageKey = "ineburaInvoiceData";
   const invoiceSnapshot = customersData.flatMap((customer) => (
     (customer.invoices || []).map((invoice) => ({
@@ -10966,6 +11659,7 @@ document.addEventListener("DOMContentLoaded", () => {
   localStorage.setItem(invoiceStorageKey, JSON.stringify(invoiceSnapshot));
 
   renderCustomers(getFilteredCustomers(), selectedCustomerId);
+  wireRunningStrategyModalEvents();
   const first = customersData.find(c => c.id === selectedCustomerId) || customersData[0];
   if (first) {
     renderCenter(first);

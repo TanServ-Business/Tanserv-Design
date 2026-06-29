@@ -96,6 +96,8 @@ The drawer shows:
 
 The AI Activity Center mock data is stored locally in `scripts/ai-activity-center.js`.
 
+The current sample set contains 28 AI actions across multiple invoices and customers, including Apollo Pharmacy, Varun Beverages, Blue Star Limited, Bikanerwala Foods, Shiva Healthcare, and Ambane India.
+
 Each action contains fields such as:
 
 - `invoiceNo`
@@ -351,4 +353,3 @@ The AI Activity Center page was also served locally during implementation to ver
 - Review decisions are local browser state only.
 - AI suggestions in the agent and visit modules are prototype logic based on local invoice/activity/email data.
 - The implementation is suitable for UI/workflow validation before backend integration.
-

@@ -293,6 +293,24 @@ body {
   color: #166534;
 }
 
+.notifyPopup.error {
+  border-color: #fecaca;
+  background: #fff1f2;
+  color: #7f1d1d;
+}
+
+.notifyPopup.warning {
+  border-color: #fde68a;
+  background: #fffbeb;
+  color: #92400e;
+}
+
+.notifyPopup.general {
+  border-color: #cbd5f5;
+  background: #f8fafc;
+  color: #1e293b;
+}
+
 .notifyPopup strong {
   display: block;
   font-size: 13px;

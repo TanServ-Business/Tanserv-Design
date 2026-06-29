@@ -32,6 +32,89 @@
 
   const closedStatuses = new Set(["PDC cleared", "PDC bounced"]);
   const bankableStatuses = new Set(["PDC logged", "PDC dispatched", "PDC received"]);
+  const pdcStatusLabelMap = {
+    "PDC logged": "logged",
+    "PDC dispatched": "dispatched",
+    "PDC received": "received",
+    "PDC details incorrect": "details incorrect",
+    "PDC banked": "banked",
+    "PDC cleared": "cleared",
+    "PDC bounced": "bounced"
+  };
+
+  const pdcStatusNotificationMap = {
+    "PDC logged": {
+      appMessage: "PDC logged. Awaiting dispatch from agent.",
+      recipients: "Agent, PDC Mgmt",
+      email: {
+        from: "ops@inebura.com",
+        to: "agent.ops@inebura.com",
+        subject: "New PDC logged",
+        message: "PDC recorded in system. Please send dispatch instructions once cheque is sent."
+      }
+    },
+    "PDC dispatched": {
+      appMessage: "PDC dispatched to customer. Tracking update in handover notes.",
+      recipients: "Agent, PDC Mgmt",
+      email: {
+        from: "ops@inebura.com",
+        to: "agent@inebura.com",
+        subject: "PDC dispatched",
+        message: "Courier/dispatch details shared for the logged PDC cheque."
+      }
+    },
+    "PDC received": {
+      appMessage: "PDC received - Email sent to agent.",
+      recipients: "Agent, PDC Mgmt",
+      email: {
+        from: "ops@inebura.com",
+        to: "agent@inebura.com",
+        subject: "PDC received",
+        message: "PDC physically received. Please proceed to confirm bank details."
+      },
+      remind: true
+    },
+    "PDC details incorrect": {
+      appMessage: "PDC details incorrect. Please update cheque/cheque date details before banking.",
+      recipients: "Agent, PDC Mgmt",
+      email: {
+        from: "ops@inebura.com",
+        to: "agent.ops@inebura.com",
+        subject: "PDC details incorrect",
+        message: "PDC details mismatch found. Please verify and update the record."
+      }
+    },
+    "PDC banked": {
+      appMessage: "PDC banked - Email sent to agent and customer.",
+      recipients: "Agent, PDC Mgmt",
+      email: {
+        from: "finance@inebura.com",
+        to: "agent@inebura.com, customer@company.com",
+        subject: "PDC banked",
+        message: "PDC has been banked. Reconcile customer balance and clear the queue."
+      }
+    },
+    "PDC cleared": {
+      appMessage: "PDC cleared - Email sent to agent and customer.",
+      recipients: "Agent, PDC Mgmt",
+      email: {
+        from: "finance@inebura.com",
+        to: "agent@inebura.com, customer@company.com",
+        subject: "PDC cleared",
+        message: "Customer PDC adjusted and cleared successfully."
+      }
+    },
+    "PDC bounced": {
+      appMessage: "PDC bounced - Email sent to agent and customer.",
+      recipients: "Agent, PDC Mgmt",
+      email: {
+        from: "finance@inebura.com",
+        to: "agent@inebura.com, customer@company.com",
+        subject: "PDC bounced",
+        message: "PDC bounced while banked. Please follow up and reissue replacement."
+      }
+    }
+  };
 
   const formatINR = (value) => {
     try {
@@ -171,6 +254,64 @@
     saveNotificationCenter(list);
   };
 
+  const normalizePdcStatus = (status) => {
+    const normalized = String(status || "").trim();
+    return pdcStatusNotificationMap[normalized] ? normalized : "PDC logged";
+  };
+
+  const getPdcStatusMeta = (status) => {
+    const normalized = normalizePdcStatus(status);
+    return pdcStatusNotificationMap[normalized] || null;
+  };
+
+  const buildEmailMeta = (record, status) => {
+    const meta = getPdcStatusMeta(status);
+    if (!meta?.email) return null;
+    const customer = record?.customerName || "Customer";
+    const chequeNo = record?.chequeNo || record?.id || "-";
+    return {
+      ...meta.email,
+      subject: `${customer}: ${meta.email.subject} - ${chequeNo}`
+    };
+  };
+
+  const addStatusEmailDraftToCenter = ({ record, status, noteId, at }) => {
+    if (!record || !status) return;
+    const normalizedStatus = normalizePdcStatus(status);
+    const statusLabel = pdcStatusLabelMap[normalizedStatus] || normalizedStatus || "status";
+    const statusKey = String(statusLabel)
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+    const seedEmailId = `seed-email-${record.id || noteId || "pdc-status"}-${statusKey}`;
+    const emailMeta = buildEmailMeta(record, normalizedStatus);
+    if (!emailMeta) return;
+    const center = loadNotificationCenter();
+    if (center.some((item) => item.id === seedEmailId)) return;
+    addNotificationCenterItem({
+      id: seedEmailId,
+      type: "email",
+      title: `PDC ${statusLabel} update draft`,
+      message: emailMeta.message,
+      createdAt: at,
+      sentAt: at,
+      read: false,
+      audience: ["agent", "ops"],
+      details: [
+        { label: "From", value: emailMeta.from || "-" },
+        { label: "To", value: emailMeta.to || "-" },
+        { label: "Subject", value: emailMeta.subject || "-" },
+        { label: "Invoice", value: record.invoiceNo || "-" },
+        { label: "Customer", value: record.customerName || "-" },
+        { label: "Status", value: normalizedStatus || "-" },
+        { label: "Cheque", value: record.chequeNo || record.id || "-" }
+      ],
+      ctas: [
+        { label: "Open email", action: "open-email", invoiceNo: record.invoiceNo || "" }
+      ]
+    });
+  };
+
   const normalizeNotificationCenter = () => {
     const list = loadNotificationCenter();
     const today = parseDateValue(new Date());
@@ -287,6 +428,214 @@
         { label: "View PDC", action: "open-pdc" }
       ]
     });
+  };
+
+  const makeFutureDate = (offsetDays) => {
+    const date = new Date();
+    date.setDate(date.getDate() + offsetDays);
+    return toISODate(date);
+  };
+
+  const getSeedNotifications = () => ([
+    {
+      id: "seed-pdc-record-logged",
+      customerCode: "APL-104",
+      customerName: "Apollo Diagnostics",
+      invoiceNo: "INV-PDC-1001",
+      chequeNo: "CHQ-99001",
+      pdcDate: makeFutureDate(5),
+      bank: "HDFC",
+      amount: 280000,
+      status: "PDC logged",
+      createdBy: userName,
+      agentName: userName
+    },
+    {
+      id: "seed-pdc-record-dispatched",
+      customerCode: "BLW-212",
+      customerName: "BlueWave Distributors",
+      invoiceNo: "INV-PDC-1002",
+      chequeNo: "CHQ-99002",
+      pdcDate: makeFutureDate(2),
+      bank: "ICICI",
+      amount: 420000,
+      status: "PDC dispatched",
+      createdBy: userName,
+      agentName: userName
+    },
+    {
+      id: "seed-pdc-record-received",
+      customerCode: "SRI-311",
+      customerName: "Sunrise Retail",
+      invoiceNo: "INV-PDC-1003",
+      chequeNo: "CHQ-99003",
+      pdcDate: makeFutureDate(-1),
+      bank: "SBI",
+      amount: 160000,
+      status: "PDC received",
+      createdBy: userName,
+      agentName: userName
+    },
+    {
+      id: "seed-pdc-record-incorrect",
+      customerCode: "MNO-421",
+      customerName: "MonoChem Corp",
+      invoiceNo: "INV-PDC-1004",
+      chequeNo: "CHQ-99004",
+      pdcDate: makeFutureDate(1),
+      bank: "Axis",
+      amount: 95000,
+      status: "PDC details incorrect",
+      createdBy: userName,
+      agentName: userName
+    },
+    {
+      id: "seed-pdc-record-banked",
+      customerCode: "LUM-512",
+      customerName: "Lumen Technologies",
+      invoiceNo: "INV-PDC-1005",
+      chequeNo: "CHQ-99005",
+      pdcDate: makeFutureDate(-2),
+      bank: "Kotak",
+      amount: 360000,
+      status: "PDC banked",
+      createdBy: userName,
+      agentName: userName
+    },
+    {
+      id: "seed-pdc-record-cleared",
+      customerCode: "MED-671",
+      customerName: "MediTrust Pvt Ltd",
+      invoiceNo: "INV-PDC-1006",
+      chequeNo: "CHQ-99006",
+      pdcDate: makeFutureDate(-3),
+      bank: "IDFC",
+      amount: 50000,
+      status: "PDC cleared",
+      createdBy: userName,
+      agentName: userName
+    },
+    {
+      id: "seed-pdc-record-bounced",
+      customerCode: "GEN-799",
+      customerName: "Generix Holdings",
+      invoiceNo: "INV-PDC-1007",
+      chequeNo: "CHQ-99007",
+      pdcDate: makeFutureDate(-4),
+      bank: "HDFC",
+      amount: 120000,
+      status: "PDC bounced",
+      createdBy: userName,
+      agentName: userName
+    }
+  ]);
+
+  const seedDummyPdcNotifications = () => {
+    const records = loadPdcRecords();
+    const existingRecordIds = new Set(records.map((record) => String(record?.id || "")));
+    const notifications = loadNotifications();
+    const existingNotificationIds = new Set(notifications.map((note) => String(note?.id || "")));
+    const center = loadNotificationCenter();
+    const existingCenterIds = new Set(center.map((note) => String(note?.id || "")));
+    let recordChanged = false;
+
+    const now = Date.now();
+    getSeedNotifications().forEach((seed, index) => {
+      const status = normalizePdcStatus(seed.status);
+      const meta = getPdcStatusMeta(status);
+      const at = new Date(now - (index * 3 * 60 * 1000)).toISOString();
+      if (!existingRecordIds.has(seed.id)) {
+        const history = [
+          {
+            status: "PDC logged",
+            remark: "Seeded dummy trail.",
+            updatedAt: at,
+            updatedBy: userName
+          }
+        ];
+        if (status && status !== "PDC logged") {
+          history.unshift({
+            status,
+            remark: `Seeded dummy trail. Current status: ${status}.`,
+            updatedAt: at,
+            updatedBy: userName
+          });
+        }
+        records.unshift({
+          ...seed,
+          status,
+          createdAt: at,
+          history,
+          remindersScheduled: false
+        });
+        existingRecordIds.add(seed.id);
+        recordChanged = true;
+      }
+
+      const noteId = `seed-pdc-note:${seed.id}:${status || "status"}`;
+      if (!existingNotificationIds.has(noteId)) {
+        const pdcMessage = meta?.appMessage || `PDC status updated to ${status}.`;
+        const pdcRecipients = meta?.recipients || "PDC Mgmt";
+        addNotification({
+          id: noteId,
+          pdcId: seed.id,
+          status,
+          message: pdcMessage,
+          recipients: pdcRecipients,
+          remark: "Seeded status update",
+          sentAt: at,
+          read: false
+        });
+        existingNotificationIds.add(noteId);
+      }
+
+      if (meta?.email) {
+        const emailStatusKey = String(pdcStatusLabelMap[status] || status || "status")
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-+|-+$/g, "");
+        const emailId = `seed-pdc-email:${seed.id}:${emailStatusKey}`;
+        if (!existingCenterIds.has(emailId)) {
+          const emailMeta = buildEmailMeta(seed, status);
+          if (emailMeta) {
+            addNotificationCenterItem({
+              id: emailId,
+              type: "email",
+              title: `PDC ${pdcStatusLabelMap[status] || status || "status"} email draft`,
+              message: emailMeta.message,
+              createdAt: at,
+              sentAt: at,
+              read: false,
+              audience: ["agent", "ops"],
+              details: [
+                { label: "From", value: emailMeta.from || "-" },
+                { label: "To", value: emailMeta.to || "-" },
+                { label: "Subject", value: emailMeta.subject || "-" },
+                { label: "Invoice", value: seed.invoiceNo || "-" },
+                { label: "Customer", value: seed.customerName || "-" },
+                { label: "Status", value: status || "-" },
+                { label: "Cheque", value: seed.chequeNo || seed.id || "-" }
+              ],
+              ctas: [
+                { label: "Open email", action: "open-email", invoiceNo: seed.invoiceNo || "" }
+              ]
+            });
+            existingCenterIds.add(emailId);
+          }
+        }
+      }
+
+      if (meta?.remind && status === "PDC received") {
+        const target = records.find((item) => item.id === seed.id);
+        if (target && !target.remindersScheduled) {
+          schedulePdcReminders(target);
+        }
+      }
+    });
+
+    if (recordChanged) {
+      savePdcRecords(records);
+    }
   };
 
   const normalizeNotifications = () => {
@@ -773,11 +1122,20 @@
 
   let activePdcId = null;
 
-  const showNotify = (title, message) => {
+  const showNotify = (title, message, options = {}) => {
+    const iconMap = {
+      success: "bi-check-circle-fill",
+      warning: "bi-exclamation-circle-fill",
+      error: "bi-exclamation-triangle-fill",
+      info: "bi-info-circle-fill"
+    };
+    const style = String(options?.type || "success").trim().toLowerCase();
+    const icon = iconMap[style] || iconMap.success;
     if (!notifyDock) return;
     const popup = document.createElement("div");
-    popup.className = "notifyPopup success animateUp";
+    popup.className = `notifyPopup ${style} animateUp`;
     popup.innerHTML = `
+      <i class="bi ${icon}" aria-hidden="true"></i>
       <div>
         <strong>${escapeHtml(title)}</strong>
         <span>${escapeHtml(message)}</span>
@@ -797,7 +1155,7 @@
   };
 
   const showStatusSuccess = (message) => {
-    showNotify("Status updated", message);
+    showNotify("Status updated", message, { type: "success" });
   };
 
   const openStatusModal = (pdcId) => {
@@ -1369,6 +1727,9 @@
       }
       if (statusError) statusError.classList.add("hidden");
       const nextStatus = statusSelect?.value || "PDC logged";
+      const statusMeta = getPdcStatusMeta(nextStatus);
+      const statusMessage = statusMeta?.appMessage || `PDC status updated to ${nextStatus}.`;
+      const statusRecipients = statusMeta?.recipients || "PDC Mgmt";
       const records = loadPdcRecords();
       const target = records.find(item => item.id === activePdcId);
       if (!target) return;
@@ -1382,41 +1743,25 @@
         updatedBy: localStorage.getItem("activeUserName") || "PDC Mgmt"
       });
 
-      let notificationMessage = `PDC status updated to ${nextStatus}.`;
-      let notificationRecipients = "PDC Mgmt";
-
-      if (nextStatus === "PDC received") {
-        notificationMessage = "PDC received - Email sent to agent.";
-        notificationRecipients = "Agent";
+      if (statusMeta?.remind) {
         schedulePdcReminders(target);
-        showStatusSuccess(notificationMessage);
       }
 
-      if (nextStatus === "PDC banked") {
-        notificationMessage = "PDC banked - Email sent to agent and customer.";
-        notificationRecipients = "Agent, Customer";
-        showStatusSuccess(notificationMessage);
-      }
-
-      if (nextStatus === "PDC cleared") {
-        notificationMessage = "PDC cleared - Email sent to agent and customer.";
-        notificationRecipients = "Agent, Customer";
-        showStatusSuccess(notificationMessage);
-      }
-
-      if (nextStatus === "PDC bounced") {
-        notificationMessage = "PDC bounced - Email sent to agent and customer.";
-        notificationRecipients = "Agent, Customer";
-        showStatusSuccess(notificationMessage);
-      }
+      addStatusEmailDraftToCenter({
+        record: target,
+        status: nextStatus,
+        noteId: `manual-${activePdcId || target.id}`,
+        at: new Date().toISOString()
+      });
 
       addNotification({
         pdcId: target.id,
-        message: notificationMessage,
-        recipients: notificationRecipients,
+        message: statusMessage,
+        recipients: statusRecipients,
         status: nextStatus,
         remark: remarkText
       });
+      showStatusSuccess(statusMessage);
 
       savePdcRecords(records);
       if (statusModal) statusModal.hide();
@@ -1493,6 +1838,7 @@
   }
 
   wireSideNavEvents();
+  seedDummyPdcNotifications();
   syncLegacyNotificationsToCenter();
   renderAll();
 })();

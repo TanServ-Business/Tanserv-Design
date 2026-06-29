@@ -496,6 +496,10 @@
       justify-content: space-between;
       gap: 12px;
       padding: 16px 18px;
+      position: sticky;
+      top: 0;
+      z-index: 4;
+      background: #ede9fe;
       border-bottom: 1px solid #e2e8f4;
     }
 
@@ -544,8 +548,11 @@
       justify-content: space-between;
       gap: 12px;
       padding: 14px 16px;
+      position: sticky;
+      top: 0;
+      z-index: 4;
+      background: #ede9fe;
       border-bottom: 1px solid #e2e8f4;
-      background: #ffffff;
     }
 
     .previousShortfallHeader h3 {
@@ -636,9 +643,10 @@
       font-weight: 700;
     }
 
-    .previousShortfallHeader .closeBtn {
-      border: 1px solid #e2e8f4;
-      background: #ffffff;
+    .closeBtn {
+      border: 1px solid #fecaca;
+      background: #fef2f2;
+      color: #991b1b;
       width: 32px;
       height: 32px;
       border-radius: 10px;
@@ -646,6 +654,11 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
+      font-weight: 800;
+    }
+
+    .closeBtn i {
+      font-weight: 800;
     }
 
     .previousShortfallField.invalid textarea {
@@ -1341,7 +1354,7 @@
         <h3 id="planModalTitle">Plan for <span id="planDateLabel">-</span></h3>
         <p>Daily planning window: 9:30 AM - 2:30 PM.</p>
       </div>
-      <button class="iconBtn" type="button" id="planModalClose" aria-label="Close planning dialog">
+      <button class="closeBtn" type="button" id="planModalClose" aria-label="Close planning dialog">
         <i class="bi bi-x-lg" aria-hidden="true"></i>
       </button>
     </div>
@@ -2036,16 +2049,68 @@
     const getAiSuggestedVisitsForDate = (dateKey) => {
       if (!dateKey || !isFutureOrToday(dateKey)) return [];
       const invoices = readJson(invoiceStorageKey, []);
+      const demoAiVisitRows = [
+        {
+          customerName: "Apollo Pharmacy",
+          customerCode: "CUST-001",
+          invoiceNo: "INV-10308",
+          primaryStatus: "PTP",
+          status: "PTP",
+          ptpDate: dateKey
+        },
+        {
+          customerName: "Apollo Pharmacy",
+          customerCode: "CUST-001",
+          invoiceNo: "INV-10211",
+          primaryStatus: "Further Docs Required",
+          status: "Delivery Challan Required"
+        },
+        {
+          customerName: "Varun Beverages",
+          customerCode: "CUST-022",
+          invoiceNo: "INV-30402",
+          primaryStatus: "Collection In Progress",
+          status: "PDC Given"
+        },
+        {
+          customerName: "Blue Star Limited",
+          customerCode: "CUST-025",
+          invoiceNo: "INV-20518",
+          primaryStatus: "Collection In Progress",
+          status: "Call Back/Email Follow up"
+        },
+        {
+          customerName: "Bikanerwala Foods",
+          customerCode: "CUST-041",
+          invoiceNo: "INV-40777",
+          primaryStatus: "Further Action Required",
+          status: "Reversal & Re-Bill"
+        },
+        {
+          customerName: "Shiva Healthcare",
+          customerCode: "CUST-052",
+          invoiceNo: "INV-51240",
+          primaryStatus: "No Due",
+          status: "Within Credit Period/Days"
+        },
+        {
+          customerName: "Ambane India",
+          customerCode: "CUST-061",
+          invoiceNo: "INV-61890",
+          primaryStatus: "Further Action Required",
+          status: "Tax Issue On The Invoice"
+        },
+        {
+          customerName: "Motherson Wires",
+          customerCode: "CUST-090",
+          invoiceNo: "INV-71920",
+          primaryStatus: "Material Delivery Issues",
+          status: "Partial Material Received"
+        }
+      ];
       const invoiceRows = Array.isArray(invoices) && invoices.length
-        ? invoices
-        : [{
-            customerName: "Apollo Pharmacy",
-            customerCode: "CUST-001",
-            invoiceNo: "INV-10308",
-            primaryStatus: "PTP",
-            status: "PTP",
-            ptpDate: "2026-05-28"
-          }];
+        ? invoices.concat(demoAiVisitRows)
+        : demoAiVisitRows;
       const activityMap = getActivityTrailMap();
       const plannedKeys = new Set((getPlansForAgentOnDate(dateKey, getSubmittingAgentForDate(dateKey)) || [])
         .map((plan) => normalizeText(plan.code) || normalizeText(plan.customer))
@@ -2165,6 +2230,25 @@
           row?.subStatus,
           row?.primaryStatus
         ].filter(Boolean).join(" ").toLowerCase();
+        const needsVisitFollowUp = rowStatusText.includes("pdc given")
+          || rowStatusText.includes("call back/email follow up")
+          || rowStatusText.includes("reversal")
+          || rowStatusText.includes("tax issue")
+          || rowStatusText.includes("partial material received");
+        if (needsVisitFollowUp) {
+          const reason = rowStatusText.includes("pdc given")
+            ? "Collection follow up"
+            : rowStatusText.includes("partial material received")
+              ? "Invoice Submission"
+              : "Collection follow up";
+          upsertSuggestion(
+            row,
+            "Invoice status",
+            `AI visit follow-up recommended${invoiceNo ? ` for ${invoiceNo}` : ""} due to ${row?.status || row?.subStatus || row?.primaryStatus}.`,
+            reason
+          );
+          return;
+        }
         const needsInvoiceSubmission = rowStatusText.includes("not submitted")
           || rowStatusText.includes("invoice submission")
           || rowStatusText.includes("invoice copy required");
@@ -2554,6 +2638,11 @@
 
     const customerDirectory = [
       { customer: "Apollo Pharmacy", code: "CUST-001", agent: "Aditi Sharma", manager: "Mukesh Mishra", kam: "Neha Kapoor", kas: "Arjun Rao" },
+      { customer: "Varun Beverages", code: "CUST-022", agent: "Palak Choudhary", manager: "Mukesh Mishra", kam: "Neha Kapoor", kas: "Arjun Rao" },
+      { customer: "Blue Star Limited", code: "CUST-025", agent: "Manish Kumar", manager: "Rohit Mehra", kam: "Riya Malhotra", kas: "Vikram Iyer" },
+      { customer: "Bikanerwala Foods", code: "CUST-041", agent: "Sakshi Sharma", manager: "Mukesh Mishra", kam: "Shreya Nair", kas: "Kunal Shah" },
+      { customer: "Shiva Healthcare", code: "CUST-052", agent: "Abhishek Sharma", manager: "Mukesh Mishra", kam: "Vikas Rao", kas: "Meera Joshi" },
+      { customer: "Ambane India", code: "CUST-061", agent: "Karan Singh", manager: "Rohit Mehra", kam: "Neha Kapoor", kas: "Arjun Rao" },
       { customer: "BlueWave", code: "CUST-014", agent: "Manish Kumar", manager: "Mukesh Mishra", kam: "Riya Malhotra", kas: "Vikram Iyer" },
       { customer: "Sunrise Pvt", code: "CUST-033", agent: "Palak Choudhary", manager: "Mukesh Mishra", kam: "Anil Thomas", kas: "Dev Patel" },
       { customer: "Michelin Tyres", code: "CUST-089", agent: "Abhishek Sharma", manager: "Mukesh Mishra", kam: "Vikas Rao", kas: "Meera Joshi" },

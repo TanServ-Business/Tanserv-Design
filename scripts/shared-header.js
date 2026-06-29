@@ -380,6 +380,14 @@
         </a>
       </li>
       <li class="menu-item">
+        <a class="nav-link" href="${resolvePath("pages/strategy-master.html")}" data-module="strategy-master">
+          <span class="link-content">
+            <i class="bi bi-diagram-3" aria-hidden="true"></i>
+            <span>Strategy Master</span>
+          </span>
+        </a>
+      </li>
+      <li class="menu-item">
         <a class="nav-link" href="#" data-toggle="submenu" aria-expanded="false">
           <span class="link-content">
             <i class="bi bi-shield-lock" aria-hidden="true"></i>
@@ -389,6 +397,7 @@
         </a>
         <div class="submenu">
           <a class="submenu-link" href="${resolvePath("pages/credit-limit-dashboard.html")}" data-module="credit-limit-dashboard">Portfolio Overview</a>
+          <a class="submenu-link" href="${resolvePath("pages/credit-limit-assessment.html")}" data-module="credit-limit-assessment">Assessment Cockpit</a>
           <a class="submenu-link" href="${resolvePath("pages/credit-limit-detail.html")}" data-module="credit-limit-detail">Manage Credit Limits</a>
         </div>
       </li>
@@ -504,6 +513,30 @@
       const list = document.getElementById("directoryList");
       if (!list) return;
       list.innerHTML = "";
+
+      const hasDirectoryEmail = (value) => {
+        const normalized = String(value || "").trim();
+        return normalized !== "" && normalized !== "-";
+      };
+
+      const buildEmailBadge = (entry) => {
+        if (!hasDirectoryEmail(entry.email)) return null;
+        const isActive = entry.useEmailForCommunication === true;
+        const label = isActive
+          ? "Email communication enabled"
+          : "Email available but communication disabled";
+        const badge = document.createElement("span");
+        badge.className = `directoryEmailBadge ${isActive ? "is-active" : "is-inactive"}`;
+        badge.setAttribute("role", "img");
+        badge.setAttribute("aria-label", label);
+        badge.setAttribute("title", label);
+        const icon = document.createElement("i");
+        icon.className = "bi bi-envelope-fill";
+        icon.setAttribute("aria-hidden", "true");
+        badge.appendChild(icon);
+        return badge;
+      };
+
       internalContacts.forEach((entry) => {
         const row = document.createElement("div");
         row.className = "directoryEntry";
@@ -517,10 +550,15 @@
         const tag = document.createElement("span");
         tag.className = "directoryTag tagInternal";
         tag.textContent = "Internal";
+        const statusStack = document.createElement("div");
+        statusStack.className = "directoryStatusStack";
+        statusStack.appendChild(tag);
+        const emailBadge = buildEmailBadge(entry);
+        if (emailBadge) statusStack.appendChild(emailBadge);
         body.appendChild(title);
         body.appendChild(meta);
         row.appendChild(body);
-        row.appendChild(tag);
+        row.appendChild(statusStack);
         list.appendChild(row);
       });
     };
@@ -975,7 +1013,7 @@
         }
       };
 
-      const appendDummyIssueNotifications = () => {
+      const appendDummyModuleNotifications = () => {
         const notifications = loadNotifications();
         const existingIds = new Set(
           notifications
@@ -984,13 +1022,371 @@
         );
         const now = Date.now();
         const makeIso = (offsetMinutes) => new Date(now - (offsetMinutes * 60 * 1000)).toISOString();
+        const details = (...rows) => rows.map(([label, value]) => ({ label, value }));
+        const open = (label, href) => [{ label, action: "link", href }];
+        const moduleDummyItems = [
+          ["visit", "Visit Module", "pages/visitmodule.html", "Visit plan and route actions are ready for review."],
+          ["visit-review", "Visit Module Review", "pages/visitmoduleReview.html", "Visit approvals are waiting in the manager review queue."],
+          ["visit-manager-plan", "Manager Visit Plan", "pages/visitmoduleReview.html", "Manager visit plan has pending field-route updates."],
+          ["landing", "Landing Page", "LPagent.html", "Landing page workbench has refreshed portfolio actions."],
+          ["landing-agent", "Landing Page - Agent", "LPagent.html", "Agent landing page has new invoice follow-up actions."],
+          ["landing-customer", "Landing Page - Customer", "pages/LPcustomer.html", "Customer landing page has new invoice and response updates."],
+          ["landing-manager", "Landing Page - Manager", "pages/LPmanager.html", "Manager landing page has team exceptions to review."],
+          ["landing-manager-drilldown", "Landing Page - Manager Drilldown", "pages/dashManager.html", "Manager drilldown has a fresh portfolio variance."],
+          ["landing-supervisor", "Landing Page - Supervisor", "pages/LPsupervisor.html", "Supervisor landing page has queue allocation updates."],
+          ["landing-kam", "Landing Page - KAM", "pages/KAM.html", "KAM landing page has strategic account alerts."],
+          ["landing-kas", "Landing Page - KAS", "pages/KAS.html", "KAS landing page has account support follow-ups."],
+          ["landing-backend", "Landing Page - Backend", "pages/LPbackend.html", "Backend landing page has upload exceptions to clear."],
+          ["landing-mis", "Landing Page - MIS", "pages/LPmis.html", "MIS landing page has scheduled report actions."],
+          ["dashboard-agent", "Dashboard - Agent", "pages/Dashboard_Agent.html", "Agent dashboard metrics have crossed a configured threshold."],
+          ["dashboard-customer", "Dashboard - Customer", "pages/Dashboard_Customer.html", "Customer dashboard has a new statement activity update."],
+          ["dashboard-manager", "Dashboard - Manager", "pages/dashManager.html", "Manager dashboard has a team-level collection variance."],
+          ["dashboard-kam", "Dashboard - KAM", "pages/dashKAM.html", "KAM dashboard has strategic exposure movement."],
+          ["dashboard-kas", "Dashboard - KAS", "pages/dashKAS.html", "KAS dashboard has support account activity."],
+          ["dashboard-supervisor", "Dashboard - Supervisor", "pages/Dashboard_Supervisor.html", "Supervisor dashboard has allocation and aging updates."],
+          ["dashboard-admin", "Dashboard - Admin", "pages/Dashboard_Admin.html", "Admin dashboard has control-panel exceptions."],
+          ["issue-tracker", "Issue Tracker", "pages/issuetrackerLP.html", "Issue tracker has newly assigned action-owner work."],
+          ["issue-matrix", "Escalation Matrix", "bin/IssueTracker/escalationMatrix.html", "Escalation matrix configuration has a pending review."],
+          ["issue-approver", "Approver Dashboard", "bin/IssueTracker/approver-dashboard.html", "Approver dashboard has approval requests in queue."],
+          ["issue-approval-request", "Approval Request", "bin/IssueTracker/approval-request.html", "Approval request page has a pending decision context."],
+          ["submission-module", "Submission Module", "pages/submission.html", "Submission module has invoice packets awaiting validation."],
+          ["pdc-agent", "PDC Module - Agent", "pages/PDCagent.html", "PDC Agent module has cheque follow-up activity."],
+          ["pdc-ops", "PDC Module - Ops", "pages/PDCOps.html", "PDC Ops module has handoff and banking updates."],
+          ["commitment-agent", "Commitment - Agent", "pages/commitment.html", "Agent commitment module has revised PTP commitments."],
+          ["commitment-manager", "Commitment - Manager", "pages/CommitmentManager.html", "Manager commitment module has submissions to approve."],
+          ["ai-activity-center", "AI Activity Center", "pages/ai-activity-center.html", "AI Activity Center has generated follow-up suggestions."],
+          ["strategy-master", "Strategy Master", "pages/strategy-master.html", "Strategy Master has template and rule changes to validate."],
+          ["credit-limit-dashboard", "Credit Limit - Portfolio Overview", "pages/credit-limit-dashboard.html", "Credit portfolio overview has utilization changes."],
+          ["credit-limit-assessment", "Credit Limit - Assessment Cockpit", "pages/credit-limit-assessment.html", "Assessment cockpit has a credit request awaiting review."],
+          ["credit-limit-detail", "Credit Limit - Manage Credit Limits", "pages/credit-limit-detail.html", "Credit limit detail page has a customer limit action."],
+          ["help-support", "Help & Support", "pages/help-support.html", "Help and support has a requester update."],
+          ["support-admin", "Support Admin Portal", "pages/support-admin.html", "Support admin portal has SLA-risk tickets."]
+        ].map(([key, moduleName, href, message], index) => ({
+          id: `dummy-module-${key}`,
+          type: "module-update",
+          title: `${moduleName} notification`,
+          message,
+          createdAt: makeIso(43 + index),
+          audience: ["all"],
+          details: details(
+            ["Module", moduleName],
+            ["Route", href],
+            ["Dummy source", "Shared navigation seed"]
+          ),
+          ctas: open("Open module", href)
+        }));
         const dummyItems = [
+          {
+            id: "dummy-landing-summary-1",
+            type: "landing-summary",
+            title: "Landing page queue refreshed",
+            message: "Agent landing page has new priority work items ready for review.",
+            createdAt: makeIso(1),
+            audience: ["all"],
+            details: details(
+              ["Module", "Landing Page - Agent"],
+              ["Queue", "High-priority invoices"],
+              ["New items", "12"]
+            ),
+            ctas: open("Open landing page", "LPagent.html")
+          },
+          {
+            id: "dummy-dashboard-alert-1",
+            type: "dashboard-alert",
+            title: "Dashboard threshold crossed",
+            message: "Collection run-rate is below the daily target threshold for the active portfolio.",
+            createdAt: makeIso(2),
+            audience: ["all"],
+            details: details(
+              ["Module", "Dashboard - Agent"],
+              ["Metric", "Run-rate gap"],
+              ["Gap", "Rs. 4,80,000"]
+            ),
+            ctas: open("Open dashboard", "pages/Dashboard_Agent.html")
+          },
+          {
+            id: "dummy-visit-approval-1",
+            type: "visit-approval",
+            title: "Visit approval pending",
+            message: "A field visit plan needs manager review before it can be executed.",
+            createdAt: makeIso(3),
+            audience: ["all"],
+            details: details(
+              ["Visit date", "15 Apr"],
+              ["Agent", "Rohit Malhotra"],
+              ["Customer", "Apollo Pharmacy Pvt. Ltd."],
+              ["Purpose", "High-value collection follow-up"]
+            ),
+            ctas: open("Review visit", "pages/visitmoduleReview.html")
+          },
+          {
+            id: "dummy-visit-approval-pending-1",
+            type: "visit-approval-pending",
+            title: "Visit approval pending",
+            message: "Manager approval is pending for tomorrow's visit plan.",
+            createdAt: makeIso(4),
+            audience: ["all"],
+            details: details(
+              ["Visit date", "16 Apr"],
+              ["Customer", "BlueWave Distributors"],
+              ["Route", "West cluster"]
+            ),
+            ctas: open("Open visit review", "pages/visitmoduleReview.html")
+          },
+          {
+            id: "dummy-visit-plan-approved-1",
+            type: "visit-plan-approved",
+            title: "Visit plan approved",
+            message: "Your visit plan has been approved and is ready for execution.",
+            createdAt: makeIso(5),
+            audience: ["all"],
+            details: details(
+              ["Visit date", "17 Apr"],
+              ["Approved by", "Meera Iyer"],
+              ["Customer", "Sunrise Retail"]
+            ),
+            ctas: open("Open visit module", "pages/visitmodule.html")
+          },
+          {
+            id: "dummy-visit-replan-required-1",
+            type: "visit-replan-required",
+            title: "Visit plan rejected",
+            message: "Visit plan needs rework because the route sequence conflicts with manager availability.",
+            createdAt: makeIso(6),
+            audience: ["all"],
+            details: details(
+              ["Visit date", "18 Apr"],
+              ["Rejected by", "Manager"],
+              ["Reason", "Route clash"]
+            ),
+            ctas: open("Replan visit", "pages/visitmodule.html")
+          },
+          {
+            id: "dummy-submission-update-1",
+            type: "submission-update",
+            title: "Submission module update",
+            message: "Three invoice submissions are awaiting validation in the submission module.",
+            createdAt: makeIso(7),
+            audience: ["all"],
+            details: details(
+              ["Module", "Submission Module"],
+              ["Pending submissions", "3"],
+              ["Oldest pending", "2 hours"]
+            ),
+            ctas: open("Open submission", "pages/submission.html")
+          },
+          {
+            id: "dummy-pdc-1",
+            type: "pdc",
+            title: "PDC logged",
+            message: "PDC logged and awaiting dispatch confirmation from the agent.",
+            createdAt: makeIso(8),
+            audience: ["all"],
+            details: details(
+              ["Customer", "Apollo Diagnostics"],
+              ["Invoice", "INV-PDC-2001"],
+              ["Cheque", "CHQ-77291"],
+              ["Amount", "Rs. 2,80,000"],
+              ["Status", "PDC logged"]
+            ),
+            ctas: [{ label: "Open PDC", action: "open-pdc", invoiceNo: "INV-PDC-2001" }]
+          },
+          {
+            id: "dummy-pdc-reminder-1",
+            type: "pdc-reminder",
+            title: "PDC banking reminder",
+            message: "Cheque date is approaching. Confirm banking readiness with PDC Ops.",
+            createdAt: makeIso(9),
+            audience: ["all"],
+            details: details(
+              ["Customer", "MediTrust Pvt Ltd"],
+              ["Invoice", "INV-PDC-2002"],
+              ["PDC date", "19 Apr"],
+              ["Bank", "HDFC"]
+            ),
+            ctas: [{ label: "Open PDC", action: "open-pdc", invoiceNo: "INV-PDC-2002" }]
+          },
+          {
+            id: "dummy-pdc-bounced-1",
+            type: "pdc-bounced",
+            title: "PDC bounced",
+            message: "Banking update marked the PDC as bounced. Follow-up is required.",
+            createdAt: makeIso(10),
+            audience: ["all"],
+            details: details(
+              ["Customer", "Generix Holdings"],
+              ["Invoice", "INV-PDC-2003"],
+              ["Reason", "Insufficient funds"],
+              ["Next action", "Request replacement cheque"]
+            ),
+            ctas: [{ label: "Open PDC", action: "open-pdc", invoiceNo: "INV-PDC-2003" }]
+          },
+          {
+            id: "dummy-pdc-handoff-1",
+            type: "pdc-handoff",
+            title: "PDC handoff pending",
+            message: "PDC record is ready for Ops handoff after dispatch details were updated.",
+            createdAt: makeIso(11),
+            audience: ["all"],
+            details: details(
+              ["Customer", "BlueWave Distributors"],
+              ["Invoice", "INV-PDC-2004"],
+              ["Courier", "BlueDart"],
+              ["Tracking", "BD-442900"]
+            ),
+            ctas: [{ label: "Open PDC", action: "open-pdc", invoiceNo: "INV-PDC-2004" }]
+          },
+          {
+            id: "dummy-commitment-1",
+            type: "commitment",
+            title: "Commitment update",
+            message: "Customer commitment has been updated for the current collection week.",
+            createdAt: makeIso(12),
+            audience: ["all"],
+            details: details(
+              ["Customer", "Apollo Pharmacy Pvt. Ltd."],
+              ["Invoice", "INV-2026-2201"],
+              ["Week", "W16"],
+              ["Committed Amount", "Rs. 1,75,000"]
+            ),
+            ctas: [{ label: "Open commitment", action: "open-invoice", invoiceNo: "INV-2026-2201" }]
+          },
+          {
+            id: "dummy-commitment-approved-1",
+            type: "commitment-approved",
+            title: "Commitment approved",
+            message: "Manager approved the commitment submitted for this invoice.",
+            createdAt: makeIso(13),
+            audience: ["all"],
+            details: details(
+              ["Customer", "Sunrise Retail"],
+              ["Invoice", "INV-2026-2202"],
+              ["Approved by", "Manager"],
+              ["Amount", "Rs. 2,10,000"]
+            ),
+            ctas: [{ label: "Open commitment", action: "open-invoice", invoiceNo: "INV-2026-2202" }]
+          },
+          {
+            id: "dummy-commitment-submitted-1",
+            type: "commitment-submitted",
+            title: "Commitment submitted",
+            message: "A new commitment submission is waiting for manager action.",
+            createdAt: makeIso(14),
+            audience: ["all"],
+            details: details(
+              ["Customer", "Lumen Technologies"],
+              ["Invoice", "INV-2026-2203"],
+              ["Submitted by", "Agent"],
+              ["Amount", "Rs. 3,60,000"]
+            ),
+            ctas: open("Open manager queue", "pages/CommitmentManager.html")
+          },
+          {
+            id: "dummy-commitment-rejected-1",
+            type: "commitment-rejected",
+            title: "Commitment rejected",
+            message: "Commitment was rejected and needs revised payment evidence.",
+            createdAt: makeIso(15),
+            audience: ["all"],
+            details: details(
+              ["Customer", "MonoChem Corp"],
+              ["Invoice", "INV-2026-2204"],
+              ["Rejected by", "Manager"],
+              ["Reason", "Insufficient proof"]
+            ),
+            ctas: open("Open commitment", "pages/commitment.html")
+          },
+          {
+            id: "dummy-todo-1",
+            type: "todo",
+            title: "Todo reminder",
+            message: "Follow up on overdue promise-to-pay confirmation.",
+            createdAt: makeIso(16),
+            audience: ["all"],
+            details: details(
+              ["Task", "Call customer finance"],
+              ["Due by", "Today 4:00 PM"],
+              ["Owner", "Agent"]
+            ),
+            ctas: [{ label: "Open task", action: "open-todo" }]
+          },
+          {
+            id: "dummy-todo-assigned-1",
+            type: "todo-assigned",
+            title: "Task assigned",
+            message: "A manager assigned a task for invoice document validation.",
+            createdAt: makeIso(17),
+            audience: ["all"],
+            details: details(
+              ["Task", "Validate delivery challan"],
+              ["Invoice", "INV-2026-2205"],
+              ["Assigned by", "Manager"]
+            ),
+            ctas: [{ label: "Open task", action: "open-todo" }]
+          },
+          {
+            id: "dummy-todo-completed-ack-1",
+            type: "todo-completed-ack",
+            title: "Task completed",
+            message: "Assigned invoice follow-up task was marked complete.",
+            createdAt: makeIso(18),
+            audience: ["all"],
+            details: details(
+              ["Task", "Share POD copy"],
+              ["Completed by", "Agent"],
+              ["Invoice", "INV-2026-2206"]
+            ),
+            ctas: [{ label: "Open task", action: "open-todo" }]
+          },
+          {
+            id: "dummy-email-1",
+            type: "email",
+            title: "Email draft ready",
+            message: "Reminder email draft is ready for review before sending.",
+            createdAt: makeIso(19),
+            audience: ["all"],
+            details: details(
+              ["From", "collections@inebura.com"],
+              ["To", "finance@apollopharmacy.com"],
+              ["Subject", "Payment reminder for INV-2026-2207"],
+              ["Invoice", "INV-2026-2207"]
+            ),
+            ctas: [{ label: "Open email", action: "open-email", invoiceNo: "INV-2026-2207" }]
+          },
+          {
+            id: "dummy-backend-upload-exception-1",
+            type: "backend-upload-exception",
+            title: "Backend upload exception",
+            message: "Invoice upload batch completed with rejected rows requiring backend review.",
+            createdAt: makeIso(20),
+            audience: ["all"],
+            details: details(
+              ["Module", "Landing Page - Backend"],
+              ["Batch", "AR-APR-019"],
+              ["Rejected rows", "8"]
+            ),
+            ctas: open("Open backend", "pages/LPbackend.html")
+          },
+          {
+            id: "dummy-mis-schedule-failed-1",
+            type: "mis-schedule-failed",
+            title: "MIS schedule failed",
+            message: "Scheduled MIS report did not complete and needs rerun.",
+            createdAt: makeIso(21),
+            audience: ["all"],
+            details: details(
+              ["Module", "Landing Page - MIS"],
+              ["Report", "Daily collection pulse"],
+              ["Failure", "Source file missing"]
+            ),
+            ctas: open("Open MIS", "pages/LPmis.html")
+          },
           {
             id: "dummy-issue-assigned-1",
             type: "issue-assigned",
             title: "Issue assigned",
             message: "Issue ISS_2026_1001 assigned to you. Action required.",
-            createdAt: makeIso(2),
+            createdAt: makeIso(22),
             audience: ["all"],
             details: [
               { label: "Issue ID", value: "ISS_2026_1001" },
@@ -1008,7 +1404,7 @@
             type: "issue-approval-requested",
             title: "Issue approval requested",
             message: "Approval required for issue ISS_2026_1002. Please review at your level.",
-            createdAt: makeIso(4),
+            createdAt: makeIso(23),
             audience: ["all"],
             details: [
               { label: "Process", value: "High Value Escalation" },
@@ -1026,7 +1422,7 @@
             type: "issue-approval-decision",
             title: "Issue approval decision",
             message: "Issue ISS_2026_1002 approved. Next action assigned.",
-            createdAt: makeIso(6),
+            createdAt: makeIso(24),
             audience: ["all"],
             details: [
               { label: "Decision", value: "Approved" },
@@ -1045,7 +1441,7 @@
             type: "issue-created-manager",
             title: "Issue created",
             message: "Issue ISS_2026_1003 created and awaiting manager review.",
-            createdAt: makeIso(8),
+            createdAt: makeIso(25),
             audience: ["all"],
             details: [
               { label: "Issue ID", value: "ISS_2026_1003" },
@@ -1064,7 +1460,7 @@
             type: "issue-manager-approved",
             title: "Issue manager approval",
             message: "Issue ISS_2026_1004 approved by manager.",
-            createdAt: makeIso(10),
+            createdAt: makeIso(26),
             audience: ["all"],
             details: [
               { label: "Issue ID", value: "ISS_2026_1004" },
@@ -1082,7 +1478,7 @@
             type: "issue-approval-forwarded",
             title: "Issue approval forwarded",
             message: "Approval moved to next level for issue ISS_2026_1004.",
-            createdAt: makeIso(12),
+            createdAt: makeIso(27),
             audience: ["all"],
             details: [
               { label: "Issue ID", value: "ISS_2026_1004" },
@@ -1101,7 +1497,7 @@
             type: "issue-approval-rejected",
             title: "Issue approval rejected",
             message: "Approval rejected for issue ISS_2026_1005.",
-            createdAt: makeIso(14),
+            createdAt: makeIso(28),
             audience: ["all"],
             details: [
               { label: "Issue ID", value: "ISS_2026_1005" },
@@ -1119,7 +1515,7 @@
             type: "issue-resolution-provided",
             title: "Issue resolution provided",
             message: "Resolution provided for issue ISS_2026_1006.",
-            createdAt: makeIso(16),
+            createdAt: makeIso(29),
             audience: ["all"],
             details: [
               { label: "Issue ID", value: "ISS_2026_1006" },
@@ -1136,7 +1532,7 @@
             type: "issue-ticket-closed",
             title: "Issue ticket closed",
             message: "Issue ISS_2026_1007 has been closed.",
-            createdAt: makeIso(18),
+            createdAt: makeIso(30),
             audience: ["all"],
             details: [
               { label: "Issue ID", value: "ISS_2026_1007" },
@@ -1153,7 +1549,7 @@
             type: "issue-assignment-updated",
             title: "Issue assignment updated",
             message: "Issue ISS_2026_1008 assigned to new action owner.",
-            createdAt: makeIso(20),
+            createdAt: makeIso(31),
             audience: ["all"],
             details: [
               { label: "Issue ID", value: "ISS_2026_1008" },
@@ -1172,7 +1568,7 @@
             type: "issue-approval-process-saved",
             title: "Issue approval process saved",
             message: "Approval process updated for issue ISS_2026_1009.",
-            createdAt: makeIso(22),
+            createdAt: makeIso(32),
             audience: ["all"],
             details: [
               { label: "Issue ID", value: "ISS_2026_1009" },
@@ -1189,7 +1585,7 @@
             type: "issue-remark-added",
             title: "Issue remark added",
             message: "New remark added on issue ISS_2026_1010.",
-            createdAt: makeIso(24),
+            createdAt: makeIso(33),
             audience: ["all"],
             details: [
               { label: "Issue ID", value: "ISS_2026_1010" },
@@ -1205,7 +1601,7 @@
             type: "issue-reopened",
             title: "Issue reopened",
             message: "Issue ISS_2026_1011 has been reopened.",
-            createdAt: makeIso(26),
+            createdAt: makeIso(34),
             audience: ["all"],
             details: [
               { label: "Issue ID", value: "ISS_2026_1011" },
@@ -1216,7 +1612,120 @@
             ctas: [
               { label: "Open issue", action: "link", href: "pages/issuetrackerLP.html" }
             ]
-          }
+          },
+          {
+            id: "dummy-ai-activity-1",
+            type: "ai-activity",
+            title: "AI activity ready",
+            message: "AI activity center has a fresh suggestion batch for collection follow-ups.",
+            createdAt: makeIso(35),
+            audience: ["all"],
+            details: details(
+              ["Module", "AI Activity Center"],
+              ["Suggestions", "9"],
+              ["Confidence", "High"]
+            ),
+            ctas: open("Open AI activity", "pages/ai-activity-center.html")
+          },
+          {
+            id: "dummy-strategy-master-update-1",
+            type: "strategy-master-update",
+            title: "Strategy rule updated",
+            message: "A strategy template rule was updated and is ready for validation.",
+            createdAt: makeIso(36),
+            audience: ["all"],
+            details: details(
+              ["Module", "Strategy Master"],
+              ["Rule", "High-value invoice reminder"],
+              ["Channel", "Email"]
+            ),
+            ctas: open("Open strategy master", "pages/strategy-master.html")
+          },
+          {
+            id: "dummy-credit-limit-request-1",
+            type: "credit-limit-request",
+            title: "Credit limit request",
+            message: "A customer credit limit revision request is awaiting assessment.",
+            createdAt: makeIso(37),
+            audience: ["all"],
+            details: details(
+              ["Customer", "Apollo Pharmacy Pvt. Ltd."],
+              ["Current limit", "Rs. 50,00,000"],
+              ["Requested limit", "Rs. 65,00,000"]
+            ),
+            ctas: open("Open assessment", "pages/credit-limit-assessment.html")
+          },
+          {
+            id: "dummy-credit-limit-decision-1",
+            type: "credit-limit-decision",
+            title: "Credit limit decision",
+            message: "Credit limit recommendation has been approved for portfolio update.",
+            createdAt: makeIso(38),
+            audience: ["all"],
+            details: details(
+              ["Customer", "Sunrise Retail"],
+              ["Decision", "Approved"],
+              ["Approved limit", "Rs. 28,00,000"]
+            ),
+            ctas: open("Open credit dashboard", "pages/credit-limit-dashboard.html")
+          },
+          {
+            id: "dummy-credit-utilization-breach-1",
+            type: "credit-utilization-breach",
+            title: "Credit utilization breach",
+            message: "Customer utilization crossed the configured risk threshold.",
+            createdAt: makeIso(39),
+            audience: ["all"],
+            details: details(
+              ["Customer", "BlueWave Distributors"],
+              ["Utilization", "92%"],
+              ["Threshold", "85%"]
+            ),
+            ctas: open("Open credit detail", "pages/credit-limit-detail.html")
+          },
+          {
+            id: "dummy-support-ticket-assigned-1",
+            type: "support-ticket-assigned",
+            title: "Support ticket assigned",
+            message: "A support ticket has been assigned to the admin queue.",
+            createdAt: makeIso(40),
+            audience: ["all"],
+            details: details(
+              ["Ticket", "SUP-2026-1041"],
+              ["Category", "Access"],
+              ["Priority", "High"]
+            ),
+            ctas: open("Open support admin", "pages/support-admin.html")
+          },
+          {
+            id: "dummy-support-ticket-update-1",
+            type: "support-ticket-update",
+            title: "Support ticket updated",
+            message: "The requester added new details to an open help ticket.",
+            createdAt: makeIso(41),
+            audience: ["all"],
+            details: details(
+              ["Ticket", "SUP-2026-1042"],
+              ["Category", "PDC"],
+              ["Update", "Screenshot attached"]
+            ),
+            ctas: open("Open help support", "pages/help-support.html")
+          },
+          {
+            id: "dummy-support-sla-risk-1",
+            type: "support-sla-risk",
+            title: "Support SLA risk",
+            message: "A high-priority support case is nearing SLA breach.",
+            createdAt: makeIso(42),
+            audience: ["all"],
+            details: details(
+              ["Ticket", "SUP-2026-1043"],
+              ["Remaining SLA", "45 minutes"],
+              ["Owner", "Support Admin"]
+            ),
+            ctas: open("Open support admin", "pages/support-admin.html")
+          },
+          ...moduleDummyItems
         ];
 
         let changed = false;
@@ -1756,6 +2265,9 @@
           return;
         }
         const typeLabelMap = {
+          "landing-summary": "Landing",
+          "dashboard-alert": "Dashboard",
+          "module-update": "Module",
           pdc: "PDC",
           "pdc-reminder": "PDC reminder",
           "pdc-bounced": "PDC",
@@ -1768,6 +2280,7 @@
           "visit-approval-pending": "Visit approval",
           "visit-plan-approved": "Visit approval",
           "visit-replan-required": "Visit approval",
+          "submission-update": "Submission",
           todo: "Todo",
           "todo-assigned": "Todo",
           "todo-completed-ack": "Todo",
@@ -1790,6 +2303,8 @@
           "credit-limit-request": "Credit Limit",
           "credit-limit-decision": "Credit Limit",
           "credit-utilization-breach": "Credit Limit",
+          "ai-activity": "AI Activity",
+          "strategy-master-update": "Strategy",
           "support-ticket-assigned": "Support",
           "support-ticket-update": "Support",
           "support-sla-risk": "Support"
@@ -1904,7 +2419,7 @@
           event.stopPropagation();
           syncIssueNotificationsToCenter();
           updateCommitmentNotifications();
-          appendDummyIssueNotifications();
+          appendDummyModuleNotifications();
           updateNotificationBadge();
           toggleNotificationPopup();
         });
@@ -1991,7 +2506,7 @@
 
       syncIssueNotificationsToCenter();
       updateCommitmentNotifications();
-      appendDummyIssueNotifications();
+      appendDummyModuleNotifications();
       updateNotificationBadge();
 
       window.addEventListener("storage", (event) => {
@@ -2005,7 +2520,7 @@
         ) {
           syncIssueNotificationsToCenter();
           updateCommitmentNotifications();
-          appendDummyIssueNotifications();
+          appendDummyModuleNotifications();
           updateNotificationBadge();
           if (notificationPopup && !notificationPopup.classList.contains("hidden")) {
             renderNotificationPopup();

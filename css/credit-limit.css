@@ -2015,3 +2015,305 @@ body.motion-preload .dashboardCard { opacity: 0; }
 }
 
 .clEmailToastClose:hover { color: #475569; }
+
+/* ======================================================
+   ASSESSMENT COCKPIT
+   ====================================================== */
+
+.clAssessmentPage {
+  padding-top: 18px;
+}
+
+.clAssessmentHero {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 6px 0 18px;
+  position: relative;
+  z-index: 1;
+}
+
+.clAssessmentHero h1 {
+  margin: 0;
+  font-size: 24px;
+  line-height: 1.2;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.clAssessmentHeroNote {
+  min-width: 190px;
+  background: #ffffff;
+  border: 1px solid #e2e8f4;
+  border-radius: 6px;
+  padding: 10px 12px;
+  box-shadow: 0 4px 12px rgba(15,23,42,0.04);
+}
+
+.clAssessmentHeroNote span {
+  display: block;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.clAssessmentHeroNote strong {
+  display: block;
+  margin-top: 3px;
+  font-size: 13px;
+  color: #0f172a;
+}
+
+.clAssessmentKpiGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+  position: relative;
+  z-index: 1;
+}
+
+.clAssessmentKpiCard {
+  background: #ffffff;
+  border: 1px solid #e2e8f4;
+  border-radius: 6px;
+  padding: 13px 14px;
+  box-shadow: 0 4px 12px rgba(15,23,42,0.04);
+  min-height: 92px;
+}
+
+.clAssessmentKpiCard span {
+  display: block;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  font-weight: 800;
+  color: #64748b;
+}
+
+.clAssessmentKpiCard strong {
+  display: block;
+  margin-top: 8px;
+  font-size: 20px;
+  line-height: 1.15;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.clAssessmentKpiCard em {
+  display: block;
+  margin-top: 6px;
+  font-style: normal;
+  font-size: 11px;
+  color: #64748b;
+}
+
+.clAssessmentGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.75fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.clAssessmentTrendPanel,
+.clAssessmentTablePanel {
+  grid-column: 1 / -1;
+}
+
+.clAssessmentTrend {
+  min-height: 230px;
+  border: 1px solid #edf2f7;
+  border-radius: 6px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafd 100%);
+  overflow: hidden;
+}
+
+.clAssessmentTrendSvg {
+  width: 100%;
+  min-height: 230px;
+  display: block;
+}
+
+.clAssessmentTrendGrid {
+  stroke: #e2e8f4;
+  stroke-width: 1;
+}
+
+.clAssessmentTrendLimit {
+  stroke: #ef4444;
+  stroke-width: 1.2;
+  stroke-dasharray: 5 5;
+}
+
+.clAssessmentTrendLimitText,
+.clAssessmentTrendLabel,
+.clAssessmentTrendValue {
+  fill: #64748b;
+  font-size: 10px;
+  font-weight: 700;
+  text-anchor: middle;
+}
+
+.clAssessmentTrendLimitText {
+  text-anchor: start;
+  fill: #b91c1c;
+}
+
+.clAssessmentTrendLine {
+  fill: none;
+  stroke: #2563eb;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.clAssessmentTrendDot {
+  fill: #ffffff;
+  stroke: #2563eb;
+  stroke-width: 2.5;
+}
+
+.clAssessmentMetricList {
+  display: grid;
+  gap: 9px;
+}
+
+.clAssessmentMetricRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 10px;
+  align-items: baseline;
+  padding: 10px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.clAssessmentMetricRow:last-child {
+  border-bottom: none;
+}
+
+.clAssessmentMetricRow span {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 700;
+}
+
+.clAssessmentMetricRow strong {
+  font-size: 14px;
+  color: #0f172a;
+  font-variant-numeric: tabular-nums;
+}
+
+.clAssessmentMetricRow em {
+  grid-column: 1 / -1;
+  font-style: normal;
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.clAssessmentSignalGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.clAssessmentSignal {
+  border: 1px solid #e2e8f4;
+  border-radius: 6px;
+  padding: 12px;
+  background: #f8fafd;
+}
+
+.clAssessmentSignal span {
+  display: block;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: #64748b;
+}
+
+.clAssessmentSignal strong {
+  display: block;
+  margin-top: 6px;
+  font-size: 16px;
+  color: #0f172a;
+}
+
+.clAssessmentRecommendationBox {
+  border-radius: 6px;
+  border: 1px solid #e2e8f4;
+  background: #f8fafd;
+  padding: 16px;
+}
+
+.clAssessmentRecommendationBox strong {
+  display: block;
+  margin-top: 12px;
+  font-size: 20px;
+  color: #0f172a;
+}
+
+.clAssessmentRecommendationBox p {
+  margin: 8px 0 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: #475569;
+}
+
+.clAssessmentRecommendationBox.is-red { border-color: #fecdd3; background: #fff1f2; }
+.clAssessmentRecommendationBox.is-amber { border-color: #fde68a; background: #fffbeb; }
+.clAssessmentRecommendationBox.is-green { border-color: #bbf7d0; background: #f0fdf4; }
+.clAssessmentRecommendationBox.is-blue { border-color: #bfdbfe; background: #eff6ff; }
+
+.clAssessmentTablePanel {
+  margin-top: 16px;
+}
+
+.clAssessmentTableWrap {
+  overflow-x: auto;
+}
+
+.clAssessmentTable tbody tr {
+  cursor: pointer;
+}
+
+.clAssessmentTable tbody tr.is-selected {
+  background: #f3ecfb;
+  box-shadow: inset 3px 0 0 #5c258d;
+}
+
+.clAssessmentEmptyPanel,
+.clAssessmentDropdownEmpty {
+  padding: 24px;
+  color: #94a3b8;
+  font-size: 13px;
+  text-align: center;
+}
+
+@media (max-width: 1100px) {
+  .clAssessmentKpiGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .clAssessmentGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .clAssessmentHero {
+    flex-direction: column;
+  }
+
+  .clAssessmentHeroNote {
+    width: 100%;
+  }
+
+  .clAssessmentKpiGrid,
+  .clAssessmentSignalGrid {
+    grid-template-columns: 1fr;
+  }
+}

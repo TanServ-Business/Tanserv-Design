@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Strategy Master - Inebura Ops UI</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../css/styles.css" />
+  <link rel="stylesheet" href="../css/strategy-master.css?v=20260617e" />
+</head>
+<body class="motion-preload" data-root-path="../" data-relationship-name="Apollo" data-relationship-badge="AP" data-relationship-logo-src="assets/apollo-sharkfin-logo.jpeg">
+<div data-shared-header></div>
+
+<main class="smPage">
+  <section class="smScreen" id="smListScreen">
+    <header class="smHero">
+      <div>
+        <div class="smEyebrow">Strategy Master</div>
+        <h1>Manage collection strategies</h1>
+        <p>Configure strategy-level targets first, then attach template-driven reminder logic.</p>
+      </div>
+      <button class="smPrimaryBtn" id="smCreateNewBtn" type="button">
+        <i class="bi bi-plus-circle" aria-hidden="true"></i>
+        Create Strategy
+      </button>
+    </header>
+
+    <section class="smPanel smListShell">
+      <div class="smToolbar">
+        <label class="smSearchField">
+          <i class="bi bi-search" aria-hidden="true"></i>
+          <input id="smListSearch" type="search" placeholder="Search by strategy name..." />
+        </label>
+
+        <select id="smListStatusFilter" class="smToolbarSelect">
+          <option value="all">All Status</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
+
+        <select id="smListScopeFilter" class="smToolbarSelect">
+          <option value="all">All Target</option>
+          <option value="customer">Customer</option>
+          <option value="invoice">Invoice</option>
+        </select>
+      </div>
+
+      <div class="smTableWrap">
+        <table class="smTable">
+          <thead>
+            <tr>
+              <th>Strategy Name</th>
+              <th>Status</th>
+              <th>Target</th>
+              <th>Selected Records</th>
+              <th>Templates</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="smStrategyListBody"></tbody>
+        </table>
+      </div>
+
+      <div class="smEmpty hidden" id="smStrategyListEmpty">
+        <i class="bi bi-diagram-3" aria-hidden="true"></i>
+        <span>No strategies found. Click "Create Strategy" to get started.</span>
+      </div>
+    </section>
+  </section>
+
+  <section class="smScreen hidden" id="smBuilderScreen">
+    <header class="smBuilderHeader">
+      <div class="smBuilderHeaderMain">
+        <button class="smGhostBtn" id="smBackToListBtn" type="button">
+          <i class="bi bi-arrow-left-short" aria-hidden="true"></i>
+          Back to list
+        </button>
+        <div>
+          <div class="smEyebrow">Strategy Master</div>
+          <h1 id="smFormTitle">Create Strategy</h1>
+          <p id="smFormSubtitle">Set the target once. Each template block then controls its own notification settings, schedule, and filters.</p>
+        </div>
+      </div>
+      <div class="smBuilderHeaderActions">
+        <button class="smGhostBtn" id="smCancelBtn" type="button">Cancel</button>
+      </div>
+    </header>
+
+    <section class="smPanel smBuilderShell">
+      <form id="smForm" novalidate>
+        <div class="smFormError hidden" id="smFormError"></div>
+
+        <section class="smSection">
+          <div class="smSectionHead">
+            <div>
+              <div class="smSectionKicker">Section 1</div>
+              <h3>Basics &amp; Target</h3>
+              <p>Define the strategy shell and pick the exact customer or invoice set.</p>
+            </div>
+            <label class="smStatusToggle" for="smStatus">
+              <span>Status</span>
+              <span class="smStatusToggleWrap">
+                <input id="smStatus" type="checkbox" checked />
+                <strong id="smStatusLabel">Active</strong>
+              </span>
+            </label>
+          </div>
+
+          <div class="smGrid smGrid3">
+            <label class="smField">
+              <span>Strategy Name *</span>
+              <input id="smStrategyName" type="text" maxlength="120" placeholder="e.g. North overdue recovery strategy" />
+            </label>
+
+            <label class="smField">
+              <span>Reminder Type</span>
+              <select id="smReminderType">
+                <option value="">Select</option>
+                <option value="pre_due">Pre Due</option>
+                <option value="post_due">Post Due</option>
+                <option value="both">Both</option>
+              </select>
+            </label>
+
+            <label class="smField">
+              <span>Target *</span>
+              <select id="smTargetType">
+                <option value="">Select</option>
+                <option value="customer">Customer</option>
+                <option value="invoice">Invoice</option>
+              </select>
+            </label>
+          </div>
+
+          <section class="smSubSection hidden" id="smTargetPickerSection">
+            <div class="smSectionHead">
+              <div>
+                <h3 id="smTargetHeading">Target Records</h3>
+                <p id="smTargetDescription">Choose the exact records this strategy should cover.</p>
+              </div>
+              <div class="smCountPill" id="smTargetCount">0 selected</div>
+            </div>
+
+            <div class="smFilterBar">
+              <label class="smSearchField">
+                <i class="bi bi-search" aria-hidden="true"></i>
+                <input id="smTargetSearch" type="search" placeholder="Search target..." />
+              </label>
+              <div class="smFilterTools">
+                <button class="smTinyBtn" id="smTargetSelectAll" type="button">Select all</button>
+                <button class="smTinyBtn" id="smTargetClear" type="button">Clear</button>
+              </div>
+            </div>
+
+            <div class="smChecklistCard" id="smTargetList"></div>
+          </section>
+        </section>
+
+        <section class="smSection">
+          <div class="smSectionHead">
+            <div>
+              <div class="smSectionKicker">Section 2</div>
+              <h3>Templates</h3>
+              <p>Add one or more templates to the strategy. Each template carries its own notification mode, schedule, and filters.</p>
+            </div>
+            <div class="smSectionActions">
+              <div class="smCountPill" id="smTemplateCount">0 templates</div>
+              <button class="smGhostBtn" id="smPreviewTemplateBtn" type="button" disabled>
+                <i class="bi bi-envelope-paper" aria-hidden="true"></i>
+                Preview Template
+              </button>
+              <button class="smPrimaryBtn" id="smAddTemplateBtn" type="button">
+                <i class="bi bi-plus-circle" aria-hidden="true"></i>
+                Add Template
+              </button>
+            </div>
+          </div>
+
+          <div class="smTemplateStack" id="smTemplateStack"></div>
+        </section>
+
+        <div class="smBuilderFooter">
+          <button class="smGhostBtn" id="smFooterCancelBtn" type="button">Cancel</button>
+          <div class="smBuilderMeta" id="smFooterMeta">Complete both sections before saving.</div>
+          <button class="smPrimaryBtn" id="smSaveBtn" type="submit">Save Strategy</button>
+        </div>
+      </form>
+    </section>
+  </section>
+</main>
+
+<div class="modalOverlay" id="smTemplatePreviewModal" aria-hidden="true">
+  <div class="modalCard smPreviewModalCard" role="dialog" aria-modal="true" aria-labelledby="smTemplatePreviewTitle">
+    <div class="modalHeader">
+      <div>
+        <h3 id="smTemplatePreviewTitle">Template Preview</h3>
+        <div class="smPreviewMeta" id="smTemplatePreviewMeta">Select a template to preview the source email.</div>
+      </div>
+      <button class="closeBtn" id="smTemplatePreviewClose" type="button" aria-label="Close template preview">
+        <i class="bi bi-x-lg" aria-hidden="true"></i>
+      </button>
+    </div>
+    <div class="modalBody smPreviewModalBody">
+      <section class="smPreviewPanel">
+        <div class="smPreviewLabel">Subject</div>
+        <div class="smPreviewSubject" id="smTemplatePreviewSubject">Preview subject will appear here.</div>
+      </section>
+
+      <section class="smPreviewPanel">
+        <div class="smPreviewLabel">Email Preview</div>
+        <div class="smPreviewFrameShell">
+          <iframe id="smTemplatePreviewFrame" title="Email template preview" sandbox></iframe>
+        </div>
+      </section>
+    </div>
+    <div class="modalFooter">
+      <button class="btnSecondary smPreviewCloseBtn" id="smTemplatePreviewFooterClose" type="button">Close</button>
+    </div>
+  </div>
+</div>
+
+<script src="../scripts/shared-header.js"></script>
+<script src="../scripts/strategy-master-template-source.js?v=20260617a"></script>
+<script src="../scripts/strategy-master.js?v=20260617e"></script>
+</body>
+</html>

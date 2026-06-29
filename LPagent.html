@@ -307,6 +307,22 @@
       --event-badge-border: #ddd6fe;
     }
 
+    .event-pdc {
+      --event-color: #0f766e;
+      --event-soft: #99f6e4;
+      --event-badge-bg: #ecfeff;
+      --event-badge-text: #155e75;
+      --event-badge-border: #99f6e4;
+    }
+
+    .event-pdc-email {
+      --event-color: #9333ea;
+      --event-soft: #e9d5ff;
+      --event-badge-bg: #f5f3ff;
+      --event-badge-text: #5b21b6;
+      --event-badge-border: #e9d5ff;
+    }
+
     .strategyNotificationsWrap {
       display: flex;
       flex-direction: column;
@@ -351,6 +367,127 @@
       gap: 8px;
     }
 
+    .strategyPanelContext {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      border: 1px solid #dbe5f1;
+      border-radius: 12px;
+      background: linear-gradient(180deg, #f8fbff 0%, #eef6ff 100%);
+      padding: 10px 12px;
+      font-size: 11px;
+      color: #33506a;
+    }
+
+    .strategyPanelContext strong {
+      color: #0f172a;
+      font-size: 12px;
+    }
+
+    .strategyPanelContextBtn {
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      color: #2563eb;
+      border-radius: 999px;
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 4px 10px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .strategyNextEmailSummary {
+      border: 1px solid #dbe3f1;
+      border-radius: 14px;
+      background: #ffffff;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04);
+    }
+
+    .strategyNextEmailHead {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .strategyNextEmailTitle {
+      font-size: 11px;
+      font-weight: 800;
+      color: #334155;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .strategyNextEmailCount {
+      font-size: 10px;
+      border: 1px solid #dbeafe;
+      background: #eff6ff;
+      color: #1d4ed8;
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .strategyNextEmailList {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .strategyNextEmailItem {
+      display: grid;
+      grid-template-columns: 28px minmax(0, 1fr);
+      gap: 10px;
+      align-items: start;
+      padding: 8px 0;
+      border-top: 1px solid #edf2f7;
+    }
+
+    .strategyNextEmailItem:first-child {
+      border-top: none;
+      padding-top: 0;
+    }
+
+    .strategyNextEmailIcon {
+      width: 28px;
+      height: 28px;
+      border-radius: 9px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #eff6ff;
+      color: #2563eb;
+      border: 1px solid #bfdbfe;
+    }
+
+    .strategyNextEmailMeta {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .strategyNextEmailPrimary {
+      font-size: 12px;
+      font-weight: 700;
+      color: #0f172a;
+      line-height: 1.35;
+      word-break: break-word;
+    }
+
+    .strategyNextEmailSecondary {
+      font-size: 10.5px;
+      color: #64748b;
+      line-height: 1.35;
+      word-break: break-word;
+    }
+
     .strategyEmpty {
       border: 1px dashed #cbd5e1;
       border-radius: 10px;
@@ -365,6 +502,188 @@
       border-radius: 12px;
       background: #f8fafc;
       padding: 10px;
+    }
+
+    .strategySummaryCard {
+      position: relative;
+      border: 1px solid #dce6f2;
+      border-radius: 16px;
+      background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+      padding: 14px 16px 12px 18px;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+      overflow: hidden;
+    }
+
+    .strategySummaryCard::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 5px;
+      background: #2563eb;
+    }
+
+    .strategySummaryCard.is-customer::before {
+      background: linear-gradient(180deg, #2563eb 0%, #38bdf8 100%);
+    }
+
+    .strategySummaryCard.is-invoice::before {
+      background: linear-gradient(180deg, #d97706 0%, #f59e0b 100%);
+    }
+
+    .strategySummaryHeader {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .strategySummaryTitle {
+      font-size: 14px;
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1.25;
+    }
+
+    .strategySummaryPills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .strategySummaryPill {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      border: 1px solid #d8e3f0;
+      background: #f8fbff;
+      padding: 4px 9px;
+      font-size: 10.5px;
+      font-weight: 700;
+      color: #33506a;
+      text-transform: capitalize;
+      white-space: nowrap;
+    }
+
+    .strategySummaryPill.is-active {
+      background: #e8f7ee;
+      border-color: #bde7cb;
+      color: #166534;
+    }
+
+    .strategySummaryPill.is-inactive {
+      background: #fef2f2;
+      border-color: #fecaca;
+      color: #b91c1c;
+    }
+
+    .strategySummaryPill.is-reminder-pre {
+      background: #eff6ff;
+      border-color: #bfdbfe;
+      color: #1d4ed8;
+    }
+
+    .strategySummaryPill.is-reminder-post {
+      background: #fff7ed;
+      border-color: #fdba74;
+      color: #c2410c;
+    }
+
+    .strategySummaryPill.is-reminder-both {
+      background: #faf5ff;
+      border-color: #d8b4fe;
+      color: #7e22ce;
+    }
+
+    .strategySummaryMeta {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+      min-width: 145px;
+    }
+
+    .strategySummaryCreated {
+      font-size: 10.5px;
+      color: #64748b;
+      text-align: right;
+      line-height: 1.35;
+    }
+
+    .strategySummaryCreated strong {
+      display: block;
+      font-size: 11px;
+      color: #0f172a;
+      margin-bottom: 2px;
+    }
+
+    .strategySummaryRows {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px 18px;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid #edf2f7;
+    }
+
+    .strategySummaryRow {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .strategySummaryKey {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #64748b;
+    }
+
+    .strategySummaryValue {
+      font-size: 12px;
+      color: #0f172a;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+
+    .strategySummaryValue.is-muted {
+      color: #64748b;
+    }
+
+    .strategySummaryFooter {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid #edf2f7;
+      flex-wrap: wrap;
+    }
+
+    .strategySummaryFooterInfo {
+      font-size: 11px;
+      color: #475569;
+      line-height: 1.4;
+    }
+
+    .strategySummaryLink {
+      border: none;
+      background: transparent;
+      color: #2563eb;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 0;
+      cursor: pointer;
+      text-transform: none;
+    }
+
+    .strategySummaryLink:hover {
+      text-decoration: underline;
     }
 
     .strategyCardHeader {
@@ -424,6 +743,25 @@
       gap: 2px;
     }
 
+    .strategyCardHeaderSide {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+      flex: 0 0 180px;
+      max-width: 100%;
+    }
+
+    .strategyCardHeaderSide .runningStrategyInfo {
+      min-width: 170px;
+    }
+
+    .activityTrailEmpty {
+      padding: 8px 4px;
+      color: #64748b;
+      font-size: 11px;
+    }
+
     .strategyReadMoreBtn {
       border: none;
       background: transparent;
@@ -437,6 +775,72 @@
 
     .strategyReadMoreBtn:hover {
       text-decoration: underline;
+    }
+
+    .strategyInlineSection {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .strategyInlineSectionHead {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .strategyInlineSectionKicker {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #2563eb;
+    }
+
+    .strategyInlineSectionTitle {
+      font-size: 18px;
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1.1;
+    }
+
+    .strategyInlineSectionText {
+      font-size: 11px;
+      color: #64748b;
+      margin-top: 2px;
+    }
+
+    .strategyCardActions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .strategyCardActionsInline {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .strategyExcludeBtn {
+      border: 1px solid #fed7aa;
+      background: #fff7ed;
+      color: #c2410c;
+      border-radius: 999px;
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 5px 10px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .strategyExcludeBtn:hover {
+      background: #ffedd5;
     }
 
     .strategyScopeInvoices {
@@ -757,9 +1161,284 @@
       opacity: 0.95;
     }
 
+    .runningStrategyModal .modal-dialog {
+      max-width: 780px;
+    }
+
+    .runningStrategyBody {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .runningStrategyHeader {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .runningStrategyContext {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .runningStrategyInvoice {
+      font-size: 18px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .runningStrategyCustomer {
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    .runningStrategyPager {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .runningStrategyPagerBtn {
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      color: #1e293b;
+      border-radius: 10px;
+      width: 34px;
+      height: 34px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .runningStrategyPagerBtn:hover:not(:disabled) {
+      background: #eff6ff;
+      border-color: #bfdbfe;
+    }
+
+    .runningStrategyPagerBtn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .runningStrategyPagerMeta {
+      min-width: 64px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: #334155;
+    }
+
+    .runningStrategyCard {
+      border: 1px solid #dbe5f1;
+      border-radius: 16px;
+      background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+      box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .runningStrategyTop {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .runningStrategyTitleWrap {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .runningStrategyTitle {
+      font-size: 18px;
+      font-weight: 700;
+      color: #0f172a;
+      line-height: 1.2;
+    }
+
+    .runningStrategyMetaRow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .runningStrategyPill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      border: 1px solid #d8e3f0;
+      background: #f8fbff;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #33506a;
+      text-transform: capitalize;
+    }
+
+    .runningStrategyPill.is-active {
+      background: #e8f7ee;
+      border-color: #bde7cb;
+      color: #166534;
+    }
+
+    .runningStrategyPill.is-inactive {
+      background: #fef2f2;
+      border-color: #fecaca;
+      color: #b91c1c;
+    }
+
+    .runningStrategyGrid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px 14px;
+    }
+
+    .runningStrategyInfo {
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      background: #ffffff;
+      padding: 10px 12px;
+    }
+
+    .runningStrategyInfoLabel {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: #64748b;
+      margin-bottom: 4px;
+    }
+
+    .runningStrategyInfoValue {
+      font-size: 13px;
+      font-weight: 600;
+      color: #0f172a;
+      line-height: 1.45;
+      word-break: break-word;
+    }
+
+    .runningStrategyDivider {
+      margin: 2px 0 0;
+      border: 0;
+      border-top: 2px solid #c7d6e8;
+    }
+
+    .runningStrategyScheduleSection {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .runningStrategyScheduleTitle {
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #475569;
+    }
+
+    .runningStrategyScheduleRow {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 0 0;
+    }
+
+    .runningStrategyScheduleIcon {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #eff6ff;
+      color: #2563eb;
+      border: 1px solid #bfdbfe;
+      flex: 0 0 auto;
+    }
+
+    .runningStrategyScheduleText {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    .runningStrategyScheduleLine {
+      font-size: 13px;
+      color: #0f172a;
+      line-height: 1.45;
+      word-break: break-word;
+    }
+
+    .runningStrategyScheduleLine strong {
+      font-weight: 700;
+    }
+
+    .runningStrategyInvoiceChips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .runningStrategyInvoiceChip {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      background: #eef2ff;
+      color: #3730a3;
+      border: 1px solid #c7d2fe;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 8px;
+    }
+
+    .runningStrategyEmpty {
+      border: 1px dashed #cbd5e1;
+      border-radius: 14px;
+      background: #f8fafc;
+      padding: 18px;
+      text-align: center;
+      font-size: 13px;
+      color: #64748b;
+    }
+
     @media (max-width: 992px) {
+      .strategySummaryHeader,
+      .strategySummaryFooter {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .strategySummaryMeta {
+        min-width: 0;
+        align-items: flex-start;
+      }
+
+      .strategySummaryCreated {
+        text-align: left;
+      }
+
+      .strategySummaryRows {
+        grid-template-columns: 1fr;
+      }
+
       .strategyGrid {
         grid-template-columns: minmax(0, 1fr);
+      }
+
+      .runningStrategyGrid {
+        grid-template-columns: 1fr;
       }
     }
 
@@ -1467,6 +2146,35 @@
           <div class="kv"><span>Mail body</span></div>
           <div class="notificationBody" id="notificationBody">-</div>
           <div class="kv"><span>Attachments</span><strong id="notificationAttachments" class="notificationAttachments">-</strong></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade runningStrategyModal" id="runningStrategyModal" tabindex="-1" aria-labelledby="runningStrategyModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="runningStrategyModalLabel">Running Strategy</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body runningStrategyBody">
+          <div class="runningStrategyHeader">
+            <div class="runningStrategyContext">
+              <div class="runningStrategyInvoice" id="runningStrategyInvoiceNo">-</div>
+              <div class="runningStrategyCustomer" id="runningStrategyCustomerName">-</div>
+            </div>
+            <div class="runningStrategyPager hidden" id="runningStrategyPager">
+              <button class="runningStrategyPagerBtn" type="button" id="runningStrategyPrevBtn" aria-label="Previous strategy">
+                <i class="bi bi-chevron-left" aria-hidden="true"></i>
+              </button>
+              <div class="runningStrategyPagerMeta" id="runningStrategyPagerMeta">1 / 1</div>
+              <button class="runningStrategyPagerBtn" type="button" id="runningStrategyNextBtn" aria-label="Next strategy">
+                <i class="bi bi-chevron-right" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+          <div id="runningStrategyModalContent" class="runningStrategyEmpty">No running strategy found.</div>
         </div>
       </div>
     </div>
@@ -2437,45 +3145,7 @@
               <div id="invoiceActivityCollapse" class="accordion-collapse collapse">
                 <div class="accordion-body">
                   <div class="activityTrail" id="activityTrailList">
-                    <details class="activityEvent event-invoice-update">
-                      <summary>
-                        <div>
-                          <div class="eventTitle">Invoice update</div>
-                          <div class="eventMeta eventStatusMeta">Follow-up</div>
-                          <div class="eventMeta eventStatusTime">12-11-25, 09:42:am</div>
-                        </div>
-                        <span class="eventBadge">Status</span>
-                      </summary>
-                      <div class="eventBody">
-                        Invoice marked as Submitted and tracking. Notes updated with next follow-up date.
-                      </div>
-                    </details>
-                    <details class="activityEvent event-push">
-                      <summary>
-                        <div>
-                          <div class="eventTitle">Push notification</div>
-                          <div class="eventTemplate">PTP missed</div>
-                          <div class="eventMeta">12-11-25, 09:45:am</div>
-                        </div>
-                        <span class="eventBadge">Notification sent</span>
-                      </summary>
-                      <div class="eventBody">
-                        <div class="eventSubject" id="pushNotificationSubject">Subject: PTP missed for -</div>
-                        <button class="readMoreBtn notificationReadMore" type="button" data-template="PTP missed">Read more</button>
-                      </div>
-                    </details>
-                    <details class="activityEvent event-issue">
-                      <summary>
-                        <div>
-                          <div class="eventTitle">Issue tracker</div>
-                          <div class="eventMeta">Dispute logged - Ticket updated | 07-11-25, 07:10:pm</div>
-                        </div>
-                        <span class="eventBadge">Ticket updated</span>
-                      </summary>
-                      <div class="eventBody">
-                        Ticket ID: IT-771. Status moved to Under review and assigned to Supervisor.
-                      </div>
-                    </details>
+                    <div class="activityTrailEmpty">Loading PDC activity...</div>
                   </div>
                 </div>
               </div>
@@ -2493,11 +3163,13 @@
                 <div class="accordion-body">
                   <div class="strategyNotificationsWrap">
                     <div class="strategyPanelTop">
-                      <div class="strategyPanelTitle">Created strategies</div>
-                      <button class="strategyCreateBtn" type="button" id="strategyCreateBtn">Strategy</button>
+                      <div class="strategyPanelTitle" id="strategyPanelTitle">Created strategies</div>
+                      <button class="strategyCreateBtn" type="button" id="strategyCreateBtn">Create Strategy</button>
                     </div>
 
                     <div id="strategyListWrap">
+                      <div class="strategyPanelContext hidden" id="strategyPanelContext"></div>
+                      <div class="strategyNextEmailSummary hidden" id="strategyNextEmailSummary"></div>
                       <div class="strategyEmpty" id="strategyListEmpty">No strategies yet.</div>
                       <div class="strategyList" id="strategyList"></div>
                     </div>
@@ -2700,6 +3372,404 @@
 
 </div>
   <div class="notifyDock" id="notifyDock" aria-live="polite" aria-atomic="true"></div>
+  <script>
+    (() => {
+      const notificationCenterKey = "ineburaNotificationCenter";
+      const pdcRecordKey = "ineburaPdcRecords";
+      const pdcNotificationKey = "ineburaPdcNotifications";
+      const activityTrailContainerId = "activityTrailList";
+
+      const pdcStatusNotificationMap = {
+        "PDC logged": {
+          appMessage: "PDC logged. Awaiting dispatch from agent.",
+          recipients: "Agent, PDC Mgmt",
+          statusLabel: "logged",
+          email: {
+            from: "ops@inebura.com",
+            to: "agent.ops@inebura.com",
+            subject: "New PDC logged",
+            message: "PDC recorded in system. Please send dispatch instructions once cheque is sent."
+          }
+        },
+        "PDC dispatched": {
+          appMessage: "PDC dispatched to customer. Tracking update in handover notes.",
+          recipients: "Agent, PDC Mgmt",
+          statusLabel: "dispatched",
+          email: {
+            from: "ops@inebura.com",
+            to: "agent@inebura.com",
+            subject: "PDC dispatched",
+            message: "Courier/dispatch details shared for the logged PDC cheque."
+          }
+        },
+        "PDC received": {
+          appMessage: "PDC received - Email sent to agent.",
+          recipients: "Agent, PDC Mgmt",
+          statusLabel: "received",
+          email: {
+            from: "ops@inebura.com",
+            to: "agent@inebura.com",
+            subject: "PDC received",
+            message: "PDC physically received. Please proceed to confirm bank details."
+          }
+        },
+        "PDC details incorrect": {
+          appMessage: "PDC details incorrect. Please update cheque/cheque date details before banking.",
+          recipients: "Agent, PDC Mgmt",
+          statusLabel: "details-incorrect",
+          email: {
+            from: "ops@inebura.com",
+            to: "agent.ops@inebura.com",
+            subject: "PDC details incorrect",
+            message: "PDC details mismatch found. Please verify and update the record."
+          }
+        },
+        "PDC banked": {
+          appMessage: "PDC banked - Email sent to agent and customer.",
+          recipients: "Agent, PDC Mgmt",
+          statusLabel: "banked",
+          email: {
+            from: "finance@inebura.com",
+            to: "agent@inebura.com, customer@company.com",
+            subject: "PDC banked",
+            message: "PDC has been banked. Reconcile customer balance and clear the queue."
+          }
+        },
+        "PDC cleared": {
+          appMessage: "PDC cleared - Email sent to agent and customer.",
+          recipients: "Agent, PDC Mgmt",
+          statusLabel: "cleared",
+          email: {
+            from: "finance@inebura.com",
+            to: "agent@inebura.com, customer@company.com",
+            subject: "PDC cleared",
+            message: "Customer PDC adjusted and cleared successfully."
+          }
+        },
+        "PDC bounced": {
+          appMessage: "PDC bounced - Email sent to agent and customer.",
+          recipients: "Agent, PDC Mgmt",
+          statusLabel: "bounced",
+          email: {
+            from: "finance@inebura.com",
+            to: "agent@inebura.com, customer@company.com",
+            subject: "PDC bounced",
+            message: "PDC bounced while banked. Please follow up and reissue replacement."
+          }
+        }
+      };
+
+      const seeds = [
+        {
+          id: "seed-lp-pdc-logged",
+          customerCode: "APL-104",
+          customerName: "Apollo Diagnostics",
+          invoiceNo: "INV-PDC-1001",
+          chequeNo: "CHQ-99001",
+          pdcDate: "2026-06-02",
+          bank: "HDFC",
+          amount: 280000,
+          status: "PDC logged"
+        },
+        {
+          id: "seed-lp-pdc-dispatched",
+          customerCode: "BLW-212",
+          customerName: "BlueWave Distributors",
+          invoiceNo: "INV-PDC-1002",
+          chequeNo: "CHQ-99002",
+          pdcDate: "2026-06-05",
+          bank: "ICICI",
+          amount: 420000,
+          status: "PDC dispatched"
+        },
+        {
+          id: "seed-lp-pdc-received",
+          customerCode: "SRI-311",
+          customerName: "Sunrise Retail",
+          invoiceNo: "INV-PDC-1003",
+          chequeNo: "CHQ-99003",
+          pdcDate: "2026-06-04",
+          bank: "SBI",
+          amount: 160000,
+          status: "PDC received"
+        },
+        {
+          id: "seed-lp-pdc-incorrect",
+          customerCode: "MNO-421",
+          customerName: "MonoChem Corp",
+          invoiceNo: "INV-PDC-1004",
+          chequeNo: "CHQ-99004",
+          pdcDate: "2026-06-03",
+          bank: "Axis",
+          amount: 95000,
+          status: "PDC details incorrect"
+        },
+        {
+          id: "seed-lp-pdc-banked",
+          customerCode: "LUM-512",
+          customerName: "Lumen Technologies",
+          invoiceNo: "INV-PDC-1005",
+          chequeNo: "CHQ-99005",
+          pdcDate: "2026-06-01",
+          bank: "Kotak",
+          amount: 360000,
+          status: "PDC banked"
+        },
+        {
+          id: "seed-lp-pdc-cleared",
+          customerCode: "MED-671",
+          customerName: "MediTrust Pvt Ltd",
+          invoiceNo: "INV-PDC-1006",
+          chequeNo: "CHQ-99006",
+          pdcDate: "2026-05-31",
+          bank: "IDFC",
+          amount: 50000,
+          status: "PDC cleared"
+        },
+        {
+          id: "seed-lp-pdc-bounced",
+          customerCode: "GEN-799",
+          customerName: "Generix Holdings",
+          invoiceNo: "INV-PDC-1007",
+          chequeNo: "CHQ-99007",
+          pdcDate: "2026-05-30",
+          bank: "HDFC",
+          amount: 120000,
+          status: "PDC bounced"
+        }
+      ];
+
+      const escapeHtml = (value) =>
+        String(value || "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+
+      const loadList = (key) => {
+        try {
+          const raw = localStorage.getItem(key);
+          const parsed = JSON.parse(raw || "[]");
+          return Array.isArray(parsed) ? parsed : [];
+        } catch (_) {
+          return [];
+        }
+      };
+
+      const saveList = (key, value) => {
+        try {
+          localStorage.setItem(key, JSON.stringify(Array.isArray(value) ? value : []));
+        } catch (_) {
+          // localStorage unavailable; keep page stable
+        }
+      };
+
+      const formatDateTime = (value) => {
+        const date = new Date(value || Date.now());
+        if (Number.isNaN(date.getTime())) return String(value || "-");
+        return date.toLocaleString("en-IN", {
+          day: "2-digit",
+          month: "short",
+          hour: "2-digit",
+          minute: "2-digit"
+        });
+      };
+
+      const formatCurrency = (amount) => `Rs. ${Number(amount || 0).toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
+
+      const detailValue = (details, label) => {
+        const key = String(label || "").toLowerCase();
+        const item = (details || []).find((entry) => String(entry?.label || "").toLowerCase() === key);
+        return item ? String(item.value || "") : "-";
+      };
+
+      const seedLandingPdcNotifications = () => {
+        const userName = localStorage.getItem("activeUserName") || "Agent";
+        const now = Date.now();
+        const records = loadList(pdcRecordKey);
+        const legacy = loadList(pdcNotificationKey);
+        const center = loadList(notificationCenterKey);
+        const recordIds = new Set(records.map((item) => String(item?.id || "")));
+        const legacyIds = new Set(legacy.map((item) => String(item?.id || "")));
+        const centerIds = new Set(center.map((item) => String(item?.id || "")));
+        let changedRecords = false;
+        let changedLegacy = false;
+        let changedCenter = false;
+
+        seeds.forEach((seed, index) => {
+          const meta = pdcStatusNotificationMap[seed.status];
+          const status = seed.status;
+          const timestamp = new Date(now - (index * 4 * 60 * 1000)).toISOString();
+          const label = String(meta?.statusLabel || seed.status || "").replace(/-/g, " ");
+          if (!recordIds.has(seed.id)) {
+            const history = [
+              {
+                status: "PDC logged",
+                remark: "Seeded dummy lifecycle.",
+                updatedAt: timestamp,
+                updatedBy: userName
+              }
+            ];
+            if (status !== "PDC logged") {
+              history.push({
+                status,
+                remark: `Seeded dummy lifecycle. Current status: ${status}.`,
+                updatedAt: timestamp,
+                updatedBy: userName
+              });
+            }
+            records.unshift({
+              ...seed,
+              status,
+              createdAt: timestamp,
+              createdBy: userName,
+              agentName: userName,
+              history
+            });
+            recordIds.add(seed.id);
+            changedRecords = true;
+          }
+
+          const appId = `seed-lp-pdc-app:${seed.id}`;
+          if (!centerIds.has(appId)) {
+            center.unshift({
+              id: appId,
+              type: "pdc",
+              title: `PDC ${label} app update`,
+              message: meta?.appMessage || `PDC status updated to ${status}.`,
+              createdAt: timestamp,
+              sentAt: timestamp,
+              read: false,
+              audience: ["all"],
+              details: [
+                { label: "Customer", value: `${seed.customerName || "-"} (${seed.customerCode || "-"})` },
+                { label: "Invoice", value: seed.invoiceNo || "-" },
+                { label: "Cheque", value: seed.chequeNo || "-" },
+                { label: "PDC date", value: seed.pdcDate || "-" },
+                { label: "Bank", value: seed.bank || "-" },
+                { label: "Amount", value: formatCurrency(seed.amount) },
+                { label: "Status", value: status || "-" }
+              ],
+              ctas: [
+                { label: "Open PDC", action: "open-pdc", invoiceNo: seed.invoiceNo || "" }
+              ],
+              data: { status }
+            });
+            centerIds.add(appId);
+            changedCenter = true;
+          }
+
+          if (meta?.email) {
+            const emailId = `seed-lp-pdc-email:${seed.id}`;
+            if (!centerIds.has(emailId)) {
+              center.unshift({
+                id: emailId,
+                type: "email",
+                title: `PDC ${label} email draft`,
+                message: `${meta.email.message} (Draft)`,
+                createdAt: timestamp,
+                sentAt: timestamp,
+                read: false,
+                audience: ["all"],
+                details: [
+                  { label: "From", value: meta.email.from || "-" },
+                  { label: "To", value: meta.email.to || "-" },
+                  { label: "Subject", value: `${seed.customerName || "Customer"}: ${meta.email.subject} - ${seed.chequeNo || seed.id}` },
+                  { label: "Invoice", value: seed.invoiceNo || "-" },
+                  { label: "Customer", value: seed.customerName || "-" },
+                  { label: "Status", value: status || "-" }
+                ],
+                ctas: [
+                  { label: "Open email", action: "open-email", invoiceNo: seed.invoiceNo || "" }
+                ],
+                data: { status, channel: "email" }
+              });
+              centerIds.add(emailId);
+              changedCenter = true;
+            }
+          }
+
+          if (meta && !legacyIds.has(appId)) {
+            legacy.unshift({
+              id: appId,
+              pdcId: seed.id,
+              type: "status",
+              status,
+              message: meta.appMessage || `PDC ${status} update`,
+              createdAt: timestamp,
+              sentAt: timestamp,
+              recipients: meta.recipients || "PDC Mgmt",
+              read: false
+            });
+            legacyIds.add(appId);
+            changedLegacy = true;
+          }
+        });
+
+        if (changedRecords) saveList(pdcRecordKey, records);
+        if (changedLegacy) saveList(pdcNotificationKey, legacy);
+        if (changedCenter) saveList(notificationCenterKey, center);
+      };
+
+      const renderActivityTrail = () => {
+        const trail = document.getElementById(activityTrailContainerId);
+        if (!trail) return;
+
+        const center = loadList(notificationCenterKey);
+        const lpSeedItems = center.filter((item) => {
+          const id = String(item?.id || "");
+          return id.startsWith("seed-lp-pdc-app:") || id.startsWith("seed-lp-pdc-email:");
+        });
+
+        if (lpSeedItems.length === 0) {
+          trail.innerHTML = "<div class=\"activityTrailEmpty\">No seeded PDC notifications found.</div>";
+          return;
+        }
+
+        const sorted = [...lpSeedItems].sort((a, b) =>
+          new Date(b.createdAt || b.sentAt || 0).getTime() - new Date(a.createdAt || a.sentAt || 0).getTime()
+        );
+
+        trail.innerHTML = sorted.map((note) => {
+          const isEmail = String(note.type || "").toLowerCase() === "email";
+          const details = Array.isArray(note.details) ? note.details : [];
+          const status = detailValue(details, "Status");
+          const meta = isEmail ? "Email draft" : "App notification";
+          const title = isEmail ? `PDC ${status} email` : `PDC ${status} update`;
+          const rowClass = isEmail ? "event-pdc-email" : "event-pdc";
+          const badge = isEmail ? "Email" : "Notification";
+          const time = formatDateTime(note.sentAt || note.createdAt);
+
+          return `
+            <details class="activityEvent ${rowClass}">
+              <summary>
+                <div>
+                  <div class="eventTitle">${escapeHtml(title)}</div>
+                  <div class="eventMeta eventStatusMeta">${escapeHtml(meta)}</div>
+                  <div class="eventMeta eventStatusTime">${escapeHtml(time)}</div>
+                </div>
+                <span class="eventBadge">${escapeHtml(badge)}</span>
+              </summary>
+              <div class="eventBody">
+                ${escapeHtml(note.message || "-")}
+                <div class="eventDetailLines">
+                  ${details.map((item) => `
+                    <div class="activityDetailLine">
+                      <span class="activityLabel">${escapeHtml(item.label || "-")}</span>
+                      <span class="activityValue">${escapeHtml(item.value || "-")}</span>
+                    </div>
+                  `).join("")}
+                </div>
+              </div>
+            </details>
+          `;
+        }).join("");
+      };
+
+      seedLandingPdcNotifications();
+      renderActivityTrail();
+    })();
+  </script>
   <script src="scripts/shared-header.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>

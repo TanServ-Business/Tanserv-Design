@@ -478,6 +478,43 @@ button.notifyBadge {
   color: #0f172a;
 }
 
+.directoryStatusStack {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex: 0 0 auto;
+}
+
+.directoryEmailBadge {
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.directoryEmailBadge i {
+  display: block;
+  line-height: 1;
+}
+
+.directoryEmailBadge.is-active {
+  background: #16a34a;
+  border: 1px solid #15803d;
+  color: #ffffff;
+}
+
+.directoryEmailBadge.is-inactive {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #64748b;
+}
+
 .directoryMeta {
   font-size: 10.5px;
   color: #64748b;
