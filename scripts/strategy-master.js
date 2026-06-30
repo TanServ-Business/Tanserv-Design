@@ -461,12 +461,13 @@
     targetHeading: document.getElementById("smTargetHeading"),
     targetDescription: document.getElementById("smTargetDescription"),
     targetCount: document.getElementById("smTargetCount"),
+    targetMode: document.getElementById("smTargetMode"),
+    targetModeHint: document.getElementById("smTargetModeHint"),
     targetSearch: document.getElementById("smTargetSearch"),
     targetSelectAll: document.getElementById("smTargetSelectAll"),
     targetClear: document.getElementById("smTargetClear"),
     targetList: document.getElementById("smTargetList"),
     templateCount: document.getElementById("smTemplateCount"),
-    previewTemplateBtn: document.getElementById("smPreviewTemplateBtn"),
     addTemplateBtn: document.getElementById("smAddTemplateBtn"),
     templateStack: document.getElementById("smTemplateStack"),
     footerMeta: document.getElementById("smFooterMeta"),
@@ -485,7 +486,9 @@
       status: "active",
       reminderType: "",
       targetType: "",
+      targetMode: "all",
       selectedTargetIds: [],
+      excludedTargetIds: [],
       templates: [createTemplateEntry("")]
     };
   }
@@ -931,13 +934,6 @@
     });
   }
 
-  function updatePreviewButton() {
-    ensureActiveTemplateUid();
-    const template = getTemplate(getTemplateEntry(state.activeTemplateUid)?.templateId);
-    els.previewTemplateBtn.disabled = !template;
-    els.previewTemplateBtn.title = template ? `Preview ${template.label}` : "Select a template first.";
-  }
-
   function populateTemplatePreview() {
     const entry = getTemplateEntry(state.activeTemplateUid);
     const template = getTemplate(entry?.templateId);
@@ -958,7 +954,10 @@
     els.templatePreviewFrame.srcdoc = buildPreviewHtml(template);
   }
 
-  function openTemplatePreview() {
+  function openTemplatePreview(templateUid = state.activeTemplateUid) {
+    if (templateUid) {
+      setActiveTemplate(templateUid, { silent: true });
+    }
     ensureActiveTemplateUid();
     const template = getTemplate(getTemplateEntry(state.activeTemplateUid)?.templateId);
     if (!template) {
@@ -985,7 +984,6 @@
     }
     state.activeTemplateUid = uid;
     syncActiveTemplateCards();
-    updatePreviewButton();
     if (state.isPreviewOpen && !options.silent) {
       populateTemplatePreview();
     }
@@ -1104,6 +1102,52 @@
   function sanitizeTargets() {
     const validIds = new Set(getTargetOptions(state.form.targetType).map((option) => option.id));
     state.form.selectedTargetIds = state.form.selectedTargetIds.filter((value) => validIds.has(value));
+    state.form.excludedTargetIds = state.form.excludedTargetIds.filter((value) => validIds.has(value));
+    state.form.targetMode = state.form.targetMode === "selected" ? "selected" : "all";
+  }
+
+  function getTargetCoverageOptions(targetType) {
+    if (targetType === "customer") {
+      return [
+        { value: "all", label: "All customers" },
+        { value: "selected", label: "Selected customer" }
+      ];
+    }
+    if (targetType === "invoice") {
+      return [
+        { value: "all", label: "All invoices" },
+        { value: "selected", label: "Selected invoices" }
+      ];
+    }
+    return [{ value: "all", label: "All records" }, { value: "selected", label: "Selected records" }];
+  }
+
+  function getTargetModeHint() {
+    if (state.form.targetType === "customer") {
+      return state.form.targetMode === "all"
+        ? "This strategy will be applied on all the customers. Any new customers added to the platform will automatically be added in the strategy. Use the list below only to exclude specific customers."
+        : "Select the customers this strategy should run for.";
+    }
+    if (state.form.targetType === "invoice") {
+      return state.form.targetMode === "all"
+        ? "This strategy will be applied on all the invoices. Any new invoices added to the platform will automatically be added in the strategy. Use the list below only to exclude specific invoices."
+        : "Select the invoices this strategy should run for.";
+    }
+    return "Choose a target first.";
+  }
+
+  function getTargetCountLabel(strategyLike = state.form) {
+    const targetType = strategyLike.targetType;
+    const targetMode = strategyLike.targetMode === "all" ? "all" : "selected";
+    const selectedCount = Array.isArray(strategyLike.selectedTargetIds) ? strategyLike.selectedTargetIds.length : 0;
+    const excludedCount = Array.isArray(strategyLike.excludedTargetIds) ? strategyLike.excludedTargetIds.length : 0;
+
+    if (!targetType) return "0 selected";
+    if (targetMode === "all") {
+      const noun = targetType === "customer" ? "customers" : "invoices";
+      return excludedCount ? `All ${noun}, ${excludedCount} excluded` : `All ${noun}`;
+    }
+    return `${selectedCount} selected`;
   }
 
   function readStorage(key) {
@@ -1186,6 +1230,14 @@
 
     const targetType = strategy.targetType || strategy.scope || "";
     const selectedTargetIds = dedupe(strategy.selectedTargetIds || strategy.selectedCustomerIds || strategy.selectedInvoiceNos || []);
+    const excludedTargetIds = dedupe(strategy.excludedTargetIds || strategy.excludedCustomerIds || strategy.excludedInvoiceNos || []);
+    const targetMode = strategy.targetMode === "all"
+      ? "all"
+      : strategy.targetMode === "selected"
+        ? "selected"
+        : selectedTargetIds.length
+          ? "selected"
+          : "all";
     const reminderType = ["pre_due", "post_due", "both"].includes(strategy.reminderType) ? strategy.reminderType : "";
 
     return {
@@ -1194,7 +1246,9 @@
       status: strategy.status === "inactive" ? "inactive" : "active",
       reminderType,
       targetType: targetType === "customer" || targetType === "invoice" ? targetType : "",
+      targetMode,
       selectedTargetIds,
+      excludedTargetIds,
       templates,
       updatedAt: strategy.updatedAt || ""
     };
@@ -1275,7 +1329,9 @@
       status: strategy.status,
       reminderType: strategy.reminderType || "",
       targetType: strategy.targetType,
+      targetMode: strategy.targetMode || "selected",
       selectedTargetIds: [...strategy.selectedTargetIds],
+      excludedTargetIds: [...(strategy.excludedTargetIds || [])],
       templates: normalizedTemplates.length ? normalizedTemplates : [createTemplateEntry("")]
     };
     state.activeTemplateUid = state.form.templates[0]?.uid || null;
@@ -1310,11 +1366,11 @@
       <tr>
         <td>
           <div class="smCellTitle">${escapeHtml(strategy.strategyName)}</div>
-          <div class="smCellMeta">${escapeHtml(strategy.templates.map((entry) => getTemplate(entry.templateId)?.label).filter(Boolean).join(", ") || "No mapped templates")}</div>
+          <div class="smCellMeta">${escapeHtml(strategy.templates.map((entry) => getTemplate(entry.templateId)?.label).filter(Boolean).join(", "))}</div>
         </td>
         <td><span class="smStatusPill is-${escapeHtml(strategy.status)}">${escapeHtml(titleCase(strategy.status))}</span></td>
         <td>${escapeHtml(titleCase(strategy.targetType))}</td>
-        <td>${escapeHtml(`${strategy.selectedTargetIds.length} selected`)}</td>
+        <td>${escapeHtml(getTargetCountLabel(strategy))}</td>
         <td>${escapeHtml(`${strategy.templates.length} template${strategy.templates.length === 1 ? "" : "s"}`)}</td>
         <td>
           <div class="smTableActions">
@@ -1334,6 +1390,7 @@
     els.statusLabel.textContent = state.form.status === "active" ? "Active" : "Inactive";
     els.reminderType.value = state.form.reminderType;
     els.targetType.value = state.form.targetType;
+    els.targetMode.value = state.form.targetMode;
     renderTargets();
     renderTemplates();
     els.footerMeta.textContent = `${state.form.templates.length} template block${state.form.templates.length === 1 ? "" : "s"} in this strategy.`;
@@ -1345,7 +1402,8 @@
     const visibleOptions = query
       ? options.filter((option) => `${option.label} ${option.meta}`.toLowerCase().includes(query))
       : options;
-    const selectedSet = new Set(state.form.selectedTargetIds);
+    const selectedSet = new Set(state.form.targetMode === "all" ? state.form.excludedTargetIds : state.form.selectedTargetIds);
+    const coverageOptions = getTargetCoverageOptions(state.form.targetType);
 
     const heading = state.form.targetType === "customer"
       ? "Target Customers *"
@@ -1354,14 +1412,20 @@
         : "Target Records";
 
     const description = state.form.targetType === "customer"
-      ? "Select the customers this strategy should run for."
+      ? "Choose whether this strategy should cover all customers or only selected customers."
       : state.form.targetType === "invoice"
-        ? "Select the invoices this strategy should run for."
+        ? "Choose whether this strategy should cover all invoices or only selected invoices."
         : "Pick Customer or Invoice first so the target list knows where to look.";
 
     els.targetHeading.textContent = heading;
     els.targetDescription.textContent = description;
-    els.targetCount.textContent = `${state.form.selectedTargetIds.length} selected`;
+    els.targetCount.textContent = getTargetCountLabel();
+    els.targetMode.innerHTML = coverageOptions.map((option) => `
+      <option value="${escapeHtml(option.value)}" ${state.form.targetMode === option.value ? "selected" : ""}>${escapeHtml(option.label)}</option>
+    `).join("");
+    els.targetModeHint.textContent = getTargetModeHint();
+    els.targetSelectAll.textContent = state.form.targetMode === "all" ? "Exclude all" : "Select all";
+    els.targetClear.textContent = state.form.targetMode === "all" ? "Clear exclusions" : "Clear";
     els.targetPickerSection.classList.toggle("hidden", !state.form.targetType);
 
     if (!state.form.targetType) {
@@ -1374,12 +1438,13 @@
       return;
     }
 
+    const checkboxLabel = state.form.targetMode === "all" ? "Exclude" : "Select";
     els.targetList.innerHTML = visibleOptions.map((option) => `
       <label class="smCheckRow">
         <input type="checkbox" data-target-id="${escapeHtml(option.id)}" ${selectedSet.has(option.id) ? "checked" : ""} />
         <span>
           <strong>${escapeHtml(option.label)}</strong>
-          <small>${escapeHtml(option.meta)}</small>
+          <small>${escapeHtml(`${checkboxLabel} • ${option.meta}`)}</small>
         </span>
       </label>
     `).join("");
@@ -1390,7 +1455,6 @@
     els.templateCount.textContent = `${state.form.templates.length} template${state.form.templates.length === 1 ? "" : "s"}`;
     els.templateStack.innerHTML = state.form.templates.map((entry, index) => renderTemplateCard(entry, index)).join("");
     syncActiveTemplateCards();
-    updatePreviewButton();
     if (state.isPreviewOpen) {
       populateTemplatePreview();
     }
@@ -1411,6 +1475,10 @@
               <span class="smMetaPill">${escapeHtml(template.supportedModes.map((mode) => MODE_LABELS[mode]).join(" / "))}</span>
               <span class="smMetaPill">${escapeHtml(template.supportedTimings.map((timing) => getTimingLabel(template, timing)).join(" / "))}</span>
             ` : ""}
+            <button class="smGhostBtn smTemplatePreviewBtn" type="button" data-preview-template="${escapeHtml(entry.uid)}" ${template ? "" : "disabled"} title="${template ? `Preview ${escapeHtml(template.label)}` : "Select a template first."}">
+              <i class="bi bi-envelope-paper" aria-hidden="true"></i>
+              Preview Template
+            </button>
             <button class="smTinyBtn is-danger ${state.form.templates.length === 1 ? "hidden" : ""}" type="button" data-remove-template="${escapeHtml(entry.uid)}">Remove</button>
           </div>
         </div>
@@ -1900,13 +1968,14 @@
   }
 
   function toggleTarget(targetId, checked) {
-    const selected = new Set(state.form.selectedTargetIds);
+    const targetKey = state.form.targetMode === "all" ? "excludedTargetIds" : "selectedTargetIds";
+    const selected = new Set(state.form[targetKey]);
     if (checked) {
       selected.add(targetId);
     } else {
       selected.delete(targetId);
     }
-    state.form.selectedTargetIds = [...selected];
+    state.form[targetKey] = [...selected];
     renderTargets();
   }
 
@@ -1916,12 +1985,13 @@
     const visibleIds = options
       .filter((option) => !query || `${option.label} ${option.meta}`.toLowerCase().includes(query))
       .map((option) => option.id);
+    const targetKey = state.form.targetMode === "all" ? "excludedTargetIds" : "selectedTargetIds";
 
     if (action === "all") {
-      state.form.selectedTargetIds = dedupe([...state.form.selectedTargetIds, ...visibleIds]);
+      state.form[targetKey] = dedupe([...state.form[targetKey], ...visibleIds]);
     } else {
       const visibleSet = new Set(visibleIds);
-      state.form.selectedTargetIds = state.form.selectedTargetIds.filter((value) => !visibleSet.has(value));
+      state.form[targetKey] = state.form[targetKey].filter((value) => !visibleSet.has(value));
     }
     renderTargets();
   }
@@ -1936,7 +2006,7 @@
     if (!state.form.reminderType) {
       return "Reminder type must be selected.";
     }
-    if (!state.form.selectedTargetIds.length) {
+    if (state.form.targetMode === "selected" && !state.form.selectedTargetIds.length) {
       return `Select at least one ${state.form.targetType}.`;
     }
 
@@ -1976,7 +2046,9 @@
       status: state.form.status,
       reminderType: state.form.reminderType,
       targetType: state.form.targetType,
+      targetMode: state.form.targetMode,
       selectedTargetIds: [...state.form.selectedTargetIds],
+      excludedTargetIds: [...state.form.excludedTargetIds],
       templates: state.form.templates.map((entry) => ({
         uid: entry.uid,
         templateId: entry.templateId,
@@ -2061,8 +2133,22 @@
     });
     els.targetType.addEventListener("change", (event) => {
       state.form.targetType = event.target.value;
+      state.form.targetMode = "all";
+      state.form.selectedTargetIds = [];
+      state.form.excludedTargetIds = [];
+      state.targetSearch = "";
+      els.targetSearch.value = "";
       sanitizeTargets();
       renderBuilder();
+    });
+
+    els.targetMode.addEventListener("change", (event) => {
+      state.form.targetMode = event.target.value === "selected" ? "selected" : "all";
+      state.form.selectedTargetIds = [];
+      state.form.excludedTargetIds = [];
+      state.targetSearch = "";
+      els.targetSearch.value = "";
+      renderTargets();
     });
 
     els.targetSearch.addEventListener("input", (event) => {
@@ -2078,7 +2164,6 @@
       }
     });
 
-    els.previewTemplateBtn.addEventListener("click", openTemplatePreview);
     els.templatePreviewClose.addEventListener("click", closeTemplatePreview);
     els.templatePreviewFooterClose.addEventListener("click", closeTemplatePreview);
     els.templatePreviewModal.addEventListener("click", (event) => {
@@ -2092,6 +2177,11 @@
       const templateCard = event.target.closest("[data-template-card]");
       if (templateCard) {
         setActiveTemplate(templateCard.dataset.templateUid, { silent: true });
+      }
+      const previewTemplateBtn = event.target.closest("[data-preview-template]");
+      if (previewTemplateBtn) {
+        openTemplatePreview(previewTemplateBtn.dataset.previewTemplate);
+        return;
       }
       const invoiceCollapseBtn = event.target.closest("[data-invoice-collapse-kind]");
       if (invoiceCollapseBtn) {

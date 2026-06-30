@@ -143,6 +143,17 @@
               <div class="smCountPill" id="smTargetCount">0 selected</div>
             </div>
 
+            <div class="smTargetModeRow">
+              <label class="smField">
+                <span>Target Coverage</span>
+                <select id="smTargetMode">
+                  <option value="all">All records</option>
+                  <option value="selected">Selected records</option>
+                </select>
+              </label>
+              <div class="smTargetModeHint" id="smTargetModeHint">Choose a target first.</div>
+            </div>
+
             <div class="smFilterBar">
               <label class="smSearchField">
                 <i class="bi bi-search" aria-hidden="true"></i>
@@ -167,10 +178,6 @@
             </div>
             <div class="smSectionActions">
               <div class="smCountPill" id="smTemplateCount">0 templates</div>
-              <button class="smGhostBtn" id="smPreviewTemplateBtn" type="button" disabled>
-                <i class="bi bi-envelope-paper" aria-hidden="true"></i>
-                Preview Template
-              </button>
               <button class="smPrimaryBtn" id="smAddTemplateBtn" type="button">
                 <i class="bi bi-plus-circle" aria-hidden="true"></i>
                 Add Template

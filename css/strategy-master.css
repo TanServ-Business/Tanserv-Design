@@ -106,6 +106,27 @@ body {
   border-bottom: 1px solid #e2e8f4;
 }
 
+.smTargetModeRow {
+  display: grid;
+  grid-template-columns: minmax(180px, 260px) minmax(0, 1fr);
+  gap: 12px;
+  align-items: end;
+  margin-bottom: 12px;
+}
+
+.smTargetModeHint {
+  border: 1px solid #d8e3f0;
+  border-radius: 14px;
+  background: #fff;
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.45;
+  padding: 10px 12px;
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+}
+
 .smSearchField {
   display: flex;
   align-items: center;
@@ -1000,6 +1021,7 @@ body {
 @media (max-width: 1180px) {
   .smTemplateOverviewGrid,
   .smTemplateSupportGrid,
+  .smTargetModeRow,
   .smGrid3 {
     grid-template-columns: 1fr;
   }

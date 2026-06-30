@@ -1274,7 +1274,13 @@ function buildSeedStrategyNotifications() {
       },
       nextNotificationByInvoice: {
         "INV-10291": { scheduledAt: makeFutureIso(6), template: "Payment reminder" },
-        "INV-10308": { scheduledAt: makeFutureIso(10), template: "Overdue notice" }
+        "INV-10270": { scheduledAt: makeFutureIso(8), template: "Payment reminder" },
+        "INV-10308": { scheduledAt: makeFutureIso(10), template: "Overdue notice" },
+        "INV-10188": { scheduledAt: makeFutureIso(12), template: "Payment reminder" },
+        "INV-10402": { scheduledAt: makeFutureIso(16), template: "Payment reminder" },
+        "INV-10433": { scheduledAt: makeFutureIso(20), template: "Overdue notice" },
+        "INV-10457": { scheduledAt: makeFutureIso(24), template: "PTP confirmation" },
+        "INV-10471": { scheduledAt: makeFutureIso(28), template: "Escalation notice" }
       },
       createdAt: new Date(Date.now() - (36 * 60 * 60 * 1000)).toISOString()
     },
@@ -1283,7 +1289,7 @@ function buildSeedStrategyNotifications() {
       customerId: "c1",
       customerName: "Apollo Pharmachy Pvt. Ltd.",
       scope: "invoice",
-      invoiceNos: ["INV-10308"],
+      invoiceNos: ["INV-10308", "INV-10457"],
       strategyName: "Apollo PTP confirmation sequence",
       reminderType: "post due",
       status: "active",
@@ -1297,7 +1303,8 @@ function buildSeedStrategyNotifications() {
         agingBuckets: ["0-30"]
       },
       nextNotificationByInvoice: {
-        "INV-10308": { scheduledAt: makeFutureIso(2), template: "PTP confirmation" }
+        "INV-10308": { scheduledAt: makeFutureIso(2), template: "PTP confirmation" },
+        "INV-10457": { scheduledAt: makeFutureIso(14), template: "PTP confirmation" }
       },
       createdAt: new Date(Date.now() - (12 * 60 * 60 * 1000)).toISOString()
     },
@@ -1320,10 +1327,41 @@ function buildSeedStrategyNotifications() {
         agingBuckets: ["31-60", "61-90"]
       },
       nextNotificationByInvoice: {
+        "INV-22011": { scheduledAt: makeFutureIso(7), template: "Escalation notice" },
         "INV-22018": { scheduledAt: makeFutureIso(18), template: "Escalation notice" },
+        "INV-22027": { scheduledAt: makeFutureIso(11), template: "Overdue notice" },
+        "INV-22045": { scheduledAt: makeFutureIso(13), template: "Escalation notice" },
+        "INV-22059": { scheduledAt: makeFutureIso(22), template: "Overdue notice" },
         "INV-22063": { scheduledAt: makeFutureIso(26), template: "Overdue notice" }
       },
       createdAt: new Date(Date.now() - (60 * 60 * 1000)).toISOString()
+    },
+    {
+      id: "seed-strategy-sunrise-reminder",
+      customerId: "c3",
+      customerName: "Sunrise Pvt",
+      scope: "customer",
+      invoiceNos: [],
+      strategyName: "Sunrise collection reminder stream",
+      reminderType: "pre due",
+      status: "active",
+      notificationMode: "custom",
+      keyAccountFilter: "Yes",
+      reminderSteps: [
+        { when: "before_due", days: 2, template: "Payment reminder", attachment: "Invoice copy" }
+      ],
+      invoiceFilters: {
+        subStatus: ["Within Credit Period/Days", "PTP"],
+        agingBuckets: ["0-30", "31-60"]
+      },
+      nextNotificationByInvoice: {
+        "INV-77102": { scheduledAt: makeFutureIso(5), template: "Payment reminder" },
+        "INV-77118": { scheduledAt: makeFutureIso(9), template: "Payment reminder" },
+        "INV-77133": { scheduledAt: makeFutureIso(15), template: "Overdue notice" },
+        "INV-77150": { scheduledAt: makeFutureIso(19), template: "Payment reminder" },
+        "INV-77179": { scheduledAt: makeFutureIso(27), template: "Overdue notice" }
+      },
+      createdAt: new Date(Date.now() - (48 * 60 * 60 * 1000)).toISOString()
     },
     {
       id: "seed-strategy-apollo-history-only",
@@ -4989,6 +5027,39 @@ function doesStrategyApplyToInvoice(strategy, invoiceNo, customerId = selectedCu
   return invoiceNos.includes(invoiceNo);
 }
 
+function excludeInvoiceFromStrategy(strategyId, invoiceNo) {
+  if (!strategyId || !invoiceNo) return null;
+  const strategies = loadStrategyNotifications();
+  const targetIndex = strategies.findIndex((item) => item && item.id === strategyId);
+  if (targetIndex < 0) return null;
+
+  const strategy = strategies[targetIndex];
+  const scope = getNormalizedStrategyScope(strategy.scope);
+  if (scope === "invoice") {
+    const remainingInvoices = (Array.isArray(strategy.invoiceNos) ? strategy.invoiceNos : []).filter((value) => value !== invoiceNo);
+    if (remainingInvoices.length === 0) {
+      strategies.splice(targetIndex, 1);
+    } else {
+      strategies[targetIndex] = {
+        ...strategy,
+        invoiceNos: remainingInvoices
+      };
+    }
+  } else {
+    const excludedInvoiceNos = dedupeArray([...(Array.isArray(strategy.excludedInvoiceNos) ? strategy.excludedInvoiceNos : []), invoiceNo]);
+    strategies[targetIndex] = {
+      ...strategy,
+      excludedInvoiceNos
+    };
+  }
+
+  saveStrategyNotifications(strategies);
+  return {
+    strategyName: strategy.strategyName || "the strategy",
+    removedStrategy: scope === "invoice" && !strategies.some((item) => item && item.id === strategyId)
+  };
+}
+
 function getStrategyScheduledNotificationForInvoice(strategy, invoiceNo) {
   if (!strategy || !invoiceNo) return null;
   const nextByInvoice = strategy.nextNotificationByInvoice;
@@ -5245,8 +5316,11 @@ function closeStrategyMultiSelects() {
 function setStrategyFormMode(mode, strategy = null) {
   const wrap = document.getElementById("strategyFormWrap");
   const titleEl = wrap ? wrap.querySelector(".strategyFormTitle") : null;
+  const detailView = document.getElementById("strategyDetailView");
+  const editorView = document.getElementById("strategyEditorView");
   const saveBtn = document.getElementById("strategySaveBtn");
   const editBtn = document.getElementById("strategyEditBtn");
+  const cancelBtn = document.getElementById("strategyCancelBtn");
   const addStepBtn = document.getElementById("strategyAddStepBtn");
   strategyFormMeta.mode = mode;
   strategyFormMeta.strategyId = strategy?.id || null;
@@ -5255,6 +5329,8 @@ function setStrategyFormMode(mode, strategy = null) {
   const isReadOnly = mode === "view";
 
   if (wrap) wrap.classList.toggle("is-readonly", isReadOnly);
+  if (detailView) detailView.classList.toggle("hidden", !isReadOnly);
+  if (editorView) editorView.classList.toggle("hidden", isReadOnly);
   if (titleEl) {
     if (mode === "view") titleEl.textContent = "Strategy details";
     else if (mode === "edit") titleEl.textContent = "Edit strategy";
@@ -5265,8 +5341,9 @@ function setStrategyFormMode(mode, strategy = null) {
     saveBtn.textContent = mode === "edit" ? "Update strategy" : "Save strategy";
   }
   if (editBtn) {
-    editBtn.classList.toggle("hidden", mode !== "view");
+    editBtn.classList.add("hidden");
   }
+  if (cancelBtn) cancelBtn.textContent = mode === "view" ? "Back" : "Cancel";
   if (addStepBtn) {
     addStepBtn.classList.toggle("hidden", mode === "view");
     addStepBtn.disabled = mode === "view";
@@ -5315,11 +5392,17 @@ function showStrategyForm(show, options = {}) {
   const requestedMode = String(options.mode || "create").toLowerCase();
   const strategy = requestedMode === "view" || requestedMode === "edit" ? options.strategy || null : null;
   const resolvedMode = strategy ? (requestedMode === "edit" ? "edit" : "view") : "create";
+  setStrategyFormMode(resolvedMode, strategy);
+  setStrategyFormError("");
+
+  if (resolvedMode === "view" && strategy) {
+    renderStrategyDetailView(strategy);
+    closeStrategyMultiSelects();
+    return;
+  }
+
   resetStrategyFormState(customer, strategy);
   applyStrategyFormValues(strategy);
-  setStrategyFormMode(resolvedMode, strategy);
-
-  setStrategyFormError("");
   renderStrategySubStatusOptions();
   renderStrategyAgingOptions();
   renderStrategyReminderSteps();
@@ -5462,6 +5545,353 @@ function getNextStrategyEmailsForInvoice(invoiceNo, customerId = selectedCustome
     }));
 }
 
+function formatStrategyDisplayLabel(value) {
+  const raw = String(value || "").trim();
+  if (!raw) return "-";
+  const normalized = raw.toLowerCase();
+  const overrides = {
+    active: "Active",
+    inactive: "Inactive",
+    customer: "Customer",
+    invoice: "Invoice",
+    custom: "Custom",
+    ongoing: "Ongoing",
+    yes: "YES",
+    no: "NO",
+    all: "All",
+    "pre due": "Pre Due",
+    "post due": "Post Due",
+    both: "Both"
+  };
+  if (overrides[normalized]) return overrides[normalized];
+  return raw;
+}
+
+function normalizeStrategyTemplateKey(value) {
+  return String(value || "").trim().toLowerCase().replace(/[^a-z0-9]+/g, "");
+}
+
+function getStrategyTimingLabelForTemplate(templateName, whenValue) {
+  const templateKey = normalizeStrategyTemplateKey(templateName);
+  const normalizedWhen = String(whenValue || "").trim().toLowerCase().startsWith("after") ? "after" : "before";
+
+  if (templateKey === "ptpmissedmail" || templateKey === "ptpmissed") {
+    return "Days After PTP Date";
+  }
+  if (templateKey === "ptpconfirmationmail") {
+    return normalizedWhen === "after" ? "Days After PTP Date" : "Days Before PTP Date";
+  }
+  if (templateKey === "acknowledgementofinvoicereceipt") {
+    return "Days After Invoice And Document Uploaded";
+  }
+  if (templateKey === "chequebounce") {
+    return "Days After Cheque Bounced";
+  }
+  if (templateKey === "requestforpaymentadviceordetails") {
+    return "Days After Collected/Part Collected";
+  }
+  if (templateKey === "newinvoicenoos" || templateKey === "newinvoiceexistingcustomer") {
+    return "Days After New Invoice Is Uploaded";
+  }
+  return normalizedWhen === "after" ? "Days After Due Date" : "Days Before Due Date";
+}
+
+function getStrategyStepAttachments(step) {
+  if (Array.isArray(step?.attachments)) {
+    return step.attachments.map((item) => String(item || "").trim()).filter(Boolean);
+  }
+  const raw = String(step?.attachment || "").trim();
+  if (!raw || raw === "-") return [];
+  return raw.split(/[|,;]+/).map((item) => item.trim()).filter(Boolean);
+}
+
+function getStrategyDetailTemplateBlocks(strategy, invoiceNo = "") {
+  const scheduledTemplate = invoiceNo ? getStrategyScheduledNotificationForInvoice(strategy, invoiceNo)?.template || "" : "";
+  const reminderSteps = Array.isArray(strategy?.reminderSteps) ? strategy.reminderSteps : [];
+  const grouped = new Map();
+
+  reminderSteps.forEach((step, index) => {
+    const template = String(step?.template || "").trim() || scheduledTemplate || "Template";
+    if (!grouped.has(template)) {
+      grouped.set(template, { label: template, steps: [] });
+    }
+    grouped.get(template).steps.push({ ...step, __index: index });
+  });
+
+  if (grouped.size === 0) {
+    grouped.set(scheduledTemplate || "Template", { label: scheduledTemplate || "Template", steps: [] });
+  }
+
+  return [...grouped.values()];
+}
+
+function groupStrategySubStatusesForDetail(values = []) {
+  const groups = new Map();
+  const uncategorized = [];
+
+  (Array.isArray(values) ? values : []).forEach((value) => {
+    const status = String(value || "").trim();
+    if (!status) return;
+    const row = findDispositionRowBySubStatus(status);
+    if (!row) {
+      uncategorized.push(status);
+      return;
+    }
+
+    if (!groups.has(row.broadStatus)) {
+      groups.set(row.broadStatus, new Map());
+    }
+    const primaryMap = groups.get(row.broadStatus);
+    if (!primaryMap.has(row.primaryStatus)) {
+      primaryMap.set(row.primaryStatus, []);
+    }
+    const subStatuses = primaryMap.get(row.primaryStatus);
+    if (!subStatuses.includes(status)) {
+      subStatuses.push(status);
+    }
+  });
+
+  const orderedGroups = [...groups.entries()].map(([broadStatus, primaryMap]) => ({
+    broadStatus,
+    primaries: [...primaryMap.entries()].map(([primaryStatus, subStatuses]) => ({
+      primaryStatus,
+      subStatuses
+    }))
+  }));
+
+  if (uncategorized.length) {
+    orderedGroups.push({
+      broadStatus: "Other",
+      primaries: [
+        {
+          primaryStatus: "Unmapped",
+          subStatuses: uncategorized
+        }
+      ]
+    });
+  }
+
+  return orderedGroups;
+}
+
+function renderStrategyDetailField(label, value) {
+  return `
+    <div class="strategyDetailField">
+      <span class="strategyDetailFieldLabel">${escapeHtml(label)}</span>
+      <div class="strategyDetailFieldValue">${escapeHtml(value || "-")}</div>
+    </div>
+  `;
+}
+
+function renderStrategyReminderPanelForDetail(templateBlock, strategy) {
+  const mode = getNormalizedStrategyMode(strategy?.notificationMode);
+  const steps = Array.isArray(templateBlock?.steps) ? templateBlock.steps : [];
+
+  if (mode === "ongoing") {
+    return `
+      <section class="strategyDetailPanel">
+        <div class="strategyDetailPanelHead">
+          <div>
+            <h5>Recurring Reminder</h5>
+            <p>Ongoing mode remains template-dependent. This strategy does not carry interval detail in LPagent seed data.</p>
+          </div>
+        </div>
+        <div class="strategyDetailEmpty">No recurring interval details available in this strategy record.</div>
+      </section>
+    `;
+  }
+
+  return `
+    <section class="strategyDetailPanel">
+      <div class="strategyDetailPanelHead">
+        <div>
+          <h5>Reminder Steps</h5>
+          <p>Custom mode uses template-specific timing labels for each reminder step.</p>
+        </div>
+        <div class="strategyDetailCountPill">${steps.length} step${steps.length === 1 ? "" : "s"}</div>
+      </div>
+      ${steps.length ? `
+        <div class="strategyDetailReminderTable">
+          <div class="strategyDetailReminderHead">
+            <span>#</span>
+            <span>When</span>
+            <span>Days</span>
+            <span>Attachments</span>
+          </div>
+          ${steps.map((step, index) => `
+            <div class="strategyDetailReminderRow">
+              <span class="strategyDetailReminderIndex">${index + 1}</span>
+              <div class="strategyDetailReminderValue">${escapeHtml(getStrategyTimingLabelForTemplate(templateBlock.label, step?.when || ""))}</div>
+              <div class="strategyDetailReminderValue">${escapeHtml(String(step?.days ?? "-"))}</div>
+              <div class="strategyDetailChipRow">
+                ${getStrategyStepAttachments(step).length
+                  ? getStrategyStepAttachments(step).map((attachment) => `<span class="strategyDetailChip">${escapeHtml(attachment)}</span>`).join("")
+                  : `<span class="strategyDetailChip">No attachment</span>`}
+              </div>
+            </div>
+          `).join("")}
+        </div>
+      ` : `<div class="strategyDetailEmpty">No reminder steps configured for this template block.</div>`}
+    </section>
+  `;
+}
+
+function renderStrategyStatusPanelForDetail(strategy) {
+  const groupedStatuses = groupStrategySubStatusesForDetail(strategy?.invoiceFilters?.subStatus || []);
+  return `
+    <section class="strategyDetailPanel">
+      <div class="strategyDetailPanelHead">
+        <div>
+          <h5>Invoice Status Filters</h5>
+          <p>Broad status, primary status, and sub-status summary for this strategy.</p>
+        </div>
+        <div class="strategyDetailCountPill">${Array.isArray(strategy?.invoiceFilters?.subStatus) ? strategy.invoiceFilters.subStatus.length : 0} selected</div>
+      </div>
+      ${groupedStatuses.length ? `
+        <div class="strategyDetailHierarchy">
+          ${groupedStatuses.map((group) => `
+            <div class="strategyDetailHierarchyGroup">
+              <div class="strategyDetailHierarchyTitle">${escapeHtml(group.broadStatus)}</div>
+              ${group.primaries.map((primary) => `
+                <div class="strategyDetailHierarchyBranch">
+                  <div class="strategyDetailHierarchyLabel">${escapeHtml(primary.primaryStatus)}</div>
+                  <div class="strategyDetailChipRow">
+                    ${primary.subStatuses.map((subStatus) => `<span class="strategyDetailChip">${escapeHtml(subStatus)}</span>`).join("")}
+                  </div>
+                </div>
+              `).join("")}
+            </div>
+          `).join("")}
+        </div>
+      ` : `<div class="strategyDetailEmpty">No invoice status filters configured.</div>`}
+    </section>
+  `;
+}
+
+function renderStrategyAgingPanelForDetail(strategy) {
+  const agingBuckets = Array.isArray(strategy?.invoiceFilters?.agingBuckets) ? strategy.invoiceFilters.agingBuckets : [];
+  return `
+    <section class="strategyDetailPanel">
+      <div class="strategyDetailPanelHead">
+        <div>
+          <h5>Aging Buckets</h5>
+          <p>Debt ageing bands currently attached to this strategy.</p>
+        </div>
+        <div class="strategyDetailCountPill">${agingBuckets.length} selected</div>
+      </div>
+      ${agingBuckets.length
+        ? `<div class="strategyDetailChipRow">${agingBuckets.map((bucket) => `<span class="strategyDetailChip">${escapeHtml(bucket)}</span>`).join("")}</div>`
+        : `<div class="strategyDetailEmpty">No aging buckets configured.</div>`}
+    </section>
+  `;
+}
+
+function renderStrategyDetailView(strategy) {
+  const detailEl = document.getElementById("strategyDetailView");
+  if (!detailEl) return;
+  if (!strategy) {
+    detailEl.innerHTML = "";
+    return;
+  }
+
+  const activeInvoiceNo = currentInvoiceNoForDocs || "";
+  const customer = getSelectedCustomerRecord() || customersData.find((item) => item.id === strategy.customerId) || null;
+  const data = getStrategyPresentationData(strategy, { invoiceNo: activeInvoiceNo, customer });
+  const templateBlocks = getStrategyDetailTemplateBlocks(strategy, activeInvoiceNo);
+  const targetDescription = data.scope === "invoice"
+    ? `${data.invoiceCount} linked invoice${data.invoiceCount === 1 ? "" : "s"} in this strategy.`
+    : "Customer-wide coverage across eligible invoices.";
+  const targetChips = data.scope === "invoice"
+    ? (data.invoiceNos.length
+        ? data.invoiceNos.map((invoiceNo) => `<span class="strategyDetailChip">${escapeHtml(invoiceNo)}</span>`).join("")
+        : `<span class="strategyDetailChip">No linked invoice</span>`)
+    : `<span class="strategyDetailChip">${escapeHtml(data.customerName)}</span>`;
+
+  detailEl.innerHTML = `
+    <section class="strategyDetailSection">
+      <div class="strategyDetailSectionHead">
+        <div>
+          <div class="strategyDetailKicker">Section 1</div>
+          <h3>Basics &amp; Target</h3>
+          <p>Strategy shell, scope, and target coverage.</p>
+        </div>
+        <div class="strategyDetailStatusToggle ${data.status === "active" ? "" : "is-inactive"}">
+          <span>Status</span>
+          <strong>${escapeHtml(formatStrategyDisplayLabel(data.status))}</strong>
+        </div>
+      </div>
+
+      <div class="strategyDetailGrid is-three">
+        ${renderStrategyDetailField("Strategy Name", data.strategyName)}
+        ${renderStrategyDetailField("Reminder Type", formatStrategyDisplayLabel(data.reminderType))}
+        ${renderStrategyDetailField("Target", formatStrategyDisplayLabel(data.scope))}
+      </div>
+
+      <div class="strategyDetailTargetBar">
+        <div class="strategyDetailTargetHead">
+          <div class="strategyDetailTargetTitle">Target Records</div>
+          <div class="strategyDetailTargetMeta">${escapeHtml(targetDescription)}</div>
+        </div>
+        <div class="strategyDetailChipRow">${targetChips}</div>
+      </div>
+    </section>
+
+    <section class="strategyDetailSection">
+      <div class="strategyDetailSectionHead">
+        <div>
+          <div class="strategyDetailKicker">Section 2</div>
+          <h3>Templates</h3>
+          <p>Each template block owns the notification mode, reminder schedule, and filters.</p>
+        </div>
+        <div class="strategyDetailCountPill">${templateBlocks.length} template${templateBlocks.length === 1 ? "" : "s"}</div>
+      </div>
+
+      ${templateBlocks.map((templateBlock, index) => {
+        const timingLabels = dedupeArray(templateBlock.steps.map((step) => getStrategyTimingLabelForTemplate(templateBlock.label, step?.when || "")));
+        return `
+          <article class="strategyDetailTemplateCard">
+            <div class="strategyDetailTemplateHead">
+              <div>
+                <div class="strategyDetailKicker">Template ${index + 1}</div>
+                <h4>${escapeHtml(templateBlock.label || "Template")}</h4>
+                <p>This template block follows the same structure as Strategy Master: notification settings, reminders, status filters, and ageing buckets.</p>
+              </div>
+              <div class="strategyDetailMetaPills">
+                <span class="strategyDetailMetaPill">${escapeHtml(formatStrategyDisplayLabel(data.notificationMode))}</span>
+                ${timingLabels.map((label) => `<span class="strategyDetailMetaPill">${escapeHtml(label)}</span>`).join("")}
+              </div>
+            </div>
+
+            <div class="strategyDetailTemplateBody">
+              <div class="strategyDetailOverviewGrid">
+                <section class="strategyDetailPanel">
+                  <div class="strategyDetailPanelHead">
+                    <div>
+                      <h5>Notification Settings</h5>
+                      <p>Template, mode, and key-account scope are defined here.</p>
+                    </div>
+                  </div>
+                  <div class="strategyDetailGrid is-three">
+                    ${renderStrategyDetailField("Template", templateBlock.label || "-")}
+                    ${renderStrategyDetailField("Notification Mode", formatStrategyDisplayLabel(data.notificationMode))}
+                    ${renderStrategyDetailField("Key Account Filter", formatStrategyDisplayLabel(data.keyAccountFilter))}
+                  </div>
+                </section>
+                ${renderStrategyReminderPanelForDetail(templateBlock, strategy)}
+              </div>
+
+              <div class="strategyDetailSupportGrid">
+                ${renderStrategyStatusPanelForDetail(strategy)}
+                ${renderStrategyAgingPanelForDetail(strategy)}
+              </div>
+            </div>
+          </article>
+        `;
+      }).join("")}
+    </section>
+  `;
+}
+
 function renderStrategyPanelContext(activeInvoiceNo) {
   const contextEl = document.getElementById("strategyPanelContext");
   const titleEl = document.getElementById("strategyPanelTitle");
@@ -5509,8 +5939,14 @@ function renderStrategyNextEmailSummary(invoiceNo, customerId = selectedCustomer
     ? getNextStrategyEmailsForCustomer(customerId, 5)
     : getNextStrategyEmailsForInvoice(invoiceNo, customerId, 5);
   if (!emails.length) {
-    summaryEl.classList.add("hidden");
-    summaryEl.innerHTML = "";
+    summaryEl.innerHTML = `
+      <div class="strategyNextEmailHead">
+        <div class="strategyNextEmailTitle">Next Emails</div>
+        <div class="strategyNextEmailCount">0 scheduled</div>
+      </div>
+      <div class="strategyNextEmailEmpty">No emails scheduled</div>
+    `;
+    summaryEl.classList.remove("hidden");
     return;
   }
 
@@ -5671,7 +6107,7 @@ function wireStrategyNotificationEvents() {
   const agingMenu = document.getElementById("strategyAgingMenu");
   const subStatusWrap = document.getElementById("strategySubStatusSelectWrap");
   const agingWrap = document.getElementById("strategyAgingSelectWrap");
-  if (!createBtn || !cancelBtn || !saveBtn) return;
+  if (!cancelBtn || !saveBtn) return;
 
   if (headerCreateBtn) {
     headerCreateBtn.addEventListener("click", () => {
@@ -5679,9 +6115,11 @@ function wireStrategyNotificationEvents() {
     });
   }
 
-  createBtn.addEventListener("click", () => {
-    showStrategyForm(true, { mode: "create" });
-  });
+  if (createBtn) {
+    createBtn.addEventListener("click", () => {
+      showStrategyForm(true, { mode: "create" });
+    });
+  }
 
   cancelBtn.addEventListener("click", () => {
     showStrategyForm(false);
@@ -5708,35 +6146,12 @@ function wireStrategyNotificationEvents() {
         const invoiceNo = excludeBtn.getAttribute("data-invoice-no") || "";
         if (!strategyId || !invoiceNo) return;
 
-        const strategies = loadStrategyNotifications();
-        const targetIndex = strategies.findIndex((item) => item && item.id === strategyId);
-        if (targetIndex < 0) return;
-
-        const strategy = strategies[targetIndex];
-        const scope = getNormalizedStrategyScope(strategy.scope);
-        if (scope === "invoice") {
-          const remainingInvoices = (Array.isArray(strategy.invoiceNos) ? strategy.invoiceNos : []).filter((value) => value !== invoiceNo);
-          if (remainingInvoices.length === 0) {
-            strategies.splice(targetIndex, 1);
-          } else {
-            strategies[targetIndex] = {
-              ...strategy,
-              invoiceNos: remainingInvoices
-            };
-          }
-        } else {
-          const excludedInvoiceNos = dedupeArray([...(Array.isArray(strategy.excludedInvoiceNos) ? strategy.excludedInvoiceNos : []), invoiceNo]);
-          strategies[targetIndex] = {
-            ...strategy,
-            excludedInvoiceNos
-          };
-        }
-
-        saveStrategyNotifications(strategies);
+        const result = excludeInvoiceFromStrategy(strategyId, invoiceNo);
+        if (!result) return;
         renderStrategyNotifications();
         applyFiltersAndRender();
         syncRunningStrategyModalIfOpen();
-        showTransientNotification("Invoice excluded", `${invoiceNo} was excluded from ${strategy.strategyName || "the strategy"}.`);
+        showTransientNotification("Invoice excluded", `${invoiceNo} was excluded from ${result.strategyName}.`);
         return;
       }
 
@@ -5994,6 +6409,20 @@ function wireRunningStrategyModalEvents() {
     if (runningStrategyModalIndex >= runningStrategyModalItems.length - 1) return;
     runningStrategyModalIndex += 1;
     renderRunningStrategyModal();
+  });
+
+  modalEl.addEventListener("click", (event) => {
+    const excludeBtn = event.target.closest("[data-running-strategy-exclude]");
+    if (!excludeBtn) return;
+    const strategyId = excludeBtn.getAttribute("data-running-strategy-exclude") || "";
+    const invoiceNo = excludeBtn.getAttribute("data-invoice-no") || runningStrategyModalInvoiceNo || "";
+    const result = excludeInvoiceFromStrategy(strategyId, invoiceNo);
+    if (!result) return;
+
+    renderStrategyNotifications();
+    applyFiltersAndRender();
+    syncRunningStrategyModalIfOpen();
+    showTransientNotification("Invoice excluded", `${invoiceNo} was excluded from ${result.strategyName}.`);
   });
 
   modalEl.addEventListener("hidden.bs.modal", () => {
@@ -6322,9 +6751,15 @@ function renderRunningStrategyModal() {
           <span class="runningStrategyPill">${escapeHtml(current.reminderType)}</span>
         </div>
       </div>
-      <div class="runningStrategyInfo">
-        <div class="runningStrategyInfoLabel">Created</div>
-        <div class="runningStrategyInfoValue">${escapeHtml(current.createdAtLabel)}</div>
+      <div class="runningStrategyTopActions">
+        <div class="runningStrategyInfo">
+          <div class="runningStrategyInfoLabel">Created</div>
+          <div class="runningStrategyInfoValue">${escapeHtml(current.createdAtLabel)}</div>
+        </div>
+        <button class="runningStrategyExcludeBtn" type="button" data-running-strategy-exclude="${escapeHtml(current.id)}" data-invoice-no="${escapeHtml(runningStrategyModalInvoiceNo)}">
+          <i class="bi bi-slash-circle" aria-hidden="true"></i>
+          Exclude invoice
+        </button>
       </div>
     </div>
     <div class="runningStrategyGrid">
@@ -6590,7 +7025,7 @@ function selectInvoiceByNo(invNo) {
   if (!invoice) return false;
   renderInvoiceDetails(invoice);
   currentInvoiceNoForDocs = invNo;
-  strategyPanelMode = "all";
+  strategyPanelMode = "running";
   renderStrategyNotifications();
   renderStoredRemarks(invNo);
   renderStoredActivityTrail(invNo);
@@ -6801,7 +7236,7 @@ let strategyFormMeta = {
   originalScope: "customer",
   linkedInvoiceNos: []
 };
-let strategyPanelMode = "all";
+let strategyPanelMode = "running";
 let runningStrategyModalInvoiceNo = "";
 let runningStrategyModalItems = [];
 let runningStrategyModalIndex = 0;
@@ -7615,7 +8050,7 @@ function selectCustomer(customerId) {
   selectedCustomerId = customerId;
 
   selectedInvoiceNos = new Set();
-  strategyPanelMode = "all";
+  strategyPanelMode = "running";
   showStrategyForm(false);
   emailInvoiceFilter = null;
   currentDocsScope = "customer";
@@ -10283,7 +10718,7 @@ function wireInvoiceTableEvents() {
         renderInvoiceDetails(invoice);
         setActiveTab("invoice");
         currentInvoiceNoForDocs = invoice.invoiceNo;
-        strategyPanelMode = "all";
+        strategyPanelMode = "running";
         renderStrategyNotifications();
         const customer = customersData.find(c => c.id === selectedCustomerId);
         if (customer) renderDocsList(customer);
