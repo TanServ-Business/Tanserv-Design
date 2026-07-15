@@ -20,6 +20,27 @@
   gap: 8px;
 }
 
+.managerHeroButtonRow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.myTeamBtn.trendToggleBtn {
+  background: #ffffff;
+  color: #4b1f73;
+  border-color: #d7c3ea;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+}
+
+.myTeamBtn.trendToggleBtn:hover,
+.myTeamBtn.trendToggleBtn[aria-pressed="true"] {
+  border-color: #4b1f73;
+  background: #4b1f73;
+  color: #ffffff;
+}
+
 .viewModeToggle {
   display: inline-flex;
   align-items: center;
@@ -29,6 +50,257 @@
   background: #fbf8fe;
   padding: 2px;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.performanceTrendsView[hidden] {
+  display: none !important;
+}
+
+.performanceTrendsView {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 14px;
+  margin-top: 0;
+}
+
+.trendPanel,
+.trendChartCard {
+  background: #ffffff;
+  border: 1px solid #e2e8f4;
+  border-radius: 5px;
+  box-shadow: 0 8px 16px rgba(15, 23, 42, 0.05);
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.28s ease, transform 0.28s ease, box-shadow 0.2s ease;
+}
+
+.trendPanel.is-visible,
+.trendChartCard.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.trendPanel {
+  padding: 16px;
+}
+
+.trendSectionHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.trendEyebrow {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #64748b;
+  margin-bottom: 4px;
+}
+
+.trendTitle {
+  margin: 0;
+  color: #0f172a;
+  font-size: 18px;
+  line-height: 1.2;
+}
+
+.trendPeriodText {
+  margin-top: 4px;
+  font-size: 12px;
+  color: #64748b;
+}
+
+.trendControls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.trendControlGroup {
+  display: grid;
+  gap: 4px;
+}
+
+.trendControlGroup span {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.trendMonthStepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.trendIconBtn,
+.trendControlGroup select,
+.trendControlGroup input {
+  border: 1px solid #d7c3ea;
+  background: #ffffff;
+  color: #111827;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  min-height: 34px;
+}
+
+.trendIconBtn {
+  width: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.trendIconBtn:hover,
+.trendIconBtn:focus-visible,
+.trendControlGroup select:focus,
+.trendControlGroup input:focus {
+  border-color: #5c258d;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(92, 37, 141, 0.14);
+}
+
+.trendIconBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.trendControlGroup select,
+.trendControlGroup input {
+  padding: 6px 10px;
+}
+
+.trendChartGrid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.trendInsightGrid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.trendInsightCard {
+  min-height: 76px;
+  padding: 10px 12px;
+  border: 1px solid #e2e8f4;
+  border-left: 3px solid #7c3aed;
+  border-radius: 5px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.035);
+}
+
+.trendInsightLabel {
+  color: #64748b;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.trendInsightValue {
+  margin-top: 6px;
+  color: #0f172a;
+  font-size: 17px;
+  font-weight: 850;
+  line-height: 1.15;
+}
+
+.trendInsightMeta {
+  margin-top: 5px;
+  color: #475569;
+  font-size: 11px;
+  line-height: 1.25;
+}
+
+.trendChartCard {
+  grid-column: span 6;
+  padding: 14px;
+}
+
+.trendChartCard.is-compact {
+  grid-column: span 4;
+}
+
+.trendChartCard.is-status {
+  grid-column: span 3;
+  padding: 14px;
+}
+
+.trendChartCard.is-status .trendChartHeader {
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.trendChartCard.is-status .trendChartTitle {
+  font-size: 14px;
+}
+
+.trendChartCard.is-status .trendChartMeta {
+  font-size: 11px;
+}
+
+.trendChartHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.trendChartTitle {
+  color: #0f172a;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.trendChartMeta {
+  margin-top: 2px;
+  color: #64748b;
+  font-size: 11px;
+}
+
+.trendChartWrap {
+  position: relative;
+  height: 230px;
+}
+
+.trendPieWrap {
+  height: 210px;
+}
+
+.trendChartWrap canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.trendStatusActionBtn {
+  border: 1px solid #d7c3ea;
+  background: #ffffff;
+  color: #4b1f73;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.trendStatusActionBtn:hover,
+.trendStatusActionBtn:focus-visible {
+  border-color: #5c258d;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(92, 37, 141, 0.14);
 }
 
 .viewToggleBtn {
@@ -857,6 +1129,16 @@ body.team-overlay-open {
 }
 
 @media (max-width: 1100px) {
+  .trendChartCard,
+  .trendChartCard.is-compact,
+  .trendChartCard.is-status {
+    grid-column: span 12;
+  }
+
+  .trendInsightGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
   .teamOverlayGrid {
     grid-template-columns: 1fr;
   }
@@ -879,5 +1161,643 @@ body.team-overlay-open {
 @media (max-width: 768px) {
   .managerHeroRight {
     align-items: flex-start;
+  }
+
+  .managerHeroButtonRow,
+  .trendSectionHeader,
+  .trendControls {
+    align-items: stretch;
+    justify-content: flex-start;
+    width: 100%;
+  }
+
+  .managerHeroButtonRow,
+  .trendSectionHeader {
+    flex-direction: column;
+  }
+
+  .trendControlGroup,
+  .trendControlGroup select,
+  .trendControlGroup input {
+    width: 100%;
+  }
+
+  .trendMonthStepper {
+    width: 100%;
+  }
+
+  .trendMonthStepper input {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .trendChartWrap {
+    height: 210px;
+  }
+
+  .trendPieWrap {
+    height: 210px;
+  }
+
+  .trendInsightGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.trendCommandRow {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
+  gap: 12px;
+  align-items: stretch;
+}
+
+.trendCommandMain {
+  grid-column: auto;
+}
+
+.trendCommandMain .trendChartWrap {
+  height: 280px;
+}
+
+.trendInsightRail {
+  display: grid;
+  gap: 8px;
+  align-content: stretch;
+  padding: 12px;
+  border: 1px solid #e9ddf4;
+  border-radius: 5px;
+  background: linear-gradient(135deg, rgba(92, 37, 141, 0.08), rgba(255, 255, 255, 0.96) 58%);
+  box-shadow: 0 8px 16px rgba(15, 23, 42, 0.05);
+}
+
+.trendInsightMetric {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 0.78fr) minmax(142px, 1fr);
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(226, 232, 244, 0.9);
+}
+
+.trendInsightMetric:last-of-type {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.trendInsightIcon {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  color: var(--trend-insight-color, #5c258d);
+  background: rgba(var(--trend-insight-rgb, 92, 37, 141), 0.12);
+}
+
+.trendInsightMetric .trendInsightLabel {
+  font-size: 11px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.trendInsightMetric .trendInsightValue {
+  margin-top: 2px;
+  font-size: 18px;
+}
+
+.trendInsightMetric .trendInsightMeta {
+  margin-top: 0;
+}
+
+.trendMiniLine {
+  width: 100%;
+  min-width: 142px;
+  height: 46px;
+  overflow: visible;
+}
+
+.trendMiniLineArea {
+  fill: var(--trend-insight-color, #5c258d);
+  opacity: 0.12;
+}
+
+.trendMiniLinePath {
+  fill: none;
+  stroke: var(--trend-insight-color, #5c258d);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.trendMiniLinePoint {
+  fill: #ffffff;
+  stroke: var(--trend-insight-color, #5c258d);
+  stroke-width: 1.8;
+  cursor: help;
+}
+
+.trendMiniLinePoint:hover {
+  fill: var(--trend-insight-color, #5c258d);
+}
+
+.trendPriorityFocus {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  padding-top: 4px;
+  color: #334155;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.trendPriorityFocus strong {
+  display: block;
+  margin-bottom: 2px;
+  color: #0f172a;
+  font-size: 12px;
+}
+
+.trendDashboardGroups {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.trendDashboardGroup {
+  min-width: 0;
+}
+
+.trendGroupHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.trendGroupAccent {
+  width: 3px;
+  height: 18px;
+  flex: 0 0 3px;
+  border-radius: 999px;
+  background: #5c258d;
+  margin-top: 2px;
+}
+
+.trendGroupHeader h3 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 14px;
+  font-weight: 850;
+  line-height: 1.2;
+}
+
+.trendGroupHeader p {
+  margin: 2px 0 0;
+  color: #64748b;
+  font-size: 11px;
+}
+
+.trendGroupGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.trendDashboardGroup .trendChartCard,
+.trendCompositionGrid .trendChartCard {
+  grid-column: auto;
+  min-width: 0;
+}
+
+.trendDashboardGroup .trendChartWrap {
+  height: 190px;
+}
+
+.trendCardValue {
+  color: #0f172a;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.trendAgentCard {
+  grid-column: span 12;
+}
+
+.trendAgentCard .trendChartWrap {
+  height: 220px;
+}
+
+.trendCompositionSection {
+  min-width: 0;
+}
+
+.trendCompositionGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.trendStatusCard {
+  grid-column: auto !important;
+}
+
+.trendStatusBody {
+  display: grid;
+  grid-template-columns: minmax(190px, 0.9fr) minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+}
+
+.trendStatusCard .trendPieWrap {
+  height: 260px;
+}
+
+.trendStatusCallouts {
+  display: grid;
+  gap: 8px;
+}
+
+.trendStatusCallout {
+  display: grid;
+  grid-template-columns: 9px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  color: #334155;
+  font-size: 11px;
+}
+
+.trendStatusDot {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: var(--status-color, #5c258d);
+}
+
+.trendStatusName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.trendStatusValue {
+  color: #0f172a;
+  font-weight: 800;
+}
+
+@media (max-width: 1280px) {
+  .trendDashboardGroups {
+    grid-template-columns: 1fr;
+  }
+
+  .trendDashboardGroup .trendChartWrap {
+    height: 220px;
+  }
+}
+
+@media (max-width: 1100px) {
+  .trendCommandRow,
+  .trendCompositionGrid,
+  .trendStatusBody {
+    grid-template-columns: 1fr;
+  }
+
+  .trendGroupGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .trendInsightMetric {
+    grid-template-columns: 32px minmax(0, 1fr);
+  }
+
+  .trendMiniLine {
+    display: none;
+  }
+
+  .trendCommandMain .trendChartWrap,
+  .trendAgentCard .trendChartWrap,
+  .trendStatusCard .trendPieWrap {
+    height: 230px;
+  }
+}
+
+.trendCommandRow {
+  grid-template-columns: minmax(0, 1.42fr) minmax(360px, 0.98fr);
+}
+
+.trendCommandMain .trendChartWrap {
+  height: 250px;
+}
+
+.trendDashboardGroups {
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.86fr);
+  align-items: start;
+}
+
+.trendDashboardGroups .trendDashboardGroup:nth-child(1) .trendGroupGrid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.trendDashboardGroups .trendDashboardGroup:nth-child(2) .trendGroupGrid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.trendDashboardGroup .trendChartWrap {
+  height: 170px;
+}
+
+.trendHealthRow {
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.2fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.trendReceivablesGroup .trendGroupGrid {
+  grid-template-columns: 1fr;
+}
+
+.trendHealthRow .trendChartWrap,
+.trendAgentCard .trendChartWrap {
+  height: 185px;
+}
+
+.trendAgentCard {
+  grid-column: auto;
+}
+
+.trendCompositionSection {
+  min-width: 0;
+  padding: 12px 14px 14px;
+  border: 1px solid #e2e8f4;
+  border-radius: 5px;
+  background: #ffffff;
+  box-shadow: 0 8px 16px rgba(15, 23, 42, 0.05);
+}
+
+.trendCompositionGrid {
+  gap: 0;
+}
+
+.trendCompositionGrid .trendStatusCard {
+  border: 0;
+  box-shadow: none;
+  background: transparent;
+  padding: 0 18px 0 0;
+}
+
+.trendCompositionGrid .trendStatusCard + .trendStatusCard {
+  padding: 0 0 0 18px;
+  border-left: 1px solid #e2e8f4;
+}
+
+.trendStatusBody {
+  grid-template-columns: minmax(170px, 0.95fr) minmax(0, 1fr);
+}
+
+.trendStatusCard .trendPieWrap {
+  height: 190px;
+}
+
+@media (max-width: 1280px) {
+  .trendDashboardGroups,
+  .trendHealthRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 1100px) {
+  .trendCommandRow,
+  .trendCompositionGrid,
+  .trendStatusBody {
+    grid-template-columns: 1fr;
+  }
+
+  .trendCompositionGrid .trendStatusCard,
+  .trendCompositionGrid .trendStatusCard + .trendStatusCard {
+    padding: 0;
+    border-left: 0;
+  }
+}
+
+.trendIntroPanel {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.trendIntroPanel .trendSectionHeader {
+  justify-content: flex-start;
+}
+
+.trendSubtitle {
+  margin-top: 5px;
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.trendFilterPanel {
+  padding: 12px;
+  background: linear-gradient(180deg, #fbf8ff 0%, #ffffff 100%);
+}
+
+.trendControls {
+  display: grid;
+  grid-template-columns: auto auto minmax(190px, auto) minmax(120px, auto) minmax(0, 1fr);
+  align-items: center;
+  justify-content: stretch;
+  gap: 12px;
+}
+
+.trendViewControl {
+  grid-template-columns: auto minmax(360px, auto);
+  align-items: center;
+  gap: 12px;
+}
+
+.trendRangeButtons {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(86px, 1fr));
+  padding: 3px;
+  border: 1px solid #e4d8f1;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.trendRangeBtn {
+  min-height: 30px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #1f2a44;
+  font-size: 12px;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.trendRangeBtn[aria-pressed="true"] {
+  background: #3b0a78;
+  color: #ffffff;
+  box-shadow: 0 6px 14px rgba(59, 10, 120, 0.22);
+}
+
+.trendRangeBtn:focus-visible {
+  outline: 2px solid rgba(92, 37, 141, 0.28);
+  outline-offset: 2px;
+}
+
+.trendToolbarDivider {
+  width: 1px;
+  height: 36px;
+  background: #e2e8f4;
+}
+
+.trendControlGroup[hidden],
+.trendControlGroup select[hidden] {
+  display: none !important;
+}
+
+.trendPeriodBadge {
+  grid-column: -2 / -1;
+  justify-self: end;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 34px;
+  color: #0f172a;
+  font-size: 12px;
+  line-height: 1.2;
+}
+
+.trendPeriodBadge i {
+  color: #5c258d;
+}
+
+.trendPeriodBadge strong {
+  font-size: 12px;
+  font-weight: 850;
+}
+
+@media (max-width: 1280px) {
+  .trendControls {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .trendViewControl {
+    grid-template-columns: 1fr;
+  }
+
+  .trendToolbarDivider {
+    display: none;
+  }
+
+  .trendPeriodBadge {
+    grid-column: auto;
+    justify-self: start;
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 720px) {
+  .trendRangeButtons {
+    grid-template-columns: 1fr;
+  }
+}
+
+.trendDashboardGroups {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+}
+
+.trendDashboardGroups > .trendDashboardGroup,
+.trendDashboardGroups > .trendDashboardGroup > .trendGroupGrid {
+  display: contents;
+}
+
+.trendDashboardGroups .trendChartCard {
+  grid-column: auto;
+}
+
+@media (max-width: 1100px) {
+  .trendDashboardGroups {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .trendDashboardGroups {
+    grid-template-columns: 1fr;
+  }
+}
+
+.trendHealthRow {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.trendHealthRow > .trendDashboardGroup,
+.trendHealthRow > .trendChartCard {
+  grid-column: auto;
+}
+
+.trendHealthRow .trendChartWrap,
+.trendAgentCard .trendChartWrap {
+  height: 220px;
+}
+
+.trendPtpHealthCard {
+  min-width: 0;
+}
+
+.trendAgentCard {
+  grid-column: 1 / -1;
+}
+
+.trendHealthRow > .trendAgentCard {
+  grid-column: 1 / -1;
+}
+
+.trendAgentCard .trendChartHeader {
+  align-items: flex-start;
+}
+
+.trendAgentCard .trendChartWrap {
+  height: 250px;
+}
+
+.trendAgentMetricSelect {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.trendAgentMetricSelect span {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.trendAgentMetricSelect select {
+  min-height: 32px;
+  padding: 0 30px 0 12px;
+  border: 1px solid #e4d8f1;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 750;
+}
+
+@media (max-width: 900px) {
+  .trendHealthRow {
+    grid-template-columns: 1fr;
   }
 }

@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your Inebura 3.0 Login Credentials</title>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #f6f0ff;
+      font-family: Arial, Helvetica, sans-serif;
+      color: #1f1937;
+    }
+
+    .email-wrapper {
+      width: 100%;
+      background-color: #f6f0ff;
+      padding: 30px 0;
+    }
+
+    .email-container {
+      max-width: 640px;
+      margin: 0 auto;
+      background-color: #ffffff;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 6px 18px rgba(109, 91, 208, 0.18);
+    }
+
+    .header {
+      padding: 26px 32px;
+      background-color: #f1ecff;
+      border-bottom: 1px solid #e6ddf7;
+    }
+
+    .logo-row {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .logo-cell {
+      width: 50%;
+      vertical-align: middle;
+    }
+
+    .logo-cell.right {
+      text-align: right;
+    }
+
+    .logo {
+      max-height: 52px;
+      max-width: 180px;
+      display: inline-block;
+      border: 0;
+    }
+
+    .content {
+      padding: 34px 32px 32px;
+      background-color: #ffffff;
+    }
+
+    .badge {
+      display: inline-block;
+      background-color: #e8ddff;
+      color: #4b3aa4;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      padding: 6px 12px;
+      border-radius: 20px;
+      margin-bottom: 16px;
+    }
+
+    .title {
+      font-size: 26px;
+      line-height: 1.3;
+      font-weight: 700;
+      color: #1f1937;
+      margin: 0 0 16px;
+    }
+
+    .text {
+      font-size: 15px;
+      line-height: 1.65;
+      color: #3f3952;
+      margin: 0 0 18px;
+    }
+
+    .credential-box {
+      background-color: #fbf9ff;
+      border: 1px solid #e6ddf7;
+      border-radius: 14px;
+      padding: 22px;
+      margin: 26px 0;
+    }
+
+    .credential-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .credential-label {
+      font-size: 13px;
+      line-height: 1.4;
+      color: #756c89;
+      font-weight: 700;
+      padding: 0 0 6px;
+    }
+
+    .credential-value {
+      font-size: 16px;
+      line-height: 1.5;
+      color: #1f1937;
+      font-weight: 700;
+      padding: 0 0 20px;
+      word-break: break-word;
+      overflow-wrap: anywhere;
+      white-space: normal;
+    }
+
+    .credential-value.last {
+      padding-bottom: 0;
+    }
+
+    .credential-link {
+      color: #6d5bd0;
+      text-decoration: none;
+      word-break: break-word;
+      overflow-wrap: anywhere;
+    }
+
+    .button-wrapper {
+      text-align: center;
+      margin: 30px 0;
+    }
+
+    .login-button {
+      display: inline-block;
+      background-color: #6d5bd0;
+      color: #ffffff !important;
+      text-decoration: none;
+      padding: 14px 32px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .note-box {
+      background-color: #fff8ed;
+      border: 1px solid #f6c887;
+      border-radius: 14px;
+      padding: 16px;
+      margin-top: 22px;
+    }
+
+    .note-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #8a4b00;
+      margin: 0 0 8px;
+    }
+
+    .note-text {
+      font-size: 13px;
+      line-height: 1.55;
+      color: #744000;
+      margin: 0;
+    }
+
+    .footer {
+      padding: 24px 32px;
+      background-color: #f8f5ff;
+      border-top: 1px solid #e6ddf7;
+      text-align: center;
+    }
+
+    .footer-text {
+      font-size: 12px;
+      line-height: 1.5;
+      color: #756c89;
+      margin: 0;
+    }
+
+    .footer-link {
+      color: #6d5bd0;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    @media only screen and (max-width: 600px) {
+      .email-container {
+        width: 94%;
+        border-radius: 14px;
+      }
+
+      .content,
+      .header,
+      .footer {
+        padding-left: 22px;
+        padding-right: 22px;
+      }
+
+      .logo-cell,
+      .logo-cell.right {
+        display: block;
+        width: 100%;
+        text-align: center;
+      }
+
+      .logo-cell.right {
+        padding-top: 16px;
+      }
+
+      .title {
+        font-size: 23px;
+      }
+
+      .credential-box {
+        padding: 18px;
+      }
+
+      .credential-value {
+        font-size: 15px;
+        line-height: 1.6;
+      }
+
+      .login-button {
+        width: auto;
+        padding: 14px 28px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="email-wrapper">
+    <div class="email-container">
+
+      <!-- Header with Logos -->
+      <div class="header">
+        <table class="logo-row" role="presentation">
+          <tr>
+            <td class="logo-cell">
+              <img
+                src="{{INEBURA_LOGO_URL}}"
+                alt="Inebura Logo"
+                class="logo"
+              />
+            </td>
+
+            <td class="logo-cell right">
+              <img
+                src="{{CLIENT_LOGO_URL}}"
+                alt="{{CLIENT_NAME}} Logo"
+                class="logo"
+              />
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- Main Content -->
+      <div class="content">
+        <div class="badge">INEBURA 3.0</div>
+
+        <h1 class="title">Welcome to Inebura 3.0</h1>
+
+        <p class="text">
+          Dear {{USER_NAME}},
+        </p>
+
+        <p class="text">
+          Welcome to the new version of Inebura, <strong>INEBURA 3.0</strong>.
+          Your user account has been created for accessing Inebura on behalf of
+          <strong>{{CLIENT_NAME}}</strong>. Please use the below credentials to log in to the platform.
+        </p>
+
+        <!-- Credentials -->
+        <div class="credential-box">
+          <table class="credential-table" role="presentation">
+            <tr>
+              <td class="credential-label">
+                Inebura URL
+              </td>
+            </tr>
+            <tr>
+              <td class="credential-value">
+                <a href="{{INEBURA_URL}}" target="_blank" class="credential-link">
+                  {{INEBURA_URL}}
+                </a>
+              </td>
+            </tr>
+
+            <tr>
+              <td class="credential-label">
+                Login ID
+              </td>
+            </tr>
+            <tr>
+              <td class="credential-value">
+                {{LOGIN_ID}}
+              </td>
+            </tr>
+
+            <tr>
+              <td class="credential-label">
+                Temporary Password
+              </td>
+            </tr>
+            <tr>
+              <td class="credential-value last">
+                {{PASSWORD}}
+              </td>
+            </tr>
+          </table>
+        </div>
+
+        <!-- CTA -->
+        <div class="button-wrapper">
+          <a href="{{INEBURA_URL}}" target="_blank" class="login-button">
+            Login to Inebura
+          </a>
+        </div>
+
+        <p class="text">
+          For security reasons, you may be asked to change your password after your first login.
+        </p>
+
+        <!-- Security Note -->
+        <div class="note-box">
+          <p class="note-title">Security Advisory</p>
+          <p class="note-text">
+            Please do not share your login credentials with anyone. If you did not request this access
+            or face any issue while logging in, please contact the Inebura support team immediately.
+          </p>
+        </div>
+
+        <p class="text" style="margin-top: 24px;">
+          Regards,<br />
+          <strong>Inebura Team</strong>
+        </p>
+      </div>
+
+      <!-- Footer -->
+      <div class="footer">
+        <p class="footer-text">
+          This is a system-generated email from Inebura. Please do not reply to this email.
+        </p>
+
+        <p class="footer-text" style="margin-top: 8px;">
+          For support, contact
+          <a href="mailto:{{SUPPORT_EMAIL}}" class="footer-link">{{SUPPORT_EMAIL}}</a>
+        </p>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>

@@ -1,4 +1,364 @@
 (() => {
+  const createNotificationCenterManager = () => {
+    const storageKey = "ineburaNotificationCenter";
+
+    const toArray = (value, fallback = []) => (
+      Array.isArray(value) ? value : fallback
+    );
+
+    const normalizeListField = (value, fallback = []) => (
+      Array.isArray(value) ? value : (value ? [value] : fallback)
+    );
+
+    const normalizeAudienceUser = (value) => (
+      String(value || "")
+        .toLowerCase()
+        .replace(/<[^>]*>/g, " ")
+        .replace(/\([^)]*\)/g, " ")
+        .replace(/[^a-z0-9]+/g, " ")
+        .trim()
+    );
+
+    const normalizeAudienceToken = (value) => String(value || "").trim().toLowerCase();
+
+    const load = () => {
+      try {
+        const raw = localStorage.getItem(storageKey);
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        return toArray(parsed);
+      } catch (err) {
+        return [];
+      }
+    };
+
+    const save = (list) => {
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(toArray(list)));
+      } catch (_) {
+        // Keep notification failures from breaking prototype pages.
+      }
+    };
+
+    const normalizeNote = (note = {}) => {
+      const source = note && typeof note === "object" ? note : {};
+      return {
+        ...source,
+        id: source.id || `note-${Date.now()}`,
+        type: source.type || "general",
+        title: source.title || "Notification",
+        message: source.message || "",
+        createdAt: source.createdAt || new Date().toISOString(),
+        scheduledFor: source.scheduledFor || "",
+        sentAt: source.sentAt || "",
+        read: Boolean(source.read),
+        audience: normalizeListField(source.audience, ["all"]),
+        audienceUsers: normalizeListField(source.audienceUsers, []),
+        details: toArray(source.details),
+        ctas: toArray(source.ctas),
+        data: source.data || {}
+      };
+    };
+
+    const upsert = (note, options = {}) => {
+      const list = load();
+      const payload = normalizeNote(note);
+      const existingIndex = list.findIndex((item) => String(item?.id || "") === String(payload.id || ""));
+      if (existingIndex >= 0) {
+        const existing = list[existingIndex] || {};
+        list[existingIndex] = {
+          ...existing,
+          ...payload,
+          read: options.preserveRead ? Boolean(existing.read) : payload.read
+        };
+      } else {
+        list.unshift(payload);
+      }
+      save(list);
+      return payload;
+    };
+
+    const toDateOnly = (value) => {
+      if (!value) return null;
+      const date = value instanceof Date ? new Date(value.getTime()) : new Date(value);
+      if (Number.isNaN(date.getTime())) return null;
+      date.setHours(0, 0, 0, 0);
+      return date;
+    };
+
+    const normalizeDueScheduled = () => {
+      const list = load();
+      const today = toDateOnly(new Date());
+      let changed = false;
+      const updated = list.map((note) => {
+        if (note?.scheduledFor && !note.sentAt) {
+          const scheduledDate = toDateOnly(note.scheduledFor);
+          if (scheduledDate && today && scheduledDate.getTime() <= today.getTime()) {
+            changed = true;
+            return { ...note, sentAt: new Date().toISOString() };
+          }
+        }
+        return note;
+      });
+      if (changed) save(updated);
+      return updated;
+    };
+
+    const getVisible = (options = {}) => {
+      const audience = normalizeAudienceToken(options.audience || "");
+      const activeUser = normalizeAudienceUser(options.activeUser || "");
+      const shouldCheckUser = Object.prototype.hasOwnProperty.call(options, "activeUser");
+      const list = options.normalizeDueScheduled ? normalizeDueScheduled() : load();
+      return list.filter((note) => {
+        if (note?.scheduledFor && !note.sentAt) return false;
+        const audiences = normalizeListField(note?.audience, [])
+          .map(normalizeAudienceToken)
+          .filter(Boolean);
+        const audienceAllowed = !audience
+          || audiences.length === 0
+          || audiences.includes("all")
+          || audiences.includes(audience);
+        if (!audienceAllowed) return false;
+        const userAudiences = normalizeListField(note?.audienceUsers, [])
+          .map(normalizeAudienceUser)
+          .filter(Boolean);
+        if (!shouldCheckUser || userAudiences.length === 0) return true;
+        if (!activeUser) return false;
+        return userAudiences.includes("all") || userAudiences.includes(activeUser);
+      });
+    };
+
+    const markVisibleRead = (options = {}) => {
+      const visibleIds = new Set(
+        getVisible(options)
+          .map((note) => String(note?.id || ""))
+          .filter(Boolean)
+      );
+      const updated = load().map((note) => (
+        visibleIds.has(String(note?.id || "")) ? { ...note, read: true } : note
+      ));
+      save(updated);
+      return updated;
+    };
+
+    const getById = (id) => {
+      const noteId = String(id || "");
+      if (!noteId) return null;
+      return normalizeDueScheduled().find((note) => String(note?.id || "") === noteId) || null;
+    };
+
+    const getDetailValue = (details, label) => {
+      const key = String(label || "").toLowerCase();
+      const match = toArray(details).find((item) => String(item?.label || "").toLowerCase() === key);
+      return match ? String(match.value || "") : "";
+    };
+
+    const typeLabelMap = {
+      "landing-summary": "Landing",
+      "dashboard-alert": "Dashboard",
+      "module-update": "Module",
+      pdc: "PDC",
+      "pdc-reminder": "PDC reminder",
+      "pdc-bounced": "PDC",
+      "pdc-handoff": "PDC",
+      commitment: "Commitment",
+      "commitment-approved": "Commitment",
+      "commitment-submitted": "Commitment",
+      "commitment-rejected": "Commitment",
+      "visit-approval": "Visit approval",
+      "visit-approval-pending": "Visit approval",
+      "visit-plan-approved": "Visit approval",
+      "visit-replan-required": "Visit approval",
+      "submission-update": "Submission",
+      todo: "Todo",
+      "todo-assigned": "Todo",
+      "todo-completed-ack": "Todo",
+      email: "Email",
+      "customer-payment": "Customer payment",
+      "backend-upload-exception": "Backend",
+      "mis-schedule-failed": "MIS",
+      "issue-assigned": "Issue",
+      "issue-approval-requested": "Issue",
+      "issue-approval-decision": "Issue",
+      "issue-created-manager": "Issue",
+      "issue-manager-approved": "Issue",
+      "issue-approval-forwarded": "Issue",
+      "issue-approval-rejected": "Issue",
+      "issue-resolution-provided": "Issue",
+      "issue-ticket-closed": "Issue",
+      "issue-assignment-updated": "Issue",
+      "issue-approval-process-saved": "Issue",
+      "issue-remark-added": "Issue",
+      "issue-reopened": "Issue",
+      "credit-limit-request": "Credit Limit",
+      "credit-limit-decision": "Credit Limit",
+      "credit-utilization-breach": "Credit Limit",
+      "ai-activity": "AI Activity",
+      "strategy-master-update": "Strategy",
+      "support-ticket-assigned": "Support",
+      "support-ticket-update": "Support",
+      "support-sla-risk": "Support",
+      "task-completed": "Task",
+      manager: "Manager"
+    };
+
+    const getTypeLabel = (type) => typeLabelMap[String(type || "").toLowerCase()] || "Update";
+
+    const buildTitle = (note = {}) => {
+      const type = String(note.type || "").toLowerCase();
+      const details = toArray(note.details);
+      const customer = getDetailValue(details, "Customer");
+      const invoice = getDetailValue(details, "Invoice");
+      const cheque = getDetailValue(details, "Cheque");
+      const chequeNo = getDetailValue(details, "Cheque no");
+      const subject = getDetailValue(details, "Subject");
+      const visitDate = getDetailValue(details, "Visit date");
+      const assignee = getDetailValue(details, "Assignee");
+
+      if (type === "pdc" || type === "pdc-reminder" || type === "pdc-bounced" || type === "pdc-handoff") {
+        if (type === "pdc-bounced") {
+          const chequeRef = chequeNo || cheque;
+          return chequeRef ? `Cheque ${chequeRef} bounced` : "Cheque bounced";
+        }
+        if (type === "pdc-handoff") {
+          const toStatus = getDetailValue(details, "To status");
+          return toStatus ? `PDC moved to ${toStatus}` : "PDC status handoff";
+        }
+        const base = type === "pdc-reminder" ? "PDC reminder" : "PDC update";
+        if (cheque && customer) return `${base} - ${cheque} - ${customer}`;
+        if (cheque) return `${base} - ${cheque}`;
+        if (invoice && customer) return `${base} - ${invoice} - ${customer}`;
+        if (invoice) return `${base} - ${invoice}`;
+        if (customer) return `${base} - ${customer}`;
+        return base;
+      }
+      if (type === "visit-approval" || type === "visit-approval-pending" || type === "visit-plan-approved" || type === "visit-replan-required") {
+        const base = type === "visit-plan-approved"
+          ? "Visit plan approved"
+          : (type === "visit-replan-required" ? "Visit plan rejected" : "Visit approval pending");
+        return visitDate ? `${base} - ${visitDate}` : base;
+      }
+      if (type === "email") {
+        const base = "Email";
+        if (subject) return `${base} - ${subject}`;
+        if (invoice) return `${base} - ${invoice}`;
+        if (customer) return `${base} - ${customer}`;
+        return base;
+      }
+      if (type === "todo") {
+        if (assignee) return `Todo reminder - ${assignee}`;
+        return "Todo reminder";
+      }
+      if (type === "todo-assigned") return "Task assigned";
+      if (type === "todo-completed-ack") return "Task completed";
+      if (type === "customer-payment") {
+        const base = "Customer payment submitted";
+        if (invoice && customer) return `${base} - ${invoice} - ${customer}`;
+        if (invoice) return `${base} - ${invoice}`;
+        if (customer) return `${base} - ${customer}`;
+        return base;
+      }
+      if (type === "commitment") return String(note.title || "Commitment update");
+      if (type === "commitment-approved") {
+        const base = "Commitment approved";
+        if (invoice && customer) return `${base} - ${invoice} - ${customer}`;
+        if (invoice) return `${base} - ${invoice}`;
+        if (customer) return `${base} - ${customer}`;
+        return base;
+      }
+      if (type === "commitment-submitted") return "Commitment submitted for approval";
+      if (type === "commitment-rejected") return "Commitment rejected";
+      if (type === "issue-assigned") return "Issue assigned";
+      if (type === "issue-approval-requested") return "Issue approval requested";
+      if (type === "issue-approval-decision") return "Issue approval decision";
+      if (type === "issue-created-manager") return "Issue created";
+      if (type === "issue-manager-approved") return "Issue manager approval";
+      if (type === "issue-approval-forwarded") return "Issue approval forwarded";
+      if (type === "issue-approval-rejected") return "Issue approval rejected";
+      if (type === "issue-resolution-provided") return "Issue resolution provided";
+      if (type === "issue-ticket-closed") return "Issue ticket closed";
+      if (type === "issue-assignment-updated") return "Issue assignment updated";
+      if (type === "issue-approval-process-saved") return "Issue approval process saved";
+      if (type === "issue-remark-added") return "Issue remark added";
+      if (type === "issue-reopened") return "Issue reopened";
+      if (type === "backend-upload-exception") return "Backend upload exception";
+      if (type === "mis-schedule-failed") return "MIS schedule failed";
+      if (type === "credit-limit-request") return "Credit limit request submitted";
+      if (type === "credit-limit-decision") return "Credit limit decision";
+      if (type === "credit-utilization-breach") return "Credit utilization breach";
+      if (type === "support-ticket-assigned") return "Support ticket assigned";
+      if (type === "support-ticket-update") return "Support ticket updated";
+      if (type === "support-sla-risk") return "Support SLA risk";
+      if (type === "task-completed") {
+        const base = "Task completed";
+        if (invoice && customer) return `${base} - ${invoice} - ${customer}`;
+        if (invoice) return `${base} - ${invoice}`;
+        if (customer) return `${base} - ${customer}`;
+        return base;
+      }
+      if (type === "manager") {
+        const base = "Manager update";
+        if (invoice) return `${base} - ${invoice}`;
+        return base;
+      }
+      if (note.title) return String(note.title);
+      if (invoice && customer) return `Update - ${invoice} - ${customer}`;
+      return "Update";
+    };
+
+    const getDefaultRoute = (note = {}) => {
+      const type = String(note.type || "").toLowerCase();
+      const details = toArray(note.details);
+      const cta = toArray(note.ctas)[0] || {};
+      const invoiceNo = cta.invoiceNo || getDetailValue(details, "Invoice") || note.invoiceNo || "";
+      if (cta.action || cta.href) {
+        return {
+          label: cta.label || "View",
+          action: cta.action || "",
+          href: cta.href || "",
+          invoiceNo
+        };
+      }
+
+      const route = { label: type === "commitment" ? "Open commitment" : "Open", action: "", href: "", invoiceNo };
+      if (type === "visit-approval" || type === "visit-approval-pending") return { ...route, action: "link", href: "pages/visitmoduleReview.html" };
+      if (type === "visit-plan-approved" || type === "visit-replan-required") return { ...route, action: "link", href: "pages/visitmodule.html" };
+      if (type === "pdc" || type === "pdc-reminder" || type === "pdc-bounced" || type === "pdc-handoff") return { ...route, action: "open-pdc" };
+      if (type === "todo" || type === "todo-assigned" || type === "todo-completed-ack") return { ...route, action: "open-todo" };
+      if (type === "email") return { ...route, action: "open-email" };
+      if (type === "customer-payment") return { ...route, action: "open-disposition" };
+      if (type === "commitment" || type === "commitment-approved") return { ...route, action: "open-invoice" };
+      if (type === "commitment-submitted") return { ...route, action: "link", href: "pages/CommitmentManager.html" };
+      if (type === "commitment-rejected") return { ...route, action: "link", href: "pages/commitment.html" };
+      if (type === "issue-approval-requested" || type === "issue-approval-forwarded") return { ...route, action: "link", href: "bin/IssueTracker/approver-dashboard.html" };
+      if (type.startsWith("issue-")) return { ...route, action: "link", href: "pages/issuetrackerLP.html" };
+      if (type === "backend-upload-exception") return { ...route, action: "link", href: "pages/LPbackend.html" };
+      if (type === "mis-schedule-failed") return { ...route, action: "link", href: "pages/LPmis.html" };
+      if (type === "credit-limit-request" || type === "credit-limit-decision" || type === "credit-utilization-breach") return { ...route, action: "link", href: "pages/credit-limit-dashboard.html" };
+      if (type === "support-ticket-assigned" || type === "support-sla-risk") return { ...route, action: "link", href: "pages/support-admin.html" };
+      if (type === "support-ticket-update") return { ...route, action: "link", href: "pages/help-support.html" };
+      return route;
+    };
+
+    return {
+      storageKey,
+      load,
+      save,
+      normalizeNote,
+      upsert,
+      getVisible,
+      markVisibleRead,
+      getById,
+      getTypeLabel,
+      buildTitle,
+      getDefaultRoute,
+      normalizeAudienceUser
+    };
+  };
+
+  window.IneburaNotificationCenter = window.IneburaNotificationCenter || createNotificationCenterManager();
+  const notificationCenter = window.IneburaNotificationCenter;
+
   const mount = document.querySelector("[data-shared-header]");
   if (!mount) return;
 
@@ -805,7 +1165,7 @@
     const initNotifications = () => {
       if (hasPdcScript) return;
 
-      const notificationCenterKey = "ineburaNotificationCenter";
+      const notificationCenterKey = notificationCenter.storageKey;
       const notificationBellBtn = document.getElementById("notificationBellBtn");
       const notificationBellCount = document.getElementById("notificationBellCount");
       const notificationPopup = document.getElementById("notificationPopup");
@@ -818,24 +1178,9 @@
       const issueTrackerCustomKey = "customIssues";
       const issueApprovalRequestKey = "approval_requests";
 
-      const loadNotifications = () => {
-        const stored = localStorage.getItem(notificationCenterKey);
-        if (!stored) return [];
-        try {
-          const parsed = JSON.parse(stored);
-          return Array.isArray(parsed) ? parsed : [];
-        } catch (err) {
-          return [];
-        }
-      };
+      const loadNotifications = () => notificationCenter.load();
 
-      const saveNotifications = (list) => {
-        try {
-          localStorage.setItem(notificationCenterKey, JSON.stringify(Array.isArray(list) ? list : []));
-        } catch (_) {
-          // ignore storage errors
-        }
-      };
+      const saveNotifications = (list) => notificationCenter.save(list);
 
       const readStoredArray = (key) => {
         try {
@@ -847,14 +1192,7 @@
         }
       };
 
-      const normalizeAudienceUser = (value) => (
-        String(value || "")
-          .toLowerCase()
-          .replace(/<[^>]*>/g, " ")
-          .replace(/\([^)]*\)/g, " ")
-          .replace(/[^a-z0-9]+/g, " ")
-          .trim()
-      );
+      const normalizeAudienceUser = (value) => notificationCenter.normalizeAudienceUser(value);
 
       const getActiveNotificationUser = () => String(localStorage.getItem("activeUserName") || "").trim();
 
@@ -880,21 +1218,10 @@
       };
 
       const getVisibleNotifications = () => {
-        const audience = getNotificationAudience();
-        const activeUser = normalizeAudienceUser(getActiveNotificationUser());
-        return loadNotifications().filter((note) => {
-          if (note.scheduledFor && !note.sentAt) return false;
-          const audiences = Array.isArray(note.audience)
-            ? note.audience
-            : (note.audience ? [note.audience] : []);
-          const audienceAllowed = audiences.length === 0 || audiences.includes("all") || audiences.includes(audience);
-          if (!audienceAllowed) return false;
-          const userAudiences = Array.isArray(note.audienceUsers)
-            ? note.audienceUsers.map(normalizeAudienceUser).filter(Boolean)
-            : [];
-          if (!userAudiences.length) return true;
-          if (!activeUser) return false;
-          return userAudiences.includes("all") || userAudiences.includes(activeUser);
+        return notificationCenter.getVisible({
+          audience: getNotificationAudience(),
+          activeUser: getActiveNotificationUser(),
+          normalizeDueScheduled: false
         });
       };
 
@@ -922,42 +1249,7 @@
         });
       };
 
-      const buildNotificationTitle = (note, details) => {
-        const type = String(note.type || "").toLowerCase();
-        const customer = getDetailValue(details, "Customer");
-        const invoice = getDetailValue(details, "Invoice");
-        const visitDate = getDetailValue(details, "Visit date");
-
-        if (type === "visit-approval" || type === "visit-approval-pending" || type === "visit-plan-approved" || type === "visit-replan-required") {
-          const base = type === "visit-plan-approved"
-            ? "Visit plan approved"
-            : (type === "visit-replan-required" ? "Visit plan rejected" : "Visit approval pending");
-          return visitDate ? `${base} - ${visitDate}` : base;
-        }
-        if (type === "todo") return "Todo reminder";
-        if (type === "todo-assigned") return "Task assigned";
-        if (type === "todo-completed-ack") return "Task completed";
-        if (type === "commitment") {
-          return String(note.title || "Commitment update");
-        }
-        if (type === "credit-utilization-breach") return "Credit utilization breach";
-        if (type === "support-ticket-assigned") return "Support ticket assigned";
-        if (type === "support-ticket-update") return "Support ticket updated";
-        if (type === "support-sla-risk") return "Support SLA risk";
-        if (type === "issue-created-manager") return "Issue created";
-        if (type === "issue-manager-approved") return "Issue manager approval";
-        if (type === "issue-approval-forwarded") return "Issue approval forwarded";
-        if (type === "issue-approval-rejected") return "Issue approval rejected";
-        if (type === "issue-resolution-provided") return "Issue resolution provided";
-        if (type === "issue-ticket-closed") return "Issue ticket closed";
-        if (type === "issue-assignment-updated") return "Issue assignment updated";
-        if (type === "issue-approval-process-saved") return "Issue approval process saved";
-        if (type === "issue-remark-added") return "Issue remark added";
-        if (type === "issue-reopened") return "Issue reopened";
-        if (note.title) return String(note.title);
-        if (invoice && customer) return `Update - ${invoice} - ${customer}`;
-        return "Update";
-      };
+      const buildNotificationTitle = (note, details) => notificationCenter.buildTitle({ ...note, details });
 
       const updateCommitmentNotifications = () => {
         const agentName = localStorage.getItem("activeUserName") || "";
@@ -2264,52 +2556,6 @@
           notificationList.innerHTML = "<div class=\"notificationEmpty\">No notifications yet.</div>";
           return;
         }
-        const typeLabelMap = {
-          "landing-summary": "Landing",
-          "dashboard-alert": "Dashboard",
-          "module-update": "Module",
-          pdc: "PDC",
-          "pdc-reminder": "PDC reminder",
-          "pdc-bounced": "PDC",
-          "pdc-handoff": "PDC",
-          commitment: "Commitment",
-          "commitment-approved": "Commitment",
-          "commitment-submitted": "Commitment",
-          "commitment-rejected": "Commitment",
-          "visit-approval": "Visit approval",
-          "visit-approval-pending": "Visit approval",
-          "visit-plan-approved": "Visit approval",
-          "visit-replan-required": "Visit approval",
-          "submission-update": "Submission",
-          todo: "Todo",
-          "todo-assigned": "Todo",
-          "todo-completed-ack": "Todo",
-          email: "Email",
-          "backend-upload-exception": "Backend",
-          "mis-schedule-failed": "MIS",
-          "issue-assigned": "Issue",
-          "issue-approval-requested": "Issue",
-          "issue-approval-decision": "Issue",
-          "issue-created-manager": "Issue",
-          "issue-manager-approved": "Issue",
-          "issue-approval-forwarded": "Issue",
-          "issue-approval-rejected": "Issue",
-          "issue-resolution-provided": "Issue",
-          "issue-ticket-closed": "Issue",
-          "issue-assignment-updated": "Issue",
-          "issue-approval-process-saved": "Issue",
-          "issue-remark-added": "Issue",
-          "issue-reopened": "Issue",
-          "credit-limit-request": "Credit Limit",
-          "credit-limit-decision": "Credit Limit",
-          "credit-utilization-breach": "Credit Limit",
-          "ai-activity": "AI Activity",
-          "strategy-master-update": "Strategy",
-          "support-ticket-assigned": "Support",
-          "support-ticket-update": "Support",
-          "support-sla-risk": "Support"
-        };
-
         notificationList.innerHTML = notes.map((note, index) => {
           const noteId = String(note.id || `note-${index}`);
           const details = Array.isArray(note.details) ? note.details : [];
@@ -2329,37 +2575,16 @@
             </div>
           `).join("");
 
-          const ctas = Array.isArray(note.ctas) ? note.ctas : [];
           const type = String(note.type || "").toLowerCase();
-          const invoiceValue = getDetailValue(detailRows, "Invoice") || note.invoiceNo || "";
-          const defaultAction = ctas[0]?.action
-            || ((type === "visit-approval" || type === "visit-approval-pending" || type === "visit-plan-approved" || type === "visit-replan-required") ? "link"
-              : (type === "pdc" || type === "pdc-reminder" || type === "pdc-bounced" || type === "pdc-handoff") ? "open-pdc"
-                : (type === "todo" || type === "todo-assigned" || type === "todo-completed-ack") ? "open-todo"
-                  : type === "email" ? "open-email"
-                    : (type === "commitment" || type === "commitment-approved") ? "open-invoice"
-                      : (type === "commitment-submitted" || type === "commitment-rejected" || type.startsWith("issue-") || type.startsWith("backend-") || type.startsWith("mis-") || type.startsWith("credit-") || type.startsWith("support-")) ? "link"
-                        : "");
-          const defaultHref = ctas[0]?.href
-            || ((type === "visit-approval" || type === "visit-approval-pending") ? "pages/visitmoduleReview.html"
-              : type === "visit-plan-approved" ? "pages/visitmodule.html"
-                : type === "visit-replan-required" ? "pages/visitmodule.html"
-                  : type === "commitment-submitted" ? "pages/CommitmentManager.html"
-                    : (type === "commitment-rejected" || type === "commitment") ? "pages/commitment.html"
-                      : type === "issue-approval-requested" ? "bin/IssueTracker/approver-dashboard.html"
-                        : type === "issue-approval-forwarded" ? "bin/IssueTracker/approver-dashboard.html"
-                          : type.startsWith("issue-") ? "pages/issuetrackerLP.html"
-                            : type === "backend-upload-exception" ? "pages/LPbackend.html"
-                              : type === "mis-schedule-failed" ? "pages/LPmis.html"
-                                : (type === "credit-limit-request" || type === "credit-limit-decision" || type === "credit-utilization-breach") ? "pages/credit-limit-dashboard.html"
-                                  : type === "support-ticket-assigned" ? "pages/support-admin.html"
-                                    : type === "support-ticket-update" ? "pages/help-support.html"
-                                      : type === "support-sla-risk" ? "pages/support-admin.html"
-                                        : "");
+          const ctas = Array.isArray(note.ctas) ? note.ctas : [];
+          const defaultRoute = notificationCenter.getDefaultRoute({ ...note, details: detailRows });
+          const invoiceValue = defaultRoute.invoiceNo || getDetailValue(detailRows, "Invoice") || note.invoiceNo || "";
+          const defaultAction = defaultRoute.action || "";
+          const defaultHref = defaultRoute.href || "";
           const ctaList = ctas.length
             ? ctas
             : (defaultAction
-              ? [{ label: type === "commitment" ? "Open commitment" : "Open", action: defaultAction, href: defaultHref, invoiceNo: invoiceValue }]
+              ? [{ label: defaultRoute.label || (type === "commitment" ? "Open commitment" : "Open"), action: defaultAction, href: defaultHref, invoiceNo: invoiceValue }]
               : []);
           const ctaHtml = ctaList.map((cta) => `
             <button
@@ -2375,7 +2600,7 @@
           const markButton = note.read
             ? ""
             : `<button class=\"notificationMarkBtn\" type=\"button\" data-note-id=\"${escapeHtml(noteId)}\" data-note-index=\"${index}\">Mark as read</button>`;
-          const typeLabel = typeLabelMap[type] || "Update";
+          const typeLabel = notificationCenter.getTypeLabel(type);
           const typeClass = `tag-${type.replace(/[^a-z0-9]+/g, "-") || "update"}`;
           const title = buildNotificationTitle(note, detailRows);
           const cardMessage = String(note.message || "-");
@@ -2443,7 +2668,7 @@
           const notes = loadNotifications();
           if (!notes.length) return;
           const updated = notes.map((note) => ({ ...note, read: true }));
-          localStorage.setItem(notificationCenterKey, JSON.stringify(updated));
+          saveNotifications(updated);
           updateNotificationBadge();
           renderNotificationPopup();
         });
@@ -2478,7 +2703,7 @@
               const matchByIndex = !noteId && Number.isInteger(index) && idx === index;
               return (matchById || matchByIndex) ? { ...note, read: true } : note;
             });
-            localStorage.setItem(notificationCenterKey, JSON.stringify(updated));
+            saveNotifications(updated);
             updateNotificationBadge();
             renderNotificationPopup();
             return;

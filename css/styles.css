@@ -3351,7 +3351,7 @@ button.notifyBadge {
 /* Agent landing: icon rail collapses to colored dots and expands on hover */
 .invoiceTable--iconPeek {
   --peek-dot-size: 9px;
-  --peek-col-collapsed: 22px;
+  --peek-col-collapsed: 18px;
   --peek-col-expanded: 44px;
 }
 

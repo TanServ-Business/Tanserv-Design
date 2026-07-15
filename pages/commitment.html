@@ -658,6 +658,7 @@
     const invoiceStorageKey = "ineburaInvoiceData";
     const submitStorageKey = "ineburaCommitmentSubmissions";
     const notificationCenterKey = "ineburaNotificationCenter";
+    const notificationCenter = window.IneburaNotificationCenter || null;
     const approvalSeenKey = "ineburaCommitmentStatusSeen";
     let showCommittedOnly = false;
 
@@ -701,7 +702,7 @@
     const updateApprovalNotifications = () => {
       const items = getSubmissionItems();
       if (!items.length) return;
-      const notificationsRaw = loadStorage(notificationCenterKey);
+      const notificationsRaw = notificationCenter ? notificationCenter.load() : loadStorage(notificationCenterKey);
       const notifications = Array.isArray(notificationsRaw) ? notificationsRaw : [];
       let changed = false;
       items.forEach((item) => {
@@ -711,7 +712,8 @@
         const title = status === "approved" ? "Commitment Approved" : "Commitment Rejected";
         const remark = item.remark ? ` Remark: ${item.remark}` : "";
         const statusLabel = status === "rejected" ? "rejected" : "approved";
-        notifications.unshift({
+        const payload = {
+          id: `commitment-status:${item.invoiceNo || "unknown"}:${status}`,
           type: "commitment",
           status,
           title,
@@ -727,12 +729,19 @@
           invoiceDate: item.invoiceDate || "",
           createdAt: new Date().toLocaleString(),
           read: false
-        });
+        };
+        if (notificationCenter) {
+          notificationCenter.upsert(payload, { preserveRead: true });
+        } else {
+          notifications.unshift(payload);
+        }
         storedStatusSeen[item.invoiceNo] = status;
         changed = true;
       });
       if (changed) {
-        localStorage.setItem(notificationCenterKey, JSON.stringify(notifications));
+        if (!notificationCenter) {
+          localStorage.setItem(notificationCenterKey, JSON.stringify(notifications));
+        }
         localStorage.setItem(approvalSeenKey, JSON.stringify(storedStatusSeen));
       }
     };

@@ -208,7 +208,11 @@
     }
   };
 
+  const getNotificationCenterManager = () => window.IneburaNotificationCenter || null;
+
   const loadNotificationCenter = () => {
+    const manager = getNotificationCenterManager();
+    if (manager) return manager.load();
     try {
       const raw = localStorage.getItem(notificationCenterKey);
       if (!raw) return [];
@@ -221,6 +225,11 @@
   };
 
   const saveNotificationCenter = (list) => {
+    const manager = getNotificationCenterManager();
+    if (manager) {
+      manager.save(list);
+      return;
+    }
     try {
       localStorage.setItem(notificationCenterKey, JSON.stringify(list));
     } catch (err) {
@@ -229,6 +238,14 @@
   };
 
   const addNotificationCenterItem = (note) => {
+    const manager = getNotificationCenterManager();
+    if (manager) {
+      manager.upsert({
+        ...note,
+        audience: Array.isArray(note.audience) ? note.audience : (note.audience ? [note.audience] : ["agent", "ops"])
+      });
+      return;
+    }
     const list = loadNotificationCenter();
     const payload = {
       id: note.id || `note-${Date.now()}`,
@@ -313,6 +330,11 @@
   };
 
   const normalizeNotificationCenter = () => {
+    const manager = getNotificationCenterManager();
+    if (manager) {
+      manager.getVisible({ normalizeDueScheduled: true });
+      return manager.load();
+    }
     const list = loadNotificationCenter();
     const today = parseDateValue(new Date());
     let changed = false;
@@ -331,6 +353,13 @@
   };
 
   const getVisibleNotificationCenter = () => {
+    const manager = getNotificationCenterManager();
+    if (manager) {
+      return manager.getVisible({
+        audience: role,
+        normalizeDueScheduled: true
+      });
+    }
     return normalizeNotificationCenter().filter((note) => {
       if (note.scheduledFor && !note.sentAt) return false;
       const audiences = Array.isArray(note.audience) ? note.audience : (note.audience ? [note.audience] : []);
@@ -870,6 +899,7 @@
       return;
     }
 
+    const notificationManager = getNotificationCenterManager();
     const typeLabelMap = {
       pdc: "PDC",
       "pdc-reminder": "PDC reminder",
@@ -941,11 +971,12 @@
       const noteId = escapeAttr(note.id || "");
       const message = escapeHtml(note.message || "");
       const time = formatDateTime(note.sentAt || note.createdAt);
-      const typeLabel = typeLabelMap[note.type] || "Update";
+      const typeLabel = notificationManager ? notificationManager.getTypeLabel(note.type) : (typeLabelMap[note.type] || "Update");
       const typeClass = `tag-${String(note.type || "update").toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
       const details = Array.isArray(note.details) ? note.details : [];
-      const title = escapeHtml(buildNotificationTitle(note, details));
-      const invoiceValue = getDetailValue(details, "Invoice");
+      const title = escapeHtml(notificationManager ? notificationManager.buildTitle({ ...note, details }) : buildNotificationTitle(note, details));
+      const defaultRoute = notificationManager ? notificationManager.getDefaultRoute({ ...note, details }) : null;
+      const invoiceValue = defaultRoute?.invoiceNo || getDetailValue(details, "Invoice");
       const detailHtml = details.map((detail) => `
         <div class="notificationDetailRow">
           <span>${escapeHtml(detail.label)}</span>
@@ -954,14 +985,14 @@
       `).join("");
       const ctas = Array.isArray(note.ctas) ? note.ctas : [];
       const defaultCta = ctas[0] || {};
-      const defaultAction = defaultCta.action
+      const defaultAction = defaultRoute?.action || defaultCta.action
         || (note.type === "visit-approval" ? "link"
           : (note.type === "pdc" || note.type === "pdc-reminder") ? "open-pdc"
             : note.type === "todo" ? "open-todo"
               : note.type === "email" ? "open-email"
                 : note.type === "commitment-approved" ? "open-invoice"
                   : "");
-      const defaultHref = defaultCta.href
+      const defaultHref = defaultRoute?.href || defaultCta.href
         || (note.type === "visit-approval" ? "pages/visitmoduleReview.html" : "");
       const defaultInv = defaultCta.invoiceNo || invoiceValue || "";
       const ctaHtml = ctas.map((cta) => `
@@ -994,6 +1025,15 @@
   };
 
   const markVisibleNotificationsRead = () => {
+    const manager = getNotificationCenterManager();
+    if (manager) {
+      manager.markVisibleRead({
+        audience: role,
+        normalizeDueScheduled: true
+      });
+      updateBellNotificationBadge();
+      return;
+    }
     const list = loadNotificationCenter();
     const visibleIds = new Set(getVisibleNotificationCenter().filter(shouldShowInBell).map(note => note.id));
     const updated = list.map((note) => {

@@ -1568,7 +1568,13 @@ function renderStoredRemarks(invoiceNo) {
   }).join("");
 }
 
+function getNotificationCenterManager() {
+  return window.IneburaNotificationCenter || null;
+}
+
 function loadNotificationCenter() {
+  const manager = getNotificationCenterManager();
+  if (manager) return manager.load();
   try {
     const raw = localStorage.getItem(notificationCenterKey);
     if (!raw) return [];
@@ -1581,6 +1587,11 @@ function loadNotificationCenter() {
 }
 
 function saveNotificationCenter(list) {
+  const manager = getNotificationCenterManager();
+  if (manager) {
+    manager.save(list);
+    return;
+  }
   try {
     localStorage.setItem(notificationCenterKey, JSON.stringify(list));
   } catch (err) {
@@ -1589,6 +1600,8 @@ function saveNotificationCenter(list) {
 }
 
 function addNotificationCenterItem(note) {
+  const manager = getNotificationCenterManager();
+  if (manager) return manager.upsert(note);
   const list = loadNotificationCenter();
   const payload = {
     id: note.id || `note-${Date.now()}`,
@@ -1617,6 +1630,11 @@ function addNotificationCenterItem(note) {
 }
 
 function normalizeNotificationCenter() {
+  const manager = getNotificationCenterManager();
+  if (manager) {
+    manager.getVisible({ normalizeDueScheduled: true });
+    return manager.load();
+  }
   const list = loadNotificationCenter();
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -1676,6 +1694,14 @@ function getNotificationAudience() {
 }
 
 function getVisibleNotificationCenter() {
+  const manager = getNotificationCenterManager();
+  if (manager) {
+    return manager.getVisible({
+      audience: getNotificationAudience(),
+      activeUser: getActiveNotificationUser(),
+      normalizeDueScheduled: true
+    });
+  }
   const audience = getNotificationAudience();
   const activeUser = normalizeAudienceUser(getActiveNotificationUser());
   return normalizeNotificationCenter().filter((note) => {
@@ -1694,10 +1720,21 @@ function getVisibleNotificationCenter() {
 
 function getNotificationCenterItemById(noteId) {
   if (!noteId) return null;
+  const manager = getNotificationCenterManager();
+  if (manager) return manager.getById(noteId);
   return normalizeNotificationCenter().find((note) => note.id === noteId) || null;
 }
 
 function markNotificationCenterRead() {
+  const manager = getNotificationCenterManager();
+  if (manager) {
+    manager.markVisibleRead({
+      audience: getNotificationAudience(),
+      activeUser: getActiveNotificationUser(),
+      normalizeDueScheduled: true
+    });
+    return;
+  }
   const list = loadNotificationCenter();
   const visibleIds = new Set(getVisibleNotificationCenter().map(note => note.id));
   const updated = list.map((note) => {
@@ -3165,11 +3202,13 @@ function renderNotificationPopup() {
     const noteId = escapeAttr(note.id || "");
     const message = safeText(note.message || "");
     const time = formatNotificationTime(note.sentAt || note.createdAt);
-    const typeLabel = typeLabelMap[note.type] || "Update";
+    const notificationManager = getNotificationCenterManager();
+    const typeLabel = notificationManager ? notificationManager.getTypeLabel(note.type) : (typeLabelMap[note.type] || "Update");
     const typeClass = `tag-${String(note.type || "update").toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
     const details = Array.isArray(note.details) ? note.details : [];
-    const title = safeText(buildNotificationTitle(note, details));
-    const invoiceValue = getDetailValue(details, "Invoice");
+    const title = safeText(notificationManager ? notificationManager.buildTitle({ ...note, details }) : buildNotificationTitle(note, details));
+    const defaultRoute = notificationManager ? notificationManager.getDefaultRoute({ ...note, details }) : null;
+    const invoiceValue = defaultRoute?.invoiceNo || getDetailValue(details, "Invoice");
     const detailHtml = details.map((detail) => `
       <div class="notificationDetailRow">
         <span>${safeText(detail.label)}</span>
@@ -3178,7 +3217,7 @@ function renderNotificationPopup() {
     `).join("");
     const ctas = Array.isArray(note.ctas) ? note.ctas : [];
     const defaultCta = ctas[0] || {};
-    const defaultAction = defaultCta.action
+    const defaultAction = defaultRoute?.action || defaultCta.action
       || ((note.type === "visit-approval" || note.type === "visit-approval-pending" || note.type === "visit-plan-approved" || note.type === "visit-replan-required") ? "link"
         : (note.type === "pdc" || note.type === "pdc-reminder" || note.type === "pdc-bounced" || note.type === "pdc-handoff") ? "open-pdc"
           : note.type === "todo" ? "open-todo"
@@ -3199,7 +3238,7 @@ function renderNotificationPopup() {
                                       : note.type === "support-ticket-update" ? "link"
                                         : note.type === "support-sla-risk" ? "link"
                 : "");
-    const defaultHref = defaultCta.href
+    const defaultHref = defaultRoute?.href || defaultCta.href
       || ((note.type === "visit-approval" || note.type === "visit-approval-pending") ? "pages/visitmoduleReview.html"
         : note.type === "visit-plan-approved" ? "pages/visitmodule.html"
           : note.type === "visit-replan-required" ? "pages/visitmodule.html"
@@ -3273,10 +3312,29 @@ let todoTasks = [];
 let todoTaskCounter = 0;
 let todoShowCompleted = false;
 
+function renderTodoCustomerOptions() {
+  const select = document.getElementById("todoCustomerSelect");
+  if (!select) return;
+  const previousValue = select.value;
+  select.innerHTML = `<option value="">No customer</option>`;
+  customersData.forEach((customer) => {
+    const option = document.createElement("option");
+    option.value = customer.id;
+    option.textContent = `${customer.name} (${customer.code})`;
+    select.appendChild(option);
+  });
+  const preferredValue = isAllCustomersScope()
+    ? ""
+    : (previousValue || selectedCustomerId);
+  select.value = customersData.some((customer) => customer.id === preferredValue) ? preferredValue : "";
+}
+
 function renderTodoInvoiceOptions() {
   const select = document.getElementById("todoInvoiceSelect");
   if (!select) return;
-  const customer = customersData.find(c => c.id === selectedCustomerId);
+  const customerSelect = document.getElementById("todoCustomerSelect");
+  const previousValue = select.value;
+  const customer = customersData.find(c => c.id === customerSelect?.value);
   select.innerHTML = `<option value="">No invoice</option>`;
   (customer?.invoices || []).forEach((inv) => {
     const option = document.createElement("option");
@@ -3284,6 +3342,7 @@ function renderTodoInvoiceOptions() {
     option.textContent = `${inv.invoiceNo} - Rs.${formatINR(inv.netDueAmount || 0)}`;
     select.appendChild(option);
   });
+  select.value = (customer?.invoices || []).some((invoice) => invoice.invoiceNo === previousValue) ? previousValue : "";
 }
 
 function buildInvoiceMeta(invoice) {
@@ -3394,7 +3453,10 @@ function renderTodoList() {
 
   const buildTaskRow = (task) => {
     const dueLine = `Due ${formatTodoDue(task)}`;
-    const customerLine = `Customer ${safeText(task.customerName)} (${safeText(task.customerCode)})`;
+    const hasCustomer = task.customerName && task.customerName !== "-";
+    const customerLine = hasCustomer
+      ? `Customer ${safeText(task.customerName)} (${safeText(task.customerCode)})`
+      : "Portfolio task";
     const assigneeLine = `Assignee ${safeText(task.assignedTo || "-")}`;
     let invoiceLine = "Invoice: -";
     if (task.invoice) {
@@ -4918,9 +4980,6 @@ function getBaseFilteredInvoices() {
   const fNetDue = filterState.netDue;
   const fUnreadOnly = filterState.unreadOnly;
   const invoiceSearch = (document.getElementById("invoiceSearch")?.value || "").trim().toLowerCase();
-  const selectedCustomer = customersData.find(c => c.id === selectedCustomerId);
-  const selectedCustomerName = String(selectedCustomer?.name || "").toLowerCase();
-  const selectedCustomerCode = String(selectedCustomer?.code || "").toLowerCase();
 
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -4952,7 +5011,9 @@ function getBaseFilteredInvoices() {
         || String(inv.invoiceStatus || "").toLowerCase().includes(invoiceSearch)
         || String(inv.primaryStatus || "").toLowerCase().includes(invoiceSearch)
         || subStatus.includes(invoiceSearch);
-      const customerMatches = selectedCustomerName.includes(invoiceSearch) || selectedCustomerCode.includes(invoiceSearch);
+      const invoiceCustomer = getCustomerForInvoice(inv);
+      const customerMatches = String(invoiceCustomer?.name || "").toLowerCase().includes(invoiceSearch)
+        || String(invoiceCustomer?.code || "").toLowerCase().includes(invoiceSearch);
       if (!invoiceMatches && !customerMatches) return false;
     }
     return true;
@@ -6900,6 +6961,7 @@ function renderCustomerDetails(customer) {
   setDetailValue("customerMtdCollection", `Rs. ${formatINR(mtdCollection)}`);
   setDetailValue("customerCnAdvPdc", `Rs. ${formatINR(cnAdvPdc)}`);
   setDetailValue("customerNetDueAmount", `Rs. ${formatINR(netDueComputed)}`);
+  renderScopeContexts(customer, currentInvoiceNoForDocs ? currentInvoicesAll.find((invoice) => invoice.invoiceNo === currentInvoiceNoForDocs) : null);
 }
 
 function renderCustomerContacts(customer) {
@@ -6973,6 +7035,7 @@ function renderInvoiceDetails(invoice) {
     setDetailValue("invoiceIndustry", "-");
     renderStoredRemarks(null);
     renderStoredActivityTrail(null);
+    renderScopeContexts(customer, null);
     return;
   }
 
@@ -7006,6 +7069,7 @@ function renderInvoiceDetails(invoice) {
 
   renderStoredRemarks(invoice.invoiceNo);
   renderStoredActivityTrail(invoice.invoiceNo);
+  renderScopeContexts(customer, invoice);
 }
 
 function highlightInvoiceRow(invNo) {
@@ -7074,6 +7138,7 @@ function renderDocsList(customer) {
 
   if (filtered.length === 0) {
     wrap.innerHTML = `<div class="kv"><span>No documents</span><strong>-</strong></div>`;
+    renderScopeContexts(customer, currentInvoiceNoForDocs ? currentInvoicesAll.find((invoice) => invoice.invoiceNo === currentInvoiceNoForDocs) : null);
     return;
   }
 
@@ -7098,6 +7163,7 @@ function renderDocsList(customer) {
       </div>
     `;
   }).join("");
+  renderScopeContexts(customer, currentInvoiceNoForDocs ? currentInvoicesAll.find((invoice) => invoice.invoiceNo === currentInvoiceNoForDocs) : null);
 }
 
 function getDocKey(doc) {
@@ -7192,7 +7258,7 @@ function setActiveTab(tabKey) {
   if (tabKey === "docs") {
     const customer = customersData.find(c => c.id === selectedCustomerId);
     if (!customer) return;
-    currentDocsScope = currentInvoiceNoForDocs ? "invoice" : "customer";
+    currentDocsScope = "invoice";
     renderDocsInvoiceSelect(customer);
     renderDocsList(customer);
     renderDocsPicker(customer);
@@ -7204,6 +7270,7 @@ function setActiveTab(tabKey) {
 // ===============================
 // Global state for table filtering + selection
 // ===============================
+let tableScope = "all";
 let selectedCustomerId = customersData[0]?.id || null;
 let activeLeftTab = "customers";
 let activeAgentName = initialAgentParam || null;
@@ -7214,7 +7281,7 @@ let selectedInvoiceNos = new Set();
 let currentPage = 1;
 const pageSize = 5;
 let currentInvoiceNoForDocs = null;
-let currentDocsScope = "customer";
+let currentDocsScope = "invoice";
 let dispositionInvoiceFilter = null;
 let dispositionInvoiceList = [];
 let emailInvoiceFilter = null;
@@ -7240,6 +7307,69 @@ let strategyPanelMode = "running";
 let runningStrategyModalInvoiceNo = "";
 let runningStrategyModalItems = [];
 let runningStrategyModalIndex = 0;
+
+function isAllCustomersScope() {
+  return tableScope === "all";
+}
+
+function getCustomerForInvoice(invoice) {
+  if (!invoice) return null;
+  return customersData.find((customer) => (customer.invoices || []).includes(invoice))
+    || customersData.find((customer) => (customer.invoices || []).some((item) => item.invoiceNo === invoice.invoiceNo))
+    || null;
+}
+
+function getAllCustomerInvoices() {
+  return customersData.flatMap((customer) => customer.invoices || []);
+}
+
+function getPortfolioSummary() {
+  return customersData.reduce((summary, customer) => {
+    const invoices = customer.invoices || [];
+    summary.invoiceCount += invoices.length;
+    summary.totalInvoice += Number(customer.totalInvoiceAmount || 0);
+    summary.netDue += getCustomerNetDue(customer);
+    summary.mtdCollection += Number(customer.mtdCollection || 0);
+    summary.target += Number(customer.targetTotal || sumInvoiceTargets(invoices));
+    summary.cnAdvPdc += Number(customer.cnAdvPdcAmount || 0);
+    return summary;
+  }, { invoiceCount: 0, totalInvoice: 0, netDue: 0, mtdCollection: 0, target: 0, cnAdvPdc: 0 });
+}
+
+function getFirstVisibleCustomer() {
+  return getFilteredCustomers()[0] || customersData[0] || null;
+}
+
+function updatePortfolioScopeState() {
+  const customer = customersData.find((item) => item.id === selectedCustomerId) || null;
+  document.body.dataset.lpCustomerScope = isAllCustomersScope() ? "all" : "customer";
+  window.IneburaLPAgentScope = {
+    tableScope,
+    customerId: customer?.id || "",
+    customerName: customer?.name || "",
+    customerCode: customer?.code || "",
+    customers: customersData.map(({ id, name, code }) => ({ id, name, code }))
+  };
+  window.dispatchEvent(new CustomEvent("lpagent:scopechange", { detail: window.IneburaLPAgentScope }));
+}
+
+function renderScopeContexts(customer = null, invoice = null) {
+  const activeCustomer = customer || customersData.find((item) => item.id === selectedCustomerId) || null;
+  const customerContextEl = document.getElementById("customerSummaryContext");
+  const invoiceContextEl = document.getElementById("invoiceCustomerContext");
+  const docsContextEl = document.getElementById("docsContext");
+  const customerLabel = activeCustomer ? `${activeCustomer.name} • ${activeCustomer.code}` : "No customer selected";
+  const invoiceLabel = invoice?.invoiceNo ? `Invoice: ${invoice.invoiceNo}` : "No invoice selected";
+
+  if (customerContextEl) customerContextEl.innerHTML = `<span class="scopePill">Viewing: ${safeText(customerLabel)}</span>`;
+  if (invoiceContextEl) {
+    const customerControl = activeCustomer
+      ? `<button class="scopePill scopeContextButton" type="button" data-action="select-customer-from-invoice-summary" data-customer-id="${safeText(activeCustomer.id)}" title="Select ${safeText(activeCustomer.name)} in Customers">Customer: ${safeText(customerLabel)}</button>`
+      : `<span class="scopePill">Customer: ${safeText(customerLabel)}</span>`;
+    invoiceContextEl.innerHTML = customerControl;
+  }
+  if (docsContextEl) docsContextEl.innerHTML = `<span class="scopePill">Customer: ${safeText(customerLabel)}</span><span>${safeText(invoiceLabel)}</span>`;
+}
 
 const filterState = {
   invoiceStatus: "__ALL__",
@@ -7358,6 +7488,33 @@ function renderCustomers(customers, selectedId) {
   if (!wrap) return;
 
   wrap.innerHTML = "";
+
+  const portfolio = getPortfolioSummary();
+  const allCard = document.createElement("div");
+  allCard.className = `customerCard allCustomersCard ${isAllCustomersScope() ? "active" : ""}`;
+  allCard.setAttribute("data-scope", "all");
+  allCard.innerHTML = `
+    <div class="custHeaderRow">
+      <div class="custName">All Customers <span class="portfolioInvoiceCount" aria-label="${portfolio.invoiceCount} invoices">${portfolio.invoiceCount}</span></div>
+      <div class="custCode">PORTFOLIO</div>
+    </div>
+    <div class="custMetricsRow">
+      <div class="metricInline">
+        <span>Total Invoice</span>
+        <strong>Rs.${formatINR(portfolio.totalInvoice)}</strong>
+      </div>
+      <div class="metricInline">
+        <span>Total Net Due</span>
+        <strong>Rs.${formatINR(portfolio.netDue)}</strong>
+      </div>
+      <div class="metricInline">
+        <span>MTD Collection</span>
+        <strong>Rs.${formatINR(portfolio.mtdCollection)}</strong>
+      </div>
+    </div>
+  `;
+  allCard.addEventListener("click", () => selectAllCustomers());
+  wrap.appendChild(allCard);
 
   customers.forEach(c => {
     const card = document.createElement("div");
@@ -7820,6 +7977,8 @@ function renderInvoiceTable(invoices) {
     const isChecked = selectedInvoiceNos.has(inv.invoiceNo);
     const tr = document.createElement("tr");
     const subStatus = inv.subStatus ?? inv.status ?? "-";
+    const invoiceCustomer = getCustomerForInvoice(inv);
+    const invoiceCustomerId = invoiceCustomer?.id || customerId;
 
     const targetTitle = `Target: Rs.${formatINR(inv.targetForMonth)} (≤ Invoice)`;
 
@@ -7828,7 +7987,7 @@ function renderInvoiceTable(invoices) {
     const emailTitle = hasUnreadEmail
       ? `Unread emails: ${inv.unreadEmailCount}`
       : "Email panel";
-    const runningStrategies = getScheduledRunningStrategiesForInvoice(inv.invoiceNo, customerId);
+    const runningStrategies = getScheduledRunningStrategiesForInvoice(inv.invoiceNo, invoiceCustomerId);
     const hasRunningStrategy = runningStrategies.length > 0;
     const hasStrategyAccent = hasRunningStrategy;
     const strategyTitle = hasRunningStrategy ? "View running strategy details" : "No scheduled running strategy";
@@ -7892,7 +8051,12 @@ function renderInvoiceTable(invoices) {
         </span>
       </td>` : ""}
 
-      <td class="colInv" title="${inv.invoiceNo}">${inv.invoiceNo}</td>
+      <td class="colInv" title="${inv.invoiceNo}">
+        <div>${inv.invoiceNo}</div>
+        ${isAllCustomersScope() && invoiceCustomer
+          ? `<span class="invoiceCustomerBadge" role="button" tabindex="0" data-action="select-customer" data-customer-id="${safeText(invoiceCustomer.id)}" title="Select ${safeText(invoiceCustomer.name)}">${safeText(invoiceCustomer.name)}</span>`
+          : ""}
+      </td>
       <td class="colAmtRight" title="Rs.${formatINR(inv.invoiceAmount)}">Rs.${formatINR(inv.invoiceAmount)}</td>
       <td class="colAmtRight" title="Rs.${formatINR(inv.amountForMonth)}">Rs.${formatINR(inv.amountForMonth)}</td>
       <td class="colAmtRight" title="Rs.${formatINR(inv.netDueAmount)}">Rs.${formatINR(inv.netDueAmount)}</td>
@@ -7933,6 +8097,21 @@ function renderCenter(customer) {
   const dispositionTagEl = document.getElementById("dispositionCustomerTag");
 
   if (!customer) return;
+
+  if (isAllCustomersScope()) {
+    const portfolio = getPortfolioSummary();
+    if (nameEl) nameEl.firstChild.nodeValue = "ALL CUSTOMERS ";
+    if (codeEl) codeEl.textContent = "PORTFOLIO";
+    if (openEl) openEl.textContent = String(portfolio.invoiceCount);
+    if (outstandingEl) outstandingEl.textContent = `Rs.${formatINR(portfolio.netDue)}`;
+    if (cityEl) cityEl.textContent = "Portfolio";
+    if (targetEl) targetEl.textContent = `Rs.${formatINR(portfolio.target)}`;
+    if (cnAdvEl) cnAdvEl.textContent = `Rs.${formatINR(portfolio.cnAdvPdc)}`;
+    updateCenterIssueCountDisplay(0);
+    if (dispositionTagEl) dispositionTagEl.textContent = "All Customers";
+    renderScopeContexts(customer, null);
+    return;
+  }
 
   if (nameEl) nameEl.firstChild.nodeValue = `${customer.name} `;
   if (codeEl) codeEl.textContent = customer.code;
@@ -8046,46 +8225,101 @@ function updateBulkBar() {
 // ===============================
 // State + actions
 // ===============================
-function selectCustomer(customerId) {
+function resetInvoiceFilters() {
+  filterState.invoiceStatus = "__ALL__";
+  filterState.primaryStatus = "__ALL__";
+  filterState.status = "__ALL__";
+  filterState.netDue = "__ALL__";
+  setUnreadFilterActive(false);
+}
+
+function selectCustomer(customerId, options = {}) {
+  const {
+    activeTab = "customer",
+    invoiceNo = ""
+  } = options;
+  const selected = customersData.find(c => c.id === customerId);
+  if (!selected) return;
+
+  tableScope = "customer";
   selectedCustomerId = customerId;
 
   selectedInvoiceNos = new Set();
   strategyPanelMode = "running";
   showStrategyForm(false);
   emailInvoiceFilter = null;
-  currentDocsScope = "customer";
+  currentDocsScope = "invoice";
   updateBulkBar();
   closeFloatingMenu();
-
-  const selected = customersData.find(c => c.id === selectedCustomerId);
   renderCustomers(getFilteredCustomers(), selectedCustomerId);
 
-  if (selected) {
-    renderCenter(selected);
+  renderCenter(selected);
+  currentInvoicesAll = selected.invoices || [];
+  currentPage = 1;
+  resetInvoiceFilters();
+  populateFilters(currentInvoicesAll);
 
-    currentInvoicesAll = selected.invoices || [];
-    currentPage = 1;
-    filterState.invoiceStatus = "__ALL__";
-    filterState.primaryStatus = "__ALL__";
-    filterState.status = "__ALL__";
-    filterState.netDue = "__ALL__";
-    populateFilters(currentInvoicesAll);
+  currentInvoiceNoForDocs = null;
+  renderCustomerDetails(selected);
+  renderInvoiceDetails(null);
+  renderDocsInvoiceSelect(selected);
+  renderDocsList(selected);
+  renderDocsPicker(selected);
+  resetDispositionState();
+  renderTodoCustomerOptions();
+  renderTodoInvoiceOptions();
+  updateUnreadEmailToggleCount();
+  updatePortfolioScopeState();
+  applyFiltersAndRender();
 
-    renderCustomerDetails(selected);
-    renderInvoiceDetails(null);
-    setActiveTab("customer");
-    currentInvoiceNoForDocs = null;
-    renderDocsInvoiceSelect(selected);
-    renderDocsList(selected);
-    renderDocsPicker(selected);
-    resetDispositionState();
-    renderTodoInvoiceOptions();
-
-    setUnreadFilterActive(false);
-    updateUnreadEmailToggleCount();
-
-    applyFiltersAndRender();
+  if (invoiceNo && selectInvoiceByNo(invoiceNo)) {
+    setActiveTab(activeTab);
+    return;
   }
+  setActiveTab(activeTab);
+}
+
+function selectAllCustomers() {
+  const detailCustomer = getFirstVisibleCustomer();
+  if (!detailCustomer) return;
+
+  tableScope = "all";
+  selectedCustomerId = detailCustomer.id;
+  selectedInvoiceNos = new Set();
+  strategyPanelMode = "running";
+  showStrategyForm(false);
+  emailInvoiceFilter = null;
+  currentDocsScope = "invoice";
+  closeFloatingMenu();
+  currentInvoicesAll = getAllCustomerInvoices();
+  currentPage = 1;
+  resetInvoiceFilters();
+  populateFilters(currentInvoicesAll);
+  const detailInvoice = getBaseFilteredInvoices()[0] || currentInvoicesAll[0] || null;
+  currentInvoiceNoForDocs = detailInvoice?.invoiceNo || null;
+  renderCustomers(getFilteredCustomers(), null);
+  renderCenter(detailCustomer);
+  renderCustomerDetails(detailCustomer);
+  renderInvoiceDetails(detailInvoice);
+  renderDocsInvoiceSelect(detailCustomer);
+  renderDocsList(detailCustomer);
+  renderDocsPicker(detailCustomer);
+  resetDispositionState();
+  renderTodoCustomerOptions();
+  renderTodoInvoiceOptions();
+  updatePortfolioScopeState();
+  applyFiltersAndRender();
+  setActiveTab("invoice");
+}
+
+function activateFirstVisibleDetailForTab(tabKey) {
+  const firstInvoice = getBaseFilteredInvoices()[0] || currentInvoicesAll[0] || null;
+  const customer = firstInvoice ? getCustomerForInvoice(firstInvoice) : getFirstVisibleCustomer();
+  if (!customer) return;
+  selectCustomer(customer.id, {
+    activeTab: tabKey,
+    invoiceNo: tabKey === "customer" ? "" : (firstInvoice?.invoiceNo || "")
+  });
 }
 
 function getFilteredCustomers() {
@@ -8220,11 +8454,29 @@ function wireTabEvents() {
     btn.addEventListener("click", () => {
       const tabKey = btn.getAttribute("data-tab");
       if (!tabKey) return;
+      if (isAllCustomersScope() && ["customer", "invoice", "docs"].includes(tabKey)) {
+        activateFirstVisibleDetailForTab(tabKey);
+        return;
+      }
       if (tabKey === "invoice" || tabKey === "docs") {
         ensureFirstInvoiceSelected();
       }
       setActiveTab(tabKey);
     });
+  });
+}
+
+function wireInvoiceCustomerContextEvents() {
+  const context = document.getElementById("invoiceCustomerContext");
+  if (!context) return;
+
+  context.addEventListener("click", (event) => {
+    const trigger = event.target.closest("[data-action='select-customer-from-invoice-summary']");
+    if (!trigger) return;
+    const customerId = trigger.getAttribute("data-customer-id") || "";
+    const invoiceNo = currentInvoiceNoForDocs || "";
+    if (!customerId) return;
+    selectCustomer(customerId, { activeTab: "invoice", invoiceNo });
   });
 }
 
@@ -10694,6 +10946,13 @@ function wireInvoiceTableEvents() {
   });
 
   tbody.addEventListener("keydown", (e) => {
+    const customerBadge = e.target.closest(".invoiceCustomerBadge[data-customer-id]");
+    if (customerBadge) {
+      if (e.key !== "Enter" && e.key !== " ") return;
+      e.preventDefault();
+      customerBadge.click();
+      return;
+    }
     const iconBtn = e.target.closest(".iconFlat[role='button']");
     if (!iconBtn) return;
     if (e.key !== "Enter" && e.key !== " ") return;
@@ -10705,14 +10964,30 @@ function wireInvoiceTableEvents() {
     const btn = e.target.closest("button");
     const iconFlat = e.target.closest(".iconFlat");
     const iconWrap = e.target.closest(".iconWrap");
+    const customerBadge = e.target.closest(".invoiceCustomerBadge[data-customer-id]");
     const chk = e.target.closest(".invChk");
     const row = e.target.closest("tr");
+
+    if (customerBadge) {
+      const customerId = customerBadge.getAttribute("data-customer-id") || "";
+      if (customerId) selectCustomer(customerId, { activeTab: "customer" });
+      closeFloatingMenu();
+      return;
+    }
 
     if (row && !btn && !iconFlat && !iconWrap && !chk) {
       const activeRow = tbody.querySelector("tr.rowActive");
       if (activeRow && activeRow !== row) activeRow.classList.remove("rowActive");
       row.classList.add("rowActive");
       const invNo = row.querySelector(".invChk")?.getAttribute("data-inv");
+      if (isAllCustomersScope()) {
+        const context = findInvoiceContext(invNo);
+        if (context) {
+          selectCustomer(context.customer.id, { activeTab: "invoice", invoiceNo: invNo });
+        }
+        closeFloatingMenu();
+        return;
+      }
       const invoice = currentInvoicesAll.find(inv => inv.invoiceNo === invNo);
       if (invoice) {
         renderInvoiceDetails(invoice);
@@ -10843,6 +11118,7 @@ function wireTodoEvents() {
   const todoInput = document.getElementById("todoInput");
   const todoDueDate = document.getElementById("todoDueDate");
   const todoDueTime = document.getElementById("todoDueTime");
+  const todoCustomerSelect = document.getElementById("todoCustomerSelect");
   const todoInvoiceSelect = document.getElementById("todoInvoiceSelect");
   const todoAddBtn = document.getElementById("todoAddBtn");
   const todoList = document.getElementById("todoList");
@@ -10885,13 +11161,19 @@ function wireTodoEvents() {
     });
   }
 
+  if (todoCustomerSelect) {
+    todoCustomerSelect.addEventListener("change", () => {
+      renderTodoInvoiceOptions();
+    });
+  }
+
   if (todoAddBtn) {
     todoAddBtn.addEventListener("click", () => {
       const text = todoInput ? todoInput.value.trim() : "";
       if (!text) return;
-      const customer = customersData.find(c => c.id === selectedCustomerId);
+      const customer = customersData.find(c => c.id === todoCustomerSelect?.value) || null;
       const invoiceNo = todoInvoiceSelect ? todoInvoiceSelect.value : "";
-      const invoice = invoiceNo ? currentInvoicesAll.find(inv => inv.invoiceNo === invoiceNo) : null;
+      const invoice = invoiceNo ? (customer?.invoices || []).find(inv => inv.invoiceNo === invoiceNo) : null;
 
       addTodoTask({
         text,
@@ -10905,6 +11187,7 @@ function wireTodoEvents() {
       if (todoInput) todoInput.value = "";
       if (todoDueDate) todoDueDate.value = "";
       if (todoDueTime) todoDueTime.value = "";
+      if (todoCustomerSelect) todoCustomerSelect.value = "";
       if (todoInvoiceSelect) todoInvoiceSelect.value = "";
     });
   }
@@ -11863,6 +12146,7 @@ document.addEventListener("DOMContentLoaded", () => {
   wireLeftPanelTabs();
 
   wireTabEvents();
+  wireInvoiceCustomerContextEvents();
   wireContactEvents();
   wireDispositionEvents();
   wireDispositionActivityEvents();
@@ -12093,23 +12377,8 @@ document.addEventListener("DOMContentLoaded", () => {
   ));
   localStorage.setItem(invoiceStorageKey, JSON.stringify(invoiceSnapshot));
 
-  renderCustomers(getFilteredCustomers(), selectedCustomerId);
   wireRunningStrategyModalEvents();
-  const first = customersData.find(c => c.id === selectedCustomerId) || customersData[0];
-  if (first) {
-    renderCenter(first);
-    currentInvoicesAll = first.invoices || [];
-    populateFilters(currentInvoicesAll);
-    renderCustomerDetails(first);
-    renderInvoiceDetails(null);
-    setActiveTab("customer");
-    renderDocsInvoiceSelect(first);
-    renderDocsList(first);
-    renderDocsPicker(first);
-    resetDispositionState();
-    renderTodoInvoiceOptions();
-    renderTodoList();
-    updateTodoBadge();
-    applyFiltersAndRender();
-  }
+  selectAllCustomers();
+  renderTodoList();
+  updateTodoBadge();
 });

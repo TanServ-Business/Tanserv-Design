@@ -76,7 +76,18 @@
     return node ? toText(node.textContent) : "";
   };
 
+  const getLandingScope = () => window.IneburaLPAgentScope || null;
+
   const detectScope = () => {
+    const landingScope = getLandingScope();
+    if (landingScope?.tableScope === "all") {
+      return {
+        scopeKey: "__all_customers__",
+        scopeLabel: "All Customers",
+        scopeName: "All Customers",
+        isPortfolio: true
+      };
+    }
     const codeCenter = getNodeText("#centerCustomerCode");
     const nameCenter = toText((getNodeText("#centerCustomerName") || "").split("CUST-")[0]);
 
@@ -114,7 +125,8 @@
     return {
       scopeKey: normalize(fallback),
       scopeLabel: fallback,
-      scopeName: fallback
+      scopeName: fallback,
+      isPortfolio: false
     };
   };
 
@@ -226,10 +238,14 @@
   const buildMainTile = (note, state, surface) => {
     const meta = escapeHtml(formatCreatorStamp(note.createdBy, note.updatedAt));
     const isEditing = state.editing?.surface === surface && state.editing?.noteId === note.id;
+    const scope = state.scope?.isPortfolio && note.scopeLabel
+      ? `<div class="customerNotesTileScope"><span class="customerNotesScopePill">${escapeHtml(note.scopeLabel)}</span></div>`
+      : "";
 
     if (isEditing) {
       return `
         <article class="customerNotesTile customerNotesTileEditing customerNotesTileEditorFocus" data-note-id="${escapeHtml(note.id)}" data-surface="${escapeHtml(surface)}">
+          ${scope}
           <textarea class="customerNotesInlineEditor" data-edit-input>${escapeHtml(note.text)}</textarea>
           <div class="customerNotesTileFooter">
             <div class="customerNotesTileMeta">${meta}</div>
@@ -244,6 +260,7 @@
 
     return `
       <article class="customerNotesTile" data-note-id="${escapeHtml(note.id)}">
+        ${scope}
         <div class="customerNotesTileBody">${buildPreviewText(note, surface, 90, false)}</div>
         <div class="customerNotesTileFooter">
           <div class="customerNotesTileMeta">${meta}</div>
@@ -278,6 +295,7 @@
 
         <div class="customerNotesComposer">
           <textarea class="customerNotesComposerInput" data-main-input placeholder="Add note..."></textarea>
+          <select class="customerNotesScopeSelect hidden" data-customer-scope-select aria-label="Customer for note"></select>
           <div class="customerNotesComposerActions">
             <button class="todoAddBtn customerNotesPrimaryBtn" type="button" data-action="add-note">Add Note</button>
           </div>
@@ -343,6 +361,7 @@
         const personal = Array.isArray(store.personal_notes[user.key]) ? store.personal_notes[user.key] : [];
         return sortByNewest(personal);
       }
+      if (state.scope.isPortfolio) return sortByNewest(store.customer_notes);
       return sortByNewest(store.customer_notes.filter((note) => normalize(note.scopeKey) === normalize(state.scope.scopeKey)));
     };
 
@@ -370,6 +389,7 @@
       const addBtn = root.querySelector('[data-action="add-note"]');
       const input = root.querySelector("[data-main-input]");
       const listEl = root.querySelector("[data-main-list]");
+      const customerScopeSelect = root.querySelector("[data-customer-scope-select]");
 
       const isPersonal = state.mode === "personal";
       customerBtn?.classList.toggle("is-active", !isPersonal);
@@ -378,7 +398,9 @@
       if (scopeHint) {
         scopeHint.textContent = isPersonal
           ? `My Notepad (${getUser().name})`
-          : `Customer Notes • ${state.scope.scopeName || state.scope.scopeLabel}`;
+          : state.scope.isPortfolio
+            ? "Customer Notes • All Customers"
+            : `Customer Notes • ${state.scope.scopeName || state.scope.scopeLabel}`;
       }
 
       if (input) {
@@ -389,6 +411,20 @@
 
       if (addBtn) {
         addBtn.textContent = isPersonal ? "Add to My Notepad" : "Add Customer Note";
+      }
+
+      if (customerScopeSelect) {
+        const shouldShowCustomerPicker = !isPersonal && state.scope.isPortfolio;
+        customerScopeSelect.classList.toggle("hidden", !shouldShowCustomerPicker);
+        if (shouldShowCustomerPicker) {
+          const previousValue = customerScopeSelect.value;
+          const customers = Array.isArray(getLandingScope()?.customers) ? getLandingScope().customers : [];
+          customerScopeSelect.innerHTML = [
+            '<option value="">Choose customer...</option>',
+            ...customers.map((customer) => `<option value="${escapeHtml(customer.id)}">${escapeHtml(customer.name)} (${escapeHtml(customer.code)})</option>`)
+          ].join("");
+          customerScopeSelect.value = customers.some((customer) => customer.id === previousValue) ? previousValue : "";
+        }
       }
 
       const notes = getMainNotes();
@@ -654,7 +690,7 @@
       }
 
       const user = getUser();
-      const scope = detectScope();
+      let scope = detectScope();
       const now = new Date().toISOString();
       const store = getStore();
 
@@ -676,6 +712,21 @@
           ...userList
         ];
       } else {
+        if (scope.isPortfolio) {
+          const customerSelect = container.querySelector("[data-customer-scope-select]");
+          const customerId = toText(customerSelect?.value);
+          const customer = (getLandingScope()?.customers || []).find((item) => item.id === customerId);
+          if (!customer) {
+            customerSelect?.focus();
+            return;
+          }
+          scope = {
+            scopeKey: normalize(customer.code || customer.id),
+            scopeLabel: `${customer.name} (${customer.code})`,
+            scopeName: customer.name,
+            isPortfolio: false
+          };
+        }
         store.customer_notes.unshift({
           id: uid("cnote"),
           type: "customer",
@@ -915,6 +966,10 @@
         observer.observe(node, { childList: true, subtree: true, characterData: true });
       });
     }
+
+    window.addEventListener("lpagent:scopechange", () => {
+      if (state.mode === "customer") renderMain();
+    });
 
     // Ensure right-side notes panel is visible on pages where it starts hidden.
     const rightPanel = container.closest(".managerTodoPanel");

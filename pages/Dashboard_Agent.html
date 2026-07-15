@@ -30,6 +30,10 @@
       </div>
     </div>
     <div class="heroActions">
+      <button type="button" class="dashboardTrendToggleBtn" id="dashboardTrendsToggle" aria-label="Show performance trends" aria-pressed="false" title="Trends">
+        <i class="bi bi-graph-up-arrow" aria-hidden="true"></i>
+        <span data-trend-toggle-text>Trends</span>
+      </button>
       <div class="viewModeToggle" id="dashboardViewToggle" role="group" aria-label="Dashboard density view">
         <button type="button" class="viewToggleBtn" data-view-mode="compact" aria-pressed="false" aria-label="Compact view" title="Compact view">
           <i class="bi bi-arrows-angle-contract" aria-hidden="true"></i>
@@ -425,6 +429,194 @@
         </article>
       </div>
     </div>
+
+  </section>
+  <section class="performanceTrendsView" id="performanceTrendsView" aria-label="Performance Trends & Historical Insights" hidden>
+    <div class="trendPanel trendIntroPanel">
+      <div class="trendSectionHeader">
+        <div>
+          <div class="trendEyebrow">Trend Analytics</div>
+          <h2 class="trendTitle">Performance Trends & Historical Insights</h2>
+          <div class="trendSubtitle">Track performance over time and uncover what drives results.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="trendPanel trendFilterPanel">
+      <div class="trendControls" aria-label="Trend controls">
+        <div class="trendControlGroup trendViewControl">
+          <span>View</span>
+          <div class="trendRangeButtons" role="group" aria-label="Trend view">
+            <button type="button" class="trendRangeBtn" data-trend-range="all_time" aria-pressed="false">All Time</button>
+            <button type="button" class="trendRangeBtn" data-trend-range="yearly" aria-pressed="true">Yearly</button>
+            <button type="button" class="trendRangeBtn" data-trend-range="fiscal_year" aria-pressed="false">Fiscal Year</button>
+            <button type="button" class="trendRangeBtn" data-trend-range="quarterly" aria-pressed="false">Quarterly</button>
+            <button type="button" class="trendRangeBtn" data-trend-range="monthly" aria-pressed="false">Monthly</button>
+          </div>
+          <select id="trendRangeSelect" aria-label="Select trend filter" hidden>
+            <option value="all_time">All Time</option>
+            <option value="yearly">Yearly</option>
+            <option value="fiscal_year">Fiscal Year</option>
+            <option value="quarterly">Quarterly</option>
+            <option value="monthly">Monthly</option>
+          </select>
+        </div>
+        <span class="trendToolbarDivider" aria-hidden="true"></span>
+        <label class="trendControlGroup" for="trendYearInput" id="trendYearGroup">
+          <span id="trendYearLabel">Period</span>
+          <div class="trendMonthStepper">
+            <button type="button" class="trendIconBtn" id="trendPrevYearBtn" aria-label="Previous year">
+              <i class="bi bi-chevron-left" aria-hidden="true"></i>
+            </button>
+            <input type="number" id="trendYearInput" value="2026" min="2020" max="2026" step="1" aria-label="Select trend year" />
+            <button type="button" class="trendIconBtn" id="trendNextYearBtn" aria-label="Next year">
+              <i class="bi bi-chevron-right" aria-hidden="true"></i>
+            </button>
+          </div>
+        </label>
+        <label class="trendControlGroup" for="trendPeriodSelect" id="trendPeriodGroup" hidden>
+          <span id="trendPeriodLabel">Period</span>
+          <select id="trendPeriodSelect" aria-label="Select trend period"></select>
+        </label>
+        <div class="trendPeriodBadge">
+          <i class="bi bi-calendar3" aria-hidden="true"></i>
+          <strong id="trendSelectedPeriod" aria-live="polite">Yearly | 2026</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="trendCommandRow" aria-label="Trend command overview">
+      <article class="trendChartCard trendCommandMain">
+        <div class="trendChartHeader">
+          <div>
+            <div class="trendChartTitle">Collection Trend</div>
+            <div class="trendChartMeta">Collection movement over the selected period</div>
+          </div>
+        </div>
+        <div class="trendChartWrap"><canvas id="trendCollectionChart"></canvas></div>
+      </article>
+      <aside class="trendInsightRail" id="trendInsightGrid" aria-label="Trend summary insights"></aside>
+    </div>
+
+    <div class="trendDashboardGroups" aria-label="Trend charts">
+      <section class="trendDashboardGroup" aria-label="Activity and pipeline charts">
+        <div class="trendGroupGrid">
+          <article class="trendChartCard">
+            <div class="trendChartHeader">
+              <div>
+                <div class="trendChartTitle">Visits Trend</div>
+                <div class="trendChartMeta">Total field visits over time</div>
+              </div>
+              <strong class="trendCardValue" id="trendVisitTotal">-</strong>
+            </div>
+            <div class="trendChartWrap"><canvas id="trendOperationsChart"></canvas></div>
+          </article>
+          <article class="trendChartCard">
+            <div class="trendChartHeader">
+              <div>
+                <div class="trendChartTitle">New Billing</div>
+                <div class="trendChartMeta">Fresh billing booked over time</div>
+              </div>
+              <strong class="trendCardValue" id="trendBillingTotal">-</strong>
+            </div>
+            <div class="trendChartWrap"><canvas id="trendBillingChart"></canvas></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="trendDashboardGroup" aria-label="Submission and commitment charts">
+        <div class="trendGroupGrid">
+          <article class="trendChartCard">
+            <div class="trendChartHeader">
+              <div>
+                <div class="trendChartTitle">Invoice Submission</div>
+                <div class="trendChartMeta">Physical, courier, email, and external split</div>
+              </div>
+            </div>
+            <div class="trendChartWrap"><canvas id="trendSubmissionChart"></canvas></div>
+          </article>
+        </div>
+      </section>
+
+    </div>
+
+    <div class="trendHealthRow" aria-label="Receivables and agent movement">
+      <section class="trendDashboardGroup trendReceivablesGroup" aria-label="Receivables health charts">
+        <div class="trendGroupGrid">
+          <article class="trendChartCard">
+            <div class="trendChartHeader">
+              <div>
+                <div class="trendChartTitle">Aging Bucket Share</div>
+                <div class="trendChartMeta">Bucket share movement across the period</div>
+              </div>
+            </div>
+            <div class="trendChartWrap"><canvas id="trendAgingChart"></canvas></div>
+          </article>
+        </div>
+      </section>
+      <article class="trendChartCard trendPtpHealthCard">
+        <div class="trendChartHeader">
+          <div>
+            <div class="trendChartTitle">PTP Committed vs Collected</div>
+            <div class="trendChartMeta">Committed promise value and realized collection</div>
+          </div>
+        </div>
+        <div class="trendChartWrap"><canvas id="trendPtpChart"></canvas></div>
+      </article>
+      <article class="trendChartCard trendAgentCard">
+        <div class="trendChartHeader">
+          <div>
+            <div class="trendChartTitle">Agent-wise Collection Trend</div>
+            <div class="trendChartMeta">Collection trend by agent (Top 8)</div>
+          </div>
+          <label class="trendAgentMetricSelect">
+            <span>Metric</span>
+            <select aria-label="Agent-wise collection metric">
+              <option>Collection (Rs. Cr)</option>
+            </select>
+          </label>
+        </div>
+        <div class="trendChartWrap"><canvas id="trendAgentCollectionChart"></canvas></div>
+      </article>
+    </div>
+
+    <section class="trendCompositionSection" aria-labelledby="trendCompositionHeading">
+      <div class="trendGroupHeader">
+        <span class="trendGroupAccent" aria-hidden="true"></span>
+        <div>
+          <h3 id="trendCompositionHeading">Closing Period Composition</h3>
+          <p>Primary status mix for the latest visible period</p>
+        </div>
+      </div>
+      <div class="trendCompositionGrid">
+        <article class="trendChartCard is-status trendStatusCard">
+          <div class="trendChartHeader">
+            <div>
+              <div class="trendChartTitle">Activity Bifurcation</div>
+              <div class="trendChartMeta" id="trendActivityStatusMeta">Pie data: -</div>
+            </div>
+            <button type="button" class="trendStatusActionBtn" id="trendActivityPrimaryBtn" hidden>Primary</button>
+          </div>
+          <div class="trendStatusBody">
+            <div class="trendChartWrap trendPieWrap"><canvas id="trendActivityStatusChart"></canvas></div>
+            <div class="trendStatusCallouts" id="trendActivityStatusCallouts" aria-label="Activity bifurcation callouts"></div>
+          </div>
+        </article>
+        <article class="trendChartCard is-status trendStatusCard">
+          <div class="trendChartHeader">
+            <div>
+              <div class="trendChartTitle">Issue Bifurcation</div>
+              <div class="trendChartMeta" id="trendIssueStatusMeta">Pie data: -</div>
+            </div>
+            <button type="button" class="trendStatusActionBtn" id="trendIssuePrimaryBtn" hidden>Primary</button>
+          </div>
+          <div class="trendStatusBody">
+            <div class="trendChartWrap trendPieWrap"><canvas id="trendIssueStatusChart"></canvas></div>
+            <div class="trendStatusCallouts" id="trendIssueStatusCallouts" aria-label="Issue bifurcation callouts"></div>
+          </div>
+        </article>
+      </div>
+    </section>
 
   </section>
 </main>
@@ -5654,5 +5846,6 @@
     }
   })();
 </script>
+<script src="../scripts/manager-dashboard-trends.js"></script>
 </body>
 </html>
