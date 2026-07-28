@@ -121,7 +121,7 @@
     }
 
     .invoiceCustomerBadge {
-      display: block;
+      display: -webkit-box;
       margin-top: 2px;
       width: 100%;
       box-sizing: border-box;
@@ -129,8 +129,11 @@
       line-height: 1.15;
       color: #2563eb;
       overflow-wrap: anywhere;
-      text-align: left;
+      text-align: center;
       white-space: normal;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      overflow: hidden;
       cursor: pointer;
       border: 0;
       background: transparent;

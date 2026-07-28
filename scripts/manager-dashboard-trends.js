@@ -10,6 +10,7 @@
   const DEFAULT_YEAR = CURRENT_YEAR;
   const HISTORY_YEARS = 7;
   const chartInstances = {};
+  const trendEchartInstances = {};
   let currentStatusSnapshot = null;
   const currentStatusDrill = {
     activity: null,
@@ -32,6 +33,65 @@
     email: "rgba(245, 158, 11, 0.64)",
     external: "rgba(92, 37, 141, 0.58)"
   };
+  const collectionFilterDefinitions = [
+    { key: "agent", label: "Agent" },
+    { key: "manager", label: "Manager" },
+    { key: "kam", label: "KAM" },
+    { key: "kas", label: "KAS" },
+    { key: "city", label: "City" },
+    { key: "customerName", label: "Customer" },
+    { key: "dueStatus", label: "Due / Not Due" }
+  ];
+  const planPortfolioFilterDefinitions = [
+    ...collectionFilterDefinitions,
+    { key: "customerCategory", label: "Customer category" }
+  ];
+  const invoiceSubmissionFilterDefinitions = collectionFilterDefinitions.filter(({ key }) => key !== "city" && key !== "dueStatus");
+  const agingBucketsFilterDefinitions = collectionFilterDefinitions.filter(({ key }) => key !== "city" && key !== "dueStatus");
+  const cnAdvFilterDefinitions = collectionFilterDefinitions.filter(({ key }) => key !== "city" && key !== "dueStatus");
+  const financialRiskFilterDefinitions = collectionFilterDefinitions.filter(({ key }) => key !== "city" && key !== "dueStatus");
+  const visitsFilterDefinitions = collectionFilterDefinitions.filter(({ key }) => key !== "city" && key !== "customerName");
+  const visitsAllFilterDefinitions = [
+    ...visitsFilterDefinitions,
+    { key: "customerName", label: "Customer" }
+  ];
+  const collectionDimensionProfiles = [
+    { customerId: "CUST-001", customerName: "Apollo Pharmacy Pvt Ltd", customerCategory: "Private", city: "Mumbai", manager: "Rohit Malhotra", kam: "Sakshi Sharma", kas: "Ravi Singh", agent: "Devashish Agent1" },
+    { customerId: "CUST-007", customerName: "Blue Star Limited", customerCategory: "Distributor", city: "Pune", manager: "Rohit Malhotra", kam: "Sakshi Sharma", kas: "Priya Nair", agent: "Neha Gupta" },
+    { customerId: "CUST-013", customerName: "Varun Beverages", customerCategory: "Private", city: "Delhi", manager: "Rohit Malhotra", kam: "Abhishek Sharma", kas: "Ankit Verma", agent: "Riya Nair" },
+    { customerId: "CUST-021", customerName: "Shiva Healthcare Pvt Ltd", customerCategory: "Public", city: "Bengaluru", manager: "Mukesh Mishra", kam: "Palak Choudhary", kas: "Manish Kumar", agent: "Vikram Das" },
+    { customerId: "CUST-034", customerName: "Mediport Labs", customerCategory: "SKAM", city: "Chennai", manager: "Mukesh Mishra", kam: "Palak Choudhary", kas: "Manish Kumar", agent: "Megha Arora" },
+    { customerId: "CUST-066", customerName: "Pulse Diagnostics", customerCategory: "Govt", city: "Hyderabad", manager: "Rohit Malhotra", kam: "Sakshi Sharma", kas: "Ravi Singh", agent: "Sagar Patel" },
+    { customerId: "CUST-072", customerName: "Lifecrest Hospitals", customerCategory: "Private", city: "Mumbai", manager: "Rohit Malhotra", kam: "Sakshi Sharma", kas: "Priya Nair", agent: "Nisha Verma" },
+    { customerId: "CUST-041", customerName: "Zen Meditech", customerCategory: "Distributor", city: "Pune", manager: "Rohit Malhotra", kam: "Abhishek Sharma", kas: "Ankit Verma", agent: "Aditi Sharma" },
+    { customerId: "CUST-056", customerName: "Skyline Healthcare", customerCategory: "SKAM", city: "Delhi", manager: "Rohit Malhotra", kam: "Abhishek Sharma", kas: "Ankit Verma", agent: "Sakshi Sharma" },
+    { customerId: "CUST-045", customerName: "Careline Pharma", customerCategory: "Public", city: "Bengaluru", manager: "Mukesh Mishra", kam: "Palak Choudhary", kas: "Manish Kumar", agent: "Abhishek Sharma" }
+  ];
+  const additionalCustomerNames = [
+    "Aster Medical Systems", "Brightline Diagnostics", "Crestview Healthcare", "Dhanvantari Clinics",
+    "Evercare Medical Centre", "Fortis Surgical Supplies", "Greenfield Hospitals", "Helix Life Sciences",
+    "Indus Health Network", "Jupiter Care Solutions", "Kaveri Diagnostics", "Lighthouse Pharma",
+    "Meridian Hospitals", "Nexgen Medisystems", "Orchid Healthcare", "Primecare Clinics",
+    "Quantum Health Services", "Radiant Medicals", "Sapphire Diagnostics", "Trinity Hospitals",
+    "Unity Healthcare", "Vertex Life Sciences", "Wellness First Hospitals", "Xcell Medical Centre",
+    "Yashoda Health Systems", "Zenith Care Network"
+  ];
+  const additionalCities = ["Mumbai", "Pune", "Delhi", "Bengaluru", "Chennai", "Hyderabad"];
+  const additionalManagers = ["Rohit Malhotra", "Mukesh Mishra"];
+  const additionalKams = ["Sakshi Sharma", "Abhishek Sharma", "Palak Choudhary"];
+  const additionalKas = ["Ravi Singh", "Priya Nair", "Ankit Verma", "Manish Kumar"];
+  const additionalAgents = ["Devashish Agent1", "Neha Gupta", "Riya Nair", "Vikram Das", "Megha Arora", "Sagar Patel", "Nisha Verma", "Aditi Sharma", "Sakshi Sharma", "Abhishek Sharma"];
+  const customerCategories = ["Public", "Private", "SKAM", "Distributor", "Govt"];
+  collectionDimensionProfiles.push(...additionalCustomerNames.map((customerName, index) => ({
+    customerId: `CUST-${String(101 + index).padStart(3, "0")}`,
+    customerName,
+    customerCategory: customerCategories[index % customerCategories.length],
+    city: additionalCities[index % additionalCities.length],
+    manager: additionalManagers[index % additionalManagers.length],
+    kam: additionalKams[index % additionalKams.length],
+    kas: additionalKas[index % additionalKas.length],
+    agent: additionalAgents[index % additionalAgents.length]
+  })));
   const activityDispositionMap = {
     "No Due": ["Within Credit Period/Days", "LC Payment", "As Per Payment Terms", "Retention Amount", "SD Amount"],
     "Part Collected": ["Part Payment through LC done", "Part Payment Made"],
@@ -158,6 +218,105 @@
     return values;
   };
 
+  const distributeAmount = (total, weights, decimals = 2) => {
+    const multiplier = 10 ** decimals;
+    return distributeInteger(Math.round(Number(total || 0) * multiplier), weights)
+      .map((value) => value / multiplier);
+  };
+
+  const makeCollectionBreakdown = (index, collectedCr, newBillingCr, ptpTargetCr, planCr, portfolioCr, monthlyVisits, submissionChannels = {}, agingBuckets = {}, cnAdv = {}, financialRisk = {}) => {
+    const rows = collectionDimensionProfiles.flatMap((profile, profileIndex) => (
+      ["Due", "Not Due"].map((dueStatus, dueIndex) => ({
+        ...profile,
+        dueStatus,
+        seed: (profileIndex * 2) + dueIndex
+      }))
+    ));
+    const collectionWeights = rows.map((row) => (
+      1 + (row.seed * 0.045) + (row.dueStatus === "Due" ? 0.38 : 0.08) + (Math.sin((index + row.seed) / 3.2) * 0.12)
+    ));
+    const billingWeights = rows.map((row) => (
+      1 + (((row.seed + 2) % 7) * 0.055) + (row.dueStatus === "Not Due" ? 0.24 : 0.06) + (Math.cos((index + row.seed) / 4.1) * 0.1)
+    ));
+    const ptpWeights = rows.map((row) => (
+      1 + (((row.seed + 4) % 5) * 0.07) + (row.dueStatus === "Due" ? 0.5 : 0.04) + (Math.sin((index + row.seed) / 5.3) * 0.09)
+    ));
+    const planWeights = rows.map((row) => (
+      1 + ((row.seed % 6) * 0.06) + (row.dueStatus === "Due" ? 0.28 : 0.12) + (Math.cos((index + row.seed) / 4.4) * 0.08)
+    ));
+    const portfolioWeights = rows.map((row) => (
+      1 + (((row.seed + 3) % 8) * 0.05) + (row.dueStatus === "Due" ? 0.44 : 0.16) + (Math.sin((index + row.seed) / 4.8) * 0.1)
+    ));
+    const activeVisitCustomerCount = 27 + (index % 7);
+    const activeVisitCustomerStart = (index * 5) % collectionDimensionProfiles.length;
+    const activeVisitCustomerIndexes = new Set(Array.from({ length: activeVisitCustomerCount }, (_, activeIndex) => (
+      (activeVisitCustomerStart + activeIndex) % collectionDimensionProfiles.length
+    )));
+    const collectionValues = distributeAmount(collectedCr, collectionWeights);
+    const billingValues = distributeAmount(newBillingCr, billingWeights);
+    const ptpValues = distributeAmount(ptpTargetCr, ptpWeights);
+    const planValues = distributeAmount(planCr, planWeights);
+    const portfolioValues = distributeAmount(portfolioCr, portfolioWeights);
+    const submissionChannelValues = Object.keys(submissionChannelLabels).reduce((acc, channel, channelIndex) => {
+      acc[channel] = distributeInteger(submissionChannels[channel] || 0, rows.map((row) => (
+        1 + ((row.seed + channelIndex) % 7) * 0.06 + (row.dueStatus === "Due" ? 0.16 : 0.08)
+      )));
+      return acc;
+    }, {});
+    const agingBucketValues = ["0-30", "31-60", "61-90", "90+"].reduce((acc, bucket, bucketIndex) => {
+      acc[bucket] = distributeAmount(agingBuckets[bucket] || 0, rows.map((row) => (
+        1 + ((row.seed + bucketIndex) % 8) * 0.055 + (row.dueStatus === "Due" ? 0.34 : 0.12)
+      )));
+      return acc;
+    }, {});
+    const cnAdvValues = ["addedCr", "utilisedCr"].reduce((acc, key, metricIndex) => {
+      acc[key] = distributeAmount(cnAdv[key] || 0, rows.map((row) => (
+        1 + ((row.seed + metricIndex) % 8) * 0.055 + (row.dueStatus === "Due" ? 0.22 : 0.11)
+      )));
+      return acc;
+    }, {});
+    const financialRiskValues = ["provisioningCr", "writtenOffCr"].reduce((acc, key, metricIndex) => {
+      acc[key] = distributeAmount(financialRisk[key] || 0, rows.map((row) => (
+        1 + ((row.seed + metricIndex) % 7) * 0.06 + (row.dueStatus === "Due" ? 0.36 : 0.09)
+      )));
+      return acc;
+    }, {});
+    const activeVisitRows = rows
+      .map((row, rowIndex) => ({ row, rowIndex, profileIndex: Math.floor(row.seed / 2) }))
+      .filter(({ profileIndex }) => activeVisitCustomerIndexes.has(profileIndex));
+    const activeVisitValues = distributeInteger(monthlyVisits, activeVisitRows.map(({ row }) => (
+      1 + ((row.seed % 5) * 0.08) + (row.dueStatus === "Due" ? 0.22 : 0.1) + (Math.cos((index + row.seed) / 3.8) * 0.1)
+    )));
+    const visitValues = rows.map(() => 0);
+    activeVisitRows.forEach(({ rowIndex }, activeIndex) => {
+      visitValues[rowIndex] = activeVisitValues[activeIndex] || 0;
+    });
+
+    return rows.map(({ seed, ...row }, rowIndex) => ({
+      ...row,
+      collectionCr: collectionValues[rowIndex] || 0,
+      newBillingCr: billingValues[rowIndex] || 0,
+      ptpTargetCr: ptpValues[rowIndex] || 0,
+      planCr: planValues[rowIndex] || 0,
+      portfolioCr: portfolioValues[rowIndex] || 0,
+      monthlyVisits: visitValues[rowIndex] || 0,
+      submissionChannels: Object.keys(submissionChannelLabels).reduce((acc, channel) => {
+        acc[channel] = submissionChannelValues[channel]?.[rowIndex] || 0;
+        return acc;
+      }, {}),
+      agingBuckets: ["0-30", "31-60", "61-90", "90+"].reduce((acc, bucket) => {
+        acc[bucket] = agingBucketValues[bucket]?.[rowIndex] || 0;
+        return acc;
+      }, {}),
+      cnAdv: ["addedCr", "utilisedCr"].reduce((acc, key) => {
+        acc[key] = cnAdvValues[key]?.[rowIndex] || 0;
+        return acc;
+      }, {}),
+      provisioningCr: financialRiskValues.provisioningCr?.[rowIndex] || 0,
+      writtenOffCr: financialRiskValues.writtenOffCr?.[rowIndex] || 0
+    }));
+  };
+
   const makeStatusDistribution = (statusMap, index, totalCount, bias = 0) => {
     const entries = Object.entries(statusMap);
     const primaryWeights = entries.map((_, itemIndex) => (
@@ -225,12 +384,13 @@
     }).sort((a, b) => b.overdueCr - a.overdueCr);
   };
 
-  const makeTeamRows = (index, collectedCr, ptpKept, resolvedIssues) => {
+  const makeTeamRows = (index, targetCr, collectedCr, ptpKept, resolvedIssues) => {
     const names = ["Ravi Singh", "Palak Choudhary", "Sakshi Sharma", "Abhishek Sharma", "Priya Nair", "Ankit Verma", "Manish Kumar", "Neha Gupta"];
     return names.map((name, itemIndex) => {
       const factor = 1 - (itemIndex * 0.07) + (((index + itemIndex) % 3) * 0.025);
       return {
         name,
+        committedCr: round(targetCr * 0.16 * factor, 2),
         collectedCr: round(collectedCr * 0.16 * factor, 2),
         ptpKept: Math.max(4, Math.round(ptpKept * 0.15 * factor)),
         issuesResolved: Math.max(2, Math.round(resolvedIssues * 0.14 * factor)),
@@ -296,6 +456,8 @@
     const openIssues = Math.max(5, issuesRaised - Math.round(resolvedIssues * 0.72));
     const escalatedIssues = Math.max(1, Math.round(openIssues * (0.13 + ((index % 3) * 0.025))));
     const currentOutstandingCr = round(8.1 + (Math.sin(index / 3) * 0.52) + (index * 0.012), 2);
+    const planCr = round(collectedCr * 0.79, 2);
+    const monthlyVisits = 118 + ((index * 9) % 52);
     const overdueCr = round(currentOutstandingCr * (0.25 + ((index % 8) * 0.009)), 2);
     const agingBuckets = makeAgingBucketSplit(overdueCr, index);
     const rawMix = {
@@ -315,6 +477,15 @@
     const submittedCount = Math.min(invoiceCount, Math.round(invoiceCount * (0.84 + ((index % 5) * 0.025))));
     const pendingSubmissionCount = Math.max(0, invoiceCount - submittedCount);
     const submissionChannels = makeSubmissionChannels(submittedCount, index);
+    const cnAdvAddedCr = round(
+      (newBillingCr * (0.035 + ((index % 5) * 0.007)))
+        + (collectedCr * (0.09 + (Math.sin(index / 3.7) * 0.018) + ((index % 4) * 0.006))),
+      2
+    );
+    // Utilisation can include a carried-forward CN/ADV balance, so it may exceed current-period additions.
+    const cnAdvUtilisedCr = round(cnAdvAddedCr * (0.68 + ((index % 8) * 0.09) + (Math.cos(index / 4.2) * 0.04)), 2);
+    const provisioningCr = round(overdueCr * (0.18 + ((index % 5) * 0.012) + (Math.sin(index / 4.7) * 0.014)), 2);
+    const writtenOffCr = round(provisioningCr * (0.12 + ((index % 4) * 0.018) + (Math.cos(index / 5.1) * 0.01)), 2);
     const activityStatusTotal = Math.max(24, Math.round(invoiceCount * (0.7 + ((index % 4) * 0.04))));
 
     return {
@@ -324,11 +495,15 @@
       quarter: `Q${Math.floor((((Number(key.slice(5, 7)) + 8) % 12) / 3)) + 1}`,
       financialYear: fiscalYearLabel(key),
       dataSource: isGeneratedExtension ? "generated_extension" : "available_seed",
+      collectionBreakdown: makeCollectionBreakdown(index, collectedCr, newBillingCr, ptpAmountCr, planCr, currentOutstandingCr, monthlyVisits, submissionChannels, agingBuckets, { addedCr: cnAdvAddedCr, utilisedCr: cnAdvUtilisedCr }, { provisioningCr, writtenOffCr }),
       collections: {
         collectedCr,
         targetCr,
         achievementPct: targetCr > 0 ? round((collectedCr / targetCr) * 100, 1) : 0,
         efficiencyPct: round(72 + ((index % 9) * 1.3) + (Math.sin(index / 4) * 2.4), 1)
+      },
+      plan: {
+        committedCr: planCr
       },
       ptp: {
         totalCount: totalPtp,
@@ -358,6 +533,14 @@
         pendingSubmissionCount,
         submissionPct: invoiceCount > 0 ? round((submittedCount / invoiceCount) * 100, 1) : 0
       },
+      cnAdv: {
+        addedCr: cnAdvAddedCr,
+        utilisedCr: cnAdvUtilisedCr
+      },
+      financialRisk: {
+        provisioningCr,
+        writtenOffCr
+      },
       aging: {
         currentOutstandingCr,
         overdueCr,
@@ -373,7 +556,7 @@
       },
       productivity: {
         calls: 840 + ((index * 17) % 190),
-        visits: 118 + ((index * 9) % 52),
+        visits: monthlyVisits,
         followups: 520 + ((index * 13) % 150),
         avgCollectionPerOwnerCr: round(collectedCr / 12, 2),
         avgPtpPerOwner: round(totalPtp / 12, 1),
@@ -398,7 +581,7 @@
         concentrationRiskPct: round(34 + ((index % 9) * 1.1), 1)
       },
       topCustomers: makeCustomerRows(index, overdueCr, collectedCr),
-      teamPerformance: makeTeamRows(index, collectedCr, ptpKept, resolvedIssues),
+      teamPerformance: makeTeamRows(index, targetCr, collectedCr, ptpKept, resolvedIssues),
       statusMix: {
         activity: makeStatusDistribution(activityDispositionMap, index, activityStatusTotal, 0),
         issue: makeStatusDistribution(issueDispositionMap, index, issuesRaised, 7)
@@ -492,6 +675,10 @@
       acc[channel] = source.reduce((sum, record) => sum + (record.billing.submissionChannels?.[channel] || 0), 0);
       return acc;
     }, {});
+    const cnAdvAddedCr = round(source.reduce((sum, record) => sum + (record.cnAdv?.addedCr || 0), 0), 2);
+    const cnAdvUtilisedCr = round(source.reduce((sum, record) => sum + (record.cnAdv?.utilisedCr || 0), 0), 2);
+    const provisioningCr = round(source.reduce((sum, record) => sum + (record.financialRisk?.provisioningCr || 0), 0), 2);
+    const writtenOffCr = round(source.reduce((sum, record) => sum + (record.financialRisk?.writtenOffCr || 0), 0), 2);
     const visits = source.reduce((sum, record) => sum + (record.productivity?.visits || 0), 0);
     const agingBuckets = ["0-30", "31-60", "61-90", "90+"].reduce((acc, bucket) => {
       acc[bucket] = round(source.reduce((sum, record) => sum + (record.aging.buckets[bucket] || 0), 0), 2);
@@ -499,21 +686,27 @@
     }, {});
     const teamPerformance = Object.values(source.reduce((acc, record) => {
       record.teamPerformance.forEach((row) => {
-        acc[row.name] = acc[row.name] || { name: row.name, collectedCr: 0 };
+        acc[row.name] = acc[row.name] || { name: row.name, committedCr: 0, collectedCr: 0 };
+        acc[row.name].committedCr = round(acc[row.name].committedCr + (row.committedCr || 0), 2);
         acc[row.name].collectedCr = round(acc[row.name].collectedCr + row.collectedCr, 2);
       });
       return acc;
     }, {})).sort((a, b) => b.collectedCr - a.collectedCr);
+    const collectionBreakdown = source.flatMap((record) => record.collectionBreakdown || []);
 
     return {
       label,
+      collectionBreakdown,
       collections: { collectedCr, targetCr },
+      plan: { committedCr: round(source.reduce((sum, record) => sum + (record.plan?.committedCr || 0), 0), 2) },
       ptp: { amountCr: ptpAmountCr, collectedCr: ptpCollectedCr },
       issues: {
         raised: source.reduce((sum, record) => sum + record.issues.raised, 0),
         resolved: source.reduce((sum, record) => sum + record.issues.resolved, 0)
       },
       billing: { newBillingCr: billingCr, invoiceCount, submittedCount, submissionChannels },
+      cnAdv: { addedCr: cnAdvAddedCr, utilisedCr: cnAdvUtilisedCr },
+      financialRisk: { provisioningCr, writtenOffCr },
       productivity: { visits },
       aging: { buckets: agingBuckets },
       teamPerformance
@@ -542,6 +735,14 @@
         return acc;
       }, {})
     },
+    cnAdv: {
+      addedCr: round((record.cnAdv?.addedCr || 0) * share, 2),
+      utilisedCr: round((record.cnAdv?.utilisedCr || 0) * share, 2)
+    },
+    financialRisk: {
+      provisioningCr: round((record.financialRisk?.provisioningCr || 0) * share, 2),
+      writtenOffCr: round((record.financialRisk?.writtenOffCr || 0) * share, 2)
+    },
     productivity: {
       visits: Math.max(0, Math.round(record.productivity.visits * share))
     },
@@ -550,7 +751,31 @@
     },
     teamPerformance: record.teamPerformance.map((row) => ({
       name: row.name,
+      committedCr: round((row.committedCr || 0) * share, 2),
       collectedCr: round(row.collectedCr * share, 2)
+    })),
+    collectionBreakdown: (record.collectionBreakdown || []).map((row) => ({
+      ...row,
+      collectionCr: round(row.collectionCr * share, 4),
+      newBillingCr: round(row.newBillingCr * share, 4),
+      ptpTargetCr: round(row.ptpTargetCr * share, 4),
+      planCr: round(row.planCr * share, 4),
+      portfolioCr: round(row.portfolioCr * share, 4),
+      monthlyVisits: Math.max(0, Math.round(row.monthlyVisits * share)),
+      submissionChannels: Object.keys(submissionChannelLabels).reduce((acc, channel) => {
+        acc[channel] = Math.max(0, Math.round((row.submissionChannels?.[channel] || 0) * share));
+        return acc;
+      }, {}),
+      agingBuckets: ["0-30", "31-60", "61-90", "90+"].reduce((acc, bucket) => {
+        acc[bucket] = round((row.agingBuckets?.[bucket] || 0) * share, 4);
+        return acc;
+      }, {}),
+      cnAdv: ["addedCr", "utilisedCr"].reduce((acc, key) => {
+        acc[key] = round((row.cnAdv?.[key] || 0) * share, 4);
+        return acc;
+      }, {}),
+      provisioningCr: round((row.provisioningCr || 0) * share, 4),
+      writtenOffCr: round((row.writtenOffCr || 0) * share, 4)
     }))
   });
 
@@ -603,7 +828,7 @@
     return `${formatMonthLabel(firstKey)} to ${formatMonthLabel(lastKey)}`;
   };
 
-  const getPeriodData = (range, activeYear, activePeriodKey) => {
+  const getPeriodData = (range, activeYear, activePeriodKey, activePeriodKeys = null) => {
     if (range === "all_time") {
       const records = trendHistoryData.monthKeys.map((key) => trendHistoryData.months[key]).filter(Boolean);
       const points = getAvailableYears().map((year) => {
@@ -619,6 +844,48 @@
         points,
         label: `All Time | ${HISTORY_YEARS}-year trend | ${allTimeLabel}`,
         closingStatus: makeClosingStatusFromRecords(closingRecords, String(closingYear))
+      };
+    }
+
+    if (Array.isArray(activePeriodKeys) && activePeriodKeys.length) {
+      const selectedKeys = [...new Set(activePeriodKeys)];
+
+      if (range === "monthly") {
+        const monthKeys = selectedKeys.filter((key) => trendHistoryData.months[key]).sort();
+        const records = monthKeys.map((key) => trendHistoryData.months[key]).filter(Boolean);
+        const points = monthKeys.flatMap((key) => makeDailyPoints(key));
+        const lastMonthKey = monthKeys[monthKeys.length - 1] || CURRENT_MONTH_KEY;
+        const lastVisibleDay = lastMonthKey === CURRENT_MONTH_KEY
+          ? Math.min(CURRENT_DAY, getDaysInMonth(lastMonthKey))
+          : getDaysInMonth(lastMonthKey);
+        return {
+          records,
+          points,
+          label: `Monthly | ${monthKeys.length} month${monthKeys.length === 1 ? "" : "s"} | ${getRangeLabel(monthKeys, CURRENT_MONTH_KEY)}`,
+          closingStatus: makeDailyClosingStatus(lastMonthKey, lastVisibleDay)
+        };
+      }
+
+      const monthKeys = selectedKeys.flatMap((key) => {
+        if (range === "yearly") return getYearKeys(Number(key));
+        if (range === "fiscal_year") return getFiscalYearKeys(Number(key));
+        if (range === "quarterly") return getQuarterKeys(key);
+        return [];
+      }).filter((key, index, keys) => keys.indexOf(key) === index).sort();
+      const records = monthKeys.map((key) => trendHistoryData.months[key]).filter(Boolean);
+      const points = monthKeys
+        .map((key) => makeTrendPoint(formatMonthLabel(key, true), [trendHistoryData.months[key]]))
+        .filter((point) => point.collections.targetCr > 0);
+      const rangeName = range === "fiscal_year" ? "Fiscal Year" : rangeLabels[range] || "Yearly";
+      const selectedLabel = selectedKeys.length === 1
+        ? (range === "quarterly" ? formatQuarterLabel(selectedKeys[0]) : String(selectedKeys[0]))
+        : `${selectedKeys.length} selected`;
+      const lastMonthKey = monthKeys[monthKeys.length - 1] || CURRENT_MONTH_KEY;
+      return {
+        records,
+        points,
+        label: `${rangeName} | ${selectedLabel} | ${getRangeLabel(monthKeys, CURRENT_MONTH_KEY)}`,
+        closingStatus: makeClosingStatusFromRecords(records.slice(-1), formatMonthLabel(lastMonthKey))
       };
     }
 
@@ -696,6 +963,9 @@
   const chartBaseOptions = {
     responsive: true,
     maintainAspectRatio: false,
+    layout: {
+      padding: { top: 8, right: 16, bottom: 20, left: 12 }
+    },
     plugins: {
       legend: {
         position: "bottom",
@@ -709,18 +979,37 @@
         backgroundColor: "#4b1f73",
         titleColor: "#ffffff",
         bodyColor: "#ffffff",
-        padding: 10
+        padding: 10,
+        callbacks: {
+          title: (items) => items?.[0]?.label || "Month",
+          label: (context) => {
+            const rawValue = context?.parsed?.y ?? context?.parsed ?? context?.raw ?? 0;
+            const value = Number(rawValue);
+            const displayValue = Number.isFinite(value)
+              ? value.toLocaleString("en-IN", { maximumFractionDigits: 2 })
+              : String(rawValue ?? "0");
+            return `${context?.dataset?.label || "Data"}: ${displayValue}`;
+          }
+        }
       }
     },
     scales: {
       x: {
         grid: { color: "rgba(148, 163, 184, 0.18)" },
-        ticks: { color: "#64748b", font: { size: 10 } }
+        ticks: {
+          color: "#64748b",
+          font: { size: 10 },
+          padding: 10,
+          autoSkip: true,
+          maxTicksLimit: 8,
+          minRotation: 0,
+          maxRotation: 0
+        }
       },
       y: {
         beginAtZero: true,
         grid: { color: "rgba(148, 163, 184, 0.18)" },
-        ticks: { color: "#64748b", font: { size: 10 } }
+        ticks: { color: "#64748b", font: { size: 10 }, padding: 8 }
       }
     }
   };
@@ -734,6 +1023,77 @@
     }
     chartInstances[canvasId] = new Chart(canvas.getContext("2d"), config);
   };
+
+  const usesTrendEcharts = (id) => Boolean(window.echarts && $(id)?.classList.contains("trendEchartCanvas"));
+
+  const setTrendEchart = (id, option) => {
+    const node = $(id);
+    if (!usesTrendEcharts(id) || !node) return;
+    const instance = trendEchartInstances[id] || window.echarts.init(node, null, { renderer: "canvas" });
+    trendEchartInstances[id] = instance;
+    instance.setOption(option, { notMerge: true, lazyUpdate: true });
+  };
+
+  const trendEchartOption = ({ labels, series, valueFormatter = formatCount, suffix = "", axisName = "Count", bars = false, stacked = false, tooltipFooter = null }) => ({
+    animationDuration: 260,
+    animationEasing: "cubicOut",
+    grid: { left: 10, right: 12, top: 36, bottom: 8, containLabel: true },
+    legend: {
+      show: true,
+      top: 4,
+      left: "center",
+      selectedMode: false,
+      itemWidth: 9,
+      itemHeight: 9,
+      itemGap: 12,
+      textStyle: { color: "#475569", fontSize: 10, fontWeight: 700 }
+    },
+    tooltip: {
+      trigger: "axis",
+      axisPointer: { type: "cross", crossStyle: { color: "#94a3b8" }, lineStyle: { color: "#94a3b8", type: "dashed" } },
+      backgroundColor: "#2e1065",
+      borderWidth: 0,
+      padding: [9, 11],
+      textStyle: { color: "#ffffff", fontSize: 11 },
+      formatter: (params) => {
+        const rows = params.map((item) => `${item.marker} ${item.seriesName}: <b>${valueFormatter(item.value)}${suffix}</b>`).join("<br/>");
+        const footer = typeof tooltipFooter === "function" ? tooltipFooter(params) : "";
+        return `<b>${params[0]?.axisValueLabel || "Period"}</b><br/>${rows}${footer ? `<br/>${footer}` : ""}`;
+      }
+    },
+    xAxis: {
+      type: "category",
+      data: labels,
+      boundaryGap: bars,
+      axisTick: { show: false },
+      axisLine: { lineStyle: { color: "#cbd5e1" } },
+      axisLabel: { color: "#64748b", fontSize: 10, margin: 10, hideOverlap: true },
+      splitLine: { show: false }
+    },
+    yAxis: {
+      type: "value",
+      min: 0,
+      max: suffix === "%" ? 100 : null,
+      name: axisName,
+      nameTextStyle: { color: "#64748b", fontSize: 10, fontWeight: 700, padding: [0, 0, 0, 2] },
+      nameGap: 8,
+      axisTick: { show: false },
+      axisLine: { show: false },
+      axisLabel: { color: "#64748b", fontSize: 10, formatter: (value) => `${valueFormatter(value)}${suffix}` },
+      splitLine: { lineStyle: { color: "rgba(148, 163, 184, 0.18)" } }
+    },
+    series: series.map((item) => ({
+      ...item,
+      smooth: item.type === "line" ? 0.28 : undefined,
+      symbol: item.type === "line" ? "circle" : undefined,
+      symbolSize: item.type === "line" ? 7 : undefined,
+      showSymbol: item.type === "line",
+      lineStyle: item.type === "line" ? { width: item.lineWidth || item.lineStyle?.width || 3, ...(item.lineStyle || {}) } : undefined,
+      itemStyle: { borderRadius: item.type === "bar" ? [4, 4, 0, 0] : undefined, ...(item.itemStyle || {}) },
+      emphasis: { focus: "series" },
+      stack: stacked ? "trend-stack" : undefined
+    }))
+  });
 
   const destroyChart = (canvasId) => {
     if (!chartInstances[canvasId]) return;
@@ -870,8 +1230,10 @@
   const renderInsightCards = (points) => {
     const grid = $("trendInsightGrid");
     if (!grid) return;
-    const totals = getPointTotals(points || []);
-    const lastPoint = points[points.length - 1] || {};
+    const safePoints = points || [];
+    const totals = getPointTotals(safePoints);
+    const lastPoint = safePoints[safePoints.length - 1] || {};
+    const latestLabel = lastPoint.label || "Latest";
     const collectionPct = totals.commitmentCr > 0 ? (totals.collectionCr / totals.commitmentCr) * 100 : 0;
     const ptpPct = totals.ptpCommittedCr > 0 ? (totals.ptpCollectedCr / totals.ptpCommittedCr) * 100 : 0;
     const issuePct = totals.issuesRaised > 0 ? (totals.issuesResolved / totals.issuesRaised) * 100 : 0;
@@ -887,8 +1249,14 @@
         label: "Collection Achievement",
         value: formatPct(collectionPct),
         meta: "of commitment",
-        values: points.map((point) => point.collections.collectedCr),
-        formatValue: formatCr
+        values: safePoints.map((point) => point.collections.collectedCr),
+        formatValue: formatCr,
+        sparkColor: "#bfdbfe",
+        details: [
+          { label: `${latestLabel} collection`, value: formatCr(lastPoint.collections?.collectedCr || 0) },
+          { label: "Total collection", value: formatCr(totals.collectionCr) },
+          { label: "Achievement", value: formatPct(collectionPct) }
+        ]
       },
       {
         icon: "bi-bezier2",
@@ -897,8 +1265,14 @@
         label: "PTP Conversion",
         value: formatPct(ptpPct),
         meta: "of committed",
-        values: points.map((point) => point.ptp.collectedCr),
-        formatValue: formatCr
+        values: safePoints.map((point) => point.ptp.collectedCr),
+        formatValue: formatCr,
+        sparkColor: "#bbf7d0",
+        details: [
+          { label: `${latestLabel} collected`, value: formatCr(lastPoint.ptp?.collectedCr || 0) },
+          { label: "Committed PTP", value: formatCr(totals.ptpCommittedCr) },
+          { label: "Conversion", value: formatPct(ptpPct) }
+        ]
       },
       {
         icon: "bi-tools",
@@ -907,8 +1281,14 @@
         label: "Issue Closure",
         value: formatPct(issuePct),
         meta: `${formatCount(issueGap)} open gap`,
-        values: points.map((point) => point.issues.resolved),
-        formatValue: (value) => `${formatCount(value)} resolved`
+        values: safePoints.map((point) => point.issues.resolved),
+        formatValue: (value) => `${formatCount(value)} resolved`,
+        sparkColor: "#fed7aa",
+        details: [
+          { label: `${latestLabel} resolved`, value: formatCount(lastPoint.issues?.resolved || 0) },
+          { label: `${latestLabel} reported`, value: formatCount(lastPoint.issues?.raised || 0) },
+          { label: "Open gap", value: formatCount(issueGap) }
+        ]
       },
       {
         icon: "bi-envelope-check",
@@ -917,21 +1297,36 @@
         label: "Invoice Submission",
         value: formatPct(submissionPct),
         meta: `${formatCount(pendingInvoices)} pending`,
-        values: points.map((point) => point.billing.submittedCount),
-        formatValue: (value) => `${formatCount(value)} submitted`
+        values: safePoints.map((point) => point.billing.submittedCount),
+        formatValue: (value) => `${formatCount(value)} submitted`,
+        sparkColor: "#ddd6fe",
+        details: [
+          { label: `${latestLabel} submitted`, value: formatCount(lastPoint.billing?.submittedCount || 0) },
+          { label: "Total invoices", value: formatCount(totals.invoices) },
+          { label: "Pending", value: formatCount(pendingInvoices) }
+        ]
       }
     ];
-    const sparkLabels = points.map((point) => point.label);
+    const sparkLabels = safePoints.map((point) => point.label);
 
     grid.innerHTML = cards.map((card) => `
-      <article class="trendInsightMetric" style="--trend-insight-color:${card.color}; --trend-insight-rgb:${card.rgb}">
+      <article class="trendInsightMetric" tabindex="0" aria-label="${escapeHtml(`${card.label}: ${card.value}, ${card.meta}. ${card.details.map((row) => `${row.label}: ${row.value}`).join(". ")}`)}" style="--trend-insight-color:${card.color}; --trend-insight-rgb:${card.rgb}">
         <span class="trendInsightIcon"><i class="bi ${card.icon}" aria-hidden="true"></i></span>
         <div>
           <div class="trendInsightLabel">${card.label}</div>
           <div class="trendInsightValue">${card.value}</div>
           <div class="trendInsightMeta">${card.meta}</div>
         </div>
-        ${renderSparkLine({ values: card.values, labels: sparkLabels, color: card.color, formatValue: card.formatValue })}
+        ${renderSparkLine({ values: card.values, labels: sparkLabels, color: card.sparkColor, formatValue: card.formatValue })}
+        <div class="trendInsightHoverPanel" role="presentation">
+          <strong>${escapeHtml(card.label)}</strong>
+          ${card.details.map((row) => `
+            <span>
+              <em>${escapeHtml(row.label)}</em>
+              <b>${escapeHtml(row.value)}</b>
+            </span>
+          `).join("")}
+        </div>
       </article>
     `).join("") + `
       <div class="trendPriorityFocus">
@@ -1035,12 +1430,501 @@
     currentStatusDrill.issue = null;
   };
 
-  const renderCharts = (points, closingStatus) => {
-    const labels = points.map((point) => point.label);
-    const totals = getPointTotals(points);
-    renderInsightCards(points);
-    setText("trendVisitTotal", formatCount(totals.visits));
-    setText("trendBillingTotal", formatCr(totals.billingCr));
+  const getCollectionFilterCatalog = (points, key) => [...new Set(
+    points.flatMap((point) => (point.collectionBreakdown || []).map((row) => row[key])).filter(Boolean)
+  )].sort((left, right) => String(left).localeCompare(String(right)));
+
+  const collectionRowMatches = (row, filters, ignoredKey = null, enabledFilters = null) => collectionFilterDefinitions.every(({ key }) => {
+    if (key === ignoredKey) return true;
+    if (enabledFilters && enabledFilters[key] === false) return true;
+    const selected = filters?.[key];
+    return !(selected instanceof Set) || selected.size === 0 || selected.has(row[key]);
+  });
+
+  const getFilteredCollectionPoints = (points, filters, enabledFilters = null) => points.map((point) => {
+    const rows = (point.collectionBreakdown || []).filter((row) => collectionRowMatches(row, filters, null, enabledFilters));
+    return {
+      label: point.label,
+      rowCount: rows.length,
+      collectionCr: round(rows.reduce((sum, row) => sum + Number(row.collectionCr || 0), 0), 2),
+      newBillingCr: round(rows.reduce((sum, row) => sum + Number(row.newBillingCr || 0), 0), 2),
+      ptpTargetCr: round(rows.reduce((sum, row) => sum + Number(row.ptpTargetCr || 0), 0), 2)
+    };
+  });
+
+  const invoiceSubmissionRowMatches = (row, filters, ignoredKey = null, enabledFilters = null) => invoiceSubmissionFilterDefinitions.every(({ key }) => {
+    if (key === ignoredKey) return true;
+    if (enabledFilters && enabledFilters[key] === false) return true;
+    const selected = filters?.[key];
+    return !(selected instanceof Set) || selected.size === 0 || selected.has(row[key]);
+  });
+
+  const getFilteredInvoiceSubmissionPoints = (points, filters, enabledFilters = null) => points.map((point) => {
+    const rows = (point.collectionBreakdown || []).filter((row) => invoiceSubmissionRowMatches(row, filters, null, enabledFilters));
+    const submissionChannels = Object.keys(submissionChannelLabels).reduce((acc, channel) => {
+      acc[channel] = rows.reduce((sum, row) => sum + Number(row.submissionChannels?.[channel] || 0), 0);
+      return acc;
+    }, {});
+    return { label: point.label, rowCount: rows.length, submissionChannels };
+  });
+
+  const renderInvoiceSubmissionChart = (points, context = null) => {
+    if (!context) return { hasData: false, filteredPoints: [] };
+    const filteredPoints = getFilteredInvoiceSubmissionPoints(points, context.filters, context.enabledFilters);
+    const hasData = filteredPoints.some((point) => Object.values(point.submissionChannels).some((value) => value > 0));
+    if (usesTrendEcharts("trendInvoiceSubmissionChart")) {
+      setTrendEchart("trendInvoiceSubmissionChart", trendEchartOption({
+        labels: filteredPoints.map((point) => point.label),
+        axisName: "Count",
+        bars: true,
+        stacked: true,
+        series: Object.entries(submissionChannelLabels).map(([channel, label]) => ({
+          name: label,
+          type: "bar",
+          data: filteredPoints.map((point) => point.submissionChannels[channel] || 0),
+          barMaxWidth: 28,
+          itemStyle: { color: submissionChannelColors[channel].replace(/rgba?\(([^,]+),\s*([^,]+),\s*([^,]+).*\)/, "rgb($1, $2, $3)") }
+        }))
+      }));
+      return { hasData, filteredPoints };
+    }
+    setChart("trendInvoiceSubmissionChart", {
+      type: "bar",
+      data: {
+        labels: filteredPoints.map((point) => point.label),
+        datasets: Object.entries(submissionChannelLabels).map(([channel, label]) => ({
+          label,
+          data: filteredPoints.map((point) => point.submissionChannels[channel] || 0),
+          backgroundColor: submissionChannelColors[channel],
+          borderColor: submissionChannelColors[channel].replace(/0\.\d+\)/, "0.9)"),
+          borderWidth: 1,
+          borderRadius: 4,
+          maxBarThickness: 30
+        }))
+      },
+      options: buildChartOptions({
+        interaction: { mode: "index", intersect: false },
+        scales: { x: { stacked: true }, y: { stacked: true } }
+      })
+    });
+    return { hasData, filteredPoints };
+  };
+
+  const agingBucketsRowMatches = (row, filters, ignoredKey = null, enabledFilters = null) => agingBucketsFilterDefinitions.every(({ key }) => {
+    if (key === ignoredKey) return true;
+    if (enabledFilters && enabledFilters[key] === false) return true;
+    const selected = filters?.[key];
+    return !(selected instanceof Set) || selected.size === 0 || selected.has(row[key]);
+  });
+
+  const getFilteredAgingBucketPoints = (points, filters, enabledFilters = null) => points.map((point) => {
+    const rows = (point.collectionBreakdown || []).filter((row) => agingBucketsRowMatches(row, filters, null, enabledFilters));
+    const buckets = ["0-30", "31-60", "61-90", "90+"].reduce((acc, bucket) => {
+      acc[bucket] = round(rows.reduce((sum, row) => sum + Number(row.agingBuckets?.[bucket] || 0), 0), 2);
+      return acc;
+    }, {});
+    const total = Object.values(buckets).reduce((sum, value) => sum + value, 0) || 1;
+    const shares = Object.fromEntries(Object.entries(buckets).map(([bucket, value]) => [bucket, round((value / total) * 100, 1)]));
+    return { label: point.label, rowCount: rows.length, buckets, shares };
+  });
+
+  const renderAgingBucketsChart = (points, context = null) => {
+    if (!context) return { hasData: false, filteredPoints: [] };
+    const filteredPoints = getFilteredAgingBucketPoints(points, context.filters, context.enabledFilters);
+    const hasData = filteredPoints.some((point) => Object.values(point.buckets).some((value) => value > 0));
+    if (usesTrendEcharts("trendAgingBucketsChart")) {
+      const colors = { "0-30": "#2563eb", "31-60": "#16a34a", "61-90": "#f59e0b", "90+": "#ef4444" };
+      setTrendEchart("trendAgingBucketsChart", trendEchartOption({
+        labels: filteredPoints.map((point) => point.label),
+        valueFormatter: (value) => `Rs. ${Number(value || 0).toFixed(2)} Cr`,
+        axisName: "Rs. Cr",
+        stacked: true,
+        series: Object.keys(colors).map((bucket) => ({
+          name: bucket,
+          type: "line",
+          data: filteredPoints.map((point) => point.buckets[bucket]),
+          areaStyle: { opacity: 0.7 },
+          itemStyle: { color: colors[bucket] },
+          lineStyle: { width: 1.4, color: colors[bucket] }
+        }))
+      }));
+      return { hasData, filteredPoints };
+    }
+    setChart("trendAgingBucketsChart", {
+      type: "line",
+      data: {
+        labels: filteredPoints.map((point) => point.label),
+        datasets: [
+          { label: "0-30", data: filteredPoints.map((point) => point.buckets["0-30"]), borderColor: "#2563eb", backgroundColor: "rgba(37, 99, 235, 0.78)", borderWidth: 1.5, pointRadius: 2.5, tension: 0.35, fill: true, stack: "aging" },
+          { label: "31-60", data: filteredPoints.map((point) => point.buckets["31-60"]), borderColor: "#16a34a", backgroundColor: "rgba(22, 163, 74, 0.68)", borderWidth: 1.5, pointRadius: 2.5, tension: 0.35, fill: true, stack: "aging" },
+          { label: "61-90", data: filteredPoints.map((point) => point.buckets["61-90"]), borderColor: "#f59e0b", backgroundColor: "rgba(245, 158, 11, 0.72)", borderWidth: 1.5, pointRadius: 2.5, tension: 0.35, fill: true, stack: "aging" },
+          { label: "90+", data: filteredPoints.map((point) => point.buckets["90+"]), borderColor: "#ef4444", backgroundColor: "rgba(239, 68, 68, 0.72)", borderWidth: 1.5, pointRadius: 2.5, tension: 0.35, fill: true, stack: "aging" }
+        ]
+      },
+      options: buildChartOptions({
+        interaction: { mode: "index", intersect: false },
+        scales: {
+          x: { stacked: true, grid: { display: false } },
+          y: { stacked: true, ticks: { callback: (value) => `Rs. ${Number(value).toFixed(2)} Cr` } }
+        }
+      })
+    });
+    return { hasData, filteredPoints };
+  };
+
+  const cnAdvRowMatches = (row, filters, ignoredKey = null, enabledFilters = null) => cnAdvFilterDefinitions.every(({ key }) => {
+    if (key === ignoredKey) return true;
+    if (enabledFilters && enabledFilters[key] === false) return true;
+    const selected = filters?.[key];
+    return !(selected instanceof Set) || selected.size === 0 || selected.has(row[key]);
+  });
+
+  const getFilteredCnAdvPoints = (points, filters, enabledFilters = null) => points.map((point) => {
+    const rows = (point.collectionBreakdown || []).filter((row) => cnAdvRowMatches(row, filters, null, enabledFilters));
+    return {
+      label: point.label,
+      rowCount: rows.length,
+      addedCr: round(rows.reduce((sum, row) => sum + Number(row.cnAdv?.addedCr || 0), 0), 2),
+      utilisedCr: round(rows.reduce((sum, row) => sum + Number(row.cnAdv?.utilisedCr || 0), 0), 2)
+    };
+  });
+
+  const renderCnAdvChart = (points, context = null) => {
+    if (!context) return { hasData: false, filteredPoints: [] };
+    const filteredPoints = getFilteredCnAdvPoints(points, context.filters, context.enabledFilters);
+    const hasData = filteredPoints.some((point) => point.addedCr > 0 || point.utilisedCr > 0);
+    if (usesTrendEcharts("trendCnAdvChart")) {
+      setTrendEchart("trendCnAdvChart", trendEchartOption({
+        labels: filteredPoints.map((point) => point.label),
+        valueFormatter: (value) => `Rs. ${Number(value || 0).toFixed(2)} Cr`,
+        axisName: "Rs. Cr",
+        series: [
+          { name: "CN / ADV added", type: "line", data: filteredPoints.map((point) => point.addedCr), itemStyle: { color: "#d97706" }, lineStyle: { color: "#d97706", width: 3 } },
+          { name: "CN / ADV utilised", type: "line", data: filteredPoints.map((point) => point.utilisedCr), areaStyle: { color: "rgba(8, 145, 178, 0.16)" }, itemStyle: { color: "#0891b2" }, lineStyle: { color: "#0891b2", width: 3 } }
+        ]
+      }));
+      return { hasData, filteredPoints };
+    }
+    setChart("trendCnAdvChart", {
+      type: "line",
+      data: {
+        labels: filteredPoints.map((point) => point.label),
+        datasets: [
+          { label: "CN / ADV added", data: filteredPoints.map((point) => point.addedCr), borderColor: "#d97706", backgroundColor: "rgba(217, 119, 6, 0.08)", borderWidth: 2.5, pointBackgroundColor: "#d97706", pointBorderColor: "#ffffff", pointBorderWidth: 1.5, pointRadius: 3, pointHoverRadius: 5, tension: 0.3, fill: false },
+          { label: "CN / ADV utilised", data: filteredPoints.map((point) => point.utilisedCr), borderColor: "#0891b2", backgroundColor: "rgba(8, 145, 178, 0.15)", borderWidth: 2.5, pointBackgroundColor: "#0891b2", pointBorderColor: "#ffffff", pointBorderWidth: 1.5, pointRadius: 3, pointHoverRadius: 5, tension: 0.3, fill: true }
+        ]
+      },
+      options: buildChartOptions({ interaction: { mode: "index", intersect: false }, scales: { y: { ticks: { callback: (value) => `Rs. ${value} Cr` } } } })
+    });
+    return { hasData, filteredPoints };
+  };
+
+  const financialRiskRowMatches = (row, filters, ignoredKey = null, enabledFilters = null) => financialRiskFilterDefinitions.every(({ key }) => {
+    if (key === ignoredKey) return true;
+    if (enabledFilters && enabledFilters[key] === false) return true;
+    const selected = filters?.[key];
+    return !(selected instanceof Set) || selected.size === 0 || selected.has(row[key]);
+  });
+
+  const getFilteredFinancialRiskPoints = (points, filters, enabledFilters, metricKey) => points.map((point) => {
+    const rows = (point.collectionBreakdown || []).filter((row) => financialRiskRowMatches(row, filters, null, enabledFilters));
+    return {
+      label: point.label,
+      rowCount: rows.length,
+      valueCr: round(rows.reduce((sum, row) => sum + Number(row[metricKey] || 0), 0), 2)
+    };
+  });
+
+  const renderProvisioningChart = (points, context = null) => {
+    const filteredPoints = getFilteredFinancialRiskPoints(points, context?.filters, context?.enabledFilters, "provisioningCr");
+    const values = filteredPoints.map((point) => point.valueCr);
+    const hasData = filteredPoints.some((point) => point.valueCr > 0);
+    if (usesTrendEcharts("trendProvisioningChart")) {
+      setTrendEchart("trendProvisioningChart", trendEchartOption({
+        labels: points.map((point) => point.label),
+        valueFormatter: (value) => `Rs. ${Number(value || 0).toFixed(2)} Cr`,
+        axisName: "Rs. Cr",
+        series: [{
+          name: "Provisioning",
+          type: "line",
+          data: values,
+          areaStyle: { color: "rgba(124, 58, 237, 0.17)" },
+          itemStyle: { color: "#7c3aed" },
+          lineStyle: { color: "#7c3aed", width: 3 }
+        }]
+      }));
+      return { hasData, filteredPoints };
+    }
+    setChart("trendProvisioningChart", {
+      type: "line",
+      data: { labels: points.map((point) => point.label), datasets: [{ label: "Provisioning", data: values, borderColor: "#7c3aed", backgroundColor: "rgba(124, 58, 237, 0.17)", borderWidth: 2.5, pointRadius: 3, tension: 0.3, fill: true }] },
+      options: buildChartOptions({ interaction: { mode: "index", intersect: false }, scales: { y: { ticks: { callback: (value) => `Rs. ${value} Cr` } } } })
+    });
+    return { hasData, filteredPoints };
+  };
+
+  const renderWrittenOffChart = (points, context = null) => {
+    const filteredPoints = getFilteredFinancialRiskPoints(points, context?.filters, context?.enabledFilters, "writtenOffCr");
+    const values = filteredPoints.map((point) => point.valueCr);
+    const hasData = filteredPoints.some((point) => point.valueCr > 0);
+    if (usesTrendEcharts("trendWrittenOffChart")) {
+      setTrendEchart("trendWrittenOffChart", trendEchartOption({
+        labels: points.map((point) => point.label),
+        valueFormatter: (value) => `Rs. ${Number(value || 0).toFixed(2)} Cr`,
+        axisName: "Rs. Cr",
+        bars: true,
+        series: [{ name: "Written Off", type: "bar", data: values, itemStyle: { color: "#dc2626" } }]
+      }));
+      return { hasData, filteredPoints };
+    }
+    setChart("trendWrittenOffChart", {
+      type: "bar",
+      data: { labels: points.map((point) => point.label), datasets: [{ label: "Written Off", data: values, borderColor: "#dc2626", backgroundColor: "rgba(220, 38, 38, 0.7)", borderWidth: 1, borderRadius: 4 }] },
+      options: buildChartOptions({ scales: { y: { ticks: { callback: (value) => `Rs. ${value} Cr` } } } })
+    });
+    return { hasData, filteredPoints };
+  };
+
+  const planPortfolioRowMatches = (row, filters, ignoredKey = null, enabledFilters = null) => planPortfolioFilterDefinitions.every(({ key }) => {
+    if (key === ignoredKey) return true;
+    if (enabledFilters && enabledFilters[key] === false) return true;
+    const selected = filters?.[key];
+    return !(selected instanceof Set) || selected.size === 0 || selected.has(row[key]);
+  });
+
+  const getFilteredPlanPortfolioPoints = (points, filters, enabledFilters = null) => points.map((point) => {
+    const rows = (point.collectionBreakdown || []).filter((row) => planPortfolioRowMatches(row, filters, null, enabledFilters));
+    return {
+      label: point.label,
+      rowCount: rows.length,
+      portfolioCr: round(rows.reduce((sum, row) => sum + Number(row.portfolioCr || 0), 0), 2),
+      planCr: round(rows.reduce((sum, row) => sum + Number(row.planCr || 0), 0), 2)
+    };
+  });
+
+  const renderPlanPortfolioChart = (points, context = null) => {
+    if (!context) return { hasData: false, filteredPoints: [] };
+    const filteredPoints = getFilteredPlanPortfolioPoints(points, context.filters, context.enabledFilters);
+    const hasData = filteredPoints.some((point) => point.rowCount > 0);
+    const showLines = filteredPoints.length > 1;
+    const seriesVisibility = context.seriesVisibility || { portfolio: true, plan: true };
+    if (usesTrendEcharts("trendPlanPortfolioChart")) {
+      setTrendEchart("trendPlanPortfolioChart", trendEchartOption({
+        labels: filteredPoints.map((point) => point.label),
+        valueFormatter: (value) => `Rs. ${Number(value || 0).toFixed(2)} Cr`,
+        axisName: "Rs. Cr",
+        series: [
+          ...(seriesVisibility.portfolio ? [{ name: "Portfolio", type: "line", data: filteredPoints.map((point) => point.portfolioCr), areaStyle: { color: "rgba(37, 99, 235, 0.1)" }, itemStyle: { color: "#2563eb" }, lineStyle: { color: "#2563eb", width: 3.2 } }] : []),
+          ...(seriesVisibility.plan ? [{ name: "Plan", type: "line", data: filteredPoints.map((point) => point.planCr), itemStyle: { color: "#7c3aed" }, lineStyle: { color: "#7c3aed", width: 3 } }] : [])
+        ]
+      }));
+      return { hasData, filteredPoints };
+    }
+    setChart("trendPlanPortfolioChart", {
+      type: "line",
+      data: {
+        labels: filteredPoints.map((point) => point.label),
+        datasets: [
+          {
+            label: "Portfolio",
+            data: filteredPoints.map((point) => point.portfolioCr),
+            borderColor: "#2563eb",
+            backgroundColor: "rgba(37, 99, 235, 0.1)",
+            borderWidth: 3.2,
+            pointBackgroundColor: "#2563eb",
+            pointBorderColor: "#ffffff",
+            pointBorderWidth: 1.5,
+            pointRadius: 3.5,
+            pointHoverRadius: 6,
+            tension: 0.32,
+            fill: showLines,
+            showLine: showLines,
+            hidden: !seriesVisibility.portfolio
+          },
+          {
+            label: "Plan",
+            data: filteredPoints.map((point) => point.planCr),
+            borderColor: "#7c3aed",
+            backgroundColor: "rgba(124, 58, 237, 0.08)",
+            borderWidth: 3,
+            pointBackgroundColor: "#7c3aed",
+            pointBorderColor: "#ffffff",
+            pointBorderWidth: 1.5,
+            pointRadius: 3.5,
+            pointHoverRadius: 6,
+            tension: 0.3,
+            fill: false,
+            showLine: showLines,
+            hidden: !seriesVisibility.plan
+          }
+        ]
+      },
+      options: buildChartOptions({
+        interaction: { mode: "index", intersect: false },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: "#3b0a78",
+            titleColor: "#ffffff",
+            bodyColor: "#ffffff",
+            padding: 10,
+            callbacks: {
+              title: (items) => items?.[0]?.label || "Period",
+              label: (tooltipContext) => `${tooltipContext.dataset.label}: ${formatCr(tooltipContext.parsed.y)}`
+            }
+          }
+        },
+        scales: { y: { ticks: { callback: (value) => `Rs. ${value} Cr` } } }
+      })
+    });
+    return { hasData, filteredPoints };
+  };
+
+  const visitsRowMatches = (row, filters, ignoredKey = null, enabledFilters = null) => visitsAllFilterDefinitions.every(({ key }) => {
+    if (key === ignoredKey) return true;
+    if (enabledFilters && enabledFilters[key] === false) return true;
+    const selected = filters?.[key];
+    return !(selected instanceof Set) || selected.size === 0 || selected.has(row[key]);
+  });
+
+  const getFilteredVisitPoints = (points, filters, enabledFilters = null) => points.map((point) => {
+    const rows = (point.collectionBreakdown || []).filter((row) => visitsRowMatches(row, filters, null, enabledFilters));
+    const visitRows = rows.filter((row) => Number(row.monthlyVisits || 0) > 0);
+    return {
+      label: point.label,
+      rowCount: rows.length,
+      monthlyVisits: visitRows.reduce((sum, row) => sum + Number(row.monthlyVisits || 0), 0),
+      uniqueCustomers: new Set(visitRows.map((row) => row.customerName)).size
+    };
+  });
+
+  const renderVisitsChart = (points, context = null) => {
+    if (!context) return { hasData: false, filteredPoints: [] };
+    const filteredPoints = getFilteredVisitPoints(points, context.filters, context.enabledFilters);
+    const hasData = filteredPoints.some((point) => point.monthlyVisits > 0);
+    const seriesVisibility = context.seriesVisibility || { visits: true, uniqueCustomers: true };
+    if (usesTrendEcharts("trendVisitsChart")) {
+      setTrendEchart("trendVisitsChart", trendEchartOption({
+        labels: filteredPoints.map((point) => point.label),
+        axisName: "Visits",
+        bars: true,
+        stacked: true,
+        tooltipFooter: (items) => {
+          const point = filteredPoints[items?.[0]?.dataIndex] || {};
+          return `Total visits: <b>${formatCount(point.monthlyVisits || 0)}</b>`;
+        },
+        series: [
+          ...(seriesVisibility.uniqueCustomers ? [{ name: "Unique visits", type: "bar", data: filteredPoints.map((point) => point.uniqueCustomers), barMaxWidth: 32, itemStyle: { color: "#7c3aed" } }] : []),
+          ...(seriesVisibility.visits ? [{ name: "Repeat visits", type: "bar", data: filteredPoints.map((point) => Math.max(0, point.monthlyVisits - point.uniqueCustomers)), barMaxWidth: 32, itemStyle: { color: "#0f9f8f" } }] : [])
+        ]
+      }));
+      return { hasData, filteredPoints };
+    }
+    setChart("trendVisitsChart", {
+      type: "bar",
+      data: {
+        labels: filteredPoints.map((point) => point.label),
+        datasets: [
+          {
+            label: "Repeat visits",
+            data: filteredPoints.map((point) => Math.max(0, point.monthlyVisits - point.uniqueCustomers)),
+            borderColor: "#0f9f8f",
+            backgroundColor: "rgba(15, 159, 143, 0.72)",
+            borderWidth: 1,
+            borderRadius: 4,
+            maxBarThickness: 34,
+            stack: "visits",
+            hidden: !seriesVisibility.visits
+          },
+          {
+            label: "Unique visits",
+            data: filteredPoints.map((point) => point.uniqueCustomers),
+            borderColor: "#7c3aed",
+            backgroundColor: "rgba(124, 58, 237, 0.66)",
+            borderWidth: 1,
+            borderRadius: 4,
+            maxBarThickness: 34,
+            stack: "visits",
+            hidden: !seriesVisibility.uniqueCustomers
+          }
+        ]
+      },
+      options: buildChartOptions({
+        interaction: { mode: "index", intersect: false },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: "#3b0a78",
+            titleColor: "#ffffff",
+            bodyColor: "#ffffff",
+            padding: 10,
+            callbacks: {
+              title: (items) => items?.[0]?.label || "Period",
+              afterBody: (items) => {
+                const index = items?.[0]?.dataIndex;
+                const point = filteredPoints[index] || {};
+                return `Total visits: ${formatCount(point.monthlyVisits || 0)}`;
+              }
+            }
+          }
+        },
+        scales: { x: { stacked: true }, y: { stacked: true } }
+      })
+    });
+    return { hasData, filteredPoints };
+  };
+
+  const renderCollectionChart = (points, context = null) => {
+    if (!context) {
+      setChart("trendCollectionChart", {
+        type: "line",
+        data: {
+          labels: points.map((point) => point.label),
+          datasets: [
+            {
+              label: "Collection",
+              data: points.map((point) => point.collections.collectedCr),
+              borderColor: "#2563eb",
+              backgroundColor: "rgba(37, 99, 235, 0.18)",
+              borderWidth: 2,
+              pointBackgroundColor: "#2563eb",
+              pointBorderColor: "#ffffff",
+              pointBorderWidth: 1.5,
+              pointHoverRadius: 5,
+              pointRadius: 3.5,
+              tension: 0.34,
+              fill: true
+            }
+          ]
+        },
+        options: buildChartOptions({
+          plugins: { legend: { display: false } },
+          scales: { y: { ticks: { callback: (value) => `Rs. ${value} Cr` } } }
+        })
+      });
+      return { hasData: points.length > 0, filteredPoints: [] };
+    }
+
+    const filteredPoints = getFilteredCollectionPoints(points, context.filters, context.enabledFilters);
+    const hasData = filteredPoints.some((point) => point.rowCount > 0);
+    const labels = filteredPoints.map((point) => point.label);
+    const showLines = filteredPoints.length > 1;
+    const seriesVisibility = context.seriesVisibility || { collection: true, billing: true, target: true };
+
+    if (usesTrendEcharts("trendCollectionChart")) {
+      setTrendEchart("trendCollectionChart", trendEchartOption({
+        labels,
+        valueFormatter: (value) => `Rs. ${Number(value || 0).toFixed(2)} Cr`,
+        axisName: "Rs. Cr",
+        series: [
+          ...(seriesVisibility.collection ? [{ name: "Collection", type: "line", data: filteredPoints.map((point) => point.collectionCr), areaStyle: { color: "rgba(37, 99, 235, 0.14)" }, itemStyle: { color: "#2563eb" }, lineStyle: { color: "#2563eb", width: 3.4 } }] : []),
+          ...(seriesVisibility.billing ? [{ name: "New Billing", type: "line", data: filteredPoints.map((point) => point.newBillingCr), itemStyle: { color: "#0f9f8f" }, lineStyle: { color: "#0f9f8f", width: 3.2 } }] : []),
+          ...(seriesVisibility.target ? [{ name: "PTP Target", type: "line", data: filteredPoints.map((point) => point.ptpTargetCr), itemStyle: { color: "#d97706" }, lineStyle: { color: "#d97706", width: 3 } }] : [])
+        ]
+      }));
+      return { hasData, filteredPoints };
+    }
+
     setChart("trendCollectionChart", {
       type: "line",
       data: {
@@ -1048,27 +1932,90 @@
         datasets: [
           {
             label: "Collection",
-            data: points.map((point) => point.collections.collectedCr),
+            data: filteredPoints.map((point) => point.collectionCr),
             borderColor: "#2563eb",
-            backgroundColor: "rgba(37, 99, 235, 0.18)",
-            borderWidth: 2,
+            backgroundColor: "rgba(37, 99, 235, 0.12)",
+            borderWidth: 3.2,
             pointBackgroundColor: "#2563eb",
             pointBorderColor: "#ffffff",
             pointBorderWidth: 1.5,
-            pointHoverRadius: 5,
             pointRadius: 3.5,
-            tension: 0.34,
-            fill: true
+            pointHoverRadius: 6,
+            tension: 0.32,
+            fill: showLines,
+            showLine: showLines,
+            hidden: !seriesVisibility.collection
+          },
+          {
+            label: "New Billing",
+            data: filteredPoints.map((point) => point.newBillingCr),
+            borderColor: "#0f9f8f",
+            backgroundColor: "rgba(15, 159, 143, 0.08)",
+            borderWidth: 3,
+            pointBackgroundColor: "#0f9f8f",
+            pointBorderColor: "#ffffff",
+            pointBorderWidth: 1.5,
+            pointRadius: 3.5,
+            pointHoverRadius: 6,
+            tension: 0.32,
+            fill: false,
+            showLine: showLines,
+            hidden: !seriesVisibility.billing
+          },
+          {
+            label: "PTP Target",
+            data: filteredPoints.map((point) => point.ptpTargetCr),
+            borderColor: "#d97706",
+            backgroundColor: "#f59e0b",
+            borderWidth: 3,
+            pointBackgroundColor: "#f59e0b",
+            pointBorderColor: "#ffffff",
+            pointBorderWidth: 2,
+            pointRadius: 4,
+            pointHoverRadius: 7,
+            tension: 0.28,
+            showLine: showLines,
+            fill: false,
+            hidden: !seriesVisibility.target
           }
         ]
       },
       options: buildChartOptions({
-        plugins: { legend: { display: false } },
+        interaction: { mode: "index", intersect: false },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: "#3b0a78",
+            titleColor: "#ffffff",
+            bodyColor: "#ffffff",
+            padding: 10,
+            callbacks: {
+              title: (items) => items?.[0]?.label || "Period",
+              label: (tooltipContext) => `${tooltipContext.dataset.label}: ${formatCr(tooltipContext.parsed.y)}`
+            }
+          }
+        },
         scales: {
           y: { ticks: { callback: (value) => `Rs. ${value} Cr` } }
         }
       })
     });
+
+    return { hasData, filteredPoints };
+  };
+
+  const renderCharts = (points, closingStatus, collectionContext = null, invoiceSubmissionContext = null, agingBucketsContext = null, cnAdvContext = null, provisioningContext = null, writtenOffContext = null) => {
+    const labels = points.map((point) => point.label);
+    const totals = getPointTotals(points);
+    renderInsightCards(points);
+    setText("trendVisitTotal", formatCount(totals.visits));
+    setText("trendBillingTotal", formatCr(totals.billingCr));
+    const collectionResult = renderCollectionChart(points, collectionContext);
+    const invoiceSubmissionResult = renderInvoiceSubmissionChart(points, invoiceSubmissionContext);
+    const agingBucketsResult = renderAgingBucketsChart(points, agingBucketsContext);
+    const cnAdvResult = renderCnAdvChart(points, cnAdvContext);
+    const provisioningResult = renderProvisioningChart(points, provisioningContext);
+    const writtenOffResult = renderWrittenOffChart(points, writtenOffContext);
 
     setChart("trendOperationsChart", {
       type: "line",
@@ -1165,10 +2112,10 @@
       data: {
         labels,
         datasets: [
-          { label: "0-30", data: points.map((point) => getAgingShare(point, "0-30")), borderColor: "#2563eb", backgroundColor: "rgba(37, 99, 235, 0.78)", borderWidth: 1.5, pointRadius: 0, tension: 0.35, fill: true, stack: "aging" },
-          { label: "31-60", data: points.map((point) => getAgingShare(point, "31-60")), borderColor: "#16a34a", backgroundColor: "rgba(22, 163, 74, 0.68)", borderWidth: 1.5, pointRadius: 0, tension: 0.35, fill: true, stack: "aging" },
-          { label: "61-90", data: points.map((point) => getAgingShare(point, "61-90")), borderColor: "#f59e0b", backgroundColor: "rgba(245, 158, 11, 0.72)", borderWidth: 1.5, pointRadius: 0, tension: 0.35, fill: true, stack: "aging" },
-          { label: "90+", data: points.map((point) => getAgingShare(point, "90+")), borderColor: "#ef4444", backgroundColor: "rgba(239, 68, 68, 0.72)", borderWidth: 1.5, pointRadius: 0, tension: 0.35, fill: true, stack: "aging" }
+          { label: "0-30", data: points.map((point) => getAgingShare(point, "0-30")), borderColor: "#2563eb", backgroundColor: "rgba(37, 99, 235, 0.78)", borderWidth: 1.5, pointRadius: 3, pointHoverRadius: 6, pointHoverBorderWidth: 2, tension: 0.35, fill: true, stack: "aging" },
+          { label: "31-60", data: points.map((point) => getAgingShare(point, "31-60")), borderColor: "#16a34a", backgroundColor: "rgba(22, 163, 74, 0.68)", borderWidth: 1.5, pointRadius: 3, pointHoverRadius: 6, pointHoverBorderWidth: 2, tension: 0.35, fill: true, stack: "aging" },
+          { label: "61-90", data: points.map((point) => getAgingShare(point, "61-90")), borderColor: "#f59e0b", backgroundColor: "rgba(245, 158, 11, 0.72)", borderWidth: 1.5, pointRadius: 3, pointHoverRadius: 6, pointHoverBorderWidth: 2, tension: 0.35, fill: true, stack: "aging" },
+          { label: "90+", data: points.map((point) => getAgingShare(point, "90+")), borderColor: "#ef4444", backgroundColor: "rgba(239, 68, 68, 0.72)", borderWidth: 1.5, pointRadius: 3, pointHoverRadius: 6, pointHoverBorderWidth: 2, tension: 0.35, fill: true, stack: "aging" }
         ]
       },
       options: buildChartOptions({
@@ -1209,20 +2156,20 @@
       })
     });
 
-    const firstPoint = points[0] || { teamPerformance: [] };
     const lastPoint = points[points.length - 1] || { teamPerformance: [] };
     const agentNames = lastPoint.teamPerformance.slice(0, 8).map((row) => row.name);
-    const firstAgentValues = agentNames.map((name) => firstPoint.teamPerformance.find((row) => row.name === name)?.collectedCr || 0);
-    const lastAgentValues = agentNames.map((name) => lastPoint.teamPerformance.find((row) => row.name === name)?.collectedCr || 0);
-    const maxAgentValue = Math.max(...firstAgentValues, ...lastAgentValues, 1);
+    const committedAgentValues = agentNames.map((name) => lastPoint.teamPerformance.find((row) => row.name === name)?.committedCr || 0);
+    const collectedAgentValues = agentNames.map((name) => lastPoint.teamPerformance.find((row) => row.name === name)?.collectedCr || 0);
+    const maxAgentValue = Math.max(...committedAgentValues, ...collectedAgentValues, 0);
+    const agentScaleMax = maxAgentValue > 0 ? maxAgentValue * 1.15 : 1;
     setChart("trendAgentCollectionChart", {
       type: "bar",
       data: {
         labels: agentNames,
         datasets: [
           {
-            label: firstPoint.label || "Start",
-            data: firstAgentValues,
+            label: "Committed",
+            data: committedAgentValues,
             backgroundColor: "rgba(186, 154, 224, 0.72)",
             borderColor: "rgba(186, 154, 224, 0.92)",
             borderWidth: 1,
@@ -1231,8 +2178,8 @@
             categoryPercentage: 0.58
           },
           {
-            label: lastPoint.label || "Latest",
-            data: lastAgentValues,
+            label: "Collected",
+            data: collectedAgentValues,
             backgroundColor: "#4c149d",
             borderColor: "#4c149d",
             borderWidth: 1,
@@ -1270,13 +2217,14 @@
             ticks: { display: false }
           },
           y: {
-            suggestedMax: Math.ceil(maxAgentValue * 1.2 * 10) / 10,
+            max: agentScaleMax,
             ticks: { callback: (value) => `Rs. ${value} Cr` }
           }
         }
       })
     });
     renderStatusPies(closingStatus);
+    return { collectionResult, invoiceSubmissionResult, agingBucketsResult, cnAdvResult, provisioningResult, writtenOffResult };
   };
 
   const markTrendsVisible = () => {
@@ -1309,6 +2257,73 @@
     const periodGroup = $("trendPeriodGroup");
     const periodLabel = $("trendPeriodLabel");
     const periodSelect = $("trendPeriodSelect");
+    const multiPeriodGroup = $("trendMultiPeriodGroup");
+    const multiPeriodLabel = $("trendMultiPeriodLabel");
+    const multiPeriodSummary = $("trendMultiPeriodSummary");
+    const multiPeriodMenu = $("trendMultiPeriodMenu");
+    const collectionFilterTray = $("trendCollectionFilterTray");
+    const collectionFilterRoot = $("trendCollectionFilterRoot");
+    const collectionFilterGrid = $("trendCollectionFilterGrid");
+    const collectionFilterChips = $("trendCollectionFilterChips");
+    const collectionNoData = $("trendCollectionNoData");
+    const collectionNoDataClear = $("trendCollectionNoDataClear");
+    const collectionScopeMeta = $("trendCollectionScopeMeta");
+    const collectionSeriesButtons = Array.from(document.querySelectorAll("[data-trend-collection-series]"));
+    const planPortfolioFilterTray = $("trendPlanPortfolioFilterTray");
+    const planPortfolioFilterRoot = $("trendPlanPortfolioFilterRoot");
+    const planPortfolioFilterGrid = $("trendPlanPortfolioFilterGrid");
+    const planPortfolioFilterChips = $("trendPlanPortfolioFilterChips");
+    const planPortfolioNoData = $("trendPlanPortfolioNoData");
+    const planPortfolioNoDataClear = $("trendPlanPortfolioNoDataClear");
+    const planPortfolioScopeMeta = $("trendPlanPortfolioScopeMeta");
+    const planPortfolioSeriesButtons = Array.from(document.querySelectorAll("[data-trend-plan-series]"));
+    const visitsFilterTray = $("trendVisitsFilterTray");
+    const visitsFilterRoot = $("trendVisitsFilterRoot");
+    const visitsFilterGrid = $("trendVisitsFilterGrid");
+    const visitsFilterChips = $("trendVisitsFilterChips");
+    const visitsNoData = $("trendVisitsNoData");
+    const visitsNoDataClear = $("trendVisitsNoDataClear");
+    const visitsScopeMeta = $("trendVisitsScopeMeta");
+    const visitsCustomerPicker = $("trendVisitsCustomerPicker");
+    const visitsCustomerSummary = $("trendVisitsCustomerSummary");
+    const visitsCustomerSearch = $("trendVisitsCustomerSearch");
+    const visitsCustomerOptions = $("trendVisitsCustomerOptions");
+    const visitsSeriesButtons = Array.from(document.querySelectorAll("[data-trend-visits-series]"));
+    const invoiceSubmissionFilterTray = $("trendInvoiceSubmissionFilterTray");
+    const invoiceSubmissionFilterRoot = $("trendInvoiceSubmissionFilterRoot");
+    const invoiceSubmissionFilterGrid = $("trendInvoiceSubmissionFilterGrid");
+    const invoiceSubmissionFilterChips = $("trendInvoiceSubmissionFilterChips");
+    const invoiceSubmissionNoData = $("trendInvoiceSubmissionNoData");
+    const invoiceSubmissionNoDataClear = $("trendInvoiceSubmissionNoDataClear");
+    const invoiceSubmissionScopeMeta = $("trendInvoiceSubmissionScopeMeta");
+    const agingBucketsFilterTray = $("trendAgingBucketsFilterTray");
+    const agingBucketsFilterRoot = $("trendAgingBucketsFilterRoot");
+    const agingBucketsFilterGrid = $("trendAgingBucketsFilterGrid");
+    const agingBucketsFilterChips = $("trendAgingBucketsFilterChips");
+    const agingBucketsNoData = $("trendAgingBucketsNoData");
+    const agingBucketsNoDataClear = $("trendAgingBucketsNoDataClear");
+    const agingBucketsScopeMeta = $("trendAgingBucketsScopeMeta");
+    const cnAdvFilterTray = $("trendCnAdvFilterTray");
+    const cnAdvFilterRoot = $("trendCnAdvFilterRoot");
+    const cnAdvFilterGrid = $("trendCnAdvFilterGrid");
+    const cnAdvFilterChips = $("trendCnAdvFilterChips");
+    const cnAdvNoData = $("trendCnAdvNoData");
+    const cnAdvNoDataClear = $("trendCnAdvNoDataClear");
+    const cnAdvScopeMeta = $("trendCnAdvScopeMeta");
+    const provisioningFilterTray = $("trendProvisioningFilterTray");
+    const provisioningFilterRoot = $("trendProvisioningFilterRoot");
+    const provisioningFilterGrid = $("trendProvisioningFilterGrid");
+    const provisioningFilterChips = $("trendProvisioningFilterChips");
+    const provisioningNoData = $("trendProvisioningNoData");
+    const provisioningNoDataClear = $("trendProvisioningNoDataClear");
+    const provisioningScopeMeta = $("trendProvisioningScopeMeta");
+    const writtenOffFilterTray = $("trendWrittenOffFilterTray");
+    const writtenOffFilterRoot = $("trendWrittenOffFilterRoot");
+    const writtenOffFilterGrid = $("trendWrittenOffFilterGrid");
+    const writtenOffFilterChips = $("trendWrittenOffFilterChips");
+    const writtenOffNoData = $("trendWrittenOffNoData");
+    const writtenOffNoDataClear = $("trendWrittenOffNoDataClear");
+    const writtenOffScopeMeta = $("trendWrittenOffScopeMeta");
     const rangeButtons = Array.from(document.querySelectorAll("[data-trend-range]"));
     if (!toggleBtn || !trendView || !yearInput || !rangeSelect || !periodSelect) return;
 
@@ -1320,16 +2335,107 @@
 
     const minYear = Math.min(...trendHistoryData.monthKeys.map((key) => Number(key.slice(0, 4))));
     const maxYear = Math.max(...trendHistoryData.monthKeys.map((key) => Number(key.slice(0, 4))));
+    const usesCollectionWorkspace = Boolean(
+      collectionFilterTray && collectionFilterRoot && collectionFilterGrid && collectionFilterChips && collectionNoData
+    );
+    const usesPlanPortfolioWorkspace = Boolean(
+      planPortfolioFilterTray && planPortfolioFilterRoot && planPortfolioFilterGrid && planPortfolioFilterChips && planPortfolioNoData
+    );
+    const usesVisitsWorkspace = Boolean(
+      visitsFilterTray && visitsFilterRoot && visitsFilterGrid && visitsFilterChips && visitsNoData
+        && visitsCustomerPicker && visitsCustomerSummary && visitsCustomerSearch && visitsCustomerOptions
+    );
+    const usesInvoiceSubmissionWorkspace = Boolean(
+      invoiceSubmissionFilterTray && invoiceSubmissionFilterRoot && invoiceSubmissionFilterGrid
+        && invoiceSubmissionFilterChips && invoiceSubmissionNoData
+    );
+    const usesAgingBucketsWorkspace = Boolean(
+      agingBucketsFilterTray && agingBucketsFilterRoot && agingBucketsFilterGrid && agingBucketsFilterChips && agingBucketsNoData
+    );
+    const usesCnAdvWorkspace = Boolean(cnAdvFilterTray && cnAdvFilterRoot && cnAdvFilterGrid && cnAdvFilterChips && cnAdvNoData);
+    const usesProvisioningWorkspace = Boolean(provisioningFilterTray && provisioningFilterRoot && provisioningFilterGrid && provisioningFilterChips && provisioningNoData);
+    const usesWrittenOffWorkspace = Boolean(writtenOffFilterTray && writtenOffFilterRoot && writtenOffFilterGrid && writtenOffFilterChips && writtenOffNoData);
+    const collectionAllRows = trendHistoryData.monthKeys.flatMap((key) => trendHistoryData.months[key]?.collectionBreakdown || []);
+    const collectionCatalogs = Object.fromEntries(collectionFilterDefinitions.map(({ key }) => [
+      key,
+      [...new Set(collectionAllRows.map((row) => row[key]).filter(Boolean))]
+        .sort((left, right) => String(left).localeCompare(String(right)))
+    ]));
+    const planPortfolioCatalogs = Object.fromEntries(planPortfolioFilterDefinitions.map(({ key }) => [
+      key,
+      [...new Set(collectionAllRows.map((row) => row[key]).filter(Boolean))]
+        .sort((left, right) => String(left).localeCompare(String(right)))
+    ]));
+    const visitsCatalogs = Object.fromEntries(visitsAllFilterDefinitions.map(({ key }) => [
+      key,
+      [...new Set(collectionAllRows.map((row) => row[key]).filter(Boolean))]
+        .sort((left, right) => String(left).localeCompare(String(right)))
+    ]));
+    const invoiceSubmissionCatalogs = Object.fromEntries(invoiceSubmissionFilterDefinitions.map(({ key }) => [
+      key,
+      [...new Set(collectionAllRows.map((row) => row[key]).filter(Boolean))]
+        .sort((left, right) => String(left).localeCompare(String(right)))
+    ]));
+    const agingBucketsCatalogs = Object.fromEntries(agingBucketsFilterDefinitions.map(({ key }) => [
+      key,
+      [...new Set(collectionAllRows.map((row) => row[key]).filter(Boolean))]
+        .sort((left, right) => String(left).localeCompare(String(right)))
+    ]));
+    const cnAdvCatalogs = Object.fromEntries(cnAdvFilterDefinitions.map(({ key }) => [
+      key,
+      [...new Set(collectionAllRows.map((row) => row[key]).filter(Boolean))]
+        .sort((left, right) => String(left).localeCompare(String(right)))
+    ]));
+    const financialRiskCatalogs = Object.fromEntries(financialRiskFilterDefinitions.map(({ key }) => [
+      key,
+      [...new Set(collectionAllRows.map((row) => row[key]).filter(Boolean))]
+        .sort((left, right) => String(left).localeCompare(String(right)))
+    ]));
     const state = {
       activeYear: DEFAULT_YEAR,
       activeQuarter: CURRENT_QUARTER_KEY,
       activeMonth: CURRENT_MONTH_KEY,
+      selectedPeriods: {
+        yearly: [String(DEFAULT_YEAR)],
+        fiscal_year: [String(DEFAULT_YEAR)],
+        quarterly: [CURRENT_QUARTER_KEY],
+        monthly: [CURRENT_MONTH_KEY]
+      },
+      collectionFilters: Object.fromEntries(collectionFilterDefinitions.map(({ key }) => [key, new Set()])),
+      collectionFilterEnabled: Object.fromEntries(collectionFilterDefinitions.map(({ key }) => [key, true])),
+      collectionSeriesVisibility: { collection: true, billing: true, target: true },
+      planPortfolioFilters: Object.fromEntries(planPortfolioFilterDefinitions.map(({ key }) => [key, new Set()])),
+      planPortfolioFilterEnabled: Object.fromEntries(planPortfolioFilterDefinitions.map(({ key }) => [key, true])),
+      planPortfolioSeriesVisibility: { portfolio: true, plan: true },
+      visitsFilters: Object.fromEntries(visitsAllFilterDefinitions.map(({ key }) => [key, new Set()])),
+      visitsFilterEnabled: Object.fromEntries(visitsAllFilterDefinitions.map(({ key }) => [key, true])),
+      visitsSeriesVisibility: { visits: true, uniqueCustomers: true },
+      invoiceSubmissionFilters: Object.fromEntries(invoiceSubmissionFilterDefinitions.map(({ key }) => [key, new Set()])),
+      invoiceSubmissionFilterEnabled: Object.fromEntries(invoiceSubmissionFilterDefinitions.map(({ key }) => [key, true])),
+      agingBucketsFilters: Object.fromEntries(agingBucketsFilterDefinitions.map(({ key }) => [key, new Set()])),
+      agingBucketsFilterEnabled: Object.fromEntries(agingBucketsFilterDefinitions.map(({ key }) => [key, true])),
+      cnAdvFilters: Object.fromEntries(cnAdvFilterDefinitions.map(({ key }) => [key, new Set()])),
+      cnAdvFilterEnabled: Object.fromEntries(cnAdvFilterDefinitions.map(({ key }) => [key, true])),
+      provisioningFilters: Object.fromEntries(financialRiskFilterDefinitions.map(({ key }) => [key, new Set()])),
+      provisioningFilterEnabled: Object.fromEntries(financialRiskFilterDefinitions.map(({ key }) => [key, true])),
+      writtenOffFilters: Object.fromEntries(financialRiskFilterDefinitions.map(({ key }) => [key, new Set()])),
+      writtenOffFilterEnabled: Object.fromEntries(financialRiskFilterDefinitions.map(({ key }) => [key, true])),
+      currentTrendPoints: [],
       range: "yearly",
       isTrendsVisible: false,
       hasRendered: false
     };
     const quarterOptions = getQuarterOptions();
     const monthOptions = getMonthOptions();
+    const usesMultiPeriodSelect = Boolean(multiPeriodGroup && multiPeriodLabel && multiPeriodSummary && multiPeriodMenu);
+    const collectionFilterSearches = {};
+    const planPortfolioFilterSearches = {};
+    const visitsFilterSearches = {};
+    const invoiceSubmissionFilterSearches = {};
+    const agingBucketsFilterSearches = {};
+    const cnAdvFilterSearches = {};
+    const provisioningFilterSearches = {};
+    const writtenOffFilterSearches = {};
 
     yearInput.min = String(minYear);
     yearInput.max = String(maxYear);
@@ -1343,14 +2449,67 @@
       });
     };
 
+    const getMultiPeriodOptions = () => {
+      if (state.range === "yearly") return getAvailableYears().map((year) => ({ value: String(year), label: String(year) }));
+      if (state.range === "fiscal_year") return getAvailableYears().map((year) => ({ value: String(year), label: fiscalYearDisplay(year) }));
+      if (state.range === "quarterly") return quarterOptions;
+      if (state.range === "monthly") return monthOptions;
+      return [];
+    };
+
+    const getMultiPeriodLabel = () => ({
+      yearly: "Year",
+      fiscal_year: "Fiscal Year",
+      quarterly: "Quarter",
+      monthly: "Month"
+    }[state.range] || "Period");
+
+    const syncMultiPeriodSelect = () => {
+      if (!usesMultiPeriodSelect) return;
+      const options = getMultiPeriodOptions();
+      const validValues = new Set(options.map((option) => option.value));
+      const currentValues = (state.selectedPeriods[state.range] || []).filter((value) => validValues.has(value));
+      const fallbackValue = options[options.length - 1]?.value || "";
+      const selectedValues = currentValues.length ? currentValues : (fallbackValue ? [fallbackValue] : []);
+      state.selectedPeriods[state.range] = selectedValues;
+      multiPeriodLabel.textContent = getMultiPeriodLabel();
+      const selectedOptions = options.filter((option) => selectedValues.includes(option.value));
+      multiPeriodSummary.textContent = selectedOptions.length === 1
+        ? selectedOptions[0].label
+        : `${selectedOptions.length} ${getMultiPeriodLabel().toLowerCase()}${selectedOptions.length === 1 ? "" : "s"} selected`;
+      multiPeriodMenu.replaceChildren();
+      options.forEach((option) => {
+        const optionLabel = document.createElement("label");
+        optionLabel.className = "trendMultiPeriodOption";
+        const input = document.createElement("input");
+        input.type = "checkbox";
+        input.value = option.value;
+        input.checked = selectedValues.includes(option.value);
+        input.dataset.trendPeriodValue = option.value;
+        const text = document.createElement("span");
+        text.textContent = option.label;
+        optionLabel.append(input, text);
+        multiPeriodMenu.appendChild(optionLabel);
+      });
+    };
+
     const syncTrendControls = () => {
+      rangeSelect.value = state.range;
+      syncRangeButtons();
+
+      if (usesMultiPeriodSelect) {
+        if (yearGroup) yearGroup.hidden = true;
+        if (periodGroup) periodGroup.hidden = true;
+        multiPeriodGroup.hidden = state.range === "all_time";
+        if (!multiPeriodGroup.hidden) syncMultiPeriodSelect();
+        return;
+      }
+
       const usesYearInput = state.range === "yearly" || state.range === "fiscal_year";
       if (yearGroup) yearGroup.hidden = !usesYearInput;
       if (periodGroup) periodGroup.hidden = !(state.range === "quarterly" || state.range === "monthly");
       if (yearLabel) yearLabel.textContent = "Period";
       yearInput.setAttribute("aria-label", state.range === "fiscal_year" ? "Select fiscal year" : "Select trend year");
-      rangeSelect.value = state.range;
-      syncRangeButtons();
 
       if (state.range === "quarterly") {
         if (periodLabel) periodLabel.textContent = "Quarter";
@@ -1369,12 +2528,881 @@
       return null;
     };
 
+    const getCurrentCollectionRows = () => state.currentTrendPoints
+      .flatMap((point) => point.collectionBreakdown || []);
+
+    const isCollectionFilterInactive = (key) => {
+      const selected = state.collectionFilters[key];
+      return !(selected instanceof Set) || selected.size === 0;
+    };
+
+    const getCollectionAvailableValues = (key) => new Set(
+      getCurrentCollectionRows()
+        .filter((row) => collectionRowMatches(row, state.collectionFilters, key, state.collectionFilterEnabled))
+        .map((row) => row[key])
+        .filter(Boolean)
+    );
+
+    const getCollectionFilterSummary = (key) => {
+      const selected = state.collectionFilters[key] || new Set();
+      if (!selected.size) return "Nothing selected";
+      if (selected.size === (collectionCatalogs[key] || []).length) return "All selected";
+      const values = [...selected];
+      return values.length === 1 ? values[0] : `${values.length} selected`;
+    };
+
+    const getCollectionFilterDisplay = (key) => {
+      const selected = [...(state.collectionFilters[key] || new Set())];
+      if (!selected.length) return "Nothing selected";
+      if (selected.length === (collectionCatalogs[key] || []).length) return "All selected";
+      if (selected.length <= 2) return selected.join(", ");
+      return `${selected.slice(0, 2).join(", ")} +${selected.length - 2}`;
+    };
+
+    const getCollectionContext = () => ({
+      filters: state.collectionFilters,
+      enabledFilters: state.collectionFilterEnabled,
+      seriesVisibility: state.collectionSeriesVisibility
+    });
+
+    const closeCollectionFilterMenus = (except = null) => {
+      if (!collectionFilterGrid) return;
+      collectionFilterGrid.querySelectorAll("details[open]").forEach((details) => {
+        if (details !== except) details.open = false;
+      });
+      if (!except && collectionFilterRoot) collectionFilterRoot.open = false;
+    };
+
+    const syncCollectionFilterChips = () => {
+      if (!usesCollectionWorkspace) return;
+      const activeDefinitions = collectionFilterDefinitions.filter(({ key }) => !isCollectionFilterInactive(key));
+      collectionFilterChips.hidden = !activeDefinitions.length;
+      collectionFilterChips.innerHTML = activeDefinitions.map(({ key, label }) => `
+        <div class="trendCollectionAppliedFilter${state.collectionFilterEnabled[key] ? "" : " is-disabled"}">
+          <button type="button" class="trendCollectionFilterVisibility" data-collection-filter-toggle="${escapeHtml(key)}" aria-pressed="${state.collectionFilterEnabled[key] ? "true" : "false"}" aria-label="${state.collectionFilterEnabled[key] ? "Disable" : "Enable"} ${escapeHtml(label)} filter" title="${state.collectionFilterEnabled[key] ? "Disable" : "Enable"} ${escapeHtml(label)} filter">
+            <i class="bi ${state.collectionFilterEnabled[key] ? "bi-eye" : "bi-eye-slash"}" aria-hidden="true"></i>
+          </button>
+          <button type="button" class="trendCollectionAppliedFilterBody" data-collection-filter-edit="${escapeHtml(key)}" aria-label="Edit ${escapeHtml(label)} filter">
+            <span>${escapeHtml(label)}</span>
+            <strong>${escapeHtml(getCollectionFilterDisplay(key))}</strong>
+          </button>
+          <button type="button" class="trendCollectionFilterRemove" data-collection-filter-reset="${escapeHtml(key)}" aria-label="Remove ${escapeHtml(label)} filter" title="Remove ${escapeHtml(label)} filter">
+            <i class="bi bi-x" aria-hidden="true"></i>
+          </button>
+        </div>
+      `).join("") + (activeDefinitions.length ? `
+        <button type="button" class="trendCollectionClearAll" data-collection-filter-reset="all">Clear all</button>
+      ` : "");
+    };
+
+    const syncCollectionFilterGrid = (openKey = null) => {
+      if (!usesCollectionWorkspace) return;
+      const rootWasOpen = collectionFilterRoot.open;
+      collectionFilterGrid.innerHTML = collectionFilterDefinitions.map(({ key, label }) => {
+        const catalog = collectionCatalogs[key] || [];
+        const selected = state.collectionFilters[key] || new Set();
+        const available = getCollectionAvailableValues(key);
+        const searchValue = String(collectionFilterSearches[key] || "");
+        const normalizedSearch = searchValue.trim().toLowerCase();
+        const visibleOptions = catalog.filter((value) => !normalizedSearch || String(value).toLowerCase().includes(normalizedSearch));
+        const showSearch = catalog.length > 8;
+        return `
+          <details class="trendCollectionFilterSelect" data-collection-filter-key="${escapeHtml(key)}"${openKey === key ? " open" : ""}>
+            <summary aria-label="Select ${escapeHtml(label)} filter values">
+              <span class="trendCollectionFilterSummaryText">
+                <span class="trendCollectionFilterLabel">${escapeHtml(label)}</span>
+                <span class="trendCollectionFilterValue">${escapeHtml(getCollectionFilterSummary(key))}</span>
+              </span>
+              <i class="bi bi-chevron-right" aria-hidden="true"></i>
+            </summary>
+            <div class="trendCollectionFilterMenu">
+              ${showSearch ? `<input type="search" class="trendCollectionFilterSearch" value="${escapeHtml(searchValue)}" placeholder="Search ${escapeHtml(label.toLowerCase())}" aria-label="Search ${escapeHtml(label)} options" />` : ""}
+              <div class="trendCollectionFilterActions">
+                <button type="button" data-collection-filter-action="all">Select all</button>
+                <button type="button" data-collection-filter-action="clear">Clear</button>
+              </div>
+              <div class="trendCollectionFilterOptions">
+                ${visibleOptions.map((value) => {
+                  const isSelected = selected.has(value);
+                  const isUnavailable = !available.has(value);
+                  const isDisabled = isUnavailable && !isSelected;
+                  return `
+                    <label class="trendCollectionFilterOption${isUnavailable ? " is-unavailable" : ""}">
+                      <input type="checkbox" value="${escapeHtml(value)}" data-collection-filter-value="${escapeHtml(value)}"${isSelected ? " checked" : ""}${isDisabled ? " disabled" : ""} />
+                      <span>${escapeHtml(value)}</span>
+                    </label>
+                  `;
+                }).join("") || `<div class="trendCollectionFilterOption is-unavailable">No matching options</div>`}
+              </div>
+            </div>
+          </details>
+        `;
+      }).join("");
+      collectionFilterRoot.open = rootWasOpen || Boolean(openKey);
+
+      collectionFilterGrid.querySelectorAll(".trendCollectionFilterSelect").forEach((details) => {
+        details.addEventListener("toggle", () => {
+          if (details.open) closeCollectionFilterMenus(details);
+        });
+      });
+    };
+
+    const syncCollectionHeaderControls = () => {
+      if (!usesCollectionWorkspace) return;
+      collectionSeriesButtons.forEach((button) => {
+        const key = button.dataset.trendCollectionSeries;
+        button.setAttribute("aria-pressed", state.collectionSeriesVisibility[key] ? "true" : "false");
+      });
+    };
+
+    const syncCollectionResultState = (result) => {
+      if (!usesCollectionWorkspace) return;
+      const hasData = Boolean(result?.hasData);
+      collectionNoData.hidden = hasData;
+      const canvas = $("trendCollectionChart");
+      if (canvas) {
+        canvas.style.opacity = hasData ? "1" : "0.12";
+        canvas.style.pointerEvents = hasData ? "auto" : "none";
+      }
+      const configuredDefinitions = collectionFilterDefinitions.filter(({ key }) => !isCollectionFilterInactive(key));
+      const activeFilterCount = configuredDefinitions.filter(({ key }) => state.collectionFilterEnabled[key]).length;
+      const disabledFilterCount = configuredDefinitions.length - activeFilterCount;
+      if (collectionScopeMeta) {
+        if (!activeFilterCount && !disabledFilterCount) {
+          collectionScopeMeta.textContent = "Collection, new billing, and committed PTP across the selected period";
+        } else {
+          const matchingRows = getCurrentCollectionRows().filter((row) => collectionRowMatches(row, state.collectionFilters, null, state.collectionFilterEnabled));
+          const customerCount = new Set(matchingRows.map((row) => row.customerName)).size;
+          const pausedText = disabledFilterCount ? ` | ${disabledFilterCount} paused` : "";
+          collectionScopeMeta.textContent = `${activeFilterCount} filter${activeFilterCount === 1 ? "" : "s"} applied${pausedText} | ${customerCount} customer${customerCount === 1 ? "" : "s"}`;
+        }
+      }
+    };
+
+    const syncCollectionWorkspace = (openKey = null, rerenderChart = true) => {
+      if (!usesCollectionWorkspace) return;
+      syncCollectionFilterGrid(openKey);
+      syncCollectionFilterChips();
+      syncCollectionHeaderControls();
+      if (rerenderChart) {
+        syncCollectionResultState(renderCollectionChart(state.currentTrendPoints, getCollectionContext()));
+      }
+    };
+
+    const resetCollectionFilters = (key = "all") => {
+      collectionFilterDefinitions.forEach((definition) => {
+        if (key !== "all" && definition.key !== key) return;
+        state.collectionFilters[definition.key] = new Set();
+        state.collectionFilterEnabled[definition.key] = true;
+        collectionFilterSearches[definition.key] = "";
+      });
+      syncCollectionWorkspace();
+    };
+
+    const getCurrentPlanPortfolioRows = () => state.currentTrendPoints
+      .flatMap((point) => point.collectionBreakdown || []);
+
+    const isPlanPortfolioFilterInactive = (key) => {
+      const selected = state.planPortfolioFilters[key];
+      return !(selected instanceof Set) || selected.size === 0;
+    };
+
+    const getPlanPortfolioAvailableValues = (key) => new Set(
+      getCurrentPlanPortfolioRows()
+        .filter((row) => planPortfolioRowMatches(row, state.planPortfolioFilters, key, state.planPortfolioFilterEnabled))
+        .map((row) => row[key])
+        .filter(Boolean)
+    );
+
+    const getPlanPortfolioFilterSummary = (key) => {
+      const selected = state.planPortfolioFilters[key] || new Set();
+      if (!selected.size) return "Nothing selected";
+      if (selected.size === (planPortfolioCatalogs[key] || []).length) return "All selected";
+      const values = [...selected];
+      return values.length === 1 ? values[0] : `${values.length} selected`;
+    };
+
+    const getPlanPortfolioFilterDisplay = (key) => {
+      const selected = [...(state.planPortfolioFilters[key] || new Set())];
+      if (!selected.length) return "Nothing selected";
+      if (selected.length === (planPortfolioCatalogs[key] || []).length) return "All selected";
+      return selected.length <= 2 ? selected.join(", ") : `${selected.slice(0, 2).join(", ")} +${selected.length - 2}`;
+    };
+
+    const getPlanPortfolioContext = () => ({
+      filters: state.planPortfolioFilters,
+      enabledFilters: state.planPortfolioFilterEnabled,
+      seriesVisibility: state.planPortfolioSeriesVisibility
+    });
+
+    const closePlanPortfolioFilterMenus = (except = null) => {
+      if (!planPortfolioFilterGrid) return;
+      planPortfolioFilterGrid.querySelectorAll("details[open]").forEach((details) => {
+        if (details !== except) details.open = false;
+      });
+      if (!except && planPortfolioFilterRoot) planPortfolioFilterRoot.open = false;
+    };
+
+    const syncPlanPortfolioFilterChips = () => {
+      if (!usesPlanPortfolioWorkspace) return;
+      const activeDefinitions = planPortfolioFilterDefinitions.filter(({ key }) => !isPlanPortfolioFilterInactive(key));
+      planPortfolioFilterChips.hidden = !activeDefinitions.length;
+      planPortfolioFilterChips.innerHTML = activeDefinitions.map(({ key, label }) => `
+        <div class="trendCollectionAppliedFilter${state.planPortfolioFilterEnabled[key] ? "" : " is-disabled"}">
+          <button type="button" class="trendCollectionFilterVisibility" data-plan-filter-toggle="${escapeHtml(key)}" aria-pressed="${state.planPortfolioFilterEnabled[key] ? "true" : "false"}" aria-label="${state.planPortfolioFilterEnabled[key] ? "Disable" : "Enable"} ${escapeHtml(label)} filter" title="${state.planPortfolioFilterEnabled[key] ? "Disable" : "Enable"} ${escapeHtml(label)} filter">
+            <i class="bi ${state.planPortfolioFilterEnabled[key] ? "bi-eye" : "bi-eye-slash"}" aria-hidden="true"></i>
+          </button>
+          <button type="button" class="trendCollectionAppliedFilterBody" data-plan-filter-edit="${escapeHtml(key)}" aria-label="Edit ${escapeHtml(label)} filter">
+            <span>${escapeHtml(label)}</span><strong>${escapeHtml(getPlanPortfolioFilterDisplay(key))}</strong>
+          </button>
+          <button type="button" class="trendCollectionFilterRemove" data-plan-filter-reset="${escapeHtml(key)}" aria-label="Remove ${escapeHtml(label)} filter" title="Remove ${escapeHtml(label)} filter"><i class="bi bi-x" aria-hidden="true"></i></button>
+        </div>
+      `).join("") + (activeDefinitions.length ? `<button type="button" class="trendCollectionClearAll" data-plan-filter-reset="all">Clear all</button>` : "");
+    };
+
+    const syncPlanPortfolioFilterGrid = (openKey = null) => {
+      if (!usesPlanPortfolioWorkspace) return;
+      const rootWasOpen = planPortfolioFilterRoot.open;
+      planPortfolioFilterGrid.innerHTML = planPortfolioFilterDefinitions.map(({ key, label }) => {
+        const catalog = planPortfolioCatalogs[key] || [];
+        const selected = state.planPortfolioFilters[key] || new Set();
+        const available = getPlanPortfolioAvailableValues(key);
+        const searchValue = String(planPortfolioFilterSearches[key] || "");
+        const normalizedSearch = searchValue.trim().toLowerCase();
+        const visibleOptions = catalog.filter((value) => !normalizedSearch || String(value).toLowerCase().includes(normalizedSearch));
+        return `
+          <details class="trendCollectionFilterSelect" data-plan-filter-key="${escapeHtml(key)}"${openKey === key ? " open" : ""}>
+            <summary aria-label="Select ${escapeHtml(label)} filter values"><span class="trendCollectionFilterSummaryText"><span class="trendCollectionFilterLabel">${escapeHtml(label)}</span><span class="trendCollectionFilterValue">${escapeHtml(getPlanPortfolioFilterSummary(key))}</span></span><i class="bi bi-chevron-right" aria-hidden="true"></i></summary>
+            <div class="trendCollectionFilterMenu">
+              ${catalog.length > 8 ? `<input type="search" class="trendCollectionFilterSearch" value="${escapeHtml(searchValue)}" placeholder="Search ${escapeHtml(label.toLowerCase())}" aria-label="Search ${escapeHtml(label)} options" />` : ""}
+              <div class="trendCollectionFilterActions"><button type="button" data-plan-filter-action="all">Select all</button><button type="button" data-plan-filter-action="clear">Clear</button></div>
+              <div class="trendCollectionFilterOptions">${visibleOptions.map((value) => {
+                const isSelected = selected.has(value);
+                const isUnavailable = !available.has(value);
+                return `<label class="trendCollectionFilterOption${isUnavailable ? " is-unavailable" : ""}"><input type="checkbox" value="${escapeHtml(value)}" data-plan-filter-value="${escapeHtml(value)}"${isSelected ? " checked" : ""}${isUnavailable && !isSelected ? " disabled" : ""} /><span>${escapeHtml(value)}</span></label>`;
+              }).join("") || `<div class="trendCollectionFilterOption is-unavailable">No matching options</div>`}</div>
+            </div>
+          </details>`;
+      }).join("");
+      planPortfolioFilterRoot.open = rootWasOpen || Boolean(openKey);
+      planPortfolioFilterGrid.querySelectorAll(".trendCollectionFilterSelect").forEach((details) => {
+        details.addEventListener("toggle", () => { if (details.open) closePlanPortfolioFilterMenus(details); });
+      });
+    };
+
+    const syncPlanPortfolioResultState = (result) => {
+      if (!usesPlanPortfolioWorkspace) return;
+      const hasData = Boolean(result?.hasData);
+      planPortfolioNoData.hidden = hasData;
+      const canvas = $("trendPlanPortfolioChart");
+      if (canvas) {
+        canvas.style.opacity = hasData ? "1" : "0.12";
+        canvas.style.pointerEvents = hasData ? "auto" : "none";
+      }
+      const configured = planPortfolioFilterDefinitions.filter(({ key }) => !isPlanPortfolioFilterInactive(key));
+      const activeCount = configured.filter(({ key }) => state.planPortfolioFilterEnabled[key]).length;
+      const pausedCount = configured.length - activeCount;
+      if (!planPortfolioScopeMeta) return;
+      if (!activeCount && !pausedCount) {
+        planPortfolioScopeMeta.textContent = "Monthly plan submitted weekly, excluding PTP, against the selected portfolio";
+        return;
+      }
+      const matchingRows = getCurrentPlanPortfolioRows().filter((row) => planPortfolioRowMatches(row, state.planPortfolioFilters, null, state.planPortfolioFilterEnabled));
+      const customers = new Set(matchingRows.map((row) => row.customerName)).size;
+      planPortfolioScopeMeta.textContent = `${activeCount} filter${activeCount === 1 ? "" : "s"} applied${pausedCount ? ` | ${pausedCount} paused` : ""} | ${customers} customer${customers === 1 ? "" : "s"}`;
+    };
+
+    const syncPlanPortfolioHeaderControls = () => {
+      planPortfolioSeriesButtons.forEach((button) => {
+        const key = button.dataset.trendPlanSeries;
+        button.setAttribute("aria-pressed", state.planPortfolioSeriesVisibility[key] ? "true" : "false");
+      });
+    };
+
+    const syncPlanPortfolioWorkspace = (openKey = null, rerenderChart = true) => {
+      if (!usesPlanPortfolioWorkspace) return;
+      syncPlanPortfolioFilterGrid(openKey);
+      syncPlanPortfolioFilterChips();
+      syncPlanPortfolioHeaderControls();
+      if (rerenderChart) syncPlanPortfolioResultState(renderPlanPortfolioChart(state.currentTrendPoints, getPlanPortfolioContext()));
+    };
+
+    const resetPlanPortfolioFilters = (key = "all") => {
+      planPortfolioFilterDefinitions.forEach((definition) => {
+        if (key !== "all" && definition.key !== key) return;
+        state.planPortfolioFilters[definition.key] = new Set();
+        state.planPortfolioFilterEnabled[definition.key] = true;
+        planPortfolioFilterSearches[definition.key] = "";
+      });
+      syncPlanPortfolioWorkspace();
+    };
+
+    const getCurrentVisitsRows = () => state.currentTrendPoints.flatMap((point) => point.collectionBreakdown || []);
+    const isVisitsFilterInactive = (key) => !(state.visitsFilters[key] instanceof Set) || !state.visitsFilters[key].size;
+    const getVisitsAvailableValues = (key) => new Set(getCurrentVisitsRows()
+      .filter((row) => visitsRowMatches(row, state.visitsFilters, key, state.visitsFilterEnabled))
+      .map((row) => row[key]).filter(Boolean));
+    const getVisitsFilterSummary = (key) => {
+      const selected = state.visitsFilters[key] || new Set();
+      if (!selected.size) return "Nothing selected";
+      if (selected.size === (visitsCatalogs[key] || []).length) return "All selected";
+      const values = [...selected];
+      return values.length === 1 ? values[0] : `${values.length} selected`;
+    };
+    const getVisitsFilterDisplay = (key) => {
+      const selected = [...(state.visitsFilters[key] || new Set())];
+      if (!selected.length) return "Nothing selected";
+      if (selected.length === (visitsCatalogs[key] || []).length) return "All selected";
+      return selected.length <= 2 ? selected.join(", ") : `${selected.slice(0, 2).join(", ")} +${selected.length - 2}`;
+    };
+    const getVisitsContext = () => ({
+      filters: state.visitsFilters,
+      enabledFilters: state.visitsFilterEnabled,
+      seriesVisibility: state.visitsSeriesVisibility
+    });
+    const closeVisitsFilterMenus = (except = null) => {
+      visitsFilterGrid?.querySelectorAll("details[open]").forEach((details) => { if (details !== except) details.open = false; });
+      if (!except && visitsFilterRoot) visitsFilterRoot.open = false;
+    };
+    const getVisitCustomerOptions = () => {
+      const matchingRows = getCurrentVisitsRows().filter((row) => visitsRowMatches(row, state.visitsFilters, "customerName", state.visitsFilterEnabled));
+      return Object.values(matchingRows.reduce((acc, row) => {
+        const name = row.customerName;
+        if (!name) return acc;
+        acc[name] = acc[name] || { name, visits: 0 };
+        acc[name].visits += Number(row.monthlyVisits || 0);
+        return acc;
+      }, {})).sort((left, right) => right.visits - left.visits || left.name.localeCompare(right.name));
+    };
+    const syncVisitsCustomerPicker = () => {
+      if (!usesVisitsWorkspace) return;
+      const selected = state.visitsFilters.customerName || new Set();
+      visitsCustomerSummary.textContent = !selected.size ? "Customer" : selected.size === 1 ? [...selected][0] : `${selected.size} customers`;
+      const search = visitsCustomerSearch.value.trim().toLowerCase();
+      const options = getVisitCustomerOptions().filter(({ name }) => !search || name.toLowerCase().includes(search));
+      visitsCustomerOptions.innerHTML = options.map(({ name, visits }) => `
+        <label class="trendVisitsCustomerOption">
+          <input type="checkbox" value="${escapeHtml(name)}" data-visits-customer-value="${escapeHtml(name)}"${selected.has(name) ? " checked" : ""} />
+          <strong>${escapeHtml(name)}</strong><span>${formatCount(visits)} visits</span>
+        </label>`).join("") || `<div class="trendCollectionFilterOption is-unavailable">No matching customers</div>`;
+    };
+    const syncVisitsFilterChips = () => {
+      if (!usesVisitsWorkspace) return;
+      const activeDefinitions = visitsAllFilterDefinitions.filter(({ key }) => !isVisitsFilterInactive(key));
+      visitsFilterChips.hidden = !activeDefinitions.length;
+      visitsFilterChips.innerHTML = activeDefinitions.map(({ key, label }) => `
+        <div class="trendCollectionAppliedFilter${state.visitsFilterEnabled[key] ? "" : " is-disabled"}">
+          <button type="button" class="trendCollectionFilterVisibility" data-visits-filter-toggle="${escapeHtml(key)}" aria-pressed="${state.visitsFilterEnabled[key] ? "true" : "false"}" aria-label="${state.visitsFilterEnabled[key] ? "Disable" : "Enable"} ${escapeHtml(label)} filter" title="${state.visitsFilterEnabled[key] ? "Disable" : "Enable"} ${escapeHtml(label)} filter"><i class="bi ${state.visitsFilterEnabled[key] ? "bi-eye" : "bi-eye-slash"}" aria-hidden="true"></i></button>
+          <button type="button" class="trendCollectionAppliedFilterBody" data-visits-filter-edit="${escapeHtml(key)}" aria-label="Edit ${escapeHtml(label)} filter"><span>${escapeHtml(label)}</span><strong>${escapeHtml(getVisitsFilterDisplay(key))}</strong></button>
+          <button type="button" class="trendCollectionFilterRemove" data-visits-filter-reset="${escapeHtml(key)}" aria-label="Remove ${escapeHtml(label)} filter" title="Remove ${escapeHtml(label)} filter"><i class="bi bi-x" aria-hidden="true"></i></button>
+        </div>`).join("") + (activeDefinitions.length ? `<button type="button" class="trendCollectionClearAll" data-visits-filter-reset="all">Clear all</button>` : "");
+    };
+    const syncVisitsFilterGrid = (openKey = null) => {
+      if (!usesVisitsWorkspace) return;
+      const rootWasOpen = visitsFilterRoot.open;
+      visitsFilterGrid.innerHTML = visitsFilterDefinitions.map(({ key, label }) => {
+        const catalog = visitsCatalogs[key] || [];
+        const selected = state.visitsFilters[key] || new Set();
+        const available = getVisitsAvailableValues(key);
+        const searchValue = String(visitsFilterSearches[key] || "");
+        const visibleOptions = catalog.filter((value) => !searchValue.trim() || String(value).toLowerCase().includes(searchValue.trim().toLowerCase()));
+        return `<details class="trendCollectionFilterSelect" data-visits-filter-key="${escapeHtml(key)}"${openKey === key ? " open" : ""}>
+          <summary aria-label="Select ${escapeHtml(label)} filter values"><span class="trendCollectionFilterSummaryText"><span class="trendCollectionFilterLabel">${escapeHtml(label)}</span><span class="trendCollectionFilterValue">${escapeHtml(getVisitsFilterSummary(key))}</span></span><i class="bi bi-chevron-right" aria-hidden="true"></i></summary>
+          <div class="trendCollectionFilterMenu">${catalog.length > 8 ? `<input type="search" class="trendCollectionFilterSearch" value="${escapeHtml(searchValue)}" placeholder="Search ${escapeHtml(label.toLowerCase())}" aria-label="Search ${escapeHtml(label)} options" />` : ""}
+            <div class="trendCollectionFilterActions"><button type="button" data-visits-filter-action="all">Select all</button><button type="button" data-visits-filter-action="clear">Clear</button></div>
+            <div class="trendCollectionFilterOptions">${visibleOptions.map((value) => `<label class="trendCollectionFilterOption${!available.has(value) ? " is-unavailable" : ""}"><input type="checkbox" value="${escapeHtml(value)}" data-visits-filter-value="${escapeHtml(value)}"${selected.has(value) ? " checked" : ""}${!available.has(value) && !selected.has(value) ? " disabled" : ""} /><span>${escapeHtml(value)}</span></label>`).join("") || `<div class="trendCollectionFilterOption is-unavailable">No matching options</div>`}</div>
+          </div></details>`;
+      }).join("");
+      visitsFilterRoot.open = rootWasOpen || Boolean(openKey);
+      visitsFilterGrid.querySelectorAll(".trendCollectionFilterSelect").forEach((details) => details.addEventListener("toggle", () => { if (details.open) closeVisitsFilterMenus(details); }));
+    };
+    const syncVisitsResultState = (result) => {
+      if (!usesVisitsWorkspace) return;
+      const hasData = Boolean(result?.hasData);
+      visitsNoData.hidden = hasData;
+      const canvas = $("trendVisitsChart");
+      if (canvas) { canvas.style.opacity = hasData ? "1" : "0.12"; canvas.style.pointerEvents = hasData ? "auto" : "none"; }
+      const configured = visitsAllFilterDefinitions.filter(({ key }) => !isVisitsFilterInactive(key));
+      const activeCount = configured.filter(({ key }) => state.visitsFilterEnabled[key]).length;
+      const pausedCount = configured.length - activeCount;
+      if (!visitsScopeMeta) return;
+      if (!activeCount && !pausedCount) { visitsScopeMeta.textContent = "Total visits shown as unique and repeat customer visits"; return; }
+      const matchingRows = getCurrentVisitsRows().filter((row) => visitsRowMatches(row, state.visitsFilters, null, state.visitsFilterEnabled));
+      const customers = new Set(matchingRows.filter((row) => row.monthlyVisits > 0).map((row) => row.customerName)).size;
+      visitsScopeMeta.textContent = `${activeCount} filter${activeCount === 1 ? "" : "s"} applied${pausedCount ? ` | ${pausedCount} paused` : ""} | ${customers} customer${customers === 1 ? "" : "s"} visited`;
+    };
+    const syncVisitsHeaderControls = () => {
+      visitsSeriesButtons.forEach((button) => {
+        const key = button.dataset.trendVisitsSeries;
+        button.setAttribute("aria-pressed", state.visitsSeriesVisibility[key] ? "true" : "false");
+      });
+    };
+    const syncVisitsWorkspace = (openKey = null, rerenderChart = true) => {
+      if (!usesVisitsWorkspace) return;
+      syncVisitsFilterGrid(openKey);
+      syncVisitsCustomerPicker();
+      syncVisitsFilterChips();
+      syncVisitsHeaderControls();
+      if (rerenderChart) syncVisitsResultState(renderVisitsChart(state.currentTrendPoints, getVisitsContext()));
+    };
+    const resetVisitsFilters = (key = "all") => {
+      visitsAllFilterDefinitions.forEach((definition) => {
+        if (key !== "all" && definition.key !== key) return;
+        state.visitsFilters[definition.key] = new Set();
+        state.visitsFilterEnabled[definition.key] = true;
+        visitsFilterSearches[definition.key] = "";
+      });
+      if (key === "all" || key === "customerName") visitsCustomerSearch.value = "";
+      syncVisitsWorkspace();
+    };
+
+    const getCurrentInvoiceSubmissionRows = () => state.currentTrendPoints.flatMap((point) => point.collectionBreakdown || []);
+    const isInvoiceSubmissionFilterInactive = (key) => !(state.invoiceSubmissionFilters[key] instanceof Set) || !state.invoiceSubmissionFilters[key].size;
+    const getInvoiceSubmissionAvailableValues = (key) => new Set(getCurrentInvoiceSubmissionRows()
+      .filter((row) => invoiceSubmissionRowMatches(row, state.invoiceSubmissionFilters, key, state.invoiceSubmissionFilterEnabled))
+      .map((row) => row[key]).filter(Boolean));
+    const getInvoiceSubmissionFilterSummary = (key) => {
+      const selected = state.invoiceSubmissionFilters[key] || new Set();
+      if (!selected.size) return "Nothing selected";
+      if (selected.size === (invoiceSubmissionCatalogs[key] || []).length) return "All selected";
+      const values = [...selected];
+      return values.length === 1 ? values[0] : `${values.length} selected`;
+    };
+    const getInvoiceSubmissionFilterDisplay = (key) => {
+      const selected = [...(state.invoiceSubmissionFilters[key] || new Set())];
+      if (!selected.length) return "Nothing selected";
+      if (selected.length === (invoiceSubmissionCatalogs[key] || []).length) return "All selected";
+      return selected.length <= 2 ? selected.join(", ") : `${selected.slice(0, 2).join(", ")} +${selected.length - 2}`;
+    };
+    const getInvoiceSubmissionContext = () => ({
+      filters: state.invoiceSubmissionFilters,
+      enabledFilters: state.invoiceSubmissionFilterEnabled
+    });
+    const closeInvoiceSubmissionFilterMenus = (except = null) => {
+      invoiceSubmissionFilterGrid?.querySelectorAll("details[open]").forEach((details) => { if (details !== except) details.open = false; });
+      if (!except && invoiceSubmissionFilterRoot) invoiceSubmissionFilterRoot.open = false;
+    };
+    const syncInvoiceSubmissionFilterChips = () => {
+      if (!usesInvoiceSubmissionWorkspace) return;
+      const activeDefinitions = invoiceSubmissionFilterDefinitions.filter(({ key }) => !isInvoiceSubmissionFilterInactive(key));
+      invoiceSubmissionFilterChips.hidden = !activeDefinitions.length;
+      invoiceSubmissionFilterChips.innerHTML = activeDefinitions.map(({ key, label }) => `
+        <div class="trendCollectionAppliedFilter${state.invoiceSubmissionFilterEnabled[key] ? "" : " is-disabled"}">
+          <button type="button" class="trendCollectionFilterVisibility" data-invoice-submission-filter-toggle="${escapeHtml(key)}" aria-pressed="${state.invoiceSubmissionFilterEnabled[key] ? "true" : "false"}" aria-label="${state.invoiceSubmissionFilterEnabled[key] ? "Disable" : "Enable"} ${escapeHtml(label)} filter" title="${state.invoiceSubmissionFilterEnabled[key] ? "Disable" : "Enable"} ${escapeHtml(label)} filter"><i class="bi ${state.invoiceSubmissionFilterEnabled[key] ? "bi-eye" : "bi-eye-slash"}" aria-hidden="true"></i></button>
+          <button type="button" class="trendCollectionAppliedFilterBody" data-invoice-submission-filter-edit="${escapeHtml(key)}" aria-label="Edit ${escapeHtml(label)} filter"><span>${escapeHtml(label)}</span><strong>${escapeHtml(getInvoiceSubmissionFilterDisplay(key))}</strong></button>
+          <button type="button" class="trendCollectionFilterRemove" data-invoice-submission-filter-reset="${escapeHtml(key)}" aria-label="Remove ${escapeHtml(label)} filter" title="Remove ${escapeHtml(label)} filter"><i class="bi bi-x" aria-hidden="true"></i></button>
+        </div>`).join("") + (activeDefinitions.length ? `<button type="button" class="trendCollectionClearAll" data-invoice-submission-filter-reset="all">Clear all</button>` : "");
+    };
+    const syncInvoiceSubmissionFilterGrid = (openKey = null) => {
+      if (!usesInvoiceSubmissionWorkspace) return;
+      const rootWasOpen = invoiceSubmissionFilterRoot.open;
+      invoiceSubmissionFilterGrid.innerHTML = invoiceSubmissionFilterDefinitions.map(({ key, label }) => {
+        const catalog = invoiceSubmissionCatalogs[key] || [];
+        const selected = state.invoiceSubmissionFilters[key] || new Set();
+        const available = getInvoiceSubmissionAvailableValues(key);
+        const searchValue = String(invoiceSubmissionFilterSearches[key] || "");
+        const normalizedSearch = searchValue.trim().toLowerCase();
+        const visibleOptions = catalog.filter((value) => !normalizedSearch || String(value).toLowerCase().includes(normalizedSearch));
+        return `<details class="trendCollectionFilterSelect" data-invoice-submission-filter-key="${escapeHtml(key)}"${openKey === key ? " open" : ""}>
+          <summary aria-label="Select ${escapeHtml(label)} filter values"><span class="trendCollectionFilterSummaryText"><span class="trendCollectionFilterLabel">${escapeHtml(label)}</span><span class="trendCollectionFilterValue">${escapeHtml(getInvoiceSubmissionFilterSummary(key))}</span></span><i class="bi bi-chevron-right" aria-hidden="true"></i></summary>
+          <div class="trendCollectionFilterMenu">${catalog.length > 8 ? `<input type="search" class="trendCollectionFilterSearch" value="${escapeHtml(searchValue)}" placeholder="Search ${escapeHtml(label.toLowerCase())}" aria-label="Search ${escapeHtml(label)} options" />` : ""}
+            <div class="trendCollectionFilterActions"><button type="button" data-invoice-submission-filter-action="all">Select all</button><button type="button" data-invoice-submission-filter-action="clear">Clear</button></div>
+            <div class="trendCollectionFilterOptions">${visibleOptions.map((value) => {
+              const isSelected = selected.has(value);
+              const isUnavailable = !available.has(value);
+              return `<label class="trendCollectionFilterOption${isUnavailable ? " is-unavailable" : ""}"><input type="checkbox" value="${escapeHtml(value)}" data-invoice-submission-filter-value="${escapeHtml(value)}"${isSelected ? " checked" : ""}${isUnavailable && !isSelected ? " disabled" : ""} /><span>${escapeHtml(value)}</span></label>`;
+            }).join("") || `<div class="trendCollectionFilterOption is-unavailable">No matching options</div>`}</div>
+          </div></details>`;
+      }).join("");
+      invoiceSubmissionFilterRoot.open = rootWasOpen || Boolean(openKey);
+      invoiceSubmissionFilterGrid.querySelectorAll(".trendCollectionFilterSelect").forEach((details) => details.addEventListener("toggle", () => { if (details.open) closeInvoiceSubmissionFilterMenus(details); }));
+    };
+    const syncInvoiceSubmissionResultState = (result) => {
+      if (!usesInvoiceSubmissionWorkspace) return;
+      const hasData = Boolean(result?.hasData);
+      invoiceSubmissionNoData.hidden = hasData;
+      const canvas = $("trendInvoiceSubmissionChart");
+      if (canvas) { canvas.style.opacity = hasData ? "1" : "0.12"; canvas.style.pointerEvents = hasData ? "auto" : "none"; }
+      const configured = invoiceSubmissionFilterDefinitions.filter(({ key }) => !isInvoiceSubmissionFilterInactive(key));
+      const activeCount = configured.filter(({ key }) => state.invoiceSubmissionFilterEnabled[key]).length;
+      const pausedCount = configured.length - activeCount;
+      if (!invoiceSubmissionScopeMeta) return;
+      if (!activeCount && !pausedCount) { invoiceSubmissionScopeMeta.textContent = "Submission channel split across the selected period"; return; }
+      const matchingRows = getCurrentInvoiceSubmissionRows().filter((row) => invoiceSubmissionRowMatches(row, state.invoiceSubmissionFilters, null, state.invoiceSubmissionFilterEnabled));
+      const customers = new Set(matchingRows.map((row) => row.customerName)).size;
+      invoiceSubmissionScopeMeta.textContent = `${activeCount} filter${activeCount === 1 ? "" : "s"} applied${pausedCount ? ` | ${pausedCount} paused` : ""} | ${customers} customer${customers === 1 ? "" : "s"}`;
+    };
+    const syncInvoiceSubmissionWorkspace = (openKey = null, rerenderChart = true) => {
+      if (!usesInvoiceSubmissionWorkspace) return;
+      syncInvoiceSubmissionFilterGrid(openKey);
+      syncInvoiceSubmissionFilterChips();
+      if (rerenderChart) syncInvoiceSubmissionResultState(renderInvoiceSubmissionChart(state.currentTrendPoints, getInvoiceSubmissionContext()));
+    };
+    const resetInvoiceSubmissionFilters = (key = "all") => {
+      invoiceSubmissionFilterDefinitions.forEach((definition) => {
+        if (key !== "all" && definition.key !== key) return;
+        state.invoiceSubmissionFilters[definition.key] = new Set();
+        state.invoiceSubmissionFilterEnabled[definition.key] = true;
+        invoiceSubmissionFilterSearches[definition.key] = "";
+      });
+      syncInvoiceSubmissionWorkspace();
+    };
+
+    const getCurrentAgingBucketsRows = () => state.currentTrendPoints.flatMap((point) => point.collectionBreakdown || []);
+    const isAgingBucketsFilterInactive = (key) => !(state.agingBucketsFilters[key] instanceof Set) || !state.agingBucketsFilters[key].size;
+    const getAgingBucketsAvailableValues = (key) => new Set(getCurrentAgingBucketsRows()
+      .filter((row) => agingBucketsRowMatches(row, state.agingBucketsFilters, key, state.agingBucketsFilterEnabled))
+      .map((row) => row[key]).filter(Boolean));
+    const getAgingBucketsFilterSummary = (key) => {
+      const selected = state.agingBucketsFilters[key] || new Set();
+      if (!selected.size) return "Nothing selected";
+      if (selected.size === (agingBucketsCatalogs[key] || []).length) return "All selected";
+      const values = [...selected];
+      return values.length === 1 ? values[0] : `${values.length} selected`;
+    };
+    const getAgingBucketsFilterDisplay = (key) => {
+      const selected = [...(state.agingBucketsFilters[key] || new Set())];
+      if (!selected.length) return "Nothing selected";
+      if (selected.length === (agingBucketsCatalogs[key] || []).length) return "All selected";
+      return selected.length <= 2 ? selected.join(", ") : `${selected.slice(0, 2).join(", ")} +${selected.length - 2}`;
+    };
+    const getAgingBucketsContext = () => ({ filters: state.agingBucketsFilters, enabledFilters: state.agingBucketsFilterEnabled });
+    const closeAgingBucketsFilterMenus = (except = null) => {
+      agingBucketsFilterGrid?.querySelectorAll("details[open]").forEach((details) => { if (details !== except) details.open = false; });
+      if (!except && agingBucketsFilterRoot) agingBucketsFilterRoot.open = false;
+    };
+    const syncAgingBucketsFilterChips = () => {
+      if (!usesAgingBucketsWorkspace) return;
+      const activeDefinitions = agingBucketsFilterDefinitions.filter(({ key }) => !isAgingBucketsFilterInactive(key));
+      agingBucketsFilterChips.hidden = !activeDefinitions.length;
+      agingBucketsFilterChips.innerHTML = activeDefinitions.map(({ key, label }) => `
+        <div class="trendCollectionAppliedFilter${state.agingBucketsFilterEnabled[key] ? "" : " is-disabled"}">
+          <button type="button" class="trendCollectionFilterVisibility" data-aging-buckets-filter-toggle="${escapeHtml(key)}" aria-pressed="${state.agingBucketsFilterEnabled[key] ? "true" : "false"}" aria-label="${state.agingBucketsFilterEnabled[key] ? "Disable" : "Enable"} ${escapeHtml(label)} filter" title="${state.agingBucketsFilterEnabled[key] ? "Disable" : "Enable"} ${escapeHtml(label)} filter"><i class="bi ${state.agingBucketsFilterEnabled[key] ? "bi-eye" : "bi-eye-slash"}" aria-hidden="true"></i></button>
+          <button type="button" class="trendCollectionAppliedFilterBody" data-aging-buckets-filter-edit="${escapeHtml(key)}" aria-label="Edit ${escapeHtml(label)} filter"><span>${escapeHtml(label)}</span><strong>${escapeHtml(getAgingBucketsFilterDisplay(key))}</strong></button>
+          <button type="button" class="trendCollectionFilterRemove" data-aging-buckets-filter-reset="${escapeHtml(key)}" aria-label="Remove ${escapeHtml(label)} filter" title="Remove ${escapeHtml(label)} filter"><i class="bi bi-x" aria-hidden="true"></i></button>
+        </div>`).join("") + (activeDefinitions.length ? `<button type="button" class="trendCollectionClearAll" data-aging-buckets-filter-reset="all">Clear all</button>` : "");
+    };
+    const syncAgingBucketsFilterGrid = (openKey = null) => {
+      if (!usesAgingBucketsWorkspace) return;
+      const rootWasOpen = agingBucketsFilterRoot.open;
+      agingBucketsFilterGrid.innerHTML = agingBucketsFilterDefinitions.map(({ key, label }) => {
+        const catalog = agingBucketsCatalogs[key] || [];
+        const selected = state.agingBucketsFilters[key] || new Set();
+        const available = getAgingBucketsAvailableValues(key);
+        const searchValue = String(agingBucketsFilterSearches[key] || "");
+        const normalizedSearch = searchValue.trim().toLowerCase();
+        const visibleOptions = catalog.filter((value) => !normalizedSearch || String(value).toLowerCase().includes(normalizedSearch));
+        return `<details class="trendCollectionFilterSelect" data-aging-buckets-filter-key="${escapeHtml(key)}"${openKey === key ? " open" : ""}>
+          <summary aria-label="Select ${escapeHtml(label)} filter values"><span class="trendCollectionFilterSummaryText"><span class="trendCollectionFilterLabel">${escapeHtml(label)}</span><span class="trendCollectionFilterValue">${escapeHtml(getAgingBucketsFilterSummary(key))}</span></span><i class="bi bi-chevron-right" aria-hidden="true"></i></summary>
+          <div class="trendCollectionFilterMenu">${catalog.length > 8 ? `<input type="search" class="trendCollectionFilterSearch" value="${escapeHtml(searchValue)}" placeholder="Search ${escapeHtml(label.toLowerCase())}" aria-label="Search ${escapeHtml(label)} options" />` : ""}
+            <div class="trendCollectionFilterActions"><button type="button" data-aging-buckets-filter-action="all">Select all</button><button type="button" data-aging-buckets-filter-action="clear">Clear</button></div>
+            <div class="trendCollectionFilterOptions">${visibleOptions.map((value) => { const isSelected = selected.has(value); const isUnavailable = !available.has(value); return `<label class="trendCollectionFilterOption${isUnavailable ? " is-unavailable" : ""}"><input type="checkbox" value="${escapeHtml(value)}" data-aging-buckets-filter-value="${escapeHtml(value)}"${isSelected ? " checked" : ""}${isUnavailable && !isSelected ? " disabled" : ""} /><span>${escapeHtml(value)}</span></label>`; }).join("") || `<div class="trendCollectionFilterOption is-unavailable">No matching options</div>`}</div>
+          </div></details>`;
+      }).join("");
+      agingBucketsFilterRoot.open = rootWasOpen || Boolean(openKey);
+      agingBucketsFilterGrid.querySelectorAll(".trendCollectionFilterSelect").forEach((details) => details.addEventListener("toggle", () => { if (details.open) closeAgingBucketsFilterMenus(details); }));
+    };
+    const syncAgingBucketsResultState = (result) => {
+      if (!usesAgingBucketsWorkspace) return;
+      const hasData = Boolean(result?.hasData);
+      agingBucketsNoData.hidden = hasData;
+      const canvas = $("trendAgingBucketsChart");
+      if (canvas) { canvas.style.opacity = hasData ? "1" : "0.12"; canvas.style.pointerEvents = hasData ? "auto" : "none"; }
+      const configured = agingBucketsFilterDefinitions.filter(({ key }) => !isAgingBucketsFilterInactive(key));
+      const activeCount = configured.filter(({ key }) => state.agingBucketsFilterEnabled[key]).length;
+      const pausedCount = configured.length - activeCount;
+      if (!agingBucketsScopeMeta) return;
+      if (!activeCount && !pausedCount) { agingBucketsScopeMeta.textContent = "Outstanding value movement by aging bucket"; return; }
+      const matchingRows = getCurrentAgingBucketsRows().filter((row) => agingBucketsRowMatches(row, state.agingBucketsFilters, null, state.agingBucketsFilterEnabled));
+      const customers = new Set(matchingRows.map((row) => row.customerName)).size;
+      agingBucketsScopeMeta.textContent = `${activeCount} filter${activeCount === 1 ? "" : "s"} applied${pausedCount ? ` | ${pausedCount} paused` : ""} | ${customers} customer${customers === 1 ? "" : "s"}`;
+    };
+    const syncAgingBucketsWorkspace = (openKey = null, rerenderChart = true) => {
+      if (!usesAgingBucketsWorkspace) return;
+      syncAgingBucketsFilterGrid(openKey);
+      syncAgingBucketsFilterChips();
+      if (rerenderChart) syncAgingBucketsResultState(renderAgingBucketsChart(state.currentTrendPoints, getAgingBucketsContext()));
+    };
+    const resetAgingBucketsFilters = (key = "all") => {
+      agingBucketsFilterDefinitions.forEach((definition) => {
+        if (key !== "all" && definition.key !== key) return;
+        state.agingBucketsFilters[definition.key] = new Set();
+        state.agingBucketsFilterEnabled[definition.key] = true;
+        agingBucketsFilterSearches[definition.key] = "";
+      });
+      syncAgingBucketsWorkspace();
+    };
+
+    const getCurrentCnAdvRows = () => state.currentTrendPoints.flatMap((point) => point.collectionBreakdown || []);
+    const isCnAdvFilterInactive = (key) => !(state.cnAdvFilters[key] instanceof Set) || !state.cnAdvFilters[key].size;
+    const getCnAdvAvailableValues = (key) => new Set(getCurrentCnAdvRows().filter((row) => cnAdvRowMatches(row, state.cnAdvFilters, key, state.cnAdvFilterEnabled)).map((row) => row[key]).filter(Boolean));
+    const getCnAdvFilterSummary = (key) => {
+      const selected = state.cnAdvFilters[key] || new Set();
+      if (!selected.size) return "Nothing selected";
+      if (selected.size === (cnAdvCatalogs[key] || []).length) return "All selected";
+      return selected.size === 1 ? [...selected][0] : `${selected.size} selected`;
+    };
+    const getCnAdvFilterDisplay = (key) => {
+      const selected = [...(state.cnAdvFilters[key] || new Set())];
+      if (!selected.length) return "Nothing selected";
+      if (selected.length === (cnAdvCatalogs[key] || []).length) return "All selected";
+      return selected.length <= 2 ? selected.join(", ") : `${selected.slice(0, 2).join(", ")} +${selected.length - 2}`;
+    };
+    const getCnAdvContext = () => ({ filters: state.cnAdvFilters, enabledFilters: state.cnAdvFilterEnabled });
+    const closeCnAdvFilterMenus = (except = null) => {
+      cnAdvFilterGrid?.querySelectorAll("details[open]").forEach((details) => { if (details !== except) details.open = false; });
+      if (!except && cnAdvFilterRoot) cnAdvFilterRoot.open = false;
+    };
+    const syncCnAdvFilterChips = () => {
+      if (!usesCnAdvWorkspace) return;
+      const activeDefinitions = cnAdvFilterDefinitions.filter(({ key }) => !isCnAdvFilterInactive(key));
+      cnAdvFilterChips.hidden = !activeDefinitions.length;
+      cnAdvFilterChips.innerHTML = activeDefinitions.map(({ key, label }) => `<div class="trendCollectionAppliedFilter${state.cnAdvFilterEnabled[key] ? "" : " is-disabled"}">
+        <button type="button" class="trendCollectionFilterVisibility" data-cn-adv-filter-toggle="${escapeHtml(key)}" aria-pressed="${state.cnAdvFilterEnabled[key] ? "true" : "false"}" aria-label="${state.cnAdvFilterEnabled[key] ? "Disable" : "Enable"} ${escapeHtml(label)} filter" title="${state.cnAdvFilterEnabled[key] ? "Disable" : "Enable"} ${escapeHtml(label)} filter"><i class="bi ${state.cnAdvFilterEnabled[key] ? "bi-eye" : "bi-eye-slash"}" aria-hidden="true"></i></button>
+        <button type="button" class="trendCollectionAppliedFilterBody" data-cn-adv-filter-edit="${escapeHtml(key)}" aria-label="Edit ${escapeHtml(label)} filter"><span>${escapeHtml(label)}</span><strong>${escapeHtml(getCnAdvFilterDisplay(key))}</strong></button>
+        <button type="button" class="trendCollectionFilterRemove" data-cn-adv-filter-reset="${escapeHtml(key)}" aria-label="Remove ${escapeHtml(label)} filter" title="Remove ${escapeHtml(label)} filter"><i class="bi bi-x" aria-hidden="true"></i></button>
+      </div>`).join("") + (activeDefinitions.length ? `<button type="button" class="trendCollectionClearAll" data-cn-adv-filter-reset="all">Clear all</button>` : "");
+    };
+    const syncCnAdvFilterGrid = (openKey = null) => {
+      if (!usesCnAdvWorkspace) return;
+      const rootWasOpen = cnAdvFilterRoot.open;
+      cnAdvFilterGrid.innerHTML = cnAdvFilterDefinitions.map(({ key, label }) => {
+        const catalog = cnAdvCatalogs[key] || [];
+        const selected = state.cnAdvFilters[key] || new Set();
+        const available = getCnAdvAvailableValues(key);
+        const searchValue = String(cnAdvFilterSearches[key] || "");
+        const term = searchValue.trim().toLowerCase();
+        const visibleOptions = catalog.filter((value) => !term || String(value).toLowerCase().includes(term));
+        return `<details class="trendCollectionFilterSelect" data-cn-adv-filter-key="${escapeHtml(key)}"${openKey === key ? " open" : ""}>
+          <summary aria-label="Select ${escapeHtml(label)} filter values"><span class="trendCollectionFilterSummaryText"><span class="trendCollectionFilterLabel">${escapeHtml(label)}</span><span class="trendCollectionFilterValue">${escapeHtml(getCnAdvFilterSummary(key))}</span></span><i class="bi bi-chevron-right" aria-hidden="true"></i></summary>
+          <div class="trendCollectionFilterMenu">${catalog.length > 8 ? `<input type="search" class="trendCollectionFilterSearch" value="${escapeHtml(searchValue)}" placeholder="Search ${escapeHtml(label.toLowerCase())}" aria-label="Search ${escapeHtml(label)} options" />` : ""}<div class="trendCollectionFilterActions"><button type="button" data-cn-adv-filter-action="all">Select all</button><button type="button" data-cn-adv-filter-action="clear">Clear</button></div>
+          <div class="trendCollectionFilterOptions">${visibleOptions.map((value) => { const isSelected = selected.has(value); const isUnavailable = !available.has(value); return `<label class="trendCollectionFilterOption${isUnavailable ? " is-unavailable" : ""}"><input type="checkbox" value="${escapeHtml(value)}" data-cn-adv-filter-value="${escapeHtml(value)}"${isSelected ? " checked" : ""}${isUnavailable && !isSelected ? " disabled" : ""} /><span>${escapeHtml(value)}</span></label>`; }).join("") || `<div class="trendCollectionFilterOption is-unavailable">No matching options</div>`}</div></div></details>`;
+      }).join("");
+      cnAdvFilterRoot.open = rootWasOpen || Boolean(openKey);
+      cnAdvFilterGrid.querySelectorAll(".trendCollectionFilterSelect").forEach((details) => details.addEventListener("toggle", () => { if (details.open) closeCnAdvFilterMenus(details); }));
+    };
+    const syncCnAdvResultState = (result) => {
+      if (!usesCnAdvWorkspace) return;
+      const hasData = Boolean(result?.hasData);
+      cnAdvNoData.hidden = hasData;
+      const canvas = $("trendCnAdvChart");
+      if (canvas) { canvas.style.opacity = hasData ? "1" : "0.12"; canvas.style.pointerEvents = hasData ? "auto" : "none"; }
+      const configured = cnAdvFilterDefinitions.filter(({ key }) => !isCnAdvFilterInactive(key));
+      const activeCount = configured.filter(({ key }) => state.cnAdvFilterEnabled[key]).length;
+      const pausedCount = configured.length - activeCount;
+      if (!cnAdvScopeMeta) return;
+      if (!activeCount && !pausedCount) { cnAdvScopeMeta.textContent = "CN and advance value added versus utilised"; return; }
+      const customers = new Set(getCurrentCnAdvRows().filter((row) => cnAdvRowMatches(row, state.cnAdvFilters, null, state.cnAdvFilterEnabled)).map((row) => row.customerName)).size;
+      cnAdvScopeMeta.textContent = `${activeCount} filter${activeCount === 1 ? "" : "s"} applied${pausedCount ? ` | ${pausedCount} paused` : ""} | ${customers} customer${customers === 1 ? "" : "s"}`;
+    };
+    const syncCnAdvWorkspace = (openKey = null, rerenderChart = true) => {
+      if (!usesCnAdvWorkspace) return;
+      syncCnAdvFilterGrid(openKey);
+      syncCnAdvFilterChips();
+      if (rerenderChart) syncCnAdvResultState(renderCnAdvChart(state.currentTrendPoints, getCnAdvContext()));
+    };
+    const resetCnAdvFilters = (key = "all") => {
+      cnAdvFilterDefinitions.forEach((definition) => {
+        if (key !== "all" && definition.key !== key) return;
+        state.cnAdvFilters[definition.key] = new Set();
+        state.cnAdvFilterEnabled[definition.key] = true;
+        cnAdvFilterSearches[definition.key] = "";
+      });
+      syncCnAdvWorkspace();
+    };
+
+    const createFinancialRiskWorkspace = ({
+      id,
+      label,
+      defaultMeta,
+      metricKey,
+      tray,
+      root,
+      grid,
+      chips,
+      noData,
+      noDataClear,
+      scopeMeta,
+      isAvailable,
+      renderMetric
+    }) => {
+      const filtersKey = `${id}Filters`;
+      const enabledKey = `${id}FilterEnabled`;
+      const searches = id === "provisioning" ? provisioningFilterSearches : writtenOffFilterSearches;
+      const attrPrefix = id === "provisioning" ? "provisioning" : "written-off";
+      if (!(tray && root && grid && chips && noData) || !isAvailable) return null;
+      const getRows = () => state.currentTrendPoints.flatMap((point) => point.collectionBreakdown || []);
+      const isInactive = (key) => !(state[filtersKey][key] instanceof Set) || !state[filtersKey][key].size;
+      const getAvailable = (key) => new Set(getRows()
+        .filter((row) => financialRiskRowMatches(row, state[filtersKey], key, state[enabledKey]))
+        .map((row) => row[key]).filter(Boolean));
+      const getSummary = (key) => {
+        const selected = state[filtersKey][key] || new Set();
+        if (!selected.size) return "Nothing selected";
+        if (selected.size === (financialRiskCatalogs[key] || []).length) return "All selected";
+        return selected.size === 1 ? [...selected][0] : `${selected.size} selected`;
+      };
+      const getDisplay = (key) => {
+        const selected = [...(state[filtersKey][key] || new Set())];
+        if (!selected.length) return "Nothing selected";
+        if (selected.length === (financialRiskCatalogs[key] || []).length) return "All selected";
+        return selected.length <= 2 ? selected.join(", ") : `${selected.slice(0, 2).join(", ")} +${selected.length - 2}`;
+      };
+      const getContext = () => ({ filters: state[filtersKey], enabledFilters: state[enabledKey] });
+      const closeMenus = (except = null) => {
+        grid.querySelectorAll("details[open]").forEach((details) => { if (details !== except) details.open = false; });
+        if (!except) root.open = false;
+      };
+      const syncChips = () => {
+        const activeDefinitions = financialRiskFilterDefinitions.filter(({ key }) => !isInactive(key));
+        chips.hidden = !activeDefinitions.length;
+        chips.innerHTML = activeDefinitions.map(({ key, label: filterLabel }) => `<div class="trendCollectionAppliedFilter${state[enabledKey][key] ? "" : " is-disabled"}">
+          <button type="button" class="trendCollectionFilterVisibility" data-${attrPrefix}-filter-toggle="${escapeHtml(key)}" aria-pressed="${state[enabledKey][key] ? "true" : "false"}" aria-label="${state[enabledKey][key] ? "Disable" : "Enable"} ${escapeHtml(filterLabel)} filter" title="${state[enabledKey][key] ? "Disable" : "Enable"} ${escapeHtml(filterLabel)} filter"><i class="bi ${state[enabledKey][key] ? "bi-eye" : "bi-eye-slash"}" aria-hidden="true"></i></button>
+          <button type="button" class="trendCollectionAppliedFilterBody" data-${attrPrefix}-filter-edit="${escapeHtml(key)}" aria-label="Edit ${escapeHtml(filterLabel)} filter"><span>${escapeHtml(filterLabel)}</span><strong>${escapeHtml(getDisplay(key))}</strong></button>
+          <button type="button" class="trendCollectionFilterRemove" data-${attrPrefix}-filter-reset="${escapeHtml(key)}" aria-label="Remove ${escapeHtml(filterLabel)} filter" title="Remove ${escapeHtml(filterLabel)} filter"><i class="bi bi-x" aria-hidden="true"></i></button>
+        </div>`).join("") + (activeDefinitions.length ? `<button type="button" class="trendCollectionClearAll" data-${attrPrefix}-filter-reset="all">Clear all</button>` : "");
+      };
+      const syncGrid = (openKey = null) => {
+        const rootWasOpen = root.open;
+        grid.innerHTML = financialRiskFilterDefinitions.map(({ key, label: filterLabel }) => {
+          const catalog = financialRiskCatalogs[key] || [];
+          const selected = state[filtersKey][key] || new Set();
+          const available = getAvailable(key);
+          const searchValue = String(searches[key] || "");
+          const term = searchValue.trim().toLowerCase();
+          const visibleOptions = catalog.filter((value) => !term || String(value).toLowerCase().includes(term));
+          return `<details class="trendCollectionFilterSelect" data-${attrPrefix}-filter-key="${escapeHtml(key)}"${openKey === key ? " open" : ""}>
+            <summary aria-label="Select ${escapeHtml(filterLabel)} filter values"><span class="trendCollectionFilterSummaryText"><span class="trendCollectionFilterLabel">${escapeHtml(filterLabel)}</span><span class="trendCollectionFilterValue">${escapeHtml(getSummary(key))}</span></span><i class="bi bi-chevron-right" aria-hidden="true"></i></summary>
+            <div class="trendCollectionFilterMenu">${catalog.length > 8 ? `<input type="search" class="trendCollectionFilterSearch" value="${escapeHtml(searchValue)}" placeholder="Search ${escapeHtml(filterLabel.toLowerCase())}" aria-label="Search ${escapeHtml(filterLabel)} options" />` : ""}<div class="trendCollectionFilterActions"><button type="button" data-${attrPrefix}-filter-action="all">Select all</button><button type="button" data-${attrPrefix}-filter-action="clear">Clear</button></div>
+            <div class="trendCollectionFilterOptions">${visibleOptions.map((value) => { const selectedValue = selected.has(value); const unavailable = !available.has(value); return `<label class="trendCollectionFilterOption${unavailable ? " is-unavailable" : ""}"><input type="checkbox" value="${escapeHtml(value)}" data-${attrPrefix}-filter-value="${escapeHtml(value)}"${selectedValue ? " checked" : ""}${unavailable && !selectedValue ? " disabled" : ""} /><span>${escapeHtml(value)}</span></label>`; }).join("") || `<div class="trendCollectionFilterOption is-unavailable">No matching options</div>`}</div></div></details>`;
+        }).join("");
+        root.open = rootWasOpen || Boolean(openKey);
+        grid.querySelectorAll(".trendCollectionFilterSelect").forEach((details) => details.addEventListener("toggle", () => { if (details.open) closeMenus(details); }));
+      };
+      const syncResult = (result) => {
+        const hasData = Boolean(result?.hasData);
+        noData.hidden = hasData;
+        const canvas = $(`trend${id === "provisioning" ? "Provisioning" : "WrittenOff"}Chart`);
+        if (canvas) { canvas.style.opacity = hasData ? "1" : "0.12"; canvas.style.pointerEvents = hasData ? "auto" : "none"; }
+        const configured = financialRiskFilterDefinitions.filter(({ key }) => !isInactive(key));
+        const activeCount = configured.filter(({ key }) => state[enabledKey][key]).length;
+        const pausedCount = configured.length - activeCount;
+        if (!scopeMeta) return;
+        if (!activeCount && !pausedCount) { scopeMeta.textContent = defaultMeta; return; }
+        const customers = new Set(getRows().filter((row) => financialRiskRowMatches(row, state[filtersKey], null, state[enabledKey])).map((row) => row.customerName)).size;
+        scopeMeta.textContent = `${activeCount} filter${activeCount === 1 ? "" : "s"} applied${pausedCount ? ` | ${pausedCount} paused` : ""} | ${customers} customer${customers === 1 ? "" : "s"}`;
+      };
+      const sync = (openKey = null, rerenderChart = true) => {
+        syncGrid(openKey);
+        syncChips();
+        if (rerenderChart) syncResult(renderMetric(state.currentTrendPoints, getContext()));
+      };
+      const reset = (key = "all") => {
+        financialRiskFilterDefinitions.forEach((definition) => {
+          if (key !== "all" && definition.key !== key) return;
+          state[filtersKey][definition.key] = new Set();
+          state[enabledKey][definition.key] = true;
+          searches[definition.key] = "";
+        });
+        sync();
+      };
+      grid.addEventListener("click", (event) => {
+        const button = event.target.closest(`[data-${attrPrefix}-filter-action]`);
+        if (!button) return;
+        event.preventDefault();
+        event.stopPropagation();
+        const key = button.closest(`[data-${attrPrefix}-filter-key]`)?.dataset[`${id}FilterKey`];
+        if (!key || !financialRiskCatalogs[key]) return;
+        state[filtersKey][key] = button.dataset[`${id}FilterAction`] === "clear" ? new Set() : new Set(financialRiskCatalogs[key]);
+        sync(key);
+      });
+      grid.addEventListener("change", (event) => {
+        const checkbox = event.target.closest(`[data-${attrPrefix}-filter-value]`);
+        if (!(checkbox instanceof HTMLInputElement)) return;
+        const key = checkbox.closest(`[data-${attrPrefix}-filter-key]`)?.dataset[`${id}FilterKey`];
+        if (!key || !(state[filtersKey][key] instanceof Set)) return;
+        if (checkbox.checked) state[filtersKey][key].add(checkbox.value);
+        else state[filtersKey][key].delete(checkbox.value);
+        sync(key);
+      });
+      grid.addEventListener("input", (event) => {
+        const input = event.target.closest(".trendCollectionFilterSearch");
+        if (!(input instanceof HTMLInputElement)) return;
+        const key = input.closest(`[data-${attrPrefix}-filter-key]`)?.dataset[`${id}FilterKey`];
+        if (!key) return;
+        searches[key] = input.value;
+        const term = input.value.trim().toLowerCase();
+        input.closest(`[data-${attrPrefix}-filter-key]`)?.querySelectorAll(".trendCollectionFilterOption").forEach((option) => {
+          const optionLabel = option.querySelector("span")?.textContent?.toLowerCase() || "";
+          option.hidden = Boolean(term && !optionLabel.includes(term));
+        });
+      });
+      chips.addEventListener("click", (event) => {
+        const toggle = event.target.closest(`[data-${attrPrefix}-filter-toggle]`);
+        if (toggle) {
+          const key = toggle.dataset[`${id}FilterToggle`];
+          if (!Object.prototype.hasOwnProperty.call(state[enabledKey], key)) return;
+          state[enabledKey][key] = !state[enabledKey][key];
+          sync();
+          return;
+        }
+        const edit = event.target.closest(`[data-${attrPrefix}-filter-edit]`);
+        if (edit) { sync(edit.dataset[`${id}FilterEdit`]); grid.querySelector(".trendCollectionFilterSelect summary")?.focus(); return; }
+        const resetButton = event.target.closest(`[data-${attrPrefix}-filter-reset]`);
+        if (resetButton) reset(resetButton.dataset[`${id}FilterReset`] || "all");
+      });
+      noDataClear?.addEventListener("click", () => reset("all"));
+      return { root, sync, syncResult, getContext, closeMenus };
+    };
+
+    const provisioningWorkspace = createFinancialRiskWorkspace({
+      id: "provisioning", label: "Provisioning", defaultMeta: "Provision value movement across the selected period", metricKey: "provisioningCr",
+      tray: provisioningFilterTray, root: provisioningFilterRoot, grid: provisioningFilterGrid, chips: provisioningFilterChips, noData: provisioningNoData, noDataClear: provisioningNoDataClear, scopeMeta: provisioningScopeMeta,
+      isAvailable: usesProvisioningWorkspace, renderMetric: renderProvisioningChart
+    });
+    const writtenOffWorkspace = createFinancialRiskWorkspace({
+      id: "writtenOff", label: "Written Off", defaultMeta: "Written-off value movement across the selected period", metricKey: "writtenOffCr",
+      tray: writtenOffFilterTray, root: writtenOffFilterRoot, grid: writtenOffFilterGrid, chips: writtenOffFilterChips, noData: writtenOffNoData, noDataClear: writtenOffNoDataClear, scopeMeta: writtenOffScopeMeta,
+      isAvailable: usesWrittenOffWorkspace, renderMetric: renderWrittenOffChart
+    });
+
     const render = () => {
       syncTrendControls();
-      const periodData = getPeriodData(state.range, state.activeYear, getActivePeriodKey());
+      const periodData = getPeriodData(
+        state.range,
+        state.activeYear,
+        getActivePeriodKey(),
+        usesMultiPeriodSelect ? state.selectedPeriods[state.range] : null
+      );
 
       setText("trendSelectedPeriod", periodData.label || `${rangeLabels[state.range] || "Yearly"} | ${state.activeYear}`);
-      renderCharts(periodData.points, periodData.closingStatus);
+      state.currentTrendPoints = periodData.points;
+      if (usesCollectionWorkspace) syncCollectionWorkspace(null, false);
+      if (usesPlanPortfolioWorkspace) syncPlanPortfolioWorkspace(null, false);
+      if (usesVisitsWorkspace) syncVisitsWorkspace(null, false);
+      if (usesInvoiceSubmissionWorkspace) syncInvoiceSubmissionWorkspace(null, false);
+      if (usesAgingBucketsWorkspace) syncAgingBucketsWorkspace(null, false);
+      if (usesCnAdvWorkspace) syncCnAdvWorkspace(null, false);
+      provisioningWorkspace?.sync(null, false);
+      writtenOffWorkspace?.sync(null, false);
+      const chartResults = renderCharts(
+        periodData.points,
+        periodData.closingStatus,
+        usesCollectionWorkspace ? getCollectionContext() : null,
+        usesInvoiceSubmissionWorkspace ? getInvoiceSubmissionContext() : null,
+        usesAgingBucketsWorkspace ? getAgingBucketsContext() : null,
+        usesCnAdvWorkspace ? getCnAdvContext() : null,
+        provisioningWorkspace?.getContext() || null,
+        writtenOffWorkspace?.getContext() || null
+      );
+      syncCollectionResultState(chartResults.collectionResult);
+      if (usesInvoiceSubmissionWorkspace) syncInvoiceSubmissionResultState(chartResults.invoiceSubmissionResult);
+      if (usesAgingBucketsWorkspace) syncAgingBucketsResultState(chartResults.agingBucketsResult);
+      if (usesCnAdvWorkspace) syncCnAdvResultState(chartResults.cnAdvResult);
+      provisioningWorkspace?.syncResult(chartResults.provisioningResult);
+      writtenOffWorkspace?.syncResult(chartResults.writtenOffResult);
+      if (usesPlanPortfolioWorkspace) syncPlanPortfolioResultState(renderPlanPortfolioChart(periodData.points, getPlanPortfolioContext()));
+      if (usesVisitsWorkspace) syncVisitsResultState(renderVisitsChart(periodData.points, getVisitsContext()));
 
       $("trendPrevYearBtn")?.toggleAttribute("disabled", state.activeYear <= minYear);
       $("trendNextYearBtn")?.toggleAttribute("disabled", state.activeYear >= maxYear);
@@ -1402,15 +3430,19 @@
       nowGrid.hidden = showTrends;
       trendView.hidden = !showTrends;
       toggleBtn.setAttribute("aria-pressed", showTrends ? "true" : "false");
-      toggleBtn.title = showTrends ? "Now" : "Trends";
+      const defaultToggleLabel = toggleBtn.dataset.trendLabel || "Trends";
+      toggleBtn.title = showTrends ? "Now" : defaultToggleLabel;
       toggleBtn.setAttribute("aria-label", showTrends ? "Show current dashboard cards" : "Show performance trends");
       const textNode = toggleBtn.querySelector("[data-trend-toggle-text]");
-      if (textNode) textNode.textContent = showTrends ? "Now" : "Trends";
+      if (textNode) textNode.textContent = showTrends ? "Now" : defaultToggleLabel;
 
       if (showTrends) {
         requestAnimationFrame(() => {
           if (!state.hasRendered) render();
-          else Object.values(chartInstances).forEach((chart) => chart?.resize());
+          else {
+            Object.values(chartInstances).forEach((chart) => chart?.resize());
+            Object.values(trendEchartInstances).forEach((chart) => chart?.resize());
+          }
           markTrendsVisible();
         });
       } else {
@@ -1424,11 +3456,405 @@
     rangeButtons.forEach((button) => {
       button.addEventListener("click", () => setActiveRange(button.dataset.trendRange));
     });
+    collectionSeriesButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const key = button.dataset.trendCollectionSeries;
+        if (!Object.prototype.hasOwnProperty.call(state.collectionSeriesVisibility, key)) return;
+        const visibleCount = Object.values(state.collectionSeriesVisibility).filter(Boolean).length;
+        if (state.collectionSeriesVisibility[key] && visibleCount === 1) return;
+        state.collectionSeriesVisibility[key] = !state.collectionSeriesVisibility[key];
+        syncCollectionHeaderControls();
+        syncCollectionResultState(renderCollectionChart(state.currentTrendPoints, getCollectionContext()));
+      });
+    });
+    planPortfolioSeriesButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const key = button.dataset.trendPlanSeries;
+        if (!Object.prototype.hasOwnProperty.call(state.planPortfolioSeriesVisibility, key)) return;
+        const visibleCount = Object.values(state.planPortfolioSeriesVisibility).filter(Boolean).length;
+        if (state.planPortfolioSeriesVisibility[key] && visibleCount === 1) return;
+        state.planPortfolioSeriesVisibility[key] = !state.planPortfolioSeriesVisibility[key];
+        syncPlanPortfolioHeaderControls();
+        syncPlanPortfolioResultState(renderPlanPortfolioChart(state.currentTrendPoints, getPlanPortfolioContext()));
+      });
+    });
+    visitsSeriesButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const key = button.dataset.trendVisitsSeries;
+        if (!Object.prototype.hasOwnProperty.call(state.visitsSeriesVisibility, key)) return;
+        const visibleCount = Object.values(state.visitsSeriesVisibility).filter(Boolean).length;
+        if (state.visitsSeriesVisibility[key] && visibleCount === 1) return;
+        state.visitsSeriesVisibility[key] = !state.visitsSeriesVisibility[key];
+        syncVisitsHeaderControls();
+        syncVisitsResultState(renderVisitsChart(state.currentTrendPoints, getVisitsContext()));
+      });
+    });
+    collectionFilterGrid?.addEventListener("click", (event) => {
+      const actionButton = event.target.closest("[data-collection-filter-action]");
+      if (!actionButton) return;
+      event.preventDefault();
+      event.stopPropagation();
+      const details = actionButton.closest("[data-collection-filter-key]");
+      const key = details?.dataset.collectionFilterKey;
+      if (!key || !collectionCatalogs[key]) return;
+      state.collectionFilters[key] = actionButton.dataset.collectionFilterAction === "clear"
+        ? new Set()
+        : new Set(collectionCatalogs[key]);
+      syncCollectionWorkspace(key);
+    });
+    collectionFilterGrid?.addEventListener("change", (event) => {
+      const checkbox = event.target.closest("[data-collection-filter-value]");
+      if (!(checkbox instanceof HTMLInputElement)) return;
+      const details = checkbox.closest("[data-collection-filter-key]");
+      const key = details?.dataset.collectionFilterKey;
+      if (!key || !(state.collectionFilters[key] instanceof Set)) return;
+      if (checkbox.checked) state.collectionFilters[key].add(checkbox.value);
+      else state.collectionFilters[key].delete(checkbox.value);
+      syncCollectionWorkspace(key);
+    });
+    collectionFilterGrid?.addEventListener("input", (event) => {
+      const searchInput = event.target.closest(".trendCollectionFilterSearch");
+      if (!(searchInput instanceof HTMLInputElement)) return;
+      const details = searchInput.closest("[data-collection-filter-key]");
+      const key = details?.dataset.collectionFilterKey;
+      if (!key) return;
+      collectionFilterSearches[key] = searchInput.value;
+      const searchValue = searchInput.value.trim().toLowerCase();
+      details.querySelectorAll(".trendCollectionFilterOption").forEach((option) => {
+        const label = option.querySelector("span")?.textContent?.toLowerCase() || "";
+        option.hidden = Boolean(searchValue && !label.includes(searchValue));
+      });
+    });
+    collectionFilterChips?.addEventListener("click", (event) => {
+      const toggleButton = event.target.closest("[data-collection-filter-toggle]");
+      if (toggleButton) {
+        const key = toggleButton.dataset.collectionFilterToggle;
+        if (!Object.prototype.hasOwnProperty.call(state.collectionFilterEnabled, key)) return;
+        state.collectionFilterEnabled[key] = !state.collectionFilterEnabled[key];
+        syncCollectionWorkspace();
+        return;
+      }
+      const editButton = event.target.closest("[data-collection-filter-edit]");
+      if (editButton) {
+        event.stopPropagation();
+        const key = editButton.dataset.collectionFilterEdit;
+        if (!collectionCatalogs[key]) return;
+        syncCollectionFilterGrid(key);
+        collectionFilterGrid.querySelector(".trendCollectionFilterSelect summary")?.focus();
+        return;
+      }
+      const resetButton = event.target.closest("[data-collection-filter-reset]");
+      if (!resetButton) return;
+      resetCollectionFilters(resetButton.dataset.collectionFilterReset || "all");
+    });
+    collectionNoDataClear?.addEventListener("click", () => resetCollectionFilters("all"));
+    planPortfolioFilterGrid?.addEventListener("click", (event) => {
+      const actionButton = event.target.closest("[data-plan-filter-action]");
+      if (!actionButton) return;
+      event.preventDefault();
+      event.stopPropagation();
+      const details = actionButton.closest("[data-plan-filter-key]");
+      const key = details?.dataset.planFilterKey;
+      if (!key || !planPortfolioCatalogs[key]) return;
+      state.planPortfolioFilters[key] = actionButton.dataset.planFilterAction === "clear"
+        ? new Set()
+        : new Set(planPortfolioCatalogs[key]);
+      syncPlanPortfolioWorkspace(key);
+    });
+    planPortfolioFilterGrid?.addEventListener("change", (event) => {
+      const checkbox = event.target.closest("[data-plan-filter-value]");
+      if (!(checkbox instanceof HTMLInputElement)) return;
+      const details = checkbox.closest("[data-plan-filter-key]");
+      const key = details?.dataset.planFilterKey;
+      if (!key || !(state.planPortfolioFilters[key] instanceof Set)) return;
+      if (checkbox.checked) state.planPortfolioFilters[key].add(checkbox.value);
+      else state.planPortfolioFilters[key].delete(checkbox.value);
+      syncPlanPortfolioWorkspace(key);
+    });
+    planPortfolioFilterGrid?.addEventListener("input", (event) => {
+      const searchInput = event.target.closest(".trendCollectionFilterSearch");
+      if (!(searchInput instanceof HTMLInputElement)) return;
+      const details = searchInput.closest("[data-plan-filter-key]");
+      const key = details?.dataset.planFilterKey;
+      if (!key) return;
+      planPortfolioFilterSearches[key] = searchInput.value;
+      const searchValue = searchInput.value.trim().toLowerCase();
+      details.querySelectorAll(".trendCollectionFilterOption").forEach((option) => {
+        const label = option.querySelector("span")?.textContent?.toLowerCase() || "";
+        option.hidden = Boolean(searchValue && !label.includes(searchValue));
+      });
+    });
+    planPortfolioFilterChips?.addEventListener("click", (event) => {
+      const toggleButton = event.target.closest("[data-plan-filter-toggle]");
+      if (toggleButton) {
+        const key = toggleButton.dataset.planFilterToggle;
+        if (!Object.prototype.hasOwnProperty.call(state.planPortfolioFilterEnabled, key)) return;
+        state.planPortfolioFilterEnabled[key] = !state.planPortfolioFilterEnabled[key];
+        syncPlanPortfolioWorkspace();
+        return;
+      }
+      const editButton = event.target.closest("[data-plan-filter-edit]");
+      if (editButton) {
+        event.stopPropagation();
+        const key = editButton.dataset.planFilterEdit;
+        if (!planPortfolioCatalogs[key]) return;
+        syncPlanPortfolioFilterGrid(key);
+        planPortfolioFilterGrid.querySelector(".trendCollectionFilterSelect summary")?.focus();
+        return;
+      }
+      const resetButton = event.target.closest("[data-plan-filter-reset]");
+      if (resetButton) resetPlanPortfolioFilters(resetButton.dataset.planFilterReset || "all");
+    });
+    planPortfolioNoDataClear?.addEventListener("click", () => resetPlanPortfolioFilters("all"));
+    visitsFilterGrid?.addEventListener("click", (event) => {
+      const actionButton = event.target.closest("[data-visits-filter-action]");
+      if (!actionButton) return;
+      event.preventDefault();
+      event.stopPropagation();
+      const details = actionButton.closest("[data-visits-filter-key]");
+      const key = details?.dataset.visitsFilterKey;
+      if (!key || !visitsCatalogs[key]) return;
+      state.visitsFilters[key] = actionButton.dataset.visitsFilterAction === "clear" ? new Set() : new Set(visitsCatalogs[key]);
+      syncVisitsWorkspace(key);
+    });
+    visitsFilterGrid?.addEventListener("change", (event) => {
+      const checkbox = event.target.closest("[data-visits-filter-value]");
+      if (!(checkbox instanceof HTMLInputElement)) return;
+      const key = checkbox.closest("[data-visits-filter-key]")?.dataset.visitsFilterKey;
+      if (!key || !(state.visitsFilters[key] instanceof Set)) return;
+      if (checkbox.checked) state.visitsFilters[key].add(checkbox.value);
+      else state.visitsFilters[key].delete(checkbox.value);
+      syncVisitsWorkspace(key);
+    });
+    visitsFilterGrid?.addEventListener("input", (event) => {
+      const searchInput = event.target.closest(".trendCollectionFilterSearch");
+      if (!(searchInput instanceof HTMLInputElement)) return;
+      const key = searchInput.closest("[data-visits-filter-key]")?.dataset.visitsFilterKey;
+      if (!key) return;
+      visitsFilterSearches[key] = searchInput.value;
+      const term = searchInput.value.trim().toLowerCase();
+      searchInput.closest("[data-visits-filter-key]")?.querySelectorAll(".trendCollectionFilterOption").forEach((option) => {
+        const label = option.querySelector("span")?.textContent?.toLowerCase() || "";
+        option.hidden = Boolean(term && !label.includes(term));
+      });
+    });
+    visitsCustomerSearch?.addEventListener("input", () => syncVisitsCustomerPicker());
+    visitsCustomerOptions?.addEventListener("change", (event) => {
+      const checkbox = event.target.closest("[data-visits-customer-value]");
+      if (!(checkbox instanceof HTMLInputElement)) return;
+      if (checkbox.checked) state.visitsFilters.customerName.add(checkbox.value);
+      else state.visitsFilters.customerName.delete(checkbox.value);
+      syncVisitsWorkspace();
+    });
+    visitsCustomerPicker?.addEventListener("click", (event) => {
+      const actionButton = event.target.closest("[data-visits-customer-action]");
+      if (!actionButton) return;
+      event.preventDefault();
+      const options = getVisitCustomerOptions().map(({ name }) => name);
+      state.visitsFilters.customerName = actionButton.dataset.visitsCustomerAction === "clear" ? new Set() : new Set(options);
+      syncVisitsWorkspace();
+    });
+    visitsCustomerPicker?.addEventListener("toggle", () => {
+      if (visitsCustomerPicker.open) closeVisitsFilterMenus();
+    });
+    visitsFilterChips?.addEventListener("click", (event) => {
+      const toggleButton = event.target.closest("[data-visits-filter-toggle]");
+      if (toggleButton) {
+        const key = toggleButton.dataset.visitsFilterToggle;
+        if (!Object.prototype.hasOwnProperty.call(state.visitsFilterEnabled, key)) return;
+        state.visitsFilterEnabled[key] = !state.visitsFilterEnabled[key];
+        syncVisitsWorkspace();
+        return;
+      }
+      const editButton = event.target.closest("[data-visits-filter-edit]");
+      if (editButton) {
+        const key = editButton.dataset.visitsFilterEdit;
+        if (key === "customerName") { visitsCustomerPicker.open = true; visitsCustomerSearch.focus(); return; }
+        syncVisitsFilterGrid(key);
+        visitsFilterGrid.querySelector(".trendCollectionFilterSelect summary")?.focus();
+        return;
+      }
+      const resetButton = event.target.closest("[data-visits-filter-reset]");
+      if (resetButton) resetVisitsFilters(resetButton.dataset.visitsFilterReset || "all");
+    });
+    visitsNoDataClear?.addEventListener("click", () => resetVisitsFilters("all"));
+    invoiceSubmissionFilterGrid?.addEventListener("click", (event) => {
+      const actionButton = event.target.closest("[data-invoice-submission-filter-action]");
+      if (!actionButton) return;
+      event.preventDefault();
+      event.stopPropagation();
+      const key = actionButton.closest("[data-invoice-submission-filter-key]")?.dataset.invoiceSubmissionFilterKey;
+      if (!key || !invoiceSubmissionCatalogs[key]) return;
+      state.invoiceSubmissionFilters[key] = actionButton.dataset.invoiceSubmissionFilterAction === "clear"
+        ? new Set()
+        : new Set(invoiceSubmissionCatalogs[key]);
+      syncInvoiceSubmissionWorkspace(key);
+    });
+    invoiceSubmissionFilterGrid?.addEventListener("change", (event) => {
+      const checkbox = event.target.closest("[data-invoice-submission-filter-value]");
+      if (!(checkbox instanceof HTMLInputElement)) return;
+      const key = checkbox.closest("[data-invoice-submission-filter-key]")?.dataset.invoiceSubmissionFilterKey;
+      if (!key || !(state.invoiceSubmissionFilters[key] instanceof Set)) return;
+      if (checkbox.checked) state.invoiceSubmissionFilters[key].add(checkbox.value);
+      else state.invoiceSubmissionFilters[key].delete(checkbox.value);
+      syncInvoiceSubmissionWorkspace(key);
+    });
+    invoiceSubmissionFilterGrid?.addEventListener("input", (event) => {
+      const searchInput = event.target.closest(".trendCollectionFilterSearch");
+      if (!(searchInput instanceof HTMLInputElement)) return;
+      const key = searchInput.closest("[data-invoice-submission-filter-key]")?.dataset.invoiceSubmissionFilterKey;
+      if (!key) return;
+      invoiceSubmissionFilterSearches[key] = searchInput.value;
+      const term = searchInput.value.trim().toLowerCase();
+      searchInput.closest("[data-invoice-submission-filter-key]")?.querySelectorAll(".trendCollectionFilterOption").forEach((option) => {
+        const label = option.querySelector("span")?.textContent?.toLowerCase() || "";
+        option.hidden = Boolean(term && !label.includes(term));
+      });
+    });
+    invoiceSubmissionFilterChips?.addEventListener("click", (event) => {
+      const toggleButton = event.target.closest("[data-invoice-submission-filter-toggle]");
+      if (toggleButton) {
+        const key = toggleButton.dataset.invoiceSubmissionFilterToggle;
+        if (!Object.prototype.hasOwnProperty.call(state.invoiceSubmissionFilterEnabled, key)) return;
+        state.invoiceSubmissionFilterEnabled[key] = !state.invoiceSubmissionFilterEnabled[key];
+        syncInvoiceSubmissionWorkspace();
+        return;
+      }
+      const editButton = event.target.closest("[data-invoice-submission-filter-edit]");
+      if (editButton) {
+        const key = editButton.dataset.invoiceSubmissionFilterEdit;
+        if (!invoiceSubmissionCatalogs[key]) return;
+        syncInvoiceSubmissionFilterGrid(key);
+        invoiceSubmissionFilterGrid.querySelector(".trendCollectionFilterSelect summary")?.focus();
+        return;
+      }
+      const resetButton = event.target.closest("[data-invoice-submission-filter-reset]");
+      if (resetButton) resetInvoiceSubmissionFilters(resetButton.dataset.invoiceSubmissionFilterReset || "all");
+    });
+    invoiceSubmissionNoDataClear?.addEventListener("click", () => resetInvoiceSubmissionFilters("all"));
+    agingBucketsFilterGrid?.addEventListener("click", (event) => {
+      const actionButton = event.target.closest("[data-aging-buckets-filter-action]");
+      if (!actionButton) return;
+      event.preventDefault();
+      event.stopPropagation();
+      const key = actionButton.closest("[data-aging-buckets-filter-key]")?.dataset.agingBucketsFilterKey;
+      if (!key || !agingBucketsCatalogs[key]) return;
+      state.agingBucketsFilters[key] = actionButton.dataset.agingBucketsFilterAction === "clear" ? new Set() : new Set(agingBucketsCatalogs[key]);
+      syncAgingBucketsWorkspace(key);
+    });
+    agingBucketsFilterGrid?.addEventListener("change", (event) => {
+      const checkbox = event.target.closest("[data-aging-buckets-filter-value]");
+      if (!(checkbox instanceof HTMLInputElement)) return;
+      const key = checkbox.closest("[data-aging-buckets-filter-key]")?.dataset.agingBucketsFilterKey;
+      if (!key || !(state.agingBucketsFilters[key] instanceof Set)) return;
+      if (checkbox.checked) state.agingBucketsFilters[key].add(checkbox.value);
+      else state.agingBucketsFilters[key].delete(checkbox.value);
+      syncAgingBucketsWorkspace(key);
+    });
+    agingBucketsFilterGrid?.addEventListener("input", (event) => {
+      const searchInput = event.target.closest(".trendCollectionFilterSearch");
+      if (!(searchInput instanceof HTMLInputElement)) return;
+      const key = searchInput.closest("[data-aging-buckets-filter-key]")?.dataset.agingBucketsFilterKey;
+      if (!key) return;
+      agingBucketsFilterSearches[key] = searchInput.value;
+      const term = searchInput.value.trim().toLowerCase();
+      searchInput.closest("[data-aging-buckets-filter-key]")?.querySelectorAll(".trendCollectionFilterOption").forEach((option) => {
+        const label = option.querySelector("span")?.textContent?.toLowerCase() || "";
+        option.hidden = Boolean(term && !label.includes(term));
+      });
+    });
+    agingBucketsFilterChips?.addEventListener("click", (event) => {
+      const toggleButton = event.target.closest("[data-aging-buckets-filter-toggle]");
+      if (toggleButton) {
+        const key = toggleButton.dataset.agingBucketsFilterToggle;
+        if (!Object.prototype.hasOwnProperty.call(state.agingBucketsFilterEnabled, key)) return;
+        state.agingBucketsFilterEnabled[key] = !state.agingBucketsFilterEnabled[key];
+        syncAgingBucketsWorkspace();
+        return;
+      }
+      const editButton = event.target.closest("[data-aging-buckets-filter-edit]");
+      if (editButton) {
+        const key = editButton.dataset.agingBucketsFilterEdit;
+        if (!agingBucketsCatalogs[key]) return;
+        syncAgingBucketsFilterGrid(key);
+        agingBucketsFilterGrid.querySelector(".trendCollectionFilterSelect summary")?.focus();
+        return;
+      }
+      const resetButton = event.target.closest("[data-aging-buckets-filter-reset]");
+      if (resetButton) resetAgingBucketsFilters(resetButton.dataset.agingBucketsFilterReset || "all");
+    });
+    agingBucketsNoDataClear?.addEventListener("click", () => resetAgingBucketsFilters("all"));
+    cnAdvFilterGrid?.addEventListener("click", (event) => {
+      const actionButton = event.target.closest("[data-cn-adv-filter-action]");
+      if (!actionButton) return;
+      event.preventDefault();
+      event.stopPropagation();
+      const key = actionButton.closest("[data-cn-adv-filter-key]")?.dataset.cnAdvFilterKey;
+      if (!key || !cnAdvCatalogs[key]) return;
+      state.cnAdvFilters[key] = actionButton.dataset.cnAdvFilterAction === "clear" ? new Set() : new Set(cnAdvCatalogs[key]);
+      syncCnAdvWorkspace(key);
+    });
+    cnAdvFilterGrid?.addEventListener("change", (event) => {
+      const checkbox = event.target.closest("[data-cn-adv-filter-value]");
+      if (!(checkbox instanceof HTMLInputElement)) return;
+      const key = checkbox.closest("[data-cn-adv-filter-key]")?.dataset.cnAdvFilterKey;
+      if (!key || !(state.cnAdvFilters[key] instanceof Set)) return;
+      if (checkbox.checked) state.cnAdvFilters[key].add(checkbox.value);
+      else state.cnAdvFilters[key].delete(checkbox.value);
+      syncCnAdvWorkspace(key);
+    });
+    cnAdvFilterGrid?.addEventListener("input", (event) => {
+      const searchInput = event.target.closest(".trendCollectionFilterSearch");
+      if (!(searchInput instanceof HTMLInputElement)) return;
+      const key = searchInput.closest("[data-cn-adv-filter-key]")?.dataset.cnAdvFilterKey;
+      if (!key) return;
+      cnAdvFilterSearches[key] = searchInput.value;
+      const term = searchInput.value.trim().toLowerCase();
+      searchInput.closest("[data-cn-adv-filter-key]")?.querySelectorAll(".trendCollectionFilterOption").forEach((option) => {
+        const label = option.querySelector("span")?.textContent?.toLowerCase() || "";
+        option.hidden = Boolean(term && !label.includes(term));
+      });
+    });
+    cnAdvFilterChips?.addEventListener("click", (event) => {
+      const toggleButton = event.target.closest("[data-cn-adv-filter-toggle]");
+      if (toggleButton) {
+        const key = toggleButton.dataset.cnAdvFilterToggle;
+        if (!Object.prototype.hasOwnProperty.call(state.cnAdvFilterEnabled, key)) return;
+        state.cnAdvFilterEnabled[key] = !state.cnAdvFilterEnabled[key];
+        syncCnAdvWorkspace();
+        return;
+      }
+      const editButton = event.target.closest("[data-cn-adv-filter-edit]");
+      if (editButton) {
+        const key = editButton.dataset.cnAdvFilterEdit;
+        if (!cnAdvCatalogs[key]) return;
+        syncCnAdvFilterGrid(key);
+        cnAdvFilterGrid.querySelector(".trendCollectionFilterSelect summary")?.focus();
+        return;
+      }
+      const resetButton = event.target.closest("[data-cn-adv-filter-reset]");
+      if (resetButton) resetCnAdvFilters(resetButton.dataset.cnAdvFilterReset || "all");
+    });
+    cnAdvNoDataClear?.addEventListener("click", () => resetCnAdvFilters("all"));
     periodSelect.addEventListener("change", (event) => {
       if (state.range === "quarterly") state.activeQuarter = event.target.value || CURRENT_QUARTER_KEY;
       if (state.range === "monthly") state.activeMonth = event.target.value || CURRENT_MONTH_KEY;
       resetStatusDrill();
       if (state.isTrendsVisible) render();
+    });
+    multiPeriodMenu?.addEventListener("change", (event) => {
+      const input = event.target;
+      if (!(input instanceof HTMLInputElement) || !input.matches("[data-trend-period-value]")) return;
+      const selectedValues = Array.from(multiPeriodMenu.querySelectorAll("input[data-trend-period-value]:checked"))
+        .map((checkbox) => checkbox.value);
+      if (!selectedValues.length) {
+        input.checked = true;
+        return;
+      }
+      state.selectedPeriods[state.range] = selectedValues;
+      resetStatusDrill();
+      if (state.isTrendsVisible) render();
+      else syncMultiPeriodSelect();
     });
     $("trendPrevYearBtn")?.addEventListener("click", () => setActiveYear(state.activeYear - 1));
     $("trendNextYearBtn")?.addEventListener("click", () => setActiveYear(state.activeYear + 1));
@@ -1440,6 +3866,31 @@
       currentStatusDrill.issue = null;
       renderStatusPies(currentStatusSnapshot);
     });
+    document.addEventListener("click", (event) => {
+      if (!collectionFilterRoot?.contains(event.target)) closeCollectionFilterMenus();
+      if (!planPortfolioFilterRoot?.contains(event.target)) closePlanPortfolioFilterMenus();
+      if (!visitsFilterRoot?.contains(event.target)) closeVisitsFilterMenus();
+      if (!invoiceSubmissionFilterRoot?.contains(event.target)) closeInvoiceSubmissionFilterMenus();
+      if (!agingBucketsFilterRoot?.contains(event.target)) closeAgingBucketsFilterMenus();
+      if (!cnAdvFilterRoot?.contains(event.target)) closeCnAdvFilterMenus();
+      if (!provisioningWorkspace?.root.contains(event.target)) provisioningWorkspace?.closeMenus();
+      if (!writtenOffWorkspace?.root.contains(event.target)) writtenOffWorkspace?.closeMenus();
+      if (!visitsCustomerPicker?.contains(event.target) && visitsCustomerPicker) visitsCustomerPicker.open = false;
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        closeCollectionFilterMenus();
+        closePlanPortfolioFilterMenus();
+        closeVisitsFilterMenus();
+        closeInvoiceSubmissionFilterMenus();
+        closeAgingBucketsFilterMenus();
+        closeCnAdvFilterMenus();
+        provisioningWorkspace?.closeMenus();
+        writtenOffWorkspace?.closeMenus();
+        if (visitsCustomerPicker) visitsCustomerPicker.open = false;
+      }
+    });
+    window.addEventListener("resize", () => Object.values(trendEchartInstances).forEach((chart) => chart?.resize()));
     syncTrendControls();
     setTrendVisibility(toggleBtn.getAttribute("aria-pressed") === "true" || !trendView.hidden);
   };

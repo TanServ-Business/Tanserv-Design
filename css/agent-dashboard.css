@@ -298,28 +298,52 @@ body.motion-preload .dashboardCard {
 }
 
 .dashboardTrendToggleBtn {
-  border: 1px solid #d7c3ea;
-  background: #ffffff;
-  color: #4b1f73;
-  border-radius: 999px;
-  padding: 7px 14px;
-  min-height: 31px;
-  font-size: 12px;
-  font-weight: 700;
+  border: 1px solid #4b1f73;
+  background: #4b1f73;
+  color: #ffffff;
+  border-radius: 8px;
+  padding: 7px 16px 7px 8px;
+  min-height: 42px;
+  font-size: 13px;
+  font-weight: 800;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 9px;
   line-height: 1;
-  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
-  transition: color 0.18s ease, border-color 0.18s ease, background-color 0.18s ease;
+  box-shadow: 0 8px 18px rgba(75, 31, 115, 0.24);
+  cursor: pointer;
+  transition: transform 0.18s ease, color 0.18s ease, border-color 0.18s ease, background-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.dashboardTrendToggleIcon {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.18);
+  font-size: 17px;
 }
 
 .dashboardTrendToggleBtn:hover,
-.dashboardTrendToggleBtn[aria-pressed="true"],
 .dashboardTrendToggleBtn:focus-visible {
-  border-color: #4b1f73;
-  background: #4b1f73;
+  border-color: #351454;
+  background: #351454;
   color: #ffffff;
+  box-shadow: 0 12px 22px rgba(75, 31, 115, 0.3);
+  transform: translateY(-1px);
+}
+
+.dashboardTrendToggleBtn[aria-pressed="true"] {
+  border-color: #d7c3ea;
+  background: #ffffff;
+  color: #4b1f73;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.1);
+}
+
+.dashboardTrendToggleBtn[aria-pressed="true"] .dashboardTrendToggleIcon {
+  background: #f1e8fa;
 }
 
 .dashboardTrendToggleBtn:focus-visible {
@@ -453,6 +477,89 @@ body.motion-preload .dashboardCard {
   padding: 6px 10px;
 }
 
+.trendMultiPeriodSelect {
+  position: relative;
+  min-width: 0;
+}
+
+.trendMultiPeriodSelect summary {
+  min-height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 10px;
+  border: 1px solid #d7c3ea;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #111827;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  list-style: none;
+}
+
+.trendMultiPeriodSelect summary::-webkit-details-marker {
+  display: none;
+}
+
+.trendMultiPeriodSelect[open] summary {
+  border-color: #5c258d;
+  box-shadow: 0 0 0 2px rgba(92, 37, 141, 0.14);
+}
+
+.trendMultiPeriodSelect summary i {
+  color: #5c258d;
+  font-size: 12px;
+  transition: transform 0.16s ease;
+}
+
+.trendMultiPeriodSelect[open] summary i {
+  transform: rotate(180deg);
+}
+
+.trendMultiPeriodMenu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 40;
+  display: grid;
+  width: max-content;
+  min-width: min(260px, 100%);
+  max-width: min(320px, calc(100vw - 40px));
+  max-height: 260px;
+  overflow-y: auto;
+  padding: 6px;
+  border: 1px solid #d7c3ea;
+  border-radius: 6px;
+  background: #ffffff;
+  box-shadow: 0 16px 30px rgba(15, 23, 42, 0.16);
+}
+
+.trendMultiPeriodOption {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  padding: 5px 7px;
+  border-radius: 4px;
+  color: #1f2937;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.trendMultiPeriodOption:hover {
+  background: #f5effb;
+}
+
+.trendMultiPeriodOption input {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  accent-color: #4b1f73;
+}
+
 .trendChartGrid {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
@@ -500,7 +607,7 @@ body.motion-preload .dashboardCard {
 
 .trendChartCard {
   grid-column: span 6;
-  padding: 14px;
+  padding: 16px;
 }
 
 .trendChartCard.is-compact {
@@ -553,9 +660,14 @@ body.motion-preload .dashboardCard {
   height: 210px;
 }
 
-.trendChartWrap canvas {
+.trendChartWrap canvas,
+.trendEchartCanvas {
   width: 100% !important;
   height: 100% !important;
+}
+
+.trendEchartCanvas {
+  min-width: 0;
 }
 
 .trendStatusActionBtn {
@@ -3422,7 +3534,7 @@ body.motion-preload .dashboardCard {
 
 .trendCommandRow {
   display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 12px;
   align-items: stretch;
 }
@@ -3435,104 +3547,833 @@ body.motion-preload .dashboardCard {
   height: 280px;
 }
 
-.trendInsightRail {
-  display: grid;
-  gap: 8px;
-  align-content: stretch;
-  padding: 12px;
-  border: 1px solid #e9ddf4;
-  border-radius: 5px;
-  background: linear-gradient(135deg, rgba(92, 37, 141, 0.08), rgba(255, 255, 255, 0.96) 58%);
-  box-shadow: 0 8px 16px rgba(15, 23, 42, 0.05);
+.trendCollectionHeader {
+  align-items: flex-start;
+  margin-bottom: 12px;
 }
 
-.trendInsightMetric {
-  display: grid;
-  grid-template-columns: 34px minmax(0, 0.78fr) minmax(142px, 1fr);
+.trendCollectionHeaderActions {
+  display: flex;
   align-items: center;
-  gap: 10px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid rgba(226, 232, 244, 0.9);
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
-.trendInsightMetric:last-of-type {
-  border-bottom: 0;
-  padding-bottom: 0;
+.trendCollectionSeriesControls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
-.trendInsightIcon {
-  width: 32px;
-  height: 32px;
+.trendCollectionSeriesBtn {
+  min-height: 30px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 9px;
+  border: 1px solid #dfe5ef;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #334155;
+  font-size: 11px;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.trendCollectionSeriesBtn[aria-pressed="false"] {
+  color: #94a3b8;
+  background: #f8fafc;
+}
+
+.trendCollectionSeriesBtn:focus-visible,
+.trendCollectionFilterRoot > summary:focus-visible,
+.trendCollectionFilterSelect summary:focus-visible,
+.trendCollectionAppliedFilter button:focus-visible,
+.trendCollectionNoData button:focus-visible {
+  outline: 2px solid rgba(92, 37, 141, 0.3);
+  outline-offset: 2px;
+}
+
+.trendCollectionSeriesSwatch {
+  position: relative;
+  width: 20px;
+  height: 8px;
+  flex: 0 0 20px;
+}
+
+.trendCollectionSeriesSwatch::before {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  border-radius: 999px;
+  background: #2563eb;
+}
+
+.trendCollectionSeriesSwatch::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 7px;
+  width: 8px;
+  height: 8px;
+  border: 2px solid #ffffff;
+  border-radius: 999px;
+  background: #2563eb;
+  box-shadow: 0 0 0 1px #2563eb;
+}
+
+.trendCollectionSeriesBtn.is-billing .trendCollectionSeriesSwatch::before,
+.trendCollectionSeriesBtn.is-billing .trendCollectionSeriesSwatch::after {
+  background: #0f9f8f;
+}
+
+.trendCollectionSeriesBtn.is-billing .trendCollectionSeriesSwatch::after {
+  box-shadow: 0 0 0 1px #0f9f8f;
+}
+
+.trendCollectionSeriesBtn.is-target .trendCollectionSeriesSwatch::before {
+  display: block;
+  background: #d97706;
+}
+
+.trendCollectionSeriesBtn.is-target .trendCollectionSeriesSwatch::after {
+  left: 6px;
+  width: 9px;
+  height: 9px;
+  background: #f59e0b;
+  box-shadow: 0 0 0 1px #d97706;
+}
+
+.trendCollectionSeriesBtn.is-plan .trendCollectionSeriesSwatch::before,
+.trendCollectionSeriesBtn.is-plan .trendCollectionSeriesSwatch::after,
+.trendCollectionSeriesBtn.is-unique-customers .trendCollectionSeriesSwatch::before,
+.trendCollectionSeriesBtn.is-unique-customers .trendCollectionSeriesSwatch::after {
+  background: #7c3aed;
+}
+
+.trendCollectionSeriesBtn.is-plan .trendCollectionSeriesSwatch::after,
+.trendCollectionSeriesBtn.is-unique-customers .trendCollectionSeriesSwatch::after {
+  box-shadow: 0 0 0 1px #7c3aed;
+}
+
+.trendCollectionSeriesBtn.is-visits .trendCollectionSeriesSwatch::before,
+.trendCollectionSeriesBtn.is-visits .trendCollectionSeriesSwatch::after {
+  background: #0f9f8f;
+}
+
+.trendCollectionSeriesBtn.is-visits .trendCollectionSeriesSwatch::after {
+  box-shadow: 0 0 0 1px #0f9f8f;
+}
+
+.trendCollectionSeriesBtn[aria-pressed="false"] .trendCollectionSeriesSwatch {
+  opacity: 0.35;
+}
+
+.trendCollectionFilterTray {
+  position: relative;
+  z-index: 12;
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  margin: 0;
+}
+
+.trendCollectionFilterRoot,
+.trendCollectionFilterRootMenu,
+.trendCollectionFilterSelect {
+  position: relative;
+  min-width: 0;
+}
+
+.trendCollectionFilterRoot {
+  width: max-content;
+}
+
+.trendCollectionFilterRoot > summary {
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border: 1px solid #dbe2ec;
+  border-radius: 5px;
+  background: #ffffff;
+  color: #4b1f73;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  list-style: none;
+}
+
+.trendCollectionFilterRoot > summary::-webkit-details-marker {
+  display: none;
+}
+
+.trendCollectionFilterRoot[open] > summary {
+  border-color: #6d35a0;
+  box-shadow: 0 0 0 2px rgba(92, 37, 141, 0.12);
+}
+
+.trendCollectionFilterRoot > summary .bi-chevron-down {
+  font-size: 10px;
+  transition: transform 0.16s ease;
+}
+
+.trendCollectionFilterRoot[open] > summary .bi-chevron-down {
+  transform: rotate(180deg);
+}
+
+.trendCollectionFilterRootMenu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  left: auto;
+  z-index: 60;
+  width: 230px;
+  padding: 5px;
+  border: 1px solid #dbe2ec;
+  border-radius: 6px;
+  background: #ffffff;
+  box-shadow: 0 16px 30px rgba(15, 23, 42, 0.16);
+}
+
+.trendCollectionFilterSelect summary {
+  min-height: 32px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 9px;
+  border: 0;
+  border-radius: 4px;
+  background: #ffffff;
+  color: #0f172a;
+  cursor: pointer;
+  list-style: none;
+}
+
+.trendCollectionFilterSelect summary::-webkit-details-marker {
+  display: none;
+}
+
+.trendCollectionFilterSelect[open] summary {
+  background: #f6f0fa;
+  box-shadow: none;
+}
+
+.trendCollectionFilterSummaryText {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.trendCollectionFilterLabel {
+  color: #64748b;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+.trendCollectionFilterValue {
+  overflow: hidden;
+  color: #1e293b;
+  font-size: 10.5px;
+  font-weight: 750;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.trendCollectionFilterSelect summary > i {
+  color: #6d35a0;
+  font-size: 11px;
+  transition: transform 0.16s ease;
+}
+
+.trendCollectionFilterSelect[open] summary > i {
+  transform: translateX(2px);
+}
+
+.trendCollectionFilterMenu {
+  position: absolute;
+  top: 0;
+  right: calc(100% + 7px);
+  left: auto;
+  z-index: 50;
+  width: max(100%, 250px);
+  max-width: min(340px, calc(100vw - 40px));
+  padding: 7px;
+  border: 1px solid #dbe2ec;
+  border-radius: 6px;
+  background: #ffffff;
+  box-shadow: 0 16px 30px rgba(15, 23, 42, 0.16);
+}
+
+.trendCollectionFilterSearch {
+  width: 100%;
+  min-height: 32px;
+  margin-bottom: 6px;
+  padding: 6px 8px;
+  border: 1px solid #dbe2ec;
+  border-radius: 5px;
+  color: #0f172a;
+  font-size: 11px;
+}
+
+.trendCollectionFilterActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 5px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #eef2f7;
+}
+
+.trendCollectionFilterActions button {
+  min-height: 26px;
+  padding: 4px 7px;
+  border: 0;
+  border-radius: 4px;
+  background: #f1e9f8;
+  color: #4b1f73;
+  font-size: 10px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.trendCollectionFilterOptions {
+  max-height: 210px;
+  overflow-y: auto;
+  padding-top: 5px;
+}
+
+.trendCollectionFilterOption {
+  min-height: 30px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 6px;
+  border-radius: 4px;
+  color: #334155;
+  font-size: 11px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.trendCollectionFilterOption:hover {
+  background: #f6f0fa;
+}
+
+.trendCollectionFilterOption.is-unavailable {
+  color: #a8b1bf;
+  cursor: not-allowed;
+}
+
+.trendCollectionFilterOption input {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 14px;
+  margin: 0;
+  accent-color: #5c258d;
+}
+
+.trendCollectionFilterOption span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.trendCollectionFilterOption small {
+  margin-left: auto;
+  color: #94a3b8;
+  font-size: 9px;
+  font-weight: 750;
+}
+
+.trendCollectionFilterChips {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 0 0 9px;
+}
+
+.trendCollectionFilterChips[hidden] {
+  display: none !important;
+}
+
+.trendCollectionAppliedFilter {
+  min-height: 30px;
+  display: inline-flex;
+  align-items: center;
+  max-width: 330px;
+  border: 1px solid #d9e0e9;
+  border-radius: 5px;
+  background: #ffffff;
+  color: #334155;
+  transition: opacity 0.16s ease, background 0.16s ease;
+}
+
+.trendCollectionAppliedFilter.is-disabled {
+  border-style: dashed;
+  background: #f8fafc;
+  opacity: 0.62;
+}
+
+.trendCollectionAppliedFilter button,
+.trendCollectionClearAll {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.trendCollectionFilterVisibility,
+.trendCollectionFilterRemove {
+  width: 28px;
+  height: 28px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 999px;
-  color: var(--trend-insight-color, #5c258d);
-  background: rgba(var(--trend-insight-rgb, 92, 37, 141), 0.12);
+  padding: 0;
+  flex: 0 0 28px;
+  color: #5c258d !important;
 }
 
-.trendInsightMetric .trendInsightLabel {
-  font-size: 11px;
-  letter-spacing: 0;
-  text-transform: none;
+.trendCollectionFilterVisibility:hover,
+.trendCollectionFilterRemove:hover {
+  background: #f3edf8;
 }
 
-.trendInsightMetric .trendInsightValue {
-  margin-top: 2px;
-  font-size: 18px;
+.trendCollectionAppliedFilterBody {
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  padding: 4px 7px !important;
+  border-right: 1px solid #edf0f4 !important;
+  border-left: 1px solid #edf0f4 !important;
+  text-align: left;
 }
 
-.trendInsightMetric .trendInsightMeta {
-  margin-top: 0;
+.trendCollectionAppliedFilterBody span {
+  color: #64748b;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
-.trendMiniLine {
-  width: 100%;
-  min-width: 142px;
-  height: 46px;
-  overflow: visible;
+.trendCollectionAppliedFilterBody strong {
+  min-width: 0;
+  overflow: hidden;
+  color: #1e293b;
+  font-size: 10px;
+  font-weight: 750;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.trendMiniLineArea {
-  fill: var(--trend-insight-color, #5c258d);
-  opacity: 0.12;
+.trendCollectionClearAll {
+  min-height: 30px;
+  padding: 4px 7px;
+  color: #5c258d;
+  font-size: 10px;
+  font-weight: 850;
 }
 
-.trendMiniLinePath {
-  fill: none;
-  stroke: var(--trend-insight-color, #5c258d);
-  stroke-width: 2.2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+.trendCollectionChartWrap {
+  min-height: 280px;
 }
 
-.trendMiniLinePoint {
-  fill: #ffffff;
-  stroke: var(--trend-insight-color, #5c258d);
-  stroke-width: 1.8;
-  cursor: help;
-}
-
-.trendMiniLinePoint:hover {
-  fill: var(--trend-insight-color, #5c258d);
-}
-
-.trendPriorityFocus {
-  display: grid;
-  grid-template-columns: 34px minmax(0, 1fr);
-  gap: 10px;
+.trendCollectionNoData {
+  position: absolute;
+  inset: 18px;
+  z-index: 3;
+  display: flex;
   align-items: center;
-  padding-top: 4px;
-  color: #334155;
-  font-size: 12px;
-  line-height: 1.35;
+  justify-content: center;
+  flex-direction: column;
+  gap: 6px;
+  padding: 20px;
+  border: 1px dashed #d7c3ea;
+  border-radius: 6px;
+  background: rgba(250, 248, 253, 0.96);
+  color: #64748b;
+  text-align: center;
 }
 
-.trendPriorityFocus strong {
-  display: block;
-  margin-bottom: 2px;
+.trendCollectionNoData[hidden] {
+  display: none !important;
+}
+
+.trendCollectionNoData > i {
+  color: #6d35a0;
+  font-size: 22px;
+}
+
+.trendCollectionNoData strong {
+  color: #1e293b;
+  font-size: 13px;
+}
+
+.trendCollectionNoData span {
+  font-size: 11px;
+}
+
+.trendCollectionNoData button {
+  min-height: 30px;
+  margin-top: 4px;
+  padding: 5px 10px;
+  border: 1px solid #5c258d;
+  border-radius: 5px;
+  background: #5c258d;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.trendPlanPortfolioRow {
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  margin-top: 12px;
+}
+
+.trendPlanPortfolioCard {
+  grid-column: span 6;
+}
+
+.trendVisitsCard {
+  grid-column: span 6;
+}
+
+.trendPlanPortfolioLegend {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  min-height: 30px;
+  color: #475569;
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.trendPlanPortfolioLegendItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.trendPlanPortfolioLegendItem i {
+  width: 18px;
+  height: 3px;
+  border-radius: 999px;
+  background: #2563eb;
+  position: relative;
+}
+
+.trendPlanPortfolioLegendItem i::after {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: 6px;
+  width: 7px;
+  height: 7px;
+  border: 1px solid #ffffff;
+  border-radius: 50%;
+  background: #2563eb;
+  box-shadow: 0 0 0 1px #2563eb;
+}
+
+.trendPlanPortfolioLegendItem.is-plan i,
+.trendPlanPortfolioLegendItem.is-plan i::after {
+  background: #7c3aed;
+}
+
+.trendPlanPortfolioLegendItem.is-plan i::after {
+  box-shadow: 0 0 0 1px #7c3aed;
+}
+
+.trendVisitsLegend {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 9px;
+  min-height: 30px;
+  color: #475569;
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.trendVisitsLegendItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.trendVisitsLegendItem i {
+  width: 18px;
+  height: 3px;
+  border-radius: 999px;
+  background: #0f9f8f;
+  position: relative;
+}
+
+.trendVisitsLegendItem i::after {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: 6px;
+  width: 7px;
+  height: 7px;
+  border: 1px solid #ffffff;
+  border-radius: 50%;
+  background: #0f9f8f;
+  box-shadow: 0 0 0 1px #0f9f8f;
+}
+
+.trendVisitsLegendItem.is-unique i,
+.trendVisitsLegendItem.is-unique i::after {
+  background: #7c3aed;
+}
+
+.trendVisitsLegendItem.is-unique i::after {
+  box-shadow: 0 0 0 1px #7c3aed;
+}
+
+.trendVisitsCustomerPicker {
+  position: relative;
+  z-index: 14;
+}
+
+.trendVisitsCustomerPicker > summary {
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 9px;
+  border: 1px solid #dbe2ec;
+  border-radius: 5px;
+  background: #ffffff;
+  color: #4b1f73;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  list-style: none;
+}
+
+.trendVisitsCustomerPicker > summary::-webkit-details-marker {
+  display: none;
+}
+
+.trendVisitsCustomerPicker[open] > summary {
+  border-color: #6d35a0;
+  box-shadow: 0 0 0 2px rgba(92, 37, 141, 0.12);
+}
+
+.trendVisitsCustomerMenu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 80;
+  width: min(310px, calc(100vw - 40px));
+  padding: 7px;
+  border: 1px solid #dbe2ec;
+  border-radius: 6px;
+  background: #ffffff;
+  box-shadow: 0 16px 30px rgba(15, 23, 42, 0.16);
+}
+
+.trendVisitsCustomerMenu input {
+  width: 100%;
+  min-height: 32px;
+  padding: 6px 8px;
+  border: 1px solid #dbe2ec;
+  border-radius: 5px;
   color: #0f172a;
-  font-size: 12px;
+  font-size: 11px;
+}
+
+.trendVisitsCustomerActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 5px;
+  padding: 6px 0;
+  border-bottom: 1px solid #eef2f7;
+}
+
+.trendVisitsCustomerActions button {
+  min-height: 26px;
+  padding: 4px 7px;
+  border: 0;
+  border-radius: 4px;
+  background: #f1e9f8;
+  color: #4b1f73;
+  font-size: 10px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.trendVisitsCustomerOptions {
+  max-height: 230px;
+  overflow-y: auto;
+  padding-top: 5px;
+}
+
+.trendVisitsCustomerOption {
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 6px;
+  border-radius: 4px;
+  color: #334155;
+  cursor: pointer;
+}
+
+.trendVisitsCustomerOption:hover {
+  background: #f6f0fa;
+}
+
+.trendVisitsCustomerOption input {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 14px;
+  min-height: 0;
+  margin: 0;
+  accent-color: #5c258d;
+}
+
+.trendVisitsCustomerOption strong {
+  min-width: 0;
+  overflow: hidden;
+  color: #1e293b;
+  font-size: 10.5px;
+  font-weight: 750;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.trendVisitsCustomerOption span {
+  margin-left: auto;
+  color: #0f9f8f;
+  font-size: 10px;
+  font-weight: 850;
+  white-space: nowrap;
+}
+
+#trendPlanPortfolioFilterGrid {
+  width: min(760px, calc(100vw - 42px));
+  display: grid;
+  grid-template-columns: repeat(4, minmax(145px, 1fr));
+  gap: 3px;
+  padding: 7px;
+  z-index: 80;
+}
+
+#trendPlanPortfolioFilterGrid .trendCollectionFilterSelect {
+  min-width: 0;
+}
+
+#trendPlanPortfolioFilterGrid .trendCollectionFilterMenu {
+  top: calc(100% + 6px);
+  right: auto;
+  left: 0;
+  width: min(280px, calc(100vw - 42px));
+  max-width: none;
+  z-index: 90;
+}
+
+#trendPlanPortfolioFilterGrid .trendCollectionFilterSelect:nth-child(4n + 3) .trendCollectionFilterMenu,
+#trendPlanPortfolioFilterGrid .trendCollectionFilterSelect:nth-child(4n) .trendCollectionFilterMenu {
+  right: 0;
+  left: auto;
+}
+
+@media (max-width: 900px) {
+  .trendCollectionHeader,
+  .trendCollectionHeaderActions {
+    align-items: stretch;
+  }
+
+  .trendCollectionHeader {
+    flex-direction: column;
+  }
+
+  .trendCollectionHeaderActions {
+    justify-content: space-between;
+  }
+
+  .trendPlanPortfolioLegend {
+    justify-content: flex-start;
+  }
+
+  .trendPlanPortfolioCard {
+    grid-column: 1 / -1;
+  }
+
+  .trendVisitsCard {
+    grid-column: 1 / -1;
+  }
+
+  #trendPlanPortfolioFilterGrid {
+    grid-template-columns: repeat(2, minmax(170px, 1fr));
+    width: min(440px, calc(100vw - 42px));
+  }
+
+  #trendPlanPortfolioFilterGrid .trendCollectionFilterSelect:nth-child(n) .trendCollectionFilterMenu {
+    right: auto;
+    left: 0;
+  }
+
+  #trendPlanPortfolioFilterGrid .trendCollectionFilterSelect:nth-child(2n) .trendCollectionFilterMenu {
+    right: 0;
+    left: auto;
+  }
+
+}
+
+@media (max-width: 640px) {
+  .trendCollectionSeriesControls {
+    display: grid;
+    grid-template-columns: 1fr;
+    flex: 1 1 auto;
+  }
+
+}
+
+@media (max-width: 520px) {
+  .trendCollectionFilterRootMenu {
+    width: min(220px, calc(100vw - 36px));
+  }
+
+  .trendCollectionFilterMenu {
+    top: calc(100% + 4px);
+    right: auto;
+    left: 0;
+    width: min(300px, calc(100vw - 46px));
+    min-width: 0;
+  }
+
+  #trendPlanPortfolioFilterGrid {
+    grid-template-columns: 1fr;
+    width: min(290px, calc(100vw - 36px));
+  }
+
+  #trendPlanPortfolioFilterGrid .trendCollectionFilterSelect:nth-child(n) .trendCollectionFilterMenu {
+    right: auto;
+    left: 0;
+  }
 }
 
 .trendDashboardGroups {
@@ -3685,14 +4526,6 @@ body.motion-preload .dashboardCard {
 }
 
 @media (max-width: 768px) {
-  .trendInsightMetric {
-    grid-template-columns: 32px minmax(0, 1fr);
-  }
-
-  .trendMiniLine {
-    display: none;
-  }
-
   .trendCommandMain .trendChartWrap,
   .trendAgentCard .trendChartWrap,
   .trendStatusCard .trendPieWrap {
@@ -3701,7 +4534,7 @@ body.motion-preload .dashboardCard {
 }
 
 .trendCommandRow {
-  grid-template-columns: minmax(0, 1.42fr) minmax(360px, 0.98fr);
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .trendCommandMain .trendChartWrap {
@@ -3719,6 +4552,64 @@ body.motion-preload .dashboardCard {
 
 .trendDashboardGroups .trendDashboardGroup:nth-child(2) .trendGroupGrid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* Keep the paired M cards together despite the legacy single-column command row. */
+.performanceTrendsView .trendPlanPortfolioRow {
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+}
+
+.performanceTrendsView .trendPlanPortfolioRow .trendPlanPortfolioCard,
+.performanceTrendsView .trendPlanPortfolioRow .trendVisitsCard {
+  grid-column: span 6;
+}
+
+.performanceTrendsView .trendFinancialMetricsRow {
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  margin-top: 12px;
+}
+
+.performanceTrendsView .trendFinancialMetricsRow .trendFinancialMetricsCard {
+  grid-column: span 4;
+}
+
+.performanceTrendsView .trendFinancialMetricsChartWrap {
+  height: 250px;
+}
+
+.performanceTrendsView .trendRiskMetricsRow {
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  margin-top: 12px;
+}
+
+.performanceTrendsView .trendRiskMetricsRow .trendRiskMetricsCard {
+  grid-column: span 6;
+}
+
+.performanceTrendsView .trendRiskMetricsChartWrap {
+  height: 250px;
+}
+
+.performanceTrendsView .trendCollectionChartWrap {
+  height: 340px;
+}
+
+.performanceTrendsView .trendPlanPortfolioCard .trendCollectionChartWrap,
+.performanceTrendsView .trendVisitsCard .trendCollectionChartWrap {
+  height: 290px;
+}
+
+@media (max-width: 900px) {
+  .performanceTrendsView .trendPlanPortfolioRow .trendPlanPortfolioCard,
+  .performanceTrendsView .trendPlanPortfolioRow .trendVisitsCard,
+  .performanceTrendsView .trendFinancialMetricsRow .trendFinancialMetricsCard,
+  .performanceTrendsView .trendRiskMetricsRow .trendRiskMetricsCard {
+    grid-column: 1 / -1;
+  }
+
+  .performanceTrendsView .trendCollectionChartWrap {
+    height: 300px;
+  }
 }
 
 .trendDashboardGroup .trendChartWrap {
@@ -3799,6 +4690,17 @@ body.motion-preload .dashboardCard {
   }
 }
 
+.trendHeaderRow {
+  position: relative;
+  z-index: 10;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 50%);
+  align-items: center;
+  gap: 24px;
+  padding: 14px 16px;
+  background: linear-gradient(180deg, #fbf8ff 0%, #ffffff 100%);
+}
+
 .trendIntroPanel {
   padding: 0;
   border: 0;
@@ -3818,8 +4720,43 @@ body.motion-preload .dashboardCard {
 }
 
 .trendFilterPanel {
-  padding: 12px;
-  background: linear-gradient(180deg, #fbf8ff 0%, #ffffff 100%);
+  display: flex;
+  justify-content: flex-end;
+  padding: 0;
+  background: transparent;
+}
+
+.trendHeaderRow .trendControls {
+  width: min(100%, 620px);
+  margin-left: auto;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 8px 12px;
+}
+
+.trendHeaderRow .trendViewControl {
+  grid-column: 1 / -1;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 8px;
+}
+
+.trendHeaderRow .trendPeriodControl {
+  grid-template-columns: max-content minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+}
+
+.trendHeaderRow .trendRangeButtons {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.trendHeaderRow .trendRangeBtn {
+  min-width: 0;
+  padding: 0 5px;
+  font-size: 11px;
+}
+
+.trendHeaderRow .trendToolbarDivider {
+  display: none;
 }
 
 .trendControls {
@@ -3878,27 +4815,6 @@ body.motion-preload .dashboardCard {
   display: none !important;
 }
 
-.trendPeriodBadge {
-  grid-column: -2 / -1;
-  justify-self: end;
-  display: inline-flex;
-  align-items: center;
-  gap: 9px;
-  min-height: 34px;
-  color: #0f172a;
-  font-size: 12px;
-  line-height: 1.2;
-}
-
-.trendPeriodBadge i {
-  color: #5c258d;
-}
-
-.trendPeriodBadge strong {
-  font-size: 12px;
-  font-weight: 850;
-}
-
 @media (max-width: 1280px) {
   .trendControls {
     grid-template-columns: 1fr;
@@ -3913,15 +4829,24 @@ body.motion-preload .dashboardCard {
     display: none;
   }
 
-  .trendPeriodBadge {
-    grid-column: auto;
-    justify-self: start;
-    justify-content: flex-start;
+}
+
+@media (max-width: 1120px) {
+  .trendHeaderRow {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .trendHeaderRow .trendControls,
+  .trendHeaderRow .trendViewControl,
+  .trendHeaderRow .trendPeriodControl {
+    width: 100%;
+    grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 720px) {
-  .trendRangeButtons {
+  .trendHeaderRow .trendRangeButtons {
     grid-template-columns: 1fr;
   }
 }

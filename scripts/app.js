@@ -7500,8 +7500,8 @@ function renderCustomers(customers, selectedId) {
     </div>
     <div class="custMetricsRow">
       <div class="metricInline">
-        <span>Total Invoice</span>
-        <strong>Rs.${formatINR(portfolio.totalInvoice)}</strong>
+        <span>Total Target</span>
+        <strong>Rs.${formatINR(portfolio.target)}</strong>
       </div>
       <div class="metricInline">
         <span>Total Net Due</span>
@@ -7518,6 +7518,9 @@ function renderCustomers(customers, selectedId) {
 
   customers.forEach(c => {
     const card = document.createElement("div");
+    const customerTarget = Number.isFinite(Number(c.targetTotal))
+      ? Number(c.targetTotal)
+      : sumInvoiceTargets(c.invoices || []);
     card.className = `customerCard ${c.id === selectedId ? "active" : ""}`;
     card.setAttribute("data-id", c.id);
 
@@ -7529,8 +7532,8 @@ function renderCustomers(customers, selectedId) {
 
       <div class="custMetricsRow">
         <div class="metricInline">
-          <span>Total Invoice</span>
-          <strong>Rs.${formatINR(c.totalInvoiceAmount)}</strong>
+          <span>Total Target</span>
+          <strong>Rs.${formatINR(customerTarget)}</strong>
         </div>
         <div class="metricInline">
           <span>Total Net Due</span>
@@ -8054,7 +8057,7 @@ function renderInvoiceTable(invoices) {
       <td class="colInv" title="${inv.invoiceNo}">
         <div>${inv.invoiceNo}</div>
         ${isAllCustomersScope() && invoiceCustomer
-          ? `<span class="invoiceCustomerBadge" role="button" tabindex="0" data-action="select-customer" data-customer-id="${safeText(invoiceCustomer.id)}" title="Select ${safeText(invoiceCustomer.name)}">${safeText(invoiceCustomer.name)}</span>`
+          ? `<span class="invoiceCustomerBadge" role="button" tabindex="0" data-action="select-customer" data-customer-id="${safeText(invoiceCustomer.id)}" title="${safeText(invoiceCustomer.name)} • ${safeText(invoiceCustomer.code)}" aria-label="${safeText(invoiceCustomer.name)} • ${safeText(invoiceCustomer.code)}">${safeText(invoiceCustomer.name)}</span>`
           : ""}
       </td>
       <td class="colAmtRight" title="Rs.${formatINR(inv.invoiceAmount)}">Rs.${formatINR(inv.invoiceAmount)}</td>
@@ -8064,7 +8067,7 @@ function renderInvoiceTable(invoices) {
       <td class="colDate ${isOverdueDueDate ? "dueDateOverdue" : ""}" title="${inv.dueDate}">${inv.dueDate}</td>
       ${showAgingColumn ? `<td class="colAging" title="${agingValue}"${agingStyleAttr}>${agingValue}</td>` : ""}
       ${showStatusColumns ? `
-      <td class="colShort" title="${inv.primaryStatus}">${inv.primaryStatus}</td>
+      <td class="colShort" title="${inv.primaryStatus}"><span class="primaryStatusText">${inv.primaryStatus}</span></td>
       <td class="colStatus" title="${subStatus}">
         <span class="pill ${statusPillClass(subStatus, inv.primaryStatus)}" title="${subStatus}">${subStatus}</span>
       </td>` : ""}
@@ -8309,6 +8312,7 @@ function selectAllCustomers() {
   renderTodoInvoiceOptions();
   updatePortfolioScopeState();
   applyFiltersAndRender();
+  if (detailInvoice) highlightInvoiceRow(detailInvoice.invoiceNo);
   setActiveTab("invoice");
 }
 

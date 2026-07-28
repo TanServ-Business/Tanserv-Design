@@ -3281,19 +3281,38 @@ button.notifyBadge {
 }
 
 .invoiceTable tbody tr:hover { background: var(--brand-lighter); }
-.rowActive { background: var(--brand-light); }
+.rowActive { background: #eff6ff; }
+.invoiceTable tbody tr.rowActive:hover { background: #dbeafe; }
 
 .cellCenter { text-align: center; }
 .colAmtRight {text-align: right;width: 90px;}
 
 .colChk { width: 34px; }
 .colIcon { width: 44px; }
-.colInv {width: 80px;}
+.colInv {width: 110px;}
 .colDate {width: 90px;}
-.colAging {width: 72px; text-align: right;}
+.colAging {width: 58px; text-align: right;}
 .colShort {width: 100px;}
 .colStatus {width: 150px;}
 .colActions {width: 125px;}
+
+.invoiceTable td.colShort,
+.invoiceTable th.colShort {
+  white-space: normal;
+}
+
+.invoiceTable th.colShort {
+  white-space: nowrap;
+}
+
+.primaryStatusText {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
 
 .invoiceTable td.colStatus,
 .invoiceTable th.colStatus {
@@ -3352,7 +3371,7 @@ button.notifyBadge {
 .invoiceTable--iconPeek {
   --peek-dot-size: 9px;
   --peek-col-collapsed: 18px;
-  --peek-col-expanded: 44px;
+  --peek-col-expanded: 30px;
 }
 
 .invoiceTable--iconPeek .colIcon {

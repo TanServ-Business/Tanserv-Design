@@ -1221,27 +1221,47 @@ body.team-overlay-open {
 
 .trendInsightRail {
   display: grid;
-  gap: 8px;
-  align-content: stretch;
+  gap: 10px;
+  align-content: start;
   padding: 12px;
-  border: 1px solid #e9ddf4;
-  border-radius: 5px;
-  background: linear-gradient(135deg, rgba(92, 37, 141, 0.08), rgba(255, 255, 255, 0.96) 58%);
-  box-shadow: 0 8px 16px rgba(15, 23, 42, 0.05);
+  border: 1px solid rgba(191, 219, 254, 0.72);
+  border-radius: 6px;
+  background: linear-gradient(135deg, #0f4fbf 0%, #2563eb 58%, #0ea5e9 100%);
+  box-shadow: 0 18px 36px rgba(37, 99, 235, 0.24);
+  color: #eff6ff;
+  isolation: isolate;
 }
 
 .trendInsightMetric {
+  position: relative;
   display: grid;
-  grid-template-columns: 34px minmax(0, 0.78fr) minmax(142px, 1fr);
+  grid-template-columns: 34px minmax(0, 0.74fr) minmax(154px, 1fr);
   align-items: center;
   gap: 10px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid rgba(226, 232, 244, 0.9);
+  padding: 9px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+.trendInsightMetric:hover,
+.trendInsightMetric:focus {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.34);
+  box-shadow: 0 14px 28px rgba(15, 23, 42, 0.2);
+  transform: translateY(-1px);
+  outline: none;
+}
+
+.trendInsightMetric:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.92);
+  outline-offset: 2px;
 }
 
 .trendInsightMetric:last-of-type {
-  border-bottom: 0;
-  padding-bottom: 0;
+  padding-bottom: 9px;
 }
 
 .trendInsightIcon {
@@ -1251,11 +1271,13 @@ body.team-overlay-open {
   align-items: center;
   justify-content: center;
   border-radius: 999px;
-  color: var(--trend-insight-color, #5c258d);
-  background: rgba(var(--trend-insight-rgb, 92, 37, 141), 0.12);
+  color: #eff6ff;
+  background: rgba(255, 255, 255, 0.16);
+  box-shadow: inset 0 0 0 1px rgba(var(--trend-insight-rgb, 92, 37, 141), 0.38);
 }
 
 .trendInsightMetric .trendInsightLabel {
+  color: #dbeafe;
   font-size: 11px;
   letter-spacing: 0;
   text-transform: none;
@@ -1263,11 +1285,13 @@ body.team-overlay-open {
 
 .trendInsightMetric .trendInsightValue {
   margin-top: 2px;
+  color: #ffffff;
   font-size: 18px;
 }
 
 .trendInsightMetric .trendInsightMeta {
   margin-top: 0;
+  color: #bfdbfe;
 }
 
 .trendMiniLine {
@@ -1279,7 +1303,7 @@ body.team-overlay-open {
 
 .trendMiniLineArea {
   fill: var(--trend-insight-color, #5c258d);
-  opacity: 0.12;
+  opacity: 0.2;
 }
 
 .trendMiniLinePath {
@@ -1294,11 +1318,65 @@ body.team-overlay-open {
   fill: #ffffff;
   stroke: var(--trend-insight-color, #5c258d);
   stroke-width: 1.8;
-  cursor: help;
+  cursor: pointer;
 }
 
 .trendMiniLinePoint:hover {
   fill: var(--trend-insight-color, #5c258d);
+}
+
+.trendInsightHoverPanel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 10px;
+  z-index: 30;
+  display: grid;
+  gap: 7px;
+  min-width: min(260px, calc(100vw - 44px));
+  padding: 10px 12px;
+  border: 1px solid rgba(191, 219, 254, 0.34);
+  border-radius: 6px;
+  background: rgba(15, 23, 42, 0.96);
+  box-shadow: 0 16px 30px rgba(15, 23, 42, 0.32);
+  color: #e2e8f0;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-4px);
+  transition: opacity 0.16s ease, transform 0.16s ease, visibility 0.16s ease;
+  visibility: hidden;
+}
+
+.trendInsightMetric:hover .trendInsightHoverPanel,
+.trendInsightMetric:focus .trendInsightHoverPanel,
+.trendInsightMetric:focus-within .trendInsightHoverPanel {
+  opacity: 1;
+  transform: translateY(0);
+  visibility: visible;
+}
+
+.trendInsightHoverPanel strong {
+  color: #ffffff;
+  font-size: 12px;
+}
+
+.trendInsightHoverPanel span {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  white-space: nowrap;
+}
+
+.trendInsightHoverPanel em {
+  color: #bfdbfe;
+  font-style: normal;
+  font-size: 11px;
+}
+
+.trendInsightHoverPanel b {
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 800;
 }
 
 .trendPriorityFocus {
@@ -1306,8 +1384,11 @@ body.team-overlay-open {
   grid-template-columns: 34px minmax(0, 1fr);
   gap: 10px;
   align-items: center;
-  padding-top: 4px;
-  color: #334155;
+  padding: 9px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #dbeafe;
   font-size: 12px;
   line-height: 1.35;
 }
@@ -1315,7 +1396,7 @@ body.team-overlay-open {
 .trendPriorityFocus strong {
   display: block;
   margin-bottom: 2px;
-  color: #0f172a;
+  color: #ffffff;
   font-size: 12px;
 }
 
@@ -1555,11 +1636,12 @@ body.team-overlay-open {
 }
 
 .trendStatusBody {
-  grid-template-columns: minmax(170px, 0.95fr) minmax(0, 1fr);
+  grid-template-columns: minmax(220px, 1.2fr) minmax(220px, 1fr);
+  gap: 20px;
 }
 
 .trendStatusCard .trendPieWrap {
-  height: 190px;
+  height: 240px;
 }
 
 @media (max-width: 1280px) {

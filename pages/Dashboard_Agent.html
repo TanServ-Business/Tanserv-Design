@@ -30,9 +30,9 @@
       </div>
     </div>
     <div class="heroActions">
-      <button type="button" class="dashboardTrendToggleBtn" id="dashboardTrendsToggle" aria-label="Show performance trends" aria-pressed="false" title="Trends">
-        <i class="bi bi-graph-up-arrow" aria-hidden="true"></i>
-        <span data-trend-toggle-text>Trends</span>
+      <button type="button" class="dashboardTrendToggleBtn" id="dashboardTrendsToggle" aria-label="Show performance trends" aria-pressed="false" title="View Trends" data-trend-label="View Trends">
+        <span class="dashboardTrendToggleIcon" aria-hidden="true"><i class="bi bi-graph-up-arrow"></i></span>
+        <span data-trend-toggle-text>View Trends</span>
       </button>
       <div class="viewModeToggle" id="dashboardViewToggle" role="group" aria-label="Dashboard density view">
         <button type="button" class="viewToggleBtn" data-view-mode="compact" aria-pressed="false" aria-label="Compact view" title="Compact view">
@@ -432,191 +432,357 @@
 
   </section>
   <section class="performanceTrendsView" id="performanceTrendsView" aria-label="Performance Trends & Historical Insights" hidden>
-    <div class="trendPanel trendIntroPanel">
-      <div class="trendSectionHeader">
-        <div>
-          <div class="trendEyebrow">Trend Analytics</div>
-          <h2 class="trendTitle">Performance Trends & Historical Insights</h2>
-          <div class="trendSubtitle">Track performance over time and uncover what drives results.</div>
+    <div class="trendHeaderRow trendPanel">
+      <div class="trendIntroPanel">
+        <div class="trendSectionHeader">
+          <div>
+            <div class="trendEyebrow">Trend Analytics</div>
+            <h2 class="trendTitle">Performance Trends & Historical Insights</h2>
+            <div class="trendSubtitle">Track performance over time and uncover what drives results.</div>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="trendPanel trendFilterPanel">
-      <div class="trendControls" aria-label="Trend controls">
-        <div class="trendControlGroup trendViewControl">
-          <span>View</span>
-          <div class="trendRangeButtons" role="group" aria-label="Trend view">
-            <button type="button" class="trendRangeBtn" data-trend-range="all_time" aria-pressed="false">All Time</button>
-            <button type="button" class="trendRangeBtn" data-trend-range="yearly" aria-pressed="true">Yearly</button>
-            <button type="button" class="trendRangeBtn" data-trend-range="fiscal_year" aria-pressed="false">Fiscal Year</button>
-            <button type="button" class="trendRangeBtn" data-trend-range="quarterly" aria-pressed="false">Quarterly</button>
-            <button type="button" class="trendRangeBtn" data-trend-range="monthly" aria-pressed="false">Monthly</button>
+      <div class="trendFilterPanel">
+        <div class="trendControls" aria-label="Trend controls">
+          <div class="trendControlGroup trendViewControl">
+            <span>View</span>
+            <div class="trendRangeButtons" role="group" aria-label="Trend view">
+              <button type="button" class="trendRangeBtn" data-trend-range="all_time" aria-pressed="false">All Time</button>
+              <button type="button" class="trendRangeBtn" data-trend-range="yearly" aria-pressed="true">Yearly</button>
+              <button type="button" class="trendRangeBtn" data-trend-range="fiscal_year" aria-pressed="false">Fiscal Year</button>
+              <button type="button" class="trendRangeBtn" data-trend-range="quarterly" aria-pressed="false">Quarterly</button>
+              <button type="button" class="trendRangeBtn" data-trend-range="monthly" aria-pressed="false">Monthly</button>
+            </div>
+            <select id="trendRangeSelect" aria-label="Select trend filter" hidden>
+              <option value="all_time">All Time</option>
+              <option value="yearly">Yearly</option>
+              <option value="fiscal_year">Fiscal Year</option>
+              <option value="quarterly">Quarterly</option>
+              <option value="monthly">Monthly</option>
+            </select>
           </div>
-          <select id="trendRangeSelect" aria-label="Select trend filter" hidden>
-            <option value="all_time">All Time</option>
-            <option value="yearly">Yearly</option>
-            <option value="fiscal_year">Fiscal Year</option>
-            <option value="quarterly">Quarterly</option>
-            <option value="monthly">Monthly</option>
-          </select>
-        </div>
-        <span class="trendToolbarDivider" aria-hidden="true"></span>
-        <label class="trendControlGroup" for="trendYearInput" id="trendYearGroup">
-          <span id="trendYearLabel">Period</span>
-          <div class="trendMonthStepper">
-            <button type="button" class="trendIconBtn" id="trendPrevYearBtn" aria-label="Previous year">
-              <i class="bi bi-chevron-left" aria-hidden="true"></i>
-            </button>
-            <input type="number" id="trendYearInput" value="2026" min="2020" max="2026" step="1" aria-label="Select trend year" />
-            <button type="button" class="trendIconBtn" id="trendNextYearBtn" aria-label="Next year">
-              <i class="bi bi-chevron-right" aria-hidden="true"></i>
-            </button>
+          <span class="trendToolbarDivider" aria-hidden="true"></span>
+          <label class="trendControlGroup trendPeriodControl" for="trendYearInput" id="trendYearGroup">
+            <span id="trendYearLabel">Period</span>
+            <div class="trendMonthStepper">
+              <button type="button" class="trendIconBtn" id="trendPrevYearBtn" aria-label="Previous year">
+                <i class="bi bi-chevron-left" aria-hidden="true"></i>
+              </button>
+              <input type="number" id="trendYearInput" value="2026" min="2020" max="2026" step="1" aria-label="Select trend year" />
+              <button type="button" class="trendIconBtn" id="trendNextYearBtn" aria-label="Next year">
+                <i class="bi bi-chevron-right" aria-hidden="true"></i>
+              </button>
+            </div>
+          </label>
+          <label class="trendControlGroup trendPeriodControl" for="trendPeriodSelect" id="trendPeriodGroup" hidden>
+            <span id="trendPeriodLabel">Period</span>
+            <select id="trendPeriodSelect" aria-label="Select trend period"></select>
+          </label>
+          <div class="trendControlGroup trendPeriodControl trendMultiPeriodControl" id="trendMultiPeriodGroup" hidden>
+            <span id="trendMultiPeriodLabel">Period</span>
+            <details class="trendMultiPeriodSelect" id="trendMultiPeriodSelect">
+              <summary aria-label="Select one or more periods">
+                <span id="trendMultiPeriodSummary">Select period</span>
+                <i class="bi bi-chevron-down" aria-hidden="true"></i>
+              </summary>
+              <div class="trendMultiPeriodMenu" id="trendMultiPeriodMenu" role="group" aria-label="Select trend periods"></div>
+            </details>
           </div>
-        </label>
-        <label class="trendControlGroup" for="trendPeriodSelect" id="trendPeriodGroup" hidden>
-          <span id="trendPeriodLabel">Period</span>
-          <select id="trendPeriodSelect" aria-label="Select trend period"></select>
-        </label>
-        <div class="trendPeriodBadge">
-          <i class="bi bi-calendar3" aria-hidden="true"></i>
-          <strong id="trendSelectedPeriod" aria-live="polite">Yearly | 2026</strong>
         </div>
       </div>
     </div>
 
     <div class="trendCommandRow" aria-label="Trend command overview">
       <article class="trendChartCard trendCommandMain">
-        <div class="trendChartHeader">
+        <div class="trendChartHeader trendCollectionHeader">
           <div>
-            <div class="trendChartTitle">Collection Trend</div>
-            <div class="trendChartMeta">Collection movement over the selected period</div>
+            <div class="trendChartTitle">Collection, Billing &amp; PTP Target Trend</div>
+            <div class="trendChartMeta" id="trendCollectionScopeMeta">Collection, new billing, and committed PTP across the selected period</div>
+          </div>
+          <div class="trendCollectionHeaderActions">
+            <div class="trendCollectionSeriesControls" role="group" aria-label="Chart series visibility">
+              <button type="button" class="trendCollectionSeriesBtn is-collection" data-trend-collection-series="collection" aria-pressed="true">
+                <span class="trendCollectionSeriesSwatch" aria-hidden="true"></span>
+                Collection
+              </button>
+              <button type="button" class="trendCollectionSeriesBtn is-billing" data-trend-collection-series="billing" aria-pressed="true">
+                <span class="trendCollectionSeriesSwatch" aria-hidden="true"></span>
+                New Billing
+              </button>
+              <button type="button" class="trendCollectionSeriesBtn is-target" data-trend-collection-series="target" aria-pressed="true">
+                <span class="trendCollectionSeriesSwatch" aria-hidden="true"></span>
+                PTP Target
+              </button>
+            </div>
+            <div class="trendCollectionFilterTray" id="trendCollectionFilterTray">
+              <details class="trendCollectionFilterRoot" id="trendCollectionFilterRoot">
+                <summary aria-label="Open collection chart filters">
+                  <i class="bi bi-filter" aria-hidden="true"></i>
+                  <span>Filter</span>
+                  <i class="bi bi-chevron-down" aria-hidden="true"></i>
+                </summary>
+                <div class="trendCollectionFilterRootMenu" id="trendCollectionFilterGrid" aria-label="Collection chart filter fields"></div>
+              </details>
+            </div>
           </div>
         </div>
-        <div class="trendChartWrap"><canvas id="trendCollectionChart"></canvas></div>
-      </article>
-      <aside class="trendInsightRail" id="trendInsightGrid" aria-label="Trend summary insights"></aside>
-    </div>
-
-    <div class="trendDashboardGroups" aria-label="Trend charts">
-      <section class="trendDashboardGroup" aria-label="Activity and pipeline charts">
-        <div class="trendGroupGrid">
-          <article class="trendChartCard">
-            <div class="trendChartHeader">
-              <div>
-                <div class="trendChartTitle">Visits Trend</div>
-                <div class="trendChartMeta">Total field visits over time</div>
-              </div>
-              <strong class="trendCardValue" id="trendVisitTotal">-</strong>
-            </div>
-            <div class="trendChartWrap"><canvas id="trendOperationsChart"></canvas></div>
-          </article>
-          <article class="trendChartCard">
-            <div class="trendChartHeader">
-              <div>
-                <div class="trendChartTitle">New Billing</div>
-                <div class="trendChartMeta">Fresh billing booked over time</div>
-              </div>
-              <strong class="trendCardValue" id="trendBillingTotal">-</strong>
-            </div>
-            <div class="trendChartWrap"><canvas id="trendBillingChart"></canvas></div>
-          </article>
-        </div>
-      </section>
-
-      <section class="trendDashboardGroup" aria-label="Submission and commitment charts">
-        <div class="trendGroupGrid">
-          <article class="trendChartCard">
-            <div class="trendChartHeader">
-              <div>
-                <div class="trendChartTitle">Invoice Submission</div>
-                <div class="trendChartMeta">Physical, courier, email, and external split</div>
-              </div>
-            </div>
-            <div class="trendChartWrap"><canvas id="trendSubmissionChart"></canvas></div>
-          </article>
-        </div>
-      </section>
-
-    </div>
-
-    <div class="trendHealthRow" aria-label="Receivables and agent movement">
-      <section class="trendDashboardGroup trendReceivablesGroup" aria-label="Receivables health charts">
-        <div class="trendGroupGrid">
-          <article class="trendChartCard">
-            <div class="trendChartHeader">
-              <div>
-                <div class="trendChartTitle">Aging Bucket Share</div>
-                <div class="trendChartMeta">Bucket share movement across the period</div>
-              </div>
-            </div>
-            <div class="trendChartWrap"><canvas id="trendAgingChart"></canvas></div>
-          </article>
-        </div>
-      </section>
-      <article class="trendChartCard trendPtpHealthCard">
-        <div class="trendChartHeader">
-          <div>
-            <div class="trendChartTitle">PTP Committed vs Collected</div>
-            <div class="trendChartMeta">Committed promise value and realized collection</div>
+        <div class="trendCollectionFilterChips" id="trendCollectionFilterChips" aria-label="Applied collection chart filters" aria-live="polite" hidden></div>
+        <div class="trendChartWrap trendCollectionChartWrap">
+          <div id="trendCollectionChart" class="trendEchartCanvas" role="img" aria-label="Collection, billing, and PTP target trend"></div>
+          <div class="trendCollectionNoData" id="trendCollectionNoData" hidden>
+            <i class="bi bi-filter-circle" aria-hidden="true"></i>
+            <strong>No data for the selected filters</strong>
+            <span>Adjust the current selections or reset the chart filters.</span>
+            <button type="button" id="trendCollectionNoDataClear">Clear filters</button>
           </div>
         </div>
-        <div class="trendChartWrap"><canvas id="trendPtpChart"></canvas></div>
-      </article>
-      <article class="trendChartCard trendAgentCard">
-        <div class="trendChartHeader">
-          <div>
-            <div class="trendChartTitle">Agent-wise Collection Trend</div>
-            <div class="trendChartMeta">Collection trend by agent (Top 8)</div>
-          </div>
-          <label class="trendAgentMetricSelect">
-            <span>Metric</span>
-            <select aria-label="Agent-wise collection metric">
-              <option>Collection (Rs. Cr)</option>
-            </select>
-          </label>
-        </div>
-        <div class="trendChartWrap"><canvas id="trendAgentCollectionChart"></canvas></div>
       </article>
     </div>
 
-    <section class="trendCompositionSection" aria-labelledby="trendCompositionHeading">
-      <div class="trendGroupHeader">
-        <span class="trendGroupAccent" aria-hidden="true"></span>
-        <div>
-          <h3 id="trendCompositionHeading">Closing Period Composition</h3>
-          <p>Primary status mix for the latest visible period</p>
+    <div class="trendCommandRow trendPlanPortfolioRow" aria-label="Plan versus portfolio overview">
+      <article class="trendChartCard trendCommandMain trendPlanPortfolioCard">
+        <div class="trendChartHeader trendCollectionHeader">
+          <div>
+            <div class="trendChartTitle">Plan vs Portfolio Trend</div>
+            <div class="trendChartMeta" id="trendPlanPortfolioScopeMeta">Monthly plan submitted weekly, excluding PTP, against the selected portfolio</div>
+          </div>
+          <div class="trendCollectionHeaderActions">
+            <div class="trendCollectionSeriesControls" role="group" aria-label="Plan versus portfolio series visibility">
+              <button type="button" class="trendCollectionSeriesBtn is-portfolio" data-trend-plan-series="portfolio" aria-pressed="true">
+                <span class="trendCollectionSeriesSwatch" aria-hidden="true"></span>
+                Portfolio
+              </button>
+              <button type="button" class="trendCollectionSeriesBtn is-plan" data-trend-plan-series="plan" aria-pressed="true">
+                <span class="trendCollectionSeriesSwatch" aria-hidden="true"></span>
+                Plan
+              </button>
+            </div>
+            <div class="trendCollectionFilterTray" id="trendPlanPortfolioFilterTray">
+              <details class="trendCollectionFilterRoot" id="trendPlanPortfolioFilterRoot">
+                <summary aria-label="Open plan versus portfolio chart filters">
+                  <i class="bi bi-filter" aria-hidden="true"></i>
+                  <span>Filter</span>
+                  <i class="bi bi-chevron-down" aria-hidden="true"></i>
+                </summary>
+                <div class="trendCollectionFilterRootMenu" id="trendPlanPortfolioFilterGrid" aria-label="Plan versus portfolio chart filter fields"></div>
+              </details>
+            </div>
+          </div>
         </div>
-      </div>
-      <div class="trendCompositionGrid">
-        <article class="trendChartCard is-status trendStatusCard">
-          <div class="trendChartHeader">
-            <div>
-              <div class="trendChartTitle">Activity Bifurcation</div>
-              <div class="trendChartMeta" id="trendActivityStatusMeta">Pie data: -</div>
+        <div class="trendCollectionFilterChips" id="trendPlanPortfolioFilterChips" aria-label="Applied plan versus portfolio chart filters" aria-live="polite" hidden></div>
+        <div class="trendChartWrap trendCollectionChartWrap">
+          <div id="trendPlanPortfolioChart" class="trendEchartCanvas" role="img" aria-label="Plan versus portfolio trend"></div>
+          <div class="trendCollectionNoData" id="trendPlanPortfolioNoData" hidden>
+            <i class="bi bi-filter-circle" aria-hidden="true"></i>
+            <strong>No data for the selected filters</strong>
+            <span>Adjust the current selections or reset the chart filters.</span>
+            <button type="button" id="trendPlanPortfolioNoDataClear">Clear filters</button>
+          </div>
+        </div>
+      </article>
+      <article class="trendChartCard trendCommandMain trendVisitsCard">
+        <div class="trendChartHeader trendCollectionHeader">
+          <div>
+            <div class="trendChartTitle">Visits Trend</div>
+            <div class="trendChartMeta" id="trendVisitsScopeMeta">Total visits shown as unique and repeat customer visits</div>
+          </div>
+          <div class="trendCollectionHeaderActions">
+            <div class="trendCollectionSeriesControls" role="group" aria-label="Visits chart series visibility">
+              <button type="button" class="trendCollectionSeriesBtn is-visits" data-trend-visits-series="visits" aria-pressed="true">
+                <span class="trendCollectionSeriesSwatch" aria-hidden="true"></span>
+                Repeat visits
+              </button>
+              <button type="button" class="trendCollectionSeriesBtn is-unique-customers" data-trend-visits-series="uniqueCustomers" aria-pressed="true">
+                <span class="trendCollectionSeriesSwatch" aria-hidden="true"></span>
+                Unique visits
+              </button>
             </div>
-            <button type="button" class="trendStatusActionBtn" id="trendActivityPrimaryBtn" hidden>Primary</button>
-          </div>
-          <div class="trendStatusBody">
-            <div class="trendChartWrap trendPieWrap"><canvas id="trendActivityStatusChart"></canvas></div>
-            <div class="trendStatusCallouts" id="trendActivityStatusCallouts" aria-label="Activity bifurcation callouts"></div>
-          </div>
-        </article>
-        <article class="trendChartCard is-status trendStatusCard">
-          <div class="trendChartHeader">
-            <div>
-              <div class="trendChartTitle">Issue Bifurcation</div>
-              <div class="trendChartMeta" id="trendIssueStatusMeta">Pie data: -</div>
+            <details class="trendVisitsCustomerPicker" id="trendVisitsCustomerPicker">
+              <summary aria-label="Search customers by visit count">
+                <i class="bi bi-search" aria-hidden="true"></i>
+                <span id="trendVisitsCustomerSummary">Customer</span>
+                <i class="bi bi-chevron-down" aria-hidden="true"></i>
+              </summary>
+              <div class="trendVisitsCustomerMenu">
+                <input type="search" id="trendVisitsCustomerSearch" placeholder="Search customer" aria-label="Search customer by visit count" />
+                <div class="trendVisitsCustomerActions">
+                  <button type="button" data-visits-customer-action="all">Select all</button>
+                  <button type="button" data-visits-customer-action="clear">Clear</button>
+                </div>
+                <div class="trendVisitsCustomerOptions" id="trendVisitsCustomerOptions"></div>
+              </div>
+            </details>
+            <div class="trendCollectionFilterTray" id="trendVisitsFilterTray">
+              <details class="trendCollectionFilterRoot" id="trendVisitsFilterRoot">
+                <summary aria-label="Open visits chart filters">
+                  <i class="bi bi-filter" aria-hidden="true"></i>
+                  <span>Filter</span>
+                  <i class="bi bi-chevron-down" aria-hidden="true"></i>
+                </summary>
+                <div class="trendCollectionFilterRootMenu" id="trendVisitsFilterGrid" aria-label="Visits chart filter fields"></div>
+              </details>
             </div>
-            <button type="button" class="trendStatusActionBtn" id="trendIssuePrimaryBtn" hidden>Primary</button>
           </div>
-          <div class="trendStatusBody">
-            <div class="trendChartWrap trendPieWrap"><canvas id="trendIssueStatusChart"></canvas></div>
-            <div class="trendStatusCallouts" id="trendIssueStatusCallouts" aria-label="Issue bifurcation callouts"></div>
+        </div>
+        <div class="trendCollectionFilterChips" id="trendVisitsFilterChips" aria-label="Applied visits chart filters" aria-live="polite" hidden></div>
+        <div class="trendChartWrap trendCollectionChartWrap">
+          <div id="trendVisitsChart" class="trendEchartCanvas" role="img" aria-label="Visits trend"></div>
+          <div class="trendCollectionNoData" id="trendVisitsNoData" hidden>
+            <i class="bi bi-filter-circle" aria-hidden="true"></i>
+            <strong>No visits for the selected filters</strong>
+            <span>Adjust the current selections or reset the chart filters.</span>
+            <button type="button" id="trendVisitsNoDataClear">Clear filters</button>
           </div>
-        </article>
-      </div>
-    </section>
+        </div>
+      </article>
+    </div>
+
+    <div class="trendCommandRow trendFinancialMetricsRow" aria-label="Invoice, aging, and credit note trends">
+      <article class="trendChartCard trendCommandMain trendFinancialMetricsCard">
+        <div class="trendChartHeader">
+          <div>
+            <div class="trendChartTitle">Invoice Submission</div>
+            <div class="trendChartMeta" id="trendInvoiceSubmissionScopeMeta">Submission channel split across the selected period</div>
+          </div>
+          <div class="trendCollectionFilterTray" id="trendInvoiceSubmissionFilterTray">
+            <details class="trendCollectionFilterRoot" id="trendInvoiceSubmissionFilterRoot">
+              <summary aria-label="Open invoice submission chart filters">
+                <i class="bi bi-filter" aria-hidden="true"></i>
+                <span>Filter</span>
+                <i class="bi bi-chevron-down" aria-hidden="true"></i>
+              </summary>
+              <div class="trendCollectionFilterRootMenu" id="trendInvoiceSubmissionFilterGrid" aria-label="Invoice submission chart filter fields"></div>
+            </details>
+          </div>
+        </div>
+        <div class="trendCollectionFilterChips" id="trendInvoiceSubmissionFilterChips" aria-label="Applied invoice submission chart filters" aria-live="polite" hidden></div>
+        <div class="trendChartWrap trendFinancialMetricsChartWrap">
+          <div id="trendInvoiceSubmissionChart" class="trendEchartCanvas" role="img" aria-label="Invoice submission trend"></div>
+          <div class="trendCollectionNoData" id="trendInvoiceSubmissionNoData" hidden>
+            <i class="bi bi-filter-circle" aria-hidden="true"></i>
+            <strong>No submissions for the selected filters</strong>
+            <span>Adjust the current selections or reset the chart filters.</span>
+            <button type="button" id="trendInvoiceSubmissionNoDataClear">Clear filters</button>
+          </div>
+        </div>
+      </article>
+      <article class="trendChartCard trendCommandMain trendFinancialMetricsCard">
+        <div class="trendChartHeader">
+          <div>
+            <div class="trendChartTitle">Aging Buckets</div>
+            <div class="trendChartMeta" id="trendAgingBucketsScopeMeta">Outstanding value movement by aging bucket</div>
+          </div>
+          <div class="trendCollectionFilterTray" id="trendAgingBucketsFilterTray">
+            <details class="trendCollectionFilterRoot" id="trendAgingBucketsFilterRoot">
+              <summary aria-label="Open aging buckets chart filters">
+                <i class="bi bi-filter" aria-hidden="true"></i>
+                <span>Filter</span>
+                <i class="bi bi-chevron-down" aria-hidden="true"></i>
+              </summary>
+              <div class="trendCollectionFilterRootMenu" id="trendAgingBucketsFilterGrid" aria-label="Aging buckets chart filter fields"></div>
+            </details>
+          </div>
+        </div>
+        <div class="trendCollectionFilterChips" id="trendAgingBucketsFilterChips" aria-label="Applied aging buckets chart filters" aria-live="polite" hidden></div>
+        <div class="trendChartWrap trendFinancialMetricsChartWrap">
+          <div id="trendAgingBucketsChart" class="trendEchartCanvas" role="img" aria-label="Aging bucket trend"></div>
+          <div class="trendCollectionNoData" id="trendAgingBucketsNoData" hidden>
+            <i class="bi bi-filter-circle" aria-hidden="true"></i>
+            <strong>No aging data for the selected filters</strong>
+            <span>Adjust the current selections or reset the chart filters.</span>
+            <button type="button" id="trendAgingBucketsNoDataClear">Clear filters</button>
+          </div>
+        </div>
+      </article>
+      <article class="trendChartCard trendCommandMain trendFinancialMetricsCard">
+        <div class="trendChartHeader">
+          <div>
+            <div class="trendChartTitle">CN / ADV Metrics</div>
+            <div class="trendChartMeta" id="trendCnAdvScopeMeta">CN and advance value added versus utilised</div>
+          </div>
+          <div class="trendCollectionFilterTray" id="trendCnAdvFilterTray">
+            <details class="trendCollectionFilterRoot" id="trendCnAdvFilterRoot">
+              <summary aria-label="Open CN and advance chart filters">
+                <i class="bi bi-filter" aria-hidden="true"></i>
+                <span>Filter</span>
+                <i class="bi bi-chevron-down" aria-hidden="true"></i>
+              </summary>
+              <div class="trendCollectionFilterRootMenu" id="trendCnAdvFilterGrid" aria-label="CN and advance chart filter fields"></div>
+            </details>
+          </div>
+        </div>
+        <div class="trendCollectionFilterChips" id="trendCnAdvFilterChips" aria-label="Applied CN and advance chart filters" aria-live="polite" hidden></div>
+        <div class="trendChartWrap trendFinancialMetricsChartWrap">
+          <div id="trendCnAdvChart" class="trendEchartCanvas" role="img" aria-label="CN and advance metrics trend"></div>
+          <div class="trendCollectionNoData" id="trendCnAdvNoData" hidden>
+            <i class="bi bi-filter-circle" aria-hidden="true"></i>
+            <strong>No CN or advance data for the selected filters</strong>
+            <span>Adjust the current selections or reset the chart filters.</span>
+            <button type="button" id="trendCnAdvNoDataClear">Clear filters</button>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <div class="trendCommandRow trendRiskMetricsRow" aria-label="Provisioning and written off trends">
+      <article class="trendChartCard trendCommandMain trendRiskMetricsCard">
+        <div class="trendChartHeader">
+          <div>
+            <div class="trendChartTitle">Provisioning</div>
+            <div class="trendChartMeta" id="trendProvisioningScopeMeta">Provision value movement across the selected period</div>
+          </div>
+          <div class="trendCollectionFilterTray" id="trendProvisioningFilterTray">
+            <details class="trendCollectionFilterRoot" id="trendProvisioningFilterRoot">
+              <summary aria-label="Open provisioning chart filters">
+                <i class="bi bi-filter" aria-hidden="true"></i>
+                <span>Filter</span>
+                <i class="bi bi-chevron-down" aria-hidden="true"></i>
+              </summary>
+              <div class="trendCollectionFilterRootMenu" id="trendProvisioningFilterGrid" aria-label="Provisioning chart filter fields"></div>
+            </details>
+          </div>
+        </div>
+        <div class="trendCollectionFilterChips" id="trendProvisioningFilterChips" aria-label="Applied provisioning chart filters" aria-live="polite" hidden></div>
+        <div class="trendChartWrap trendRiskMetricsChartWrap">
+          <div id="trendProvisioningChart" class="trendEchartCanvas" role="img" aria-label="Provisioning trend"></div>
+          <div class="trendCollectionNoData" id="trendProvisioningNoData" hidden>
+            <i class="bi bi-filter-circle" aria-hidden="true"></i>
+            <strong>No provisioning data for the selected filters</strong>
+            <span>Adjust the current selections or reset the chart filters.</span>
+            <button type="button" id="trendProvisioningNoDataClear">Clear filters</button>
+          </div>
+        </div>
+      </article>
+      <article class="trendChartCard trendCommandMain trendRiskMetricsCard">
+        <div class="trendChartHeader">
+          <div>
+            <div class="trendChartTitle">Written Off</div>
+            <div class="trendChartMeta" id="trendWrittenOffScopeMeta">Written-off value movement across the selected period</div>
+          </div>
+          <div class="trendCollectionFilterTray" id="trendWrittenOffFilterTray">
+            <details class="trendCollectionFilterRoot" id="trendWrittenOffFilterRoot">
+              <summary aria-label="Open written off chart filters">
+                <i class="bi bi-filter" aria-hidden="true"></i>
+                <span>Filter</span>
+                <i class="bi bi-chevron-down" aria-hidden="true"></i>
+              </summary>
+              <div class="trendCollectionFilterRootMenu" id="trendWrittenOffFilterGrid" aria-label="Written off chart filter fields"></div>
+            </details>
+          </div>
+        </div>
+        <div class="trendCollectionFilterChips" id="trendWrittenOffFilterChips" aria-label="Applied written off chart filters" aria-live="polite" hidden></div>
+        <div class="trendChartWrap trendRiskMetricsChartWrap">
+          <div id="trendWrittenOffChart" class="trendEchartCanvas" role="img" aria-label="Written off trend"></div>
+          <div class="trendCollectionNoData" id="trendWrittenOffNoData" hidden>
+            <i class="bi bi-filter-circle" aria-hidden="true"></i>
+            <strong>No written-off data for the selected filters</strong>
+            <span>Adjust the current selections or reset the chart filters.</span>
+            <button type="button" id="trendWrittenOffNoDataClear">Clear filters</button>
+          </div>
+        </div>
+      </article>
+    </div>
 
   </section>
 </main>
@@ -1109,6 +1275,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
 <script src="../scripts/shared-header.js"></script>
 <script>
   (() => {
