@@ -968,7 +968,7 @@
     },
     plugins: {
       legend: {
-        position: "bottom",
+        display: false,
         labels: {
           color: "#475569",
           boxWidth: 10,
@@ -1037,9 +1037,9 @@
   const trendEchartOption = ({ labels, series, valueFormatter = formatCount, suffix = "", axisName = "Count", bars = false, stacked = false, tooltipFooter = null }) => ({
     animationDuration: 260,
     animationEasing: "cubicOut",
-    grid: { left: 10, right: 12, top: 36, bottom: 8, containLabel: true },
+    grid: { left: 10, right: 12, top: 12, bottom: 8, containLabel: true },
     legend: {
-      show: true,
+      show: false,
       top: 4,
       left: "center",
       selectedMode: false,
@@ -1085,13 +1085,13 @@
     series: series.map((item) => ({
       ...item,
       smooth: item.type === "line" ? 0.28 : undefined,
-      symbol: item.type === "line" ? "circle" : undefined,
-      symbolSize: item.type === "line" ? 7 : undefined,
+      symbol: item.type === "line" ? (item.symbol || "circle") : undefined,
+      symbolSize: item.type === "line" ? (item.symbolSize || 7) : undefined,
       showSymbol: item.type === "line",
       lineStyle: item.type === "line" ? { width: item.lineWidth || item.lineStyle?.width || 3, ...(item.lineStyle || {}) } : undefined,
       itemStyle: { borderRadius: item.type === "bar" ? [4, 4, 0, 0] : undefined, ...(item.itemStyle || {}) },
       emphasis: { focus: "series" },
-      stack: stacked ? "trend-stack" : undefined
+      stack: stacked ? (item.stack || "trend-stack") : undefined
     }))
   });
 
@@ -1452,6 +1452,80 @@
     };
   });
 
+  const comparisonPalette = [
+    { primary: "#1677ff", secondary: "#93c5fd", soft: "rgba(22, 119, 255, 0.12)" },
+    { primary: "#d94801", secondary: "#fdba74", soft: "rgba(217, 72, 1, 0.12)" }
+  ];
+
+  const getComparisonGroups = (context) => {
+    if (!context?.comparison?.enabled) return [];
+    const groups = (context.comparison.groups || []).filter((group) => (
+      Object.values(group?.filters || {}).some((values) => values instanceof Set && values.size > 0)
+    ));
+    return groups.length === 2 ? groups.slice(0, 2) : [];
+  };
+
+  const getComparisonGroupLabel = (group, definitions = []) => {
+    const labels = definitions.flatMap(({ key, label }) => {
+      const values = [...(group?.filters?.[key] || [])];
+      if (!values.length) return [];
+      return `${label}: ${values.length === 1 ? values[0] : `${values.length} selected`}`;
+    });
+    return labels.join(" | ");
+  };
+
+  const getComparisonContexts = (context, definitions = []) => getComparisonGroups(context).map((group, index) => {
+    const cohortFilters = Object.fromEntries(Object.entries(group.filters || {}).filter(([, values]) => values instanceof Set && values.size));
+    return {
+      group,
+      index,
+      label: getComparisonGroupLabel(group, definitions),
+      context: {
+        ...context,
+        filters: { ...(context.filters || {}), ...cohortFilters },
+        enabledFilters: {
+          ...(context.enabledFilters || {}),
+          ...Object.fromEntries(Object.keys(cohortFilters).map((key) => [key, true]))
+        }
+      },
+      palette: comparisonPalette[index]
+    };
+  });
+
+  const getTrendComparisonPoints = (points, context, definitions, getFilteredPoints) => {
+    const periodGroups = context?.periodComparison?.groups || [];
+    if (periodGroups.length === 2) {
+      return periodGroups.map((group, index) => ({
+        label: group.label,
+        index,
+        palette: comparisonPalette[index],
+        points: getFilteredPoints(group.points, context.filters, context.enabledFilters)
+      }));
+    }
+    return getComparisonContexts(context, definitions).map((item) => ({
+      ...item,
+      points: getFilteredPoints(points, item.context.filters, item.context.enabledFilters)
+    }));
+  };
+
+  const getTrendComparisonLabels = (points, context) => {
+    const periodGroups = context?.periodComparison?.groups || [];
+    if (periodGroups.length === 2 && context?.periodComparison?.range === "quarterly") {
+      const length = Math.max(...periodGroups.map((group) => group.points.length));
+      return Array.from({ length }, (_, index) => `Month ${index + 1}`);
+    }
+    if (periodGroups.length === 2 && context?.periodComparison?.range === "monthly") {
+      const length = Math.max(...periodGroups.map((group) => group.points.length));
+      return Array.from({ length }, (_, index) => `Day ${index + 1}`);
+    }
+    const source = periodGroups.length === 2
+      ? periodGroups.reduce((longest, group) => group.points.length > longest.length ? group.points : longest, [])
+      : points;
+    return source.map((point) => periodGroups.length === 2
+      ? point.label.replace(/\s+\d{2,4}$/, "")
+      : point.label);
+  };
+
   const invoiceSubmissionRowMatches = (row, filters, ignoredKey = null, enabledFilters = null) => invoiceSubmissionFilterDefinitions.every(({ key }) => {
     if (key === ignoredKey) return true;
     if (enabledFilters && enabledFilters[key] === false) return true;
@@ -1471,14 +1545,26 @@
   const renderInvoiceSubmissionChart = (points, context = null) => {
     if (!context) return { hasData: false, filteredPoints: [] };
     const filteredPoints = getFilteredInvoiceSubmissionPoints(points, context.filters, context.enabledFilters);
-    const hasData = filteredPoints.some((point) => Object.values(point.submissionChannels).some((value) => value > 0));
+    const comparisonPoints = getTrendComparisonPoints(points, context, invoiceSubmissionFilterDefinitions, getFilteredInvoiceSubmissionPoints);
+    const hasData = comparisonPoints.length
+      ? comparisonPoints.some((item) => item.points.some((point) => Object.values(point.submissionChannels).some((value) => value > 0)))
+      : filteredPoints.some((point) => Object.values(point.submissionChannels).some((value) => value > 0));
     if (usesTrendEcharts("trendInvoiceSubmissionChart")) {
       setTrendEchart("trendInvoiceSubmissionChart", trendEchartOption({
-        labels: filteredPoints.map((point) => point.label),
+        labels: getTrendComparisonLabels(filteredPoints, context),
         axisName: "Count",
         bars: true,
         stacked: true,
-        series: Object.entries(submissionChannelLabels).map(([channel, label]) => ({
+        series: comparisonPoints.length ? comparisonPoints.flatMap(({ label: groupLabel, index, points: groupPoints }) => Object.entries(submissionChannelLabels).map(([channel, label]) => ({
+          name: `${groupLabel} · ${label}`,
+          type: "bar",
+          stack: `submission-${index}`,
+          data: groupPoints.map((point) => point.submissionChannels[channel] || 0),
+          barMaxWidth: 17,
+          itemStyle: { color: index === 0
+            ? submissionChannelColors[channel].replace(/rgba?\(([^,]+),\s*([^,]+),\s*([^,]+).*\)/, "rgb($1, $2, $3)")
+            : ({ physical: "#93c5fd", courier: "#86efac", email: "#fcd34d", external: "#d8b4fe" }[channel]) }
+        }))) : Object.entries(submissionChannelLabels).map(([channel, label]) => ({
           name: label,
           type: "bar",
           data: filteredPoints.map((point) => point.submissionChannels[channel] || 0),
@@ -1486,7 +1572,7 @@
           itemStyle: { color: submissionChannelColors[channel].replace(/rgba?\(([^,]+),\s*([^,]+),\s*([^,]+).*\)/, "rgb($1, $2, $3)") }
         }))
       }));
-      return { hasData, filteredPoints };
+      return { hasData, filteredPoints, comparisonPoints };
     }
     setChart("trendInvoiceSubmissionChart", {
       type: "bar",
@@ -1531,15 +1617,26 @@
   const renderAgingBucketsChart = (points, context = null) => {
     if (!context) return { hasData: false, filteredPoints: [] };
     const filteredPoints = getFilteredAgingBucketPoints(points, context.filters, context.enabledFilters);
-    const hasData = filteredPoints.some((point) => Object.values(point.buckets).some((value) => value > 0));
+    const comparisonPoints = getTrendComparisonPoints(points, context, agingBucketsFilterDefinitions, getFilteredAgingBucketPoints);
+    const hasData = comparisonPoints.length
+      ? comparisonPoints.some((item) => item.points.some((point) => Object.values(point.buckets).some((value) => value > 0)))
+      : filteredPoints.some((point) => Object.values(point.buckets).some((value) => value > 0));
     if (usesTrendEcharts("trendAgingBucketsChart")) {
       const colors = { "0-30": "#2563eb", "31-60": "#16a34a", "61-90": "#f59e0b", "90+": "#ef4444" };
       setTrendEchart("trendAgingBucketsChart", trendEchartOption({
-        labels: filteredPoints.map((point) => point.label),
+        labels: getTrendComparisonLabels(filteredPoints, context),
         valueFormatter: (value) => `Rs. ${Number(value || 0).toFixed(2)} Cr`,
         axisName: "Rs. Cr",
+        bars: comparisonPoints.length > 0,
         stacked: true,
-        series: Object.keys(colors).map((bucket) => ({
+        series: comparisonPoints.length ? comparisonPoints.flatMap(({ label, index, points: groupPoints }) => Object.keys(colors).map((bucket) => ({
+          name: `${label} · ${bucket}`,
+          type: "bar",
+          stack: `aging-${index}`,
+          data: groupPoints.map((point) => point.buckets[bucket]),
+          barMaxWidth: 18,
+          itemStyle: { color: index === 0 ? colors[bucket] : ({ "0-30": "#93c5fd", "31-60": "#86efac", "61-90": "#fcd34d", "90+": "#fca5a5" }[bucket]) }
+        }))) : Object.keys(colors).map((bucket) => ({
           name: bucket,
           type: "line",
           data: filteredPoints.map((point) => point.buckets[bucket]),
@@ -1548,7 +1645,7 @@
           lineStyle: { width: 1.4, color: colors[bucket] }
         }))
       }));
-      return { hasData, filteredPoints };
+      return { hasData, filteredPoints, comparisonPoints };
     }
     setChart("trendAgingBucketsChart", {
       type: "line",
@@ -1592,18 +1689,24 @@
   const renderCnAdvChart = (points, context = null) => {
     if (!context) return { hasData: false, filteredPoints: [] };
     const filteredPoints = getFilteredCnAdvPoints(points, context.filters, context.enabledFilters);
-    const hasData = filteredPoints.some((point) => point.addedCr > 0 || point.utilisedCr > 0);
+    const comparisonPoints = getTrendComparisonPoints(points, context, cnAdvFilterDefinitions, getFilteredCnAdvPoints);
+    const hasData = comparisonPoints.length
+      ? comparisonPoints.some((item) => item.points.some((point) => point.addedCr > 0 || point.utilisedCr > 0))
+      : filteredPoints.some((point) => point.addedCr > 0 || point.utilisedCr > 0);
     if (usesTrendEcharts("trendCnAdvChart")) {
       setTrendEchart("trendCnAdvChart", trendEchartOption({
-        labels: filteredPoints.map((point) => point.label),
+        labels: getTrendComparisonLabels(filteredPoints, context),
         valueFormatter: (value) => `Rs. ${Number(value || 0).toFixed(2)} Cr`,
         axisName: "Rs. Cr",
-        series: [
+        series: comparisonPoints.length ? comparisonPoints.flatMap(({ label, palette, points: groupPoints }) => [
+          { name: `${label} · CN/ADV added`, type: "line", data: groupPoints.map((point) => point.addedCr), itemStyle: { color: palette.primary }, lineStyle: { color: palette.primary, width: 3, type: "solid" } },
+          { name: `${label} · CN/ADV utilised`, type: "line", data: groupPoints.map((point) => point.utilisedCr), itemStyle: { color: palette.primary }, lineStyle: { color: palette.primary, width: 2.7, type: "dashed" } }
+        ]) : [
           { name: "CN / ADV added", type: "line", data: filteredPoints.map((point) => point.addedCr), itemStyle: { color: "#d97706" }, lineStyle: { color: "#d97706", width: 3 } },
           { name: "CN / ADV utilised", type: "line", data: filteredPoints.map((point) => point.utilisedCr), areaStyle: { color: "rgba(8, 145, 178, 0.16)" }, itemStyle: { color: "#0891b2" }, lineStyle: { color: "#0891b2", width: 3 } }
         ]
       }));
-      return { hasData, filteredPoints };
+      return { hasData, filteredPoints, comparisonPoints };
     }
     setChart("trendCnAdvChart", {
       type: "line",
@@ -1638,13 +1741,27 @@
   const renderProvisioningChart = (points, context = null) => {
     const filteredPoints = getFilteredFinancialRiskPoints(points, context?.filters, context?.enabledFilters, "provisioningCr");
     const values = filteredPoints.map((point) => point.valueCr);
-    const hasData = filteredPoints.some((point) => point.valueCr > 0);
+    const comparisonPoints = getTrendComparisonPoints(
+      points,
+      context,
+      financialRiskFilterDefinitions,
+      (sourcePoints, filters, enabledFilters) => getFilteredFinancialRiskPoints(sourcePoints, filters, enabledFilters, "provisioningCr")
+    );
+    const hasData = comparisonPoints.length
+      ? comparisonPoints.some((item) => item.points.some((point) => point.valueCr > 0))
+      : filteredPoints.some((point) => point.valueCr > 0);
     if (usesTrendEcharts("trendProvisioningChart")) {
       setTrendEchart("trendProvisioningChart", trendEchartOption({
-        labels: points.map((point) => point.label),
+        labels: getTrendComparisonLabels(filteredPoints, context),
         valueFormatter: (value) => `Rs. ${Number(value || 0).toFixed(2)} Cr`,
         axisName: "Rs. Cr",
-        series: [{
+        series: comparisonPoints.length ? comparisonPoints.map(({ label, palette, points: groupPoints }) => ({
+          name: `${label} · Provisioning`,
+          type: "line",
+          data: groupPoints.map((point) => point.valueCr),
+          itemStyle: { color: palette.primary },
+          lineStyle: { color: palette.primary, width: 3 }
+        })) : [{
           name: "Provisioning",
           type: "line",
           data: values,
@@ -1653,7 +1770,7 @@
           lineStyle: { color: "#7c3aed", width: 3 }
         }]
       }));
-      return { hasData, filteredPoints };
+      return { hasData, filteredPoints, comparisonPoints };
     }
     setChart("trendProvisioningChart", {
       type: "line",
@@ -1666,16 +1783,26 @@
   const renderWrittenOffChart = (points, context = null) => {
     const filteredPoints = getFilteredFinancialRiskPoints(points, context?.filters, context?.enabledFilters, "writtenOffCr");
     const values = filteredPoints.map((point) => point.valueCr);
-    const hasData = filteredPoints.some((point) => point.valueCr > 0);
+    const comparisonPoints = getTrendComparisonPoints(
+      points,
+      context,
+      financialRiskFilterDefinitions,
+      (sourcePoints, filters, enabledFilters) => getFilteredFinancialRiskPoints(sourcePoints, filters, enabledFilters, "writtenOffCr")
+    );
+    const hasData = comparisonPoints.length
+      ? comparisonPoints.some((item) => item.points.some((point) => point.valueCr > 0))
+      : filteredPoints.some((point) => point.valueCr > 0);
     if (usesTrendEcharts("trendWrittenOffChart")) {
       setTrendEchart("trendWrittenOffChart", trendEchartOption({
-        labels: points.map((point) => point.label),
+        labels: getTrendComparisonLabels(filteredPoints, context),
         valueFormatter: (value) => `Rs. ${Number(value || 0).toFixed(2)} Cr`,
         axisName: "Rs. Cr",
         bars: true,
-        series: [{ name: "Written Off", type: "bar", data: values, itemStyle: { color: "#dc2626" } }]
+        series: comparisonPoints.length ? comparisonPoints.map(({ label, palette, points: groupPoints }) => ({
+          name: `${label} · Written Off`, type: "bar", data: groupPoints.map((point) => point.valueCr), barMaxWidth: 24, itemStyle: { color: palette.primary }
+        })) : [{ name: "Written Off", type: "bar", data: values, itemStyle: { color: "#dc2626" } }]
       }));
-      return { hasData, filteredPoints };
+      return { hasData, filteredPoints, comparisonPoints };
     }
     setChart("trendWrittenOffChart", {
       type: "bar",
@@ -1705,20 +1832,26 @@
   const renderPlanPortfolioChart = (points, context = null) => {
     if (!context) return { hasData: false, filteredPoints: [] };
     const filteredPoints = getFilteredPlanPortfolioPoints(points, context.filters, context.enabledFilters);
-    const hasData = filteredPoints.some((point) => point.rowCount > 0);
+    const comparisonPoints = getTrendComparisonPoints(points, context, planPortfolioFilterDefinitions, getFilteredPlanPortfolioPoints);
+    const hasData = comparisonPoints.length
+      ? comparisonPoints.some((item) => item.points.some((point) => point.rowCount > 0))
+      : filteredPoints.some((point) => point.rowCount > 0);
     const showLines = filteredPoints.length > 1;
     const seriesVisibility = context.seriesVisibility || { portfolio: true, plan: true };
     if (usesTrendEcharts("trendPlanPortfolioChart")) {
       setTrendEchart("trendPlanPortfolioChart", trendEchartOption({
-        labels: filteredPoints.map((point) => point.label),
+        labels: getTrendComparisonLabels(filteredPoints, context),
         valueFormatter: (value) => `Rs. ${Number(value || 0).toFixed(2)} Cr`,
         axisName: "Rs. Cr",
-        series: [
+        series: comparisonPoints.length ? comparisonPoints.flatMap(({ label, palette, points: groupPoints }) => [
+          ...(seriesVisibility.portfolio ? [{ name: `${label} · Portfolio`, type: "line", data: groupPoints.map((point) => point.portfolioCr), itemStyle: { color: palette.primary }, lineStyle: { color: palette.primary, width: 3.2, type: "solid" } }] : []),
+          ...(seriesVisibility.plan ? [{ name: `${label} · Plan`, type: "line", data: groupPoints.map((point) => point.planCr), itemStyle: { color: palette.primary }, lineStyle: { color: palette.primary, width: 2.8, type: "dashed" } }] : [])
+        ]) : [
           ...(seriesVisibility.portfolio ? [{ name: "Portfolio", type: "line", data: filteredPoints.map((point) => point.portfolioCr), areaStyle: { color: "rgba(37, 99, 235, 0.1)" }, itemStyle: { color: "#2563eb" }, lineStyle: { color: "#2563eb", width: 3.2 } }] : []),
           ...(seriesVisibility.plan ? [{ name: "Plan", type: "line", data: filteredPoints.map((point) => point.planCr), itemStyle: { color: "#7c3aed" }, lineStyle: { color: "#7c3aed", width: 3 } }] : [])
         ]
       }));
-      return { hasData, filteredPoints };
+      return { hasData, filteredPoints, comparisonPoints };
     }
     setChart("trendPlanPortfolioChart", {
       type: "line",
@@ -1801,24 +1934,31 @@
   const renderVisitsChart = (points, context = null) => {
     if (!context) return { hasData: false, filteredPoints: [] };
     const filteredPoints = getFilteredVisitPoints(points, context.filters, context.enabledFilters);
-    const hasData = filteredPoints.some((point) => point.monthlyVisits > 0);
+    const comparisonPoints = getTrendComparisonPoints(points, context, visitsAllFilterDefinitions, getFilteredVisitPoints);
+    const hasData = comparisonPoints.length
+      ? comparisonPoints.some((item) => item.points.some((point) => point.monthlyVisits > 0))
+      : filteredPoints.some((point) => point.monthlyVisits > 0);
     const seriesVisibility = context.seriesVisibility || { visits: true, uniqueCustomers: true };
     if (usesTrendEcharts("trendVisitsChart")) {
       setTrendEchart("trendVisitsChart", trendEchartOption({
-        labels: filteredPoints.map((point) => point.label),
+        labels: getTrendComparisonLabels(filteredPoints, context),
         axisName: "Visits",
         bars: true,
         stacked: true,
         tooltipFooter: (items) => {
+          if (comparisonPoints.length) return "Each cohort stack equals total visits for that comparison group.";
           const point = filteredPoints[items?.[0]?.dataIndex] || {};
           return `Total visits: <b>${formatCount(point.monthlyVisits || 0)}</b>`;
         },
-        series: [
+        series: comparisonPoints.length ? comparisonPoints.flatMap(({ label, palette, index, points: groupPoints }) => [
+          ...(seriesVisibility.uniqueCustomers ? [{ name: `${label} · Unique visits`, type: "bar", stack: `visits-${index}`, data: groupPoints.map((point) => point.uniqueCustomers), barMaxWidth: 22, itemStyle: { color: palette.secondary } }] : []),
+          ...(seriesVisibility.visits ? [{ name: `${label} · Repeat visits`, type: "bar", stack: `visits-${index}`, data: groupPoints.map((point) => Math.max(0, point.monthlyVisits - point.uniqueCustomers)), barMaxWidth: 22, itemStyle: { color: palette.primary } }] : [])
+        ]) : [
           ...(seriesVisibility.uniqueCustomers ? [{ name: "Unique visits", type: "bar", data: filteredPoints.map((point) => point.uniqueCustomers), barMaxWidth: 32, itemStyle: { color: "#7c3aed" } }] : []),
           ...(seriesVisibility.visits ? [{ name: "Repeat visits", type: "bar", data: filteredPoints.map((point) => Math.max(0, point.monthlyVisits - point.uniqueCustomers)), barMaxWidth: 32, itemStyle: { color: "#0f9f8f" } }] : [])
         ]
       }));
-      return { hasData, filteredPoints };
+      return { hasData, filteredPoints, comparisonPoints };
     }
     setChart("trendVisitsChart", {
       type: "bar",
@@ -1906,8 +2046,11 @@
     }
 
     const filteredPoints = getFilteredCollectionPoints(points, context.filters, context.enabledFilters);
-    const hasData = filteredPoints.some((point) => point.rowCount > 0);
-    const labels = filteredPoints.map((point) => point.label);
+    const comparisonPoints = getTrendComparisonPoints(points, context, collectionFilterDefinitions, getFilteredCollectionPoints);
+    const hasData = comparisonPoints.length
+      ? comparisonPoints.some((item) => item.points.some((point) => point.rowCount > 0))
+      : filteredPoints.some((point) => point.rowCount > 0);
+    const labels = getTrendComparisonLabels(filteredPoints, context);
     const showLines = filteredPoints.length > 1;
     const seriesVisibility = context.seriesVisibility || { collection: true, billing: true, target: true };
 
@@ -1916,13 +2059,17 @@
         labels,
         valueFormatter: (value) => `Rs. ${Number(value || 0).toFixed(2)} Cr`,
         axisName: "Rs. Cr",
-        series: [
-          ...(seriesVisibility.collection ? [{ name: "Collection", type: "line", data: filteredPoints.map((point) => point.collectionCr), areaStyle: { color: "rgba(37, 99, 235, 0.14)" }, itemStyle: { color: "#2563eb" }, lineStyle: { color: "#2563eb", width: 3.4 } }] : []),
-          ...(seriesVisibility.billing ? [{ name: "New Billing", type: "line", data: filteredPoints.map((point) => point.newBillingCr), itemStyle: { color: "#0f9f8f" }, lineStyle: { color: "#0f9f8f", width: 3.2 } }] : []),
-          ...(seriesVisibility.target ? [{ name: "PTP Target", type: "line", data: filteredPoints.map((point) => point.ptpTargetCr), itemStyle: { color: "#d97706" }, lineStyle: { color: "#d97706", width: 3 } }] : [])
+        series: comparisonPoints.length ? comparisonPoints.flatMap(({ label, palette, points: groupPoints }) => [
+          ...(seriesVisibility.collection ? [{ name: `${label} · Collection`, type: "line", symbol: "circle", data: groupPoints.map((point) => point.collectionCr), itemStyle: { color: palette.primary }, lineStyle: { color: palette.primary, width: 3.4, type: "solid" } }] : []),
+          ...(seriesVisibility.billing ? [{ name: `${label} · New Billing`, type: "line", symbol: "rect", data: groupPoints.map((point) => point.newBillingCr), itemStyle: { color: palette.primary }, lineStyle: { color: palette.primary, width: 3, type: "dashed" } }] : []),
+          ...(seriesVisibility.target ? [{ name: `${label} · PTP Target`, type: "line", symbol: "diamond", data: groupPoints.map((point) => point.ptpTargetCr), itemStyle: { color: palette.primary }, lineStyle: { color: palette.primary, width: 2.6, type: "dotted" } }] : [])
+        ]) : [
+          ...(seriesVisibility.collection ? [{ name: "Collection", type: "line", symbol: "circle", data: filteredPoints.map((point) => point.collectionCr), areaStyle: { color: "rgba(37, 99, 235, 0.14)" }, itemStyle: { color: "#2563eb" }, lineStyle: { color: "#2563eb", width: 3.4 } }] : []),
+          ...(seriesVisibility.billing ? [{ name: "New Billing", type: "line", symbol: "rect", data: filteredPoints.map((point) => point.newBillingCr), itemStyle: { color: "#0f9f8f" }, lineStyle: { color: "#0f9f8f", width: 3.2 } }] : []),
+          ...(seriesVisibility.target ? [{ name: "PTP Target", type: "line", symbol: "diamond", data: filteredPoints.map((point) => point.ptpTargetCr), itemStyle: { color: "#d97706" }, lineStyle: { color: "#d97706", width: 3 } }] : [])
         ]
       }));
-      return { hasData, filteredPoints };
+      return { hasData, filteredPoints, comparisonPoints };
     }
 
     setChart("trendCollectionChart", {
@@ -2401,25 +2548,35 @@
         quarterly: [CURRENT_QUARTER_KEY],
         monthly: [CURRENT_MONTH_KEY]
       },
+      globalPeriodComparison: { enabled: false, values: [] },
+      currentGlobalPeriodComparison: null,
       collectionFilters: Object.fromEntries(collectionFilterDefinitions.map(({ key }) => [key, new Set()])),
       collectionFilterEnabled: Object.fromEntries(collectionFilterDefinitions.map(({ key }) => [key, true])),
       collectionSeriesVisibility: { collection: true, billing: true, target: true },
+      collectionComparison: { enabled: false, groups: [{ filters: {} }, { filters: {} }] },
       planPortfolioFilters: Object.fromEntries(planPortfolioFilterDefinitions.map(({ key }) => [key, new Set()])),
       planPortfolioFilterEnabled: Object.fromEntries(planPortfolioFilterDefinitions.map(({ key }) => [key, true])),
       planPortfolioSeriesVisibility: { portfolio: true, plan: true },
+      planPortfolioComparison: { enabled: false, groups: [{ filters: {} }, { filters: {} }] },
       visitsFilters: Object.fromEntries(visitsAllFilterDefinitions.map(({ key }) => [key, new Set()])),
       visitsFilterEnabled: Object.fromEntries(visitsAllFilterDefinitions.map(({ key }) => [key, true])),
       visitsSeriesVisibility: { visits: true, uniqueCustomers: true },
+      visitsComparison: { enabled: false, groups: [{ filters: {} }, { filters: {} }] },
       invoiceSubmissionFilters: Object.fromEntries(invoiceSubmissionFilterDefinitions.map(({ key }) => [key, new Set()])),
       invoiceSubmissionFilterEnabled: Object.fromEntries(invoiceSubmissionFilterDefinitions.map(({ key }) => [key, true])),
+      invoiceSubmissionComparison: { enabled: false, groups: [{ filters: {} }, { filters: {} }] },
       agingBucketsFilters: Object.fromEntries(agingBucketsFilterDefinitions.map(({ key }) => [key, new Set()])),
       agingBucketsFilterEnabled: Object.fromEntries(agingBucketsFilterDefinitions.map(({ key }) => [key, true])),
+      agingBucketsComparison: { enabled: false, groups: [{ filters: {} }, { filters: {} }] },
       cnAdvFilters: Object.fromEntries(cnAdvFilterDefinitions.map(({ key }) => [key, new Set()])),
       cnAdvFilterEnabled: Object.fromEntries(cnAdvFilterDefinitions.map(({ key }) => [key, true])),
+      cnAdvComparison: { enabled: false, groups: [{ filters: {} }, { filters: {} }] },
       provisioningFilters: Object.fromEntries(financialRiskFilterDefinitions.map(({ key }) => [key, new Set()])),
       provisioningFilterEnabled: Object.fromEntries(financialRiskFilterDefinitions.map(({ key }) => [key, true])),
+      provisioningComparison: { enabled: false, groups: [{ filters: {} }, { filters: {} }] },
       writtenOffFilters: Object.fromEntries(financialRiskFilterDefinitions.map(({ key }) => [key, new Set()])),
       writtenOffFilterEnabled: Object.fromEntries(financialRiskFilterDefinitions.map(({ key }) => [key, true])),
+      writtenOffComparison: { enabled: false, groups: [{ filters: {} }, { filters: {} }] },
       currentTrendPoints: [],
       range: "yearly",
       isTrendsVisible: false,
@@ -2428,6 +2585,22 @@
     const quarterOptions = getQuarterOptions();
     const monthOptions = getMonthOptions();
     const usesMultiPeriodSelect = Boolean(multiPeriodGroup && multiPeriodLabel && multiPeriodSummary && multiPeriodMenu);
+    const globalPeriodCompareControl = document.createElement("div");
+    globalPeriodCompareControl.className = "trendGlobalPeriodCompare";
+    globalPeriodCompareControl.hidden = true;
+    globalPeriodCompareControl.innerHTML = `
+      <button type="button" class="trendGlobalCompareToggle" aria-pressed="false" aria-expanded="false">
+        <i class="bi bi-bar-chart-line" aria-hidden="true"></i><span>Compare periods</span>
+      </button>
+      <div class="trendGlobalComparePickers" hidden>
+        <label><span>Period A</span><select data-global-period-comparison="a" aria-label="Select first comparison period"></select></label>
+        <label><span>Period B</span><select data-global-period-comparison="b" aria-label="Select second comparison period"></select></label>
+      </div>`;
+    if (usesMultiPeriodSelect) multiPeriodGroup.after(globalPeriodCompareControl);
+    const globalPeriodCompareToggle = globalPeriodCompareControl.querySelector(".trendGlobalCompareToggle");
+    const globalPeriodComparePickers = globalPeriodCompareControl.querySelector(".trendGlobalComparePickers");
+    const globalPeriodCompareSelects = Array.from(globalPeriodCompareControl.querySelectorAll("select[data-global-period-comparison]"));
+    const comparisonWorkspaces = {};
     const collectionFilterSearches = {};
     const planPortfolioFilterSearches = {};
     const visitsFilterSearches = {};
@@ -2493,6 +2666,57 @@
       });
     };
 
+    const syncGlobalPeriodCompare = () => {
+      const isAvailable = usesMultiPeriodSelect && state.range !== "all_time";
+      globalPeriodCompareControl.hidden = !isAvailable;
+      if (!isAvailable) {
+        state.globalPeriodComparison.enabled = false;
+        state.globalPeriodComparison.values = [];
+        return;
+      }
+
+      const options = getMultiPeriodOptions();
+      const validValues = new Set(options.map((option) => option.value));
+      const values = [...new Set(state.globalPeriodComparison.values)].filter((value) => validValues.has(value));
+      const selectedPeriods = (state.selectedPeriods[state.range] || []).filter((value) => validValues.has(value));
+      const candidates = [...values, ...selectedPeriods, ...options.map((option) => option.value).reverse()]
+        .filter((value, index, array) => array.indexOf(value) === index);
+      state.globalPeriodComparison.values = candidates.slice(0, 2);
+
+      const canCompare = options.length > 1;
+      if (!canCompare) state.globalPeriodComparison.enabled = false;
+      globalPeriodCompareToggle.disabled = !canCompare;
+      globalPeriodCompareToggle.setAttribute("aria-pressed", state.globalPeriodComparison.enabled ? "true" : "false");
+      globalPeriodCompareToggle.setAttribute("aria-expanded", state.globalPeriodComparison.enabled ? "true" : "false");
+      globalPeriodCompareToggle.querySelector("span").textContent = state.globalPeriodComparison.enabled ? "Comparing periods" : "Compare periods";
+      globalPeriodComparePickers.hidden = !state.globalPeriodComparison.enabled;
+
+      if (!state.globalPeriodComparison.enabled) return;
+      const [firstValue, secondValue] = state.globalPeriodComparison.values;
+      globalPeriodCompareSelects.forEach((select, index) => {
+        select.replaceChildren(...options.map((option) => {
+          const node = document.createElement("option");
+          node.value = option.value;
+          node.textContent = option.label;
+          node.disabled = option.value === (index === 0 ? secondValue : firstValue);
+          return node;
+        }));
+        select.value = index === 0 ? firstValue : secondValue;
+      });
+    };
+
+    const getGlobalPeriodComparisonGroups = () => {
+      if (!state.globalPeriodComparison.enabled || state.range === "all_time") return null;
+      const labels = new Map(getMultiPeriodOptions().map((option) => [option.value, option.label]));
+      const values = [...new Set(state.globalPeriodComparison.values)].filter((value) => labels.has(value));
+      if (values.length !== 2) return null;
+      return values.map((value) => ({
+        value,
+        label: labels.get(value),
+        points: getPeriodData(state.range, state.activeYear, getActivePeriodKey(), [value]).points
+      }));
+    };
+
     const syncTrendControls = () => {
       rangeSelect.value = state.range;
       syncRangeButtons();
@@ -2502,8 +2726,11 @@
         if (periodGroup) periodGroup.hidden = true;
         multiPeriodGroup.hidden = state.range === "all_time";
         if (!multiPeriodGroup.hidden) syncMultiPeriodSelect();
+        syncGlobalPeriodCompare();
         return;
       }
+
+      syncGlobalPeriodCompare();
 
       const usesYearInput = state.range === "yearly" || state.range === "fiscal_year";
       if (yearGroup) yearGroup.hidden = !usesYearInput;
@@ -2562,7 +2789,9 @@
     const getCollectionContext = () => ({
       filters: state.collectionFilters,
       enabledFilters: state.collectionFilterEnabled,
-      seriesVisibility: state.collectionSeriesVisibility
+      seriesVisibility: state.collectionSeriesVisibility,
+      comparison: comparisonWorkspaces.collection?.getComparison() || state.collectionComparison,
+      periodComparison: state.currentGlobalPeriodComparison
     });
 
     const closeCollectionFilterMenus = (except = null) => {
@@ -2684,6 +2913,7 @@
       syncCollectionFilterGrid(openKey);
       syncCollectionFilterChips();
       syncCollectionHeaderControls();
+      comparisonWorkspaces.collection?.sync();
       if (rerenderChart) {
         syncCollectionResultState(renderCollectionChart(state.currentTrendPoints, getCollectionContext()));
       }
@@ -2732,7 +2962,9 @@
     const getPlanPortfolioContext = () => ({
       filters: state.planPortfolioFilters,
       enabledFilters: state.planPortfolioFilterEnabled,
-      seriesVisibility: state.planPortfolioSeriesVisibility
+      seriesVisibility: state.planPortfolioSeriesVisibility,
+      comparison: comparisonWorkspaces.planPortfolio?.getComparison() || state.planPortfolioComparison,
+      periodComparison: state.currentGlobalPeriodComparison
     });
 
     const closePlanPortfolioFilterMenus = (except = null) => {
@@ -2824,6 +3056,7 @@
       syncPlanPortfolioFilterGrid(openKey);
       syncPlanPortfolioFilterChips();
       syncPlanPortfolioHeaderControls();
+      comparisonWorkspaces.planPortfolio?.sync();
       if (rerenderChart) syncPlanPortfolioResultState(renderPlanPortfolioChart(state.currentTrendPoints, getPlanPortfolioContext()));
     };
 
@@ -2858,7 +3091,9 @@
     const getVisitsContext = () => ({
       filters: state.visitsFilters,
       enabledFilters: state.visitsFilterEnabled,
-      seriesVisibility: state.visitsSeriesVisibility
+      seriesVisibility: state.visitsSeriesVisibility,
+      comparison: comparisonWorkspaces.visits?.getComparison() || state.visitsComparison,
+      periodComparison: state.currentGlobalPeriodComparison
     });
     const closeVisitsFilterMenus = (except = null) => {
       visitsFilterGrid?.querySelectorAll("details[open]").forEach((details) => { if (details !== except) details.open = false; });
@@ -2943,6 +3178,7 @@
       syncVisitsCustomerPicker();
       syncVisitsFilterChips();
       syncVisitsHeaderControls();
+      comparisonWorkspaces.visits?.sync();
       if (rerenderChart) syncVisitsResultState(renderVisitsChart(state.currentTrendPoints, getVisitsContext()));
     };
     const resetVisitsFilters = (key = "all") => {
@@ -2976,7 +3212,9 @@
     };
     const getInvoiceSubmissionContext = () => ({
       filters: state.invoiceSubmissionFilters,
-      enabledFilters: state.invoiceSubmissionFilterEnabled
+      enabledFilters: state.invoiceSubmissionFilterEnabled,
+      comparison: comparisonWorkspaces.invoiceSubmission?.getComparison() || state.invoiceSubmissionComparison,
+      periodComparison: state.currentGlobalPeriodComparison
     });
     const closeInvoiceSubmissionFilterMenus = (except = null) => {
       invoiceSubmissionFilterGrid?.querySelectorAll("details[open]").forEach((details) => { if (details !== except) details.open = false; });
@@ -3036,6 +3274,7 @@
       if (!usesInvoiceSubmissionWorkspace) return;
       syncInvoiceSubmissionFilterGrid(openKey);
       syncInvoiceSubmissionFilterChips();
+      comparisonWorkspaces.invoiceSubmission?.sync();
       if (rerenderChart) syncInvoiceSubmissionResultState(renderInvoiceSubmissionChart(state.currentTrendPoints, getInvoiceSubmissionContext()));
     };
     const resetInvoiceSubmissionFilters = (key = "all") => {
@@ -3066,7 +3305,12 @@
       if (selected.length === (agingBucketsCatalogs[key] || []).length) return "All selected";
       return selected.length <= 2 ? selected.join(", ") : `${selected.slice(0, 2).join(", ")} +${selected.length - 2}`;
     };
-    const getAgingBucketsContext = () => ({ filters: state.agingBucketsFilters, enabledFilters: state.agingBucketsFilterEnabled });
+    const getAgingBucketsContext = () => ({
+      filters: state.agingBucketsFilters,
+      enabledFilters: state.agingBucketsFilterEnabled,
+      comparison: comparisonWorkspaces.agingBuckets?.getComparison() || state.agingBucketsComparison,
+      periodComparison: state.currentGlobalPeriodComparison
+    });
     const closeAgingBucketsFilterMenus = (except = null) => {
       agingBucketsFilterGrid?.querySelectorAll("details[open]").forEach((details) => { if (details !== except) details.open = false; });
       if (!except && agingBucketsFilterRoot) agingBucketsFilterRoot.open = false;
@@ -3121,6 +3365,7 @@
       if (!usesAgingBucketsWorkspace) return;
       syncAgingBucketsFilterGrid(openKey);
       syncAgingBucketsFilterChips();
+      comparisonWorkspaces.agingBuckets?.sync();
       if (rerenderChart) syncAgingBucketsResultState(renderAgingBucketsChart(state.currentTrendPoints, getAgingBucketsContext()));
     };
     const resetAgingBucketsFilters = (key = "all") => {
@@ -3148,7 +3393,12 @@
       if (selected.length === (cnAdvCatalogs[key] || []).length) return "All selected";
       return selected.length <= 2 ? selected.join(", ") : `${selected.slice(0, 2).join(", ")} +${selected.length - 2}`;
     };
-    const getCnAdvContext = () => ({ filters: state.cnAdvFilters, enabledFilters: state.cnAdvFilterEnabled });
+    const getCnAdvContext = () => ({
+      filters: state.cnAdvFilters,
+      enabledFilters: state.cnAdvFilterEnabled,
+      comparison: comparisonWorkspaces.cnAdv?.getComparison() || state.cnAdvComparison,
+      periodComparison: state.currentGlobalPeriodComparison
+    });
     const closeCnAdvFilterMenus = (except = null) => {
       cnAdvFilterGrid?.querySelectorAll("details[open]").forEach((details) => { if (details !== except) details.open = false; });
       if (!except && cnAdvFilterRoot) cnAdvFilterRoot.open = false;
@@ -3199,6 +3449,7 @@
       if (!usesCnAdvWorkspace) return;
       syncCnAdvFilterGrid(openKey);
       syncCnAdvFilterChips();
+      comparisonWorkspaces.cnAdv?.sync();
       if (rerenderChart) syncCnAdvResultState(renderCnAdvChart(state.currentTrendPoints, getCnAdvContext()));
     };
     const resetCnAdvFilters = (key = "all") => {
@@ -3248,7 +3499,12 @@
         if (selected.length === (financialRiskCatalogs[key] || []).length) return "All selected";
         return selected.length <= 2 ? selected.join(", ") : `${selected.slice(0, 2).join(", ")} +${selected.length - 2}`;
       };
-      const getContext = () => ({ filters: state[filtersKey], enabledFilters: state[enabledKey] });
+      const getContext = () => ({
+        filters: state[filtersKey],
+        enabledFilters: state[enabledKey],
+        comparison: comparisonWorkspaces[id]?.getComparison() || state[`${id}Comparison`],
+        periodComparison: state.currentGlobalPeriodComparison
+      });
       const closeMenus = (except = null) => {
         grid.querySelectorAll("details[open]").forEach((details) => { if (details !== except) details.open = false; });
         if (!except) root.open = false;
@@ -3295,6 +3551,7 @@
       const sync = (openKey = null, rerenderChart = true) => {
         syncGrid(openKey);
         syncChips();
+        comparisonWorkspaces[id]?.sync();
         if (rerenderChart) syncResult(renderMetric(state.currentTrendPoints, getContext()));
       };
       const reset = (key = "all") => {
@@ -3366,6 +3623,228 @@
       isAvailable: usesWrittenOffWorkspace, renderMetric: renderWrittenOffChart
     });
 
+    const createComparisonWorkspace = ({ id, definitions, catalogs, filtersKey, enabledKey, tray, chips, getRows, rowMatches, rerender, seriesKey = [] }) => {
+      if (!document.querySelector(".agentDashboard")) return null;
+      if (!tray || !chips || !state[`${id}Comparison`]) return null;
+      const comparisonState = state[`${id}Comparison`];
+      const searches = [{}, {}];
+      const toggle = document.createElement("button");
+      toggle.type = "button";
+      toggle.className = "trendCompareToggle";
+      toggle.setAttribute("data-trend-compare-toggle", id);
+      const actionGroup = document.createElement("div");
+      actionGroup.className = "trendCompareActions";
+      tray.before(actionGroup);
+      actionGroup.append(toggle, tray);
+
+      const panel = document.createElement("div");
+      panel.className = "trendComparisonPanel";
+      panel.hidden = true;
+      panel.setAttribute("data-trend-comparison-panel", id);
+      chips.before(panel);
+
+      const getConfiguredFilters = (group) => Object.fromEntries(
+        Object.entries(group.filters || {}).filter(([, values]) => values instanceof Set && values.size)
+      );
+      const getGroupFilters = (group) => ({ ...state[filtersKey], ...getConfiguredFilters(group) });
+      const getGroupEnabledFilters = (group) => ({
+        ...state[enabledKey],
+        ...Object.fromEntries(Object.keys(getConfiguredFilters(group)).map((key) => [key, true]))
+      });
+      const getAvailableValues = (group, key) => new Set(
+        getRows()
+          .filter((row) => rowMatches(row, getGroupFilters(group), key, getGroupEnabledFilters(group)))
+          .map((row) => row[key])
+          .filter(Boolean)
+      );
+
+      const getGroupSummary = (group, key) => {
+        const values = [...(group.filters?.[key] || [])];
+        if (!values.length) return "Choose values";
+        return values.length === 1 ? values[0] : `${values.length} selected`;
+      };
+      const isGroupConfigured = (group) => Object.values(group.filters || {}).some((values) => values instanceof Set && values.size);
+      const closeGroupMenus = (current) => {
+        panel.querySelectorAll("details[open]").forEach((details) => {
+          if (details !== current) details.open = false;
+        });
+      };
+
+      const sync = () => {
+        const configuredCount = comparisonState.groups.filter(isGroupConfigured).length;
+        const isReady = comparisonState.enabled && configuredCount === 2;
+        toggle.setAttribute("aria-pressed", comparisonState.enabled ? "true" : "false");
+        toggle.setAttribute("aria-label", comparisonState.enabled ? "Disable comparison mode" : "Enable comparison mode");
+        toggle.title = comparisonState.enabled ? "Disable comparison mode" : "Compare two filtered cohorts";
+        toggle.innerHTML = `<i class="bi ${comparisonState.enabled ? "bi-bar-chart-line-fill" : "bi-bar-chart-line"}" aria-hidden="true"></i><span>${isReady ? "Comparing" : "Compare"}</span>`;
+        panel.hidden = !comparisonState.enabled;
+        if (!comparisonState.enabled) {
+          panel.replaceChildren();
+          return;
+        }
+        panel.innerHTML = `
+          <div class="trendComparisonIntro">
+            <strong>Compare two cohorts</strong>
+            <span>Build each cohort with one or more filters. Values use OR; filters use AND.</span>
+            <button type="button" data-trend-compare-reset="${id}">Reset</button>
+          </div>
+          <div class="trendComparisonGroups">
+            ${comparisonState.groups.map((group, index) => {
+              const selectedDefinitions = definitions.filter(({ key }) => group.filters?.[key] instanceof Set);
+              const availableDefinitions = definitions.filter(({ key }) => !(group.filters?.[key] instanceof Set));
+              const groupColor = comparisonPalette[index].primary;
+              const comparisonKey = seriesKey.length
+                ? `<div class="trendComparisonSeriesKey">${seriesKey.map(({ label, style = "solid" }) => `<span><i class="trendComparisonSeriesLine is-${escapeHtml(style)}" style="--comparison-series-color:${groupColor}"></i>${escapeHtml(label)}</span>`).join("")}</div>`
+                : `<span class="trendComparisonCohortKey"><i style="--comparison-series-color:${groupColor}"></i>${index === 0 ? "Blue" : "Orange"} cohort</span>`;
+              return `
+                <section class="trendComparisonGroup" data-trend-compare-group="${index}">
+                  <div class="trendComparisonGroupHeading"><span class="trendComparisonBadge">${index === 0 ? "A" : "B"}</span><strong>Comparison ${index === 0 ? "A" : "B"}</strong>${comparisonKey}</div>
+                  <div class="trendComparisonGroupFilters">
+                    ${selectedDefinitions.map(({ key, label }) => {
+                      const catalog = catalogs[key] || [];
+                      const available = getAvailableValues(group, key);
+                      const term = String(searches[index][key] || "").trim().toLowerCase();
+                      const visibleOptions = catalog.filter((value) => !term || String(value).toLowerCase().includes(term));
+                      return `<div class="trendComparisonAppliedFilter">
+                        <details class="trendComparisonValuePicker" data-trend-compare-values="${index}" data-trend-compare-key="${escapeHtml(key)}">
+                          <summary><span>${escapeHtml(label)}</span><strong>${escapeHtml(getGroupSummary(group, key))}</strong><i class="bi bi-chevron-down" aria-hidden="true"></i></summary>
+                          <div class="trendComparisonValueMenu">
+                            ${catalog.length > 8 ? `<input type="search" class="trendComparisonSearch" data-trend-compare-search="${index}" data-trend-compare-key="${escapeHtml(key)}" placeholder="Search ${escapeHtml(label.toLowerCase())}" aria-label="Search ${escapeHtml(label)} values" />` : ""}
+                            <div class="trendCollectionFilterActions"><button type="button" data-trend-compare-action="all" data-trend-compare-index="${index}" data-trend-compare-key="${escapeHtml(key)}">Select all</button><button type="button" data-trend-compare-action="clear" data-trend-compare-index="${index}" data-trend-compare-key="${escapeHtml(key)}">Clear</button></div>
+                            <div class="trendCollectionFilterOptions">${visibleOptions.map((value) => {
+                              const selected = group.filters[key].has(value);
+                              const unavailable = !available.has(value);
+                              return `<label class="trendCollectionFilterOption${unavailable ? " is-unavailable" : ""}"><input type="checkbox" value="${escapeHtml(value)}" data-trend-compare-value="${index}" data-trend-compare-key="${escapeHtml(key)}"${selected ? " checked" : ""}${unavailable && !selected ? " disabled" : ""} /><span>${escapeHtml(value)}</span></label>`;
+                            }).join("") || `<div class="trendCollectionFilterOption is-unavailable">No matching options</div>`}</div>
+                          </div>
+                        </details>
+                        <button type="button" class="trendComparisonFilterRemove" data-trend-compare-remove="${index}" data-trend-compare-key="${escapeHtml(key)}" aria-label="Remove ${escapeHtml(label)} filter" title="Remove ${escapeHtml(label)} filter"><i class="bi bi-x" aria-hidden="true"></i></button>
+                      </div>`;
+                    }).join("")}
+                    ${availableDefinitions.length ? `<details class="trendComparisonAddFilter" data-trend-compare-add="${index}">
+                      <summary><i class="bi bi-plus-lg" aria-hidden="true"></i>Add filter</summary>
+                      <div class="trendComparisonAddMenu">${availableDefinitions.map(({ key, label }) => `<button type="button" data-trend-compare-add-filter="${index}" data-trend-compare-key="${escapeHtml(key)}">${escapeHtml(label)}</button>`).join("")}</div>
+                    </details>` : ""}
+                    ${selectedDefinitions.length ? "" : `<div class="trendComparisonPlaceholder">Add Agent, Customer, or another filter.</div>`}
+                  </div>
+                </section>`;
+            }).join("")}
+          </div>
+          <div class="trendComparisonStatus${isReady ? " is-ready" : ""}">${isReady ? "Comparison is active. Colours identify cohorts; line style identifies the original measure." : "Configure both cohorts to compare their trends."}</div>`;
+      };
+
+      toggle.addEventListener("click", () => {
+        comparisonState.enabled = !comparisonState.enabled;
+        sync();
+        rerender();
+      });
+      panel.addEventListener("change", (event) => {
+        const checkbox = event.target.closest("[data-trend-compare-value]");
+        if (!(checkbox instanceof HTMLInputElement)) return;
+        const index = Number(checkbox.dataset.trendCompareValue);
+        const key = checkbox.dataset.trendCompareKey;
+        const group = comparisonState.groups[index];
+        if (!group?.filters?.[key]) return;
+        if (checkbox.checked) group.filters[key].add(checkbox.value);
+        else group.filters[key].delete(checkbox.value);
+        sync();
+        rerender();
+      });
+      panel.addEventListener("click", (event) => {
+        const action = event.target.closest("[data-trend-compare-action]");
+        if (action) {
+          const index = Number(action.dataset.trendCompareIndex);
+          const key = action.dataset.trendCompareKey;
+          const group = comparisonState.groups[index];
+          if (!group?.filters?.[key]) return;
+          group.filters[key] = action.dataset.trendCompareAction === "clear" ? new Set() : new Set(catalogs[key] || []);
+          sync();
+          rerender();
+          return;
+        }
+        const add = event.target.closest("[data-trend-compare-add-filter]");
+        if (add) {
+          const index = Number(add.dataset.trendCompareAddFilter);
+          const key = add.dataset.trendCompareKey;
+          if (!comparisonState.groups[index] || !definitions.some((definition) => definition.key === key)) return;
+          comparisonState.groups[index].filters[key] = new Set();
+          sync();
+          rerender();
+          return;
+        }
+        const remove = event.target.closest("[data-trend-compare-remove]");
+        if (remove) {
+          const index = Number(remove.dataset.trendCompareRemove);
+          const key = remove.dataset.trendCompareKey;
+          delete comparisonState.groups[index]?.filters?.[key];
+          delete searches[index]?.[key];
+          sync();
+          rerender();
+          return;
+        }
+        const reset = event.target.closest("[data-trend-compare-reset]");
+        if (reset) {
+          comparisonState.groups = [{ filters: {} }, { filters: {} }];
+          searches[0] = {};
+          searches[1] = {};
+          sync();
+          rerender();
+        }
+      });
+      panel.addEventListener("input", (event) => {
+        const input = event.target.closest("[data-trend-compare-search]");
+        if (!(input instanceof HTMLInputElement)) return;
+        const index = Number(input.dataset.trendCompareSearch);
+        const key = input.dataset.trendCompareKey;
+        if (!comparisonState.groups[index]?.filters?.[key]) return;
+        searches[index][key] = input.value;
+        const term = input.value.trim().toLowerCase();
+        input.closest(".trendComparisonValueMenu")?.querySelectorAll(".trendCollectionFilterOption").forEach((option) => {
+          const text = option.querySelector("span")?.textContent?.toLowerCase() || "";
+          option.hidden = Boolean(term && !text.includes(term));
+        });
+      });
+      panel.addEventListener("toggle", (event) => {
+        const details = event.target;
+        if (details instanceof HTMLDetailsElement && details.open) closeGroupMenus(details);
+      }, true);
+      return { sync, getComparison: () => comparisonState };
+    };
+
+    comparisonWorkspaces.collection = createComparisonWorkspace({
+      id: "collection", definitions: collectionFilterDefinitions, catalogs: collectionCatalogs, filtersKey: "collectionFilters", enabledKey: "collectionFilterEnabled",
+      tray: collectionFilterTray, chips: collectionFilterChips, getRows: getCurrentCollectionRows, rowMatches: collectionRowMatches, rerender: () => syncCollectionWorkspace(),
+      seriesKey: [{ label: "Collection", style: "solid" }, { label: "New Billing", style: "dashed" }, { label: "PTP Target", style: "dotted" }]
+    });
+    comparisonWorkspaces.planPortfolio = createComparisonWorkspace({
+      id: "planPortfolio", definitions: planPortfolioFilterDefinitions, catalogs: planPortfolioCatalogs, filtersKey: "planPortfolioFilters", enabledKey: "planPortfolioFilterEnabled",
+      tray: planPortfolioFilterTray, chips: planPortfolioFilterChips, getRows: getCurrentPlanPortfolioRows, rowMatches: planPortfolioRowMatches, rerender: () => syncPlanPortfolioWorkspace()
+    });
+    comparisonWorkspaces.visits = createComparisonWorkspace({
+      id: "visits", definitions: visitsAllFilterDefinitions, catalogs: visitsCatalogs, filtersKey: "visitsFilters", enabledKey: "visitsFilterEnabled",
+      tray: visitsFilterTray, chips: visitsFilterChips, getRows: getCurrentVisitsRows, rowMatches: visitsRowMatches, rerender: () => syncVisitsWorkspace()
+    });
+    comparisonWorkspaces.invoiceSubmission = createComparisonWorkspace({
+      id: "invoiceSubmission", definitions: invoiceSubmissionFilterDefinitions, catalogs: invoiceSubmissionCatalogs, filtersKey: "invoiceSubmissionFilters", enabledKey: "invoiceSubmissionFilterEnabled",
+      tray: invoiceSubmissionFilterTray, chips: invoiceSubmissionFilterChips, getRows: getCurrentInvoiceSubmissionRows, rowMatches: invoiceSubmissionRowMatches, rerender: () => syncInvoiceSubmissionWorkspace()
+    });
+    comparisonWorkspaces.agingBuckets = createComparisonWorkspace({
+      id: "agingBuckets", definitions: agingBucketsFilterDefinitions, catalogs: agingBucketsCatalogs, filtersKey: "agingBucketsFilters", enabledKey: "agingBucketsFilterEnabled",
+      tray: agingBucketsFilterTray, chips: agingBucketsFilterChips, getRows: getCurrentAgingBucketsRows, rowMatches: agingBucketsRowMatches, rerender: () => syncAgingBucketsWorkspace()
+    });
+    comparisonWorkspaces.cnAdv = createComparisonWorkspace({
+      id: "cnAdv", definitions: cnAdvFilterDefinitions, catalogs: cnAdvCatalogs, filtersKey: "cnAdvFilters", enabledKey: "cnAdvFilterEnabled",
+      tray: cnAdvFilterTray, chips: cnAdvFilterChips, getRows: getCurrentCnAdvRows, rowMatches: cnAdvRowMatches, rerender: () => syncCnAdvWorkspace()
+    });
+    comparisonWorkspaces.provisioning = createComparisonWorkspace({
+      id: "provisioning", definitions: financialRiskFilterDefinitions, catalogs: financialRiskCatalogs, filtersKey: "provisioningFilters", enabledKey: "provisioningFilterEnabled",
+      tray: provisioningFilterTray, chips: provisioningFilterChips, getRows: () => state.currentTrendPoints.flatMap((point) => point.collectionBreakdown || []), rowMatches: financialRiskRowMatches, rerender: () => provisioningWorkspace?.sync()
+    });
+    comparisonWorkspaces.writtenOff = createComparisonWorkspace({
+      id: "writtenOff", definitions: financialRiskFilterDefinitions, catalogs: financialRiskCatalogs, filtersKey: "writtenOffFilters", enabledKey: "writtenOffFilterEnabled",
+      tray: writtenOffFilterTray, chips: writtenOffFilterChips, getRows: () => state.currentTrendPoints.flatMap((point) => point.collectionBreakdown || []), rowMatches: financialRiskRowMatches, rerender: () => writtenOffWorkspace?.sync()
+    });
+
     const render = () => {
       syncTrendControls();
       const periodData = getPeriodData(
@@ -3374,9 +3853,13 @@
         getActivePeriodKey(),
         usesMultiPeriodSelect ? state.selectedPeriods[state.range] : null
       );
+      const globalPeriodGroups = getGlobalPeriodComparisonGroups();
+      state.currentGlobalPeriodComparison = globalPeriodGroups
+        ? { range: state.range, groups: globalPeriodGroups }
+        : null;
 
       setText("trendSelectedPeriod", periodData.label || `${rangeLabels[state.range] || "Yearly"} | ${state.activeYear}`);
-      state.currentTrendPoints = periodData.points;
+      state.currentTrendPoints = globalPeriodGroups?.[0]?.points || periodData.points;
       if (usesCollectionWorkspace) syncCollectionWorkspace(null, false);
       if (usesPlanPortfolioWorkspace) syncPlanPortfolioWorkspace(null, false);
       if (usesVisitsWorkspace) syncVisitsWorkspace(null, false);
@@ -3855,6 +4338,27 @@
       resetStatusDrill();
       if (state.isTrendsVisible) render();
       else syncMultiPeriodSelect();
+    });
+    globalPeriodCompareToggle?.addEventListener("click", () => {
+      if (globalPeriodCompareToggle.disabled) return;
+      state.globalPeriodComparison.enabled = !state.globalPeriodComparison.enabled;
+      syncGlobalPeriodCompare();
+      resetStatusDrill();
+      if (state.isTrendsVisible) render();
+    });
+    globalPeriodCompareSelects.forEach((select) => {
+      select.addEventListener("change", () => {
+        const nextValues = globalPeriodCompareSelects.map((picker) => picker.value);
+        if (nextValues[0] === nextValues[1]) {
+          const alternatives = getMultiPeriodOptions().map((option) => option.value)
+            .filter((value) => value !== nextValues[0]);
+          nextValues[select.dataset.globalPeriodComparison === "a" ? 0 : 1] = alternatives[0] || nextValues[select.dataset.globalPeriodComparison === "a" ? 1 : 0];
+        }
+        state.globalPeriodComparison.values = nextValues;
+        resetStatusDrill();
+        if (state.isTrendsVisible) render();
+        else syncGlobalPeriodCompare();
+      });
     });
     $("trendPrevYearBtn")?.addEventListener("click", () => setActiveYear(state.activeYear - 1));
     $("trendNextYearBtn")?.addEventListener("click", () => setActiveYear(state.activeYear + 1));
