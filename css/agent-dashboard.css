@@ -142,6 +142,8 @@ body.motion-preload .dashboardCard {
 
 .heroActions {
   display: flex;
+  flex-direction: column;
+  align-items: flex-end;
   gap: 10px;
 }
 
@@ -1824,11 +1826,112 @@ body.motion-preload .dashboardCard {
   background: #ffffff;
 }
 
+.vintageDetailLayout {
+  display: grid;
+  grid-template-columns: minmax(240px, 25%) minmax(0, 1fr);
+  gap: 24px;
+  align-items: center;
+  min-height: 520px;
+}
+
+.vintageDetailComposition {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.vintageDetailDonutWrap {
+  width: min(100%, 230px);
+  aspect-ratio: 1;
+}
+
+.vintageDetailDonutWrap canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.vintageDetailLegend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px 10px;
+  max-width: 280px;
+}
+
+.vintageDetailLegendItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #64748b;
+  font-size: 9px;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.vintageDetailLegendDot,
+.vintageBucketDot {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 8px;
+  border-radius: 50%;
+  background: var(--vintage-bucket-color, #2563eb);
+}
+
+.vintageDetailTablePane {
+  min-width: 0;
+}
+
+.vintageDetailToolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 0 0 10px;
+}
+
+.vintageDetailSearch {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  width: min(100%, 310px);
+  min-height: 30px;
+  padding: 0 10px;
+  border: 1px solid #dbe4f0;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #94a3b8;
+}
+
+.vintageDetailSearch input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  color: #334155;
+  font-size: 11px;
+  background: transparent;
+}
+
+.vintageDetailSearch input::placeholder {
+  color: #94a3b8;
+}
+
+.vintageDetailSummary {
+  color: #475569;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: right;
+  white-space: nowrap;
+}
+
 .vintageDetailTableWrap {
   border: 1px solid #e2e8f4;
-  border-radius: 10px;
+  border-radius: 8px;
   overflow: auto;
-  max-height: 620px;
+  max-height: 520px;
 }
 
 .vintageDetailTable {
@@ -1849,12 +1952,27 @@ body.motion-preload .dashboardCard {
 .vintageDetailTable th {
   position: sticky;
   top: 0;
-  background: #f8fafc;
+  background: #5c258d;
   font-size: 11px;
   font-weight: 700;
-  color: #475569;
+  color: #ffffff;
   z-index: 1;
   text-align: center;
+}
+
+.vintageDetailTable tbody tr:nth-child(even) {
+  background: #f8fafc;
+}
+
+.vintageDetailTable tbody tr:hover {
+  background: #f1f5ff;
+}
+
+.vintageBucketName {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-weight: 600;
 }
 
 .vintageDetailTable th:nth-child(2),
@@ -1896,7 +2014,7 @@ body.motion-preload .dashboardCard {
   display: block;
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(90deg, #5c258d 0%, #2563eb 100%);
+  background: var(--vintage-bucket-color, #2563eb);
 }
 
 .vintageBucketBarText {
@@ -1917,6 +2035,21 @@ body.motion-preload .dashboardCard {
 
 .vintageDetailTable td:nth-child(6) .vintageBucketShareCell {
   margin: 0 auto;
+}
+
+#chartDetailModal.is-vintage-detail .modal-dialog {
+  max-width: min(1520px, 97vw);
+}
+
+#chartDetailModal.is-vintage-detail .modal-content {
+  height: auto;
+  min-height: 0;
+  max-height: min(86vh, 850px);
+}
+
+#chartDetailModal.is-vintage-detail .modal-body {
+  padding: 12px 16px 16px;
+  overflow: auto;
 }
 
 #chartDetailModal .modal-dialog {
@@ -3181,6 +3314,25 @@ body.motion-preload .dashboardCard {
   gap: 10px;
 }
 
+.mtdModalSubtotal {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 5px 9px;
+  border: 1px solid #e2e8f4;
+  border-radius: 6px;
+  background: #f8fafc;
+  color: #64748b;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.mtdModalSubtotal strong {
+  color: #1e293b;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
 .mtdIssueTrackerBtn {
   padding: 6px 10px;
   font-size: 11px;
@@ -3331,7 +3483,58 @@ body.motion-preload .dashboardCard {
 
 .mtdCollectionTable .amountCell {
   text-align: right;
+  padding-right: 14px;
   font-variant-numeric: tabular-nums;
+}
+
+.mtdCollectionTable thead #mtdInvoiceValueHeader,
+.mtdCollectionTable thead #mtdAmountForMonthHeader,
+.mtdCollectionTable thead #mtdTotalNetDueHeader,
+.mtdCollectionTable thead #mtdValueColumnHeader:not(.is-text-column) {
+  text-align: right;
+  padding-right: 14px;
+}
+
+.mtdCollectionTable thead #mtdValueColumnHeader.is-text-column {
+  text-align: left;
+  padding-right: 8px;
+}
+
+.mtdCollectionTable .mtdColumnSubtotalRow th {
+  padding: 7px 14px 7px 8px;
+  background: #f3e8ff !important;
+  color: #4c1d95 !important;
+  font-size: 10px;
+  font-weight: 600;
+  text-align: right;
+  vertical-align: bottom;
+  white-space: nowrap;
+  border-top: 1px solid #e9d5ff;
+  border-bottom: 1px solid #d8b4fe;
+}
+
+.mtdCollectionTable .mtdColumnSubtotalRow th strong {
+  display: block;
+  color: #24113d !important;
+  font-size: 12px;
+  line-height: 1.25;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.mtdCollectionTable .mtdColumnSubtotalRow th:first-child {
+  padding-left: 10px;
+  padding-right: 10px;
+  text-align: left;
+}
+
+.mtdCollectionTable .mtdColumnSubtotalRow .mtdColumnSubtotalLabel {
+  display: block;
+  color: #4c1d95 !important;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.25;
+  text-align: left;
 }
 
 .mtdCollectionTable th:last-child,
@@ -3454,6 +3657,27 @@ body.motion-preload .dashboardCard {
 }
 
 @media (max-width: 900px) {
+  .vintageDetailLayout {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .vintageDetailComposition {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  .vintageDetailDonutWrap {
+    width: 190px;
+    flex: 0 0 190px;
+  }
+
+  .vintageDetailLegend {
+    justify-content: flex-start;
+    max-width: none;
+  }
+
   .dashboardHero {
     flex-direction: column;
     align-items: flex-start;
@@ -3495,6 +3719,35 @@ body.motion-preload .dashboardCard {
 }
 
 @media (max-width: 540px) {
+  .vintageDetailLayout {
+    gap: 16px;
+    min-height: 0;
+  }
+
+  .vintageDetailComposition {
+    flex-direction: column;
+  }
+
+  .vintageDetailDonutWrap {
+    width: 210px;
+    flex-basis: auto;
+  }
+
+  .vintageDetailToolbar {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .vintageDetailSearch {
+    width: 100%;
+  }
+
+  .vintageDetailSummary {
+    text-align: left;
+    white-space: normal;
+  }
+
   .trendChartWrap {
     height: 210px;
   }

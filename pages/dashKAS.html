@@ -1206,9 +1206,9 @@
                 <th>Customer code</th>
                 <th>Customer name</th>
                 <th>Invoice No</th>
-                <th>Invoice value</th>
+                <th id="mtdInvoiceValueHeader">Invoice value</th>
                 <th id="mtdAmountForMonthHeader">Amount for the month</th>
-                <th>Total net due</th>
+                <th id="mtdTotalNetDueHeader">Total net due</th>
                 <th>Invoice date</th>
                 <th>Due date</th>
                 <th id="mtdAgingDaysHeader" hidden>Aging days</th>
@@ -1330,7 +1330,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<script src="../scripts/shared-header.js"></script>
+<script src="../scripts/shared-header.js?v=20260730-tutorials"></script>
 <script>
   (() => {
     const brand = getComputedStyle(document.documentElement).getPropertyValue("--brand").trim() || "#5c258d";
@@ -5515,6 +5515,43 @@
       if (mtdNextBtn) mtdNextBtn.disabled = mtdCurrentPage >= totalPages || !totalRows;
     };
 
+    const updateMtdColumnSubtotals = (rows, { showAmountForMonthColumn, showValueColumn, valueIsAmount, valueField }) => {
+      const headerRow = document.getElementById("mtdCollectionsHeaderRow");
+      if (!headerRow || !headerRow.parentElement) return;
+      let subtotalRow = document.getElementById("mtdColumnSubtotalRow");
+      if (!subtotalRow) {
+        subtotalRow = document.createElement("tr");
+        subtotalRow.id = "mtdColumnSubtotalRow";
+        subtotalRow.className = "mtdColumnSubtotalRow";
+      }
+      headerRow.parentElement.insertBefore(subtotalRow, headerRow);
+
+      const totals = {
+        mtdInvoiceValueHeader: rows.reduce((sum, row) => sum + Number(row.invoiceValue || 0), 0),
+        mtdAmountForMonthHeader: rows.reduce((sum, row) => sum + Number(row.amountForMonth || 0), 0),
+        mtdTotalNetDueHeader: rows.reduce((sum, row) => sum + Number(row.totalNetDue || 0), 0),
+        mtdValueColumnHeader: rows.reduce((sum, row) => sum + Number(row[valueField] || 0), 0)
+      };
+      subtotalRow.innerHTML = "";
+      Array.from(headerRow.children).forEach((headerCell) => {
+        const subtotalCell = document.createElement("th");
+        subtotalCell.hidden = headerCell.hidden;
+        const headerId = headerCell.id;
+        const isVisibleAmount = headerId === "mtdInvoiceValueHeader"
+          || headerId === "mtdTotalNetDueHeader"
+          || (headerId === "mtdAmountForMonthHeader" && showAmountForMonthColumn)
+          || (headerId === "mtdValueColumnHeader" && showValueColumn && valueIsAmount);
+        if (isVisibleAmount) {
+          subtotalCell.innerHTML = `<strong>${formatCurrency(totals[headerId] || 0)}</strong>`;
+        } else if (headerCell === headerRow.firstElementChild) {
+          subtotalCell.innerHTML = '<span class="mtdColumnSubtotalLabel">Subtotal</span>';
+        } else {
+          subtotalCell.setAttribute("aria-hidden", "true");
+        }
+        subtotalRow.appendChild(subtotalCell);
+      });
+    };
+
     const renderMtdCollectionsTable = () => {
       if (!mtdTableBody) return;
       const searchValue = mtdFilters.search.trim().toLowerCase();
@@ -5556,6 +5593,7 @@
       if (mtdValueColumnHeader) {
         mtdValueColumnHeader.hidden = !showValueColumn;
         mtdValueColumnHeader.textContent = activeConfig.valueColumnLabel || "Committed amount";
+        mtdValueColumnHeader.classList.toggle("is-text-column", !valueIsAmount);
       }
       if (mtdAgingDaysHeader) mtdAgingDaysHeader.textContent = activeConfig.agingColumnLabel || "Aging days";
       if (mtdStatusHeader) {
@@ -5607,6 +5645,12 @@
           || String(row.primaryStatus || "").toLowerCase().includes(searchValue)
           || String(row.status || "").toLowerCase().includes(searchValue);
         return dueMatches && statusMatches && commitmentMatches && managerMatches && kamMatches && kasMatches && agingMatches && searchMatches;
+      });
+      updateMtdColumnSubtotals(filteredRows, {
+        showAmountForMonthColumn,
+        showValueColumn,
+        valueIsAmount,
+        valueField
       });
       const totalRows = filteredRows.length;
       const totalPages = Math.max(1, Math.ceil(totalRows / mtdPageSize));

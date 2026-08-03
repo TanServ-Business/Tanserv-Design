@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
   <link rel="stylesheet" href="../css/styles.css" />
   <link rel="stylesheet" href="../bin/IssueTracker/css/style.css" />
-  <link rel="stylesheet" href="../css/issuetrackerLP.css" />
+  <link rel="stylesheet" href="../css/issuetrackerLP.css?v=20260803-required-document-pills" />
   <link rel="stylesheet" href="../css/shared-header.css" />
 </head>
 <body class="issueTrackerPage issueTrackerDetailPage" data-root-path="../" data-relationship-name="Issue Tracker" data-relationship-badge="IT">
@@ -46,7 +46,29 @@
 
       <div class="issueWorkspaceGrid">
         <aside class="issueListPanel" aria-labelledby="issue-list-title">
-          <h3 id="issue-list-title">Issue cards</h3>
+          <div class="issueListHeader">
+            <h3 id="issue-list-title">Issue cards</h3>
+            <div class="issueCardFilterBar" id="detail-issue-filter-bar" aria-label="Issue card filters">
+              <details class="filterDropdown" data-detail-filter-group="approval">
+                <summary>Approval <span class="filterBadge">All</span></summary>
+                <div class="filterMenu">
+                  <button class="filterItem" type="button" data-detail-filter-group="approval" data-detail-filter-value="all">All</button>
+                  <button class="filterItem" type="button" data-detail-filter-group="approval" data-detail-filter-value="pending">Pending</button>
+                  <button class="filterItem" type="button" data-detail-filter-group="approval" data-detail-filter-value="approved">Approved</button>
+                  <button class="filterItem" type="button" data-detail-filter-group="approval" data-detail-filter-value="rejected">Rejected</button>
+                </div>
+              </details>
+              <details class="filterDropdown" data-detail-filter-group="action">
+                <summary>Action <span class="filterBadge">All</span></summary>
+                <div class="filterMenu">
+                  <button class="filterItem" type="button" data-detail-filter-group="action" data-detail-filter-value="all">All</button>
+                  <button class="filterItem" type="button" data-detail-filter-group="action" data-detail-filter-value="my-actionable">My Actionable</button>
+                  <button class="filterItem" type="button" data-detail-filter-group="action" data-detail-filter-value="no-action-required">No Action Required</button>
+                  <button class="filterItem" type="button" data-detail-filter-group="action" data-detail-filter-value="resolution-provided">Resolution Provided</button>
+                </div>
+              </details>
+            </div>
+          </div>
           <div class="issueListActions">
             <button id="toggle-archived-issues" class="issueListToggle" type="button">Show closed issues</button>
           </div>
@@ -197,7 +219,7 @@
     <small>Generated on <time id="generated-time"></time></small>
   </footer>
 
-  <script src="../scripts/shared-header.js"></script>
-  <script src="../bin/IssueTracker/js/app.js"></script>
+<script src="../scripts/shared-header.js?v=20260730-tutorials"></script>
+  <script src="../bin/IssueTracker/js/app.js?v=20260803-required-document-catalogue"></script>
 </body>
 </html>

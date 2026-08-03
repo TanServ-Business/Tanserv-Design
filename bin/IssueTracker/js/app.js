@@ -238,6 +238,9 @@
   const invoicePagePrev = document.getElementById('invoice-page-prev');
   const invoicePageNext = document.getElementById('invoice-page-next');
   const invoicePageInfo = document.getElementById('invoice-page-info');
+  const invoicePageCurrent = document.getElementById('invoice-page-current');
+  const issueFilterBar = document.getElementById('issue-filter-bar');
+  const detailIssueFilterBar = document.getElementById('detail-issue-filter-bar');
   const issueList = document.getElementById('issue-list');
   const archivedToggle = document.getElementById('toggle-archived-issues');
   const archivedWrap = document.getElementById('archived-issues-wrap');
@@ -251,6 +254,7 @@
   const issuePanelSubtitle = document.getElementById('issue-panel-subtitle');
   const statInvoiceCount = document.getElementById('statInvoiceCount');
   const statInvoiceAmount = document.getElementById('statInvoiceAmount');
+  const statIssueScopeLabel = document.getElementById('statIssueScopeLabel');
   const statTotalIssues = document.getElementById('statTotalIssues');
   const statApprovalPending = document.getElementById('statApprovalPending');
   const statAssignedClient = document.getElementById('statAssignedClient');
@@ -279,6 +283,10 @@
   let selectedInvoiceId = null;
   let selectedIssueId = null;
   let invoiceSearchQuery = '';
+  let approvalStatusFilter = 'all';
+  let actionRequirementFilter = 'all';
+  let detailApprovalStatusFilter = 'all';
+  let detailActionRequirementFilter = 'all';
   let invoicePage = 1;
   const invoicePageSize = 10;
   const isDetailPage = document.body.classList.contains('issueTrackerDetailPage');
@@ -287,7 +295,7 @@
 
   // Utility: format dates and currency
   const fmtDate = (d) => new Date(d).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: '2-digit' });
-  const fmtCurrency = (n) => new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' }).format(n);
+  const fmtCurrency = (n) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(n);
   let trailIdSeed = 0;
   function ensureTrailId(entry) {
     if (entry && entry.trailId) return entry.trailId;
@@ -309,7 +317,8 @@
         id: file.id || `${trailId}_file_${idx + 1}`,
         name,
         url: file.url || '',
-        status: file.status || ''
+        status: file.status || '',
+        requirement: file.requirement || ''
       };
     }).filter(Boolean);
     entry.files = normalized;
@@ -322,6 +331,21 @@
     if (value === 'manager') return 'manager';
     if (value === 'action-owner' || value === 'action_owner' || value === 'action owner') return 'action-owner';
     return 'agent';
+  }
+
+  function normalizeIdentity(value) {
+    return String(value || '')
+      .replace(/\s*<[^>]*@[^>]*>\s*/g, ' ')
+      .replace(/\s*\([^)]*@[^)]*\)\s*/g, ' ')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, ' ')
+      .trim();
+  }
+
+  function identitiesMatch(left, right) {
+    const leftId = normalizeIdentity(left);
+    const rightId = normalizeIdentity(right);
+    return !!leftId && !!rightId && leftId === rightId;
   }
 
   function clearActionButtonHighlights() {
@@ -1064,21 +1088,119 @@
 
   function getFilteredInvoices() {
     const base = getInvoiceBaseList();
-    if (!invoiceSearchQuery) return base;
     return base.filter(inv => {
-      const firstIssue = getPrimaryIssue(inv);
-      const matrixName = firstIssue ? getApprovalMatrixName(firstIssue) : '';
-      const haystack = [
-        inv.id,
-        inv.customer,
-        inv.customerCode,
-        firstIssue && firstIssue.actionOwner ? firstIssue.actionOwner : '',
-        firstIssue && firstIssue.subStatus ? firstIssue.subStatus : '',
-        matrixName || '',
-        computeInvoiceDaysOpen(inv)
-      ].join(' ').toLowerCase();
-      return haystack.includes(invoiceSearchQuery);
+      const matchingIssues = getInvoiceIssuesForFilters(inv);
+      if (!matchingIssues.length) return false;
+      if (!invoiceSearchQuery) return true;
+      return matchingIssues.some((issue) => {
+        const haystack = [
+          inv.id,
+          inv.customer,
+          inv.customerCode,
+          issue.actionOwner || '',
+          issue.subStatus || '',
+          getApprovalMatrixName(issue) || '',
+          getIssuePendingWith(issue),
+          computeInvoiceDaysOpen(inv)
+        ].join(' ').toLowerCase();
+        return haystack.includes(invoiceSearchQuery);
+      });
     });
+  }
+
+  function getIssueApprovalState(issue) {
+    const request = getApprovalSummary(issue?.id);
+    const requestStatus = String(request?.status || '').toLowerCase();
+    if (requestStatus === 'pending' || requestStatus === 'approved' || requestStatus === 'rejected') {
+      return requestStatus;
+    }
+    const status = String(issue?.status || '').toLowerCase();
+    if (status === 'resolution provided' || status === 'resolved' || status === 'closed') return 'approved';
+    return Number(issue?.stage || 0) >= 1 ? 'approved' : 'pending';
+  }
+
+  function getIssuePendingWithInfo(issue) {
+    const status = String(issue?.status || '').toLowerCase();
+    if (status === 'resolution provided' || status === 'resolved' || status === 'closed') {
+      return { type: 'none', name: '-' };
+    }
+    const request = getApprovalSummary(issue?.id);
+    if (String(request?.status || '').toLowerCase() === 'pending') {
+      const level = request.currentLevel || 1;
+      const approver = request?.levels?.[level - 1] || {};
+      const fallbackNames = ['Anoop Sharma', 'Priya Verma', 'Rohit Malhotra'];
+      return {
+        type: 'approver',
+        name: approver.ownerName || fallbackNames[level - 1] || 'Approver'
+      };
+    }
+    if (Number(issue?.stage || 0) < 1) {
+      return { type: 'manager', name: issue?.manager || 'Meera Iyer' };
+    }
+    return { type: 'none', name: '-' };
+  }
+
+  function getIssuePendingWith(issue) {
+    return getIssuePendingWithInfo(issue).name;
+  }
+
+  function getIssueActionRequirement(issue) {
+    const status = String(issue?.status || '').toLowerCase();
+    if (status === 'resolution provided') return 'resolution-provided';
+    if (status === 'resolved' || status === 'closed') return 'no-action-required';
+
+    const pendingWith = getIssuePendingWithInfo(issue);
+    if (pendingWith.type === 'manager') {
+      return currentRole === 'manager' ? 'my-actionable' : 'no-action-required';
+    }
+
+    const request = getApprovalSummary(issue?.id);
+    if (pendingWith.type === 'approver') {
+      const activeApprover = localStorage.getItem('approver_active_user') || '';
+      const currentApprover = request?.levels?.[(request.currentLevel || 1) - 1] || {};
+      return identitiesMatch(activeApprover, currentApprover.ownerEmail || currentApprover.ownerName)
+        ? 'my-actionable'
+        : 'no-action-required';
+    }
+
+    const activeUser = localStorage.getItem('activeUserName') || '';
+    if (issue?.actionOwner) {
+      return currentRole === 'action-owner' || identitiesMatch(activeUser, issue.actionOwner)
+        ? 'my-actionable'
+        : 'no-action-required';
+    }
+    return currentRole === 'agent' ? 'my-actionable' : 'no-action-required';
+  }
+
+  function getInvoiceIssuesForFilters(invoice) {
+    const issues = showClosedInvoices ? getAllIssues(invoice) : getDisplayIssues(invoice);
+    return issues.filter((issue) => {
+      const approvalMatches = approvalStatusFilter === 'all'
+        || getIssueApprovalState(issue) === approvalStatusFilter;
+      const actionMatches = actionRequirementFilter === 'all'
+        || getIssueActionRequirement(issue) === actionRequirementFilter;
+      return approvalMatches && actionMatches;
+    });
+  }
+
+  function getInvoiceTableIssue(invoice) {
+    return getInvoiceIssuesForFilters(invoice)[0] || getPrimaryIssue(invoice);
+  }
+
+  function matchesDetailIssueFilters(issue) {
+    const approvalMatches = detailApprovalStatusFilter === 'all'
+      || getIssueApprovalState(issue) === detailApprovalStatusFilter;
+    const actionMatches = detailActionRequirementFilter === 'all'
+      || getIssueActionRequirement(issue) === detailActionRequirementFilter;
+    return approvalMatches && actionMatches;
+  }
+
+  function getDetailDisplayIssues(invoice) {
+    return getDisplayIssues(invoice).filter(matchesDetailIssueFilters);
+  }
+
+  function getDetailArchivedIssues(invoice) {
+    return getClosedIssues(invoice).filter(matchesDetailIssueFilters);
   }
 
   function getPagedInvoices() {
@@ -1096,10 +1218,11 @@
 
   function updatePaginationUI(totalPages, total) {
     if (invoicePageInfo) {
-      invoicePageInfo.textContent = total
-        ? `Page ${invoicePage} of ${totalPages}`
-        : 'No results';
+      const start = total ? ((invoicePage - 1) * invoicePageSize) + 1 : 0;
+      const end = total ? Math.min(invoicePage * invoicePageSize, total) : 0;
+      invoicePageInfo.textContent = `Showing ${start}–${end} of ${total}`;
     }
+    if (invoicePageCurrent) invoicePageCurrent.textContent = String(invoicePage);
     if (invoicePagePrev) invoicePagePrev.disabled = invoicePage <= 1;
     if (invoicePageNext) invoicePageNext.disabled = invoicePage >= totalPages;
   }
@@ -1150,8 +1273,10 @@
       inv,
       activeIssues: getDisplayIssues(inv)
     })).filter(entry => entry.activeIssues.length > 0);
-    const totalIssues = invoicesWithIssues.reduce((sum, entry) => sum + entry.activeIssues.length, 0);
-    const totalAmount = invoicesWithIssues.reduce((sum, entry) => sum + (entry.inv.total || 0), 0);
+    const openIssues = invoicesWithIssues.reduce((sum, entry) => sum + entry.activeIssues.length, 0);
+    const closedIssues = data.reduce((sum, inv) => sum + getClosedIssues(inv).length, 0);
+    const scopedIssueCount = showClosedInvoices ? closedIssues : openIssues;
+    const totalAmount = invoicesWithIssues.reduce((sum, entry) => sum + (getInvoiceDueAmount(entry.inv) || 0), 0);
     const pendingApprovals = loadApprovalRequests().filter(req => req && req.status === 'pending').length;
     const assignedToClient = invoicesWithIssues.reduce((sum, entry) => {
       const count = entry.activeIssues.filter(iss => (iss.stage || 0) >= 2).length;
@@ -1159,10 +1284,11 @@
     }, 0);
     if (statInvoiceCount) statInvoiceCount.textContent = invoicesWithIssues.length;
     if (statInvoiceAmount) statInvoiceAmount.textContent = fmtCurrency(totalAmount);
-    if (statTotalIssues) statTotalIssues.textContent = totalIssues;
+    if (statIssueScopeLabel) statIssueScopeLabel.textContent = showClosedInvoices ? 'Closed issues' : 'Open issues';
+    if (statTotalIssues) statTotalIssues.textContent = scopedIssueCount;
     if (statApprovalPending) statApprovalPending.textContent = pendingApprovals;
     if (statAssignedClient) statAssignedClient.textContent = assignedToClient;
-    try { localStorage.setItem(ISSUE_TRACKER_TOTAL_KEY, String(totalIssues)); } catch (_) {}
+    try { localStorage.setItem(ISSUE_TRACKER_TOTAL_KEY, String(openIssues)); } catch (_) {}
   }
 
   function renderInvoices(invoices) {
@@ -1175,15 +1301,12 @@
         tr.tabIndex = 0;
         let dueAmount = getInvoiceDueAmount(inv);
         const displayIssues = getDisplayIssues(inv);
-        const firstIssue = getPrimaryIssue(inv);
+        const firstIssue = getInvoiceTableIssue(inv);
+        const pendingWith = getIssuePendingWithInfo(firstIssue);
         if (dueAmount == null && firstIssue && firstIssue.invoiceDueAmount != null) {
           const parsed = Number(firstIssue.invoiceDueAmount);
           dueAmount = Number.isFinite(parsed) ? parsed : dueAmount;
         }
-        const actionOwner = firstIssue && firstIssue.actionOwner ? firstIssue.actionOwner : '-';
-        const actionOwnerLabel = actionOwner === '-' ? '-' : (formatActionOwner(actionOwner) || '-');
-        const approvalMatrix = firstIssue ? (getApprovalMatrixName(firstIssue) || '-') : '-';
-        const subStatus = firstIssue && firstIssue.subStatus ? firstIssue.subStatus : '-';
         const customerName = inv.customer || '-';
         const customerCode = inv.customerCode || '-';
         const issueOpenDays = computeInvoiceDaysOpen(inv);
@@ -1193,16 +1316,27 @@
         const totalValue = Number.isFinite(Number(inv.total)) && Number(inv.total) > 0
           ? Number(inv.total)
           : (fallbackTotal != null ? fallbackTotal : Number(inv.total || 0));
+        const invoiceDueDate = getInvoiceDueDate(inv);
+        const formatTableDate = (value) => {
+          if (!value || Number.isNaN(new Date(value).getTime())) return '-';
+          const date = new Date(value);
+          return [
+            String(date.getDate()).padStart(2, '0'),
+            String(date.getMonth() + 1).padStart(2, '0'),
+            date.getFullYear()
+          ].join('-');
+        };
         tr.innerHTML = `
           <td>${customerCode}</td>
           <td>${customerName}</td>
           <td>${inv.id}</td>
+          <td>${formatTableDate(inv.date)}</td>
+          <td>${formatTableDate(invoiceDueDate)}</td>
           <td>${fmtCurrency(totalValue)}</td>
           <td>${dueAmount != null ? fmtCurrency(dueAmount) : '-'}</td>
-          <td>${actionOwnerLabel}</td>
-          <td>${approvalMatrix}</td>
+          <td>${displayIssues.length}</td>
+          <td><span class="pendingWithPill ${pendingWith.type === 'manager' ? 'pendingWithPill--manager' : (pendingWith.type === 'approver' ? 'pendingWithPill--approver' : '')}">${pendingWith.name}</span></td>
           <td>${issueOpenDays}</td>
-          <td>${subStatus}</td>
           <td><button class="btnSecondary viewIssueBtn" type="button">View issues</button></td>
         `;
         tr.addEventListener('click', () => {
@@ -1343,7 +1477,7 @@
       archivedWrap.setAttribute('aria-hidden', 'true');
       return;
     }
-    const closedIssues = invoice ? getClosedIssues(invoice) : [];
+    const closedIssues = invoice ? getDetailArchivedIssues(invoice) : [];
     archivedList.innerHTML = '';
     if (!closedIssues.length) {
       const empty = document.createElement('li');
@@ -1534,7 +1668,7 @@
 
   // Helper: refresh issues list and preserve current selection
   function refreshIssueListFor(invoice, issueId) {
-    const issues = invoice ? getDisplayIssues(invoice) : [];
+    const issues = invoice ? getDetailDisplayIssues(invoice) : [];
     renderIssues(issues);
     renderArchivedIssues(invoice);
     if (issueId) {
@@ -1603,7 +1737,106 @@
         <div class="field"><span class="label">Region</span><span class="value">${issue.region || '-'}</span></div>
       </div>
       <hr />
+      <section class="issueDocuments" aria-label="Issue documents">
+        <div class="issueDocumentsHeader">
+          <span class="label">Documents</span>
+        </div>
+        <div id="issue-document-pills" class="issueDocumentPills"></div>
+        <input id="issue-document-add-input" type="file" multiple class="issueDocumentInput" aria-label="Upload issue document" />
+      </section>
     `;
+
+    const documentRequirements = [
+      { id: 'invoice', label: 'Invoice', scope: 'Invoice level' },
+      { id: 'delivery-challan', label: 'Delivery Challan', scope: 'Invoice level' },
+      { id: 'payment-receipt', label: 'Payment Receipt', scope: 'Invoice level' },
+      { id: 'purchase-order', label: 'Purchase Order', scope: 'Customer level' },
+      { id: 'agreement', label: 'Agreement', scope: 'Customer level' },
+      { id: 'contract', label: 'Contract', scope: 'Customer level' }
+    ];
+    const getIssueDocuments = () => (issue.actionTrail || []).flatMap((entry) => {
+      const trailId = ensureTrailId(entry);
+      return normalizeTrailFiles(entry).map((file) => ({
+        key: `${trailId}:${file.id}`,
+        name: file.name,
+        url: file.url || '',
+        source: entry.what || 'Uploaded document',
+        requirement: file.requirement || ''
+      }));
+    });
+    const getDocumentRequirementId = (document) => {
+      const explicit = String(document?.requirement || '').toLowerCase();
+      if (explicit === 'po-copy-required') return 'purchase-order';
+      if (documentRequirements.some((requirement) => requirement.id === explicit)) return explicit;
+      const reference = `${document?.name || ''} ${document?.source || ''}`.toLowerCase();
+      if (/delivery\s*challan|\bchallan\b|\bdc\b/.test(reference)) return 'delivery-challan';
+      if (/payment\s*receipt|\breceipt\b/.test(reference)) return 'payment-receipt';
+      if (/\bpo\b|purchase\s*order/.test(reference)) return 'purchase-order';
+      if (/\bagreement\b/.test(reference)) return 'agreement';
+      if (/\bcontract\b/.test(reference)) return 'contract';
+      if (/\binvoice\b|\binv[\s_-]/.test(reference)) return 'invoice';
+      return '';
+    };
+    const documentPills = document.getElementById('issue-document-pills');
+    const documentAddInput = document.getElementById('issue-document-add-input');
+    const issueDocuments = getIssueDocuments();
+    if (documentPills) {
+      documentPills.innerHTML = documentRequirements.map((requirement) => {
+        const document = issueDocuments.find((item) => getDocumentRequirementId(item) === requirement.id);
+        const isUploaded = !!document;
+        const action = isUploaded
+          ? `<button type="button" class="issueDocumentControl issueDocumentPreview" data-document-key="${document.key}" aria-label="Preview ${requirement.label}" title="Preview ${document.name}"><i class="bi bi-eye" aria-hidden="true"></i></button>`
+          : `<button type="button" class="issueDocumentControl issueDocumentAdd" data-document-requirement="${requirement.id}" aria-label="Add ${requirement.label}" title="Add ${requirement.label}"><i class="bi bi-plus-lg" aria-hidden="true"></i></button>`;
+        return `<span class="issueDocumentPill${isUploaded ? ' is-uploaded' : ''}"><span class="issueDocumentName">${requirement.label}</span>${action}</span>`;
+      }).join('');
+      documentPills.onclick = (event) => {
+        const previewBtn = event.target.closest('[data-document-key]');
+        if (previewBtn) {
+          const document = issueDocuments.find((item) => item.key === previewBtn.dataset.documentKey);
+          if (!document) return;
+          if (document.url) {
+            window.open(document.url, '_blank', 'noopener');
+          } else {
+            try { window.alert(`Preview for ${document.name} is not available after refresh in this demo.`); } catch (_) {}
+          }
+          return;
+        }
+        const addBtn = event.target.closest('[data-document-requirement]');
+        if (!addBtn || !documentAddInput) return;
+        documentAddInput.dataset.documentRequirement = addBtn.dataset.documentRequirement || '';
+        documentAddInput.click();
+      };
+    }
+    if (documentAddInput) {
+      documentAddInput.onchange = () => {
+        const files = Array.from(documentAddInput.files || []);
+        if (!files.length) return;
+        const requirementId = documentAddInput.dataset.documentRequirement || '';
+        const requirement = documentRequirements.find((item) => item.id === requirementId);
+        if (!requirement) return;
+        const entry = {
+          who: 'You',
+          what: `uploaded ${requirement.label}`,
+          type: 'document',
+          when: new Date().toISOString(),
+          files: []
+        };
+        const trailId = ensureTrailId(entry);
+        entry.files = files.map((file, index) => ({
+          id: `${trailId}_file_${index + 1}`,
+          name: file.name,
+          url: URL.createObjectURL(file),
+          status: '',
+          requirement: requirement.id
+        }));
+        issue.actionTrail = issue.actionTrail || [];
+        issue.actionTrail.push(entry);
+        documentAddInput.value = '';
+        delete documentAddInput.dataset.documentRequirement;
+        if (issue.isCustom) persistCustomIssue(issue, invoice);
+        renderDetails(invoice, issue);
+      };
+    }
 
     // Ensure launcher visible and action aside hidden until opened
     const launcher = document.getElementById('action-launcher');
@@ -2525,7 +2758,7 @@
         ? `${invoice.customer} - ${fmtDate(invoice.date)} - ${fmtCurrency(invoice.total)}`
         : 'Choose an invoice to load related issues.';
     }
-    const issues = invoice ? getDisplayIssues(invoice) : [];
+    const issues = invoice ? getDetailDisplayIssues(invoice) : [];
     if (isDetailPage) {
       renderIssueReasonCounts(issues);
     }
@@ -2559,6 +2792,30 @@
     const invoice = data.find(d => d.id === selectedInvoiceId);
     const issue = invoice ? getAllIssues(invoice).find(i => i.id === id) : null;
     renderDetails(invoice, issue);
+  }
+
+  function refreshDetailIssueCards() {
+    if (!isDetailPage || !selectedInvoiceId) return;
+    const invoice = data.find((item) => item.id === selectedInvoiceId);
+    if (!invoice) return;
+    const issues = getDetailDisplayIssues(invoice);
+    const archivedIssues = getDetailArchivedIssues(invoice);
+    renderIssueReasonCounts(issues);
+    renderIssues(issues);
+    renderArchivedIssues(invoice);
+    const selectedStillVisible = issues.some((issue) => issue.id === selectedIssueId)
+      || (archivedVisible && archivedIssues.some((issue) => issue.id === selectedIssueId));
+    if (selectedStillVisible) {
+      const selected = getAllIssues(invoice).find((issue) => issue.id === selectedIssueId) || null;
+      renderDetails(invoice, selected);
+      return;
+    }
+    if (issues.length) {
+      selectIssue(issues[0].id);
+      return;
+    }
+    selectedIssueId = null;
+    renderDetails(invoice, null);
   }
 
   // ===== Sort control wiring =====
@@ -2734,7 +2991,7 @@
   if (closedInvoiceToggle) {
     closedInvoiceToggle.addEventListener('click', () => {
       showClosedInvoices = !showClosedInvoices;
-      closedInvoiceToggle.textContent = showClosedInvoices ? 'Hide closed invoices' : 'Show closed invoices';
+      closedInvoiceToggle.textContent = showClosedInvoices ? 'Hide Archived' : 'Show Archived';
       renderInvoicesSortedAndPreserveSelection();
     });
   }
@@ -2743,6 +3000,37 @@
       invoiceSearchQuery = normalizeSearch(invoiceSearchInput.value);
       invoicePage = 1;
       renderInvoicesSortedAndPreserveSelection();
+    });
+  }
+  if (issueFilterBar) {
+    issueFilterBar.addEventListener('click', (event) => {
+      const button = event.target.closest('[data-filter-group][data-filter-value]');
+      if (!button) return;
+      const group = button.dataset.filterGroup;
+      const value = button.dataset.filterValue;
+      if (group === 'approval') approvalStatusFilter = value;
+      if (group === 'action') actionRequirementFilter = value;
+      const dropdown = button.closest('.filterDropdown');
+      const badge = dropdown?.querySelector('.filterBadge');
+      if (badge) badge.textContent = button.textContent.trim();
+      dropdown?.removeAttribute('open');
+      invoicePage = 1;
+      renderInvoicesSortedAndPreserveSelection();
+    });
+  }
+  if (detailIssueFilterBar) {
+    detailIssueFilterBar.addEventListener('click', (event) => {
+      const button = event.target.closest('[data-detail-filter-group][data-detail-filter-value]');
+      if (!button) return;
+      const group = button.dataset.detailFilterGroup;
+      const value = button.dataset.detailFilterValue;
+      if (group === 'approval') detailApprovalStatusFilter = value;
+      if (group === 'action') detailActionRequirementFilter = value;
+      const dropdown = button.closest('.filterDropdown');
+      const badge = dropdown?.querySelector('.filterBadge');
+      if (badge) badge.textContent = button.textContent.trim();
+      dropdown?.removeAttribute('open');
+      refreshDetailIssueCards();
     });
   }
   if (invoicePagePrev) {

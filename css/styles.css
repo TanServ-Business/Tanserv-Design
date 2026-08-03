@@ -3296,6 +3296,19 @@ button.notifyBadge {
 .colStatus {width: 150px;}
 .colActions {width: 125px;}
 
+.agingValue {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  padding: 2px 5px;
+  border-radius: 5px;
+  background: var(--aging-color, #64748b);
+  color: var(--aging-text-color, #ffffff);
+  font-weight: 800;
+  line-height: 1.15;
+}
+
 .invoiceTable td.colShort,
 .invoiceTable th.colShort {
   white-space: normal;
@@ -3774,6 +3787,12 @@ textarea { min-height: 70px; resize: vertical; }
 
 .collectionError.hidden {
   display: none;
+}
+
+.collectionFields .collectionFieldInvalid {
+  border-color: #dc2626;
+  background: #fff7f7;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
 }
 
 .collectionSingleFields.hidden {

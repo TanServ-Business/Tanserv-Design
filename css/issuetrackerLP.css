@@ -113,9 +113,9 @@
 
 .summaryCards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 10px;
-  margin-bottom: 16px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
 }
 
 .issueLandingGrid {
@@ -123,6 +123,10 @@
   grid-template-columns: 280px minmax(0, 1fr);
   gap: 16px;
   align-items: start;
+}
+
+.issueLandingGrid > .panelCard {
+  min-width: 0;
 }
 
 .quickInfoPanel {
@@ -140,7 +144,7 @@
 }
 
 .invoiceSearch input {
-  width: min(320px, 60vw);
+  width: min(230px, 30vw);
   padding: 8px 12px;
   border-radius: 10px;
   border: 1px solid #e2e8f4;
@@ -152,15 +156,108 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   justify-content: flex-end;
 }
 
-.summaryCard {
+.issueFilterBar {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.invoiceSearch .filterDropdown,
+.issueCardFilterBar .filterDropdown {
+  position: relative;
+}
+
+.invoiceSearch .filterDropdown summary,
+.issueCardFilterBar .filterDropdown summary {
+  list-style: none;
+  cursor: pointer;
+  border: 1px solid #e2e8f4;
+  background: #ffffff;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #111827;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.invoiceSearch .filterDropdown summary::-webkit-details-marker,
+.issueCardFilterBar .filterDropdown summary::-webkit-details-marker {
+  display: none;
+}
+
+.invoiceSearch .filterBadge,
+.issueCardFilterBar .filterBadge {
+  background: #f1f5f9;
+  border: 1px solid #e2e8f4;
+  color: #334155;
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.invoiceSearch .filterMenu,
+.issueCardFilterBar .filterMenu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  min-width: 200px;
+  background: #ffffff;
   border: 1px solid #e2e8f4;
   border-radius: 12px;
-  padding: 10px 12px;
+  padding: 6px;
+  box-shadow: 0 16px 32px rgba(15, 23, 42, 0.12);
+  display: none;
+  z-index: 50;
+}
+
+.invoiceSearch .filterDropdown[open] .filterMenu,
+.issueCardFilterBar .filterDropdown[open] .filterMenu {
+  display: block;
+  animation: issueFilterFadeIn 0.2s ease;
+}
+
+.invoiceSearch .filterItem,
+.issueCardFilterBar .filterItem {
+  width: 100%;
+  border: none;
+  background: transparent;
+  text-align: left;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  color: #111827;
+  cursor: pointer;
+}
+
+.invoiceSearch .filterItem:hover,
+.invoiceSearch .filterItem:focus-visible,
+.issueCardFilterBar .filterItem:hover,
+.issueCardFilterBar .filterItem:focus-visible {
   background: #f8fafc;
+  outline: none;
+}
+
+@keyframes issueFilterFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.summaryCard {
+  min-height: 68px;
+  border: 1px solid #e6ddff;
+  border-radius: 12px;
+  padding: 12px;
+  background: #f5f1ff;
 }
 
 .summaryCard span {
@@ -168,35 +265,38 @@
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #94a3b8;
-  margin-bottom: 6px;
+  color: #8194b5;
+  margin-bottom: 7px;
 }
 
 .summaryCard strong {
-  font-size: 16px;
+  font-size: 15px;
   color: #111827;
 }
 
 .tableWrap {
   width: 100%;
+  max-width: 100%;
   overflow: auto;
 }
 
 .paginationRow {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  gap: 10px;
-  padding-top: 10px;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0 0;
   font-size: 12px;
   color: #64748b;
 }
 
 .pageBtn {
-  border: 1px solid #e2e8f4;
-  background: #ffffff;
-  border-radius: 10px;
-  padding: 6px 10px;
+  border: 0;
+  background: #f7f8fb;
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  padding: 0;
   font-size: 12px;
   font-weight: 700;
   color: #1f2937;
@@ -208,26 +308,68 @@
   cursor: not-allowed;
 }
 
+.paginationControls {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pageBtn--icon {
+  display: inline-grid;
+  place-items: center;
+}
+
+.pageCurrent {
+  display: inline-grid;
+  place-items: center;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 8px;
+  border-radius: 8px;
+  background: var(--brand);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
 .issueTable {
   width: 100%;
   border-collapse: collapse;
   font-size: 12px;
-  table-layout: fixed;
+  min-width: 1410px;
+  table-layout: auto;
 }
 
 .issueTable th,
 .issueTable td {
-  padding: 10px 8px;
-  border-bottom: 1px dashed #e2e8f4;
+  padding: 11px 8px;
+  border-bottom: 1px solid #e2e8f4;
   text-align: left;
   vertical-align: middle;
 }
 
 .issueTable th {
   font-size: 11px;
-  text-transform: capitalize;
-  letter-spacing: 0.04em;
-  color: #64748b;
+  text-transform: none;
+  letter-spacing: 0;
+  color: #ffffff;
+  background: var(--brand);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.tableSortIcon {
+  display: inline-block;
+  margin-left: 3px;
+  color: #b9a5e3;
+  font-size: 8px;
+  line-height: 7px;
+  vertical-align: middle;
+}
+
+.tableSortIcon + .tableSortIcon {
+  margin-left: -8px;
+  transform: translateY(5px);
 }
 
 .issueTable tbody tr {
@@ -236,6 +378,10 @@
 
 .issueTable tbody tr:hover {
   background: #f8fafc;
+}
+
+.issueTrackerPage:not(.issueTrackerDetailPage) .managerHeaderControls {
+  display: none;
 }
 
 .issueTable tbody tr[aria-selected="true"] {
@@ -252,6 +398,32 @@
   font-weight: 700;
   font-size: 11px;
   cursor: pointer;
+}
+
+.pendingWithPill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  border: 1px solid #e2e8f4;
+  border-radius: 999px;
+  background: #f8fafc;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  white-space: nowrap;
+}
+
+.pendingWithPill--manager {
+  border-color: #fde68a;
+  background: #fffbeb;
+  color: #92400e;
+}
+
+.pendingWithPill--approver {
+  border-color: #c7d2fe;
+  background: #eef2ff;
+  color: #4338ca;
 }
 
 .issueWorkspace {
@@ -302,8 +474,15 @@
   overflow: auto;
 }
 
+.issueListHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
 .issueListPanel h3 {
-  margin: 0 0 10px;
+  margin: 0;
   font-size: 14px;
   color: #111827;
 }
@@ -313,6 +492,14 @@
   align-items: center;
   justify-content: flex-start;
   margin-bottom: 10px;
+}
+
+.issueCardFilterBar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin: 0;
 }
 
 .issueListToggle {
@@ -408,6 +595,95 @@
   border-radius: 14px;
 }
 
+.issueDocuments {
+  display: grid;
+  gap: 8px;
+  padding: 2px 0 0;
+}
+
+.issueDocumentsHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.issueDocumentPills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.issueDocumentPill {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  border: 1px solid #e2e8f4;
+  border-radius: 999px;
+  background: #f8fafc;
+  color: #475569;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 4px 3px 9px;
+}
+
+.issueDocumentPill.is-uploaded {
+  border-color: #ddd6fe;
+  background: #f5f3ff;
+  color: #4c1d95;
+}
+
+.issueDocumentName {
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.issueDocumentControl {
+  display: inline-grid;
+  place-items: center;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+}
+
+.issueDocumentPreview,
+.issueDocumentAdd {
+  width: 24px;
+  height: 24px;
+  margin-left: 4px;
+}
+
+.issueDocumentPreview {
+  background: #ffffff;
+  color: var(--brand-dark);
+}
+
+.issueDocumentAdd {
+  background: var(--brand-light);
+  color: var(--brand-dark);
+}
+
+.issueDocumentControl:hover,
+.issueDocumentControl:focus-visible,
+.issueDocumentAdd:hover,
+.issueDocumentAdd:focus-visible {
+  outline: 2px solid var(--brand-border);
+  outline-offset: 1px;
+}
+
+.issueDocumentEmpty {
+  color: #94a3b8;
+  font-size: 11px;
+}
+
+.issueDocumentInput {
+  display: none;
+}
+
 .issueDetailHeader {
   display: flex;
   align-items: center;
@@ -438,6 +714,9 @@
 }
 
 @media (max-width: 1100px) {
+  .summaryCards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
   .issueWorkspaceGrid {
     grid-template-columns: 1fr;
   }
@@ -463,5 +742,35 @@
   .managerClock {
     align-self: stretch;
     align-items: flex-start;
+  }
+}
+
+@media (max-width: 560px) {
+  .summaryCards {
+    grid-template-columns: 1fr;
+  }
+
+  .summaryHeader,
+  .paginationRow {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .invoiceSearch {
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+
+  .invoiceSearch input,
+  .issueFilterBar,
+  .invoiceSearch .filterDropdown,
+  .invoiceSearch .filterDropdown summary {
+    width: 100%;
+  }
+
+  .issueFilterBar {
+    align-items: stretch;
+    flex-direction: column;
   }
 }

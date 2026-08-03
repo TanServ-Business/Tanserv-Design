@@ -9,28 +9,32 @@
   <link rel="stylesheet" href="../css/styles.css" />
   <link rel="stylesheet" href="../css/agent-dashboard.css" />
   <link rel="stylesheet" href="../css/admin-dashboard.css" />
+  <link rel="stylesheet" href="../css/shared-header.css" />
+  <link rel="stylesheet" href="../css/admin-shell.css?v=2" />
+  <link rel="stylesheet" href="../css/admin-header-runtime.css" />
 </head>
-<body class="motion-preload"
+<body class="motion-preload" data-admin-role="admin"
   data-root-path="../"
   data-relationship-name="Inebura HO"
   data-relationship-badge="HO">
 
-<div data-shared-header></div>
+<div data-admin-shell></div>
 
 <main class="adminDashboard">
 
   <!-- ── Hero ──────────────────────────────────────────────── -->
   <section class="dashboardHero">
     <div>
-      <div class="heroEyebrow">System Administration</div>
+      <div class="heroEyebrow">Client Administration</div>
       <div class="heroTitleRow">
         <h1>Admin Dashboard</h1>
-        <span class="pill" style="background:rgba(255,255,255,0.85);color:#5c258d;border:1px solid #d7c3ea;font-size:10px;padding:3px 10px;font-weight:700;">Admin Only</span>
+        <span class="pill" style="background:rgba(255,255,255,0.85);color:#5c258d;border:1px solid #d7c3ea;font-size:10px;padding:3px 10px;font-weight:700;">Client Admin</span>
+        <span class="pill" style="background:#dcfce7;color:#166534;border:1px solid #86efac;font-size:10px;padding:3px 10px;font-weight:700;">LIVE</span>
       </div>
       <div class="heroMeta">
-        <span class="heroTag"><span id="heroActiveUsers">24</span> Active Now</span>
+        <span class="heroTag"><span id="heroActiveUsers">0</span> Active Now</span>
         <span class="heroTag heroTagRefresh" id="heroDayTag">As of Today</span>
-        <span class="heroTag">48 Total Users</span>
+        <span class="heroTag">3 Total Users</span>
       </div>
     </div>
     <div class="heroActions">
@@ -56,21 +60,21 @@
                 <span class="kpiLabel">Total Invoices</span>
                 <span class="kpiDelta">+3.1%</span>
               </div>
-              <div class="kpiValue">14,832</div>
+              <div class="kpiValue">1,286</div>
               <div class="kpiSub">Across all customers</div>
               <div class="kpiSplit">
                 <div class="kpiSplitItem">
                   <span>This Month</span>
                   <strong>
-                    <span class="kpiSplitLine">1,247 invoices</span>
-                    <span class="kpiSplitLine">38 today</span>
+                    <span class="kpiSplitLine">1,286 invoices</span>
+                    <span class="kpiSplitLine">0 today</span>
                   </strong>
                 </div>
                 <div class="kpiSplitItem">
                   <span class="kpiDueLabel">Limbo</span>
                   <strong>
-                    <span class="kpiSplitLine">73 copies</span>
-                    <span class="kpiSplitLine">41 unassigned</span>
+                    <span class="kpiSplitLine">0 copies</span>
+                    <span class="kpiSplitLine">0 unassigned</span>
                   </strong>
                 </div>
               </div>
@@ -84,26 +88,26 @@
                 <span class="kpiLabel">Total Customers</span>
                 <span class="kpiDelta">+0.8%</span>
               </div>
-              <div class="kpiValue">2,104</div>
+              <div class="kpiValue">0</div>
               <div class="kpiProgressRow">
                 <div class="progressWrap" style="flex:1;">
                   <div class="progressFill" style="--value: 0.898;"></div>
                 </div>
               </div>
-              <div class="kpiSub">Active: 1,890 (89.8%)</div>
+              <div class="kpiSub">Updated: 0 (0%)</div>
               <div class="kpiSplit">
                 <div class="kpiSplitItem">
                   <span>Active</span>
                   <strong>
-                    <span class="kpiSplitLine">1,890 entities</span>
-                    <span class="kpiSplitLine">17 new (MTD)</span>
+                    <span class="kpiSplitLine">0 strategies</span>
+                    <span class="kpiSplitLine">this week</span>
                   </strong>
                 </div>
                 <div class="kpiSplitItem">
                   <span class="kpiDueLabel">Limbo</span>
                   <strong>
-                    <span class="kpiSplitLine">19 incomplete</span>
-                    <span class="kpiSplitLine">onboarding</span>
+                    <span class="kpiSplitLine">0 remaining</span>
+                    <span class="kpiSplitLine">strategies</span>
                   </strong>
                 </div>
               </div>
@@ -115,7 +119,7 @@
             <article class="dashboardCard kpiCard kpiLavender">
               <div class="kpiLabel">Supporting Documents</div>
               <div class="kpiProgressRow">
-                <div class="kpiValue">42,561</div>
+                <div class="kpiValue">24</div>
                 <div class="progressWrap">
                   <div class="progressFill" style="--value: 0.74;"></div>
                 </div>
@@ -125,15 +129,15 @@
                 <div class="kpiSplitItem">
                   <span>Avg / Invoice</span>
                   <strong>
-                    <span class="kpiSplitLine">2.87 docs</span>
-                    <span class="kpiSplitLine">124 added today</span>
+                    <span class="kpiSplitLine">0.00 docs</span>
+                    <span class="kpiSplitLine">per invoice</span>
                   </strong>
                 </div>
                 <div class="kpiSplitItem">
                   <span class="kpiDueLabel">In Limbo</span>
                   <strong>
-                    <span class="kpiSplitLine">58 unlinked</span>
-                    <span class="kpiSplitLine">unclassified</span>
+                    <span class="kpiSplitLine">0 unlinked</span>
+                    <span class="kpiSplitLine">documents</span>
                   </strong>
                 </div>
               </div>
@@ -144,8 +148,8 @@
           <div class="col-12 col-md-3">
             <article class="dashboardCard kpiCard">
               <div class="kpiLabel">Active Users Today</div>
-              <div class="kpiValue">24</div>
-              <div class="kpiSub">of 48 total users · 50%</div>
+              <div class="kpiValue">0</div>
+              <div class="kpiSub">of 3 total users · 0%</div>
             </article>
           </div>
 
@@ -162,7 +166,7 @@
           <div class="col-12 col-md-3">
             <article class="dashboardCard kpiCard">
               <div class="kpiLabel">Total Sessions</div>
-              <div class="kpiValue">31</div>
+              <div class="kpiValue">3</div>
               <div class="kpiSub">Across all users today</div>
             </article>
           </div>
@@ -171,8 +175,8 @@
           <div class="col-12 col-md-3">
             <article class="dashboardCard kpiCard">
               <div class="kpiLabel">Longest Session</div>
-              <div class="kpiValue">4h 45m</div>
-              <div class="kpiSub">Manish Tiwari · Agent</div>
+              <div class="kpiValue">00:19</div>
+              <div class="kpiSub">Devashish Manager</div>
             </article>
           </div>
 
@@ -184,8 +188,8 @@
             <article class="dashboardCard actionCard accentAmber">
               <div class="actionMeta">
                 <span>Invoice Copies in Limbo</span>
-                <strong>73</strong>
-                <span>Pending review / assignment</span>
+                <strong>0</strong>
+                <span>0 assigned</span>
               </div>
               <div class="actionIcon"><i class="bi bi-file-earmark-break"></i></div>
             </article>
@@ -193,9 +197,9 @@
           <div class="col-12 col-md-3">
             <article class="dashboardCard actionCard accentAmber">
               <div class="actionMeta">
-                <span>Customers in Limbo</span>
-                <strong>19</strong>
-                <span>Incomplete onboarding</span>
+                <span>Strategies Remaining</span>
+                <strong>0</strong>
+                <span>0 updated this week</span>
               </div>
               <div class="actionIcon"><i class="bi bi-building-exclamation"></i></div>
             </article>
@@ -203,9 +207,9 @@
           <div class="col-12 col-md-3">
             <article class="dashboardCard actionCard accentAmber">
               <div class="actionMeta">
-                <span>Other Docs in Limbo</span>
-                <strong>58</strong>
-                <span>Unlinked / unclassified</span>
+                <span>Documents in Limbo</span>
+                <strong>21</strong>
+                <span>3 with strategy</span>
               </div>
               <div class="actionIcon"><i class="bi bi-folder-x"></i></div>
             </article>
@@ -213,9 +217,9 @@
           <div class="col-12 col-md-3">
             <article class="dashboardCard actionCard accentPurple">
               <div class="actionMeta">
-                <span>Unassigned Invoices</span>
-                <strong>41</strong>
-                <span>No agent assigned yet</span>
+                <span>Invoices Submitted Today</span>
+                <strong>0</strong>
+                <span>0 total today</span>
               </div>
               <div class="actionIcon"><i class="bi bi-file-earmark-minus"></i></div>
             </article>
@@ -420,7 +424,9 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="../scripts/shared-header.js"></script>
+<script src="../scripts/admin-shell.js"></script>
+<script src="../scripts/admin-header-runtime.js"></script>
+<script src="../scripts/tutorial-splash.js?v=20260730-close-only"></script>
 <script>
 (() => {
   // ── Brand colours (from CSS vars) ─────────────────────────

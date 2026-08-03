@@ -1,0 +1,780 @@
+:root {
+  --admin-live-purple: #55227d;
+  --admin-live-purple-dark: #42175f;
+  --admin-live-purple-bright: #7138db;
+  --admin-live-lavender: #f5eefb;
+  --admin-live-bg: #f4f6f9;
+  --admin-live-border: #e2e8f4;
+  --admin-live-text: #111827;
+  --admin-live-muted: #64748b;
+}
+
+body[data-admin-role="admin"] {
+  background: var(--admin-live-bg);
+  color: var(--admin-live-text);
+  font-family: Calibri, "Segoe UI", Arial, sans-serif;
+}
+
+.adminRuntimePage {
+  max-width: none;
+  padding: 46px 48px 54px;
+}
+
+.adminRuntimePage .adminPageHero {
+  display: block;
+  margin: 0 0 26px;
+  padding: 0;
+}
+
+.adminRuntimePage .adminPageHero > div {
+  position: relative;
+  padding-left: 18px;
+}
+
+.adminRuntimePage .adminPageHero > div::before {
+  content: "";
+  position: absolute;
+  inset: 2px auto 2px 0;
+  width: 6px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--admin-live-purple), #7735ae);
+}
+
+.adminRuntimePage .adminPageHero h1 {
+  margin: 0 0 4px;
+  color: var(--admin-live-text);
+  font-size: 27px;
+  line-height: 1.15;
+  font-weight: 800;
+}
+
+.adminRuntimePage .adminPageHero span {
+  color: #5f6b7c;
+  font-size: 14px;
+}
+
+.adminSourceWorkspace {
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid var(--admin-live-border);
+  border-radius: 16px;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
+}
+
+.adminWorkspaceHeader {
+  min-height: 64px;
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 1px solid var(--admin-live-border);
+  padding: 0 24px;
+  background: #fff;
+  color: var(--admin-live-text);
+}
+
+.adminWorkspaceTabs {
+  min-width: 0;
+  display: flex;
+  align-items: stretch;
+  overflow-x: auto;
+}
+
+.adminRuntimeTabs {
+  align-items: stretch;
+  gap: 10px;
+  min-width: max-content;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+}
+
+.adminRuntimeTabs a {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  padding: 0 5px;
+  border-radius: 0;
+  background: transparent;
+  color: #697386;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.adminRuntimeTabs a:hover {
+  background: transparent;
+  color: var(--admin-live-purple);
+}
+
+.adminRuntimeTabs a.is-active {
+  background: transparent;
+  color: var(--admin-live-purple);
+}
+
+.adminRuntimeTabs a.is-active::after {
+  content: "";
+  position: absolute;
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+  inset: auto 0 0;
+  background: var(--admin-live-purple);
+}
+
+.adminWorkspaceActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 9px;
+  flex: 0 0 auto;
+}
+
+.adminPrimary,
+.adminSecondary,
+.adminGhostButton {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 9px 16px;
+  border-radius: 11px;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.adminPrimary {
+  color: #fff;
+  border: 1px solid var(--admin-live-purple-dark);
+  background: linear-gradient(135deg, var(--admin-live-purple) 0%, var(--admin-live-purple-bright) 100%);
+  box-shadow: 0 8px 18px rgba(92, 37, 141, 0.18);
+}
+
+.adminPrimary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 11px 22px rgba(92, 37, 141, 0.24);
+}
+
+.adminSecondary {
+  color: var(--admin-live-purple);
+  border: 1px solid #d5c6e2;
+  background: #fff;
+  box-shadow: none;
+}
+
+.adminGhostButton {
+  color: #64748b;
+  border: 1px dashed #cbd5e1;
+  background: transparent;
+}
+
+.adminWorkspaceBody {
+  padding: 40px 24px 24px;
+}
+
+.adminSourceTablePanel.adminPanel {
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.adminTableWrap {
+  overflow-x: auto;
+  border: 1px solid rgba(15, 23, 42, 0.09);
+  border-radius: 14px;
+}
+
+.adminRuntimePage .adminTable {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 12px;
+}
+
+.adminRuntimePage .adminTable th,
+.adminRuntimePage .adminTable td {
+  padding: 14px 16px;
+  text-align: left;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.adminRuntimePage .adminTable thead th {
+  background: var(--admin-live-purple);
+  color: #fff;
+  border: 0;
+  font-size: 11px;
+  letter-spacing: 0.01em;
+}
+
+.adminRuntimePage .adminTable thead th:first-child {
+  border-top-left-radius: 12px;
+}
+
+.adminRuntimePage .adminTable thead th:last-child {
+  border-top-right-radius: 12px;
+}
+
+.adminRuntimePage .adminTable th button {
+  color: #fff;
+  text-transform: none;
+}
+
+.adminRuntimePage .adminTable th button i {
+  opacity: 0.48;
+  font-size: 10px;
+}
+
+.adminRuntimePage .adminTable tbody td {
+  height: 62px;
+  color: #334155;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.09);
+  background: #fff;
+}
+
+.adminRuntimePage .adminTable tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.adminRuntimePage .adminTable tbody tr:hover td {
+  background: #fcfaff;
+}
+
+.adminRuntimeRowActions {
+  gap: 7px;
+}
+
+.adminRuntimeRowActions button {
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 7px 13px;
+  border: 1px solid #d5c6e2;
+  border-radius: 10px;
+  background: #fff;
+  color: var(--admin-live-purple);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.adminRuntimeRowActions button:hover {
+  border-color: var(--admin-live-purple);
+  background: #faf7fd;
+}
+
+.adminRuntimeRowActions button.is-danger {
+  color: #991b1b;
+  border-color: #fecaca;
+  background: #fff7f7;
+}
+
+.adminStatus {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 4px 10px;
+  border: 1px solid #86efac;
+  border-radius: 999px;
+  background: #dcfce7;
+  color: #166534;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.adminStatus.muted {
+  border-color: #e2e8f0;
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.adminPager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 16px 12px 0;
+  border-top: 1px dashed #e2e8f0;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.adminPager[hidden] {
+  display: none !important;
+}
+
+.adminPager > div {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.adminRuntimePage .adminPager button {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--admin-live-border);
+  border-radius: 10px;
+  background: #fff;
+  color: #64748b;
+  font-weight: 800;
+}
+
+.adminRuntimePage .adminPager button.is-current {
+  color: #fff;
+  border-color: var(--admin-live-purple);
+  background: var(--admin-live-purple);
+  box-shadow: 0 7px 14px rgba(85, 34, 125, 0.18);
+}
+
+.adminTableFilters {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: -12px 0 18px;
+}
+
+.adminTableSearch {
+  min-width: 250px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  border: 1px solid #d8cce3;
+  border-radius: 10px;
+  background: #fff;
+  color: var(--admin-live-purple);
+}
+
+.adminTableSearch:focus-within {
+  border-color: var(--admin-live-purple);
+  box-shadow: 0 0 0 3px rgba(92, 37, 141, 0.11);
+}
+
+.adminTableSearch input {
+  min-width: 0;
+  flex: 1;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--admin-live-text);
+  font-size: 12px;
+}
+
+.adminFilterDropdown {
+  position: relative;
+}
+
+.adminFilterDropdown summary {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 11px;
+  list-style: none;
+  cursor: pointer;
+  border: 1px solid var(--admin-live-border);
+  border-radius: 10px;
+  background: #fff;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.adminFilterDropdown summary::-webkit-details-marker {
+  display: none;
+}
+
+.adminFilterDropdown summary span {
+  padding: 2px 7px;
+  border: 1px solid var(--admin-live-border);
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 9px;
+  text-transform: uppercase;
+}
+
+.adminFilterDropdown summary i {
+  color: #94a3b8;
+  font-size: 10px;
+}
+
+.adminFilterMenu {
+  position: absolute;
+  inset: calc(100% + 7px) auto auto 0;
+  z-index: 25;
+  min-width: 205px;
+  display: grid;
+  gap: 2px;
+  padding: 6px;
+  border: 1px solid var(--admin-live-border);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.14);
+}
+
+.adminFilterMenu button {
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #334155;
+  text-align: left;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.adminFilterMenu button:hover {
+  background: #f8f5fb;
+  color: var(--admin-live-purple);
+}
+
+.adminAuditFilterArea {
+  margin: 0 0 18px;
+  padding: 0 0 16px;
+}
+
+.adminRuntimePage[data-admin-module="audit-trail"] .adminWorkspaceBody {
+  padding: 16px;
+}
+
+.adminAuditFilterGrid {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr .78fr 1fr .82fr .82fr;
+  gap: 9px;
+}
+
+.adminSourceFilterField {
+  min-width: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.adminSourceFilterField > span {
+  color: #475569;
+  font-size: 11px;
+}
+
+.adminSourceFilterField input,
+.adminSourceFilterField select {
+  width: 100%;
+  min-height: 40px;
+  padding: 8px 11px;
+  border: 1px solid var(--admin-live-border);
+  border-radius: 10px;
+  outline: 0;
+  background: #fff;
+  color: var(--admin-live-text);
+  font: inherit;
+  font-size: 12px;
+}
+
+.adminSourceFilterField input:focus,
+.adminSourceFilterField select:focus {
+  border-color: var(--admin-live-purple);
+  box-shadow: 0 0 0 3px rgba(92, 37, 141, 0.1);
+}
+
+.adminAuditFilterActions {
+  display: flex;
+  gap: 9px;
+  margin-top: 9px;
+}
+
+.adminRuntimeSettings,
+.adminCustomBlocks {
+  margin-bottom: 22px;
+}
+
+.adminRuntimeSettingCard,
+.adminCustomNotice,
+.adminCustomStats article,
+.adminCustomCards article,
+.adminRuntimeActivity,
+.adminRuntimeWizard > article {
+  border-color: var(--admin-live-border);
+  border-radius: 14px;
+  box-shadow: 0 7px 18px rgba(15, 23, 42, 0.035);
+}
+
+.adminRuntimeField {
+  gap: 6px;
+  color: #475569;
+  font-size: 11px;
+}
+
+.adminRuntimeField input,
+.adminRuntimeField select,
+.adminRuntimeField textarea {
+  min-height: 40px;
+  padding: 9px 11px;
+  border: 1px solid var(--admin-live-border);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--admin-live-text);
+  font-size: 12px;
+}
+
+.adminRuntimeField input:focus,
+.adminRuntimeField select:focus,
+.adminRuntimeField textarea:focus {
+  outline: 0;
+  border-color: var(--admin-live-purple);
+  box-shadow: 0 0 0 3px rgba(92, 37, 141, 0.1);
+}
+
+.adminModalBackdrop {
+  background: rgba(15, 23, 42, 0.54);
+  backdrop-filter: blur(1px);
+}
+
+.adminModalCard {
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 16px;
+  box-shadow: 0 28px 70px rgba(15, 23, 42, 0.27);
+}
+
+.adminModalCard header {
+  min-height: 64px;
+  padding: 15px 20px;
+  border-bottom: 1px solid #ddd0e7;
+  background: var(--admin-live-lavender);
+}
+
+.adminModalCard header p {
+  display: none;
+}
+
+.adminModalCard h2 {
+  color: var(--admin-live-purple);
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.adminModalClose {
+  border: 1px solid var(--admin-live-border);
+  border-radius: 9px;
+  background: #fff;
+  color: #64748b;
+}
+
+.adminRecordForm {
+  gap: 15px;
+  padding: 22px 20px;
+}
+
+.adminModalCard footer {
+  padding: 14px 20px;
+  border-top: 1px solid var(--admin-live-border);
+  background: #f8fafc;
+}
+
+.adminUploadModal {
+  width: min(600px, 100%);
+}
+
+.adminUploadModalBody {
+  padding: 22px 20px 0;
+}
+
+.adminUploadModal .adminRuntimeUpload {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+}
+
+.adminUploadModal .adminRuntimeUploadFields {
+  margin: 0 0 15px;
+}
+
+.adminRuntimeDropzone {
+  min-height: 198px;
+  margin: 0;
+  border: 1.5px dashed #d4dae4;
+  border-radius: 14px;
+  background: #fbfcfe;
+}
+
+.adminUploadFieldLabel {
+  display: block;
+  margin: 0 0 8px;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.adminRuntimeDropzone i {
+  color: #c5cbd4;
+  font-size: 38px;
+}
+
+.adminRuntimeDropzone strong {
+  color: #475569;
+  font-size: 14px;
+}
+
+.adminRuntimeDropzone span {
+  color: #94a3b8;
+  font-size: 11px;
+}
+
+.adminRuntimeDropzone em {
+  margin-top: 5px;
+  color: var(--admin-live-purple);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.adminRuntimeFileList {
+  min-height: 34px;
+}
+
+.adminRuntimeFileList[hidden] {
+  display: none !important;
+}
+
+.adminUploadTemplateActions {
+  display: flex;
+  justify-content: center;
+  margin: 4px 0 18px;
+}
+
+.adminRuntimeUploadButtons {
+  margin: 12px -20px 0;
+  padding: 14px 20px;
+  border-top: 1px solid var(--admin-live-border);
+  background: #f8fafc;
+}
+
+.adminRuntimeUploadButtons button:last-child {
+  color: #fff;
+  border-color: var(--admin-live-purple-dark);
+  background: linear-gradient(135deg, var(--admin-live-purple), var(--admin-live-purple-bright));
+}
+
+.adminResetDemo {
+  margin-top: 14px;
+  color: #8791a3;
+}
+
+@media (max-width: 980px) {
+  .adminAuditFilterGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .adminRuntimePage {
+    padding: 46px 48px 56px;
+  }
+
+  .adminRuntimePage .adminPageHero h1 {
+    font-size: 25px;
+  }
+
+  .adminWorkspaceHeader {
+    min-height: 96px;
+    display: grid;
+    overflow: hidden;
+    padding: 0 24px;
+  }
+
+  .adminWorkspaceTabs {
+    height: 96px;
+    overflow-x: auto;
+  }
+
+  .adminRuntimeTabs {
+    height: 96px;
+    align-items: stretch;
+  }
+
+  .adminRuntimeTabs a {
+    width: 76px;
+    justify-content: center;
+    padding: 0 7px;
+    text-align: center;
+    white-space: normal;
+  }
+
+  .adminWorkspaceActions {
+    position: static;
+    justify-content: stretch;
+    padding: 0 0 14px;
+    margin: 0;
+  }
+
+  .adminWorkspaceActions:empty {
+    display: none;
+  }
+
+  .adminWorkspaceActions button {
+    flex: 1;
+  }
+
+  .adminWorkspaceBody {
+    padding: 40px 24px 24px;
+  }
+
+  .adminTableFilters,
+  .adminAuditFilterActions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .adminTableSearch,
+  .adminFilterDropdown summary,
+  .adminFilterReset,
+  .adminAuditFilterActions button {
+    width: 100%;
+  }
+
+  .adminAuditFilterGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .adminRuntimePage .adminTable {
+    min-width: 930px;
+  }
+
+  .adminRuntimePage .adminTable th,
+  .adminRuntimePage .adminTable td {
+    padding: 13px 16px;
+  }
+
+  .adminPager {
+    align-items: flex-start;
+  }
+
+  .adminPager > span {
+    max-width: 90px;
+  }
+
+  .adminUploadModalBody {
+    padding: 18px 16px 0;
+  }
+
+  .adminRuntimeUploadButtons {
+    margin-inline: -16px;
+    padding-inline: 16px;
+  }
+}

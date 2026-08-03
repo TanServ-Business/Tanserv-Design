@@ -1636,18 +1636,14 @@ function normalizeNotificationCenter() {
     return manager.load();
   }
   const list = loadNotificationCenter();
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const now = Date.now();
   let changed = false;
   const updated = list.map((note) => {
     if (note.scheduledFor && !note.sentAt) {
       const scheduledDate = new Date(note.scheduledFor);
-      if (!Number.isNaN(scheduledDate.getTime())) {
-        scheduledDate.setHours(0, 0, 0, 0);
-        if (scheduledDate.getTime() <= today.getTime()) {
-          note.sentAt = new Date().toISOString();
-          changed = true;
-        }
+      if (!Number.isNaN(scheduledDate.getTime()) && scheduledDate.getTime() <= now) {
+        note.sentAt = new Date().toISOString();
+        changed = true;
       }
     }
     return note;
@@ -8004,7 +8000,9 @@ function renderInvoiceTable(invoices) {
     const agingColor = agingDays == null
       ? ""
       : agingColorPalette[hashStringToIndex(`${inv.invoiceNo || ""}-aging`, agingColorPalette.length)];
-    const agingStyleAttr = agingColor ? ` style="color:${agingColor}; font-weight:700;"` : "";
+    const agingStyleAttr = agingColor
+      ? ` style="--aging-color:${normalizeAgingColor(agingColor)}; --aging-text-color:${getAgingTextColor(agingColor)};"`
+      : "";
     const actionMarkup = isCustomerLandingView
       ? `
         <div class="invoiceActionGroup">
@@ -8065,7 +8063,7 @@ function renderInvoiceTable(invoices) {
       <td class="colAmtRight" title="Rs.${formatINR(inv.netDueAmount)}">Rs.${formatINR(inv.netDueAmount)}</td>
       <td class="colDate" title="${inv.invoiceDate}">${inv.invoiceDate}</td>
       <td class="colDate ${isOverdueDueDate ? "dueDateOverdue" : ""}" title="${inv.dueDate}">${inv.dueDate}</td>
-      ${showAgingColumn ? `<td class="colAging" title="${agingValue}"${agingStyleAttr}>${agingValue}</td>` : ""}
+      ${showAgingColumn ? `<td class="colAging" title="${agingValue}"><span class="agingValue"${agingStyleAttr}>${agingValue}</span></td>` : ""}
       ${showStatusColumns ? `
       <td class="colShort" title="${inv.primaryStatus}"><span class="primaryStatusText">${inv.primaryStatus}</span></td>
       <td class="colStatus" title="${subStatus}">
@@ -9083,6 +9081,9 @@ function wireDispositionActivityEvents() {
   const tdsEl = document.getElementById("collectionTds");
   const ldEl = document.getElementById("collectionLd");
   const instrumentModeSelect = document.getElementById("collectionInstrumentMode");
+  const instrumentRefInput = document.getElementById("collectionInstrumentRef");
+  const collectionBankInput = document.getElementById("collectionBank");
+  const collectionTransferDateInput = document.getElementById("collectionTransferDate");
   const miscFields = document.getElementById("collectionMiscFields");
   const miscList = document.getElementById("collectionMiscList");
   const addMiscBtn = document.getElementById("addMiscModeBtn");
@@ -9099,6 +9100,11 @@ function wireDispositionActivityEvents() {
   const pdcDispatchMode = document.getElementById("pdcDispatchMode");
   const ptpDateWrap = document.getElementById("ptpDateFieldWrap");
   const ptpDateInput = document.getElementById("ptpDateInput");
+  const callbackDateWrap = document.getElementById("callbackDateFieldWrap");
+  const callbackTimeWrap = document.getElementById("callbackTimeFieldWrap");
+  const callbackDateInput = document.getElementById("callbackDateInput");
+  const callbackTimeInput = document.getElementById("callbackTimeInput");
+  const callbackReminderHint = document.getElementById("callbackReminderHint");
   const dispatchModalEl = document.getElementById("pdcDispatchConfirmModal");
   const dispatchAddBtn = document.getElementById("pdcDispatchAddDetailBtn");
   const dispatchProceedBtn = document.getElementById("pdcDispatchProceedBtn");
@@ -9106,6 +9112,7 @@ function wireDispositionActivityEvents() {
   const issueTrackerCheck = document.getElementById("issueTrackerCheck");
   const actionOwnerSelect = document.getElementById("actionOwnerSelect");
   const approvalProcessSelect = document.getElementById("approvalProcessSelect");
+  const deliveryChallanError = document.getElementById("deliveryChallanError");
 
   const miscModes = ["NEFT", "RTGS", "Cheque", "Demand Draft", "PDC", "CN", "Adv"];
   const miscAdjustmentModes = new Set(["PDC", "CN", "Adv"]);
@@ -9156,6 +9163,41 @@ function wireDispositionActivityEvents() {
     if (!errorEl) return;
     errorEl.textContent = "";
     errorEl.classList.add("hidden");
+  };
+
+  const collectionRequiredFields = [
+    instrumentModeSelect,
+    instrumentRefInput,
+    collectionBankInput,
+    collectionTransferDateInput,
+    amountEl,
+    tdsEl,
+    ldEl
+  ].filter(Boolean);
+
+  const clearCollectionFieldErrors = () => {
+    collectionRequiredFields.forEach((field) => {
+      field.classList.remove("collectionFieldInvalid");
+      field.removeAttribute("aria-invalid");
+    });
+  };
+
+  const showDeliveryChallanError = (message) => {
+    if (!deliveryChallanError) return;
+    deliveryChallanError.textContent = message;
+    deliveryChallanError.classList.remove("hidden");
+  };
+
+  const clearDeliveryChallanError = () => {
+    if (!deliveryChallanError) return;
+    deliveryChallanError.textContent = "";
+    deliveryChallanError.classList.add("hidden");
+  };
+
+  const markCollectionFieldInvalid = (field) => {
+    if (!field) return;
+    field.classList.add("collectionFieldInvalid");
+    field.setAttribute("aria-invalid", "true");
   };
 
   const showPdcError = (message) => {
@@ -9276,8 +9318,10 @@ function wireDispositionActivityEvents() {
     const isCollection = isCollectionFlowSelected();
     if (!isCollection) return true;
 
+    clearCollectionFieldErrors();
     const instrumentMode = instrumentModeSelect?.value || "";
     const isMisc = instrumentMode === "Miscellenious";
+    const isCollected = String(subStatusSelect?.value || "").trim() === "Collected";
     const outstanding = getOutstandingAmount();
     const miscRows = isMisc ? getMiscRowsData() : [];
 
@@ -9293,10 +9337,50 @@ function wireDispositionActivityEvents() {
     }
 
     let hasError = false;
+    let validationMessage = "";
+
+    if (isCollected && !isMisc) {
+      const requiredEvidence = [
+        [instrumentModeSelect, "instrument mode"],
+        [instrumentRefInput, "instrument reference number"],
+        [collectionBankInput, "bank"],
+        [collectionTransferDateInput, "transfer date"]
+      ];
+      const missingEvidence = requiredEvidence.filter(([field]) => !String(field?.value || "").trim());
+      missingEvidence.forEach(([field]) => markCollectionFieldInvalid(field));
+
+      const valueFields = [
+        [amountEl, "amount"],
+        [tdsEl, "TDS"],
+        [ldEl, "LD"]
+      ];
+      const invalidValues = valueFields.filter(([field]) => {
+        const raw = String(field?.value || "").trim();
+        return raw !== "" && (!Number.isFinite(Number(raw)) || Number(raw) < 0);
+      });
+      invalidValues.forEach(([field]) => markCollectionFieldInvalid(field));
+
+      if (missingEvidence.length) {
+        validationMessage = `Complete ${missingEvidence.map(([, label]) => label).join(", ")}.`;
+        hasError = true;
+      } else if (invalidValues.length) {
+        validationMessage = `${invalidValues.map(([, label]) => label).join(", ")} must contain a valid value of zero or more.`;
+        hasError = true;
+      } else if (totalCollected <= 0) {
+        [amountEl, tdsEl, ldEl].forEach(markCollectionFieldInvalid);
+        validationMessage = "Enter a collection value greater than zero across Amount, TDS, or LD.";
+        hasError = true;
+      }
+    }
 
     if (totalCollected > outstanding) {
-      if (showErrors) showError("Total collected cannot be more than total outstanding.");
+      [amountEl, tdsEl, ldEl].forEach(markCollectionFieldInvalid);
+      validationMessage = "Total collected cannot be more than total outstanding.";
       hasError = true;
+    }
+
+    if (showErrors && validationMessage) {
+      showError(validationMessage);
     } else if (showErrors) {
       clearError();
     }
@@ -9694,20 +9778,38 @@ function wireDispositionActivityEvents() {
     if (!show && ptpDateInput) ptpDateInput.value = "";
   };
 
+  const isCallbackFollowUpSelected = () => (
+    normalizeDispositionKey(subStatusSelect?.value) === "call back/email follow up"
+  );
+
+  const toggleCallbackReminderFields = () => {
+    const show = isCallbackFollowUpSelected();
+    callbackDateWrap?.classList.toggle("hidden", !show);
+    callbackTimeWrap?.classList.toggle("hidden", !show);
+    callbackReminderHint?.classList.toggle("hidden", !show);
+    if (!show) {
+      if (callbackDateInput) callbackDateInput.value = "";
+      if (callbackTimeInput) callbackTimeInput.value = "";
+    }
+  };
+
   wireBankSuggestion(document.getElementById("collectionBank"));
 
-  if (subStatusSelect) {
+    if (subStatusSelect) {
     subStatusSelect.addEventListener("change", () => {
+      clearDeliveryChallanError();
       syncDispositionStatusFromSubStatus();
       toggleCollectionFields();
       togglePdcFields();
       toggleDeliveryChallanFields();
       togglePtpDateField();
+      toggleCallbackReminderFields();
     });
     toggleCollectionFields();
     togglePdcFields();
     toggleDeliveryChallanFields();
     togglePtpDateField();
+    toggleCallbackReminderFields();
   }
 
   if (activityTypeSelect) {
@@ -9715,6 +9817,10 @@ function wireDispositionActivityEvents() {
       toggleCollectionFields();
     });
   }
+
+  [issueTrackerCheck, actionOwnerSelect, approvalProcessSelect].forEach((field) => {
+    field?.addEventListener("change", clearDeliveryChallanError);
+  });
 
   if (primaryStatusSelect) {
     primaryStatusSelect.addEventListener("change", togglePtpDateField);
@@ -9742,6 +9848,16 @@ function wireDispositionActivityEvents() {
       clearError();
       updateCollectionTotals();
       validateCollection(true);
+    });
+  });
+
+  [instrumentModeSelect, instrumentRefInput, collectionBankInput, collectionTransferDateInput].forEach((field) => {
+    if (!field) return;
+    const eventName = field.tagName === "SELECT" || field.type === "date" ? "change" : "input";
+    field.addEventListener(eventName, () => {
+      field.classList.remove("collectionFieldInvalid");
+      field.removeAttribute("aria-invalid");
+      if (!document.querySelector(".collectionFieldInvalid")) clearError();
     });
   });
 
@@ -9854,12 +9970,33 @@ function wireDispositionActivityEvents() {
 
     if (!trail) return;
     clearError();
+    clearDeliveryChallanError();
     clearPdcError();
     const subStatus = getValue("subStatusSelect");
     const dispositionRow = syncDispositionStatusFromSubStatus();
     if (!dispositionRow) {
       showError("Select a valid sub status.");
       return;
+    }
+    const isCallbackFollowUp = normalizeDispositionKey(subStatus) === "call back/email follow up";
+    const callbackDate = getValue("callbackDateInput");
+    const callbackTime = getValue("callbackTimeInput");
+    let callbackDueAt = "";
+    if (isCallbackFollowUp) {
+      if (!callbackDate || !callbackTime) {
+        showError("Select callback date and time to schedule the follow-up reminder.");
+        return;
+      }
+      const callbackDateTime = new Date(`${callbackDate}T${callbackTime}:00`);
+      if (Number.isNaN(callbackDateTime.getTime())) {
+        showError("Enter a valid callback date and time.");
+        return;
+      }
+      if (callbackDateTime.getTime() <= Date.now()) {
+        showError("Callback reminder must be scheduled for a future date and time.");
+        return;
+      }
+      callbackDueAt = callbackDateTime.toISOString();
     }
     const isCollection = isCollectionFlowSelected();
     const isPdcGiven = normalizeDispositionKey(subStatus) === "pdc given";
@@ -9885,6 +10022,19 @@ function wireDispositionActivityEvents() {
     }
 
     if (!validateCollection(true)) return;
+
+    const isDeliveryChallan = normalizeDispositionKey(subStatus) === "delivery challan required";
+    const shouldCreateDeliveryIssue = isDeliveryChallan && Boolean(issueTrackerCheck?.checked);
+    if (shouldCreateDeliveryIssue && !String(actionOwnerSelect?.value || "").trim()) {
+      showDeliveryChallanError("Select an Action Owner before creating the Delivery Challan Issue.");
+      actionOwnerSelect?.focus();
+      return;
+    }
+    if (shouldCreateDeliveryIssue && !String(approvalProcessSelect?.value || "").trim()) {
+      showDeliveryChallanError("Select an Approval Process so its approval matrix can route the Delivery Challan Issue.");
+      approvalProcessSelect?.focus();
+      return;
+    }
 
     if (isPdcGiven) {
       if (!pdcOpsUserName) {
@@ -9919,6 +10069,9 @@ function wireDispositionActivityEvents() {
       tds: getValue("collectionTds"),
       ld: getValue("collectionLd"),
       ptpDate: getValue("ptpDateInput"),
+      callbackDate,
+      callbackTime,
+      callbackDueAt,
       miscRows,
       pdcRows,
       pdcOpsUser: pdcOpsUserName,
@@ -9930,6 +10083,8 @@ function wireDispositionActivityEvents() {
     };
 
     const submitActivity = () => {
+      const activityTimestamp = new Date().toISOString();
+
       if (/@task\b/i.test(remarkText)) {
         const customer = customersData.find(c => c.id === selectedCustomerId);
         const invNo = dispositionInvoiceList && dispositionInvoiceList.length > 0
@@ -9947,13 +10102,59 @@ function wireDispositionActivityEvents() {
         });
       }
 
+      if (isCallbackFollowUp && data.callbackDueAt) {
+        const customer = customersData.find(c => c.id === selectedCustomerId) || null;
+        const invNo = data.invoices?.[0] || currentInvoiceNoForDocs || "";
+        const invoice = invNo ? currentInvoicesAll.find(inv => inv.invoiceNo === invNo) : null;
+        const customerLabel = customer?.name || "the customer";
+        const taskText = `Follow up with ${customerLabel}${invNo ? ` for ${invNo}` : ""}`;
+
+        addTodoTask({
+          text: taskText,
+          dueDate: data.callbackDate,
+          dueTime: data.callbackTime,
+          customer,
+          invoice,
+          source: "activity-callback"
+        });
+
+        addNotificationCenterItem({
+          id: `callback-reminder:${invNo || selectedCustomerId}:${data.callbackDueAt}`,
+          type: "todo",
+          title: "Callback reminder",
+          message: taskText,
+          createdAt: activityTimestamp,
+          scheduledFor: data.callbackDueAt,
+          sentAt: "",
+          read: false,
+          audience: ["all"],
+          details: [
+            { label: "Follow up at", value: `${data.callbackDate} ${data.callbackTime}` },
+            { label: "Customer", value: customer ? `${customer.name} (${customer.code})` : "-" },
+            { label: "Invoice", value: invNo || "-" },
+            { label: "Source", value: "New activity - Call Back/Email Follow up" }
+          ],
+          ctas: [
+            { label: "Open todo", action: "open-todo" }
+          ]
+        });
+
+        const reminderDelay = Date.parse(data.callbackDueAt) - Date.now();
+        if (reminderDelay > 0 && reminderDelay <= 2147483647) {
+          window.setTimeout(() => {
+            normalizeNotificationCenter();
+            updateManagerNotificationBadge();
+            refreshNotificationCenterUi();
+          }, reminderDelay + 250);
+        }
+      }
+
       const isDeliveryChallan = String(subStatus || "").trim().toLowerCase() === "delivery challan required";
       const shouldAddIssue = isDeliveryChallan && issueTrackerCheck && issueTrackerCheck.checked;
       let issueTrailEntry = null;
       let approvalTrailEntry = null;
       let issueTrailPayload = null;
       let approvalTrailPayload = null;
-      const activityTimestamp = new Date().toISOString();
       if (shouldAddIssue) {
         const customer = customersData.find(c => c.id === selectedCustomerId);
         const invNo = dispositionInvoiceList && dispositionInvoiceList.length > 0
@@ -10229,7 +10430,7 @@ function wireDispositionActivityEvents() {
       resetSelect("approvalProcessSelect");
       syncDispositionStatusFromSubStatus();
 
-      ["activityRemarks", "collectionInstrumentRef", "collectionBank", "collectionTransferDate", "collectionAmount", "collectionTds", "collectionLd", "ptpDateInput", "pdcOpsUser", "pdcCourierName", "pdcDispatchDate", "pdcTrackingNo", "pdcDispatchMode"]
+      ["activityRemarks", "collectionInstrumentRef", "collectionBank", "collectionTransferDate", "collectionAmount", "collectionTds", "collectionLd", "ptpDateInput", "callbackDateInput", "callbackTimeInput", "pdcOpsUser", "pdcCourierName", "pdcDispatchDate", "pdcTrackingNo", "pdcDispatchMode"]
         .forEach((id) => {
           const el = document.getElementById(id);
           if (el) el.value = "";
@@ -10251,6 +10452,9 @@ function wireDispositionActivityEvents() {
       toggleCollectionModeFields();
       toggleCollectionFields();
       togglePdcFields();
+      toggleDeliveryChallanFields();
+      togglePtpDateField();
+      toggleCallbackReminderFields();
     };
 
     if (isPdcGiven && !hasDispatchDetails(dispatchDetails)) {
@@ -11701,6 +11905,26 @@ function getInitials(firstName, lastName) {
     .map((value) => value.trim().charAt(0).toUpperCase())
     .join("")
     .slice(0, 2);
+}
+
+function normalizeAgingColor(value) {
+  const color = String(value || "").trim();
+  return /^#[0-9a-f]{3,8}$/i.test(color) ? color : "#64748b";
+}
+
+function getAgingTextColor(value) {
+  const color = normalizeAgingColor(value).slice(1);
+  const hex = color.length === 3
+    ? color.split("").map((part) => `${part}${part}`).join("")
+    : color.slice(0, 6);
+  const red = parseInt(hex.slice(0, 2), 16) / 255;
+  const green = parseInt(hex.slice(2, 4), 16) / 255;
+  const blue = parseInt(hex.slice(4, 6), 16) / 255;
+  const channel = (component) => (component <= 0.03928
+    ? component / 12.92
+    : Math.pow((component + 0.055) / 1.055, 2.4));
+  const luminance = (0.2126 * channel(red)) + (0.7152 * channel(green)) + (0.0722 * channel(blue));
+  return luminance > 0.179 ? "#0f172a" : "#ffffff";
 }
 
 function hashStringToIndex(value, size) {

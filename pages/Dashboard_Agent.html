@@ -801,20 +801,37 @@
         <div class="modalChartWrap">
           <canvas id="chartDetailCanvas"></canvas>
         </div>
-        <div class="vintageDetailTableWrap" id="vintageDetailTableWrap" hidden>
-          <table class="vintageDetailTable">
-            <thead>
-              <tr>
-                <th>Aging Bucket</th>
-                <th>Count of invoices</th>
-                <th>Count of customers</th>
-                <th>Total Amount</th>
-                <th>Total Net Due</th>
-                <th>Share %</th>
-              </tr>
-            </thead>
-            <tbody id="vintageDetailTableBody"></tbody>
-          </table>
+        <div class="vintageDetailLayout" id="vintageDetailLayout" hidden>
+          <aside class="vintageDetailComposition" aria-label="Vintage portfolio composition">
+            <div class="vintageDetailDonutWrap">
+              <canvas id="vintageDetailCanvas"></canvas>
+            </div>
+            <div class="vintageDetailLegend" id="vintageDetailLegend" aria-label="Aging bucket legend"></div>
+          </aside>
+          <section class="vintageDetailTablePane">
+            <div class="vintageDetailToolbar">
+              <label class="vintageDetailSearch">
+                <i class="bi bi-search" aria-hidden="true"></i>
+                <input type="search" id="vintageDetailSearch" placeholder="Search aging bucket" aria-label="Search aging bucket">
+              </label>
+              <strong class="vintageDetailSummary" id="vintageDetailSummary" aria-live="polite"></strong>
+            </div>
+            <div class="vintageDetailTableWrap" id="vintageDetailTableWrap">
+              <table class="vintageDetailTable">
+                <thead>
+                  <tr>
+                    <th>Aging Bucket</th>
+                    <th>Count of invoices</th>
+                    <th>Count of customers</th>
+                    <th>Total Amount</th>
+                    <th>Total Net Due</th>
+                    <th>Share %</th>
+                  </tr>
+                </thead>
+                <tbody id="vintageDetailTableBody"></tbody>
+              </table>
+            </div>
+          </section>
         </div>
         <div class="activityDetailLayout" id="activityDetailLayout" hidden>
           <section class="activityDetailChartPane">
@@ -1186,13 +1203,13 @@
         <div class="tableWrap">
           <table class="invoiceTable mtdCollectionTable">
             <thead>
-              <tr>
+              <tr id="mtdCollectionsHeaderRow">
                 <th>Customer code</th>
                 <th>Customer name</th>
                 <th>Invoice No</th>
-                <th>Invoice value</th>
+                <th id="mtdInvoiceValueHeader">Invoice value</th>
                 <th id="mtdAmountForMonthHeader">Amount for the month</th>
-                <th>Total net due</th>
+                <th id="mtdTotalNetDueHeader">Total net due</th>
                 <th>Invoice date</th>
                 <th>Due date</th>
                 <th id="mtdAgingDaysHeader" hidden>Aging days</th>
@@ -1276,7 +1293,8 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
-<script src="../scripts/shared-header.js"></script>
+<script src="../scripts/shared-header.js?v=20260730-tutorials"></script>
+<script src="../scripts/dashboard-agent-tutorial.js?v=20260730-close-only"></script>
 <script>
   (() => {
     const brand = getComputedStyle(document.documentElement).getPropertyValue("--brand").trim() || "#5c258d";
@@ -2058,8 +2076,13 @@
     const modalMeta = document.getElementById("chartDetailModalMeta");
     const modalHighlights = document.getElementById("chartDetailHighlights");
     const modalCanvas = document.getElementById("chartDetailCanvas");
+    const vintageDetailLayout = document.getElementById("vintageDetailLayout");
     const vintageDetailTableWrap = document.getElementById("vintageDetailTableWrap");
     const vintageDetailTableBody = document.getElementById("vintageDetailTableBody");
+    const vintageDetailCanvas = document.getElementById("vintageDetailCanvas");
+    const vintageDetailLegend = document.getElementById("vintageDetailLegend");
+    const vintageDetailSearch = document.getElementById("vintageDetailSearch");
+    const vintageDetailSummary = document.getElementById("vintageDetailSummary");
     const activityDetailLayout = document.getElementById("activityDetailLayout");
     const activityDetailCanvas = document.getElementById("activityDetailCanvas");
     const activityDetailTableBody = document.getElementById("activityDetailTableBody");
@@ -2135,6 +2158,7 @@
     const targetUrgencyTrackFill = document.getElementById("targetUrgencyTrackFill");
     const targetRunRateNote = document.getElementById("targetRunRateNote");
     let modalChart = null;
+    let vintageDetailChart = null;
     let activityDetailChart = null;
     let issueDetailChart = null;
     let cashflowDetailChart = null;
@@ -2190,24 +2214,47 @@
     const buildVintageTableRows = () => {
       const values = chartConfigs.vintage?.data?.datasets?.[0]?.data || [];
       const normalizedValues = [
-        Number(values[0] || 0), // Not Due
-        Number(values[1] || 0), // 1-30
-        Number(values[2] || 0), // 31-60
+        Number(values[0] || 0) + Number(values[1] || 0), // Not due - 30
+        Number((Number(values[2] || 0) * 0.58).toFixed(2)), // 31-45
+        Number((Number(values[2] || 0) * 0.42).toFixed(2)), // 46-60
         Number(values[3] || 0) + Number(values[4] || 0), // 61-120
         Number(values[5] || 0), // 121-150
-        Number(values[6] || 0) + Number(values[7] || 0) + Number(values[8] || 0), // 151-240
-        Number(values[9] || 0) + Number(values[10] || 0) + Number(values[11] || 0) + Number(values[12] || 0), // 241-365
-        Number(values[13] || 0) + Number(values[14] || 0) + Number(values[15] || 0) + Number(values[16] || 0) + Number(values[17] || 0) // 1+ year
+        Number(values[6] || 0), // 151-180
+        Number(values[7] || 0), // 181-210
+        Number(values[8] || 0), // 211-240
+        Number(values[9] || 0), // 241-270
+        Number(values[10] || 0), // 271-300
+        Number(values[11] || 0), // 301-330
+        Number(values[12] || 0), // 331-365
+        Number(values[13] || 0), // 1-2 yrs
+        Number(values[14] || 0), // 2-3 yrs
+        Number(values[15] || 0), // 3-4 yrs
+        Number(values[16] || 0), // 4-5 yrs
+        Number(values[17] || 0) // 5+ yrs
       ];
       const buckets = [
-        "Not Due",
-        "1-30",
-        "31-60",
+        "Not due 1-30",
+        "31-45",
+        "46-60",
         "61-120",
         "121-150",
-        "151-240",
-        "241-365",
-        "1+ Year"
+        "151-180",
+        "181-210",
+        "211-240",
+        "241-270",
+        "271-300",
+        "301-330",
+        "331-365",
+        "1-2 yrs",
+        "2-3 yrs",
+        "3-4 yrs",
+        "4-5 yrs",
+        "5+ yrs"
+      ];
+      const colors = [
+        "#1e88ff", "#a5c9f5", "#fecaca", "#ec4899", "#c4b5fd", "#e5e7eb",
+        "#99f6e4", "#fda4af", "#fbcfe8", "#bae6fd", "#bfdbfe", "#fecaca",
+        "#bbf7d0", "#fde68a", "#ddd6fe", "#e5e7eb", "#ccfbf1"
       ];
       const totalValue = normalizedValues.reduce((sum, value) => sum + Number(value || 0), 0);
       const roundedPercentages = (() => {
@@ -2230,8 +2277,8 @@
       return buckets.map((bucket, index) => {
         const amountCr = Number(normalizedValues[index] || 0);
         const netDueCr = amountCr * 0.93;
-        const invoices = Math.max(6, Math.round(amountCr * 26));
-        const customers = Math.max(2, Math.round(invoices * 0.28));
+        const invoices = amountCr > 0 ? Math.max(1, Math.round(amountCr * 26)) : 0;
+        const customers = invoices > 0 ? Math.max(1, Math.round(invoices * 0.28)) : 0;
         const percentage = roundedPercentages[index] || 0;
         return {
           bucket,
@@ -2239,17 +2286,36 @@
           customers,
           percentage,
           amountCr,
-          netDueCr
+          netDueCr,
+          color: colors[index]
         };
       });
     };
 
-    const renderVintageDetailTable = () => {
+    const renderVintageDetail = () => {
       if (!vintageDetailTableBody) return;
       const rows = buildVintageTableRows();
-      vintageDetailTableBody.innerHTML = rows.map((row) => `
+      const searchTerm = String(vintageDetailSearch?.value || "").trim().toLowerCase();
+      const visibleRows = searchTerm
+        ? rows.filter((row) => row.bucket.toLowerCase().includes(searchTerm))
+        : rows;
+      const totalInvoices = rows.reduce((sum, row) => sum + row.invoices, 0);
+      const customerCount = Math.max(0, ...rows.map((row) => row.customers));
+
+      if (vintageDetailSummary) {
+        vintageDetailSummary.textContent = `Showing ${formatCount(totalInvoices)} invoices across ${formatCount(customerCount)} customers`;
+      }
+      if (vintageDetailLegend) {
+        vintageDetailLegend.innerHTML = rows.map((row) => `
+          <span class="vintageDetailLegendItem">
+            <span class="vintageDetailLegendDot" style="--vintage-bucket-color: ${row.color};"></span>
+            ${escapeHtml(row.bucket)}
+          </span>
+        `).join("");
+      }
+      vintageDetailTableBody.innerHTML = visibleRows.map((row) => `
         <tr>
-          <td>${escapeHtml(row.bucket)}</td>
+          <td><span class="vintageBucketName"><span class="vintageBucketDot" style="--vintage-bucket-color: ${row.color};"></span>${escapeHtml(row.bucket)}</span></td>
           <td>${formatCount(row.invoices)}</td>
           <td>${formatCount(row.customers)}</td>
           <td>${formatCrCurrency(row.amountCr)}</td>
@@ -2257,14 +2323,54 @@
           <td>
             <span class="vintageBucketShareCell">
               <span class="vintageShareProgress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${row.percentage.toFixed(1)}">
-                <span class="vintageShareProgressFill" style="width: ${Math.max(0, Math.min(100, row.percentage))}%;"></span>
+                <span class="vintageShareProgressFill" style="--vintage-bucket-color: ${row.color}; width: ${Math.max(0, Math.min(100, row.percentage))}%;"></span>
               </span>
               <span class="vintageBucketBarText">${row.percentage.toFixed(1)}%</span>
             </span>
           </td>
         </tr>
       `).join("");
+
+      if (vintageDetailChart) {
+        vintageDetailChart.destroy();
+        vintageDetailChart = null;
+      }
+      if (vintageDetailCanvas) {
+        vintageDetailChart = new Chart(vintageDetailCanvas.getContext("2d"), {
+          type: "doughnut",
+          data: {
+            labels: rows.map((row) => row.bucket),
+            datasets: [{
+              data: rows.map((row) => row.amountCr),
+              backgroundColor: rows.map((row) => row.color),
+              borderColor: "#ffffff",
+              borderWidth: 2,
+              hoverOffset: 5
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: "62%",
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: (context) => {
+                    const row = rows[context.dataIndex];
+                    return `${row.bucket}: ${formatCrCurrency(row.amountCr)} (${row.percentage.toFixed(1)}%)`;
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
     };
+
+    if (vintageDetailSearch) {
+      vintageDetailSearch.addEventListener("input", renderVintageDetail);
+    }
 
     const formatInrCompact = (value) => `Rs. ${Number(value || 0).toLocaleString("en-IN")}`;
     const safeHtml = (value) => String(value || "").replace(/[&<>"']/g, (ch) => ({
@@ -3720,6 +3826,13 @@
 
     if (modalEl) {
       modalEl.addEventListener("hidden.bs.modal", () => {
+        if (modalEl.classList.contains("is-vintage-detail")) {
+          modalEl.classList.remove("is-vintage-detail");
+          if (vintageDetailChart) {
+            vintageDetailChart.destroy();
+            vintageDetailChart = null;
+          }
+        }
         if (modalEl.classList.contains("is-activity-detail")) {
           resetActivityDetailState({ rerender: false });
           modalEl.classList.remove("is-activity-detail");
@@ -3765,6 +3878,7 @@
       const isCashflowDetail = key === "cashflow";
       const isTargetDetail = key === "planActual";
       if (modalEl) {
+        modalEl.classList.toggle("is-vintage-detail", isVintageDetail);
         modalEl.classList.toggle("is-activity-detail", isActivityDetail);
         modalEl.classList.toggle("is-issue-detail", isIssueDetail);
         modalEl.classList.toggle("is-cashflow-detail", isCashflowDetail);
@@ -3773,8 +3887,8 @@
       if (modalCanvas) {
         modalCanvas.parentElement.hidden = isVintageDetail || isActivityDetail || isIssueDetail || isCashflowDetail || isTargetDetail;
       }
-      if (vintageDetailTableWrap) {
-        vintageDetailTableWrap.hidden = !isVintageDetail;
+      if (vintageDetailLayout) {
+        vintageDetailLayout.hidden = !isVintageDetail;
       }
       if (activityDetailLayout) {
         activityDetailLayout.hidden = !isActivityDetail;
@@ -3795,7 +3909,7 @@
         )).join("");
       }
       if (isVintageDetail) {
-        renderVintageDetailTable();
+        renderVintageDetail();
       }
       if (isActivityDetail) {
         renderActivityDetail();
@@ -3813,6 +3927,10 @@
       if (modalChart) {
         modalChart.destroy();
         modalChart = null;
+      }
+      if (vintageDetailChart && !isVintageDetail) {
+        vintageDetailChart.destroy();
+        vintageDetailChart = null;
       }
       if (activityDetailChart && !isActivityDetail) {
         activityDetailChart.destroy();
@@ -4115,6 +4233,7 @@
     const callbacksForDayCard = document.getElementById("callbacksForDayCard");
     const mtdCollectionsModalLabel = document.getElementById("mtdCollectionsModalLabel");
     const mtdCollectionsModalSubtext = document.getElementById("mtdCollectionsModalSubtext");
+    const mtdModalSubtotal = document.getElementById("mtdModalSubtotal");
     const mtdIssueTrackerBtn = document.getElementById("mtdIssueTrackerBtn");
     const mtdAmountForMonthHeader = document.getElementById("mtdAmountForMonthHeader");
     const mtdAgingDaysHeader = document.getElementById("mtdAgingDaysHeader");
@@ -4838,11 +4957,91 @@
       if (mtdNextBtn) mtdNextBtn.disabled = mtdCurrentPage >= totalPages || !totalRows;
     };
 
+    const getFilteredMtdRows = (activeConfig) => {
+      const searchValue = mtdFilters.search.trim().toLowerCase();
+      const showAgingColumn = Boolean(activeConfig.showAging);
+      const isIssuesMode = mtdActiveModalType === "issues";
+      const showStatusColumn = activeConfig.showStatusColumn !== false;
+      const showOwnerColumns = ["allocations", "billing"].includes(mtdActiveModalType);
+      return activeConfig.rows.filter((row) => {
+        const dueMatches = mtdFilters.due === "all" || row.dueType === mtdFilters.due;
+        const rowStatusKey = isIssuesMode ? normalizeKey(row.status) : normalizeMtdStatus(row.status);
+        const statusMatches = !showStatusColumn || mtdFilters.status === "all" || rowStatusKey === mtdFilters.status;
+        const commitmentMatches = mtdFilters.commitment === "all" || row.commitmentType === mtdFilters.commitment;
+        const managerMatches = !showOwnerColumns || mtdFilters.manager === "all" || normalizeKey(row.manager) === mtdFilters.manager;
+        const kamMatches = !showOwnerColumns || mtdFilters.kam === "all" || normalizeKey(row.kam) === mtdFilters.kam;
+        const kasMatches = !showOwnerColumns || mtdFilters.kas === "all" || normalizeKey(row.kas) === mtdFilters.kas;
+        const agingMatches = (() => {
+          if (!showAgingColumn || mtdFilters.agingRange === "all") return true;
+          const days = Number(row.agingDays || 0);
+          if (mtdFilters.agingRange === "31_45") return days >= 31 && days <= 45;
+          if (mtdFilters.agingRange === "46_60") return days >= 46 && days <= 60;
+          if (mtdFilters.agingRange === "61_90") return days >= 61 && days <= 90;
+          return mtdFilters.agingRange !== "90_plus" || days > 90;
+        })();
+        const searchMatches = !searchValue
+          || row.invoiceNo.toLowerCase().includes(searchValue)
+          || row.customerName.toLowerCase().includes(searchValue)
+          || row.customerCode.toLowerCase().includes(searchValue);
+        return dueMatches && statusMatches && commitmentMatches && managerMatches && kamMatches && kasMatches && agingMatches && searchMatches;
+      });
+    };
+
+    const updateMtdModalSubtotal = (rows) => {
+      if (!mtdModalSubtotal) return;
+      const valueKey = {
+        mtd: "amountForMonth",
+        issues: "totalNetDue",
+        aging: "totalNetDue",
+        billing: "invoiceValue",
+        allocations: "invoiceValue",
+        ptp: "committedAmount",
+        callbacks: "committedAmount"
+      }[mtdActiveModalType] || "amountForMonth";
+      const subtotal = rows.reduce((sum, row) => sum + Number(row[valueKey] || 0), 0);
+      mtdModalSubtotal.innerHTML = `<span>Subtotal</span><strong>${formatCurrency(subtotal)}</strong>`;
+    };
+
+    const updateMtdColumnSubtotals = (rows, { showAmountForMonthColumn, showValueColumn, valueIsAmount, valueField }) => {
+      const headerRow = document.getElementById("mtdCollectionsHeaderRow");
+      if (!headerRow || !headerRow.parentElement) return;
+      let subtotalRow = document.getElementById("mtdColumnSubtotalRow");
+      if (!subtotalRow) {
+        subtotalRow = document.createElement("tr");
+        subtotalRow.id = "mtdColumnSubtotalRow";
+        subtotalRow.className = "mtdColumnSubtotalRow";
+      }
+      headerRow.parentElement.insertBefore(subtotalRow, headerRow);
+
+      const totals = {
+        mtdInvoiceValueHeader: rows.reduce((sum, row) => sum + Number(row.invoiceValue || 0), 0),
+        mtdAmountForMonthHeader: rows.reduce((sum, row) => sum + Number(row.amountForMonth || 0), 0),
+        mtdTotalNetDueHeader: rows.reduce((sum, row) => sum + Number(row.totalNetDue || 0), 0),
+        mtdValueColumnHeader: rows.reduce((sum, row) => sum + Number(row[valueField] || 0), 0)
+      };
+      subtotalRow.innerHTML = "";
+      Array.from(headerRow.children).forEach((headerCell) => {
+        const subtotalCell = document.createElement("th");
+        subtotalCell.hidden = headerCell.hidden;
+        const headerId = headerCell.id;
+        const isVisibleAmount = headerId === "mtdInvoiceValueHeader"
+          || headerId === "mtdTotalNetDueHeader"
+          || (headerId === "mtdAmountForMonthHeader" && showAmountForMonthColumn)
+          || (headerId === "mtdValueColumnHeader" && showValueColumn && valueIsAmount);
+        if (isVisibleAmount) {
+          subtotalCell.innerHTML = `<strong>${formatCurrency(totals[headerId] || 0)}</strong>`;
+        } else if (headerCell === headerRow.firstElementChild) {
+          subtotalCell.innerHTML = '<span class="mtdColumnSubtotalLabel">Subtotal</span>';
+        } else {
+          subtotalCell.setAttribute("aria-hidden", "true");
+        }
+        subtotalRow.appendChild(subtotalCell);
+      });
+    };
+
     const renderMtdCollectionsTable = () => {
       if (!mtdTableBody) return;
-      const searchValue = mtdFilters.search.trim().toLowerCase();
       const activeConfig = getMtdActiveConfig();
-      const activeRows = activeConfig.rows;
       const showAgingColumn = Boolean(activeConfig.showAging);
       const isIssuesMode = mtdActiveModalType === "issues";
       const showPrimaryStatusColumn = isIssuesMode;
@@ -4857,6 +5056,7 @@
       if (mtdValueColumnHeader) {
         mtdValueColumnHeader.hidden = !showValueColumn;
         mtdValueColumnHeader.textContent = showPrimaryStatusColumn ? "Primary status" : "Committed amount";
+        mtdValueColumnHeader.classList.toggle("is-text-column", showPrimaryStatusColumn);
       }
       if (mtdStatusHeader) mtdStatusHeader.hidden = !showStatusColumn;
       if (mtdActionOwnerHeader) mtdActionOwnerHeader.hidden = !showActionOwnerColumn;
@@ -4864,28 +5064,13 @@
       if (mtdManagerHeader) mtdManagerHeader.hidden = !showOwnerColumns;
       if (mtdKamHeader) mtdKamHeader.hidden = !showOwnerColumns;
       if (mtdKasHeader) mtdKasHeader.hidden = !showOwnerColumns;
-      const filteredRows = activeRows.filter((row) => {
-        const dueMatches = mtdFilters.due === "all" || row.dueType === mtdFilters.due;
-        const rowStatusKey = mtdActiveModalType === "mtd" ? normalizeMtdStatus(row.status) : normalizeKey(row.status);
-        const statusMatches = !showStatusColumn || mtdFilters.status === "all" || rowStatusKey === mtdFilters.status;
-        const commitmentMatches = mtdFilters.commitment === "all" || row.commitmentType === mtdFilters.commitment;
-        const managerMatches = !showOwnerColumns || mtdFilters.manager === "all" || normalizeKey(row.manager) === mtdFilters.manager;
-        const kamMatches = !showOwnerColumns || mtdFilters.kam === "all" || normalizeKey(row.kam) === mtdFilters.kam;
-        const kasMatches = !showOwnerColumns || mtdFilters.kas === "all" || normalizeKey(row.kas) === mtdFilters.kas;
-        const agingMatches = (() => {
-          if (!showAgingColumn || mtdFilters.agingRange === "all") return true;
-          const days = Number(row.agingDays || 0);
-          if (mtdFilters.agingRange === "31_45") return days >= 31 && days <= 45;
-          if (mtdFilters.agingRange === "46_60") return days >= 46 && days <= 60;
-          if (mtdFilters.agingRange === "61_90") return days >= 61 && days <= 90;
-          if (mtdFilters.agingRange === "90_plus") return days > 90;
-          return true;
-        })();
-        const searchMatches = !searchValue
-          || row.invoiceNo.toLowerCase().includes(searchValue)
-          || row.customerName.toLowerCase().includes(searchValue)
-          || row.customerCode.toLowerCase().includes(searchValue);
-        return dueMatches && statusMatches && commitmentMatches && managerMatches && kamMatches && kasMatches && agingMatches && searchMatches;
+      const filteredRows = getFilteredMtdRows(activeConfig);
+      updateMtdModalSubtotal(filteredRows);
+      updateMtdColumnSubtotals(filteredRows, {
+        showAmountForMonthColumn,
+        showValueColumn,
+        valueIsAmount: !showPrimaryStatusColumn,
+        valueField: "committedAmount"
       });
       const totalRows = filteredRows.length;
       const totalPages = Math.max(1, Math.ceil(totalRows / mtdPageSize));

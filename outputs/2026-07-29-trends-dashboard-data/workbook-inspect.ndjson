@@ -1,0 +1,110 @@
+{"kind":"workbook","id":"wb/2uvd9g","sheets":7}
+{"kind":"sheet","id":"ws/www99u","name":"README","index":0,"range":"A1:H22","address":"A1:H22"}
+{"kind":"sheet","id":"ws/9191eu","name":"AR_Trend_Data","index":1,"range":"A1:AI19","address":"A1:AI19","formulas":72}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"D8","formula":"=YEAR(A8)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"E8","formula":"=\"FY\"&IF(MONTH(A8)>=4,YEAR(A8),YEAR(A8)-1)&\"-\"&RIGHT(IF(MONTH(A8)>=4,YEAR(A8)+1,YEAR(A8))&\"\",2)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"F8","formula":"=\"Q\"&ROUNDUP(MONTH(A8)/3,0)&\" \"&YEAR(A8)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"G8","formula":"=TEXT(A8,\"mmm yyyy\")"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"H8","formula":"=DAY(A8)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"AA8","formula":"=SUM(W8:Z8)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"D9","formula":"=YEAR(A9)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"E9","formula":"=\"FY\"&IF(MONTH(A9)>=4,YEAR(A9),YEAR(A9)-1)&\"-\"&RIGHT(IF(MONTH(A9)>=4,YEAR(A9)+1,YEAR(A9))&\"\",2)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"F9","formula":"=\"Q\"&ROUNDUP(MONTH(A9)/3,0)&\" \"&YEAR(A9)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"G9","formula":"=TEXT(A9,\"mmm yyyy\")"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"H9","formula":"=DAY(A9)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"AA9","formula":"=SUM(W9:Z9)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"D10","formula":"=YEAR(A10)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"E10","formula":"=\"FY\"&IF(MONTH(A10)>=4,YEAR(A10),YEAR(A10)-1)&\"-\"&RIGHT(IF(MONTH(A10)>=4,YEAR(A10)+1,YEAR(A10))&\"\",2)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"F10","formula":"=\"Q\"&ROUNDUP(MONTH(A10)/3,0)&\" \"&YEAR(A10)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"G10","formula":"=TEXT(A10,\"mmm yyyy\")"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"H10","formula":"=DAY(A10)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"AA10","formula":"=SUM(W10:Z10)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"D11","formula":"=YEAR(A11)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"E11","formula":"=\"FY\"&IF(MONTH(A11)>=4,YEAR(A11),YEAR(A11)-1)&\"-\"&RIGHT(IF(MONTH(A11)>=4,YEAR(A11)+1,YEAR(A11))&\"\",2)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"F11","formula":"=\"Q\"&ROUNDUP(MONTH(A11)/3,0)&\" \"&YEAR(A11)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"G11","formula":"=TEXT(A11,\"mmm yyyy\")"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"H11","formula":"=DAY(A11)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"AA11","formula":"=SUM(W11:Z11)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"D12","formula":"=YEAR(A12)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"E12","formula":"=\"FY\"&IF(MONTH(A12)>=4,YEAR(A12),YEAR(A12)-1)&\"-\"&RIGHT(IF(MONTH(A12)>=4,YEAR(A12)+1,YEAR(A12))&\"\",2)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"F12","formula":"=\"Q\"&ROUNDUP(MONTH(A12)/3,0)&\" \"&YEAR(A12)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"G12","formula":"=TEXT(A12,\"mmm yyyy\")"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"H12","formula":"=DAY(A12)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"AA12","formula":"=SUM(W12:Z12)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"D13","formula":"=YEAR(A13)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"E13","formula":"=\"FY\"&IF(MONTH(A13)>=4,YEAR(A13),YEAR(A13)-1)&\"-\"&RIGHT(IF(MONTH(A13)>=4,YEAR(A13)+1,YEAR(A13))&\"\",2)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"F13","formula":"=\"Q\"&ROUNDUP(MONTH(A13)/3,0)&\" \"&YEAR(A13)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"G13","formula":"=TEXT(A13,\"mmm yyyy\")"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"H13","formula":"=DAY(A13)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"AA13","formula":"=SUM(W13:Z13)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"D14","formula":"=YEAR(A14)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"E14","formula":"=\"FY\"&IF(MONTH(A14)>=4,YEAR(A14),YEAR(A14)-1)&\"-\"&RIGHT(IF(MONTH(A14)>=4,YEAR(A14)+1,YEAR(A14))&\"\",2)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"F14","formula":"=\"Q\"&ROUNDUP(MONTH(A14)/3,0)&\" \"&YEAR(A14)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"G14","formula":"=TEXT(A14,\"mmm yyyy\")"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"H14","formula":"=DAY(A14)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"AA14","formula":"=SUM(W14:Z14)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"D15","formula":"=YEAR(A15)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"E15","formula":"=\"FY\"&IF(MONTH(A15)>=4,YEAR(A15),YEAR(A15)-1)&\"-\"&RIGHT(IF(MONTH(A15)>=4,YEAR(A15)+1,YEAR(A15))&\"\",2)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"F15","formula":"=\"Q\"&ROUNDUP(MONTH(A15)/3,0)&\" \"&YEAR(A15)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"G15","formula":"=TEXT(A15,\"mmm yyyy\")"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"H15","formula":"=DAY(A15)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"AA15","formula":"=SUM(W15:Z15)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"D16","formula":"=YEAR(A16)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"E16","formula":"=\"FY\"&IF(MONTH(A16)>=4,YEAR(A16),YEAR(A16)-1)&\"-\"&RIGHT(IF(MONTH(A16)>=4,YEAR(A16)+1,YEAR(A16))&\"\",2)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"F16","formula":"=\"Q\"&ROUNDUP(MONTH(A16)/3,0)&\" \"&YEAR(A16)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"G16","formula":"=TEXT(A16,\"mmm yyyy\")"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"H16","formula":"=DAY(A16)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"AA16","formula":"=SUM(W16:Z16)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"D17","formula":"=YEAR(A17)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"E17","formula":"=\"FY\"&IF(MONTH(A17)>=4,YEAR(A17),YEAR(A17)-1)&\"-\"&RIGHT(IF(MONTH(A17)>=4,YEAR(A17)+1,YEAR(A17))&\"\",2)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"F17","formula":"=\"Q\"&ROUNDUP(MONTH(A17)/3,0)&\" \"&YEAR(A17)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"G17","formula":"=TEXT(A17,\"mmm yyyy\")"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"H17","formula":"=DAY(A17)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"AA17","formula":"=SUM(W17:Z17)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"D18","formula":"=YEAR(A18)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"E18","formula":"=\"FY\"&IF(MONTH(A18)>=4,YEAR(A18),YEAR(A18)-1)&\"-\"&RIGHT(IF(MONTH(A18)>=4,YEAR(A18)+1,YEAR(A18))&\"\",2)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"F18","formula":"=\"Q\"&ROUNDUP(MONTH(A18)/3,0)&\" \"&YEAR(A18)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"G18","formula":"=TEXT(A18,\"mmm yyyy\")"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"H18","formula":"=DAY(A18)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"AA18","formula":"=SUM(W18:Z18)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"D19","formula":"=YEAR(A19)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"E19","formula":"=\"FY\"&IF(MONTH(A19)>=4,YEAR(A19),YEAR(A19)-1)&\"-\"&RIGHT(IF(MONTH(A19)>=4,YEAR(A19)+1,YEAR(A19))&\"\",2)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"F19","formula":"=\"Q\"&ROUNDUP(MONTH(A19)/3,0)&\" \"&YEAR(A19)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"G19","formula":"=TEXT(A19,\"mmm yyyy\")"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"H19","formula":"=DAY(A19)"}
+{"kind":"formula","sheet":"AR_Trend_Data","address":"AA19","formula":"=SUM(W19:Z19)"}
+{"kind":"sheet","id":"ws/n8h40t","name":"Visit_Data","index":2,"range":"A1:Q22","address":"A1:Q22","formulas":60}
+{"kind":"formula","sheet":"Visit_Data","address":"B8","formula":"=YEAR(A8)"}
+{"kind":"formula","sheet":"Visit_Data","address":"C8","formula":"=\"FY\"&IF(MONTH(A8)>=4,YEAR(A8),YEAR(A8)-1)&\"-\"&RIGHT(IF(MONTH(A8)>=4,YEAR(A8)+1,YEAR(A8))&\"\",2)"}
+{"kind":"formula","sheet":"Visit_Data","address":"D8","formula":"=\"Q\"&ROUNDUP(MONTH(A8)/3,0)&\" \"&YEAR(A8)"}
+{"kind":"formula","sheet":"Visit_Data","address":"E8","formula":"=TEXT(A8,\"mmm yyyy\")"}
+{"kind":"formula","sheet":"Visit_Data","address":"B9","formula":"=YEAR(A9)"}
+{"kind":"formula","sheet":"Visit_Data","address":"C9","formula":"=\"FY\"&IF(MONTH(A9)>=4,YEAR(A9),YEAR(A9)-1)&\"-\"&RIGHT(IF(MONTH(A9)>=4,YEAR(A9)+1,YEAR(A9))&\"\",2)"}
+{"kind":"formula","sheet":"Visit_Data","address":"D9","formula":"=\"Q\"&ROUNDUP(MONTH(A9)/3,0)&\" \"&YEAR(A9)"}
+{"kind":"formula","sheet":"Visit_Data","address":"E9","formula":"=TEXT(A9,\"mmm yyyy\")"}
+{"kind":"formula","sheet":"Visit_Data","address":"B10","formula":"=YEAR(A10)"}
+{"kind":"formula","sheet":"Visit_Data","address":"C10","formula":"=\"FY\"&IF(MONTH(A10)>=4,YEAR(A10),YEAR(A10)-1)&\"-\"&RIGHT(IF(MONTH(A10)>=4,YEAR(A10)+1,YEAR(A10))&\"\",2)"}
+{"kind":"formula","sheet":"Visit_Data","address":"D10","formula":"=\"Q\"&ROUNDUP(MONTH(A10)/3,0)&\" \"&YEAR(A10)"}
+{"kind":"formula","sheet":"Visit_Data","address":"E10","formula":"=TEXT(A10,\"mmm yyyy\")"}
+{"kind":"formula","sheet":"Visit_Data","address":"B11","formula":"=YEAR(A11)"}
+{"kind":"formula","sheet":"Visit_Data","address":"C11","formula":"=\"FY\"&IF(MONTH(A11)>=4,YEAR(A11),YEAR(A11)-1)&\"-\"&RIGHT(IF(MONTH(A11)>=4,YEAR(A11)+1,YEAR(A11))&\"\",2)"}
+{"kind":"formula","sheet":"Visit_Data","address":"D11","formula":"=\"Q\"&ROUNDUP(MONTH(A11)/3,0)&\" \"&YEAR(A11)"}
+{"kind":"formula","sheet":"Visit_Data","address":"E11","formula":"=TEXT(A11,\"mmm yyyy\")"}
+{"kind":"formula","sheet":"Visit_Data","address":"B12","formula":"=YEAR(A12)"}
+{"kind":"formula","sheet":"Visit_Data","address":"C12","formula":"=\"FY\"&IF(MONTH(A12)>=4,YEAR(A12),YEAR(A12)-1)&\"-\"&RIGHT(IF(MONTH(A12)>=4,YEAR(A12)+1,YEAR(A12))&\"\",2)"}
+{"kind":"formula","sheet":"Visit_Data","address":"D12","formula":"=\"Q\"&ROUNDUP(MONTH(A12)/3,0)&\" \"&YEAR(A12)"}
+{"kind":"formula","sheet":"Visit_Data","address":"E12","formula":"=TEXT(A12,\"mmm yyyy\")"}
+{"kind":"formula","sheet":"Visit_Data","address":"B13","formula":"=YEAR(A13)"}
+{"kind":"formula","sheet":"Visit_Data","address":"C13","formula":"=\"FY\"&IF(MONTH(A13)>=4,YEAR(A13),YEAR(A13)-1)&\"-\"&RIGHT(IF(MONTH(A13)>=4,YEAR(A13)+1,YEAR(A13))&\"\",2)"}
+{"kind":"formula","sheet":"Visit_Data","address":"D13","formula":"=\"Q\"&ROUNDUP(MONTH(A13)/3,0)&\" \"&YEAR(A13)"}
+{"kind":"formula","sheet":"Visit_Data","address":"E13","formula":"=TEXT(A13,\"mmm yyyy\")"}
+{"kind":"formula","sheet":"Visit_Data","address":"B14","formula":"=YEAR(A14)"}
+{"kind":"formula","sheet":"Visit_Data","address":"C14","formula":"=\"FY\"&IF(MONTH(A14)>=4,YEAR(A14),YEAR(A14)-1)&\"-\"&RIGHT(IF(MONTH(A14)>=4,YEAR(A14)+1,YEAR(A14))&\"\",2)"}
+{"kind":"formula","sheet":"Visit_Data","address":"D14","formula":"=\"Q\"&ROUNDUP(MONTH(A14)/3,0)&\" \"&YEAR(A14)"}
+{"kind":"formula","sheet":"Visit_Data","address":"E14","formula":"=TEXT(A14,\"mmm yyyy\")"}
+{"kind":"formula","sheet":"Visit_Data","address":"B15","formula":"=YEAR(A15)"}
+{"kind":"formula","sheet":"Visit_Data","address":"C15","formula":"=\"FY\"&IF(MONTH(A15)>=4,YEAR(A15),YEAR(A15)-1)&\"-\"&RIGHT(IF(MONTH(A15)>=4,YEAR(A15)+1,YEAR(A15))&\"\",2)"}
+{"kind":"formula","sheet":"Visit_Data","address":"D15","formula":"=\"Q\"&ROUNDUP(MONTH(A15)/3,0)&\" \"&YEAR(A15)"}
+{"kind":"formula","sheet":"Visit_Data","address":"E15","formula":"=TEXT(A15,\"mmm yyyy\")"}
+{"kind":"formula","sheet":"Visit_Data","address":"B16","formula":"=YEAR(A16)"}
+{"kind":"notice","message":"Truncated: omitted 91 lines. Increase maxChars, narrow range, or use tableMaxRows/tableMaxCols/tableMaxCellChars."}
