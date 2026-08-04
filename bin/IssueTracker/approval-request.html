@@ -1,72 +1,37 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Approval Request - Inebura</title>
-  <link rel="stylesheet" href="../../css/styles.css">
-  <link rel="stylesheet" href="css/approver.css">
-  <link rel="icon" href="/favicon.ico" sizes="any">
-  <link rel="icon" href="/icon.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="icon.png">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-  <link rel="stylesheet" href="../../css/shared-header.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Opening Issue Tracker approval…</title>
 </head>
-<body class="it-page" data-root-path="../../" data-relationship-name="Issue Tracker" data-relationship-badge="IT">
-  <div class="app-shell">
-    <div data-shared-header></div>
-
-    <main class="main">
-      <section class="hero">
-        <h2>Approval Request</h2>
-        <p id="request-subtitle">Review the issue and provide your decision with remarks and documents.</p>
-      </section>
-
-      <section class="approval-grid">
-        <div class="card stack">
-          <div id="request-meta" class="stack"></div>
-        </div>
-
-        <div class="card stack">
-          <h3>Escalation Matrix</h3>
-          <div id="matrix-levels" class="levels"></div>
-          <div id="viewer-note" class="notice" style="display:none;"></div>
-        </div>
-      </section>
-
-      <section class="decision-trail-grid">
-        <div id="decision-card" class="card stack">
-          <h3>Decision</h3>
-          <div class="field">
-            <label for="remark">Remarks (required)</label>
-            <textarea id="remark" rows="4" placeholder="Add your approval or rejection remark..."></textarea>
-          </div>
-          <div class="field">
-            <label for="documents">Attach documents</label>
-            <input id="documents" type="file" multiple>
-          </div>
-          <div class="controls">
-            <button id="approve-btn" class="btn btn--approve" type="button" disabled>Approve</button>
-            <button id="reject-btn" class="btn btn--reject" type="button" disabled>Reject</button>
-            <a class="btn btn--ghost" id="back-to-dashboard" href="approver-dashboard.html">Back to dashboard</a>
-          </div>
-          <div class="meta" id="decision-disabled-note">Approvals are disabled. Remarks can be added for reference.</div>
-          <div id="action-msg" class="notice" style="display:none;"></div>
-        </div>
-
-        <div class="card stack trail-card">
-          <h3>Approval Trail</h3>
-          <div id="trail" class="trailCompact"></div>
-        </div>
-      </section>
-    </main>
-
-    <footer class="footer">
-      <small>Remarks are mandatory for approval or rejection.</small>
-    </footer>
-  </div>
-
-<script src="../../scripts/shared-header.js?v=20260730-tutorials"></script>
-<script src="js/approval-request.js"></script>
+<body>
+  <p>This approval now opens inside Issue Tracker. <a id="fallback" href="../../pages/issuetrackerLP.html?view=my-work&amp;role=manager">Open My Work</a>.</p>
+  <script>
+    (function () {
+      const params = new URLSearchParams(location.search);
+      const requestId = params.get('id') || params.get('request');
+      let requests = [];
+      try { requests = JSON.parse(localStorage.getItem('approval_requests') || '[]'); } catch (_) {}
+      const request = Array.isArray(requests) ? requests.find((item) => item && item.id === requestId) : null;
+      localStorage.setItem('issue_tracker_role', 'manager');
+      const requestedUser = params.get('user');
+      const currentLevel = Number(request && request.currentLevel || 1);
+      const currentOwner = request && Array.isArray(request.levels)
+        ? request.levels.find((item) => Number(item.level) === currentLevel) || request.levels[currentLevel - 1]
+        : null;
+      if (requestedUser || currentOwner && currentOwner.ownerName) {
+        const activeUser = requestedUser || currentOwner.ownerName;
+        localStorage.setItem('approver_active_user', activeUser);
+        localStorage.setItem('issue_tracker_active_user', activeUser);
+        localStorage.setItem('issue_tracker_active_user_manager', activeUser);
+      }
+      const target = request && request.invoice && request.issue
+        ? `../../pages/issuetrackerdetail.html?${new URLSearchParams({ invoice: request.invoice.id || '', issue: request.issue.id || '', request: request.id || '', role: 'manager', user: requestedUser || currentOwner?.ownerName || 'Meera Iyer' })}`
+        : '../../pages/issuetrackerLP.html?view=my-work&role=manager';
+      document.getElementById('fallback').href = target;
+      location.replace(target);
+    })();
+  </script>
 </body>
 </html>

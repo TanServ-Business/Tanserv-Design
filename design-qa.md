@@ -1,275 +1,76 @@
-# LP Agent New Activity tutorial — design QA
+# Issue Tracker Design QA
 
 ## Comparison target
 
 - Source visual truth:
-  - Approved LP Agent tutorial treatment: `lpagent-tutorial-navigation.jpeg`, `lpagent-tutorial-features.jpeg`, and `lpagent-tutorial-inside.jpeg`.
-  - User-confirmed form sequence and outcome-specific behaviour for Collected, Part Payment Made, PTP, Call Back/Email Follow up, and Delivery Challan Required.
+  - `/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/issue-tracker-landing-source.png`
+  - `/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/issue-tracker-detail-source.png`
 - Browser-rendered implementation:
-  - `lpagent-tutorial-new-activity.jpeg`
-  - `lpagent-tutorial-ptp-activity.jpeg`
-  - `lpagent-tutorial-callback-activity.jpeg`
-  - `lpagent-tutorial-delivery-challan-activity.jpeg`
-  - `lpagent-tutorial-header-fixed.jpeg`
-- Full-view comparison evidence: `lpagent-new-activity-tutorial-comparison.jpg`.
-- Approved-source pixels: 1405 x 768.
-- Implementation pixels / CSS viewport: 1405 x 768 and 1280 x 720 at device scale 1.
-- Browser and states: Safari; opened New Activity form, initial Activity Type/Sub Status guidance, PTP, Call Back/Email Follow up, Delivery Challan Required, and Part Payment Made after Activity Type was changed to Collection.
+  - `/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/issue-tracker-landing-implementation.png`
+  - `/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/issue-tracker-detail-implementation.png`
+- Combined comparison evidence:
+  - `/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/issue-tracker-design-comparison.png`
+- Responsive evidence:
+  - `/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/issue-tracker-landing-1024.png`
+  - `/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/issue-tracker-detail-1024.png`
 
-## Findings
+## Viewport and normalization
 
-- No actionable P0, P1, P2, or P3 findings remain.
-- Entering the New Activity tutorial opens the first invoice's Update Disposition form automatically.
-- The tutorial becomes selectively interactive on this step so Activity Type and Sub Status remain usable beneath the overlay.
-- Outcome and System nuance copy is rendered only for the selected activity; unrelated outcome cards are absent.
-- The guide cards and targeted callouts occupy separate measured lanes and do not cover the selected field, the dismissal hint, or the persistent tutorial controls.
-- The complete 71px shared header remains visible while the tutorial centres the activity form and its outcome-specific fields.
-
-## Comparison history
-
-1. Extended the approved three-part tutorial structure without changing its category model:
-   - Navigation remains the first screen.
-   - More to know includes the worklist screen and the interactive New Activity walkthrough.
-   - Inside Inebura retains the connected-workflow and tutorial-replay guidance.
-2. Replaced the static five-outcome summary with an in-form sequence:
-   - Activity Type is explained first.
-   - Sub Status is explained second.
-   - The spotlight then moves to the fields revealed by the selected outcome.
-3. PTP moves the spotlight to PTP date and explains that the invoice remains open.
-4. Call Back/Email Follow up moves the spotlight to callback date/time and gives one concise reminder-notification statement.
-5. Delivery Challan Required moves the spotlight to Add to issue tracker and places its nuance panel away from the form controls.
-6. Part Payment Made first prompts for Activity Type = Collection, then moves to the collection amount fields.
-7. Final 1405 x 768 Safari captures show clear arrow endpoints, readable copy, and no tutorial-card collisions.
-8. [P2] Centring Update Disposition scrolled the document by 19px, pushed the Customers heading under the header, and left the third-screen guide anchored away from the form.
-   - Fix: the document now remains at scroll position `0`; Update Disposition gets a viewport-bounded internal scroll area, and activity guide panels default to the form-aligned top-center lane.
-   - Post-fix: the shared header ends at `71.34px`, Customers begins at `85.34px`, the guide spans `342.5px–1062.5px` over the `336px–1028px` form, and deeper fields scroll inside Update Disposition.
-9. [P2] At 1280 x 720, the in-flow activity panel had only 160px of usable height, leaving three Collected fields outside the tutorial viewport.
-   - Fix: the activity step now uses a dedicated fixed, internally scrollable form lane from `84px–636px`, with guide and callout cards in a separate right-hand lane.
-   - Post-fix: all seven Collected inputs are highlighted simultaneously; the guide spans `760px–1260px`, the callout spans `712px–982px`, and neither card overlaps the form or the other card.
-10. Delivery Challan now highlights Add to issue tracker, Action Owner, and Approval Process together, with numbered guidance explaining that the selected process supplies the configured approval matrix.
-
-## Required fidelity surfaces
-
-- Fonts and typography: `Avenir Next`, `Segoe UI`, and Arial fallbacks preserve the approved hierarchy and professional tone.
-- Spacing and layout rhythm: guide panels use safe viewport margins, measured target rectangles, alternate placement candidates, and collision penalties.
-- Colors and visual tokens: the approved navy surface, purple accent, focus rings, and lighter 56% interactive overlay are preserved.
-- Connector fidelity: target annotations use the existing high-resolution chalk-arrow asset rather than CSS-drawn or emoji arrows.
-- Copy accuracy:
-  - Part Collected describes Part Payment Made only.
-  - Call Back/Email Follow up says only that the selected date and time send a reminder notification.
-  - Delivery Challan Required states that an Issue is created only when Add to issue tracker remains checked.
-
-## Interactions tested
-
-1. `?tutorial=1` opens the LP Agent tutorial; Next reaches the activity step and opens Update Disposition automatically.
-2. Activity Type and Sub Status remain clickable while the activity tutorial is active.
-3. Selecting PTP reveals PTP date and replaces the tutorial copy with only the PTP outcome and nuance.
-4. Selecting Call Back/Email Follow up reveals callback date/time and replaces the tutorial copy with only the callback outcome and reminder note.
-5. Selecting Delivery Challan Required reveals Add to issue tracker, owner, and approval process, with only its Issue-creation nuance.
-6. Selecting Part Payment Made prompts for Activity Type = Collection; choosing Collection reveals and targets the collection fields.
-7. Leaving or closing the activity tutorial closes the form only when the tutorial opened it.
-8. The activity step keeps both the shared header and Customers heading fully visible at document scroll position `0`.
-9. PTP and other deeper outcome fields use Update Disposition's internal scroll while their guide panels remain centred over the form.
-10. Leaving the activity step removes the temporary viewport constraint and closes the form when the tutorial opened it.
-11. Clicking the tutorial backdrop leaves the current tutorial step open; the instructional hint now directs users to Close.
-12. The scoped Close button dismisses the tutorial, while backdrop clicks and Escape do not.
-13. Safari's JavaScript Console contained no error or warning entries after the final contextual renders.
-14. `scripts/app.js` and `scripts/shared-header.js` passed `node --check`; all inline scripts in `LPagent.html` parsed successfully.
-15. The scoped implementation passed `git diff --check`.
-16. Collected submission blocks missing instrument reference, bank, and transfer date; rejects negative values, zero total collection, and totals above the invoice outstanding.
-17. Delivery Challan Issue creation blocks submission until both Action Owner and Approval Process are selected; unchecking Add to issue tracker retains the documented no-Issue path.
-
-## Final result
-
-final result: passed
-
----
-
-# Issue Tracker landing page — design QA
-
-## Comparison target
-
-- Source visual truth: `/var/folders/qk/bjvc8gw900scdv4cv1cgm7f00000gp/T/TemporaryItems/NSIRD_screencaptureui_VJmQiZ/Screenshot 2026-08-03 at 12.56.43 PM.png`.
-- Browser-rendered implementation: `/private/tmp/issuetrackerLP-final.png`.
-- Normalized full-view comparison: `/private/tmp/issuetrackerLP-final-comparison.png`.
-- Viewport: 1900 x 960 CSS px at device scale 1. The source was 2000 x 1125 px; browser chrome was excluded by cropping the application region to 1900 x 960 px before comparison.
-- State: Issue Tracker landing page, default list, archive closed, first pagination page.
-
-## Findings
-
-- No actionable P0, P1, or P2 differences remain within the requested KPI-card and invoice-table scope.
-- The source's two invoice rows versus the implementation's generated data rows is expected mock-data variance; the layout, column order, labels, action placement, and pagination treatment are matched.
-- [P3] The shared-header avatar state differs from the source because it reflects the local active user rather than the source session. It is outside the requested landing-page card/table scope.
-
-## Required fidelity surfaces
-
-- Fonts and typography: preserves the existing product typeface and hierarchy, with compact uppercase KPI labels, a strong page/table heading, and 11–12px scan-friendly table text.
-- Spacing and layout rhythm: five equal lavender cards, the 280px Quick Info rail, the 16px inter-panel gap, the full-width invoice workspace, and the bottom-aligned pagination match the source composition.
-- Colors and visual tokens: light lavender KPI surfaces, white card panels, pale blue-gray dividers, and the shared Inebura purple table/action treatment match the reference.
-- Image quality and asset fidelity: reused the existing header logos and Bootstrap icon set; no replacement imagery or CSS-drawn assets were introduced.
-- Copy and content: card labels, search placeholder, archive wording, and the ten requested invoice columns match the reference.
-
-## Interactions tested
-
-1. Search for `Initech` reduced the rendered list to five matching rows and updated pagination to `Showing 1–5 of 5`.
-2. Show Archived toggled to Hide Archived while retaining the filtered list.
-3. View issues opened the matching issue-detail route for `INV_0001`.
-4. At 390px, KPI cards stack and the wide table is contained by its horizontal table wrapper rather than expanding the landing grid.
-5. Browser console contained no errors. `bin/IssueTracker/js/app.js` passed `node --check`, and `git diff --check` passed.
-
-## Comparison history
-
-1. Replaced the original owner/matrix/sub-status table treatment with the reference's invoice dates, due date, total issues, and action layout.
-2. Updated KPI wording and calculation to show aggregate Net Due in Indian currency formatting.
-3. Added the purple table header, source-style sort indicators, archive label, and compact pagination controls.
-4. [P2] A 1280px table initially expanded the mobile landing grid. Fix: constrained the landing-card grid item and table wrapper; the table now scrolls within its wrapper at narrow widths.
-
-## Final result
-
-final result: passed
-
----
-
-# Agent Dashboard tutorial splash — design QA
-
-## Comparison target
-
-- Source visual truth:
-  - Approved LP Agent treatment: `lpagent-tutorial-navigation.jpeg`, `lpagent-tutorial-features.jpeg`, and `lpagent-tutorial-inside.jpeg`.
-  - Original art-direction reference: `/var/folders/qk/bjvc8gw900scdv4cv1cgm7f00000gp/T/codex-clipboard-6e6b963c-57c7-4a2c-a901-a5fd9449b2f8.png`.
-  - Previous Dashboard overlay capture: `dashboard-agent-tutorial-navigation-dark-reference.jpeg`.
-- Browser-rendered implementation:
-  - `dashboard-agent-tutorial-navigation.jpeg`
-  - `dashboard-agent-tutorial-features.jpeg`
-  - `dashboard-agent-tutorial-inside.jpeg`
-- Combined full-view comparison evidence: `dashboard-agent-tutorial-design-comparison.jpg`.
-- Overlay-lightness comparison evidence: `dashboard-agent-overlay-lightness-comparison.jpg`.
-- Approved-source pixels: 1405 x 768.
-- Implementation pixels / CSS viewport: 1405 x 768 / 1405 x 768 at device scale 1.
-- State: Agent Dashboard with the tutorial forced open through `?tutorial=1`; Navigation, More to know, and Inside Inebura were each captured in Safari.
-
-The approved LP Agent implementation is the direct layout and visual-system reference. The original portrait screenshot remains the art-direction reference for a dimmed live interface, short target annotations, and a tutorial that is not a central popup.
+- Desktop implementation CSS viewport: 1536 x 1024 at device scale factor 1.
+- Landing source pixels: 1487 x 1058. It was proportionally fitted beside the 1536 x 1024 implementation in the combined comparison; no differences caused only by the small crop/aspect mismatch were filed.
+- Detail source pixels: 1536 x 1024. Detail implementation pixels: 1536 x 1024; direct 1:1 comparison.
+- Responsive implementation CSS viewport and pixels: 1024 x 768 at device scale factor 1.
+- Comparison board pixels: 1536 x 1300, with source and implementation displayed together for each page.
+- State: agent My Work landing view and a new/open issue requiring a supporting document, remark, and first approval submission.
 
 ## Findings
 
 - No actionable P0, P1, or P2 findings remain.
-- [P3] The Dashboard callouts use slightly shorter copy than the LP Agent callouts.
-  - Evidence: the Dashboard has wider KPI regions and fewer toolbar controls, so each step requires only two annotations.
-  - Rationale: limiting each step to two cards keeps the dense dashboard legible and prevents tutorial-card collisions.
-
-## Comparison history
-
-1. First Safari render:
-   - Navigation placed the menu and notification annotations in separate top-left and top-right lanes.
-   - More to know placed Total Net Due below its target and View Trends to the left of its target.
-   - Inside Inebura placed Summary below its target and Tutorial replay to the left of the profile control.
-   - No tutorial cards, target outlines, arrows, bottom hint, or persistent controls overlapped one another.
-2. Final Safari evidence:
-   - The target-to-arrow-to-card relationship is unambiguous in all six annotations.
-   - The callout placer uses measured card rectangles, safe viewport margins, alternate cardinal placements, and fallback lanes before choosing a position.
-   - The controls omit numeric `1/3`, `2/3`, and `3/3` labels while retaining section names and three understated progress bars.
-3. Overlay-lightness refinement:
-   - [P2] The original 74% navy overlay made the underlying KPI values, chart shapes, and card boundaries unnecessarily difficult to read.
-   - Fix: reduced the overlay opacity from 74% to 60% while leaving callout panels, focus rings, arrows, and controls unchanged.
-   - Post-fix evidence: `dashboard-agent-overlay-lightness-comparison.jpg` shows the same 1405 x 768 Navigation state before and after the change. Dashboard context is materially clearer, while callout contrast and target emphasis remain intact.
+- The landing intentionally differs from the early mock by removing `Pending With` and due-period group rows. This reflects the approved product decisions: My Work contains only the current user's items, and rows are clubbed by invoice number in one table.
+- Counts and customer values differ because the implementation uses the live prototype state exercised during workflow QA; hierarchy, placement, and behavior remain equivalent.
 
 ## Required fidelity surfaces
 
-- Fonts and typography: `Avenir Next`, then `Segoe UI` and Arial fallbacks match the approved professional treatment. Eyebrows, titles, body copy, dismissal hint, and controls retain distinct hierarchy, weights, wrapping, and line heights.
-- Spacing and layout rhythm: every step uses two callouts. Cards are clamped to safe viewport margins and the collision score penalizes overlap with targets, earlier tutorial cards, the close hint, and the bottom-right controls.
-- Colors and visual tokens: the navy overlay now uses 60% opacity, preserving the dashboard context without muting KPI values and chart shapes too heavily. Blue, purple, and green accents distinguish Navigation, More to know, and Inside Inebura and remain consistent with the approved LP Agent treatment.
-- Image quality and asset fidelity: connectors use the existing high-resolution `assets/tutorial/chalk-arrow-up-left.png` raster asset with short target-adjacent sizing. No custom SVG, emoji, or CSS-drawn arrow substitutes it.
-- Copy and content: all tutorial statements are grounded in live Dashboard controls: module menu, notifications, Total Net Due, other KPI drill-downs, View Trends, Summary, and profile-menu tutorial replay.
+- Fonts and typography: existing Inebura product font stack is retained. Heading weight, KPI hierarchy, table labels, action title, helper text, and right-rail metadata remain clearly distinct at both tested widths.
+- Spacing and layout rhythm: the landing uses the approved overview-card and full-width table structure. Detail retains the broad working canvas and narrower reference rail, with the largest space reserved for attachments and remarks.
+- Colors and visual tokens: the existing Inebura purple, neutral surfaces, semantic red/green/amber states, subtle borders, and focus-visible treatments map consistently across both pages.
+- Image quality and assets: existing Inebura and Apollo source logos are reused. Bootstrap Icons supplies the visible UI icon family; no placeholder drawings or fake product imagery were introduced.
+- Copy and content: language is action-led and plain: `Upload ... and add your remark`, `Waiting for ...`, `Approve and send forward`, and `No action required`. Complete reference data is moved to the right rail.
+- Accessibility and interaction states: form controls have accessible names, the upload wrapper no longer nests one button inside another, tab selection is exposed, status updates use a live region, and responsive layouts avoid overlap.
 
-## Full-view and focused comparison evidence
+## Focused comparison evidence
 
-- The original-size 2810 x 810 side-by-side comparison confirms matching overlay treatment, card treatment, arrow style, focus rings, and bottom controls between the approved LP Agent source and Dashboard implementation.
-- The original-size 2810 x 810 before/after lightness comparison confirms that only the overlay opacity changed; annotation geometry, typography, arrows, focus rings, and controls remain aligned.
-- Separate 1405 x 768 Safari captures were inspected at 1:1 for each step. Additional crops were not required because callout typography, arrow endpoints, focus rings, and target controls are legible at native size.
-
-## Interactions tested
-
-1. `?tutorial=1` opens the Dashboard tutorial even after prior completion.
-2. Next advances through Navigation, More to know, and Inside Inebura.
-3. Back returns from More to know to Navigation.
-4. Close and Done dismiss the overlay.
-5. The shared profile-menu Tutorials action reopens the Dashboard-specific renderer.
-6. The controls show section names and progress bars without numeric step fractions.
-7. Clicking outside the controls leaves the Agent Dashboard tutorial open; only Close explicitly dismisses it before completion.
-8. The generic Admin Dashboard tutorial follows the same close-only backdrop behaviour.
-9. Escape no longer dismisses either Dashboard tutorial.
-10. Safari's JavaScript Console was reopened after the lighter-overlay render; it contained no error or warning entries.
-11. `scripts/dashboard-agent-tutorial.js` and `scripts/tutorial-splash.js` passed `node --check`, and the scoped page/script diff passed `git diff --check`.
-
-## Final result
-
-final result: passed
-
----
-
-# Admin Operational Setup — design QA
-
-## Comparison target
-
-- Source visual truth:
-  - `https://testclient.inebura.ai/admin/dashboard/invoice-setup`
-  - `https://testclient.inebura.ai/admin/dashboard/document-setup`
-  - `https://testclient.inebura.ai/admin/dashboard/role-display-name-setup`
-  - `https://testclient.inebura.ai/admin/dashboard/user-setup`
-  - `https://testclient.inebura.ai/admin/dashboard/whatsApp-declaration`
-- Browser-rendered implementation:
-  - `http://127.0.0.1:8765/pages/admin.html?module=invoice-preferences`
-  - The remaining four screens use the same local page with their Admin module route.
-- Compared at 1280 x 720 and 390 x 844 CSS pixels at device scale 1.
-- Full-view evidence compared every default Operational Setup screen source-left and implementation-right.
-- Focused evidence compared document creation, preset selection, role display names, the user wizard, and bulk user upload.
-
-## Matched screens and states
-
-1. Invoice Preferences:
-   - Standard Ageing Buckets, Create Custom Groups, Customization of Activity Dispositions, and Purge Policy.
-   - Create/edit/delete bucket and sub-status dialogs; editable purge controls.
-2. Document Setup:
-   - Source-faithful document list, category treatment, pagination, create/edit/delete dialogs, and preset selection.
-3. Role and Display Name Setup:
-   - Operational, Support, View, and Customer hierarchy lanes.
-   - Dependent role-type and role selection with reset and submit states.
-4. User Setup:
-   - Team filters, search, source-style table actions, two-step create/edit wizard, and bulk upload history/modal.
-5. Notification Manager:
-   - Searchable notification table and live WhatsApp declaration toggles.
+- Landing table: checked invoice group rows, customer code/name, invoice and issue identifiers, due state, and action button alignment against the approved direction.
+- Detail work area: checked current-action banner, substatus/original remark/action owner/matrix summary, document pills, upload target, large remark field, submit controls, approval matrix, complete details, and compact before/after handoff.
+- Separate crop files were not needed because the combined comparison renders both screens at a readable scale, while the full-resolution implementation captures were inspected independently for control and text detail.
 
 ## Comparison history
 
-1. [P2] The first hierarchy render compressed the source structure into four equal columns.
-   - Fix: restored the Operational supervisor/manager/agent tree, separated Support and View columns, and moved Customer into its lower source lane.
-2. [P2] The first user-wizard footer stretched Cancel across excess width.
-   - Fix: constrained footer actions and aligned Cancel and Next to the right like the source.
-3. [P2] Disabled Role Submit and Bulk Import controls looked active.
-   - Fix: added the source-style muted lavender disabled treatment.
-4. Final desktop and mobile review found no remaining P0, P1, or P2 issues.
-5. [P3] The local user list is intentionally populated with representative dummy rows instead of reproducing a transient source loading state.
-6. [P2] Activity Dispositions initially repeated empty Broad Status and Primary Status cells instead of merging each hierarchy section.
-   - Fix: applied source-matched row spans to both grouping columns, including Work In Progress, No Due, Part Collected, Further Docs Required, and Collection Done.
-7. [P2] Organisation Hierarchy connectors used generic level-wide lines, which incorrectly linked Agent 6 to the Manager branch and omitted the vertical Support/View chains.
-   - Fix: rebuilt the Operational tree as explicit Manager and AgentCumManager branches, added branch-specific child connectors, restored Support/View vertical connectors, and matched the live node coordinates within 2 px at 1280 x 720.
-8. [P1] Create User Step 2 rendered Role Type, Role, and Branch as empty text inputs, so the workflow could not be completed through dropdown selection.
-   - Fix: added the source Role Type values, dependent Role options, the Gurugram branch option, Back/Next selection persistence, and a complete dummy-user save path.
+### Iteration 1
 
-## Interactions tested
+- Earlier P2: the shared global `header` rule painted the page-level headers purple, weakening hierarchy below the main navigation.
+- Fix: page-level `.issuePageHeader` and `.detailTopbar` now explicitly use a transparent background and zero padding.
+- Post-fix evidence: both 1536 x 1024 implementation captures and the final combined comparison.
 
-1. A new document can be created and immediately appears in the document table.
-2. The two-step user wizard retains step-one values and inserts the completed dummy user.
-3. Custom group, disposition, document, preset, user, and bulk-upload dialogs open and close correctly.
-4. Role Display Names enables its dependent controls in sequence.
-5. Notification search filters the table and toggles change their visible On/Off state.
-6. All five Operational Setup routes render dedicated `.opWorkspace` content.
-7. At 390 px, every route retains a 390 px document width; wide tables and hierarchy content scroll inside their own regions.
-8. Browser console review returned no errors or warnings.
-9. `scripts/admin-operational-setup.js` and `scripts/admin-runtime.js` passed `node --check`.
-10. `scripts/validate-admin-modules.js` passed all 31 menu modules and tab targets.
-11. `git diff --check` passed.
+### Iteration 2
 
-## Final result
+- Earlier P2: at 1024 px, the action button in the last table column was partially clipped by the horizontal table width.
+- Fix: the table minimum width is reduced to 960 px at the 1180 px breakpoint while preserving the desktop column proportions.
+- Post-fix evidence: `artifacts/issue-tracker-landing-1024.png`; the full Action column and Open task button are visible.
+
+## Functional QA
+
+- Tested search and My Work/Open Issues/Closed tabs.
+- Opened and cancelled the New issue dialog.
+- Uploaded a supporting document, added a remark, and submitted to the first approver.
+- Approved the same request through Arjun Patel, Meera Iyer, and Compliance Team; verified the current-level indicator and final closure.
+- Verified `approver-dashboard.html` redirects to unified My Work.
+- Verified the Approval setup route opens `escalationMatrix.html` and exposes a Back to Issue Tracker link.
+- Browser console: 0 errors and 0 warnings during the final checked flow.
+- Static checks: `node --check` passed for both changed JavaScript files; `git diff --check` passed.
+
+## Follow-up polish
+
+- P3: connect document eye icons to a real backend preview endpoint when the prototype receives service APIs; the current local prototype uses mock document metadata.
 
 final result: passed

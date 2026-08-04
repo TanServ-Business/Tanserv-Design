@@ -1,132 +1,60 @@
-# Issue Tracker - Project Documentation
+# Issue Tracker - Unified Workflow
 
 ## Overview
-This project is a front-end only Issue Tracker prototype built with static HTML, CSS, and vanilla JavaScript. It simulates invoice issues, approvals, assignments, resolutions, and action trails using in-browser localStorage. There is no backend; all data is mocked and persisted locally in the browser.
 
-## Core Pages
-- `index.html`: Main Issue Tracker (invoices, issues, details, actions, trail).
-- `dashboard.html`: User dashboard with charts (dummy data).
-- `UserScreen.html`: Invite-based onboarding for new users.
-- `InviteUser.html`: Invite flow for new users (mocked).
-- `escalationMatrix.html`: Manage approval processes and escalation matrices.
-- `approver-dashboard.html`: Approver summary dashboard.
-- `approval-request.html`: Approver decision page for a specific request.
+The Issue Tracker is a static front-end prototype for invoice issues, document work, remarks, reassignment, resolutions, and multi-level approvals. It uses browser `localStorage`; there is no backend.
 
-## High-Level Data Flow
-1. **Invoices and issues are generated** on page load in `js/app.js`.
-2. **Issues are displayed** per invoice in `index.html`.
-3. **User actions** (assign, email, approve, resolution, close/reopen) update the issue and trail.
-4. **Approval processes** come from `escalationMatrix.html` and persist in localStorage.
-5. **Approval requests** are created in `index.html` and shown in `approver-dashboard.html`.
-6. **Approval decisions** in `approval-request.html` update the request and issue trail.
-7. **LocalStorage** is the single source of truth across pages.
+## User-facing pages
 
-## Reporting Issues (Main Flow)
-The main flow is entirely on `index.html`:
-1. Select an invoice in the left column.
-2. Select an issue in the middle column.
-3. The right column shows issue details and the Action panel.
-4. The user triggers actions like Approve, Assign, Re-Send Email, Approval Process, Add Resolution, Close/Resolved, or Reopen.
-5. Each action writes a structured entry into the Action Trail.
+- `pages/issuetrackerLP.html`: action-first landing page. It shows overview cards and one table clubbed by invoice number.
+- `pages/issuetrackerdetail.html`: the complete issue workspace. Documents and remarks receive the largest area; approval actions appear here when it is the current user's turn.
+- `bin/IssueTracker/escalationMatrix.html`: configuration for approval processes, reusable matrices, and approver levels.
+- `bin/IssueTracker/approver-dashboard.html`: compatibility redirect to Issue Tracker My Work.
+- `bin/IssueTracker/approval-request.html`: compatibility redirect that opens the matching issue in manager/approver mode.
 
-## Action Flow Details
-### Assign to Client Action Owner
-- Select an action owner from a dropdown.
-- Remark is required.
-- Updates issue actionOwner and adds an assignment entry to the trail.
+## Workflow
 
-### Re-Send Email
-- Select reminder or escalation email type.
-- Remark is required.
-- Escalation requires valid email addresses.
-- Adds an email entry to the trail.
+1. An agent creates an issue from an activity. Every new issue is assigned to that agent's manager for mandatory manager approval.
+2. My Work contains only open issues assigned to the logged-in user. Open Issues contains the complete active register for reference.
+3. The manager accepts or rejects the new issue. A decision remark is mandatory.
+4. A manager rejection assigns the issue back to the creating agent.
+5. A manager acceptance starts the tagged approval matrix, when present, and assigns the issue to Approver L1. Without a tagged matrix, the issue returns to the agent for processing.
+6. Each matrix approver accepts to advance to the next level or rejects to return the issue to the creating agent.
+7. Final matrix acceptance returns the open issue to the agent for processing; it does not close the issue automatically.
+8. Every action updates the single Assigned to value and writes an entry to the issue history. The right panel shows the current assignee above the full approval matrix.
 
-### Approval Process (Submit for Approval)
-- Select approval process from escalation matrix list.
-- Remark is required.
-- Creates or updates an approval request in localStorage.
-- Adds a "submitted for approval" entry to the trail.
+## Data contracts
 
-### Approve / Close / Reopen
-- Uses the same remark prompt.
-- Remark is required.
-- Approve submits an approval request when a process is selected.
-- Close sets status to Resolved.
-- Reopen sets status back to Open.
+- `issueTrackerBaseData`: generated invoice and issue records.
+- `customIssues`: issues created manually from the landing page.
+- `approval_processes`: approval process definitions from Escalation Matrix.
+- `approval_matrices`: named approver-level matrices.
+- `approval_requests`: active and completed approval requests with trail entries.
+- `issue_tracker_role`: selected Agent, Manager / Approver, or Action Owner view.
+- `approver_active_user`: current approver identity used by legacy deep links.
 
-### Add Resolution
-- Resolution summary is required.
-- Remark is optional.
-- Optional file attachment list is captured (file names only).
-- Sets status to Resolved and updates the trail.
+`bin/IssueTracker/js/issue-tracker-unified.js` preserves these keys so existing Escalation Matrix data, notification links, and legacy approval links continue to work.
 
-## Approval Workflow
-1. **Process Definition**
-   - `escalationMatrix.html` defines:
-     - Processes (name, SLA, linked matrix).
-     - Matrices (levels with approver name/email).
-2. **Issue Submission**
-   - In `index.html`, user selects an approval process and approves.
-   - A request is created in localStorage under `approval_requests`.
-3. **Approver Dashboard**
-   - `approver-dashboard.html` reads all requests.
-   - Displays KPIs and a list of requests relevant to the selected approver.
-4. **Approval Request**
-   - `approval-request.html` shows issue + invoice details.
-   - Shows escalation matrix, decision box (if the user can decide), and trail.
-   - Approve advances to the next level; Reject ends the request.
-5. **Trail Sync**
-   - Approval trail entries are synced back into the issue action trail.
+## Role behavior
 
-## Role-Based Actions
-The header dropdown in `index.html` changes visible action pills:
-- **Agent**: Assign to Client Action Owner, Re-Send Email, Approval Process
-- **Manager**: Approve, Assign to Client Action Owner, Re-Send Email, Approval Process
-- **Action Owner**: Assign to Client Action Owner, Add Resolution, Close/Resolved
+- Agent: creates issues from activities and processes issues assigned or returned to them with documents and remarks.
+- Manager / Approver: accepts or rejects manager-assigned issues, and accepts or rejects the current tagged matrix level when assigned as an approver.
+- Action Owner: document/remark work and resolution submission, reassign, close/reopen.
 
-Close/Resolved and Reopen visibility also depend on issue status.
+## Prototype limitations
 
-## LocalStorage Keys
-- `customIssues`: Manually added issues.
-- `approval_processes`: Process definitions from `escalationMatrix.html`.
-- `approval_matrices`: Escalation matrices from `escalationMatrix.html`.
-- `approval_requests`: Approval requests and their trail.
-- `issue_tracker_role`: Current role selected in the header.
-- `approver_active_user`: Current approver in approver dashboard.
+- File content is not persisted; only file names and document types are stored.
+- Authentication and identity matching are simulated through the role selector.
+- Data is browser-specific and can be cleared with browser storage.
 
-## File-Level Responsibilities
-- `js/app.js`
-  - Generates mock invoice/issue data.
-  - Renders invoice list, issue list, and details.
-  - Handles action panels and trail updates.
-  - Creates approval requests and syncs approval trails.
-  - Applies role-based action visibility.
-- `js/approver-dashboard.js`
-  - Reads approval requests and filters by active user.
-  - Renders KPIs and chart.
-- `js/approval-request.js`
-  - Loads request by id.
-  - Enforces decision permissions based on escalation matrix.
-  - Updates request status and trail.
-- `escalationMatrix.html`
-  - Stores and manages matrices/processes.
-  - Seeds defaults when empty.
+## Verification checklist
 
-## Data Flow Diagram (Text)
-1. `index.html` loads -> generates invoices/issues -> renders lists.
-2. Action submitted -> update issue + trail -> persist localStorage if needed.
-3. Approval submitted -> write to `approval_requests` -> appears in approver dashboard.
-4. Approver decision -> update request -> sync back to issue action trail.
-
-## Testing Checklist
-1. Select invoice/issue -> details render.
-2. Trigger each action -> trail updates.
-3. Submit approval -> appears in approver dashboard.
-4. Approve at level 1 -> request moves to level 2.
-5. Reject -> request closes and trail updates.
-6. Role switch -> action pills update and panels close.
-
-## Notes and Limitations
-- This is a static prototype; no backend or authentication.
-- File uploads are not persisted; only file names are captured.
-- localStorage data is browser-specific and can be cleared.
+1. Landing page shows one invoice-clubbed table without due-date group sections.
+2. Search, tabs, archive toggle, approval filter, and action filter update the table.
+3. A newly created issue appears only in the assigned manager's My Work.
+4. Manager acceptance creates an `approval_requests` entry only when an approval matrix is tagged.
+5. Approver acceptance advances the current level and updates Assigned to.
+6. Manager or approver rejection returns the issue to the creating agent's My Work.
+7. Open Issues continues to show active issues not assigned to the logged-in user.
+8. Matrix edits are reflected after returning to the issue page.
+9. Legacy approval URLs redirect into the unified workflow.

@@ -330,7 +330,7 @@
       if (type === "commitment" || type === "commitment-approved") return { ...route, action: "open-invoice" };
       if (type === "commitment-submitted") return { ...route, action: "link", href: "pages/CommitmentManager.html" };
       if (type === "commitment-rejected") return { ...route, action: "link", href: "pages/commitment.html" };
-      if (type === "issue-approval-requested" || type === "issue-approval-forwarded") return { ...route, action: "link", href: "bin/IssueTracker/approver-dashboard.html" };
+      if (type === "issue-approval-requested" || type === "issue-approval-forwarded") return { ...route, action: "link", href: "pages/issuetrackerLP.html?view=my-work&role=manager" };
       if (type.startsWith("issue-")) return { ...route, action: "link", href: "pages/issuetrackerLP.html" };
       if (type === "backend-upload-exception") return { ...route, action: "link", href: "pages/LPbackend.html" };
       if (type === "mis-schedule-failed") return { ...route, action: "link", href: "pages/LPmis.html" };
@@ -693,8 +693,6 @@
         <div class="submenu">
           <a class="submenu-link" href="${resolvePath("pages/issuetrackerLP.html")}" data-module="issue-tracker">Issue Tracker</a>
           <a class="submenu-link" href="${resolvePath("bin/IssueTracker/escalationMatrix.html")}" data-module="issue-matrix">Escalation Matrix</a>
-          <a class="submenu-link" href="${resolvePath("bin/IssueTracker/approver-dashboard.html")}" data-module="issue-approver">Approver Dashboard</a>
-          <a class="submenu-link" href="${resolvePath("bin/IssueTracker/approval-request.html")}" data-module="issue-approval-request">Approval Request</a>
         </div>
       </li>
       <li class="menu-item">
@@ -1146,8 +1144,8 @@
             "dashboard-admin": "pages/Dashboard_Admin.html",
             "issue-tracker": "pages/issuetrackerLP.html",
             "issue-matrix": "bin/IssueTracker/escalationMatrix.html",
-            "issue-approver": "bin/IssueTracker/approver-dashboard.html",
-            "issue-approval-request": "bin/IssueTracker/approval-request.html",
+            "issue-approver": "pages/issuetrackerLP.html?view=my-work&role=manager",
+            "issue-approval-request": "pages/issuetrackerLP.html?view=my-work&role=manager",
             "submission-module": "pages/submission.html",
             "pdc-agent": "pages/PDCagent.html",
             "pdc-ops": "pages/PDCOps.html",

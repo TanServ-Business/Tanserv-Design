@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Issue Tracker design comparison</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { background: #e9edf4; color: #151a29; font-family: Arial, sans-serif; margin: 0; padding: 18px; }
+    h1 { font-size: 22px; margin: 0 0 16px; }
+    h2 { font-size: 17px; grid-column: 1 / -1; margin: 0; }
+    .comparison { display: grid; gap: 12px 18px; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-bottom: 22px; }
+    .frame { background: #fff; border: 1px solid #cfd6e3; border-radius: 12px; box-shadow: 0 8px 22px rgba(24, 31, 50, .08); padding: 14px; }
+    .label { color: #5b2494; font-size: 13px; font-weight: 700; margin-bottom: 10px; text-transform: uppercase; }
+    .imageBox { align-items: flex-start; background: #f7f8fb; display: flex; justify-content: center; overflow: hidden; width: 100%; }
+    img { display: block; height: auto; max-width: 100%; width: 100%; }
+  </style>
+</head>
+<body>
+  <h1>Issue Tracker visual QA</h1>
+
+  <section class="comparison">
+    <h2>Landing page</h2>
+    <article class="frame">
+      <div class="label">Approved visual direction</div>
+      <div class="imageBox"><img src="issue-tracker-landing-source.png" alt="Approved landing page direction" /></div>
+    </article>
+    <article class="frame">
+      <div class="label">Browser implementation · 1536 × 1024</div>
+      <div class="imageBox"><img src="issue-tracker-landing-implementation.png" alt="Implemented landing page" /></div>
+    </article>
+  </section>
+
+  <section class="comparison">
+    <h2>Action detail page</h2>
+    <article class="frame">
+      <div class="label">Approved visual direction</div>
+      <div class="imageBox"><img src="issue-tracker-detail-source.png" alt="Approved action detail direction" /></div>
+    </article>
+    <article class="frame">
+      <div class="label">Browser implementation · 1536 × 1024</div>
+      <div class="imageBox"><img src="issue-tracker-detail-implementation.png" alt="Implemented action detail page" /></div>
+    </article>
+  </section>
+</body>
+</html>

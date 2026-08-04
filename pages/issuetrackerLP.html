@@ -6,145 +6,157 @@
   <title>Inebura | Issue Tracker</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
   <link rel="stylesheet" href="../css/styles.css" />
-  <link rel="stylesheet" href="../bin/IssueTracker/css/style.css" />
-  <link rel="stylesheet" href="../css/issuetrackerLP.css?v=20260803-issue-tracker" />
+  <link rel="stylesheet" href="../css/issuetrackerLP.css?v=20260804-next-action" />
   <link rel="stylesheet" href="../css/shared-header.css" />
 </head>
 <body class="issueTrackerPage" data-root-path="../" data-relationship-name="Issue Tracker" data-relationship-badge="IT">
   <div data-shared-header></div>
 
-  <main class="managerMain issueTrackerMain">
-    <div class="managerHeader">
+  <main class="issueTrackerMain" id="issue-tracker-landing">
+    <header class="issuePageHeader">
       <div>
         <h1>Issue Tracker</h1>
-        <p>Track invoice issues, approvals, and client assignments.</p>
+        <p>See what needs your attention and track every issue.</p>
       </div>
-      <div class="managerHeaderControls">
-        <div class="role-select">
-          <label class="meta" for="role-select">Role</label>
+      <div class="issueHeaderActions">
+        <label class="compactSelect">
+          <span>Viewing as</span>
           <select id="role-select" aria-label="Select role">
             <option value="agent">Agent</option>
-            <option value="manager">Manager</option>
+            <option value="manager">Manager / Approver</option>
             <option value="action-owner">Action Owner</option>
           </select>
-          <button id="clearIssueDataBtn" class="role-link" type="button">Clear data</button>
-        </div>
-        <div class="managerClock">
-          <span>Updated</span>
-          <strong id="issueTrackerClock">--:--</strong>
-        </div>
+        </label>
+        <label class="compactSelect">
+          <span>User</span>
+          <select id="user-select" aria-label="Select user">
+            <option value="">Select user</option>
+          </select>
+        </label>
       </div>
-    </div>
+    </header>
 
-    <section class="summaryCards" aria-label="Issue tracker summary">
-      <div class="summaryCard"><span>Invoices with issues</span><strong id="statInvoiceCount">0</strong></div>
-      <div class="summaryCard"><span>Net Due (Issues)</span><strong id="statInvoiceAmount">Rs. 0</strong></div>
-      <div class="summaryCard"><span id="statIssueScopeLabel">Open issues</span><strong id="statTotalIssues">0</strong></div>
-      <div class="summaryCard"><span>Issues for approval pending</span><strong id="statApprovalPending">0</strong></div>
-      <div class="summaryCard"><span>Issues assigned to client</span><strong id="statAssignedClient">0</strong></div>
+    <section class="overviewCards" aria-label="Issue tracker overview">
+      <article class="overviewCard overviewCard--focus">
+        <span class="overviewIcon"><i class="bi bi-clipboard2-check" aria-hidden="true"></i></span>
+        <div><span>My action items</span><strong id="statMyActions">0</strong></div>
+      </article>
+      <article class="overviewCard">
+        <span class="overviewIcon"><i class="bi bi-folder2-open" aria-hidden="true"></i></span>
+        <div><span>Open issues</span><strong id="statOpenIssues">0</strong><small id="statOpenInvoices">Across 0 invoices</small></div>
+      </article>
+      <article class="overviewCard">
+        <span class="overviewIcon"><i class="bi bi-clock-history" aria-hidden="true"></i></span>
+        <div><span>Waiting on others</span><strong id="statWaiting">0</strong><small id="statWaitingApprovals">0 awaiting approval</small></div>
+      </article>
+      <article class="overviewCard">
+        <span class="overviewIcon overviewIcon--currency">&#8377;</span>
+        <div><span>Net due in issues</span><strong id="statInvoiceAmount">&#8377;0</strong><small>Current open balance</small></div>
+      </article>
     </section>
 
-    <div class="issueLandingGrid">
-      <aside class="panelCard quickInfoPanel" aria-label="Quick issue info">
-        <div class="panelTitle">Quick info</div>
-        <ul id="issue-reason-list" class="reasonList" aria-label="Issue reasons"></ul>
-      </aside>
-
-      <section class="panelCard">
-        <div class="summaryHeader">
-          <div>
-            <h2>Invoices with issues</h2>
-            <p>Select an invoice to view issues and actions.</p>
-          </div>
-          <div class="invoiceSearch">
-            <input id="invoice-search-input" type="text" placeholder="Search invoice, customer, customer code..." aria-label="Search invoices" />
-            <div id="issue-filter-bar" class="issueFilterBar" aria-label="Issue filters">
-              <details class="filterDropdown" data-filter-group="approval">
-                <summary>Approval <span class="filterBadge">All</span></summary>
-                <div class="filterMenu">
-                  <button class="filterItem" type="button" data-filter-group="approval" data-filter-value="all">All</button>
-                  <button class="filterItem" type="button" data-filter-group="approval" data-filter-value="pending">Pending</button>
-                  <button class="filterItem" type="button" data-filter-group="approval" data-filter-value="approved">Approved</button>
-                  <button class="filterItem" type="button" data-filter-group="approval" data-filter-value="rejected">Rejected</button>
-                </div>
-              </details>
-              <details class="filterDropdown" data-filter-group="action">
-                <summary>Action <span class="filterBadge">All</span></summary>
-                <div class="filterMenu">
-                  <button class="filterItem" type="button" data-filter-group="action" data-filter-value="all">All</button>
-                  <button class="filterItem" type="button" data-filter-group="action" data-filter-value="my-actionable">My Actionable</button>
-                  <button class="filterItem" type="button" data-filter-group="action" data-filter-value="no-action-required">No Action Required</button>
-                  <button class="filterItem" type="button" data-filter-group="action" data-filter-value="resolution-provided">Resolution Provided</button>
-                </div>
-              </details>
+    <section class="workTablePanel" aria-labelledby="work-table-title">
+      <div class="workTableToolbar">
+        <div class="workTabs" id="issue-view-tabs" role="tablist" aria-label="Issue views">
+          <button type="button" class="workTab is-active" data-view="my-work" role="tab" aria-selected="true">My Work <span id="tabMyWorkCount">0</span></button>
+          <button type="button" class="workTab" data-view="open" role="tab" aria-selected="false">Open Issues <span id="tabOpenCount">0</span></button>
+          <button type="button" class="workTab" data-view="closed" role="tab" aria-selected="false">Closed <span id="tabClosedCount">0</span></button>
+        </div>
+        <div class="workTools">
+          <label class="searchField">
+            <i class="bi bi-search" aria-hidden="true"></i>
+            <input id="invoice-search-input" type="search" placeholder="Search invoice, customer or issue" aria-label="Search issues" />
+          </label>
+          <details class="filterDropdown" id="issue-filter-menu">
+            <summary><i class="bi bi-funnel" aria-hidden="true"></i> Filters <span id="active-filter-count" class="filterCount hidden">0</span></summary>
+            <div class="filterMenu filterMenu--wide">
+              <label>Approval status
+                <select id="approval-filter">
+                  <option value="all">All</option>
+                  <option value="pending">Pending</option>
+                  <option value="approved">Approved</option>
+                  <option value="rejected">Rejected</option>
+                </select>
+              </label>
+              <label>Action status
+                <select id="action-filter">
+                  <option value="all">All</option>
+                  <option value="my-actionable">My actionable</option>
+                  <option value="no-action-required">No action required</option>
+                  <option value="resolution-provided">Resolution provided</option>
+                </select>
+              </label>
+              <button id="clear-filters" type="button" class="textButton">Clear filters</button>
             </div>
-            <button id="toggle-closed-invoices" class="issueListToggle" type="button">Show Archived</button>
-          </div>
+          </details>
+          <button id="toggle-closed-invoices" class="textButton" type="button"><i class="bi bi-eye-slash" aria-hidden="true"></i> Show archived</button>
         </div>
-        <div class="tableWrap">
-          <table class="issueTable" aria-label="Invoices with issues">
-            <thead>
-              <tr>
-                <th>Customer Code <i class="bi bi-caret-up-fill tableSortIcon" aria-hidden="true"></i><i class="bi bi-caret-down-fill tableSortIcon" aria-hidden="true"></i></th>
-                <th>Customer Name <i class="bi bi-caret-up-fill tableSortIcon" aria-hidden="true"></i><i class="bi bi-caret-down-fill tableSortIcon" aria-hidden="true"></i></th>
-                <th>Invoice No <i class="bi bi-caret-up-fill tableSortIcon" aria-hidden="true"></i><i class="bi bi-caret-down-fill tableSortIcon" aria-hidden="true"></i></th>
-                <th>Invoice Date <i class="bi bi-caret-up-fill tableSortIcon" aria-hidden="true"></i><i class="bi bi-caret-down-fill tableSortIcon" aria-hidden="true"></i></th>
-                <th>Invoice Due Date <i class="bi bi-caret-up-fill tableSortIcon" aria-hidden="true"></i><i class="bi bi-caret-down-fill tableSortIcon" aria-hidden="true"></i></th>
-                <th>Invoice Value <i class="bi bi-caret-up-fill tableSortIcon" aria-hidden="true"></i><i class="bi bi-caret-down-fill tableSortIcon" aria-hidden="true"></i></th>
-                <th>Net Due <i class="bi bi-caret-up-fill tableSortIcon" aria-hidden="true"></i><i class="bi bi-caret-down-fill tableSortIcon" aria-hidden="true"></i></th>
-                <th>Total Issues <i class="bi bi-caret-up-fill tableSortIcon" aria-hidden="true"></i><i class="bi bi-caret-down-fill tableSortIcon" aria-hidden="true"></i></th>
-                <th>Pending With <i class="bi bi-caret-up-fill tableSortIcon" aria-hidden="true"></i><i class="bi bi-caret-down-fill tableSortIcon" aria-hidden="true"></i></th>
-                <th>Issue Open Days <i class="bi bi-caret-up-fill tableSortIcon" aria-hidden="true"></i><i class="bi bi-caret-down-fill tableSortIcon" aria-hidden="true"></i></th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody id="invoice-table-body"></tbody>
-          </table>
+      </div>
+
+      <div class="tableWrap">
+        <table class="unifiedIssueTable" aria-label="Issues clubbed by invoice number">
+          <thead>
+            <tr>
+              <th id="work-table-title">Substatus</th>
+              <th>Customer code</th>
+              <th>Customer name</th>
+              <th>Invoice no.</th>
+              <th>Issue no.</th>
+              <th>Issue created</th>
+              <th>Open days</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="invoice-table-body"></tbody>
+        </table>
+        <div id="issue-empty-state" class="emptyState hidden">
+          <i class="bi bi-check2-circle" aria-hidden="true"></i>
+          <strong>No issues in this view</strong>
+          <span>Try another tab or clear the filters.</span>
         </div>
-        <div class="paginationRow">
-          <span id="invoice-page-info">Showing 0–0 of 0</span>
-          <div class="paginationControls">
-            <button class="pageBtn pageBtn--icon" type="button" id="invoice-page-prev" aria-label="Previous page"><i class="bi bi-chevron-left" aria-hidden="true"></i></button>
-            <span id="invoice-page-current" class="pageCurrent" aria-current="page">1</span>
-            <button class="pageBtn pageBtn--icon" type="button" id="invoice-page-next" aria-label="Next page"><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
-          </div>
+      </div>
+
+      <footer class="paginationRow">
+        <span id="invoice-page-info">Showing 0–0 of 0 invoices</span>
+        <div class="paginationControls">
+          <button type="button" id="invoice-page-prev" aria-label="Previous page"><i class="bi bi-chevron-left" aria-hidden="true"></i></button>
+          <span id="invoice-page-current" aria-current="page">1</span>
+          <button type="button" id="invoice-page-next" aria-label="Next page"><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
         </div>
-      </section>
-    </div>
+      </footer>
+    </section>
   </main>
 
-  <div id="add-issue-modal" class="modal-overlay hidden" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="add-issue-title">
-      <div class="modal-header">
-        <h3 id="add-issue-title">Add Issue</h3>
-        <button id="add-issue-close" class="modal-close" type="button" aria-label="Close">x</button>
+  <div id="add-issue-modal" class="modalOverlay hidden" aria-hidden="true">
+    <div class="issueModal" role="dialog" aria-modal="true" aria-labelledby="add-issue-title">
+      <div class="modalHeader">
+        <div><span>Issue Tracker</span><h2 id="add-issue-title">Create a new issue</h2></div>
+        <button id="add-issue-close" type="button" aria-label="Close"><i class="bi bi-x-lg" aria-hidden="true"></i></button>
       </div>
-      <form id="add-issue-form" class="modal-body">
-        <div class="modal-field">
-          <label for="new-issue-broad" class="meta">Broad Status</label>
-          <select id="new-issue-broad" required></select>
+      <form id="add-issue-form" class="issueForm">
+        <label>Invoice
+          <select id="new-issue-invoice" required></select>
+        </label>
+        <div class="formGrid">
+          <label>Primary status<select id="new-issue-primary" required></select></label>
+          <label>Substatus<select id="new-issue-sub" required></select></label>
         </div>
-        <div class="modal-field">
-          <label for="new-issue-primary" class="meta">Primary Status</label>
-          <select id="new-issue-primary" required></select>
-        </div>
-        <div class="modal-field">
-          <label for="new-issue-sub" class="meta">Sub Status</label>
-          <select id="new-issue-sub" required></select>
-        </div>
-        <div class="modal-field">
-          <label for="new-issue-remark" class="meta">Agent Remark</label>
-          <textarea id="new-issue-remark" rows="3" placeholder="Add agent remark..." required></textarea>
-        </div>
-        <div class="modal-actions">
-          <button id="add-issue-cancel" type="button" class="pill">Cancel</button>
-          <button id="add-issue-submit" type="submit" class="pill pill--primary">Submit</button>
+        <label>Action owner<select id="new-issue-owner" required></select></label>
+        <label>Approval process<select id="new-issue-process" required></select></label>
+        <label>Agent's original remark
+          <textarea id="new-issue-remark" rows="5" placeholder="Describe the issue and what the next person should know..." required></textarea>
+        </label>
+        <div class="modalActions">
+          <button id="add-issue-cancel" type="button" class="outlineButton">Cancel</button>
+          <button type="submit" class="primaryButton">Create issue</button>
         </div>
       </form>
     </div>
   </div>
 
-<script src="../scripts/shared-header.js?v=20260730-tutorials"></script>
-  <script src="../bin/IssueTracker/js/app.js?v=20260803-pending-with-names"></script>
+  <div id="issue-toast" class="issueToast hidden" role="status" aria-live="polite"></div>
+
+  <script src="../scripts/shared-header.js?v=20260730-tutorials"></script>
+  <script src="../bin/IssueTracker/js/issue-tracker-unified.js?v=20260804-single-update"></script>
 </body>
 </html>
