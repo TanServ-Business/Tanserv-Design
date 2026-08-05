@@ -6,7 +6,7 @@
   <title>Inebura | Issue Tracker</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
   <link rel="stylesheet" href="../css/styles.css" />
-  <link rel="stylesheet" href="../css/issuetrackerLP.css?v=20260804-next-action" />
+  <link rel="stylesheet" href="../css/issuetrackerLP.css?v=20260805-multiselect-filters" />
   <link rel="stylesheet" href="../css/shared-header.css" />
 </head>
 <body class="issueTrackerPage" data-root-path="../" data-relationship-name="Issue Tracker" data-relationship-badge="IT">
@@ -18,32 +18,35 @@
         <h1>Issue Tracker</h1>
         <p>See what needs your attention and track every issue.</p>
       </div>
-      <div class="issueHeaderActions">
-        <label class="compactSelect">
-          <span>Viewing as</span>
-          <select id="role-select" aria-label="Select role">
-            <option value="agent">Agent</option>
-            <option value="manager">Manager / Approver</option>
-            <option value="action-owner">Action Owner</option>
-          </select>
-        </label>
-        <label class="compactSelect">
-          <span>User</span>
-          <select id="user-select" aria-label="Select user">
-            <option value="">Select user</option>
-          </select>
-        </label>
-      </div>
+      <details class="adminPreview">
+        <summary><i class="bi bi-person-gear" aria-hidden="true"></i><span>Admin preview</span></summary>
+        <div class="issueHeaderActions adminPreviewControls">
+          <label class="compactSelect">
+            <span>Viewing as</span>
+            <select id="role-select" aria-label="Select preview role">
+              <option value="agent">Agent</option>
+              <option value="manager">Manager / Approver</option>
+              <option value="action-owner">Action Owner</option>
+            </select>
+          </label>
+          <label class="compactSelect">
+            <span>User</span>
+            <select id="user-select" aria-label="Select preview user">
+              <option value="">Select user</option>
+            </select>
+          </label>
+        </div>
+      </details>
     </header>
 
     <section class="overviewCards" aria-label="Issue tracker overview">
-      <article class="overviewCard overviewCard--focus">
-        <span class="overviewIcon"><i class="bi bi-clipboard2-check" aria-hidden="true"></i></span>
-        <div><span>My action items</span><strong id="statMyActions">0</strong></div>
-      </article>
       <article class="overviewCard">
         <span class="overviewIcon"><i class="bi bi-folder2-open" aria-hidden="true"></i></span>
         <div><span>Open issues</span><strong id="statOpenIssues">0</strong><small id="statOpenInvoices">Across 0 invoices</small></div>
+      </article>
+      <article class="overviewCard overviewCard--focus">
+        <span class="overviewIcon"><i class="bi bi-clipboard2-check" aria-hidden="true"></i></span>
+        <div><span>My action items</span><strong id="statMyActions">0</strong></div>
       </article>
       <article class="overviewCard">
         <span class="overviewIcon"><i class="bi bi-clock-history" aria-hidden="true"></i></span>
@@ -51,7 +54,7 @@
       </article>
       <article class="overviewCard">
         <span class="overviewIcon overviewIcon--currency">&#8377;</span>
-        <div><span>Net due in issues</span><strong id="statInvoiceAmount">&#8377;0</strong><small>Current open balance</small></div>
+        <div><span>Net due in issues</span><strong id="statInvoiceAmount">&#8377;0</strong><small id="statIssueInvoicePercent">0% of portfolio invoices</small></div>
       </article>
     </section>
 
@@ -67,29 +70,71 @@
             <i class="bi bi-search" aria-hidden="true"></i>
             <input id="invoice-search-input" type="search" placeholder="Search invoice, customer or issue" aria-label="Search issues" />
           </label>
-          <details class="filterDropdown" id="issue-filter-menu">
+          <details class="filterPanelDropdown" id="issue-filter-menu">
             <summary><i class="bi bi-funnel" aria-hidden="true"></i> Filters <span id="active-filter-count" class="filterCount hidden">0</span></summary>
-            <div class="filterMenu filterMenu--wide">
-              <label>Approval status
-                <select id="approval-filter">
-                  <option value="all">All</option>
-                  <option value="pending">Pending</option>
-                  <option value="approved">Approved</option>
-                  <option value="rejected">Rejected</option>
+            <div class="filterPanel">
+              <details class="filterChoice" data-filter-choice="agent-filter">
+                <summary>Agent <span class="filterBadge">All</span></summary>
+                <div class="filterChoiceMenu" data-filter-options></div>
+                <select id="agent-filter" class="visuallyHidden" tabindex="-1" aria-hidden="true" multiple>
+                  <option value="all">All agents</option>
                 </select>
-              </label>
-              <label>Action status
-                <select id="action-filter">
-                  <option value="all">All</option>
-                  <option value="my-actionable">My actionable</option>
-                  <option value="no-action-required">No action required</option>
-                  <option value="resolution-provided">Resolution provided</option>
+              </details>
+              <details class="filterChoice" data-filter-choice="manager-filter">
+                <summary>Manager <span class="filterBadge">All</span></summary>
+                <div class="filterChoiceMenu" data-filter-options></div>
+                <select id="manager-filter" class="visuallyHidden" tabindex="-1" aria-hidden="true" multiple>
+                  <option value="all">All managers</option>
                 </select>
-              </label>
+              </details>
+              <details class="filterChoice" data-filter-choice="primary-status-filter">
+                <summary>Primary status <span class="filterBadge">All</span></summary>
+                <div class="filterChoiceMenu" data-filter-options></div>
+                <select id="primary-status-filter" class="visuallyHidden" tabindex="-1" aria-hidden="true" multiple>
+                  <option value="all">All primary statuses</option>
+                </select>
+              </details>
+              <details class="filterChoice" data-filter-choice="sub-status-filter">
+                <summary>Substatus <span class="filterBadge">All</span></summary>
+                <div class="filterChoiceMenu" data-filter-options></div>
+                <select id="sub-status-filter" class="visuallyHidden" tabindex="-1" aria-hidden="true" multiple>
+                  <option value="all">All substatuses</option>
+                </select>
+              </details>
+              <details class="filterChoice" data-filter-choice="assignee-filter">
+                <summary>Assignee <span class="filterBadge">All</span></summary>
+                <div class="filterChoiceMenu" data-filter-options></div>
+                <select id="assignee-filter" class="visuallyHidden" tabindex="-1" aria-hidden="true" multiple>
+                  <option value="all">All assignees</option>
+                </select>
+              </details>
+              <details class="filterChoice" data-filter-choice="action-owner-filter">
+                <summary>Action owner <span class="filterBadge">All</span></summary>
+                <div class="filterChoiceMenu" data-filter-options></div>
+                <select id="action-owner-filter" class="visuallyHidden" tabindex="-1" aria-hidden="true" multiple>
+                  <option value="all">All action owners</option>
+                </select>
+              </details>
+              <details class="filterChoice" data-filter-choice="invoice-due-filter">
+                <summary>Invoice due <span class="filterBadge">All</span></summary>
+                <div class="filterChoiceMenu" data-filter-options></div>
+                <select id="invoice-due-filter" class="visuallyHidden" tabindex="-1" aria-hidden="true" multiple>
+                  <option value="all">All invoices</option>
+                  <option value="due">Due</option>
+                  <option value="not-due">Not due</option>
+                </select>
+              </details>
+              <details class="filterChoice" data-filter-choice="region-filter">
+                <summary>Region <span class="filterBadge">All</span></summary>
+                <div class="filterChoiceMenu" data-filter-options></div>
+                <select id="region-filter" class="visuallyHidden" tabindex="-1" aria-hidden="true" multiple>
+                  <option value="all">All regions</option>
+                </select>
+              </details>
               <button id="clear-filters" type="button" class="textButton">Clear filters</button>
             </div>
           </details>
-          <button id="toggle-closed-invoices" class="textButton" type="button"><i class="bi bi-eye-slash" aria-hidden="true"></i> Show archived</button>
+          <button id="toggle-all-invoices" class="textButton" type="button"><i class="bi bi-arrows-collapse" aria-hidden="true"></i> Collapse all invoices</button>
         </div>
       </div>
 
@@ -98,10 +143,12 @@
           <thead>
             <tr>
               <th id="work-table-title">Substatus</th>
-              <th>Customer code</th>
-              <th>Customer name</th>
-              <th>Invoice no.</th>
-              <th>Issue no.</th>
+              <th aria-sort="none"><button class="tableSortButton" type="button" data-sort="customerCode">Customer code <i class="bi bi-arrow-down-up" aria-hidden="true"></i></button></th>
+              <th aria-sort="none"><button class="tableSortButton" type="button" data-sort="customerName">Customer name <i class="bi bi-arrow-down-up" aria-hidden="true"></i></button></th>
+              <th aria-sort="none"><button class="tableSortButton" type="button" data-sort="invoiceNo">Invoice no. <i class="bi bi-arrow-down-up" aria-hidden="true"></i></button></th>
+              <th aria-sort="none"><button class="tableSortButton" type="button" data-sort="invoiceValue">Invoice value <i class="bi bi-arrow-down-up" aria-hidden="true"></i></button></th>
+              <th aria-sort="none"><button class="tableSortButton" type="button" data-sort="issueId">Issue ID <i class="bi bi-arrow-down-up" aria-hidden="true"></i></button></th>
+              <th>Assigned to</th>
               <th>Issue created</th>
               <th>Open days</th>
               <th>Action</th>
@@ -157,6 +204,6 @@
   <div id="issue-toast" class="issueToast hidden" role="status" aria-live="polite"></div>
 
   <script src="../scripts/shared-header.js?v=20260730-tutorials"></script>
-  <script src="../bin/IssueTracker/js/issue-tracker-unified.js?v=20260804-single-update"></script>
+  <script src="../bin/IssueTracker/js/issue-tracker-unified.js?v=20260805-collapse-all"></script>
 </body>
 </html>

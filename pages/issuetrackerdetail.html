@@ -6,7 +6,7 @@
   <title>Inebura | Issue Tracker Detail</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
   <link rel="stylesheet" href="../css/styles.css" />
-  <link rel="stylesheet" href="../css/issuetrackerLP.css?v=20260804-next-action" />
+  <link rel="stylesheet" href="../css/issuetrackerLP.css?v=20260805-multiselect-filters" />
   <link rel="stylesheet" href="../css/shared-header.css" />
 </head>
 <body class="issueTrackerPage issueTrackerDetailPage" data-root-path="../" data-relationship-name="Issue Tracker" data-relationship-badge="IT">
@@ -22,22 +22,25 @@
         </div>
         <p id="detail-identity">Loading issue details...</p>
       </div>
-      <div class="issueHeaderActions">
-        <label class="compactSelect">
-          <span>Viewing as</span>
-          <select id="role-select" aria-label="Select role">
-            <option value="agent">Agent</option>
-            <option value="manager">Manager / Approver</option>
-            <option value="action-owner">Action Owner</option>
-          </select>
-        </label>
-        <label class="compactSelect">
-          <span>User</span>
-          <select id="user-select" aria-label="Select user">
-            <option value="">Select user</option>
-          </select>
-        </label>
-      </div>
+      <details class="adminPreview">
+        <summary><i class="bi bi-person-gear" aria-hidden="true"></i><span>Admin preview</span></summary>
+        <div class="issueHeaderActions adminPreviewControls">
+          <label class="compactSelect">
+            <span>Viewing as</span>
+            <select id="role-select" aria-label="Select preview role">
+              <option value="agent">Agent</option>
+              <option value="manager">Manager / Approver</option>
+              <option value="action-owner">Action Owner</option>
+            </select>
+          </label>
+          <label class="compactSelect">
+            <span>User</span>
+            <select id="user-select" aria-label="Select preview user">
+              <option value="">Select user</option>
+            </select>
+          </label>
+        </div>
+      </details>
     </header>
 
     <div id="detail-empty-state" class="emptyState detailEmpty hidden">
@@ -49,17 +52,27 @@
     <div id="issue-detail-layout" class="issueDetailLayout hidden">
       <section class="issueMainColumn" aria-label="Current issue action">
         <section id="current-action" class="currentAction"></section>
+        <section id="workflow-strip" class="workflowStrip" aria-label="Workflow handoff"></section>
         <section id="issue-context" class="issueContext"></section>
         <section id="work-area" class="primaryWorkArea"></section>
         <details class="activityPanel" open>
-          <summary>Action trail <span id="activity-count">0</span><i class="bi bi-chevron-down" aria-hidden="true"></i></summary>
+          <summary>
+            <span class="activitySummaryContent">
+              <span class="activitySummaryHeading">Action trail <span id="activity-count">0</span></span>
+              <span id="activity-summary-latest" class="activitySummaryLatest">Latest activity will appear here.</span>
+              <small id="activity-summary-detail" class="activitySummaryDetail">No additional details yet.</small>
+            </span>
+            <span class="activitySummaryAside">
+              <time id="activity-summary-time"></time>
+              <i class="bi bi-chevron-down" aria-hidden="true"></i>
+            </span>
+          </summary>
           <ol id="activity-list" class="activityList"></ol>
         </details>
       </section>
 
       <aside class="issueReferenceRail" aria-label="Complete issue details">
         <section id="approval-matrix-panel" class="railSection"></section>
-        <section id="before-after-panel" class="railSection"></section>
         <section id="complete-details-panel" class="railSection"></section>
       </aside>
     </div>
@@ -69,6 +82,6 @@
   <div id="issue-toast" class="issueToast hidden" role="status" aria-live="polite"></div>
 
   <script src="../scripts/shared-header.js?v=20260730-tutorials"></script>
-  <script src="../bin/IssueTracker/js/issue-tracker-unified.js?v=20260804-single-update"></script>
+  <script src="../bin/IssueTracker/js/issue-tracker-unified.js?v=20260805-collapse-all"></script>
 </body>
 </html>

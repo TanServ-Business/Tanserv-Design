@@ -9,9 +9,12 @@
     requests: 'approval_requests',
     role: 'issue_tracker_role',
     activeUser: 'issue_tracker_active_user',
-    activeApprover: 'approver_active_user'
+    activeApprover: 'approver_active_user',
+    portfolioInvoiceCount: 'issueTrackerPortfolioInvoiceCount'
   };
   const PAGE_SIZE = 5;
+  // Matches the current LP Agent demo portfolio; a live total can override this localStorage key.
+  const DEFAULT_PORTFOLIO_INVOICE_COUNT = 27;
   const USERS = ['Rahul Jain', 'Meera Iyer', 'Arjun Patel', 'Priya Verma', 'Neha Gupta', 'Sanjay Rao', 'Compliance Team'];
   const PRIMARY_STATUSES = ['Payment Processing', 'Material Delivery Issues', 'Invoice Dispute', 'Clarification Needed'];
   const SUB_STATUSES = ['Delivery Challan Required', 'Invoice Rebill Required', 'Manager Approval', 'Review Resolution', 'Further Documents Required', 'Service/PM Report Required', 'Payment Verification', 'PO Copy Required'];
@@ -50,6 +53,16 @@
     today.setHours(0, 0, 0, 0);
     if (Number.isNaN(created.getTime())) return '—';
     return Math.max(1, Math.floor((today - created) / 86400000) + 1);
+  };
+  const invoiceDueStatus = (issue) => {
+    const value = String(issue?.invoiceDueDate || '').trim();
+    if (!value) return 'not-due';
+    const dueDate = /^\d{4}-\d{2}-\d{2}/.test(value) ? new Date(`${value.slice(0, 10)}T00:00:00`) : new Date(value);
+    if (Number.isNaN(dueDate.getTime())) return 'not-due';
+    dueDate.setHours(0, 0, 0, 0);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return dueDate <= today ? 'due' : 'not-due';
   };
   const toast = (message, tone) => {
     const node = document.getElementById('issue-toast');
@@ -239,17 +252,56 @@
       .sort((left, right) => new Date(right.when || 0) - new Date(left.when || 0))[0];
     return Boolean(latestResolution && (!latestReopen || new Date(latestResolution.when || 0) > new Date(latestReopen.when || 0)));
   }
+  function workflowState(issue, request = latestRequest(issue.id)) {
+    const managerStatus = managerApprovalStatus(issue);
+    const matrix = getMatrix(issue);
+    const levels = request?.levels || matrix?.levels || [];
+    const orderedLevels = levels.map((level, index) => ({ ...level, level: Number(level.level || index + 1) }))
+      .sort((left, right) => left.level - right.level);
+    const actionOwner = issue.actionOwner || issue.agent || 'Rahul Jain';
+    const agent = issue.agent || 'Rahul Jain';
+    const firstLevel = orderedLevels[0] || null;
+    const currentLevelNumber = Number(request?.currentLevel || 1);
+    const currentLevel = orderedLevels.find((level) => level.level === currentLevelNumber) || orderedLevels[currentLevelNumber - 1] || null;
+    const nextLevel = orderedLevels.find((level) => level.level > currentLevelNumber) || null;
+    const result = (step, label, currentAssignee, next, detail) => ({
+      issueState: isClosed(issue) ? 'closed' : 'open',
+      step,
+      label,
+      detail: detail || label,
+      currentAssignee: currentAssignee || '',
+      actionOwner,
+      next,
+      contributionRights: 'Permitted users may add documents and remarks without advancing the workflow.'
+    });
+
+    if (isClosed(issue)) return result('closed', 'Closed', '', { person: 'No further action', action: 'Workflow complete', complete: true }, 'Workflow complete');
+    if (hasResolution(issue)) return result('ready-to-close', 'Ready to close', agent, { person: agent, action: 'Review resolution and close issue', complete: false }, 'Resolution provided');
+    if (managerStatus === 'rejected') return result('agent-correction', 'Returned to agent', agent, { person: issue.manager || 'Manager', action: 'Manager review after resubmission', complete: false }, 'Manager rejected the issue');
+    if (request?.status === 'rejected') return result('agent-correction', 'Returned to agent', agent, { person: firstLevel?.ownerName || issue.manager || 'Approver', action: 'Approval after resubmission', complete: false }, 'Approval was rejected');
+    if (managerStatus === 'pending') {
+      return result('manager-review', 'Manager review', issue.manager || 'Meera Iyer', firstLevel
+        ? { person: firstLevel.ownerName || 'Approver L1', action: 'Approver L1 approval', complete: false }
+        : { person: actionOwner, action: 'Provide resolution', complete: false }, 'Manager decision required');
+    }
+    if (request?.status === 'pending') {
+      return result(`approver-l${currentLevelNumber}`, `Approver L${currentLevelNumber}`, currentLevel?.ownerName || issue.assignedTo || 'Approver', nextLevel
+        ? { person: nextLevel.ownerName || `Approver L${nextLevel.level}`, action: `Approver L${nextLevel.level} approval`, complete: false }
+        : { person: actionOwner, action: 'Provide resolution', complete: false }, `Approval level ${currentLevelNumber}`);
+    }
+    if (request?.status === 'approved') return result('resolution-work', 'Resolution work', actionOwner, { person: agent, action: 'Review resolution and close issue', complete: false }, 'Approvals complete');
+    if (managerStatus === 'approved' && firstLevel) {
+      return result('approver-l1', 'Approver L1', firstLevel.ownerName || 'Approver L1', orderedLevels[1]
+        ? { person: orderedLevels[1].ownerName || 'Approver L2', action: 'Approver L2 approval', complete: false }
+        : { person: actionOwner, action: 'Provide resolution', complete: false }, 'Manager review complete');
+    }
+    return result('resolution-work', 'Resolution work', actionOwner, { person: agent, action: 'Review resolution and close issue', complete: false }, 'Provide resolution');
+  }
   function samePerson(left, right) {
     return cleanName(left).toLowerCase() === cleanName(right).toLowerCase();
   }
   function assignedUser(issue, request = latestRequest(issue.id)) {
-    if (isClosed(issue)) return '';
-    const managerStatus = managerApprovalStatus(issue);
-    if (managerStatus === 'pending') return issue.manager || 'Meera Iyer';
-    if (managerStatus === 'rejected') return issue.agent || 'Rahul Jain';
-    if (request?.status === 'pending') return currentApprover(request)?.ownerName || issue.assignedTo || 'Approver';
-    if (request?.status === 'rejected') return issue.agent || 'Rahul Jain';
-    return issue.assignedTo || issue.agent || issue.actionOwner || 'Rahul Jain';
+    return workflowState(issue, request).currentAssignee;
   }
   function approvalDecisionContext(issue, request = latestRequest(issue.id), role = getRole()) {
     if (role !== 'manager' || isClosed(issue)) return null;
@@ -324,15 +376,16 @@
   }
   function actionState(issue, role) {
     const request = latestRequest(issue.id);
-    if (isClosed(issue)) return { key: 'closed', label: 'Issue completed', meta: 'No action required' };
-    const assigned = assignedUser(issue, request);
+    const workflow = workflowState(issue, request);
+    if (workflow.issueState === 'closed') return { key: 'closed', label: 'Issue completed', meta: 'Workflow complete' };
+    const assigned = workflow.currentAssignee;
     const mine = samePerson(assigned, rolePerson(role));
     const decision = approvalDecisionContext(issue, request, role);
-    if (!mine) return { key: 'waiting', label: `Assigned to ${assigned || 'another user'}`, meta: `Assigned to ${assigned || 'another user'}` };
+    if (!mine) return { key: 'waiting', label: `Assigned to ${assigned || 'another user'}`, meta: `${workflow.label} · Waiting for ${assigned || 'another user'}` };
     if (decision) return { key: 'approval', label: decision.label, meta: decision.kind === 'manager' ? 'Manager decision required' : `Approval level ${decision.level}` };
-    if (hasResolution(issue) && role === 'agent') return { key: 'documents', label: 'Review resolution and close issue', meta: 'Resolution provided' };
-    if (role === 'action-owner') return { key: 'resolution', label: 'Add resolution', meta: issue.subStatus || issue.title };
-    return { key: 'documents', label: issue.subStatus || issue.title || 'Add documents and remarks', meta: managerApprovalStatus(issue) === 'rejected' || request?.status === 'rejected' ? 'Returned to agent' : 'Assigned to you' };
+    if (workflow.step === 'ready-to-close') return { key: 'documents', label: 'Review resolution and close issue', meta: 'Ready to close · Assigned to you' };
+    if (workflow.step === 'resolution-work') return { key: 'resolution', label: 'Provide resolution', meta: 'Resolution work · Assigned to you' };
+    return { key: 'documents', label: issue.subStatus || issue.title || 'Add documents and remarks', meta: `${workflow.label} · Assigned to you` };
   }
   function isMyWork(record, role) {
     return !isClosed(record.issue) && samePerson(assignedUser(record.issue), rolePerson(role));
@@ -369,60 +422,141 @@
   function initLanding() {
     let view = new URLSearchParams(location.search).get('view') || 'my-work';
     let page = 1;
+    let sortKey = '';
+    let sortDirection = 'asc';
+    let groupedInvoiceIds = [];
     const collapsedInvoices = new Set();
     const body = document.getElementById('invoice-table-body');
+    const sortButtons = [...document.querySelectorAll('[data-sort]')];
     const search = document.getElementById('invoice-search-input');
-    const approvalFilter = document.getElementById('approval-filter');
-    const actionFilter = document.getElementById('action-filter');
+    const agentFilter = document.getElementById('agent-filter');
+    const managerFilter = document.getElementById('manager-filter');
+    const primaryStatusFilter = document.getElementById('primary-status-filter');
+    const subStatusFilter = document.getElementById('sub-status-filter');
+    const assigneeFilter = document.getElementById('assignee-filter');
+    const actionOwnerFilter = document.getElementById('action-owner-filter');
+    const invoiceDueFilter = document.getElementById('invoice-due-filter');
+    const regionFilter = document.getElementById('region-filter');
+    const filterPanel = document.getElementById('issue-filter-menu');
+    const landingFilters = [agentFilter, managerFilter, primaryStatusFilter, subStatusFilter, assigneeFilter, actionOwnerFilter, invoiceDueFilter, regionFilter];
+
+    const selectedFilterValues = (select) => [...select.selectedOptions]
+      .map((option) => option.value)
+      .filter((value) => value !== 'all');
+    const resetFilter = (select) => {
+      [...select.options].forEach((option) => { option.selected = option.value === 'all'; });
+    };
+    const matchesSelectedFilter = (select, value, exact = false) => {
+      const selected = selectedFilterValues(select);
+      if (!selected.length) return true;
+      return selected.some((filterValue) => exact ? value === filterValue : samePerson(value, filterValue));
+    };
+
+    const syncFilterChoice = (select) => {
+      const choice = select.closest('[data-filter-choice]');
+      if (!choice) return;
+      const badge = choice.querySelector('.filterBadge');
+      const options = choice.querySelector('[data-filter-options]');
+      const selectedValues = selectedFilterValues(select);
+      const selectedLabels = [...select.options]
+        .filter((option) => selectedValues.includes(option.value))
+        .map((option) => option.textContent);
+      badge.textContent = selectedLabels.length === 0 ? 'All' : (selectedLabels.length === 1 ? selectedLabels[0] : `${selectedLabels.length} selected`);
+      options.innerHTML = [...select.options].map((option) => {
+        const isSelected = option.value === 'all' ? selectedValues.length === 0 : selectedValues.includes(option.value);
+        return `<button class="filterItem${isSelected ? ' is-selected' : ''}" type="button" data-filter-value="${esc(option.value)}" aria-pressed="${String(isSelected)}"><span>${esc(option.textContent)}</span><i class="bi bi-check2" aria-hidden="true"></i></button>`;
+      }).join('');
+    };
+    const populatePersonFilter = (select, names, allLabel) => {
+      const selected = new Set(selectedFilterValues(select));
+      const options = [...new Set(names.filter(Boolean).map(cleanName))].sort((left, right) => left.localeCompare(right));
+      select.innerHTML = `<option value="all">${esc(allLabel)}</option>${options.map((name) => `<option value="${esc(name)}">${esc(name)}</option>`).join('')}`;
+      const retained = options.filter((value) => selected.has(value));
+      [...select.options].forEach((option) => { option.selected = retained.length ? retained.includes(option.value) : option.value === 'all'; });
+      syncFilterChoice(select);
+    };
+    const sortValue = ({ invoice, issue }, key) => {
+      if (key === 'customerCode') return invoice.customerCode || '';
+      if (key === 'customerName') return invoice.customer || '';
+      if (key === 'invoiceNo') return invoice.id || '';
+      if (key === 'invoiceValue') return Number(invoice.total || issue.invoiceTotal || 0);
+      if (key === 'issueId') return issue.id || '';
+      return '';
+    };
+    const compareRecords = (left, right) => {
+      const leftValue = sortValue(left, sortKey);
+      const rightValue = sortValue(right, sortKey);
+      const direction = sortDirection === 'desc' ? -1 : 1;
+      if (typeof leftValue === 'number' && typeof rightValue === 'number') return (leftValue - rightValue) * direction;
+      return String(leftValue).localeCompare(String(rightValue), undefined, { numeric: true, sensitivity: 'base' }) * direction;
+    };
 
     function render() {
       data = loadData();
       approvalData = seedApprovals();
       const role = getRole();
       const records = allIssueRecords();
+      populatePersonFilter(agentFilter, records.map(({ issue }) => issue.agent), 'All agents');
+      populatePersonFilter(managerFilter, records.map(({ issue }) => issue.manager), 'All managers');
+      populatePersonFilter(primaryStatusFilter, records.map(({ issue }) => issue.primaryStatus), 'All primary statuses');
+      populatePersonFilter(subStatusFilter, records.map(({ issue }) => issue.subStatus), 'All substatuses');
+      populatePersonFilter(assigneeFilter, records.map(({ issue }) => assignedUser(issue)), 'All assignees');
+      populatePersonFilter(actionOwnerFilter, records.map(({ issue }) => issue.actionOwner), 'All action owners');
+      populatePersonFilter(regionFilter, records.map(({ issue }) => issue.region), 'All regions');
+      syncFilterChoice(invoiceDueFilter);
       const open = records.filter((item) => !isClosed(item.issue));
       const closed = records.filter((item) => isClosed(item.issue));
       const mine = open.filter((item) => isMyWork(item, role));
       const waiting = open.filter((item) => actionState(item.issue, role).key === 'waiting');
-      const pending = open.filter((item) => approvalStatus(item.issue) === 'pending');
+      const waitingApprovals = waiting.filter((item) => approvalStatus(item.issue) === 'pending');
       const openInvoices = new Set(open.map((item) => item.invoice.id)).size;
+      const configuredPortfolioCount = Number(read(KEYS.portfolioInvoiceCount, DEFAULT_PORTFOLIO_INVOICE_COUNT));
+      const trackedInvoiceCount = new Set(data.map((invoice) => invoice.id)).size;
+      const portfolioInvoiceCount = Math.max(Number.isFinite(configuredPortfolioCount) && configuredPortfolioCount > 0 ? configuredPortfolioCount : DEFAULT_PORTFOLIO_INVOICE_COUNT, trackedInvoiceCount);
+      const issueInvoicePercent = portfolioInvoiceCount ? Number(((openInvoices / portfolioInvoiceCount) * 100).toFixed(1)) : 0;
       const netDue = open.reduce((sum, item) => sum + Number(item.issue.invoiceDueAmount || 0), 0);
       document.getElementById('statMyActions').textContent = mine.length;
       document.getElementById('statOpenIssues').textContent = open.length;
       document.getElementById('statOpenInvoices').textContent = `Across ${openInvoices} invoices`;
       document.getElementById('statWaiting').textContent = waiting.length;
-      document.getElementById('statWaitingApprovals').textContent = `${pending.length} awaiting approval`;
+      document.getElementById('statWaitingApprovals').textContent = `${waitingApprovals.length} awaiting approval`;
       document.getElementById('statInvoiceAmount').textContent = money(netDue);
+      document.getElementById('statIssueInvoicePercent').textContent = `${issueInvoicePercent}% of portfolio invoices · ${openInvoices} of ${portfolioInvoiceCount}`;
       document.getElementById('tabMyWorkCount').textContent = mine.length;
       document.getElementById('tabOpenCount').textContent = open.length;
       document.getElementById('tabClosedCount').textContent = closed.length;
 
       let filtered = view === 'closed' ? closed : (view === 'open' ? open : mine);
       const query = search.value.trim().toLowerCase();
-      if (query) filtered = filtered.filter(({ invoice, issue }) => [invoice.id, invoice.customer, invoice.customerCode, issue.id, issue.title, issue.subStatus].join(' ').toLowerCase().includes(query));
-      if (approvalFilter.value !== 'all') filtered = filtered.filter(({ issue }) => approvalStatus(issue) === approvalFilter.value);
-      if (actionFilter.value !== 'all') filtered = filtered.filter(({ issue }) => {
-        const key = actionState(issue, role).key;
-        if (actionFilter.value === 'my-actionable') return ['documents', 'approval', 'resolution'].includes(key);
-        if (actionFilter.value === 'no-action-required') return ['waiting', 'closed'].includes(key);
-        return actionFilter.value === 'resolution-provided' && (key === 'closed' || Number(issue.stage) >= 3);
-      });
+      if (query) filtered = filtered.filter(({ invoice, issue }) => [invoice.id, invoice.customer, invoice.customerCode, issue.id, issue.title, issue.primaryStatus, issue.subStatus, issue.agent, issue.manager, assignedUser(issue), issue.actionOwner].join(' ').toLowerCase().includes(query));
+      filtered = filtered.filter(({ issue }) => matchesSelectedFilter(agentFilter, issue.agent));
+      filtered = filtered.filter(({ issue }) => matchesSelectedFilter(managerFilter, issue.manager));
+      filtered = filtered.filter(({ issue }) => matchesSelectedFilter(primaryStatusFilter, issue.primaryStatus));
+      filtered = filtered.filter(({ issue }) => matchesSelectedFilter(subStatusFilter, issue.subStatus));
+      filtered = filtered.filter(({ issue }) => matchesSelectedFilter(assigneeFilter, assignedUser(issue)));
+      filtered = filtered.filter(({ issue }) => matchesSelectedFilter(actionOwnerFilter, issue.actionOwner));
+      filtered = filtered.filter(({ issue }) => matchesSelectedFilter(invoiceDueFilter, invoiceDueStatus(issue), true));
+      filtered = filtered.filter(({ issue }) => matchesSelectedFilter(regionFilter, issue.region));
+      if (sortKey) filtered = [...filtered].sort(compareRecords);
       const groups = [];
       filtered.forEach((record) => {
         let group = groups.find((item) => item.invoice.id === record.invoice.id);
         if (!group) { group = { invoice: record.invoice, records: [] }; groups.push(group); }
         group.records.push(record);
       });
+      groupedInvoiceIds = groups.map((group) => group.invoice.id);
       const pages = Math.max(1, Math.ceil(groups.length / PAGE_SIZE));
       page = Math.min(Math.max(1, page), pages);
       const shown = groups.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
       body.innerHTML = shown.map((group) => {
         const due = group.records.reduce((sum, item) => sum + Number(item.issue.invoiceDueAmount || 0), 0);
         const collapsed = collapsedInvoices.has(group.invoice.id);
-        return `<tr class="invoiceGroupRow${collapsed ? ' is-collapsed' : ''}"><td colspan="8"><button class="invoiceGroupToggle" type="button" data-invoice-toggle="${esc(group.invoice.id)}" aria-expanded="${String(!collapsed)}"><span class="invoiceGroupIdentity"><i class="bi bi-chevron-down invoiceGroupChevron" aria-hidden="true"></i><strong><i class="bi bi-receipt" aria-hidden="true"></i> ${esc(group.invoice.id)}</strong><span>${group.records.length} issue${group.records.length === 1 ? '' : 's'}</span></span><span class="invoiceGroupAmount">Net due ${esc(money(due))}</span></button></td></tr>` + group.records.map(({ invoice, issue }) => {
+        return `<tr class="invoiceGroupRow${collapsed ? ' is-collapsed' : ''}"><td colspan="10"><button class="invoiceGroupToggle" type="button" data-invoice-toggle="${esc(group.invoice.id)}" aria-expanded="${String(!collapsed)}"><span class="invoiceGroupIdentity"><i class="bi bi-chevron-down invoiceGroupChevron" aria-hidden="true"></i><strong><i class="bi bi-receipt" aria-hidden="true"></i> ${esc(group.invoice.id)}</strong><span>${group.records.length} issue${group.records.length === 1 ? '' : 's'}</span></span><span class="invoiceGroupAmount">Net due ${esc(money(due))}</span></button></td></tr>` + group.records.map(({ invoice, issue }) => {
           const state = actionState(issue, role);
           const params = new URLSearchParams({ invoice: invoice.id, issue: issue.id, role, user: rolePerson(role) });
-          return `<tr class="issueRow" data-invoice-issue="${esc(invoice.id)}"${collapsed ? ' hidden' : ''}><td><span class="actionName">${esc(issue.subStatus || issue.title || '—')}</span><span class="actionMeta">${esc(state.meta)}</span></td><td>${esc(invoice.customerCode)}</td><td>${esc(invoice.customer)}</td><td><strong>${esc(invoice.id)}</strong></td><td>${esc(issue.id)}</td><td>${esc(prettyDate(issue.created))}</td><td class="openDaysCell">${esc(issueOpenDays(issue))}</td><td><a class="smallAction${['documents', 'approval', 'resolution'].includes(state.key) ? ' is-primary' : ''}" href="issuetrackerdetail.html?${params}">${state.key === 'closed' ? 'View' : 'Open task'}</a></td></tr>`;
+          const assignee = assignedUser(issue) || issue.assignedTo || '—';
+          const invoiceValue = Number(invoice.total || issue.invoiceTotal || 0);
+          return `<tr class="issueRow" data-invoice-issue="${esc(invoice.id)}"${collapsed ? ' hidden' : ''}><td><span class="actionName">${esc(issue.subStatus || issue.title || '—')}</span><span class="actionMeta">${esc(state.meta)}</span></td><td>${esc(invoice.customerCode)}</td><td>${esc(invoice.customer)}</td><td><strong>${esc(invoice.id)}</strong></td><td class="invoiceValueCell">${esc(money(invoiceValue))}</td><td>${esc(issue.id)}</td><td class="assignedToCell"><i class="bi bi-person" aria-hidden="true"></i><span>${esc(assignee)}</span></td><td>${esc(prettyDate(issue.created))}</td><td class="openDaysCell">${esc(issueOpenDays(issue))}</td><td><a class="smallAction${['documents', 'approval', 'resolution'].includes(state.key) ? ' is-primary' : ''}" href="issuetrackerdetail.html?${params}">${state.key === 'closed' ? 'View' : 'Open task'}</a></td></tr>`;
         }).join('');
       }).join('');
       body.querySelectorAll('[data-invoice-toggle]').forEach((button) => button.addEventListener('click', () => {
@@ -442,21 +576,90 @@
         tab.classList.toggle('is-active', active);
         tab.setAttribute('aria-selected', String(active));
       });
-      const filterCount = Number(approvalFilter.value !== 'all') + Number(actionFilter.value !== 'all');
+      sortButtons.forEach((button) => {
+        const active = button.dataset.sort === sortKey;
+        const header = button.closest('th');
+        const icon = button.querySelector('i');
+        button.classList.toggle('is-active', active);
+        header.setAttribute('aria-sort', active ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none');
+        icon.className = `bi ${active ? (sortDirection === 'asc' ? 'bi-chevron-up' : 'bi-chevron-down') : 'bi-arrow-down-up'}`;
+      });
+      const filterCount = landingFilters.reduce((total, filter) => total + Number(selectedFilterValues(filter).length > 0), 0);
       const count = document.getElementById('active-filter-count');
       count.textContent = filterCount;
       count.classList.toggle('hidden', filterCount === 0);
-      const toggle = document.getElementById('toggle-closed-invoices');
-      toggle.innerHTML = view === 'closed' ? '<i class="bi bi-eye"></i> Show active' : '<i class="bi bi-eye-slash"></i> Show archived';
+      const toggleAll = document.getElementById('toggle-all-invoices');
+      const allCollapsed = groupedInvoiceIds.length > 0 && groupedInvoiceIds.every((invoiceId) => collapsedInvoices.has(invoiceId));
+      toggleAll.disabled = groupedInvoiceIds.length === 0;
+      toggleAll.innerHTML = allCollapsed
+        ? '<i class="bi bi-arrows-expand" aria-hidden="true"></i> Expand all invoices'
+        : '<i class="bi bi-arrows-collapse" aria-hidden="true"></i> Collapse all invoices';
     }
 
     initRoleSelect(render);
+    filterPanel.addEventListener('click', (event) => {
+      const summary = event.target.closest('.filterChoice > summary');
+      if (summary) {
+        const activeChoice = summary.parentElement;
+        filterPanel.querySelectorAll('.filterChoice[open]').forEach((choice) => {
+          if (choice !== activeChoice) choice.removeAttribute('open');
+        });
+      }
+      const item = event.target.closest('[data-filter-value]');
+      if (!item) return;
+      const choice = item.closest('[data-filter-choice]');
+      const select = document.getElementById(choice.dataset.filterChoice);
+      const value = item.dataset.filterValue;
+      if (value === 'all') resetFilter(select);
+      else {
+        const option = [...select.options].find((candidate) => candidate.value === value);
+        if (option) option.selected = !option.selected;
+        const selectedValues = selectedFilterValues(select);
+        [...select.options].forEach((candidate) => {
+          if (candidate.value === 'all') candidate.selected = selectedValues.length === 0;
+        });
+      }
+      page = 1;
+      render();
+    });
+    filterPanel.addEventListener('toggle', () => {
+      if (!filterPanel.open) filterPanel.querySelectorAll('.filterChoice[open]').forEach((choice) => choice.removeAttribute('open'));
+    });
+    document.addEventListener('click', (event) => {
+      if (filterPanel.contains(event.target)) return;
+      filterPanel.removeAttribute('open');
+      filterPanel.querySelectorAll('.filterChoice[open]').forEach((choice) => choice.removeAttribute('open'));
+    }, true);
+    sortButtons.forEach((button) => button.addEventListener('click', () => {
+      const nextKey = button.dataset.sort;
+      if (sortKey === nextKey) sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+      else { sortKey = nextKey; sortDirection = 'asc'; }
+      page = 1;
+      render();
+    }));
     document.querySelectorAll('.workTab').forEach((tab) => tab.addEventListener('click', () => { view = tab.dataset.view; page = 1; render(); }));
     search.addEventListener('input', () => { page = 1; render(); });
-    approvalFilter.addEventListener('change', () => { page = 1; render(); });
-    actionFilter.addEventListener('change', () => { page = 1; render(); });
-    document.getElementById('clear-filters').addEventListener('click', () => { approvalFilter.value = 'all'; actionFilter.value = 'all'; render(); });
-    document.getElementById('toggle-closed-invoices').addEventListener('click', () => { view = view === 'closed' ? 'my-work' : 'closed'; page = 1; render(); });
+    agentFilter.addEventListener('change', () => { page = 1; render(); });
+    managerFilter.addEventListener('change', () => { page = 1; render(); });
+    primaryStatusFilter.addEventListener('change', () => { page = 1; render(); });
+    subStatusFilter.addEventListener('change', () => { page = 1; render(); });
+    assigneeFilter.addEventListener('change', () => { page = 1; render(); });
+    actionOwnerFilter.addEventListener('change', () => { page = 1; render(); });
+    invoiceDueFilter.addEventListener('change', () => { page = 1; render(); });
+    regionFilter.addEventListener('change', () => { page = 1; render(); });
+    document.getElementById('clear-filters').addEventListener('click', () => {
+      landingFilters.forEach(resetFilter);
+      page = 1;
+      render();
+    });
+    document.getElementById('toggle-all-invoices').addEventListener('click', () => {
+      const allCollapsed = groupedInvoiceIds.length > 0 && groupedInvoiceIds.every((invoiceId) => collapsedInvoices.has(invoiceId));
+      groupedInvoiceIds.forEach((invoiceId) => {
+        if (allCollapsed) collapsedInvoices.delete(invoiceId);
+        else collapsedInvoices.add(invoiceId);
+      });
+      render();
+    });
     document.getElementById('invoice-page-prev').addEventListener('click', () => { page -= 1; render(); });
     document.getElementById('invoice-page-next').addEventListener('click', () => { page += 1; render(); });
     initNewIssue(render);
@@ -588,12 +791,12 @@
       status.textContent = isClosed(issue) ? 'Closed' : (approvalStatus(issue) === 'pending' ? 'Approval pending' : issue.status || 'Open');
       status.className = `statusPill${isClosed(issue) ? ' is-closed' : (approvalStatus(issue) === 'pending' ? ' is-pending' : '')}`;
       renderCurrentAction(issue, state, request);
+      renderWorkflowStrip(issue, request);
       renderContext(issue, request);
       renderWorkArea(invoice, issue, request, state, pendingFiles, selectedRequirement);
       renderActivity(issue, request);
       renderMatrix(issue, request);
       renderDetails(invoice, issue, request);
-      renderRoute(issue, request);
       bindDetailEvents(invoice, issue, request, state);
     }
 
@@ -616,6 +819,11 @@
       function bindQuickActionPanel() {
         const quickCancel = document.getElementById('quick-action-cancel');
         if (quickCancel) quickCancel.addEventListener('click', closeQuickActionPanel);
+        const quickClose = document.getElementById('quick-action-close');
+        if (quickClose) quickClose.addEventListener('click', () => {
+          closeQuickActionPanel();
+          document.getElementById('work-remark')?.focus();
+        });
         const emailType = document.getElementById('quick-email-type');
         if (emailType) emailType.addEventListener('change', () => {
           document.getElementById('quick-email-recipients')?.classList.toggle('hidden', emailType.value !== 'escalate');
@@ -635,12 +843,21 @@
         }));
       }
       document.querySelectorAll('[data-issue-action]').forEach((button) => button.addEventListener('click', () => {
+        if (button.getAttribute('aria-disabled') === 'true') {
+          toast(button.dataset.unavailable || 'This action is not available to the current user.', 'error');
+          return;
+        }
         if (button.classList.contains('is-active')) {
           closeQuickActionPanel();
           return;
         }
         openQuickActionPanel(button.dataset.issueAction, issue, request);
         bindQuickActionPanel();
+        document.querySelector('.requiredActionPanelHost')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }));
+      document.querySelectorAll('[data-focus-contribution]').forEach((button) => button.addEventListener('click', () => {
+        document.getElementById('contribution-section')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        document.getElementById('work-remark')?.focus({ preventScroll: true });
       }));
     }
 
@@ -665,14 +882,40 @@
   }
   function renderCurrentAction(issue, state, request) {
     const node = document.getElementById('current-action');
-    const title = state.key === 'documents' ? `Upload ${documentRequirement(issue)} and add your remark` : state.label;
+    const workflow = workflowState(issue, request);
+    const decision = approvalDecisionContext(issue, request);
+    const title = state.key === 'documents' && workflow.step !== 'ready-to-close' ? `Add ${documentRequirement(issue)} and your remark` : state.label;
     const explanation = state.key === 'approval' ? 'Review the supporting documents and the previous remark, then approve or send it back.' :
-      state.key === 'waiting' ? 'This issue is assigned to another person, but you can still add documents, share a resolution, add remarks or use the available actions.' :
+      state.key === 'waiting' ? `Track progress here, or contribute documents and remarks without advancing ${workflow.currentAssignee || 'the assignee'}’s step.` :
       state.key === 'resolution' ? 'Explain the resolution clearly and attach any supporting proof.' :
       state.key === 'closed' ? 'This issue has completed its action and approval flow.' : 'Attach the requested document and explain what you completed before sending it forward.';
     const waitingWith = state.key === 'waiting' ? `<span class="actionDue"><i class="bi bi-person"></i>With ${esc(assignedUser(issue, request) || 'another user')}</span>` : '';
+    let actionControl = '';
+    let actionHint = '';
+    if (state.key === 'approval' && decision) {
+      actionControl = `<button class="currentActionButton" type="button" data-issue-action="approve" aria-describedby="current-action-hint"><i class="bi bi-check2-circle" aria-hidden="true"></i>${esc(decision.label)}</button>`;
+      actionHint = 'Opens Accept and Reject options with supporting documents and a remark.';
+    } else if (state.key === 'resolution') {
+      actionControl = '<button class="currentActionButton" type="button" data-issue-action="resolution" aria-describedby="current-action-hint"><i class="bi bi-file-earmark-check" aria-hidden="true"></i>Provide resolution</button>';
+      actionHint = 'Opens the document upload and resolution remark fields.';
+    } else if (workflow.step === 'ready-to-close' && canCloseIssue(issue)) {
+      actionControl = '<button class="currentActionButton" type="button" data-issue-action="close" aria-describedby="current-action-hint"><i class="bi bi-lock" aria-hidden="true"></i>Review and close</button>';
+      actionHint = 'Opens the closure review before completing the issue.';
+    } else if (state.key === 'documents') {
+      actionControl = '<button class="currentActionButton" type="button" data-focus-contribution aria-describedby="current-action-hint"><i class="bi bi-paperclip" aria-hidden="true"></i>Add documents or remark</button>';
+      actionHint = 'Moves to the document upload and remark section below.';
+    }
+    const actionCta = actionControl && actionHint ? `<div class="currentActionCta">${actionControl}<span id="current-action-hint" class="currentActionHint" role="tooltip">${esc(actionHint)}</span></div>` : actionControl;
     node.className = `currentAction${state.key === 'waiting' ? ' is-waiting' : (state.key === 'closed' ? ' is-complete' : '')}`;
-    node.innerHTML = `<div class="currentActionHeader"><div><span class="eyebrow">${state.key === 'approval' ? 'Your approval is needed' : (state.key === 'waiting' ? 'Waiting on another person' : (state.key === 'closed' ? 'Completed' : 'Your action is needed'))}</span><h2>${esc(title)}</h2><p>${esc(explanation)}</p></div>${waitingWith}</div>`;
+    node.innerHTML = `<div class="currentActionHeader"><div><span class="eyebrow">${state.key === 'waiting' ? 'Tracking only' : (state.key === 'closed' ? 'Completed' : 'Your required action')}</span><h2>${esc(title)}</h2><p>${esc(explanation)}</p></div><div class="currentActionControls">${waitingWith}${actionCta}</div></div>`;
+  }
+  function renderWorkflowStrip(issue, request) {
+    const workflow = workflowState(issue, request);
+    const latest = mergedActivity(issue, request)[0];
+    const previousPerson = latest?.who || issue.agent || 'Agent';
+    const previousAction = latest?.what || 'created the issue';
+    const next = workflow.next;
+    document.getElementById('workflow-strip').innerHTML = `<div class="workflowStripItem"><span>Previous update</span><strong>${esc(previousPerson)}</strong><small>${esc(previousAction)}</small></div><i class="bi bi-chevron-right workflowStripArrow" aria-hidden="true"></i><div class="workflowStripItem is-current"><span>Current assignee</span><strong>${esc(workflow.currentAssignee || 'No active assignment')}</strong><small>${esc(workflow.label)}</small></div><i class="bi bi-chevron-right workflowStripArrow" aria-hidden="true"></i><div class="workflowStripItem"><span>Next step</span><strong>${esc(next.person)}</strong><small>${esc(next.action)}</small></div>`;
   }
   function originalRemark(issue) {
     return (issue.actionTrail || []).find((entry) => entry.remark)?.remark || issue.description || 'No original remark provided.';
@@ -681,29 +924,23 @@
     const matrix = getMatrix(issue);
     document.getElementById('issue-context').innerHTML = `<h2 class="sectionHeading">Issue context</h2><div class="contextGrid"><div class="contextItem"><span>Primary status</span><strong>${esc(issue.primaryStatus || '—')}</strong></div><div class="contextItem"><span>Sub status</span><strong>${esc(issue.subStatus || issue.title || '—')}</strong></div><div class="contextItem"><span>Action owner</span><strong>${esc(issue.actionOwner || 'Unassigned')}</strong></div><div class="contextItem"><span>Approval matrix</span><strong>${esc(matrix?.name || 'Not selected')}</strong></div></div><div class="originalRemarkCard"><span>Agent's original remark</span><p>${esc(originalRemark(issue))}</p></div>`;
   }
-  function canCloseIssue(role = getRole()) {
+  function canCloseIssue(issue, role = getRole()) {
     if (role === 'agent') return true;
-    if (role !== 'manager') return false;
-    const viewer = rolePerson(role);
-    return allIssueRecords().some(({ issue }) => samePerson(issue.manager, viewer));
+    return role === 'manager' && samePerson(issue.manager, rolePerson(role));
   }
-  function renderActionToolbar(issue, request) {
+  function renderMoreActions(issue, request) {
     const closed = isClosed(issue);
-    const decision = approvalDecisionContext(issue, request);
-    const managerPending = managerApprovalStatus(issue) === 'pending';
-    const pendingLevel = request?.status === 'pending' ? Number(request.currentLevel || 1) : 0;
-    const approvalLabel = decision?.kind === 'approver' ? `Approver L${decision.level}` : (managerPending ? 'Manager approval' : (pendingLevel ? `Approver L${pendingLevel}` : 'Approval'));
-    const approvalOwner = assignedUser(issue, request) || 'the current assignee';
+    const role = getRole();
+    const canManage = role === 'agent' || (role === 'manager' && samePerson(issue.manager, rolePerson(role)));
+    const canChangeProcess = role === 'manager' && samePerson(issue.manager, rolePerson(role));
     const actions = [
-      ['approve', 'bi-check2-circle', approvalLabel, closed || !decision, decision?.label || `Only ${approvalOwner} can accept or reject at this stage`],
-      ['assign', 'bi-person-plus', 'Reassign', closed, 'Reassign action owner'],
-      ['email', 'bi-envelope-arrow-up', 'Resend', false, 'Resend email'],
-      ['process', 'bi-diagram-3', 'Process', closed, 'Change approval process'],
-      ['resolution', 'bi-file-earmark-check', 'Resolve', closed, 'Add resolution'],
-      ['close', 'bi-lock', 'Close', closed || !canCloseIssue(), canCloseIssue() ? 'Close issue at any point in the workflow' : 'Only an agent or manager can close this issue'],
-      ['reopen', 'bi-arrow-counterclockwise', 'Reopen', !closed, 'Reopen issue']
+      ['assign', 'bi-person-plus', 'Reassign owner', closed || !canManage, 'Reassign the action owner', 'Available to agents and managers'],
+      ['email', 'bi-envelope-arrow-up', 'Resend email', false, 'Resend or escalate an email', 'Does not advance the workflow'],
+      ['process', 'bi-diagram-3', 'Change process', closed || !canChangeProcess, 'Change the approval process', 'Available to the issue manager'],
+      ['close', 'bi-lock', 'Close issue', closed || !canCloseIssue(issue), 'Close the issue', 'Available to the agent or issue manager'],
+      ['reopen', 'bi-arrow-counterclockwise', 'Reopen issue', !closed || !canCloseIssue(issue), 'Reopen the issue', 'Available to the agent or issue manager']
     ];
-    return `<section class="workActionSection" aria-labelledby="issue-actions-title"><div id="issue-actions-title" class="workActionSummary"><span><i class="bi bi-three-dots" aria-hidden="true"></i> Actions</span></div><div class="workActionContent"><div class="workActionButtons">${actions.map(([key, icon, label, disabled, title]) => `<button type="button" class="workActionButton" data-issue-action="${key}" title="${esc(title)}" aria-label="${esc(title)}"${disabled ? ' disabled' : ''}><i class="bi ${icon}" aria-hidden="true"></i><span>${label}</span></button>`).join('')}</div><div id="quick-action-panel" class="quickActionPanel hidden" aria-live="polite"></div></div></section>`;
+    return `<details class="issueActionsSection"><summary class="issueActionsHeader"><div><h3>Actions</h3><p>Administrative and exception actions</p></div><span class="issueActionsToggle"><i class="bi bi-chevron-down" aria-hidden="true"></i></span></summary><div class="workActionButtons workActionButtons--secondary">${actions.map(([key, icon, label, disabled, title, permission]) => `<button type="button" class="workActionButton${disabled ? ' is-disabled' : ''}" data-issue-action="${key}" data-unavailable="${esc(permission)}" title="${esc(title)}" aria-label="${esc(`${title}. ${permission}`)}" aria-disabled="${String(disabled)}"><i class="bi ${icon}" aria-hidden="true"></i><span>${esc(label)}<small>${esc(permission)}</small></span></button>`).join('')}</div></details>`;
   }
   function restoreDefaultWorkInputs() {
     const inputs = document.getElementById('default-work-inputs');
@@ -728,7 +965,7 @@
     document.querySelectorAll('[data-issue-action]').forEach((button) => button.classList.toggle('is-active', button.dataset.issueAction === action));
     const processOptions = approvalData.processes.map((process) => `<option value="${esc(process.id)}"${process.id === (issue.approvalProcessId || getProcess(issue)?.id) ? ' selected' : ''}>${esc(process.process)}</option>`).join('');
     const ownerOptions = USERS.map((user) => `<option value="${esc(user)}"${user === issue.actionOwner ? ' selected' : ''}>${esc(user)}</option>`).join('');
-    const header = (icon, title, description) => `<div class="quickActionHeader"><span class="quickActionHeaderIcon"><i class="bi ${icon}" aria-hidden="true"></i></span><div><h4>${title}</h4><p>${description}</p></div></div>`;
+    const header = (icon, title, description) => `<div class="quickActionHeader"><span class="quickActionHeaderIcon"><i class="bi ${icon}" aria-hidden="true"></i></span><div><h4>${title}</h4><p>${description}</p></div><button id="quick-action-close" class="quickActionClose" type="button" aria-label="Close action and add a remark only"><i class="bi bi-x-lg" aria-hidden="true"></i></button></div>`;
     const footer = (label) => `<div class="quickActionFooter"><button id="quick-action-confirm" data-action="${action}" class="primaryButton" type="button">${label}</button><button id="quick-action-cancel" class="outlineButton" type="button">Cancel</button></div>`;
     const approvalFooter = `<div class="quickActionFooter quickActionFooter--decision"><button type="button" class="primaryButton" data-quick-decision="approve"><i class="bi bi-check2" aria-hidden="true"></i> Accept</button><button type="button" class="dangerButton" data-quick-decision="reject"><i class="bi bi-x-lg" aria-hidden="true"></i> Reject</button><button id="quick-action-cancel" class="outlineButton" type="button">Cancel</button></div>`;
     let content = '';
@@ -822,7 +1059,7 @@
       provideResolution(invoice, issue, remark, pendingFiles);
       return true;
     }
-    if (action === 'close' && !canCloseIssue()) {
+    if (action === 'close' && !canCloseIssue(issue)) {
       toast('Only an agent or manager can close this issue.', 'error');
       return false;
     }
@@ -837,32 +1074,22 @@
   }
   function renderWorkArea(invoice, issue, request, state, pendingFiles) {
     const node = document.getElementById('work-area');
-    const actionToolbar = renderActionToolbar(issue, request);
     const customerDocuments = issueDocuments(invoice, issue, request);
     const docs = renderDocuments(invoice, issue, request);
     const pendingUpload = `<div id="pending-upload-list" class="uploadFileList${pendingFiles.length ? '' : ' hidden'}"><strong>Ready to attach:</strong> <span>${pendingFiles.map((file) => esc(file.name)).join(', ')}</span></div>`;
     const upload = `<div class="uploadZone"><span class="uploadIcon"><i class="bi bi-cloud-arrow-up"></i></span><div class="uploadCopy"><strong>Attach supporting documents</strong><span>PDF, JPG, PNG, DOCX or XLSX</span><small>${esc(documentRequirement(issue))} ${customerDocuments.some((item) => String(item.requirement || '').toLowerCase() === documentRequirement(issue).toLowerCase()) ? 'is already available for this customer' : 'is requested for this issue'} · New uploads are reusable across this customer's invoices</small></div><button class="outlineButton uploadAction" type="button" data-trigger-upload data-requirement="${esc(documentRequirement(issue))}"><i class="bi bi-paperclip" aria-hidden="true"></i> Browse</button></div>${pendingUpload}`;
     const remark = `<label class="workRemarkLabel" for="work-remark">${state.key === 'approval' ? 'Decision remark' : (state.key === 'resolution' ? 'Resolution' : 'Your remark')} <span aria-hidden="true">*</span></label><textarea id="work-remark" class="workRemark" maxlength="1000" placeholder="Explain what you checked, attached or decided. This is shown to the next person."></textarea><span id="remark-counter" class="remarkCounter">0 / 1000</span><div id="work-form-error" class="formError"></div>`;
-    const documentSection = `<section class="workSection documentSection"><div class="workSectionHeader"><div><h3>Existing Documents</h3><p>Documents available for this customer across all invoices</p></div><span class="documentCount">${customerDocuments.length}</span></div>${docs}</section>`;
+    const documentSection = `<details class="workSection documentSection"><summary class="workSectionHeader"><div><h3>Existing Documents</h3><p>Documents available for this customer across all invoices</p></div><span class="documentSummaryMeta"><span class="documentCount">${customerDocuments.length}</span><i class="bi bi-chevron-down" aria-hidden="true"></i></span></summary><div class="documentSectionBody">${docs}</div></details>`;
     const workNote = state.key === 'approval' ? `Sharing an update does not approve or reject the issue. Use the ${esc(state.label)} action above for the decision.` :
       state.key === 'waiting' ? 'Shares the remark and any attached documents without changing the current assignment.' :
       state.key === 'closed' ? 'Sharing an update does not reopen the issue.' :
       'Shares the remark and any attached documents together.';
     const defaultWorkInputs = `<div id="default-work-inputs" class="defaultWorkInputs">${upload}<div class="resolutionFields">${remark}</div><div class="workActions"><button id="submit-primary-action" class="primaryButton" type="button"><i class="bi bi-send" aria-hidden="true"></i> Share update</button><span class="workNote"><i class="bi bi-info-circle"></i> ${workNote}</span></div></div>`;
-    const interactiveWorkArea = `${actionToolbar}<div id="default-work-input-slot" aria-hidden="true"></div>${defaultWorkInputs}`;
-    if (state.key === 'waiting') {
-      node.innerHTML = `${documentSection}<section class="workSection resolutionSection resolutionSection--waiting"><div class="workSectionHeader"><div><h3>Contribute to this issue</h3><p>Share documents, resolution or remarks even while another user owns the next approval.</p></div></div><div class="waitingAssignmentNote"><i class="bi bi-person-check" aria-hidden="true"></i><span>Currently assigned to <strong>${esc(assignedUser(issue, request) || 'another user')}</strong>. Only Accept/Reject follows the active approval level; all other actions remain available.</span></div>${interactiveWorkArea}</section>`;
-      return;
-    }
-    if (state.key === 'closed') {
-      node.innerHTML = `${documentSection}<section class="workSection resolutionSection resolutionSection--closed"><div class="workSectionHeader"><div><h3>Update issue</h3><p>Attach supporting files or share a remark without reopening the issue.</p></div></div>${interactiveWorkArea}</section>`;
-      return;
-    }
-    if (state.key === 'approval') {
-      node.innerHTML = `${documentSection}<section class="workSection resolutionSection"><div class="workSectionHeader"><div><h3>Review and respond</h3><p>Attach supporting evidence, share a resolution or record your approval decision.</p></div></div>${interactiveWorkArea}</section>`;
-      return;
-    }
-    node.innerHTML = `${documentSection}<section class="workSection resolutionSection"><div class="workSectionHeader"><div><h3>Provide resolution</h3><p>Upload supporting files and explain the action completed.</p></div></div>${interactiveWorkArea}</section>`;
+    const contributionCopy = state.key === 'waiting' ? `Currently assigned to ${assignedUser(issue, request) || 'another user'}. Your update will not advance their step.` :
+      state.key === 'closed' ? 'Add supporting context without reopening the issue.' :
+      'Add documents or a remark without changing the current workflow step.';
+    const contributionSection = `<section id="contribution-section" class="workSection resolutionSection contributionSection"><div class="workSectionHeader"><div><h3>Add remark</h3><p>${esc(contributionCopy)}</p></div><span class="contributionBadge"><i class="bi bi-shield-check" aria-hidden="true"></i>No workflow change</span></div><div id="default-work-input-slot" aria-hidden="true"></div>${defaultWorkInputs}</section>`;
+    node.innerHTML = `${documentSection}${renderMoreActions(issue, request)}<section class="requiredActionPanelHost" aria-label="Selected required action"><div id="quick-action-panel" class="quickActionPanel hidden" aria-live="polite"></div></section>${contributionSection}`;
   }
 
   function attachFiles(invoice, issue, files, by) {
@@ -981,6 +1208,16 @@
     const entries = mergedActivity(issue, request);
     document.getElementById('activity-count').textContent = entries.length;
     const supportedTypes = ['approval', 'remark', 'assignment', 'email', 'resolution', 'closure', 'reopen'];
+    const latest = entries[0];
+    const latestTypeRaw = String(latest?.type || 'remark').toLowerCase();
+    const latestType = latestTypeRaw === 'assigned' ? 'assignment' : (supportedTypes.includes(latestTypeRaw) ? latestTypeRaw : 'remark');
+    const latestFiles = Array.isArray(latest?.files) ? latest.files : [];
+    const summaryText = latest ? `${latest.who || 'System'} · ${latest.what || 'updated the issue'}` : 'No activity recorded yet.';
+    const summaryDetail = latest?.remark ? `${latestType.toUpperCase()} · ${String(latest.remark).slice(0, 110)}${String(latest.remark).length > 110 ? '…' : ''}` :
+      (latestFiles.length ? `${latestType.toUpperCase()} · ${latestFiles.length} attachment${latestFiles.length === 1 ? '' : 's'}` : (latest ? `${latestType.toUpperCase()} · No additional remark` : 'Updates will appear after the first action.'));
+    document.getElementById('activity-summary-latest').textContent = summaryText;
+    document.getElementById('activity-summary-detail').textContent = summaryDetail;
+    document.getElementById('activity-summary-time').textContent = latest ? shortDateTime(latest.when) : '';
     document.getElementById('activity-list').innerHTML = entries.map((entry) => {
       const rawType = String(entry.type || 'remark').toLowerCase();
       const type = rawType === 'assigned' ? 'assignment' : (supportedTypes.includes(rawType) ? rawType : 'remark');
@@ -991,55 +1228,45 @@
   function renderMatrix(issue, request) {
     const matrix = getMatrix(issue);
     const levels = request?.levels || matrix?.levels || [];
-    const hierarchyLevels = levels.map((level, index) => ({ level, index })).reverse();
-    const assigned = assignedUser(issue, request);
-    document.getElementById('approval-matrix-panel').innerHTML = `<div class="assignedToBanner"><span>Assigned to</span><strong><i class="bi bi-person-check" aria-hidden="true"></i>${esc(assigned || 'No active assignment')}</strong></div><h2>Approval matrix</h2><p>${esc(request?.matrixName || matrix?.name || 'No approval matrix selected')} <span class="matrixOrderNote">Highest level first</span></p><div class="matrixList" aria-label="Approval hierarchy, highest level first">${hierarchyLevels.map(({ level, index }) => {
-      let state = level.status || (request ? (index + 1 < Number(request.currentLevel || 1) ? 'approved' : (index + 1 === Number(request.currentLevel || 1) && request.status === 'pending' ? 'current' : 'waiting')) : 'not started');
-      if (state === 'pending') state = 'current';
-      const stateClass = String(state).toLowerCase().replace(/\s+/g, '-');
-      return `<div class="matrixLevel is-${esc(stateClass)}"><div class="matrixLevelMeta"><span class="levelTag">Level ${index + 1}</span><span class="matrixState is-${esc(stateClass)}">${esc(state === 'current' ? 'CURRENT' : state.toUpperCase())}</span></div><div class="matrixPerson"><span class="matrixAvatar"><i class="bi bi-person" aria-hidden="true"></i></span><div><strong>${esc(level.ownerName || 'Unassigned')}</strong><span>${esc(level.ownerEmail || '')}</span></div></div></div>`;
-    }).join('') || '<p>No approvers are configured.</p>'}</div>`;
+    const normalizedLevels = levels.map((level, index) => ({ ...level, number: Number(level.level || index + 1) }));
+    const hierarchyLevels = [...normalizedLevels].sort((left, right) => right.number - left.number);
+    const workflow = workflowState(issue, request);
+    const managerState = managerApprovalStatus(issue);
+    const managerDisplay = managerState === 'pending' ? 'current' : managerState;
+    const currentLevel = Number(request?.currentLevel || 0);
+    const levelState = (level) => {
+      if (managerState === 'pending') return level.number === 1 ? 'next' : 'locked';
+      if (managerState === 'rejected') return 'locked';
+      if (request?.status === 'approved') return 'approved';
+      if (request?.status === 'rejected') return String(level.status || '').toLowerCase() === 'approved' ? 'approved' : 'locked';
+      if (request?.status === 'pending') {
+        const explicit = String(level.status || '').toLowerCase();
+        if (explicit === 'approved') return 'approved';
+        if (level.number === currentLevel) return 'current';
+        if (level.number === currentLevel + 1) return 'next';
+        return 'locked';
+      }
+      if (managerState === 'approved') return level.number === 1 ? 'current' : (level.number === 2 ? 'next' : 'locked');
+      return 'locked';
+    };
+    const renderLevel = (level) => {
+      const state = levelState(level);
+      const stateClass = state.replace(/\s+/g, '-');
+      const stateLabel = state === 'current' ? 'CURRENT' : state.toUpperCase();
+      const summary = `<div class="matrixLevelMeta"><span class="levelTag">Approver ${level.number}</span><span class="matrixState is-${esc(stateClass)}">${esc(stateLabel)}</span></div><div class="matrixPerson"><span class="matrixAvatar"><i class="bi bi-person" aria-hidden="true"></i></span><div><strong>${esc(level.ownerName || 'Unassigned')}</strong></div></div>`;
+      return `<div class="matrixLevel is-${esc(stateClass)}">${summary}</div>`;
+    };
+    document.getElementById('approval-matrix-panel').innerHTML = `<div class="assignedToBanner"><span>Current assignee</span><strong><i class="bi bi-person-check" aria-hidden="true"></i>${esc(workflow.currentAssignee || 'No active assignment')}</strong><small>${esc(workflow.label)}</small></div><h2>Approval route</h2><div class="managerReviewStep is-${esc(managerDisplay)}"><div><span class="levelTag">Manager review</span><strong>${esc(issue.manager || 'Unassigned manager')}</strong></div><span class="matrixState is-${esc(managerDisplay)}">${esc(managerDisplay === 'current' ? 'CURRENT' : managerDisplay.toUpperCase())}</span></div><p>${esc(request?.matrixName || matrix?.name || 'No approval matrix selected')} <span class="matrixOrderNote">Highest approver first</span></p><div class="matrixList" aria-label="Approval hierarchy, highest approver first">${hierarchyLevels.map(renderLevel).join('') || '<p>No approvers are configured.</p>'}</div>`;
   }
   function renderDetails(invoice, issue, request) {
+    const workflow = workflowState(issue, request);
     const fields = [
       ['Customer code', invoice.customerCode], ['Customer name', invoice.customer], ['Invoice no.', invoice.id], ['Invoice date', prettyDate(invoice.date)], ['Invoice value', money(invoice.total)],
       ['Issue no.', issue.id], ['Primary status', issue.primaryStatus], ['Substatus', issue.subStatus], ['Agent', issue.agent], ['Manager', issue.manager], ['FPR / SPR', `${issue.fpr || '—'} / ${issue.spr || '—'}`],
-      ['Action owner', issue.actionOwner], ['Assigned to', assignedUser(issue, request) || '—'], ['Manager approval', managerApprovalStatus(issue)], ['Matrix approval', latestRequest(issue.id)?.status || 'not submitted'], ['Invoice due amount', money(issue.invoiceDueAmount)], ['Invoice due date', prettyDate(issue.invoiceDueDate)], ['Region', issue.region || '—']
+      ['Action owner', issue.actionOwner], ['Current step', workflow.label], ['Current assignee', workflow.currentAssignee || '—'], ['Manager approval', managerApprovalStatus(issue)], ['Matrix approval', latestRequest(issue.id)?.status || 'not submitted'], ['Invoice due amount', money(issue.invoiceDueAmount)], ['Invoice due date', prettyDate(issue.invoiceDueDate)], ['Region', issue.region || '—']
     ];
     document.getElementById('complete-details-panel').innerHTML = `<h2>Complete details</h2><p>Reference information for this issue.</p><dl class="detailList">${fields.map(([label, value]) => `<div><dt>${esc(label)}</dt><dd>${esc(value || '—')}</dd></div>`).join('')}</dl>`;
   }
-  function nextWorkflowStep(issue, request) {
-    if (isClosed(issue)) return { person: 'No further action', action: 'Workflow complete', complete: true };
-    if (hasResolution(issue)) return { person: issue.agent || 'Agent', action: 'Review resolution and close issue', complete: false };
-
-    const managerStatus = managerApprovalStatus(issue);
-    const matrix = getMatrix(issue);
-    const matrixLevels = request?.levels || matrix?.levels || [];
-    const firstLevel = matrixLevels.find((level) => Number(level.level || 1) === 1) || matrixLevels[0];
-
-    if (managerStatus === 'rejected') return { person: issue.agent || 'Agent', action: 'Address rejection and resubmit for manager approval', complete: false };
-    if (request?.status === 'rejected') return { person: issue.agent || 'Agent', action: 'Address rejection and resubmit for approval', complete: false };
-    if (managerStatus === 'pending') {
-      if (firstLevel) return { person: firstLevel.ownerName || 'Approver L1', action: 'Approver L1 approval', complete: false };
-      return { person: issue.actionOwner || issue.agent || 'Action owner', action: 'Provide resolution', complete: false };
-    }
-    if (request?.status === 'pending') {
-      const currentLevel = Number(request.currentLevel || 1);
-      const nextLevel = matrixLevels
-        .filter((level, index) => Number(level.level || index + 1) > currentLevel)
-        .sort((left, right) => Number(left.level || 0) - Number(right.level || 0))[0];
-      if (nextLevel) return { person: nextLevel.ownerName || `Approver L${currentLevel + 1}`, action: `Approver L${Number(nextLevel.level || currentLevel + 1)} approval`, complete: false };
-      return { person: issue.actionOwner || issue.agent || 'Action owner', action: 'Provide resolution', complete: false };
-    }
-    if (request?.status === 'approved') return { person: issue.actionOwner || issue.agent || 'Action owner', action: 'Provide resolution', complete: false };
-    if (firstLevel) return { person: firstLevel.ownerName || 'Approver L1', action: 'Approver L1 approval', complete: false };
-    return { person: issue.actionOwner || issue.agent || 'Action owner', action: 'Provide resolution', complete: false };
-  }
-  function renderRoute(issue, request) {
-    const next = nextWorkflowStep(issue, request);
-    document.getElementById('before-after-panel').innerHTML = `<h2>What's next!</h2><div class="nextStepCard"><span class="nextStepIcon"><i class="bi ${next.complete ? 'bi-check2' : 'bi-arrow-right'}" aria-hidden="true"></i></span><div><strong>${esc(next.person)}</strong><span>${esc(next.action)}</span></div></div>`;
-  }
-
   const landing = document.getElementById('issue-tracker-landing');
   const detail = document.getElementById('issue-detail-page');
   if (landing) initLanding();
