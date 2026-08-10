@@ -181,6 +181,13 @@
       "issue-approval-requested": "Issue",
       "issue-approval-decision": "Issue",
       "issue-created-manager": "Issue",
+      "issue-manager-approval-request": "Issue",
+      "issue-approver-request": "Issue",
+      "issue-correction-required": "Issue",
+      "issue-resolution-review-required": "Issue",
+      "issue-resolution-rejected": "Issue",
+      "issue-resolution-accepted": "Issue",
+      "issue-approval-cancelled": "Issue",
       "issue-manager-approved": "Issue",
       "issue-approval-forwarded": "Issue",
       "issue-approval-rejected": "Issue",
@@ -272,6 +279,13 @@
       if (type === "issue-approval-requested") return "Issue approval requested";
       if (type === "issue-approval-decision") return "Issue approval decision";
       if (type === "issue-created-manager") return "Issue created";
+      if (type === "issue-manager-approval-request") return "Manager approval request";
+      if (type === "issue-approver-request") return "Approver request";
+      if (type === "issue-correction-required") return "Correction required";
+      if (type === "issue-resolution-review-required") return "Resolution review required";
+      if (type === "issue-resolution-rejected") return "Resolution rejected";
+      if (type === "issue-resolution-accepted") return "Resolution accepted";
+      if (type === "issue-approval-cancelled") return "Approval cancelled";
       if (type === "issue-manager-approved") return "Issue manager approval";
       if (type === "issue-approval-forwarded") return "Issue approval forwarded";
       if (type === "issue-approval-rejected") return "Issue approval rejected";
@@ -311,11 +325,11 @@
       const details = toArray(note.details);
       const cta = toArray(note.ctas)[0] || {};
       const invoiceNo = cta.invoiceNo || getDetailValue(details, "Invoice") || note.invoiceNo || "";
-      if (cta.action || cta.href) {
+      if (cta.action || cta.href || cta.url) {
         return {
           label: cta.label || "View",
-          action: cta.action || "",
-          href: cta.href || "",
+          action: cta.action === "open-url" ? "link" : (cta.action || "link"),
+          href: cta.href || cta.url || "",
           invoiceNo
         };
       }
@@ -330,7 +344,8 @@
       if (type === "commitment" || type === "commitment-approved") return { ...route, action: "open-invoice" };
       if (type === "commitment-submitted") return { ...route, action: "link", href: "pages/CommitmentManager.html" };
       if (type === "commitment-rejected") return { ...route, action: "link", href: "pages/commitment.html" };
-      if (type === "issue-approval-requested" || type === "issue-approval-forwarded") return { ...route, action: "link", href: "pages/issuetrackerLP.html?view=my-work&role=manager" };
+      if (type === "issue-approval-requested" || type === "issue-approval-forwarded" || type === "issue-approver-request") return { ...route, action: "link", href: "pages/issuetrackerLP.html?view=my-work&role=approver" };
+      if (type === "issue-manager-approval-request") return { ...route, action: "link", href: "pages/issuetrackerLP.html?view=my-work&role=manager" };
       if (type.startsWith("issue-")) return { ...route, action: "link", href: "pages/issuetrackerLP.html" };
       if (type === "backend-upload-exception") return { ...route, action: "link", href: "pages/LPbackend.html" };
       if (type === "mis-schedule-failed") return { ...route, action: "link", href: "pages/LPmis.html" };
@@ -1308,7 +1323,13 @@
       };
 
       const appendDummyModuleNotifications = () => {
-        const notifications = loadNotifications();
+        const loadedNotifications = loadNotifications();
+        const notifications = loadedNotifications.filter((note) => {
+          const id = String(note?.id || "").toLowerCase();
+          return !id.startsWith("dummy-issue-")
+            && id !== "dummy-module-issue-approver"
+            && id !== "dummy-module-issue-approval-request";
+        });
         const existingIds = new Set(
           notifications
             .map((note) => String(note?.id || "").trim())
@@ -1341,8 +1362,6 @@
           ["dashboard-admin", "Dashboard - Admin", "pages/Dashboard_Admin.html", "Admin dashboard has control-panel exceptions."],
           ["issue-tracker", "Issue Tracker", "pages/issuetrackerLP.html", "Issue tracker has newly assigned action-owner work."],
           ["issue-matrix", "Escalation Matrix", "bin/IssueTracker/escalationMatrix.html", "Escalation matrix configuration has a pending review."],
-          ["issue-approver", "Approver Dashboard", "bin/IssueTracker/approver-dashboard.html", "Approver dashboard has approval requests in queue."],
-          ["issue-approval-request", "Approval Request", "bin/IssueTracker/approval-request.html", "Approval request page has a pending decision context."],
           ["submission-module", "Submission Module", "pages/submission.html", "Submission module has invoice packets awaiting validation."],
           ["pdc-agent", "PDC Module - Agent", "pages/PDCagent.html", "PDC Agent module has cheque follow-up activity."],
           ["pdc-ops", "PDC Module - Ops", "pages/PDCOps.html", "PDC Ops module has handoff and banking updates."],
@@ -1708,7 +1727,7 @@
               { label: "SLA", value: "24 hours" }
             ],
             ctas: [
-              { label: "Open approval request", action: "link", href: "bin/IssueTracker/approver-dashboard.html" }
+              { label: "Open approval request", action: "link", href: "pages/issuetrackerLP.html?view=my-work" }
             ]
           },
           {
@@ -1783,7 +1802,7 @@
               { label: "Next approver", value: "CFO Approver" }
             ],
             ctas: [
-              { label: "Open approval request", action: "link", href: "bin/IssueTracker/approver-dashboard.html" }
+              { label: "Open approval request", action: "link", href: "pages/issuetrackerLP.html?view=my-work" }
             ]
           },
           {
@@ -2022,8 +2041,11 @@
           ...moduleDummyItems
         ];
 
-        let changed = false;
+        let changed = notifications.length !== loadedNotifications.length;
         dummyItems.forEach((item) => {
+          const itemId = String(item?.id || "").toLowerCase();
+          const itemType = String(item?.type || "").toLowerCase();
+          if (itemType.startsWith("issue-") || itemId === "dummy-module-issue-approver" || itemId === "dummy-module-issue-approval-request") return;
           if (existingIds.has(item.id)) return;
           notifications.push({
             ...item,
@@ -2157,6 +2179,14 @@
             createdAt: issue?.createdAt || issue?.created || previous.createdAt || "",
             updatedAt: issue?.updatedAt || previous.updatedAt || "",
             approvalProcessName: issue?.approvalProcessName || previous.approvalProcessName || "",
+            workflowStep: issue?.workflowStep || previous.workflowStep || "",
+            assignedTo: issue?.assignedTo || previous.assignedTo || "",
+            initialVisibilityReleased: Boolean(
+              issue?.initialVisibilityReleased
+              || issue?.visibilityReleasedAt
+              || issue?.skipManagerApproval
+              || previous.initialVisibilityReleased
+            ),
             actionTrail: Array.isArray(issue?.actionTrail) && issue.actionTrail.length
               ? issue.actionTrail
               : (Array.isArray(previous.actionTrail) ? previous.actionTrail : [])
@@ -2167,13 +2197,26 @@
           const issueId = issue?.id || "";
           const managerRaw = issue?.manager || "";
           const createdAt = issue?.createdAt || issue?.updatedAt || new Date().toISOString();
+          const published = Boolean(issue?.initialVisibilityReleased);
+          const issueHref = (role, user) => `pages/issuetrackerdetail.html?invoice=${encodeURIComponent(issue?.invoiceNo || "")}&issue=${encodeURIComponent(issueId)}&role=${encodeURIComponent(role)}&user=${encodeURIComponent(user || "")}`;
+          if (!published) {
+            const allowedRecipients = new Set(uniqueRecipients(issue?.agent || "", managerRaw).map(normalizeAudienceUser));
+            byId.forEach((note, noteId) => {
+              const noteType = String(note?.type || "").toLowerCase();
+              const details = Array.isArray(note?.details) ? note.details : [];
+              const referencedIssue = details.find((detail) => ["issue", "issue id"].includes(String(detail?.label || "").toLowerCase()))?.value;
+              if (!noteType.startsWith("issue-") || String(referencedIssue || "") !== String(issueId)) return;
+              const recipients = uniqueRecipients(note?.audienceUsers || []).map(normalizeAudienceUser);
+              if (recipients.some((recipient) => !allowedRecipients.has(recipient))) byId.delete(noteId);
+            });
+          }
 
-          if (managerRaw) {
+          if (managerRaw && issue?.workflowStep === "manager-review") {
             pushIssueNotification({
-              id: `issue-created-manager:${issueId}:${slugToken(managerRaw)}`,
-              type: "issue-created-manager",
-              title: "Issue created",
-              message: `Issue ${issueId} created and awaiting manager review.`,
+              id: `issue-manager-approval-request:${issueId}:${slugToken(managerRaw)}`,
+              type: "issue-manager-approval-request",
+              title: "Manager approval request",
+              message: `${issue?.subStatus || "Issue"} is waiting for your review.`,
               createdAt,
               audienceUsers: [managerRaw],
               details: [
@@ -2185,12 +2228,14 @@
                 { label: "Due by", value: issue?.dueBy || "-" }
               ],
               ctas: [
-                { label: "Open issue", action: "link", href: "pages/issuetrackerLP.html" }
+                { label: "Review issue", action: "link", href: issueHref("manager", managerRaw) }
               ]
             });
           }
 
-          const assigneeRaw = issue?.actionOwner || "";
+          const assigneeRaw = published && issue?.workflowStep === "resolution-work"
+            ? (issue?.assignedTo || issue?.actionOwner || "")
+            : "";
           const assignee = normalizeAudienceUser(assigneeRaw);
           if (issueId && assignee) {
             pushIssueNotification({
@@ -2208,7 +2253,7 @@
                 { label: "Due by", value: issue?.dueBy || "-" }
               ],
               ctas: [
-                { label: "Open issue", action: "link", href: "pages/issuetrackerLP.html" }
+                { label: "Open task", action: "link", href: issueHref("action-owner", assigneeRaw) }
               ]
             });
           }
@@ -2222,7 +2267,7 @@
             const at = entry?.when || issue?.updatedAt || issue?.createdAt || new Date().toISOString();
             const trailKey = buildTrailEventKey(entry, index);
 
-            if (type === "assignment" && what.includes("assigned to action owner")) {
+            if (published && type === "assignment" && what.includes("assigned to action owner")) {
               const newOwner = parseBracketValue(whatText, issue?.actionOwner || "");
               pushIssueNotification({
                 id: `issue-assignment-updated:${issueId}:${trailKey}`,
@@ -2245,7 +2290,7 @@
               });
             }
 
-            if (type === "assigned" && what.includes("selected approval process")) {
+            if (published && type === "assigned" && what.includes("selected approval process")) {
               const processName = parseBracketValue(whatText, issue?.approvalProcessName || "");
               pushIssueNotification({
                 id: `issue-approval-process-saved:${issueId}:${trailKey}`,
@@ -2266,7 +2311,7 @@
               });
             }
 
-            if (type === "remark" && /^updated remark\b/.test(what)) {
+            if (published && type === "remark" && (/^updated remark\b/.test(what) || what.includes("shared an update"))) {
               pushIssueNotification({
                 id: `issue-remark-added:${issueId}:${trailKey}`,
                 type: "issue-remark-added",
@@ -2285,7 +2330,7 @@
               });
             }
 
-            if (type === "approval" && what.includes("approved the issue") && !entry?.approvalKey) {
+            if (published && type === "approval" && (what.includes("approved the issue") || what.includes("accepted the new issue")) && !entry?.approvalKey) {
               pushIssueNotification({
                 id: `issue-manager-approved:${issueId}:${trailKey}`,
                 type: "issue-manager-approved",
@@ -2306,7 +2351,7 @@
               });
             }
 
-            if (type === "resolution") {
+            if (published && type === "resolution" && what.includes("provided a resolution")) {
               pushIssueNotification({
                 id: `issue-resolution-provided:${issueId}:${trailKey}`,
                 type: "issue-resolution-provided",
@@ -2326,7 +2371,7 @@
               });
             }
 
-            if (type === "closure" && what.includes("closed the issue")) {
+            if (published && type === "closure" && what.includes("closed the issue")) {
               pushIssueNotification({
                 id: `issue-ticket-closed:${issueId}:${trailKey}`,
                 type: "issue-ticket-closed",
@@ -2346,7 +2391,7 @@
               });
             }
 
-            if (type === "reopen") {
+            if (published && type === "reopen") {
               pushIssueNotification({
                 id: `issue-reopened:${issueId}:${trailKey}`,
                 type: "issue-reopened",
@@ -2398,14 +2443,14 @@
             .reverse()
             .find((entry) => ["approved", "rejected"].includes(String(entry?.action || "").toLowerCase()));
           const reqTrail = Array.isArray(req?.trail) ? req.trail : [];
+          const published = Boolean(issueContext?.initialVisibilityReleased);
+          const issueDetailHref = `pages/issuetrackerdetail.html?invoice=${encodeURIComponent(issueInvoice)}&issue=${encodeURIComponent(issueId)}&role=approver&user=${encodeURIComponent(ownerTarget)}`;
 
-          if (status === "pending" && ownerTarget) {
-            const ownerEmail = levelOwner.ownerEmail || "";
-            const ownerHint = ownerEmail || ownerTarget;
+          if (published && status === "pending" && ownerTarget) {
             pushIssueNotification({
               id: `issue-approval-requested:${reqId}:level-${level}`,
-              type: "issue-approval-requested",
-              title: "Issue approval requested",
+              type: "issue-approver-request",
+              title: "Approver request",
               message: `Approval required for issue ${issueId || "-"}. Please review at your level.`,
               createdAt: req?.updatedAt || req?.createdAt || new Date().toISOString(),
               audienceUsers: [ownerTarget],
@@ -2417,7 +2462,7 @@
                 { label: "SLA", value: req?.slaHours ? `${req.slaHours} hours` : "-" }
               ],
               ctas: [
-                { label: "Open approval request", action: "link", href: `bin/IssueTracker/approval-request.html?id=${encodeURIComponent(reqId)}&user=${encodeURIComponent(ownerHint)}` }
+                { label: "Open issue", action: "link", href: issueDetailHref }
               ]
             });
           }
@@ -2439,7 +2484,7 @@
             if (action === "approved") {
               const managerNorm = normalizeAudienceUser(managerUser);
               const actorNorm = normalizeAudienceUser(actor);
-              const isManagerApproval = (managerNorm && actorNorm && managerNorm === actorNorm) || entryLevel === 1;
+              const isManagerApproval = managerNorm && actorNorm && managerNorm === actorNorm;
               if (isManagerApproval) {
                 pushIssueNotification({
                   id: `issue-manager-approved:${reqId}:${eventKey}`,
@@ -2463,15 +2508,15 @@
 
               const nextLevelOwner = levels[entryLevel] || {};
               const nextTarget = nextLevelOwner.ownerName || nextLevelOwner.ownerEmail || "";
-              if (nextTarget) {
-                const nextHint = nextLevelOwner.ownerEmail || nextTarget;
+              if (published && nextTarget) {
+                const nextIssueHref = `pages/issuetrackerdetail.html?invoice=${encodeURIComponent(issueInvoice)}&issue=${encodeURIComponent(issueId)}&role=approver&user=${encodeURIComponent(nextTarget)}`;
                 pushIssueNotification({
                   id: `issue-approval-forwarded:${reqId}:${eventKey}`,
-                  type: "issue-approval-forwarded",
-                  title: "Issue approval forwarded",
+                  type: "issue-approver-request",
+                  title: "Approver request",
                   message: `Approval moved to next level for issue ${issueId || "-"}.`,
                   createdAt: entryAt,
-                  audienceUsers: [nextTarget, kamUser, agentUser, actionOwnerUser],
+                  audienceUsers: [nextTarget],
                   details: [
                     { label: "Issue ID", value: issueId || "-" },
                     { label: "Process", value: req?.processName || req?.processId || "-" },
@@ -2481,26 +2526,26 @@
                     { label: "Next approver", value: nextTarget || "-" }
                   ],
                   ctas: [
-                    { label: "Open approval request", action: "link", href: `bin/IssueTracker/approval-request.html?id=${encodeURIComponent(reqId)}&user=${encodeURIComponent(nextHint)}` }
+                    { label: "Open issue", action: "link", href: nextIssueHref }
                   ]
                 });
               }
             }
 
-            if (action === "rejected") {
+            if (published && action === "rejected") {
               pushIssueNotification({
                 id: `issue-approval-rejected:${reqId}:${eventKey}`,
-                type: "issue-approval-rejected",
-                title: "Issue approval rejected",
+                type: "issue-correction-required",
+                title: "Correction required",
                 message: `Approval rejected for issue ${issueId || "-"}.`,
                 createdAt: entryAt,
-                audienceUsers: [kamUser, agentUser, actionOwnerUser],
+                audienceUsers: [agentUser, managerUser],
                 details: [
                   { label: "Issue ID", value: issueId || "-" },
                   { label: "Level", value: String(entryLevel) },
                   { label: "Rejected by", value: actor || "-" },
                   { label: "Reason", value: trailEntry?.remark || "-" },
-                  { label: "Next action", value: actionOwnerUser || "-" }
+                  { label: "Next action", value: agentUser || "-" }
                 ],
                 ctas: [
                   { label: "Open issue", action: "link", href: "pages/issuetrackerLP.html" }
@@ -2509,28 +2554,6 @@
             }
           });
 
-          if (status === "approved" || status === "rejected") {
-            const decisionAt = req?.updatedAt || req?.reviewedAt || decisionEntry?.at || req?.createdAt || "";
-            pushIssueNotification({
-              id: `issue-approval-decision:${reqId}:${status}:${decisionAt || "latest"}`,
-              type: "issue-approval-decision",
-              title: "Issue approval decision",
-              message: `Issue ${issueId || "-"} ${status}. Next action assigned.`,
-              createdAt: decisionAt || new Date().toISOString(),
-              audienceUsers: [kamUser, agentUser, actionOwnerUser],
-              details: [
-                { label: "Decision", value: status === "approved" ? "Approved" : "Rejected" },
-                { label: "By", value: decisionEntry?.by || "-" },
-                { label: "Remarks", value: decisionEntry?.remark || "-" },
-                { label: "Next owner", value: actionOwnerUser || "-" },
-                { label: "Customer", value: issueCustomer || "-" },
-                { label: "Invoice", value: issueInvoice || "-" }
-              ],
-              ctas: [
-                { label: "Open issue", action: "link", href: "pages/issuetrackerLP.html" }
-              ]
-            });
-          }
         });
 
         const next = Array.from(byId.values())
@@ -2584,7 +2607,11 @@
           const defaultAction = defaultRoute.action || "";
           const defaultHref = defaultRoute.href || "";
           const ctaList = ctas.length
-            ? ctas
+            ? ctas.map((cta) => ({
+                ...cta,
+                action: cta.action === "open-url" ? "link" : (cta.action || (cta.url ? "link" : "")),
+                href: cta.href || cta.url || ""
+              }))
             : (defaultAction
               ? [{ label: defaultRoute.label || (type === "commitment" ? "Open commitment" : "Open"), action: defaultAction, href: defaultHref, invoiceNo: invoiceValue }]
               : []);

@@ -200,7 +200,9 @@
   </div>
 
 <script src="../../scripts/shared-header.js?v=20260730-tutorials"></script>
+<script src="js/issue-tracker-config.js?v=20260805-approved-flow-v1"></script>
 <script>
+    window.IssueTrackerConfig?.ensureApprovalData();
     const PROC_KEY = 'approval_processes';
     const REQ_KEY = 'approval_requests';
 
@@ -358,17 +360,10 @@
     const vmName = document.getElementById('vm-name');
     const vmLevels = document.getElementById('vm-levels');
 
-    const users = [
-      { name: 'Anoop Sharma', email: 'anoop.sharma@example.com' },
-      { name: 'Priya Verma', email: 'priya.verma@example.com' },
-      { name: 'Rohit Malhotra', email: 'rohit.m@example.com' },
-      { name: 'Rahul Jain', email: 'rahul.jain@example.com' },
-      { name: 'Neha Gupta', email: 'neha.gupta@example.com' },
-      { name: 'Sanjay Rao', email: 'sanjay.rao@example.com' },
-      { name: 'Arjun Patel', email: 'arjun.patel@example.com' },
-      { name: 'Meera Iyer', email: 'meera.iyer@example.com' },
-      { name: 'Compliance Team', email: 'compliance@example.com' }
-    ];
+    const users = (window.IssueTrackerConfig?.usersForRole('approver') || []).map((user) => ({
+      name: user.name,
+      email: `${user.name.toLowerCase().replace(/\s+/g, '.')}@example.com`
+    }));
 
     const INVOICE_SUB_STATUSES = [
       'Invoice Received', 'Pending Verification', 'Verified', 'Disputed', 'On Hold', 'Resolved'
@@ -400,17 +395,17 @@
         { name: 'Invoice Delay Default', levels: [
           { level: 1, ownerName: 'Anoop Sharma', ownerEmail: 'anoop.sharma@example.com' },
           { level: 2, ownerName: 'Priya Verma', ownerEmail: 'priya.verma@example.com' },
-          { level: 3, ownerName: 'Rohit Malhotra', ownerEmail: 'rohit.m@example.com' }
-        ]},
-        { name: 'PO Approval Default', levels: [
-          { level: 1, ownerName: 'Rahul Jain', ownerEmail: 'rahul.jain@example.com' },
-          { level: 2, ownerName: 'Neha Gupta', ownerEmail: 'neha.gupta@example.com' },
           { level: 3, ownerName: 'Sanjay Rao', ownerEmail: 'sanjay.rao@example.com' }
         ]},
+        { name: 'PO Approval Default', levels: [
+          { level: 1, ownerName: 'Kavita Nair', ownerEmail: 'kavita.nair@example.com' },
+          { level: 2, ownerName: 'Vikram Singh', ownerEmail: 'vikram.singh@example.com' },
+          { level: 3, ownerName: 'Pooja Mehta', ownerEmail: 'pooja.mehta@example.com' }
+        ]},
         { name: 'Delivery Challan Default', levels: [
-          { level: 1, ownerName: 'Arjun Patel', ownerEmail: 'arjun.patel@example.com' },
-          { level: 2, ownerName: 'Meera Iyer', ownerEmail: 'meera.iyer@example.com' },
-          { level: 3, ownerName: 'Compliance Team', ownerEmail: 'compliance@example.com' }
+          { level: 1, ownerName: 'Anoop Sharma', ownerEmail: 'anoop.sharma@example.com' },
+          { level: 2, ownerName: 'Priya Verma', ownerEmail: 'priya.verma@example.com' },
+          { level: 3, ownerName: 'Sanjay Rao', ownerEmail: 'sanjay.rao@example.com' }
         ]}
       ];
       matrices = seeds.map(s => ({ id: genMatrixId(s.name), name: s.name, levels: s.levels }));

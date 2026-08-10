@@ -16,7 +16,7 @@
   }
 
   function goToApprovals() {
-    window.location.href = 'approver-dashboard.html';
+    window.location.href = '../../pages/issuetrackerLP.html?view=my-work&role=approver';
   }
 
   function loadRequests() {

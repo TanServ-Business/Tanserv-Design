@@ -1,6 +1,9 @@
 (function () {
   'use strict';
 
+  const CONFIG = window.IssueTrackerConfig;
+  CONFIG?.ensureCleanSlate();
+
   const KEYS = {
     base: 'issueTrackerBaseData',
     custom: 'customIssues',
@@ -10,12 +13,13 @@
     role: 'issue_tracker_role',
     activeUser: 'issue_tracker_active_user',
     activeApprover: 'approver_active_user',
-    portfolioInvoiceCount: 'issueTrackerPortfolioInvoiceCount'
+    portfolioInvoiceCount: 'issueTrackerPortfolioInvoiceCount',
+    notifications: 'ineburaNotificationCenter'
   };
   const PAGE_SIZE = 5;
   // Matches the current LP Agent demo portfolio; a live total can override this localStorage key.
   const DEFAULT_PORTFOLIO_INVOICE_COUNT = 27;
-  const USERS = ['Rahul Jain', 'Meera Iyer', 'Arjun Patel', 'Priya Verma', 'Neha Gupta', 'Sanjay Rao', 'Compliance Team'];
+  const USERS = (CONFIG?.users || []).map((user) => user.name);
   const PRIMARY_STATUSES = ['Payment Processing', 'Material Delivery Issues', 'Invoice Dispute', 'Clarification Needed'];
   const SUB_STATUSES = ['Delivery Challan Required', 'Invoice Rebill Required', 'Manager Approval', 'Review Resolution', 'Further Documents Required', 'Service/PM Report Required', 'Payment Verification', 'PO Copy Required'];
 
@@ -81,17 +85,17 @@
         { id: 'MATRIX_INV_DELAY_DEFAULT', name: 'Invoice Delay Default', levels: [
           { level: 1, ownerName: 'Anoop Sharma', ownerEmail: 'anoop.sharma@example.com' },
           { level: 2, ownerName: 'Priya Verma', ownerEmail: 'priya.verma@example.com' },
-          { level: 3, ownerName: 'Rohit Malhotra', ownerEmail: 'rohit.m@example.com' }
-        ] },
-        { id: 'MATRIX_PO_APPROVAL_DEFAULT', name: 'PO Approval Default', levels: [
-          { level: 1, ownerName: 'Rahul Jain', ownerEmail: 'rahul.jain@example.com' },
-          { level: 2, ownerName: 'Neha Gupta', ownerEmail: 'neha.gupta@example.com' },
           { level: 3, ownerName: 'Sanjay Rao', ownerEmail: 'sanjay.rao@example.com' }
         ] },
+        { id: 'MATRIX_PO_APPROVAL_DEFAULT', name: 'PO Approval Default', levels: [
+          { level: 1, ownerName: 'Kavita Nair', ownerEmail: 'kavita.nair@example.com' },
+          { level: 2, ownerName: 'Vikram Singh', ownerEmail: 'vikram.singh@example.com' },
+          { level: 3, ownerName: 'Pooja Mehta', ownerEmail: 'pooja.mehta@example.com' }
+        ] },
         { id: 'MATRIX_DELIVERY_CHALLAN_DEFAULT', name: 'Delivery Challan Default', levels: [
-          { level: 1, ownerName: 'Arjun Patel', ownerEmail: 'arjun.patel@example.com' },
-          { level: 2, ownerName: 'Meera Iyer', ownerEmail: 'meera.iyer@example.com' },
-          { level: 3, ownerName: 'Compliance Team', ownerEmail: 'compliance@example.com' }
+          { level: 1, ownerName: 'Anoop Sharma', ownerEmail: 'anoop.sharma@example.com' },
+          { level: 2, ownerName: 'Priya Verma', ownerEmail: 'priya.verma@example.com' },
+          { level: 3, ownerName: 'Sanjay Rao', ownerEmail: 'sanjay.rao@example.com' }
         ] }
       ];
       write(KEYS.matrices, matrices);
@@ -104,57 +108,25 @@
       ];
       write(KEYS.processes, processes);
     }
+    const approvers = CONFIG?.usersForRole('approver') || [];
+    let matricesChanged = false;
+    matrices = matrices.map((matrix, matrixIndex) => ({
+      ...matrix,
+      levels: (matrix.levels || []).map((level, levelIndex) => {
+        if (CONFIG?.roleOf(level.ownerName) === 'approver') return level;
+        const replacement = approvers[(matrixIndex * 3 + levelIndex) % Math.max(approvers.length, 1)];
+        matricesChanged = true;
+        return replacement ? { ...level, ownerName: replacement.name, ownerEmail: `${replacement.name.toLowerCase().replace(/\s+/g, '.')}@example.com` } : level;
+      })
+    }));
+    if (matricesChanged) write(KEYS.matrices, matrices);
     return { processes, matrices };
   }
 
-  function fallbackData() {
-    const customers = [
-      ['CUST-001', 'Acme Corp'], ['CUST-002', 'Globex Inc'], ['CUST-003', 'Initech'],
-      ['CUST-004', 'Stark Industries'], ['CUST-005', 'Wayne Enterprises'], ['CUST-006', 'Umbrella Ltd']
-    ];
-    const issueSpecs = [
-      ['Delivery Challan Required', 'Material Delivery Issues', '2026-08-03', 'Rahul Jain', 'PROC_DELIVERY_CHALLAN'],
-      ['Invoice Rebill Required', 'Invoice Dispute', '2026-08-03', 'Rahul Jain', 'PROC_INV_DELAY'],
-      ['Manager Approval', 'Payment Processing', '2026-08-05', 'Meera Iyer', 'PROC_INV_DELAY'],
-      ['Review Resolution', 'Clarification Needed', '2026-08-06', 'Rahul Jain', 'PROC_PO_APPROVAL'],
-      ['Further Documents Required', 'Material Delivery Issues', '2026-08-10', 'Rahul Jain', 'PROC_DELIVERY_CHALLAN'],
-      ['Service/PM Report Required', 'Payment Processing', '2026-08-18', 'Rahul Jain', 'PROC_PO_APPROVAL'],
-      ['Payment Verification', 'Invoice Dispute', '2026-08-20', 'Meera Iyer', 'PROC_INV_DELAY'],
-      ['PO Copy Required', 'Material Delivery Issues', '2026-08-22', 'Rahul Jain', 'PROC_PO_APPROVAL']
-    ];
-    return issueSpecs.map((spec, index) => {
-      const invoiceNumber = index === 1 ? 'INV_0001' : `INV_${String(index + 1).padStart(4, '0')}`;
-      const customer = customers[index % customers.length];
-      const issueNumber = `ISS_${String(index + 1).padStart(4, '0')}_${index === 1 ? '02' : '01'}`;
-      return {
-        id: invoiceNumber,
-        customerCode: customer[0], customer: customer[1], date: `2026-07-${String(20 - index).padStart(2, '0')}`,
-        total: 944358 - index * 31741, kam: 'Karan Shah', kas: 'Nisha Kapoor', manager: 'Meera Iyer',
-        issues: [{
-          id: issueNumber, title: spec[0], status: index === 7 ? 'Closed' : 'Open', created: `2026-07-${String(21 - index).padStart(2, '0')}`,
-          description: `${spec[0]} for ${customer[1]}.`, primaryStatus: spec[1], broadStatus: index % 3 === 0 ? 'Red' : 'Amber',
-          subStatus: spec[0], stage: index === 2 ? 2 : (index === 3 ? 3 : (index === 7 ? 4 : 1)),
-          agent: 'Rahul Jain', manager: 'Meera Iyer', fpr: `FPR-${101 + index}`, spr: `SPR-${201 + index}`,
-          actionOwner: spec[3], approvalProcessId: spec[4], invoiceDueAmount: 662017 - index * 24167,
-          managerApprovalStatus: index === 7 ? 'Approved' : 'Pending', assignedTo: index === 7 ? '' : 'Meera Iyer', assignmentRole: index === 7 ? '' : 'manager',
-          invoiceDueDate: spec[2], region: ['East', 'North', 'West', 'South'][index % 4],
-          documents: index === 0 ? [{ name: 'Invoice_INV_0001.pdf', requirement: 'Invoice', uploadedBy: 'Rahul Jain', uploadedAt: '2026-08-01T10:30:00Z' }] : [],
-          actionTrail: [
-            { who: 'Rahul Jain', what: 'created the issue', type: 'created', when: `2026-07-${String(21 - index).padStart(2, '0')}T08:00:00Z`, remark: index === 0 ? 'Delivery challan is missing from the invoice submission. Please upload it before approval.' : `Please complete ${spec[0].toLowerCase()} for ${customer[1]}.` }
-          ]
-        }]
-      };
-    });
-  }
-
   function loadData() {
-    let base = read(KEYS.base, null);
-    if (!Array.isArray(base) || !base.length) {
-      base = fallbackData();
-      write(KEYS.base, base);
-    }
+    const base = read(KEYS.base, []);
     const custom = read(KEYS.custom, []);
-    const cloned = JSON.parse(JSON.stringify(base));
+    const cloned = JSON.parse(JSON.stringify(Array.isArray(base) ? base : []));
     const map = new Map(cloned.map((invoice) => [invoice.id, invoice]));
     (Array.isArray(custom) ? custom : []).forEach((raw, index) => {
       const issue = normalizeIssue(raw, index);
@@ -172,12 +144,17 @@
 
   function normalizeIssue(raw, index) {
     return {
+      ...raw,
       id: raw.id || `ISS_MAN_${index + 1}`, title: raw.title || raw.subStatus || 'Manual issue', status: raw.status || 'Open',
       created: raw.created || new Date().toISOString().slice(0, 10), description: raw.description || '', primaryStatus: raw.primaryStatus || 'Clarification Needed',
-      broadStatus: raw.broadStatus || 'Amber', subStatus: raw.subStatus || raw.title || 'Further Documents Required', stage: Number(raw.stage || 1),
+      broadStatus: raw.broadStatus || 'External dependency', subStatus: raw.subStatus || raw.title || 'Further Documents Required', stage: Number(raw.stage || 1),
       agent: raw.agent || 'Rahul Jain', manager: raw.manager || 'Meera Iyer', fpr: raw.fpr || '', spr: raw.spr || '', actionOwner: raw.actionOwner || 'Rahul Jain',
       approvalProcessId: raw.approvalProcessId || '', approvalProcessName: raw.approvalProcessName || '', approvalMatrixId: raw.approvalMatrixId || '', approvalMatrixName: raw.approvalMatrixName || '',
       managerApprovalStatus: raw.managerApprovalStatus || (isClosed(raw) ? 'Approved' : 'Pending'), assignedTo: raw.assignedTo || (isClosed(raw) ? '' : (raw.manager || 'Meera Iyer')), assignmentRole: raw.assignmentRole || (isClosed(raw) ? '' : 'manager'),
+      workflowStep: raw.workflowStep || '', initialVisibilityReleased: Boolean(raw.initialVisibilityReleased || raw.visibilityReleasedAt || raw.skipManagerApproval), visibilityReleasedAt: raw.visibilityReleasedAt || '', skipManagerApproval: Boolean(raw.skipManagerApproval),
+      matrixApprovalStatus: raw.matrixApprovalStatus || raw.approvalStatus || 'not-submitted', resolutionStatus: raw.resolutionStatus || '', resolutionVersion: Number(raw.resolutionVersion || 0), resolutionDecisionVersion: Number(raw.resolutionDecisionVersion || 0),
+      rejectionKind: raw.rejectionKind || '', rejectedBy: raw.rejectedBy || '', rejectedAt: raw.rejectedAt || '', pendingProcessId: raw.pendingProcessId || '',
+      connectedUsers: Array.isArray(raw.connectedUsers) ? raw.connectedUsers : [],
       invoiceDueAmount: Number(raw.invoiceDueAmount || 0), invoiceDueDate: raw.invoiceDueDate || '', region: raw.region || '', documents: Array.isArray(raw.documents) ? raw.documents : [],
       actionTrail: Array.isArray(raw.actionTrail) ? raw.actionTrail : [], isCustom: raw.isCustom !== false,
       invoiceNo: raw.invoiceNo || raw.invoiceId || '', invoiceDate: raw.invoiceDate || '', invoiceTotal: Number(raw.invoiceTotal || 0), customerName: raw.customerName || '', customerCode: raw.customerCode || ''
@@ -241,16 +218,11 @@
   }
   function managerApprovalStatus(issue) {
     const value = String(issue?.managerApprovalStatus || '').toLowerCase();
-    if (value === 'approved' || value === 'rejected' || value === 'pending') return value;
+    if (value === 'approved' || value === 'rejected' || value === 'pending' || value === 'superseded') return value;
     return isClosed(issue) ? 'approved' : 'pending';
   }
   function hasResolution(issue) {
-    const trail = issue?.actionTrail || [];
-    const latestResolution = trail.filter((entry) => String(entry.type || '').toLowerCase() === 'resolution')
-      .sort((left, right) => new Date(right.when || 0) - new Date(left.when || 0))[0];
-    const latestReopen = trail.filter((entry) => String(entry.type || '').toLowerCase() === 'reopen')
-      .sort((left, right) => new Date(right.when || 0) - new Date(left.when || 0))[0];
-    return Boolean(latestResolution && (!latestReopen || new Date(latestResolution.when || 0) > new Date(latestReopen.when || 0)));
+    return issue?.workflowStep === 'resolution-review' || issue?.resolutionStatus === 'pending-review';
   }
   function workflowState(issue, request = latestRequest(issue.id)) {
     const managerStatus = managerApprovalStatus(issue);
@@ -275,10 +247,25 @@
       contributionRights: 'Permitted users may add documents and remarks without advancing the workflow.'
     });
 
+    const explicit = issue.workflowStep;
     if (isClosed(issue)) return result('closed', 'Closed', '', { person: 'No further action', action: 'Workflow complete', complete: true }, 'Workflow complete');
-    if (hasResolution(issue)) return result('ready-to-close', 'Ready to close', agent, { person: agent, action: 'Review resolution and close issue', complete: false }, 'Resolution provided');
-    if (managerStatus === 'rejected') return result('agent-correction', 'Returned to agent', agent, { person: issue.manager || 'Manager', action: 'Manager review after resubmission', complete: false }, 'Manager rejected the issue');
-    if (request?.status === 'rejected') return result('agent-correction', 'Returned to agent', agent, { person: firstLevel?.ownerName || issue.manager || 'Approver', action: 'Approval after resubmission', complete: false }, 'Approval was rejected');
+    if (explicit === 'resolution-review' || hasResolution(issue)) return result('resolution-review', 'Resolution review', agent, { person: agent, action: 'Accept or reject resolution', complete: false }, 'Resolution decision required');
+    if (explicit === 'resolution-accepted') return result('resolution-accepted', 'Resolution accepted', agent, { person: agent, action: 'Close or reassign for remaining information', complete: false }, 'Resolution accepted; issue remains open');
+    if (explicit === 'agent-correction') return result('agent-correction', 'Correction required', agent, { person: issue.manager || 'Manager', action: 'Manager review after the agent remark', complete: false }, 'Approval was rejected');
+    if (explicit === 'manager-review' || explicit === 'reopen-manager-review') {
+      return result('manager-review', 'Manager review', issue.manager || 'Meera Iyer', firstLevel
+        ? { person: firstLevel.ownerName || 'Approver L1', action: 'Approver L1 approval', complete: false }
+        : { person: actionOwner, action: 'Provide resolution', complete: false }, 'Manager decision required');
+    }
+    if (explicit?.startsWith('approver-l')) {
+      return result(`approver-l${currentLevelNumber}`, `Approver L${currentLevelNumber}`, currentLevel?.ownerName || issue.assignedTo || 'Approver', nextLevel
+        ? { person: nextLevel.ownerName || `Approver L${nextLevel.level}`, action: `Approver L${nextLevel.level} approval`, complete: false }
+        : { person: actionOwner, action: 'Provide resolution', complete: false }, `Approval level ${currentLevelNumber}`);
+    }
+    if (explicit === 'resolution-work') return result('resolution-work', 'Resolution work', actionOwner, { person: agent, action: 'Review submitted resolution', complete: false }, 'Provide resolution');
+    // Explicit workflow steps are authoritative. The fallbacks below only support
+    // older stored records which pre-date workflowStep.
+    if (managerStatus === 'rejected' || request?.status === 'rejected') return result('agent-correction', 'Correction required', agent, { person: issue.manager || 'Manager', action: 'Manager review after the agent remark', complete: false }, 'Approval was rejected');
     if (managerStatus === 'pending') {
       return result('manager-review', 'Manager review', issue.manager || 'Meera Iyer', firstLevel
         ? { person: firstLevel.ownerName || 'Approver L1', action: 'Approver L1 approval', complete: false }
@@ -289,7 +276,7 @@
         ? { person: nextLevel.ownerName || `Approver L${nextLevel.level}`, action: `Approver L${nextLevel.level} approval`, complete: false }
         : { person: actionOwner, action: 'Provide resolution', complete: false }, `Approval level ${currentLevelNumber}`);
     }
-    if (request?.status === 'approved') return result('resolution-work', 'Resolution work', actionOwner, { person: agent, action: 'Review resolution and close issue', complete: false }, 'Approvals complete');
+    if (request?.status === 'approved') return result('resolution-work', 'Resolution work', actionOwner, { person: agent, action: 'Review submitted resolution', complete: false }, 'Provide resolution');
     if (managerStatus === 'approved' && firstLevel) {
       return result('approver-l1', 'Approver L1', firstLevel.ownerName || 'Approver L1', orderedLevels[1]
         ? { person: orderedLevels[1].ownerName || 'Approver L2', action: 'Approver L2 approval', complete: false }
@@ -304,14 +291,14 @@
     return workflowState(issue, request).currentAssignee;
   }
   function approvalDecisionContext(issue, request = latestRequest(issue.id), role = getRole()) {
-    if (role !== 'manager' || isClosed(issue)) return null;
+    if (!['manager', 'approver'].includes(role) || isClosed(issue)) return null;
     const loggedInUser = rolePerson(role);
     const assigned = assignedUser(issue, request);
     if (!samePerson(loggedInUser, assigned)) return null;
-    if (managerApprovalStatus(issue) === 'pending') {
+    if (role === 'manager' && managerApprovalStatus(issue) === 'pending' && ['manager-review', 'reopen-manager-review'].includes(issue.workflowStep)) {
       return { kind: 'manager', label: 'Manager approval', actor: issue.manager || loggedInUser };
     }
-    if (request?.status === 'pending') {
+    if (role === 'approver' && request?.status === 'pending') {
       const level = Number(request.currentLevel || 1);
       return { kind: 'approver', label: `Approver L${level} approval`, actor: currentApprover(request)?.ownerName || loggedInUser, level };
     }
@@ -320,6 +307,12 @@
   function approvalStatus(issue) {
     const request = latestRequest(issue.id);
     const managerStatus = managerApprovalStatus(issue);
+    if (issue.workflowStep === 'agent-correction') return 'rejected';
+    if (['manager-review', 'reopen-manager-review'].includes(issue.workflowStep)) return 'pending';
+    if (String(issue.workflowStep || '').startsWith('approver-l')) return 'pending';
+    if (['resolution-work', 'resolution-review', 'resolution-accepted', 'closed'].includes(issue.workflowStep)) {
+      return issue.matrixApprovalStatus === 'approved' ? 'approved' : 'not-submitted';
+    }
     if (managerStatus === 'pending' || managerStatus === 'rejected') return managerStatus;
     if (request?.status === 'pending' || request?.status === 'rejected' || request?.status === 'approved') return request.status;
     return managerStatus === 'approved' ? 'approved' : 'not-submitted';
@@ -327,7 +320,7 @@
   function getRole() {
     const query = new URLSearchParams(location.search).get('role');
     const role = query || localStorage.getItem(KEYS.role) || 'agent';
-    return ['agent', 'manager', 'action-owner'].includes(role) ? role : 'agent';
+    return ['agent', 'manager', 'approver', 'action-owner'].includes(role) ? role : 'agent';
   }
   function setRole(role) {
     localStorage.setItem(KEYS.role, role);
@@ -336,32 +329,19 @@
     history.replaceState({}, '', url);
   }
   function defaultUserForRole(role) {
-    return role === 'manager' ? 'Meera Iyer' : 'Rahul Jain';
+    return CONFIG?.defaultUser(role) || (role === 'manager' ? 'Mukesh Mishra' : (role === 'approver' ? 'Anoop Sharma' : (role === 'action-owner' ? 'Neha Gupta' : 'Aditi Sharma')));
   }
   function roleUserKey(role) {
     return `${KEYS.activeUser}_${role}`;
   }
   function usersForRole(role) {
-    const records = allIssueRecords();
-    let candidates = [];
-    if (role === 'manager') {
-      candidates = [
-        ...records.map(({ issue }) => issue.manager),
-        ...approvalData.matrices.flatMap((matrix) => (matrix.levels || []).map((level) => level.ownerName)),
-        ...requests().flatMap((request) => (request.levels || []).map((level) => level.ownerName))
-      ];
-    } else if (role === 'action-owner') {
-      candidates = records.map(({ issue }) => issue.actionOwner);
-    } else {
-      candidates = records.map(({ issue }) => issue.agent);
-    }
-    return [...new Set([defaultUserForRole(role), ...candidates].map(cleanName).filter(Boolean))];
+    return (CONFIG?.usersForRole(role) || []).map((user) => user.name);
   }
   function setActiveUser(user, role = getRole()) {
     const activeUser = cleanName(user) || defaultUserForRole(role);
     localStorage.setItem(KEYS.activeUser, activeUser);
     localStorage.setItem(roleUserKey(role), activeUser);
-    if (role === 'manager') localStorage.setItem(KEYS.activeApprover, activeUser);
+    if (role === 'approver') localStorage.setItem(KEYS.activeApprover, activeUser);
     const url = new URL(location.href);
     url.searchParams.set('user', activeUser);
     history.replaceState({}, '', url);
@@ -371,19 +351,53 @@
     if (queryUser) return queryUser;
     const savedUser = cleanName(localStorage.getItem(roleUserKey(role)));
     if (savedUser) return savedUser;
-    if (role === 'manager') return cleanName(localStorage.getItem(KEYS.activeApprover)) || defaultUserForRole(role);
+    if (role === 'approver') return cleanName(localStorage.getItem(KEYS.activeApprover)) || defaultUserForRole(role);
     return defaultUserForRole(role);
+  }
+  function visibilityReleased(issue) {
+    return Boolean(issue.initialVisibilityReleased || issue.visibilityReleasedAt || issue.skipManagerApproval);
+  }
+  function canViewIssue(issue, role = getRole(), user = rolePerson(role)) {
+    const isAgent = role === 'agent' && samePerson(user, issue.agent);
+    const isManager = role === 'manager' && samePerson(user, issue.manager);
+    if (!visibilityReleased(issue)) return isAgent || isManager;
+    if (isAgent || isManager) return true;
+    const requestApprovers = requests()
+      .filter((request) => request?.issue?.id === issue.id)
+      .flatMap((request) => (request.levels || []).map((level) => level.ownerName));
+    const matrixApprovers = (getMatrix(issue)?.levels || []).map((level) => level.ownerName);
+    const connectedUsers = [issue.actionOwner, issue.resolutionProvidedBy, ...(issue.connectedUsers || []), ...requestApprovers, ...matrixApprovers];
+    if (role === 'action-owner') return connectedUsers.some((name) => samePerson(name, user));
+    if (role === 'approver') return [...requestApprovers, ...matrixApprovers, ...(issue.connectedUsers || [])].some((name) => samePerson(name, user));
+    return false;
+  }
+  function visibleIssueRecords(role = getRole(), user = rolePerson(role)) {
+    return allIssueRecords().filter(({ issue }) => canViewIssue(issue, role, user));
+  }
+  function isRejected(issue) {
+    return !isClosed(issue) && Boolean(issue.rejectionKind || issue.rejectedAt)
+      && (issue.workflowStep === 'agent-correction' || issue.rejectionKind === 'resolution');
+  }
+  function rejectionSourceLabel(issue) {
+    if (issue.rejectionKind === 'manager') return 'Manager approval';
+    if (issue.rejectionKind === 'resolution') return 'Resolution review';
+    const approverLevel = String(issue.rejectionKind || '').match(/^approver-l(\d+)$/i)?.[1];
+    return approverLevel ? `Approver ${approverLevel}` : 'Approval';
   }
   function actionState(issue, role) {
     const request = latestRequest(issue.id);
     const workflow = workflowState(issue, request);
     if (workflow.issueState === 'closed') return { key: 'closed', label: 'Issue completed', meta: 'Workflow complete' };
+    if (workflow.step === 'resolution-review' && ((role === 'agent' && samePerson(rolePerson(role), issue.agent)) || (role === 'manager' && samePerson(rolePerson(role), issue.manager)))) {
+      return { key: 'resolution-review', label: 'Review resolution', meta: 'A formal resolution decision is required' };
+    }
     const assigned = workflow.currentAssignee;
     const mine = samePerson(assigned, rolePerson(role));
     const decision = approvalDecisionContext(issue, request, role);
     if (!mine) return { key: 'waiting', label: `Assigned to ${assigned || 'another user'}`, meta: `${workflow.label} · Waiting for ${assigned || 'another user'}` };
     if (decision) return { key: 'approval', label: decision.label, meta: decision.kind === 'manager' ? 'Manager decision required' : `Approval level ${decision.level}` };
-    if (workflow.step === 'ready-to-close') return { key: 'documents', label: 'Review resolution and close issue', meta: 'Ready to close · Assigned to you' };
+    if (workflow.step === 'resolution-review') return { key: 'resolution-review', label: 'Review resolution', meta: 'Accept, accept and close, or reject' };
+    if (workflow.step === 'resolution-accepted') return { key: 'documents', label: issue.subStatus, meta: 'Resolution accepted · Assigned to you' };
     if (workflow.step === 'resolution-work') return { key: 'resolution', label: 'Provide resolution', meta: 'Resolution work · Assigned to you' };
     return { key: 'documents', label: issue.subStatus || issue.title || 'Add documents and remarks', meta: `${workflow.label} · Assigned to you` };
   }
@@ -406,7 +420,7 @@
     const role = getRole();
     roleSelect.value = role;
     const queryUser = new URLSearchParams(location.search).get('user');
-    const savedUser = localStorage.getItem(roleUserKey(role)) || (role === 'manager' ? localStorage.getItem(KEYS.activeApprover) : '');
+    const savedUser = localStorage.getItem(roleUserKey(role)) || (role === 'approver' ? localStorage.getItem(KEYS.activeApprover) : '');
     populateUsers(role, queryUser || savedUser || defaultUserForRole(role));
     roleSelect.addEventListener('change', () => {
       setRole(roleSelect.value);
@@ -495,7 +509,7 @@
       data = loadData();
       approvalData = seedApprovals();
       const role = getRole();
-      const records = allIssueRecords();
+      const records = visibleIssueRecords(role, rolePerson(role));
       populatePersonFilter(agentFilter, records.map(({ issue }) => issue.agent), 'All agents');
       populatePersonFilter(managerFilter, records.map(({ issue }) => issue.manager), 'All managers');
       populatePersonFilter(primaryStatusFilter, records.map(({ issue }) => issue.primaryStatus), 'All primary statuses');
@@ -525,6 +539,12 @@
       document.getElementById('tabMyWorkCount').textContent = mine.length;
       document.getElementById('tabOpenCount').textContent = open.length;
       document.getElementById('tabClosedCount').textContent = closed.length;
+      const openTab = document.querySelector('.workTab[data-view="open"]');
+      openTab?.querySelector('.rejectedTabCount')?.remove();
+      if (role === 'manager') {
+        const rejectedCount = open.filter(({ issue }) => isRejected(issue)).length;
+        if (rejectedCount) openTab?.insertAdjacentHTML('beforeend', `<em class="rejectedTabCount">${rejectedCount} rejected</em>`);
+      }
 
       let filtered = view === 'closed' ? closed : (view === 'open' ? open : mine);
       const query = search.value.trim().toLowerCase();
@@ -556,7 +576,9 @@
           const params = new URLSearchParams({ invoice: invoice.id, issue: issue.id, role, user: rolePerson(role) });
           const assignee = assignedUser(issue) || issue.assignedTo || '—';
           const invoiceValue = Number(invoice.total || issue.invoiceTotal || 0);
-          return `<tr class="issueRow" data-invoice-issue="${esc(invoice.id)}"${collapsed ? ' hidden' : ''}><td><span class="actionName">${esc(issue.subStatus || issue.title || '—')}</span><span class="actionMeta">${esc(state.meta)}</span></td><td>${esc(invoice.customerCode)}</td><td>${esc(invoice.customer)}</td><td><strong>${esc(invoice.id)}</strong></td><td class="invoiceValueCell">${esc(money(invoiceValue))}</td><td>${esc(issue.id)}</td><td class="assignedToCell"><i class="bi bi-person" aria-hidden="true"></i><span>${esc(assignee)}</span></td><td>${esc(prettyDate(issue.created))}</td><td class="openDaysCell">${esc(issueOpenDays(issue))}</td><td><a class="smallAction${['documents', 'approval', 'resolution'].includes(state.key) ? ' is-primary' : ''}" href="issuetrackerdetail.html?${params}">${state.key === 'closed' ? 'View' : 'Open task'}</a></td></tr>`;
+          const rejected = isRejected(issue);
+          const rejectedMeta = rejected ? `<span class="rejectedRowMeta"><i class="bi bi-exclamation-circle"></i> Rejected by ${esc(issue.rejectedBy || 'approver')} · ${esc(rejectionSourceLabel(issue))} · ${esc(shortDateTime(issue.rejectedAt))}</span>` : '';
+          return `<tr class="issueRow${rejected ? ' is-rejected' : ''}" data-invoice-issue="${esc(invoice.id)}"${collapsed ? ' hidden' : ''}><td><span class="actionName">${esc(issue.subStatus || issue.title || '—')}${rejected ? '<span class="rejectedPill">Rejected</span>' : ''}</span><span class="actionMeta">${esc(state.meta)}</span>${rejectedMeta}</td><td>${esc(invoice.customerCode)}</td><td>${esc(invoice.customer)}</td><td><strong>${esc(invoice.id)}</strong></td><td class="invoiceValueCell">${esc(money(invoiceValue))}</td><td>${esc(issue.id)}</td><td class="assignedToCell"><i class="bi bi-person" aria-hidden="true"></i><span>${esc(assignee)}</span></td><td>${esc(prettyDate(issue.created))}</td><td class="openDaysCell">${esc(issueOpenDays(issue))}</td><td><a class="smallAction${['documents', 'approval', 'resolution', 'resolution-review'].includes(state.key) ? ' is-primary' : ''}" href="issuetrackerdetail.html?${params}">${state.key === 'closed' ? 'View' : 'Open task'}</a></td></tr>`;
         }).join('');
       }).join('');
       body.querySelectorAll('[data-invoice-toggle]').forEach((button) => button.addEventListener('click', () => {
@@ -710,13 +732,7 @@
   }
 
   function documentRequirement(issue) {
-    const text = `${issue.subStatus} ${issue.title}`.toLowerCase();
-    if (text.includes('challan')) return 'Delivery Challan';
-    if (text.includes('po ') || text.includes('purchase')) return 'Purchase Order';
-    if (text.includes('receipt') || text.includes('payment')) return 'Payment Receipt';
-    if (text.includes('agreement')) return 'Agreement';
-    if (text.includes('contract')) return 'Contract';
-    return 'Supporting Document';
+    return issue.subStatus || issue.title || 'Supporting document';
   }
   function sameCustomer(left, right) {
     const leftCode = cleanName(left?.customerCode).toLowerCase();
@@ -751,6 +767,7 @@
     (issue.documents || []).forEach((document) => addDocument(document, invoice, issue));
     allIssueRecords().forEach(({ invoice: sourceInvoice, issue: sourceIssue }) => {
       if (!sameCustomer(invoice, sourceInvoice) || (sourceInvoice.id === invoice.id && sourceIssue.id === issue.id)) return;
+      if (!visibilityReleased(sourceIssue) && !canViewIssue(sourceIssue, getRole(), rolePerson(getRole()))) return;
       (sourceIssue.documents || []).forEach((document) => addDocument(document, sourceInvoice, sourceIssue));
     });
     (request?.trail || []).forEach((entry) => (entry.files || []).forEach((file) => {
@@ -761,7 +778,7 @@
   function renderDocuments(invoice, issue, request) {
     const docs = issueDocuments(invoice, issue, request);
     if (!docs.length) return `<div class="emptyDocuments"><i class="bi bi-file-earmark" aria-hidden="true"></i><span><strong>No customer documents uploaded</strong><small>Files uploaded from any invoice for this customer will appear here.</small></span></div>`;
-    return `<div class="documentRows">${docs.map((doc) => `<div class="documentRow${doc.shared ? ' is-shared' : ''}"><i class="bi bi-file-earmark-check" aria-hidden="true"></i><span><strong>${esc(doc.requirement || 'Supporting document')}</strong><small title="${esc(doc.name)}">${esc(doc.name)}</small>${doc.shared ? `<em><i class="bi bi-link-45deg" aria-hidden="true"></i> Shared from ${esc(doc.sourceInvoice)}</em>` : ''}</span><button type="button" data-preview-document="${esc(doc.name)}" title="Preview ${esc(doc.name)}" aria-label="Preview ${esc(doc.name)}"><i class="bi bi-eye"></i></button></div>`).join('')}</div>`;
+    return `<div class="documentRows">${docs.map((doc) => `<div class="documentRow${doc.shared ? ' is-shared' : ''}"><i class="bi bi-file-earmark-check" aria-hidden="true"></i><span><strong>${esc(doc.requirement || 'Supporting document')}</strong><small title="${esc(doc.name)}">${esc(doc.name)}</small><em><i class="bi bi-link-45deg" aria-hidden="true"></i>${esc(doc.sourceInvoice || invoice.id)} · ${esc(doc.sourceIssue || issue.id)} · ${esc(doc.uploadedBy || 'User')} · ${esc(shortDateTime(doc.uploadedAt))}</em></span><button type="button" data-preview-document="${esc(doc.name)}" title="Preview ${esc(doc.name)}" aria-label="Preview ${esc(doc.name)}"><i class="bi bi-eye"></i></button></div>`).join('')}</div>`;
   }
 
   function initDetail() {
@@ -769,8 +786,10 @@
     let record = findRecord(params.get('invoice'), params.get('issue'));
     const pendingFiles = [];
     let selectedRequirement = '';
-    if (!record) {
+    if (!record || !canViewIssue(record.issue, getRole(), rolePerson(getRole()))) {
       document.getElementById('detail-empty-state').classList.remove('hidden');
+      document.querySelector('#detail-empty-state strong').textContent = record ? 'You do not have access to this issue yet' : 'Issue not found';
+      initRoleSelect(() => location.reload());
       return;
     }
 
@@ -779,6 +798,12 @@
       data = loadData(); approvalData = seedApprovals(); refreshRecord();
       const { invoice, issue } = record;
       const role = getRole();
+      if (!canViewIssue(issue, role, rolePerson(role))) {
+        document.getElementById('issue-detail-layout').classList.add('hidden');
+        document.getElementById('detail-empty-state').classList.remove('hidden');
+        document.querySelector('#detail-empty-state strong').textContent = 'You do not have access to this issue yet';
+        return;
+      }
       const request = latestRequest(issue.id);
       const state = actionState(issue, role);
       const backLink = document.querySelector('.backLink');
@@ -788,9 +813,10 @@
       document.getElementById('detail-title').textContent = issue.subStatus || issue.title || 'Issue detail';
       document.getElementById('detail-identity').textContent = `Invoice no.: ${invoice.id} · Issue ID: ${issue.id} · ${invoice.customerCode} · ${invoice.customer}`;
       const status = document.getElementById('detail-status');
-      status.textContent = isClosed(issue) ? 'Closed' : (approvalStatus(issue) === 'pending' ? 'Approval pending' : issue.status || 'Open');
-      status.className = `statusPill${isClosed(issue) ? ' is-closed' : (approvalStatus(issue) === 'pending' ? ' is-pending' : '')}`;
-      renderCurrentAction(issue, state, request);
+      const rejected = isRejected(issue);
+      status.textContent = isClosed(issue) ? 'Closed' : (rejected ? 'Rejected · correction required' : (approvalStatus(issue) === 'pending' ? 'Approval pending' : issue.status || 'Open'));
+      status.className = `statusPill${isClosed(issue) ? ' is-closed' : (rejected ? ' is-rejected' : (approvalStatus(issue) === 'pending' ? ' is-pending' : ''))}`;
+      renderCurrentAction(invoice, issue, state, request);
       renderWorkflowStrip(issue, request);
       renderContext(issue, request);
       renderWorkArea(invoice, issue, request, state, pendingFiles, selectedRequirement);
@@ -810,12 +836,11 @@
       const submit = document.getElementById('submit-primary-action');
       if (submit) submit.addEventListener('click', () => {
         const text = remark?.value.trim() || '';
-        if (!text) { showFormError('Please add a remark so the next person knows what happened.'); return; }
+        const correctiveRemarkRequired = issue.workflowStep === 'agent-correction' && getRole() === 'agent' && samePerson(rolePerson(getRole()), issue.agent);
+        if (!text && (correctiveRemarkRequired || !pendingFiles.length)) { showFormError(correctiveRemarkRequired ? 'Please add a corrective remark to send the issue back to the manager.' : 'Please add a remark or attach a document.'); return; }
         shareUpdate(invoice, issue, text, pendingFiles);
         pendingFiles.length = 0; render();
       });
-      const reminder = document.getElementById('send-reminder-action');
-      if (reminder) reminder.addEventListener('click', () => { issue.actionTrail.push({ who: rolePerson(getRole()), what: 'sent an approval reminder', type: 'reminder', when: isoNow(), remark: 'Please review this issue when possible.' }); saveRecord(invoice, issue); toast('Reminder sent.', 'success'); render(); });
       function bindQuickActionPanel() {
         const quickCancel = document.getElementById('quick-action-cancel');
         if (quickCancel) quickCancel.addEventListener('click', closeQuickActionPanel);
@@ -823,10 +848,6 @@
         if (quickClose) quickClose.addEventListener('click', () => {
           closeQuickActionPanel();
           document.getElementById('work-remark')?.focus();
-        });
-        const emailType = document.getElementById('quick-email-type');
-        if (emailType) emailType.addEventListener('change', () => {
-          document.getElementById('quick-email-recipients')?.classList.toggle('hidden', emailType.value !== 'escalate');
         });
         const quickConfirm = document.getElementById('quick-action-confirm');
         if (quickConfirm) quickConfirm.addEventListener('click', () => {
@@ -880,27 +901,36 @@
     const node = document.getElementById('work-form-error');
     if (node) node.textContent = message; else toast(message, 'error');
   }
-  function renderCurrentAction(issue, state, request) {
+  function renderCurrentAction(invoice, issue, state, request) {
     const node = document.getElementById('current-action');
     const workflow = workflowState(issue, request);
     const decision = approvalDecisionContext(issue, request);
-    const title = state.key === 'documents' && workflow.step !== 'ready-to-close' ? `Add ${documentRequirement(issue)} and your remark` : state.label;
-    const explanation = state.key === 'approval' ? 'Review the supporting documents and the previous remark, then approve or send it back.' :
+    const title = state.key === 'documents' ? (issue.subStatus || issue.title) : state.label;
+    const issueReason = issue.subStatus || issue.title || 'this issue';
+    const invoiceNumber = invoice?.id || issue.invoiceNo || 'the selected invoice';
+    const customerName = invoice?.customer || issue.customerName || 'the customer';
+    const raisedBy = issue.agent || 'the assigned agent';
+    const approverLevel = String(decision?.label || 'Approver').replace(/\s+approval$/i, '');
+    const approvalExplanation = decision?.kind === 'approver'
+      ? `You are ${approverLevel.replace(/^Approver/i, 'approver')} for this issue. Your approval is required to provide the resolution for this issue.`
+      : `${raisedBy} raised “${issueReason}” for invoice ${invoiceNumber} belonging to ${customerName}. Review the Issue context, Agent's original remark, Existing Documents, and Action trail before choosing Approve or Reject.`;
+    const explanation = state.key === 'approval' ? approvalExplanation :
       state.key === 'waiting' ? `Track progress here, or contribute documents and remarks without advancing ${workflow.currentAssignee || 'the assignee'}’s step.` :
       state.key === 'resolution' ? 'Explain the resolution clearly and attach any supporting proof.' :
+      state.key === 'resolution-review' ? 'Review the submitted resolution, then accept it, close the issue, or return it to the action owner.' :
       state.key === 'closed' ? 'This issue has completed its action and approval flow.' : 'Attach the requested document and explain what you completed before sending it forward.';
     const waitingWith = state.key === 'waiting' ? `<span class="actionDue"><i class="bi bi-person"></i>With ${esc(assignedUser(issue, request) || 'another user')}</span>` : '';
     let actionControl = '';
     let actionHint = '';
     if (state.key === 'approval' && decision) {
       actionControl = `<button class="currentActionButton" type="button" data-issue-action="approve" aria-describedby="current-action-hint"><i class="bi bi-check2-circle" aria-hidden="true"></i>${esc(decision.label)}</button>`;
-      actionHint = 'Opens Accept and Reject options with supporting documents and a remark.';
+      actionHint = 'Opens the Approve and Reject options for this issue.';
     } else if (state.key === 'resolution') {
       actionControl = '<button class="currentActionButton" type="button" data-issue-action="resolution" aria-describedby="current-action-hint"><i class="bi bi-file-earmark-check" aria-hidden="true"></i>Provide resolution</button>';
       actionHint = 'Opens the document upload and resolution remark fields.';
-    } else if (workflow.step === 'ready-to-close' && canCloseIssue(issue)) {
-      actionControl = '<button class="currentActionButton" type="button" data-issue-action="close" aria-describedby="current-action-hint"><i class="bi bi-lock" aria-hidden="true"></i>Review and close</button>';
-      actionHint = 'Opens the closure review before completing the issue.';
+    } else if (state.key === 'resolution-review') {
+      actionControl = '<button class="currentActionButton" type="button" data-issue-action="resolution-review" aria-describedby="current-action-hint"><i class="bi bi-clipboard-check" aria-hidden="true"></i>Review resolution</button>';
+      actionHint = 'Opens Accept and close, Accept resolution, and Reject resolution options.';
     } else if (state.key === 'documents') {
       actionControl = '<button class="currentActionButton" type="button" data-focus-contribution aria-describedby="current-action-hint"><i class="bi bi-paperclip" aria-hidden="true"></i>Add documents or remark</button>';
       actionHint = 'Moves to the document upload and remark section below.';
@@ -925,17 +955,18 @@
     document.getElementById('issue-context').innerHTML = `<h2 class="sectionHeading">Issue context</h2><div class="contextGrid"><div class="contextItem"><span>Primary status</span><strong>${esc(issue.primaryStatus || '—')}</strong></div><div class="contextItem"><span>Sub status</span><strong>${esc(issue.subStatus || issue.title || '—')}</strong></div><div class="contextItem"><span>Action owner</span><strong>${esc(issue.actionOwner || 'Unassigned')}</strong></div><div class="contextItem"><span>Approval matrix</span><strong>${esc(matrix?.name || 'Not selected')}</strong></div></div><div class="originalRemarkCard"><span>Agent's original remark</span><p>${esc(originalRemark(issue))}</p></div>`;
   }
   function canCloseIssue(issue, role = getRole()) {
-    if (role === 'agent') return true;
+    if (role === 'agent') return samePerson(issue.agent, rolePerson(role));
     return role === 'manager' && samePerson(issue.manager, rolePerson(role));
   }
   function renderMoreActions(issue, request) {
     const closed = isClosed(issue);
     const role = getRole();
-    const canManage = role === 'agent' || (role === 'manager' && samePerson(issue.manager, rolePerson(role)));
+    const canManage = (role === 'agent' && samePerson(issue.agent, rolePerson(role))) || (role === 'manager' && samePerson(issue.manager, rolePerson(role)));
     const canChangeProcess = role === 'manager' && samePerson(issue.manager, rolePerson(role));
+    const canResolve = !closed && visibilityReleased(issue) && role === 'action-owner' && samePerson(issue.actionOwner, rolePerson(role));
     const actions = [
+      ['resolution', 'bi-file-earmark-check', 'Provide resolution', !canResolve, 'Provide a formal resolution', 'Available to the action owner at any open stage'],
       ['assign', 'bi-person-plus', 'Reassign owner', closed || !canManage, 'Reassign the action owner', 'Available to agents and managers'],
-      ['email', 'bi-envelope-arrow-up', 'Resend email', false, 'Resend or escalate an email', 'Does not advance the workflow'],
       ['process', 'bi-diagram-3', 'Change process', closed || !canChangeProcess, 'Change the approval process', 'Available to the issue manager'],
       ['close', 'bi-lock', 'Close issue', closed || !canCloseIssue(issue), 'Close the issue', 'Available to the agent or issue manager'],
       ['reopen', 'bi-arrow-counterclockwise', 'Reopen issue', !closed || !canCloseIssue(issue), 'Reopen the issue', 'Available to the agent or issue manager']
@@ -964,21 +995,21 @@
     restoreDefaultWorkInputs();
     document.querySelectorAll('[data-issue-action]').forEach((button) => button.classList.toggle('is-active', button.dataset.issueAction === action));
     const processOptions = approvalData.processes.map((process) => `<option value="${esc(process.id)}"${process.id === (issue.approvalProcessId || getProcess(issue)?.id) ? ' selected' : ''}>${esc(process.process)}</option>`).join('');
-    const ownerOptions = USERS.map((user) => `<option value="${esc(user)}"${user === issue.actionOwner ? ' selected' : ''}>${esc(user)}</option>`).join('');
+    const ownerOptions = usersForRole('action-owner').map((user) => `<option value="${esc(user)}"${user === issue.actionOwner ? ' selected' : ''}>${esc(user)}</option>`).join('');
     const header = (icon, title, description) => `<div class="quickActionHeader"><span class="quickActionHeaderIcon"><i class="bi ${icon}" aria-hidden="true"></i></span><div><h4>${title}</h4><p>${description}</p></div><button id="quick-action-close" class="quickActionClose" type="button" aria-label="Close action and add a remark only"><i class="bi bi-x-lg" aria-hidden="true"></i></button></div>`;
     const footer = (label) => `<div class="quickActionFooter"><button id="quick-action-confirm" data-action="${action}" class="primaryButton" type="button">${label}</button><button id="quick-action-cancel" class="outlineButton" type="button">Cancel</button></div>`;
-    const approvalFooter = `<div class="quickActionFooter quickActionFooter--decision"><button type="button" class="primaryButton" data-quick-decision="approve"><i class="bi bi-check2" aria-hidden="true"></i> Accept</button><button type="button" class="dangerButton" data-quick-decision="reject"><i class="bi bi-x-lg" aria-hidden="true"></i> Reject</button><button id="quick-action-cancel" class="outlineButton" type="button">Cancel</button></div>`;
+    const approvalFooter = `<div class="quickActionFooter quickActionFooter--decision"><button type="button" class="primaryButton" data-quick-decision="approve"><i class="bi bi-check2" aria-hidden="true"></i> Approve</button><button type="button" class="dangerButton" data-quick-decision="reject"><i class="bi bi-x-lg" aria-hidden="true"></i> Reject</button><button id="quick-action-cancel" class="outlineButton" type="button">Cancel</button></div>`;
     let content = '';
     if (action === 'approve') {
       const decision = approvalDecisionContext(issue, request);
       if (!decision) return;
-      const description = decision.kind === 'manager' ? 'Accept the new issue so processing can begin, or reject it back to the agent.' : 'Accept this approval level to continue the matrix, or reject it back to the agent.';
+      const description = decision.kind === 'manager' ? 'Approve the new issue so processing can begin, or reject it back to the agent.' : 'Approve this level to continue the approval matrix, or reject the issue back to the agent.';
       const statusLabel = decision.kind === 'manager' ? managerApprovalStatus(issue) : (currentApprover(request)?.status || 'pending');
       content = `${header('bi-check2-circle', decision.label, description)}<div class="quickActionBody"><div class="quickActionValue"><span>Assigned approver</span><strong>${esc(decision.actor)}</strong></div><div class="quickActionValue"><span>Current decision</span><strong>${esc(statusLabel)}</strong></div></div>${approvalFooter}`;
+    } else if (action === 'resolution-review') {
+      content = `${header('bi-clipboard-check', 'Review resolution', 'Your decision applies to the current resolution version.')}<div class="quickActionBody"><div class="quickActionValue"><span>Provided by</span><strong>${esc(issue.resolutionProvidedBy || issue.actionOwner || 'Action owner')}</strong></div><div class="quickActionValue"><span>Version</span><strong>${esc(issue.resolutionVersion || 1)}</strong></div></div><div class="quickActionFooter quickActionFooter--decision"><button type="button" class="primaryButton" data-quick-decision="accept-close"><i class="bi bi-check2-all"></i> Accept and close</button><button type="button" class="outlineButton" data-quick-decision="accept-resolution"><i class="bi bi-check2"></i> Accept resolution</button><button type="button" class="dangerButton" data-quick-decision="reject-resolution"><i class="bi bi-x-lg"></i> Reject resolution</button><button id="quick-action-cancel" class="outlineButton" type="button">Cancel</button></div>`;
     } else if (action === 'assign') {
       content = `${header('bi-person-plus', 'Reassign action owner', 'Select the person responsible for the next action.')}<div class="quickActionBody"><label>Action owner<select id="quick-owner">${ownerOptions}</select></label></div>${footer('Reassign')}`;
-    } else if (action === 'email') {
-      content = `${header('bi-envelope-arrow-up', 'Resend email', 'Send a reminder or escalate the issue by email.')}<div class="quickActionBody"><div class="quickActionGrid"><label>Email type<select id="quick-email-type"><option value="reminder">Reminder email</option><option value="escalate">Escalation email</option></select></label><label id="quick-email-recipients" class="hidden">Escalate to<input id="quick-email-addresses" type="text" placeholder="name@example.com, manager@example.com"></label></div></div>${footer('Send email')}`;
     } else if (action === 'process') {
       content = `${header('bi-diagram-3', 'Approval process', 'Change the approval route applied to this issue.')}<div class="quickActionBody"><label>Approval process<select id="quick-process">${processOptions}</select></label></div>${footer('Save process')}`;
     } else if (action === 'resolution') {
@@ -1011,7 +1042,6 @@
       return false;
     };
     if (action === 'approve' || action === 'reject') {
-      if (!requireRemark()) return false;
       const decisionContext = approvalDecisionContext(issue, request);
       if (!decisionContext) { toast('This approval is not assigned to the logged-in user.', 'error'); return false; }
       if (decisionContext.kind === 'approver') {
@@ -1021,41 +1051,40 @@
       }
       return true;
     }
+    if (['accept-close', 'accept-resolution', 'reject-resolution'].includes(action)) {
+      if (!requireRemark()) return false;
+      decideResolution(invoice, issue, action, remark, pendingFiles);
+      return true;
+    }
     if (action === 'assign') {
       if (!requireRemark()) return false;
       const owner = document.getElementById('quick-owner')?.value || issue.actionOwner;
+      issue.connectedUsers = [...new Set([...(issue.connectedUsers || []), issue.actionOwner, owner].map(cleanName).filter(Boolean))];
       issue.actionOwner = owner;
-      issue.assignedTo = owner;
-      issue.assignmentRole = 'action-owner';
+      if (['resolution-work', 'resolution-accepted'].includes(issue.workflowStep)) {
+        issue.assignedTo = owner;
+        issue.assignmentRole = 'action-owner';
+        issue.workflowStep = 'resolution-work';
+      }
       issue.stage = Math.max(Number(issue.stage || 0), 2);
       attachFiles(invoice, issue, pendingFiles, by);
       issue.actionTrail.push({ who: by, what: `assigned to action owner (${owner})`, type: 'assignment', when: isoNow(), remark, files: actionFiles });
       saveRecord(invoice, issue); toast(`Assigned to ${owner}.`, 'success'); return true;
-    }
-    if (action === 'email') {
-      if (!requireRemark()) return false;
-      const kind = document.getElementById('quick-email-type')?.value || 'reminder';
-      const addresses = (document.getElementById('quick-email-addresses')?.value || '').split(/[ ,;]+/).map((value) => value.trim()).filter(Boolean);
-      if (kind === 'escalate' && (!addresses.length || !addresses.every((value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)))) {
-        toast('Enter at least one valid escalation email address.', 'error'); return false;
-      }
-      const target = kind === 'escalate' ? addresses.join(', ') : (issue.actionOwner || 'action owner');
-      attachFiles(invoice, issue, pendingFiles, by);
-      issue.actionTrail.push({ who: by, what: `${kind === 'escalate' ? 'sent escalation email to' : 're-sent reminder email to'} ${target}`, type: 'email', when: isoNow(), remark, recipients: addresses, files: actionFiles });
-      saveRecord(invoice, issue); toast(kind === 'escalate' ? 'Escalation email sent.' : 'Reminder email re-sent.', 'success'); return true;
     }
     if (action === 'process') {
       if (!requireRemark()) return false;
       const processId = document.getElementById('quick-process')?.value;
       const process = approvalData.processes.find((item) => item.id === processId);
       if (!process) { toast('Select an approval process.', 'error'); return false; }
-      issue.approvalProcessId = process.id; issue.approvalProcessName = process.process;
+      cancelActiveApprovals(invoice, issue, 'Approval route change requested');
+      issue.pendingProcessId = process.id;
+      issue.managerApprovalStatus = 'Pending'; issue.workflowStep = 'manager-review'; issue.assignedTo = issue.manager; issue.assignmentRole = 'manager';
       attachFiles(invoice, issue, pendingFiles, by);
-      issue.actionTrail.push({ who: by, what: `selected approval process (${process.process})`, type: 'process', when: isoNow(), remark, files: actionFiles });
-      saveRecord(invoice, issue); toast('Approval process saved.', 'success'); return true;
+      issue.actionTrail.push({ who: by, what: `requested approval process change (${process.process})`, type: 'process', when: isoNow(), remark, files: actionFiles });
+      saveRecord(invoice, issue); toast('Process change sent to the manager.', 'success'); return true;
     }
     if (action === 'resolution') {
-      if (!requireRemark()) return false;
+      if (!remark && !pendingFiles.length) { showFormError('Add a resolution remark or attach a document.'); return false; }
       provideResolution(invoice, issue, remark, pendingFiles);
       return true;
     }
@@ -1065,9 +1094,15 @@
     }
     if (!requireRemark()) return false;
     issue.status = action === 'reopen' ? 'Open' : 'Closed';
-    issue.stage = action === 'reopen' ? 1 : 4;
-    issue.assignedTo = action === 'reopen' ? (issue.agent || 'Rahul Jain') : '';
-    issue.assignmentRole = action === 'reopen' ? 'agent' : '';
+    if (action === 'reopen') {
+      if (getRole() === 'manager' || issue.skipManagerApproval) {
+        issue.managerApprovalStatus = 'Approved'; issue.workflowStep = 'resolution-work'; issue.assignedTo = issue.actionOwner; issue.assignmentRole = 'action-owner';
+      } else {
+        issue.managerApprovalStatus = 'Pending'; issue.workflowStep = 'reopen-manager-review'; issue.assignedTo = issue.manager; issue.assignmentRole = 'manager';
+      }
+    } else {
+      cancelActiveApprovals(invoice, issue, 'Issue closed'); issue.workflowStep = 'closed'; issue.assignedTo = ''; issue.assignmentRole = '';
+    }
     attachFiles(invoice, issue, pendingFiles, by);
     issue.actionTrail.push({ who: by, what: action === 'reopen' ? 'reopened the issue' : 'closed the issue', type: action === 'reopen' ? 'reopen' : 'closure', when: isoNow(), remark, files: actionFiles });
     saveRecord(invoice, issue); toast(action === 'reopen' ? 'Issue reopened.' : 'Issue closed.', 'success'); return true;
@@ -1078,7 +1113,10 @@
     const docs = renderDocuments(invoice, issue, request);
     const pendingUpload = `<div id="pending-upload-list" class="uploadFileList${pendingFiles.length ? '' : ' hidden'}"><strong>Ready to attach:</strong> <span>${pendingFiles.map((file) => esc(file.name)).join(', ')}</span></div>`;
     const upload = `<div class="uploadZone"><span class="uploadIcon"><i class="bi bi-cloud-arrow-up"></i></span><div class="uploadCopy"><strong>Attach supporting documents</strong><span>PDF, JPG, PNG, DOCX or XLSX</span><small>${esc(documentRequirement(issue))} ${customerDocuments.some((item) => String(item.requirement || '').toLowerCase() === documentRequirement(issue).toLowerCase()) ? 'is already available for this customer' : 'is requested for this issue'} · New uploads are reusable across this customer's invoices</small></div><button class="outlineButton uploadAction" type="button" data-trigger-upload data-requirement="${esc(documentRequirement(issue))}"><i class="bi bi-paperclip" aria-hidden="true"></i> Browse</button></div>${pendingUpload}`;
-    const remark = `<label class="workRemarkLabel" for="work-remark">${state.key === 'approval' ? 'Decision remark' : (state.key === 'resolution' ? 'Resolution' : 'Your remark')} <span aria-hidden="true">*</span></label><textarea id="work-remark" class="workRemark" maxlength="1000" placeholder="Explain what you checked, attached or decided. This is shown to the next person."></textarea><span id="remark-counter" class="remarkCounter">0 / 1000</span><div id="work-form-error" class="formError"></div>`;
+    const remarkLabel = state.key === 'approval' ? 'Additional context (optional)' : (state.key === 'resolution' ? 'Resolution' : 'Your remark');
+    const remarkRequired = state.key === 'approval' ? '' : ' <span aria-hidden="true">*</span>';
+    const remarkPlaceholder = state.key === 'approval' ? 'Optionally add supporting context for the next person.' : 'Explain what you checked, attached or decided. This is shown to the next person.';
+    const remark = `<label class="workRemarkLabel" for="work-remark">${remarkLabel}${remarkRequired}</label><textarea id="work-remark" class="workRemark" maxlength="1000" placeholder="${remarkPlaceholder}"></textarea><span id="remark-counter" class="remarkCounter">0 / 1000</span><div id="work-form-error" class="formError"></div>`;
     const documentSection = `<details class="workSection documentSection"><summary class="workSectionHeader"><div><h3>Existing Documents</h3><p>Documents available for this customer across all invoices</p></div><span class="documentSummaryMeta"><span class="documentCount">${customerDocuments.length}</span><i class="bi bi-chevron-down" aria-hidden="true"></i></span></summary><div class="documentSectionBody">${docs}</div></details>`;
     const workNote = state.key === 'approval' ? `Sharing an update does not approve or reject the issue. Use the ${esc(state.label)} action above for the decision.` :
       state.key === 'waiting' ? 'Shares the remark and any attached documents without changing the current assignment.' :
@@ -1088,7 +1126,9 @@
     const contributionCopy = state.key === 'waiting' ? `Currently assigned to ${assignedUser(issue, request) || 'another user'}. Your update will not advance their step.` :
       state.key === 'closed' ? 'Add supporting context without reopening the issue.' :
       'Add documents or a remark without changing the current workflow step.';
-    const contributionSection = `<section id="contribution-section" class="workSection resolutionSection contributionSection"><div class="workSectionHeader"><div><h3>Add remark</h3><p>${esc(contributionCopy)}</p></div><span class="contributionBadge"><i class="bi bi-shield-check" aria-hidden="true"></i>No workflow change</span></div><div id="default-work-input-slot" aria-hidden="true"></div>${defaultWorkInputs}</section>`;
+    const contributionSection = state.key === 'closed'
+      ? '<section id="contribution-section" class="workSection resolutionSection contributionSection"><div class="workSectionHeader"><div><h3>Issue closed</h3><p>Reopen the issue before adding another remark or document.</p></div></div><div id="default-work-input-slot" aria-hidden="true"></div></section>'
+      : `<section id="contribution-section" class="workSection resolutionSection contributionSection"><div class="workSectionHeader"><div><h3>Add remark</h3><p>${esc(contributionCopy)}</p></div><span class="contributionBadge"><i class="bi bi-shield-check" aria-hidden="true"></i>No workflow change</span></div><div id="default-work-input-slot" aria-hidden="true"></div>${defaultWorkInputs}</section>`;
     node.innerHTML = `${documentSection}${renderMoreActions(issue, request)}<section class="requiredActionPanelHost" aria-label="Selected required action"><div id="quick-action-panel" class="quickActionPanel hidden" aria-live="polite"></div></section>${contributionSection}`;
   }
 
@@ -1096,7 +1136,69 @@
     issue.documents = Array.isArray(issue.documents) ? issue.documents : [];
     files.forEach((file) => issue.documents.push({ name: file.name, requirement: file.requirement, uploadedBy: by, uploadedAt: isoNow(), sourceInvoice: invoice.id, sourceIssue: issue.id, customerCode: invoice.customerCode, customerName: invoice.customer }));
   }
+  function addIssueNotification(issue, invoice, type, recipients, title, message) {
+    const people = [...new Set((recipients || []).map(cleanName).filter(Boolean))];
+    if (!people.length) return;
+    const list = read(KEYS.notifications, []);
+    const createdAt = isoNow();
+    const latestTrailAt = (issue.actionTrail || []).at(-1)?.when || createdAt;
+    const notification = {
+      id: `issue-${type}:${issue.id}:${latestTrailAt}:${people.join('-')}`,
+      type: `issue-${type}`,
+      title,
+      message,
+      createdAt,
+      read: false,
+      audience: ['all'],
+      audienceUsers: people,
+      details: [
+        { label: 'Issue', value: issue.id },
+        { label: 'Substatus', value: issue.subStatus },
+        { label: 'Invoice', value: invoice.id },
+        { label: 'Assigned to', value: issue.assignedTo || '—' }
+      ],
+      ctas: [{ label: 'Open issue', action: 'open-url', url: `pages/issuetrackerdetail.html?invoice=${encodeURIComponent(invoice.id)}&issue=${encodeURIComponent(issue.id)}` }]
+    };
+    const index = list.findIndex((item) => item.id === notification.id);
+    if (index >= 0) list[index] = { ...list[index], ...notification }; else list.unshift(notification);
+    write(KEYS.notifications, list);
+  }
+  function supersedePendingRequests(issue, reason) {
+    const list = requests();
+    const now = isoNow();
+    let changed = false;
+    list.forEach((item) => {
+      if (item?.issue?.id === issue.id && item.status === 'pending') {
+        item.status = 'superseded'; item.updatedAt = now;
+        item.trail = Array.isArray(item.trail) ? item.trail : [];
+        item.trail.push({ action: 'superseded', by: rolePerson(getRole()), at: now, remark: reason || 'Workflow changed' });
+        changed = true;
+      }
+    });
+    if (changed) write(KEYS.requests, list);
+    return changed;
+  }
+  function cancelActiveApprovals(invoice, issue, reason) {
+    const activeRequest = latestRequest(issue.id);
+    const recipients = [];
+    if (managerApprovalStatus(issue) === 'pending' && ['manager-review', 'reopen-manager-review'].includes(issue.workflowStep)) {
+      recipients.push(issue.manager);
+      issue.managerApprovalStatus = 'Superseded';
+    }
+    if (activeRequest?.status === 'pending') {
+      recipients.push(currentApprover(activeRequest)?.ownerName);
+      issue.approvalStatus = 'superseded';
+      issue.matrixApprovalStatus = 'superseded';
+    }
+    const requestChanged = supersedePendingRequests(issue, reason);
+    const people = [...new Set(recipients.map(cleanName).filter(Boolean))];
+    if ((requestChanged || people.length) && people.length) {
+      addIssueNotification(issue, invoice, 'approval-cancelled', people, 'Approval cancelled', `${reason || 'The approval step was cancelled'} for ${issue.subStatus}.`);
+    }
+    return requestChanged || people.length > 0;
+  }
   function shareUpdate(invoice, issue, remark, files) {
+    if (isClosed(issue)) { toast('Closed issues cannot receive new remarks.', 'error'); return; }
     const by = rolePerson(getRole());
     attachFiles(invoice, issue, files, by);
     issue.actionTrail.push({
@@ -1107,10 +1209,26 @@
       remark,
       files: files.map((file) => ({ name: file.name, requirement: file.requirement }))
     });
+    if (issue.workflowStep === 'agent-correction' && getRole() === 'agent' && samePerson(by, issue.agent)) {
+      issue.rejectionKind = ''; issue.rejectedBy = ''; issue.rejectedAt = '';
+      issue.managerApprovalStatus = issue.skipManagerApproval ? 'Approved' : 'Pending';
+      if (issue.skipManagerApproval) {
+        if (!startMatrixApproval(invoice, issue, remark, [], by)) {
+          issue.workflowStep = 'resolution-work'; issue.assignedTo = issue.actionOwner; issue.assignmentRole = 'action-owner';
+          saveRecord(invoice, issue);
+        }
+      } else {
+        issue.workflowStep = 'manager-review'; issue.assignedTo = issue.manager; issue.assignmentRole = 'manager';
+        saveRecord(invoice, issue);
+        addIssueNotification(issue, invoice, 'manager-approval-request', [issue.manager], 'Manager approval required', `${issue.agent} added the corrective remark for ${issue.subStatus}.`);
+      }
+      toast('Corrective remark added and sent to the manager.', 'success');
+      return;
+    }
     saveRecord(invoice, issue);
     toast(files.length ? 'Update and documents shared.' : 'Update shared.', 'success');
   }
-  function startMatrixApproval(invoice, issue, remark, files, by) {
+  function startMatrixApproval(invoice, issue, remark, files, by, managerDecisionText = '') {
     const process = getTaggedProcess(issue);
     const matrix = getMatrix(issue);
     if (!process || !matrix || !Array.isArray(matrix.levels) || !matrix.levels.length) return false;
@@ -1132,34 +1250,59 @@
     };
     list.push(request); write(KEYS.requests, list);
     issue.approvalProcessId = process.id; issue.approvalProcessName = process.process; issue.approvalMatrixId = matrix.id; issue.approvalMatrixName = matrix.name;
-    issue.approvalStatus = 'pending'; issue.stage = 2; issue.assignedTo = matrix.levels[0].ownerName; issue.assignmentRole = 'approver';
-    issue.actionTrail.push({ who: by, what: `accepted the issue as manager and assigned it to Approver L1 (${matrix.levels[0].ownerName})`, type: 'approval', when: now, remark, files: files.map((file) => ({ name: file.name, requirement: file.requirement })) });
+    issue.approvalStatus = 'pending'; issue.matrixApprovalStatus = 'pending'; issue.stage = 2; issue.workflowStep = 'approver-l1'; issue.assignedTo = matrix.levels[0].ownerName; issue.assignmentRole = 'approver';
+    const handoffText = `sent the issue to Approver 1 (${matrix.levels[0].ownerName})`;
+    issue.actionTrail.push({ who: by, what: managerDecisionText ? `${managerDecisionText} and ${handoffText}` : handoffText, type: 'approval', when: now, remark, files: files.map((file) => ({ name: file.name, requirement: file.requirement })) });
     saveRecord(invoice, issue);
+    addIssueNotification(issue, invoice, 'approver-request', [issue.assignedTo], 'Approver action required', `${issue.subStatus} is waiting for your approval.`);
     toast(`Issue accepted and assigned to Approver L1: ${matrix.levels[0].ownerName}.`, 'success');
     return true;
   }
   function decideManagerApproval(invoice, issue, decision, remark, files) {
     const by = issue.manager || rolePerson(getRole());
     const now = isoNow();
+    const managerReviewStep = issue.workflowStep;
+    const wasVisible = visibilityReleased(issue);
+    const processChangeRequested = Boolean(issue.pendingProcessId);
     issue.managerApprovalStatus = decision === 'rejected' ? 'Rejected' : 'Approved';
     issue.managerApprovalBy = by;
     issue.managerApprovalAt = now;
     if (decision === 'rejected') {
+      const rejectedProcessChange = Boolean(issue.pendingProcessId);
+      issue.pendingProcessId = '';
       attachFiles(invoice, issue, files, by);
       const list = requests();
       list.forEach((item) => {
         if (item?.issue?.id === issue.id && item.status === 'pending') { item.status = 'superseded'; item.updatedAt = now; }
       });
       write(KEYS.requests, list);
-      issue.approvalStatus = 'not-submitted'; issue.stage = 1; issue.assignedTo = issue.agent || 'Rahul Jain'; issue.assignmentRole = 'agent';
-      issue.actionTrail.push({ who: by, what: `rejected the new issue and assigned it back to ${issue.assignedTo}`, type: 'approval', when: now, remark, files: files.map((file) => ({ name: file.name, requirement: file.requirement })) });
-      saveRecord(invoice, issue); toast(`Issue rejected and assigned to ${issue.assignedTo}.`, 'error'); return;
+      issue.approvalStatus = 'not-submitted'; issue.matrixApprovalStatus = 'not-submitted'; issue.stage = 1; issue.workflowStep = 'agent-correction'; issue.assignedTo = issue.agent || 'Rahul Jain'; issue.assignmentRole = 'agent';
+      issue.rejectionKind = 'manager'; issue.rejectedBy = by; issue.rejectedAt = now;
+      const rejectedAction = managerReviewStep === 'reopen-manager-review' ? 'rejected reopening the issue' : (rejectedProcessChange ? 'rejected the approval process change' : (wasVisible ? 'rejected the corrected issue' : 'rejected the new issue'));
+      issue.actionTrail.push({ who: by, what: `${rejectedAction} and assigned it back to ${issue.assignedTo}`, type: 'approval', when: now, remark, files: files.map((file) => ({ name: file.name, requirement: file.requirement })) });
+      saveRecord(invoice, issue); addIssueNotification(issue, invoice, 'correction-required', [issue.agent], 'Correction required', `${by} rejected ${issue.subStatus}. Add a corrective remark to send it back.`); toast(`Issue rejected and assigned to ${issue.assignedTo}.`, 'error'); return;
     }
-    if (startMatrixApproval(invoice, issue, remark, files, by)) return;
+    if (issue.pendingProcessId) {
+      const process = approvalData.processes.find((item) => item.id === issue.pendingProcessId);
+      if (process) { issue.approvalProcessId = process.id; issue.approvalProcessName = process.process; issue.approvalMatrixId = process.matrixId || ''; }
+      issue.pendingProcessId = '';
+    }
+    if (!issue.initialVisibilityReleased) { issue.initialVisibilityReleased = true; issue.visibilityReleasedAt = now; }
+    issue.rejectionKind = ''; issue.rejectedBy = ''; issue.rejectedAt = '';
+    const approvalDescription = managerReviewStep === 'reopen-manager-review'
+      ? `approved reopening the issue and assigned it to ${issue.actionOwner || issue.agent}`
+      : (processChangeRequested ? 'approved the changed approval process' : (wasVisible ? 'accepted the corrected issue for continued processing' : 'accepted the new issue for processing'));
+    if (managerReviewStep === 'reopen-manager-review') {
+      attachFiles(invoice, issue, files, by);
+      issue.approvalStatus = 'not-submitted'; issue.matrixApprovalStatus = 'not-submitted'; issue.stage = 3; issue.workflowStep = 'resolution-work'; issue.assignedTo = issue.actionOwner || issue.agent || 'Rahul Jain'; issue.assignmentRole = issue.actionOwner ? 'action-owner' : 'agent';
+      issue.actionTrail.push({ who: by, what: approvalDescription, type: 'approval', when: now, remark, files: files.map((file) => ({ name: file.name, requirement: file.requirement })) });
+      saveRecord(invoice, issue); addIssueNotification(issue, invoice, 'assigned', [issue.assignedTo], 'Issue assignment', `${issue.subStatus} was reopened and is ready for resolution.`); toast(`Issue reopened and assigned to ${issue.assignedTo}.`, 'success'); return;
+    }
+    if (startMatrixApproval(invoice, issue, remark, files, by, approvalDescription)) return;
     attachFiles(invoice, issue, files, by);
-    issue.approvalStatus = 'not-submitted'; issue.stage = 3; issue.assignedTo = issue.actionOwner || issue.agent || 'Rahul Jain'; issue.assignmentRole = issue.actionOwner ? 'action-owner' : 'agent';
-    issue.actionTrail.push({ who: by, what: `accepted the new issue and assigned it to ${issue.assignedTo}`, type: 'approval', when: now, remark, files: files.map((file) => ({ name: file.name, requirement: file.requirement })) });
-    saveRecord(invoice, issue); toast(`Issue accepted and assigned to ${issue.assignedTo}.`, 'success');
+    issue.approvalStatus = 'not-submitted'; issue.matrixApprovalStatus = 'not-submitted'; issue.stage = 3; issue.workflowStep = 'resolution-work'; issue.assignedTo = issue.actionOwner || issue.agent || 'Rahul Jain'; issue.assignmentRole = issue.actionOwner ? 'action-owner' : 'agent';
+    issue.actionTrail.push({ who: by, what: `${approvalDescription} and assigned it to ${issue.assignedTo}`, type: 'approval', when: now, remark, files: files.map((file) => ({ name: file.name, requirement: file.requirement })) });
+    saveRecord(invoice, issue); addIssueNotification(issue, invoice, 'assigned', [issue.assignedTo], 'Issue assignment', `${issue.subStatus} is ready for your resolution.`); toast(`Issue accepted and assigned to ${issue.assignedTo}.`, 'success');
   }
   function decideApproval(invoice, issue, request, decision, remark, files) {
     if (!request || request.status !== 'pending') { toast('There is no pending approval request for this issue.', 'error'); return; }
@@ -1173,32 +1316,92 @@
     target.trail = Array.isArray(target.trail) ? target.trail : [];
     target.trail.push({ action: decision, by, level: currentLevel, at: now, remark, files: files.map((file) => ({ name: file.name, requirement: file.requirement })) });
     if (decision === 'rejected') {
-      target.status = 'rejected'; issue.approvalStatus = 'rejected'; issue.stage = 1; issue.assignedTo = issue.agent || 'Rahul Jain'; issue.assignmentRole = 'agent';
+      target.status = 'rejected'; issue.approvalStatus = 'rejected'; issue.matrixApprovalStatus = 'rejected'; issue.stage = 1; issue.workflowStep = 'agent-correction'; issue.assignedTo = issue.agent || 'Rahul Jain'; issue.assignmentRole = 'agent';
+      issue.rejectionKind = `approver-l${currentLevel}`; issue.rejectedBy = by; issue.rejectedAt = now;
       issue.actionTrail.push({ who: by, what: `rejected approval level ${currentLevel} and assigned the issue back to ${issue.assignedTo}`, type: 'approval', when: now, remark, files });
-      toast(`Issue rejected and assigned to ${issue.assignedTo}.`, 'error');
+      addIssueNotification(issue, invoice, 'correction-required', [issue.agent], 'Correction required', `${by} rejected ${issue.subStatus}. Add a corrective remark to restart approval.`); toast(`Issue rejected and assigned to ${issue.assignedTo}.`, 'error');
     } else if (currentLevel < target.levels.length) {
-      target.currentLevel = currentLevel + 1; target.levels[currentLevel].status = 'pending'; issue.approvalStatus = 'pending'; issue.stage = 2;
+      target.currentLevel = currentLevel + 1; target.levels[currentLevel].status = 'pending'; issue.approvalStatus = 'pending'; issue.matrixApprovalStatus = 'pending'; issue.stage = 2; issue.workflowStep = `approver-l${target.currentLevel}`;
       const next = currentApprover(target);
       issue.assignedTo = next?.ownerName || 'Approver'; issue.assignmentRole = 'approver';
       issue.actionTrail.push({ who: by, what: `accepted approval level ${currentLevel} and sent to ${next?.ownerName}`, type: 'approval', when: now, remark, files });
-      toast(`Accepted. Assigned to Approver L${target.currentLevel}: ${next?.ownerName}.`, 'success');
+      addIssueNotification(issue, invoice, 'approver-request', [issue.assignedTo], 'Approver action required', `${issue.subStatus} is waiting for Approver ${target.currentLevel}.`); toast(`Accepted. Assigned to Approver ${target.currentLevel}: ${next?.ownerName}.`, 'success');
     } else {
-      target.status = 'approved'; issue.approvalStatus = 'approved'; issue.status = 'Open'; issue.stage = 3; issue.assignedTo = issue.actionOwner || issue.agent || 'Rahul Jain'; issue.assignmentRole = issue.actionOwner ? 'action-owner' : 'agent';
+      target.status = 'approved'; issue.approvalStatus = 'approved'; issue.matrixApprovalStatus = 'approved'; issue.status = 'Open'; issue.stage = 3; issue.workflowStep = 'resolution-work'; issue.assignedTo = issue.actionOwner || issue.agent || 'Rahul Jain'; issue.assignmentRole = issue.actionOwner ? 'action-owner' : 'agent';
       issue.actionTrail.push({ who: by, what: `completed the final approval and assigned the issue to ${issue.assignedTo} for resolution`, type: 'approval', when: now, remark, files });
-      toast(`Final approval completed. Assigned to ${issue.assignedTo} for resolution.`, 'success');
+      addIssueNotification(issue, invoice, 'assigned', [issue.assignedTo], 'Issue assignment', `${issue.subStatus} is approved and ready for resolution.`); toast(`Final approval completed. Assigned to ${issue.assignedTo} for resolution.`, 'success');
     }
     target.updatedAt = now; write(KEYS.requests, list); saveRecord(invoice, issue);
   }
   function provideResolution(invoice, issue, remark, files) {
-    const by = rolePerson(getRole()); attachFiles(invoice, issue, files, by); issue.stage = 4; issue.assignedTo = issue.agent || 'Rahul Jain'; issue.assignmentRole = 'agent';
-    issue.actionTrail.push({ who: by, what: `provided a resolution and assigned the issue to ${issue.assignedTo} for closure`, type: 'resolution', when: isoNow(), remark, files });
-    saveRecord(invoice, issue); toast(files.length ? `Resolution saved and assigned to ${issue.assignedTo} for closure. Documents are available across this customer’s invoices.` : `Resolution saved and assigned to ${issue.assignedTo} for closure.`, 'success');
+    const by = rolePerson(getRole());
+    cancelActiveApprovals(invoice, issue, 'Resolution provided before approval completed');
+    attachFiles(invoice, issue, files, by); issue.stage = 4; issue.workflowStep = 'resolution-review'; issue.resolutionStatus = 'pending-review'; issue.resolutionVersion = Number(issue.resolutionVersion || 0) + 1; issue.resolutionProvidedBy = by; issue.resolutionProvidedAt = isoNow(); issue.assignedTo = issue.agent || 'Rahul Jain'; issue.assignmentRole = 'agent';
+    issue.rejectionKind = ''; issue.rejectedBy = ''; issue.rejectedAt = '';
+    issue.actionTrail.push({ who: by, what: `provided a resolution and assigned the issue to ${issue.assignedTo} for review`, type: 'resolution', when: isoNow(), remark, files });
+    saveRecord(invoice, issue); addIssueNotification(issue, invoice, 'resolution-review-required', [issue.agent, issue.manager], 'Resolution review required', `${by} provided a resolution for ${issue.subStatus}.`); toast(`Resolution saved and assigned to ${issue.assignedTo} for review.`, 'success');
+  }
+  function decideResolution(invoice, issue, decision, remark, files) {
+    if (issue.workflowStep !== 'resolution-review' || issue.resolutionDecisionVersion === issue.resolutionVersion) {
+      toast('This resolution version has already been decided.', 'error'); return;
+    }
+    const by = rolePerson(getRole());
+    const role = getRole();
+    if (!(samePerson(by, issue.agent) && role === 'agent') && !(samePerson(by, issue.manager) && role === 'manager')) {
+      toast('Only the issue agent or manager can decide this resolution.', 'error'); return;
+    }
+    const now = isoNow();
+    attachFiles(invoice, issue, files, by);
+    issue.resolutionDecisionVersion = issue.resolutionVersion;
+    if (decision === 'reject-resolution') {
+      issue.resolutionStatus = 'rejected'; issue.workflowStep = 'resolution-work'; issue.assignedTo = issue.actionOwner; issue.assignmentRole = 'action-owner';
+      issue.rejectionKind = 'resolution'; issue.rejectedBy = by; issue.rejectedAt = now;
+      issue.actionTrail.push({ who: by, what: `rejected resolution version ${issue.resolutionVersion} and returned it to ${issue.actionOwner}`, type: 'resolution', when: now, remark, files });
+      saveRecord(invoice, issue); addIssueNotification(issue, invoice, 'resolution-rejected', [issue.actionOwner], 'Resolution rejected', `${by} returned ${issue.subStatus} for a revised resolution.`); toast('Resolution rejected and returned to the action owner.', 'error'); return;
+    }
+    issue.rejectionKind = ''; issue.rejectedBy = ''; issue.rejectedAt = '';
+    issue.resolutionStatus = 'accepted';
+    issue.actionTrail.push({ who: by, what: decision === 'accept-close' ? `accepted resolution version ${issue.resolutionVersion} and closed the issue` : `accepted resolution version ${issue.resolutionVersion}`, type: 'resolution', when: now, remark, files });
+    if (decision === 'accept-close') {
+      issue.status = 'Closed'; issue.workflowStep = 'closed'; issue.assignedTo = ''; issue.assignmentRole = '';
+    } else {
+      issue.workflowStep = 'resolution-accepted'; issue.assignedTo = issue.agent; issue.assignmentRole = 'agent';
+    }
+    saveRecord(invoice, issue); addIssueNotification(issue, invoice, 'resolution-accepted', [issue.actionOwner], 'Resolution accepted', `${by} accepted the resolution for ${issue.subStatus}.`); toast(decision === 'accept-close' ? 'Resolution accepted and issue closed.' : 'Resolution accepted. The issue remains open.', 'success');
   }
 
+  function sameApprovalMoment(left, right) {
+    if (String(left?.type || '').toLowerCase() !== 'approval') return false;
+    if (!samePerson(left?.who, right?.by || right?.who)) return false;
+    if (String(left?.remark || '').trim() !== String(right?.remark || '').trim()) return false;
+    const leftValue = left?.when;
+    const rightValue = right?.at || right?.when;
+    if (!leftValue || !rightValue) return false;
+    const leftTime = new Date(leftValue).getTime();
+    const rightTime = new Date(rightValue).getTime();
+    return Number.isFinite(leftTime) && Number.isFinite(rightTime)
+      ? Math.abs(leftTime - rightTime) <= 2000
+      : String(left?.when || '') === String(right?.at || right?.when || '');
+  }
+  function collapseLegacyApprovalDuplicates(source) {
+    const entries = [];
+    const transitionPattern = /\b(sent|assigned|returned|completed|closed|reopened)\b/i;
+    (source || []).forEach((entry) => {
+      const duplicateIndex = entries.findIndex((existing) => sameApprovalMoment(existing, entry));
+      if (duplicateIndex < 0) {
+        entries.push(entry);
+        return;
+      }
+      if (transitionPattern.test(String(entry?.what || '')) && !transitionPattern.test(String(entries[duplicateIndex]?.what || ''))) {
+        entries[duplicateIndex] = entry;
+      }
+    });
+    return entries;
+  }
   function mergedActivity(issue, request) {
-    const entries = [...(issue.actionTrail || [])];
+    const entries = collapseLegacyApprovalDuplicates(issue.actionTrail || []);
     (request?.trail || []).forEach((entry) => {
-      if (entry.action === 'submitted' && entries.some((item) => item.type === 'approval' && item.who === entry.by && item.when === entry.at)) return;
+      if (entries.some((item) => sameApprovalMoment(item, entry))) return;
       const signature = `${entry.at}|${entry.action}|${entry.by}`;
       if (!entries.some((item) => `${item.when}|${String(item.what).includes(entry.action) ? entry.action : ''}|${item.who}` === signature)) entries.push({ who: entry.by, what: entry.action === 'submitted' ? 'submitted the issue for approval' : `${entry.action} approval level ${entry.level || request.currentLevel || ''}`.trim(), when: entry.at, remark: entry.remark, files: entry.files, type: 'approval' });
     });
@@ -1207,7 +1410,7 @@
   function renderActivity(issue, request) {
     const entries = mergedActivity(issue, request);
     document.getElementById('activity-count').textContent = entries.length;
-    const supportedTypes = ['approval', 'remark', 'assignment', 'email', 'resolution', 'closure', 'reopen'];
+    const supportedTypes = ['approval', 'remark', 'assignment', 'resolution', 'closure', 'reopen'];
     const latest = entries[0];
     const latestTypeRaw = String(latest?.type || 'remark').toLowerCase();
     const latestType = latestTypeRaw === 'assigned' ? 'assignment' : (supportedTypes.includes(latestTypeRaw) ? latestTypeRaw : 'remark');
@@ -1232,9 +1435,10 @@
     const hierarchyLevels = [...normalizedLevels].sort((left, right) => right.number - left.number);
     const workflow = workflowState(issue, request);
     const managerState = managerApprovalStatus(issue);
-    const managerDisplay = managerState === 'pending' ? 'current' : managerState;
+    const managerDisplay = workflow.step === 'resolution-review' && managerState === 'pending' ? 'superseded' : (managerState === 'pending' ? 'current' : managerState);
     const currentLevel = Number(request?.currentLevel || 0);
     const levelState = (level) => {
+      if (request?.status === 'superseded') return String(level.status || '').toLowerCase() === 'approved' ? 'approved' : 'locked';
       if (managerState === 'pending') return level.number === 1 ? 'next' : 'locked';
       if (managerState === 'rejected') return 'locked';
       if (request?.status === 'approved') return 'approved';

@@ -2602,7 +2602,8 @@
       }
     }
   </style>
-  <script defer src="scripts/app.js?v=20260730-activity-tutorial"></script>
+  <script defer src="bin/IssueTracker/js/issue-tracker-config.js?v=20260805-approved-flow-v1"></script>
+  <script defer src="scripts/app.js?v=20260805-approved-flow-v1"></script>
   <script defer src="scripts/customer-notes.js"></script>
 </head>
 <body data-root-path="" data-relationship-name="Apollo" data-relationship-badge="AP" data-relationship-logo-src="assets/apollo-sharkfin-logo.jpeg">
@@ -3584,25 +3585,16 @@
             <label>Select Action Owner</label>
             <select id="actionOwnerSelect">
               <option value="" selected disabled>Select action owner</option>
-              <option>Anoop Sharma</option>
-              <option>Priya Verma</option>
-              <option>Rohit Malhotra</option>
-              <option>Rahul Jain</option>
               <option>Neha Gupta</option>
-              <option>Sanjay Rao</option>
               <option>Arjun Patel</option>
-              <option>Meera Iyer</option>
-              <option>Compliance Team</option>
+              <option>Karan Shah</option>
             </select>
           </div>
 
           <div>
-            <label>Select Approval Process</label>
+            <label>Approval Matrix <span class="text-muted">(optional)</span></label>
             <select id="approvalProcessSelect">
-              <option value="" selected disabled>Select approval process</option>
-              <option>Invoice Delay Resolution</option>
-              <option>PO Approval Follow-up</option>
-              <option>Delivery Challan Collection</option>
+              <option value="" selected>No approval matrix</option>
             </select>
           </div>
         </div>
@@ -4375,8 +4367,8 @@
           callouts: [{
             selector: "#issueTrackerCheck",
             eyebrow: "Issue routing",
-            title: "Complete all three routing steps",
-            copy: "Keep Add to issue tracker checked, select the action owner, then select the approval process that supplies the approval matrix.",
+            title: "Choose the issue routing",
+            copy: "Keep Add to issue tracker checked, select the action owner, and optionally select an approval process when a matrix is required.",
             placement: "right-bottom",
             placementSelector: "#dispositionPanel",
             arrow: false
@@ -4392,10 +4384,10 @@
               },
               {
                 title: "2 · Select Action Owner",
-                copy: "Choose the person or team responsible for collecting the Delivery Challan."
+                copy: "Choose the Action Owner responsible for completing this substatus."
               },
               {
-                title: "3 · Select Approval Process",
+                title: "3 · Approval Matrix (optional)",
                 copy: "Choose the process; its configured approval matrix routes the new Issue."
               }
             ],

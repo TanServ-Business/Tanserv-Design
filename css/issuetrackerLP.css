@@ -282,6 +282,7 @@
 
 .workTab span { color: inherit; font-size: 12px; margin-left: 7px; }
 .workTab.is-active { border-bottom-color: var(--it-purple); color: var(--it-purple); }
+.workTab .rejectedTabCount { align-items: center; background: #fff0f0; border-radius: 999px; color: #c62828; display: inline-flex; font-size: 11px; font-style: normal; font-weight: 700; margin-left: 6px; padding: 2px 7px; }
 
 .workTools { align-items: center; display: flex; gap: 8px; }
 
@@ -417,6 +418,11 @@
 .unifiedIssueTable .assignedToCell i { color: var(--it-purple); font-size: 13px; margin-right: 7px; }
 .unifiedIssueTable .openDaysCell { color: var(--it-ink); font-weight: 700; text-align: center; }
 .unifiedIssueTable tr.issueRow:hover td { background: #faf8ff; }
+.unifiedIssueTable .issueRow.is-rejected > td { background: #fff8f8; }
+.unifiedIssueTable .issueRow.is-rejected > td:first-child { box-shadow: inset 3px 0 0 #d93025; }
+.rejectedPill { background: #fff0f0; border: 1px solid #f2b8b5; border-radius: 999px; color: #b3261e; display: inline-flex; font-size: 10px; font-weight: 800; margin-left: 8px; padding: 2px 7px; text-transform: uppercase; }
+.rejectedRowMeta { color: #b3261e; display: block; font-size: 11px; font-weight: 600; margin-top: 4px; }
+.statusPill.is-rejected { background: #fff0f0; border-color: #f2b8b5; color: #b3261e; }
 
 .invoiceGroupRow td {
   background: #f8f9fc;

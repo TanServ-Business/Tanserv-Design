@@ -6,7 +6,7 @@
   <title>Inebura | Issue Tracker Detail</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
   <link rel="stylesheet" href="../css/styles.css" />
-  <link rel="stylesheet" href="../css/issuetrackerLP.css?v=20260805-multiselect-filters" />
+  <link rel="stylesheet" href="../css/issuetrackerLP.css?v=20260805-approved-flow-v1" />
   <link rel="stylesheet" href="../css/shared-header.css" />
 </head>
 <body class="issueTrackerPage issueTrackerDetailPage" data-root-path="../" data-relationship-name="Issue Tracker" data-relationship-badge="IT">
@@ -29,7 +29,8 @@
             <span>Viewing as</span>
             <select id="role-select" aria-label="Select preview role">
               <option value="agent">Agent</option>
-              <option value="manager">Manager / Approver</option>
+              <option value="manager">Manager</option>
+              <option value="approver">Approver</option>
               <option value="action-owner">Action Owner</option>
             </select>
           </label>
@@ -82,6 +83,7 @@
   <div id="issue-toast" class="issueToast hidden" role="status" aria-live="polite"></div>
 
   <script src="../scripts/shared-header.js?v=20260730-tutorials"></script>
-  <script src="../bin/IssueTracker/js/issue-tracker-unified.js?v=20260805-collapse-all"></script>
+  <script src="../bin/IssueTracker/js/issue-tracker-config.js?v=20260805-approved-flow-v1"></script>
+  <script src="../bin/IssueTracker/js/issue-tracker-unified.js?v=20260805-approved-flow-v1"></script>
 </body>
 </html>

@@ -1271,7 +1271,7 @@
 
     if (approvalDashboardBtn) {
       approvalDashboardBtn.addEventListener("click", () => {
-        window.location.href = "../bin/IssueTracker/approver-dashboard.html";
+        window.location.href = "issuetrackerLP.html?view=my-work&role=approver";
       });
     }
 
@@ -1281,7 +1281,7 @@
         if (!item) return;
         const type = item.getAttribute("data-approval");
         if (!type) return;
-        window.location.href = `../bin/IssueTracker/approver-dashboard.html?type=${encodeURIComponent(type)}`;
+        window.location.href = `issuetrackerLP.html?view=my-work&role=approver&approvalType=${encodeURIComponent(type)}`;
       });
     }
 

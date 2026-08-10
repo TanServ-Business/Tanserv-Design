@@ -112,6 +112,8 @@ const issueApprovalRequestKey = "approval_requests";
 const issueTrackerProcessKey = "approval_processes";
 const issueTrackerMatrixKey = "approval_matrices";
 const issueTrackerClearedKey = "issueTrackerDataCleared";
+window.IssueTrackerConfig?.ensureCleanSlate();
+window.IssueTrackerConfig?.ensureApprovalData();
 const creditLimitOverridesKey = "ineburaCreditLimits";
 const creditLimitApprovalsKey = "ineburaCLApprovals";
 const supportTicketsKey = "inebura_support_tickets";
@@ -1894,6 +1896,13 @@ const notificationScopeTypes = new Set([
   "issue-approval-requested",
   "issue-approval-decision",
   "issue-created-manager",
+  "issue-manager-approval-request",
+  "issue-approver-request",
+  "issue-correction-required",
+  "issue-resolution-review-required",
+  "issue-resolution-rejected",
+  "issue-resolution-accepted",
+  "issue-approval-cancelled",
   "issue-manager-approved",
   "issue-approval-forwarded",
   "issue-approval-rejected",
@@ -2025,6 +2034,9 @@ function syncIssueNotificationsToCenter() {
       createdAt: issue?.createdAt || issue?.created || previous.createdAt || "",
       updatedAt: issue?.updatedAt || previous.updatedAt || "",
       approvalProcessName: issue?.approvalProcessName || previous.approvalProcessName || "",
+      workflowStep: issue?.workflowStep || previous.workflowStep || "",
+      assignedTo: issue?.assignedTo || previous.assignedTo || "",
+      initialVisibilityReleased: Boolean(issue?.initialVisibilityReleased || issue?.visibilityReleasedAt || issue?.skipManagerApproval || previous.initialVisibilityReleased),
       actionTrail: Array.isArray(issue?.actionTrail) && issue.actionTrail.length
         ? issue.actionTrail
         : (Array.isArray(previous.actionTrail) ? previous.actionTrail : [])
@@ -2036,12 +2048,14 @@ function syncIssueNotificationsToCenter() {
     const issueId = issue?.id || "";
     const managerRaw = issue?.manager || "";
     const createdAt = issue?.createdAt || issue?.updatedAt || new Date().toISOString();
-    if (managerRaw) {
+    const published = Boolean(issue?.initialVisibilityReleased);
+    const issueHref = (role, user) => `pages/issuetrackerdetail.html?invoice=${encodeURIComponent(issue?.invoiceNo || "")}&issue=${encodeURIComponent(issueId)}&role=${encodeURIComponent(role)}&user=${encodeURIComponent(user || "")}`;
+    if (managerRaw && issue.workflowStep === "manager-review") {
       pushIssueNotification({
-        id: `issue-created-manager:${issueId}:${slugToken(managerRaw)}`,
-        type: "issue-created-manager",
-        title: "Issue created",
-        message: `Issue ${issueId} created and awaiting manager review.`,
+        id: `issue-manager-approval-request:${issueId}:${slugToken(managerRaw)}`,
+        type: "issue-manager-approval-request",
+        title: "Manager approval request",
+        message: `${issue?.subStatus || "Issue"} is waiting for your review.`,
         createdAt,
         audienceUsers: [managerRaw],
         details: [
@@ -2053,12 +2067,12 @@ function syncIssueNotificationsToCenter() {
           { label: "Due by", value: issue?.dueBy || "-" }
         ],
         ctas: [
-          { label: "Open issue", action: "link", href: "pages/issuetrackerLP.html" }
+          { label: "Review issue", action: "link", href: issueHref("manager", managerRaw) }
         ]
       });
     }
 
-    const assigneeRaw = issue?.actionOwner || "";
+    const assigneeRaw = issue?.initialVisibilityReleased && issue?.workflowStep === "resolution-work" ? (issue?.assignedTo || issue?.actionOwner || "") : "";
     const assignee = normalizeAudienceUser(assigneeRaw);
     if (issueId && assignee) {
       pushIssueNotification({
@@ -2076,7 +2090,7 @@ function syncIssueNotificationsToCenter() {
           { label: "Due by", value: issue?.dueBy || "-" }
         ],
         ctas: [
-          { label: "Open issue", action: "link", href: "pages/issuetrackerLP.html" }
+          { label: "Open task", action: "link", href: issueHref("action-owner", assigneeRaw) }
         ]
       });
     }
@@ -2090,7 +2104,7 @@ function syncIssueNotificationsToCenter() {
       const at = entry?.when || issue?.updatedAt || issue?.createdAt || new Date().toISOString();
       const trailKey = buildTrailEventKey(entry, index);
 
-      if (type === "assignment" && what.includes("assigned to action owner")) {
+      if (published && type === "assignment" && what.includes("assigned to action owner")) {
         const newOwner = parseNewOwnerFromWhat(whatText, issue?.actionOwner || "");
         pushIssueNotification({
           id: `issue-assignment-updated:${issueId}:${trailKey}`,
@@ -2113,7 +2127,7 @@ function syncIssueNotificationsToCenter() {
         });
       }
 
-      if (type === "assigned" && what.includes("selected approval process")) {
+      if (published && type === "assigned" && what.includes("selected approval process")) {
         const processName = parseNewOwnerFromWhat(whatText, issue?.approvalProcessName || "");
         pushIssueNotification({
           id: `issue-approval-process-saved:${issueId}:${trailKey}`,
@@ -2134,7 +2148,7 @@ function syncIssueNotificationsToCenter() {
         });
       }
 
-      if (type === "remark" && /^updated remark\b/.test(what)) {
+      if (published && type === "remark" && (/^updated remark\b/.test(what) || what.includes("shared an update"))) {
         pushIssueNotification({
           id: `issue-remark-added:${issueId}:${trailKey}`,
           type: "issue-remark-added",
@@ -2153,7 +2167,7 @@ function syncIssueNotificationsToCenter() {
         });
       }
 
-      if (type === "approval" && what.includes("approved the issue") && !entry?.approvalKey) {
+      if (published && type === "approval" && (what.includes("approved the issue") || what.includes("accepted the new issue")) && !entry?.approvalKey) {
         pushIssueNotification({
           id: `issue-manager-approved:${issueId}:${trailKey}`,
           type: "issue-manager-approved",
@@ -2174,7 +2188,7 @@ function syncIssueNotificationsToCenter() {
         });
       }
 
-      if (type === "resolution") {
+      if (published && type === "resolution" && what.includes("provided a resolution")) {
         pushIssueNotification({
           id: `issue-resolution-provided:${issueId}:${trailKey}`,
           type: "issue-resolution-provided",
@@ -2194,7 +2208,7 @@ function syncIssueNotificationsToCenter() {
         });
       }
 
-      if (type === "closure" && what.includes("closed the issue")) {
+      if (published && type === "closure" && what.includes("closed the issue")) {
         pushIssueNotification({
           id: `issue-ticket-closed:${issueId}:${trailKey}`,
           type: "issue-ticket-closed",
@@ -2214,7 +2228,7 @@ function syncIssueNotificationsToCenter() {
         });
       }
 
-      if (type === "reopen") {
+      if (published && type === "reopen") {
         pushIssueNotification({
           id: `issue-reopened:${issueId}:${trailKey}`,
           type: "issue-reopened",
@@ -2266,14 +2280,14 @@ function syncIssueNotificationsToCenter() {
       .reverse()
       .find((entry) => ["approved", "rejected"].includes(String(entry?.action || "").toLowerCase()));
     const reqTrail = Array.isArray(req?.trail) ? req.trail : [];
+    const published = Boolean(issueContext?.initialVisibilityReleased);
+    const issueDetailHref = `pages/issuetrackerdetail.html?invoice=${encodeURIComponent(issueInvoice)}&issue=${encodeURIComponent(issueId)}&role=approver&user=${encodeURIComponent(ownerTarget)}`;
 
-    if (status === "pending" && ownerTarget) {
-      const ownerEmail = levelOwner.ownerEmail || "";
-      const ownerHint = ownerEmail || ownerTarget;
+    if (published && status === "pending" && ownerTarget) {
       pushIssueNotification({
         id: `issue-approval-requested:${reqId}:level-${level}`,
-        type: "issue-approval-requested",
-        title: "Issue approval requested",
+        type: "issue-approver-request",
+        title: "Approver request",
         message: `Approval required for issue ${issueId || "-"}. Please review at your level.`,
         createdAt: req?.updatedAt || req?.createdAt || new Date().toISOString(),
         audienceUsers: [ownerTarget],
@@ -2285,7 +2299,7 @@ function syncIssueNotificationsToCenter() {
           { label: "SLA", value: req?.slaHours ? `${req.slaHours} hours` : "-" }
         ],
         ctas: [
-          { label: "Open approval request", action: "link", href: `bin/IssueTracker/approval-request.html?id=${encodeURIComponent(reqId)}&user=${encodeURIComponent(ownerHint)}` }
+          { label: "Open issue", action: "link", href: issueDetailHref }
         ]
       });
     }
@@ -2307,7 +2321,7 @@ function syncIssueNotificationsToCenter() {
       if (action === "approved") {
         const managerNorm = normalizeAudienceUser(managerUser);
         const actorNorm = normalizeAudienceUser(actor);
-        const isManagerApproval = (managerNorm && actorNorm && managerNorm === actorNorm) || entryLevel === 1;
+        const isManagerApproval = managerNorm && actorNorm && managerNorm === actorNorm;
         if (isManagerApproval) {
           pushIssueNotification({
             id: `issue-manager-approved:${reqId}:${eventKey}`,
@@ -2331,15 +2345,15 @@ function syncIssueNotificationsToCenter() {
 
         const nextLevelOwner = levels[entryLevel] || {};
         const nextTarget = nextLevelOwner.ownerName || nextLevelOwner.ownerEmail || "";
-        if (nextTarget) {
-          const nextHint = nextLevelOwner.ownerEmail || nextTarget;
+        if (published && nextTarget) {
+          const nextIssueHref = `pages/issuetrackerdetail.html?invoice=${encodeURIComponent(issueInvoice)}&issue=${encodeURIComponent(issueId)}&role=approver&user=${encodeURIComponent(nextTarget)}`;
           pushIssueNotification({
             id: `issue-approval-forwarded:${reqId}:${eventKey}`,
-            type: "issue-approval-forwarded",
-            title: "Issue approval forwarded",
+            type: "issue-approver-request",
+            title: "Approver request",
             message: `Approval moved to next level for issue ${issueId || "-"}.`,
             createdAt: entryAt,
-            audienceUsers: [nextTarget, kamUser, agentUser, actionOwnerUser],
+            audienceUsers: [nextTarget],
             details: [
               { label: "Issue ID", value: issueId || "-" },
               { label: "Process", value: req?.processName || req?.processId || "-" },
@@ -2349,26 +2363,26 @@ function syncIssueNotificationsToCenter() {
               { label: "Next approver", value: nextTarget || "-" }
             ],
             ctas: [
-              { label: "Open approval request", action: "link", href: `bin/IssueTracker/approval-request.html?id=${encodeURIComponent(reqId)}&user=${encodeURIComponent(nextHint)}` }
+              { label: "Open issue", action: "link", href: nextIssueHref }
             ]
           });
         }
       }
 
-      if (action === "rejected") {
+      if (published && action === "rejected") {
         pushIssueNotification({
           id: `issue-approval-rejected:${reqId}:${eventKey}`,
-          type: "issue-approval-rejected",
-          title: "Issue approval rejected",
+          type: "issue-correction-required",
+          title: "Correction required",
           message: `Approval rejected for issue ${issueId || "-"}.`,
           createdAt: entryAt,
-          audienceUsers: [kamUser, agentUser, actionOwnerUser],
+          audienceUsers: [agentUser, managerUser],
           details: [
             { label: "Issue ID", value: issueId || "-" },
             { label: "Level", value: String(entryLevel) },
             { label: "Rejected by", value: actor || "-" },
             { label: "Reason", value: trailEntry?.remark || "-" },
-            { label: "Next action", value: actionOwnerUser || "-" }
+            { label: "Next action", value: agentUser || "-" }
           ],
           ctas: [
             { label: "Open issue", action: "link", href: "pages/issuetrackerLP.html" }
@@ -2377,28 +2391,6 @@ function syncIssueNotificationsToCenter() {
       }
     });
 
-    if (status === "approved" || status === "rejected") {
-      const decisionAt = req?.updatedAt || req?.reviewedAt || decisionEntry?.at || req?.createdAt || "";
-      pushIssueNotification({
-        id: `issue-approval-decision:${reqId}:${status}:${decisionAt || "latest"}`,
-        type: "issue-approval-decision",
-        title: "Issue approval decision",
-        message: `Issue ${issueId || "-"} ${status}. Next action assigned.`,
-        createdAt: decisionAt || new Date().toISOString(),
-        audienceUsers: [kamUser, agentUser, actionOwnerUser],
-        details: [
-          { label: "Decision", value: status === "approved" ? "Approved" : "Rejected" },
-          { label: "By", value: decisionEntry?.by || "-" },
-          { label: "Remarks", value: decisionEntry?.remark || "-" },
-          { label: "Next owner", value: actionOwnerUser || "-" },
-          { label: "Customer", value: issueCustomer || "-" },
-          { label: "Invoice", value: issueInvoice || "-" }
-        ],
-        ctas: [
-          { label: "Open issue", action: "link", href: "pages/issuetrackerLP.html" }
-        ]
-      });
-    }
   });
 
   additions.forEach(addNotificationCenterItem);
@@ -3065,6 +3057,13 @@ function renderNotificationPopup() {
     "issue-approval-requested": "Issue",
     "issue-approval-decision": "Issue",
     "issue-created-manager": "Issue",
+    "issue-manager-approval-request": "Issue",
+    "issue-approver-request": "Issue",
+    "issue-correction-required": "Issue",
+    "issue-resolution-review-required": "Issue",
+    "issue-resolution-rejected": "Issue",
+    "issue-resolution-accepted": "Issue",
+    "issue-approval-cancelled": "Issue",
     "issue-manager-approved": "Issue",
     "issue-approval-forwarded": "Issue",
     "issue-approval-rejected": "Issue",
@@ -3162,6 +3161,13 @@ function renderNotificationPopup() {
     if (type === "issue-approval-requested") return "Issue approval requested";
     if (type === "issue-approval-decision") return "Issue approval decision";
     if (type === "issue-created-manager") return "Issue created";
+    if (type === "issue-manager-approval-request") return "Manager approval request";
+    if (type === "issue-approver-request") return "Approver request";
+    if (type === "issue-correction-required") return "Correction required";
+    if (type === "issue-resolution-review-required") return "Resolution review required";
+    if (type === "issue-resolution-rejected") return "Resolution rejected";
+    if (type === "issue-resolution-accepted") return "Resolution accepted";
+    if (type === "issue-approval-cancelled") return "Approval cancelled";
     if (type === "issue-manager-approved") return "Issue manager approval";
     if (type === "issue-approval-forwarded") return "Issue approval forwarded";
     if (type === "issue-approval-rejected") return "Issue approval rejected";
@@ -3211,7 +3217,11 @@ function renderNotificationPopup() {
         <strong>${safeText(detail.value)}</strong>
       </div>
     `).join("");
-    const ctas = Array.isArray(note.ctas) ? note.ctas : [];
+    const ctas = Array.isArray(note.ctas) ? note.ctas.map((cta) => ({
+      ...cta,
+      action: cta.action === "open-url" ? "link" : (cta.action || (cta.url ? "link" : "")),
+      href: cta.href || cta.url || ""
+    })) : [];
     const defaultCta = ctas[0] || {};
     const defaultAction = defaultRoute?.action || defaultCta.action
       || ((note.type === "visit-approval" || note.type === "visit-approval-pending" || note.type === "visit-plan-approved" || note.type === "visit-replan-required") ? "link"
@@ -3240,7 +3250,7 @@ function renderNotificationPopup() {
           : note.type === "visit-replan-required" ? "pages/visitmodule.html"
             : note.type === "commitment-submitted" ? "pages/CommitmentManager.html"
               : note.type === "commitment-rejected" ? "pages/commitment.html"
-                : note.type === "issue-approval-requested" ? "bin/IssueTracker/approver-dashboard.html"
+                : (note.type === "issue-approval-requested" || note.type === "issue-approver-request") ? "pages/issuetrackerLP.html?view=my-work&role=approver"
                   : String(note.type || "").startsWith("issue-") ? "pages/issuetrackerLP.html"
                       : note.type === "backend-upload-exception" ? "pages/LPbackend.html"
                         : note.type === "mis-schedule-failed" ? "pages/LPmis.html"
@@ -9113,6 +9123,26 @@ function wireDispositionActivityEvents() {
   const actionOwnerSelect = document.getElementById("actionOwnerSelect");
   const approvalProcessSelect = document.getElementById("approvalProcessSelect");
   const deliveryChallanError = document.getElementById("deliveryChallanError");
+  if (actionOwnerSelect && window.IssueTrackerConfig) {
+    const currentOwner = actionOwnerSelect.value;
+    actionOwnerSelect.innerHTML = '<option value="" selected disabled>Select action owner</option>'
+      + window.IssueTrackerConfig.usersForRole("action-owner").map((user) => `<option value="${user.name}">${user.name}</option>`).join("");
+    if (currentOwner && window.IssueTrackerConfig.roleOf(currentOwner) === "action-owner") actionOwnerSelect.value = currentOwner;
+  }
+  if (approvalProcessSelect) {
+    const currentProcess = approvalProcessSelect.value;
+    const configuredProcesses = readStoredArray(issueTrackerProcessKey);
+    approvalProcessSelect.innerHTML = '<option value="">No approval matrix</option>';
+    configuredProcesses.forEach((process) => {
+      const option = document.createElement("option");
+      option.value = process?.process || "";
+      option.textContent = process?.process || process?.id || "Approval process";
+      approvalProcessSelect.appendChild(option);
+    });
+    if (currentProcess && configuredProcesses.some((process) => process?.process === currentProcess)) {
+      approvalProcessSelect.value = currentProcess;
+    }
+  }
 
   const miscModes = ["NEFT", "RTGS", "Cheque", "Demand Draft", "PDC", "CN", "Adv"];
   const miscAdjustmentModes = new Set(["PDC", "CN", "Adv"]);
@@ -9760,9 +9790,9 @@ function wireDispositionActivityEvents() {
 
   const toggleDeliveryChallanFields = () => {
     if (!subStatusSelect || !deliveryChallanFields) return;
-    const selected = String(subStatusSelect.value || "").trim().toLowerCase();
-    const isDeliveryChallan = selected === "delivery challan required";
-    deliveryChallanFields.classList.toggle("hidden", !isDeliveryChallan);
+    const row = findDispositionRowBySubStatus(subStatusSelect.value);
+    const isExternalDependency = normalizeDispositionKey(row?.broadStatus) === "external dependency";
+    deliveryChallanFields.classList.toggle("hidden", !isExternalDependency);
   };
 
   const isPtpSelected = () => {
@@ -10023,16 +10053,11 @@ function wireDispositionActivityEvents() {
 
     if (!validateCollection(true)) return;
 
-    const isDeliveryChallan = normalizeDispositionKey(subStatus) === "delivery challan required";
-    const shouldCreateDeliveryIssue = isDeliveryChallan && Boolean(issueTrackerCheck?.checked);
-    if (shouldCreateDeliveryIssue && !String(actionOwnerSelect?.value || "").trim()) {
-      showDeliveryChallanError("Select an Action Owner before creating the Delivery Challan Issue.");
+    const isExternalDependency = normalizeDispositionKey(dispositionRow?.broadStatus) === "external dependency";
+    const shouldCreateIssue = isExternalDependency && Boolean(issueTrackerCheck?.checked);
+    if (shouldCreateIssue && !String(actionOwnerSelect?.value || "").trim()) {
+      showDeliveryChallanError("Select an Action Owner before creating the issue.");
       actionOwnerSelect?.focus();
-      return;
-    }
-    if (shouldCreateDeliveryIssue && !String(approvalProcessSelect?.value || "").trim()) {
-      showDeliveryChallanError("Select an Approval Process so its approval matrix can route the Delivery Challan Issue.");
-      approvalProcessSelect?.focus();
       return;
     }
 
@@ -10149,8 +10174,7 @@ function wireDispositionActivityEvents() {
         }
       }
 
-      const isDeliveryChallan = String(subStatus || "").trim().toLowerCase() === "delivery challan required";
-      const shouldAddIssue = isDeliveryChallan && issueTrackerCheck && issueTrackerCheck.checked;
+      const shouldAddIssue = normalizeDispositionKey(data.broadStatus) === "external dependency" && issueTrackerCheck && issueTrackerCheck.checked;
       let issueTrailEntry = null;
       let approvalTrailEntry = null;
       let issueTrailPayload = null;
@@ -10167,28 +10191,42 @@ function wireDispositionActivityEvents() {
         const approvalProcess = findApprovalProcessByName(approvalProcessName);
         const approvalMatrix = findApprovalMatrixForProcess(approvalProcessName);
         const approvalMatrixObj = findApprovalMatrixById(approvalProcess?.matrixId || approvalMatrix.id);
+        const approvalLevels = Array.isArray(approvalMatrixObj?.levels) ? approvalMatrixObj.levels : [];
         const actionOwner = actionOwnerSelect?.value || "";
+        const skipManagerApproval = Boolean(window.IssueTrackerConfig?.settings()?.skipManagerApproval);
+        const configuredAgent = localStorage.getItem("activeUserName") || customer?.agentName || window.IssueTrackerConfig?.defaultUser("agent") || "Aditi Sharma";
+        const agent = window.IssueTrackerConfig?.roleOf(configuredAgent) === "agent" ? configuredAgent : (window.IssueTrackerConfig?.defaultUser("agent") || "Aditi Sharma");
+        const configuredManager = customer?.managerName || "";
+        const manager = window.IssueTrackerConfig?.roleOf(configuredManager) === "manager" ? configuredManager : (window.IssueTrackerConfig?.defaultUser("manager") || "Mukesh Mishra");
         const invoiceValue = parseAmount(invoice?.invoiceAmount ?? invoice?.amountForMonth ?? 0);
         const invoiceDueAmount = parseAmount(invoice?.netDueAmount ?? invoiceValue ?? 0);
         const issue = {
           id: `ISS_MAN_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
-          title: "Delivery Challan Required",
+          title: data.subStatus,
           status: "Open",
           created: now.toISOString().slice(0, 10),
           createdAt: now.toISOString(),
-          description: remarkText || "Delivery challan required.",
+          description: remarkText || `${data.subStatus}.`,
           activityType: data.activityType || "-",
           primaryStatus: data.primaryStatus || "-",
           broadStatus: data.broadStatus || "-",
-          subStatus: "Delivery Challan Required",
+          subStatus: data.subStatus,
           stage: 1,
-          agent: customer?.agentName || "Agent",
-          manager: customer?.managerName || "",
+          workflowStep: skipManagerApproval ? (approvalLevels.length ? "approver-l1" : "resolution-work") : "manager-review",
+          agent,
+          manager,
           actionOwner,
           approvalProcessId,
           approvalProcessName,
           approvalMatrixId: approvalMatrix.id,
           approvalMatrixName: approvalMatrix.name,
+          managerApprovalStatus: skipManagerApproval ? "Approved" : "Pending",
+          matrixApprovalStatus: "not-submitted",
+          assignedTo: skipManagerApproval ? (approvalLevels[0]?.ownerName || actionOwner) : manager,
+          assignmentRole: skipManagerApproval ? (approvalLevels.length ? "approver" : "action-owner") : "manager",
+          skipManagerApproval,
+          initialVisibilityReleased: skipManagerApproval,
+          visibilityReleasedAt: skipManagerApproval ? now.toISOString() : "",
           invoiceDueAmount,
           invoiceDueDate: invoice?.dueDate || "",
           region: customer?.region || "",
@@ -10199,7 +10237,7 @@ function wireDispositionActivityEvents() {
           customerCode: customer?.code || "",
           isCustom: true,
           actionTrail: [{
-            who: "You",
+            who: agent,
             what: "created issue from activity",
             type: "remark",
             when: now.toISOString(),
@@ -10211,6 +10249,25 @@ function wireDispositionActivityEvents() {
         const customIssues = readStoredArray(issueTrackerCustomKey);
         customIssues.push(issue);
         try { localStorage.setItem(issueTrackerCustomKey, JSON.stringify(customIssues)); } catch (_) {}
+        if (skipManagerApproval && approvalLevels.length) {
+          const existingReqs = readStoredArray("approval_requests");
+          existingReqs.push({
+            id: `REQ_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+            processId: approvalProcess?.id || approvalProcessId || approvalProcessName,
+            processName: approvalProcess?.process || approvalProcessName,
+            matrixId: approvalProcess?.matrixId || approvalMatrix.id || "",
+            matrixName: approvalMatrixObj?.name || approvalMatrix.name || "",
+            levels: approvalLevels.map((level, index) => ({ level: index + 1, ownerName: level.ownerName, ownerEmail: level.ownerEmail, status: index === 0 ? "pending" : "waiting" })),
+            currentLevel: 1,
+            status: "pending",
+            createdAt: activityTimestamp,
+            updatedAt: activityTimestamp,
+            issue: { id: issue.id, title: issue.title, subStatus: issue.subStatus },
+            invoice: { id: invNo || "", customer: customer?.name || "", customerCode: customer?.code || "", date: invoice?.invoiceDate || "", total: invoiceValue },
+            trail: [{ action: "submitted", by: agent, at: activityTimestamp, remark: "Manager approval skipped by configuration." }]
+          });
+          try { localStorage.setItem("approval_requests", JSON.stringify(existingReqs)); } catch (_) {}
+        }
         try { localStorage.removeItem(issueTrackerClearedKey); } catch (_) {}
         const total = syncIssueTrackerTotal();
         const issueEl = document.getElementById("centerIssueCount");
@@ -10240,108 +10297,6 @@ function wireDispositionActivityEvents() {
           event: issueTrailEvent
         };
 
-        if (approvalProcessName) {
-          const reqKey = "approval_requests";
-          const existingReqs = readStoredArray(reqKey);
-          const processId = approvalProcess?.id || approvalProcessId || approvalProcessName;
-          const matrixId = approvalProcess?.matrixId || approvalMatrix.id || "";
-          const matrixName = approvalMatrixObj?.name || approvalMatrix.name || "";
-          const levels = Array.isArray(approvalMatrixObj?.levels)
-            ? approvalMatrixObj.levels.map((lvl, idx) => ({
-                level: idx + 1,
-                ownerName: lvl?.ownerName || "",
-                ownerEmail: lvl?.ownerEmail || ""
-              }))
-            : [];
-          const nowIso = activityTimestamp;
-          let req = existingReqs.find(r => r && r.issue && r.issue.id === issue.id && r.processId === processId && r.status === "pending");
-          if (!req) {
-            req = {
-              id: `REQ_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
-              processId,
-              processName: approvalProcess?.process || approvalProcessName || processId,
-              matrixId,
-              matrixName,
-              levels,
-              currentLevel: 1,
-              status: "pending",
-              createdAt: nowIso,
-              updatedAt: nowIso,
-              issue: {
-                id: issue.id,
-                title: issue.title || "",
-                status: issue.status || "",
-                created: issue.created || "",
-                description: issue.description || "",
-                primaryStatus: issue.primaryStatus || "",
-                broadStatus: issue.broadStatus || "",
-                subStatus: issue.subStatus || "",
-                actionOwner: issue.actionOwner || ""
-              },
-              invoice: {
-                id: invNo || "",
-                customer: customer?.name || "",
-                date: invoice?.invoiceDate || "",
-                total: invoiceValue,
-                dueDate: invoice?.dueDate || "",
-                dueAmount: invoiceDueAmount
-              },
-              trail: []
-            };
-            existingReqs.push(req);
-          } else {
-            req.processName = approvalProcess?.process || req.processName || processId;
-            req.matrixId = matrixId || req.matrixId || "";
-            req.matrixName = matrixName || req.matrixName || "";
-            if (levels.length) req.levels = levels;
-            req.issue = req.issue || {};
-            req.issue.actionOwner = issue.actionOwner || req.issue.actionOwner || "";
-            req.updatedAt = nowIso;
-          }
-          req.trail = Array.isArray(req.trail) ? req.trail : [];
-          req.trail.push({
-            action: "submitted",
-            by: "You",
-            level: req.currentLevel || 1,
-            at: nowIso,
-            remark: remarkText || "Submitted from activity",
-            files: []
-          });
-          try { localStorage.setItem(reqKey, JSON.stringify(existingReqs)); } catch (_) {}
-
-          const approvalEntry = {
-            who: "You",
-            what: `submitted for approval (${req.processName || processId})`,
-            type: "approval",
-            when: nowIso,
-            sequence: 2,
-            remark: remarkText || "",
-            approvalKey: `approval:${req.id}:${nowIso}:submitted`
-          };
-          issue.actionTrail.push(approvalEntry);
-          try { localStorage.setItem(issueTrackerCustomKey, JSON.stringify(customIssues)); } catch (_) {}
-
-          const approvalTrailEvent = {
-            title: "Issue tracker update",
-            meta: `${issue.id} - submitted for approval (${req.processName || processId})`,
-            badge: "Issue",
-            performedAt: nowIso,
-            lines: [
-              { label: "Process", value: req.processName || processId },
-              { label: "Matrix", value: matrixName || "-" },
-              { label: "Level", value: "1" }
-            ],
-            eventClass: "event-issue"
-          };
-          approvalTrailEntry = buildIssueTrailEntry(approvalTrailEvent);
-          approvalTrailPayload = {
-            id: approvalEntry.approvalKey || `issue:${issue.id}:${approvalEntry.when}:${approvalEntry.what}`,
-            type: "issue",
-            at: nowIso,
-            sequence: 2,
-            event: approvalTrailEvent
-          };
-        }
       }
 
       if (isPdcGiven) {
@@ -12225,14 +12180,8 @@ function initUserSelect() {
   if (!userSelect) return;
 
   const headerUserDirectory = {
-    agents: [
-      "Aditi Sharma",
-      "Manish Kumar",
-      "Palak Choudhary",
-      "Abhishek Sharma",
-      "Sakshi Sharma"
-    ],
-    managers: ["Mukesh Mishra"]
+    agents: (window.IssueTrackerConfig?.usersForRole("agent") || []).map((user) => user.name),
+    managers: (window.IssueTrackerConfig?.usersForRole("manager") || []).map((user) => user.name)
   };
 
   userSelect.innerHTML = "";
