@@ -5232,6 +5232,16 @@ body.motion-preload .dashboardCard {
   height: 250px;
 }
 
+.performanceTrendsView .trendDocumentAnalyticsRow .trendRiskMetricsChartWrap,
+.performanceTrendsView .trendRiskMetricsRow .trendRiskMetricsChartWrap {
+  min-height: 260px;
+}
+
+.performanceTrendsView .trendDocumentAnalyticsRow .trendChartMeta,
+.performanceTrendsView .trendRiskMetricsRow .trendChartMeta {
+  max-width: 36rem;
+}
+
 .performanceTrendsView .trendCollectionChartWrap {
   height: 340px;
 }

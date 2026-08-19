@@ -698,8 +698,8 @@
       <article class="trendChartCard trendCommandMain trendFinancialMetricsCard">
         <div class="trendChartHeader">
           <div>
-            <div class="trendChartTitle">CN / ADV Metrics</div>
-            <div class="trendChartMeta" id="trendCnAdvScopeMeta">CN and advance value added versus utilised</div>
+            <div class="trendChartTitle">CN / Advance Added</div>
+            <div class="trendChartMeta" id="trendCnAdvScopeMeta">Credit note and advance value added to the client</div>
           </div>
           <div class="trendCollectionFilterTray" id="trendCnAdvFilterTray">
             <details class="trendCollectionFilterRoot" id="trendCnAdvFilterRoot">
@@ -717,10 +717,51 @@
           <div id="trendCnAdvChart" class="trendEchartCanvas" role="img" aria-label="CN and advance metrics trend"></div>
           <div class="trendCollectionNoData" id="trendCnAdvNoData" hidden>
             <i class="bi bi-filter-circle" aria-hidden="true"></i>
-            <strong>No CN or advance data for the selected filters</strong>
+            <strong>No CN or advance additions for the selected filters</strong>
             <span>Adjust the current selections or reset the chart filters.</span>
             <button type="button" id="trendCnAdvNoDataClear">Clear filters</button>
           </div>
+        </div>
+      </article>
+    </div>
+
+    <div class="trendCommandRow trendRiskMetricsRow trendDocumentAnalyticsRow" aria-label="Document upload and submission analytics">
+      <article class="trendChartCard trendCommandMain trendRiskMetricsCard">
+        <div class="trendChartHeader">
+          <div>
+            <div class="trendChartTitle">Document Type Uploads</div>
+            <div class="trendChartMeta" id="trendDocumentUploadsScopeMeta">Hard-copy uploads by document type across the selected period</div>
+          </div>
+          <div class="trendCollectionFilterTray" id="trendDocumentUploadsFilterTray">
+            <details class="trendCollectionFilterRoot" id="trendDocumentUploadsFilterRoot">
+              <summary aria-label="Open document upload chart filters"><i class="bi bi-filter" aria-hidden="true"></i><span>Filter</span><i class="bi bi-chevron-down" aria-hidden="true"></i></summary>
+              <div class="trendCollectionFilterRootMenu" id="trendDocumentUploadsFilterGrid" aria-label="Document upload chart filter fields"></div>
+            </details>
+          </div>
+        </div>
+        <div class="trendCollectionFilterChips" id="trendDocumentUploadsFilterChips" aria-label="Applied document upload chart filters" aria-live="polite" hidden></div>
+        <div class="trendChartWrap trendRiskMetricsChartWrap">
+          <div id="trendDocumentUploadsChart" class="trendEchartCanvas" role="img" aria-label="Document type uploads trend"></div>
+          <div class="trendCollectionNoData" id="trendDocumentUploadsNoData" hidden><i class="bi bi-filter-circle" aria-hidden="true"></i><strong>No document uploads for the selected filters</strong><span>Adjust the current selections or reset the chart filters.</span><button type="button" id="trendDocumentUploadsNoDataClear">Clear filters</button></div>
+        </div>
+      </article>
+      <article class="trendChartCard trendCommandMain trendRiskMetricsCard">
+        <div class="trendChartHeader">
+          <div>
+            <div class="trendChartTitle">Submission Cycle Time</div>
+            <div class="trendChartMeta" id="trendSubmissionCycleScopeMeta">Average days from document readiness to submission</div>
+          </div>
+          <div class="trendCollectionFilterTray" id="trendSubmissionCycleFilterTray">
+            <details class="trendCollectionFilterRoot" id="trendSubmissionCycleFilterRoot">
+              <summary aria-label="Open submission cycle chart filters"><i class="bi bi-filter" aria-hidden="true"></i><span>Filter</span><i class="bi bi-chevron-down" aria-hidden="true"></i></summary>
+              <div class="trendCollectionFilterRootMenu" id="trendSubmissionCycleFilterGrid" aria-label="Submission cycle chart filter fields"></div>
+            </details>
+          </div>
+        </div>
+        <div class="trendCollectionFilterChips" id="trendSubmissionCycleFilterChips" aria-label="Applied submission cycle chart filters" aria-live="polite" hidden></div>
+        <div class="trendChartWrap trendRiskMetricsChartWrap">
+          <div id="trendSubmissionCycleChart" class="trendEchartCanvas" role="img" aria-label="Submission cycle time trend"></div>
+          <div class="trendCollectionNoData" id="trendSubmissionCycleNoData" hidden><i class="bi bi-filter-circle" aria-hidden="true"></i><strong>No submission cycle data for the selected filters</strong><span>Adjust the current selections or reset the chart filters.</span><button type="button" id="trendSubmissionCycleNoDataClear">Clear filters</button></div>
         </div>
       </article>
     </div>
@@ -780,6 +821,47 @@
             <span>Adjust the current selections or reset the chart filters.</span>
             <button type="button" id="trendWrittenOffNoDataClear">Clear filters</button>
           </div>
+        </div>
+      </article>
+    </div>
+
+    <div class="trendCommandRow trendRiskMetricsRow" aria-label="Issue and commitment breakage analytics">
+      <article class="trendChartCard trendCommandMain trendRiskMetricsCard">
+        <div class="trendChartHeader">
+          <div>
+            <div class="trendChartTitle">Issue Resolution &amp; TAT</div>
+            <div class="trendChartMeta" id="trendIssueAnalyticsScopeMeta">Average resolution time, TAT, and latest closing sub-status mix</div>
+          </div>
+          <div class="trendCollectionFilterTray" id="trendIssueAnalyticsFilterTray">
+            <details class="trendCollectionFilterRoot" id="trendIssueAnalyticsFilterRoot">
+              <summary aria-label="Open issue analytics chart filters"><i class="bi bi-filter" aria-hidden="true"></i><span>Filter</span><i class="bi bi-chevron-down" aria-hidden="true"></i></summary>
+              <div class="trendCollectionFilterRootMenu" id="trendIssueAnalyticsFilterGrid" aria-label="Issue analytics chart filter fields"></div>
+            </details>
+          </div>
+        </div>
+        <div class="trendCollectionFilterChips" id="trendIssueAnalyticsFilterChips" aria-label="Applied issue analytics chart filters" aria-live="polite" hidden></div>
+        <div class="trendChartWrap trendRiskMetricsChartWrap">
+          <div id="trendIssueAnalyticsChart" class="trendEchartCanvas" role="img" aria-label="Issue resolution and TAT trend"></div>
+          <div class="trendCollectionNoData" id="trendIssueAnalyticsNoData" hidden><i class="bi bi-filter-circle" aria-hidden="true"></i><strong>No issue resolution data for the selected filters</strong><span>Adjust the current selections or reset the chart filters.</span><button type="button" id="trendIssueAnalyticsNoDataClear">Clear filters</button></div>
+        </div>
+      </article>
+      <article class="trendChartCard trendCommandMain trendRiskMetricsCard">
+        <div class="trendChartHeader">
+          <div>
+            <div class="trendChartTitle">PTP &amp; Commitment Breakage</div>
+            <div class="trendChartMeta" id="trendBreakageScopeMeta">Broken PTP and non-PTP commitment value across the selected period</div>
+          </div>
+          <div class="trendCollectionFilterTray" id="trendBreakageFilterTray">
+            <details class="trendCollectionFilterRoot" id="trendBreakageFilterRoot">
+              <summary aria-label="Open PTP and commitment breakage chart filters"><i class="bi bi-filter" aria-hidden="true"></i><span>Filter</span><i class="bi bi-chevron-down" aria-hidden="true"></i></summary>
+              <div class="trendCollectionFilterRootMenu" id="trendBreakageFilterGrid" aria-label="PTP and commitment breakage chart filter fields"></div>
+            </details>
+          </div>
+        </div>
+        <div class="trendCollectionFilterChips" id="trendBreakageFilterChips" aria-label="Applied PTP and commitment breakage chart filters" aria-live="polite" hidden></div>
+        <div class="trendChartWrap trendRiskMetricsChartWrap">
+          <div id="trendBreakageChart" class="trendEchartCanvas" role="img" aria-label="PTP and commitment breakage trend"></div>
+          <div class="trendCollectionNoData" id="trendBreakageNoData" hidden><i class="bi bi-filter-circle" aria-hidden="true"></i><strong>No breakage data for the selected filters</strong><span>Adjust the current selections or reset the chart filters.</span><button type="button" id="trendBreakageNoDataClear">Clear filters</button></div>
         </div>
       </article>
     </div>

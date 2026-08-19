@@ -33,6 +33,22 @@
     email: "rgba(245, 158, 11, 0.64)",
     external: "rgba(92, 37, 141, 0.58)"
   };
+  const documentTypeLabels = {
+    invoice: "Invoice",
+    contract: "Contract",
+    agreement: "Agreement",
+    bgPbg: "BG / PBG",
+    report: "Report",
+    other: "Other"
+  };
+  const documentTypeColors = {
+    invoice: "#2563eb",
+    contract: "#0f9f8f",
+    agreement: "#7c3aed",
+    bgPbg: "#d97706",
+    report: "#db2777",
+    other: "#64748b"
+  };
   const collectionFilterDefinitions = [
     { key: "agent", label: "Agent" },
     { key: "manager", label: "Manager" },
@@ -48,7 +64,8 @@
   ];
   const invoiceSubmissionFilterDefinitions = collectionFilterDefinitions.filter(({ key }) => key !== "city" && key !== "dueStatus");
   const agingBucketsFilterDefinitions = collectionFilterDefinitions.filter(({ key }) => key !== "city" && key !== "dueStatus");
-  const cnAdvFilterDefinitions = collectionFilterDefinitions.filter(({ key }) => key !== "city" && key !== "dueStatus");
+  const cnAdvFilterDefinitions = collectionFilterDefinitions;
+  const analyticsFilterDefinitions = collectionFilterDefinitions;
   const financialRiskFilterDefinitions = collectionFilterDefinitions.filter(({ key }) => key !== "city" && key !== "dueStatus");
   const visitsFilterDefinitions = collectionFilterDefinitions.filter(({ key }) => key !== "city" && key !== "customerName");
   const visitsAllFilterDefinitions = [
@@ -224,7 +241,7 @@
       .map((value) => value / multiplier);
   };
 
-  const makeCollectionBreakdown = (index, collectedCr, newBillingCr, ptpTargetCr, planCr, portfolioCr, monthlyVisits, submissionChannels = {}, agingBuckets = {}, cnAdv = {}, financialRisk = {}) => {
+  const makeCollectionBreakdown = (index, collectedCr, newBillingCr, ptpTargetCr, planCr, portfolioCr, monthlyVisits, submissionChannels = {}, agingBuckets = {}, cnAdv = {}, financialRisk = {}, analytics = {}) => {
     const rows = collectionDimensionProfiles.flatMap((profile, profileIndex) => (
       ["Due", "Not Due"].map((dueStatus, dueIndex) => ({
         ...profile,
@@ -269,7 +286,7 @@
       )));
       return acc;
     }, {});
-    const cnAdvValues = ["addedCr", "utilisedCr"].reduce((acc, key, metricIndex) => {
+    const cnAdvValues = ["addedCr", "utilisedCr", "creditNoteAddedCr", "advanceAddedCr"].reduce((acc, key, metricIndex) => {
       acc[key] = distributeAmount(cnAdv[key] || 0, rows.map((row) => (
         1 + ((row.seed + metricIndex) % 8) * 0.055 + (row.dueStatus === "Due" ? 0.22 : 0.11)
       )));
@@ -281,6 +298,34 @@
       )));
       return acc;
     }, {});
+    const analyticsWeights = rows.map((row) => (
+      1 + ((row.seed + 3) % 8) * 0.055 + (row.dueStatus === "Due" ? 0.25 : 0.1) + (Math.sin((index + row.seed) / 4.6) * 0.08)
+    ));
+    const documentUploadValues = Object.keys(documentTypeLabels).reduce((acc, type, typeIndex) => {
+      acc[type] = distributeInteger(analytics.documentUploads?.[type] || 0, analyticsWeights.map((weight, rowIndex) => weight + ((rowIndex + typeIndex) % 5) * 0.04));
+      return acc;
+    }, {});
+    const submissionCycleValues = {
+      submittedCount: distributeInteger(analytics.submissionCycle?.submittedCount || 0, analyticsWeights),
+      totalDays: distributeAmount(analytics.submissionCycle?.totalDays || 0, analyticsWeights, 3),
+      delayedCount: distributeInteger(analytics.submissionCycle?.delayedCount || 0, analyticsWeights)
+    };
+    const issueValues = {
+      resolvedCount: distributeInteger(analytics.issue?.resolvedCount || 0, analyticsWeights),
+      totalResolutionDays: distributeAmount(analytics.issue?.totalResolutionDays || 0, analyticsWeights, 3),
+      totalTatDays: distributeAmount(analytics.issue?.totalTatDays || 0, analyticsWeights, 3),
+      overdueAtClose: distributeInteger(analytics.issue?.overdueAtClose || 0, analyticsWeights),
+      subStatus: Object.entries(analytics.issue?.subStatus || {}).reduce((acc, [status, value], statusIndex) => {
+        acc[status] = distributeInteger(value || 0, analyticsWeights.map((weight, rowIndex) => weight + ((rowIndex + statusIndex) % 4) * 0.04));
+        return acc;
+      }, {})
+    };
+    const breakageValues = {
+      ptpBrokenCr: distributeAmount(analytics.breakage?.ptpBrokenCr || 0, analyticsWeights),
+      commitmentBrokenCr: distributeAmount(analytics.breakage?.commitmentBrokenCr || 0, analyticsWeights),
+      ptpBrokenCount: distributeInteger(analytics.breakage?.ptpBrokenCount || 0, analyticsWeights),
+      commitmentBrokenCount: distributeInteger(analytics.breakage?.commitmentBrokenCount || 0, analyticsWeights)
+    };
     const activeVisitRows = rows
       .map((row, rowIndex) => ({ row, rowIndex, profileIndex: Math.floor(row.seed / 2) }))
       .filter(({ profileIndex }) => activeVisitCustomerIndexes.has(profileIndex));
@@ -308,10 +353,32 @@
         acc[bucket] = agingBucketValues[bucket]?.[rowIndex] || 0;
         return acc;
       }, {}),
-      cnAdv: ["addedCr", "utilisedCr"].reduce((acc, key) => {
+      cnAdv: ["addedCr", "utilisedCr", "creditNoteAddedCr", "advanceAddedCr"].reduce((acc, key) => {
         acc[key] = cnAdvValues[key]?.[rowIndex] || 0;
         return acc;
       }, {}),
+      documentUploads: Object.keys(documentTypeLabels).reduce((acc, type) => {
+        acc[type] = documentUploadValues[type]?.[rowIndex] || 0;
+        return acc;
+      }, {}),
+      submissionCycle: {
+        submittedCount: submissionCycleValues.submittedCount[rowIndex] || 0,
+        totalDays: submissionCycleValues.totalDays[rowIndex] || 0,
+        delayedCount: submissionCycleValues.delayedCount[rowIndex] || 0
+      },
+      issueAnalytics: {
+        resolvedCount: issueValues.resolvedCount[rowIndex] || 0,
+        totalResolutionDays: issueValues.totalResolutionDays[rowIndex] || 0,
+        totalTatDays: issueValues.totalTatDays[rowIndex] || 0,
+        overdueAtClose: issueValues.overdueAtClose[rowIndex] || 0,
+        subStatus: Object.fromEntries(Object.entries(issueValues.subStatus).map(([status, values]) => [status, values[rowIndex] || 0]))
+      },
+      breakage: {
+        ptpBrokenCr: breakageValues.ptpBrokenCr[rowIndex] || 0,
+        commitmentBrokenCr: breakageValues.commitmentBrokenCr[rowIndex] || 0,
+        ptpBrokenCount: breakageValues.ptpBrokenCount[rowIndex] || 0,
+        commitmentBrokenCount: breakageValues.commitmentBrokenCount[rowIndex] || 0
+      },
       provisioningCr: financialRiskValues.provisioningCr?.[rowIndex] || 0,
       writtenOffCr: financialRiskValues.writtenOffCr?.[rowIndex] || 0
     }));
@@ -487,6 +554,24 @@
     const provisioningCr = round(overdueCr * (0.18 + ((index % 5) * 0.012) + (Math.sin(index / 4.7) * 0.014)), 2);
     const writtenOffCr = round(provisioningCr * (0.12 + ((index % 4) * 0.018) + (Math.cos(index / 5.1) * 0.01)), 2);
     const activityStatusTotal = Math.max(24, Math.round(invoiceCount * (0.7 + ((index % 4) * 0.04))));
+    const issueStatusDistribution = makeStatusDistribution(issueDispositionMap, index, issuesRaised, 7);
+    const issueSubStatus = Object.values(issueStatusDistribution.subStatus).reduce((allStatuses, statuses) => (
+      Object.entries(statuses).reduce((next, [status, count]) => ({ ...next, [status]: (next[status] || 0) + count }), allStatuses)
+    ), {});
+    const averageSubmissionDays = round(2.4 + ((index % 5) * 0.34) + (Math.sin(index / 4.8) * 0.22), 1);
+    const documentUploads = {
+      invoice: submittedCount,
+      contract: 16 + ((index * 3) % 14),
+      agreement: 12 + ((index * 5) % 11),
+      bgPbg: 7 + ((index * 2) % 8),
+      report: 20 + ((index * 4) % 16),
+      other: 11 + ((index * 7) % 10)
+    };
+    const creditNoteAddedCr = round(cnAdvAddedCr * (0.54 + ((index % 3) * 0.035)), 2);
+    const advanceAddedCr = round(Math.max(0, cnAdvAddedCr - creditNoteAddedCr), 2);
+    const issueTatDays = 5;
+    const ptpBrokenCr = round(Math.max(0, ptpAmountCr - ptpCollectedCr), 2);
+    const commitmentBrokenCr = round(planCr * (0.11 + ((index % 5) * 0.018)), 2);
 
     return {
       trendIndex: index,
@@ -495,7 +580,12 @@
       quarter: `Q${Math.floor((((Number(key.slice(5, 7)) + 8) % 12) / 3)) + 1}`,
       financialYear: fiscalYearLabel(key),
       dataSource: isGeneratedExtension ? "generated_extension" : "available_seed",
-      collectionBreakdown: makeCollectionBreakdown(index, collectedCr, newBillingCr, ptpAmountCr, planCr, currentOutstandingCr, monthlyVisits, submissionChannels, agingBuckets, { addedCr: cnAdvAddedCr, utilisedCr: cnAdvUtilisedCr }, { provisioningCr, writtenOffCr }),
+      collectionBreakdown: makeCollectionBreakdown(index, collectedCr, newBillingCr, ptpAmountCr, planCr, currentOutstandingCr, monthlyVisits, submissionChannels, agingBuckets, { addedCr: cnAdvAddedCr, utilisedCr: cnAdvUtilisedCr, creditNoteAddedCr, advanceAddedCr }, { provisioningCr, writtenOffCr }, {
+        documentUploads,
+        submissionCycle: { submittedCount, totalDays: submittedCount * averageSubmissionDays, delayedCount: Math.round(submittedCount * (0.14 + ((index % 4) * 0.025))) },
+        issue: { resolvedCount: resolvedIssues, totalResolutionDays: resolvedIssues * (4.6 + ((index % 6) * 0.35)), totalTatDays: resolvedIssues * issueTatDays, overdueAtClose: escalatedIssues, subStatus: issueSubStatus },
+        breakage: { ptpBrokenCr, commitmentBrokenCr, ptpBrokenCount: ptpBroken, commitmentBrokenCount: Math.max(2, Math.round(totalPtp * (0.09 + ((index % 4) * 0.018)))) }
+      }),
       collections: {
         collectedCr,
         targetCr,
@@ -521,6 +611,7 @@
         resolved: resolvedIssues,
         escalated: escalatedIssues,
         avgResolutionDays: round(4.6 + ((index % 6) * 0.35), 1),
+        tatDays: issueTatDays,
         resolutionPct: issuesRaised > 0 ? round((resolvedIssues / issuesRaised) * 100, 1) : 0,
         topCategory: ["Further docs required", "Further action required", "Material delivery issue", "Service related issue"][index % 4]
       },
@@ -535,7 +626,9 @@
       },
       cnAdv: {
         addedCr: cnAdvAddedCr,
-        utilisedCr: cnAdvUtilisedCr
+        utilisedCr: cnAdvUtilisedCr,
+        creditNoteAddedCr,
+        advanceAddedCr
       },
       financialRisk: {
         provisioningCr,
@@ -737,7 +830,9 @@
     },
     cnAdv: {
       addedCr: round((record.cnAdv?.addedCr || 0) * share, 2),
-      utilisedCr: round((record.cnAdv?.utilisedCr || 0) * share, 2)
+      utilisedCr: round((record.cnAdv?.utilisedCr || 0) * share, 2),
+      creditNoteAddedCr: round((record.cnAdv?.creditNoteAddedCr || 0) * share, 2),
+      advanceAddedCr: round((record.cnAdv?.advanceAddedCr || 0) * share, 2)
     },
     financialRisk: {
       provisioningCr: round((record.financialRisk?.provisioningCr || 0) * share, 2),
@@ -770,10 +865,35 @@
         acc[bucket] = round((row.agingBuckets?.[bucket] || 0) * share, 4);
         return acc;
       }, {}),
-      cnAdv: ["addedCr", "utilisedCr"].reduce((acc, key) => {
+      cnAdv: ["addedCr", "utilisedCr", "creditNoteAddedCr", "advanceAddedCr"].reduce((acc, key) => {
         acc[key] = round((row.cnAdv?.[key] || 0) * share, 4);
         return acc;
       }, {}),
+      documentUploads: Object.keys(documentTypeLabels).reduce((acc, type) => {
+        acc[type] = Math.max(0, Math.round((row.documentUploads?.[type] || 0) * share));
+        return acc;
+      }, {}),
+      submissionCycle: {
+        submittedCount: Math.max(0, Math.round((row.submissionCycle?.submittedCount || 0) * share)),
+        totalDays: round((row.submissionCycle?.totalDays || 0) * share, 4),
+        delayedCount: Math.max(0, Math.round((row.submissionCycle?.delayedCount || 0) * share))
+      },
+      issueAnalytics: {
+        resolvedCount: Math.max(0, Math.round((row.issueAnalytics?.resolvedCount || 0) * share)),
+        totalResolutionDays: round((row.issueAnalytics?.totalResolutionDays || 0) * share, 4),
+        totalTatDays: round((row.issueAnalytics?.totalTatDays || 0) * share, 4),
+        overdueAtClose: Math.max(0, Math.round((row.issueAnalytics?.overdueAtClose || 0) * share)),
+        subStatus: Object.entries(row.issueAnalytics?.subStatus || {}).reduce((acc, [status, count]) => {
+          acc[status] = Math.max(0, Math.round(Number(count || 0) * share));
+          return acc;
+        }, {})
+      },
+      breakage: {
+        ptpBrokenCr: round((row.breakage?.ptpBrokenCr || 0) * share, 4),
+        commitmentBrokenCr: round((row.breakage?.commitmentBrokenCr || 0) * share, 4),
+        ptpBrokenCount: Math.max(0, Math.round((row.breakage?.ptpBrokenCount || 0) * share)),
+        commitmentBrokenCount: Math.max(0, Math.round((row.breakage?.commitmentBrokenCount || 0) * share))
+      },
       provisioningCr: round((row.provisioningCr || 0) * share, 4),
       writtenOffCr: round((row.writtenOffCr || 0) * share, 4)
     }))
@@ -1681,8 +1801,8 @@
     return {
       label: point.label,
       rowCount: rows.length,
-      addedCr: round(rows.reduce((sum, row) => sum + Number(row.cnAdv?.addedCr || 0), 0), 2),
-      utilisedCr: round(rows.reduce((sum, row) => sum + Number(row.cnAdv?.utilisedCr || 0), 0), 2)
+      creditNoteAddedCr: round(rows.reduce((sum, row) => sum + Number(row.cnAdv?.creditNoteAddedCr || 0), 0), 2),
+      advanceAddedCr: round(rows.reduce((sum, row) => sum + Number(row.cnAdv?.advanceAddedCr || 0), 0), 2)
     };
   });
 
@@ -1691,35 +1811,169 @@
     const filteredPoints = getFilteredCnAdvPoints(points, context.filters, context.enabledFilters);
     const comparisonPoints = getTrendComparisonPoints(points, context, cnAdvFilterDefinitions, getFilteredCnAdvPoints);
     const hasData = comparisonPoints.length
-      ? comparisonPoints.some((item) => item.points.some((point) => point.addedCr > 0 || point.utilisedCr > 0))
-      : filteredPoints.some((point) => point.addedCr > 0 || point.utilisedCr > 0);
+      ? comparisonPoints.some((item) => item.points.some((point) => point.creditNoteAddedCr > 0 || point.advanceAddedCr > 0))
+      : filteredPoints.some((point) => point.creditNoteAddedCr > 0 || point.advanceAddedCr > 0);
     if (usesTrendEcharts("trendCnAdvChart")) {
       setTrendEchart("trendCnAdvChart", trendEchartOption({
         labels: getTrendComparisonLabels(filteredPoints, context),
         valueFormatter: (value) => `Rs. ${Number(value || 0).toFixed(2)} Cr`,
         axisName: "Rs. Cr",
-        series: comparisonPoints.length ? comparisonPoints.flatMap(({ label, palette, points: groupPoints }) => [
-          { name: `${label} · CN/ADV added`, type: "line", data: groupPoints.map((point) => point.addedCr), itemStyle: { color: palette.primary }, lineStyle: { color: palette.primary, width: 3, type: "solid" } },
-          { name: `${label} · CN/ADV utilised`, type: "line", data: groupPoints.map((point) => point.utilisedCr), itemStyle: { color: palette.primary }, lineStyle: { color: palette.primary, width: 2.7, type: "dashed" } }
+        bars: true,
+        stacked: true,
+        series: comparisonPoints.length ? comparisonPoints.flatMap(({ label, palette, index, points: groupPoints }) => [
+          { name: `${label} · Credit note`, type: "bar", stack: `cn-adv-${index}`, data: groupPoints.map((point) => point.creditNoteAddedCr), itemStyle: { color: palette.primary }, barMaxWidth: 22 },
+          { name: `${label} · Advance`, type: "bar", stack: `cn-adv-${index}`, data: groupPoints.map((point) => point.advanceAddedCr), itemStyle: { color: palette.secondary }, barMaxWidth: 22 }
         ]) : [
-          { name: "CN / ADV added", type: "line", data: filteredPoints.map((point) => point.addedCr), itemStyle: { color: "#d97706" }, lineStyle: { color: "#d97706", width: 3 } },
-          { name: "CN / ADV utilised", type: "line", data: filteredPoints.map((point) => point.utilisedCr), areaStyle: { color: "rgba(8, 145, 178, 0.16)" }, itemStyle: { color: "#0891b2" }, lineStyle: { color: "#0891b2", width: 3 } }
+          { name: "Credit note added", type: "bar", data: filteredPoints.map((point) => point.creditNoteAddedCr), stack: "cn-adv", itemStyle: { color: "#d97706" }, barMaxWidth: 24 },
+          { name: "Advance added", type: "bar", data: filteredPoints.map((point) => point.advanceAddedCr), stack: "cn-adv", itemStyle: { color: "#0891b2" }, barMaxWidth: 24 }
         ]
       }));
       return { hasData, filteredPoints, comparisonPoints };
     }
     setChart("trendCnAdvChart", {
-      type: "line",
+      type: "bar",
       data: {
         labels: filteredPoints.map((point) => point.label),
         datasets: [
-          { label: "CN / ADV added", data: filteredPoints.map((point) => point.addedCr), borderColor: "#d97706", backgroundColor: "rgba(217, 119, 6, 0.08)", borderWidth: 2.5, pointBackgroundColor: "#d97706", pointBorderColor: "#ffffff", pointBorderWidth: 1.5, pointRadius: 3, pointHoverRadius: 5, tension: 0.3, fill: false },
-          { label: "CN / ADV utilised", data: filteredPoints.map((point) => point.utilisedCr), borderColor: "#0891b2", backgroundColor: "rgba(8, 145, 178, 0.15)", borderWidth: 2.5, pointBackgroundColor: "#0891b2", pointBorderColor: "#ffffff", pointBorderWidth: 1.5, pointRadius: 3, pointHoverRadius: 5, tension: 0.3, fill: true }
+          { label: "Credit note added", data: filteredPoints.map((point) => point.creditNoteAddedCr), backgroundColor: "rgba(217, 119, 6, 0.72)", borderWidth: 0, borderRadius: 4, stack: "cn-adv" },
+          { label: "Advance added", data: filteredPoints.map((point) => point.advanceAddedCr), backgroundColor: "rgba(8, 145, 178, 0.7)", borderWidth: 0, borderRadius: 4, stack: "cn-adv" }
         ]
       },
       options: buildChartOptions({ interaction: { mode: "index", intersect: false }, scales: { y: { ticks: { callback: (value) => `Rs. ${value} Cr` } } } })
     });
     return { hasData, filteredPoints };
+  };
+
+  const analyticsRowMatches = (row, filters, ignoredKey = null, enabledFilters = null) => analyticsFilterDefinitions.every(({ key }) => {
+    if (key === ignoredKey || (enabledFilters && enabledFilters[key] === false)) return true;
+    const selected = filters?.[key];
+    return !(selected instanceof Set) || selected.size === 0 || selected.has(row[key]);
+  });
+
+  const getFilteredDocumentUploadPoints = (points, filters, enabledFilters = null) => points.map((point) => {
+    const rows = (point.collectionBreakdown || []).filter((row) => analyticsRowMatches(row, filters, null, enabledFilters));
+    return {
+      label: point.label,
+      rowCount: rows.length,
+      uploads: Object.keys(documentTypeLabels).reduce((acc, type) => {
+        acc[type] = Math.round(rows.reduce((sum, row) => sum + Number(row.documentUploads?.[type] || 0), 0));
+        return acc;
+      }, {})
+    };
+  });
+
+  const renderDocumentUploadsChart = (points, context = null) => {
+    const filteredPoints = getFilteredDocumentUploadPoints(points, context?.filters, context?.enabledFilters);
+    const comparisonPoints = getTrendComparisonPoints(points, context, analyticsFilterDefinitions, getFilteredDocumentUploadPoints);
+    const hasData = (comparisonPoints.length ? comparisonPoints.flatMap((item) => item.points) : filteredPoints)
+      .some((point) => Object.values(point.uploads).some((value) => value > 0));
+    if (usesTrendEcharts("trendDocumentUploadsChart")) {
+      setTrendEchart("trendDocumentUploadsChart", trendEchartOption({
+        labels: getTrendComparisonLabels(filteredPoints, context),
+        axisName: "Uploads",
+        bars: true,
+        stacked: true,
+        series: comparisonPoints.length ? comparisonPoints.flatMap(({ label, index, palette, points: groupPoints }) => Object.keys(documentTypeLabels).map((type, typeIndex) => ({
+          name: `${label} · ${documentTypeLabels[type]}`,
+          type: "bar",
+          stack: `documents-${index}`,
+          data: groupPoints.map((point) => point.uploads[type]),
+          barMaxWidth: 18,
+          itemStyle: { color: index === 0 ? documentTypeColors[type] : (typeIndex % 2 ? palette.secondary : palette.primary) }
+        }))) : Object.keys(documentTypeLabels).map((type) => ({
+          name: documentTypeLabels[type], type: "bar", stack: "documents", data: filteredPoints.map((point) => point.uploads[type]), barMaxWidth: 22, itemStyle: { color: documentTypeColors[type] }
+        }))
+      }));
+    }
+    return { hasData, filteredPoints, comparisonPoints };
+  };
+
+  const getFilteredSubmissionCyclePoints = (points, filters, enabledFilters = null) => points.map((point) => {
+    const rows = (point.collectionBreakdown || []).filter((row) => analyticsRowMatches(row, filters, null, enabledFilters));
+    const submittedCount = rows.reduce((sum, row) => sum + Number(row.submissionCycle?.submittedCount || 0), 0);
+    const totalDays = rows.reduce((sum, row) => sum + Number(row.submissionCycle?.totalDays || 0), 0);
+    return { label: point.label, rowCount: rows.length, submittedCount, delayedCount: Math.round(rows.reduce((sum, row) => sum + Number(row.submissionCycle?.delayedCount || 0), 0)), averageDays: submittedCount ? round(totalDays / submittedCount, 1) : 0 };
+  });
+
+  const renderSubmissionCycleChart = (points, context = null) => {
+    const filteredPoints = getFilteredSubmissionCyclePoints(points, context?.filters, context?.enabledFilters);
+    const comparisonPoints = getTrendComparisonPoints(points, context, analyticsFilterDefinitions, getFilteredSubmissionCyclePoints);
+    const hasData = (comparisonPoints.length ? comparisonPoints.flatMap((item) => item.points) : filteredPoints).some((point) => point.submittedCount > 0);
+    if (usesTrendEcharts("trendSubmissionCycleChart")) {
+      setTrendEchart("trendSubmissionCycleChart", trendEchartOption({
+        labels: getTrendComparisonLabels(filteredPoints, context),
+        axisName: "Days",
+        valueFormatter: (value) => `${Number(value || 0).toFixed(1)} days`,
+        tooltipFooter: (params) => {
+          const point = (comparisonPoints.length ? comparisonPoints[0]?.points : filteredPoints)[params?.[0]?.dataIndex || 0];
+          return point ? `Submitted: <b>${formatCount(point.submittedCount)}</b> | Over 3 days: <b>${formatCount(point.delayedCount)}</b>` : "";
+        },
+        series: comparisonPoints.length ? comparisonPoints.flatMap(({ label, palette, points: groupPoints }) => [{
+          name: `${label} · Average days`, type: "line", data: groupPoints.map((point) => point.averageDays), itemStyle: { color: palette.primary }, lineStyle: { color: palette.primary, width: 3 }
+        }, { name: `${label} · 3-day SLA`, type: "line", data: groupPoints.map(() => 3), symbol: "none", itemStyle: { color: palette.secondary }, lineStyle: { color: palette.secondary, width: 2, type: "dashed" } }]) : [
+          { name: "Average submission days", type: "line", data: filteredPoints.map((point) => point.averageDays), itemStyle: { color: "#5c258d" }, lineStyle: { color: "#5c258d", width: 3 } },
+          { name: "3-day SLA", type: "line", data: filteredPoints.map(() => 3), symbol: "none", itemStyle: { color: "#f59e0b" }, lineStyle: { color: "#f59e0b", width: 2, type: "dashed" } }
+        ]
+      }));
+    }
+    return { hasData, filteredPoints, comparisonPoints };
+  };
+
+  const getFilteredIssueAnalyticsPoints = (points, filters, enabledFilters = null) => points.map((point) => {
+    const rows = (point.collectionBreakdown || []).filter((row) => analyticsRowMatches(row, filters, null, enabledFilters));
+    const resolvedCount = rows.reduce((sum, row) => sum + Number(row.issueAnalytics?.resolvedCount || 0), 0);
+    const resolutionDays = rows.reduce((sum, row) => sum + Number(row.issueAnalytics?.totalResolutionDays || 0), 0);
+    const tatDays = rows.reduce((sum, row) => sum + Number(row.issueAnalytics?.totalTatDays || 0), 0);
+    return {
+      label: point.label,
+      rowCount: rows.length,
+      resolvedCount,
+      averageResolutionDays: resolvedCount ? round(resolutionDays / resolvedCount, 1) : 0,
+      averageTatDays: resolvedCount ? round(tatDays / resolvedCount, 1) : 0,
+      overdueAtClose: Math.round(rows.reduce((sum, row) => sum + Number(row.issueAnalytics?.overdueAtClose || 0), 0)),
+      subStatus: rows.reduce((acc, row) => Object.entries(row.issueAnalytics?.subStatus || {}).reduce((next, [status, count]) => ({ ...next, [status]: (next[status] || 0) + Number(count || 0) }), acc), {})
+    };
+  });
+
+  const renderIssueAnalyticsChart = (points, context = null) => {
+    const filteredPoints = getFilteredIssueAnalyticsPoints(points, context?.filters, context?.enabledFilters);
+    const comparisonPoints = getTrendComparisonPoints(points, context, analyticsFilterDefinitions, getFilteredIssueAnalyticsPoints);
+    const chartPoints = comparisonPoints.length ? comparisonPoints[0]?.points || [] : filteredPoints;
+    const hasData = (comparisonPoints.length ? comparisonPoints.flatMap((item) => item.points) : filteredPoints).some((point) => point.resolvedCount > 0);
+    if (usesTrendEcharts("trendIssueAnalyticsChart")) {
+      const latestStatuses = Object.entries(chartPoints.at(-1)?.subStatus || {}).sort((left, right) => right[1] - left[1]).slice(0, 5);
+      setTrendEchart("trendIssueAnalyticsChart", {
+        animationDuration: 260,
+        grid: [{ left: 10, right: "50%", top: 30, bottom: 14, containLabel: true }, { left: "69%", right: 10, top: 38, bottom: 12, containLabel: true }],
+        tooltip: { trigger: "axis", axisPointer: { type: "cross" }, backgroundColor: "#2e1065", borderWidth: 0, textStyle: { color: "#fff", fontSize: 11 } },
+        graphic: [{ type: "text", left: 10, top: 6, style: { text: "Resolution time", fill: "#475569", font: "700 11px Arial" } }, { type: "text", left: "68%", top: 6, style: { text: "Latest sub-status", fill: "#475569", font: "700 11px Arial" } }],
+        xAxis: [{ type: "category", data: getTrendComparisonLabels(filteredPoints, context), boundaryGap: false, axisTick: { show: false }, axisLabel: { color: "#64748b", fontSize: 10, hideOverlap: true }, axisLine: { lineStyle: { color: "#cbd5e1" } } }, { type: "value", gridIndex: 1, axisLabel: { color: "#64748b", fontSize: 9 }, splitLine: { show: false } }],
+        yAxis: [{ type: "value", name: "Days", min: 0, axisLabel: { color: "#64748b", fontSize: 10, formatter: (value) => `${value}d` }, splitLine: { lineStyle: { color: "rgba(148, 163, 184, 0.18)" } } }, { type: "category", gridIndex: 1, data: latestStatuses.map(([label]) => label), axisLabel: { color: "#64748b", fontSize: 9, width: 92, overflow: "truncate" }, axisTick: { show: false }, axisLine: { show: false } }],
+        series: [
+          ...(comparisonPoints.length ? comparisonPoints.flatMap(({ label, palette, points: groupPoints }) => [{ name: `${label} · Avg resolution`, type: "line", data: groupPoints.map((point) => point.averageResolutionDays), smooth: 0.28, symbolSize: 7, lineStyle: { color: palette.primary, width: 3 }, itemStyle: { color: palette.primary } }, { name: `${label} · TAT`, type: "line", data: groupPoints.map((point) => point.averageTatDays), smooth: 0.28, symbol: "diamond", symbolSize: 7, lineStyle: { color: palette.secondary, width: 2, type: "dashed" }, itemStyle: { color: palette.secondary } }]) : [{ name: "Avg resolution", type: "line", data: filteredPoints.map((point) => point.averageResolutionDays), smooth: 0.28, symbolSize: 7, lineStyle: { color: "#d94801", width: 3 }, itemStyle: { color: "#d94801" } }, { name: "TAT", type: "line", data: filteredPoints.map((point) => point.averageTatDays), smooth: 0.28, symbol: "diamond", symbolSize: 7, lineStyle: { color: "#7c3aed", width: 2, type: "dashed" }, itemStyle: { color: "#7c3aed" } }]),
+          { name: "Sub-status", type: "bar", xAxisIndex: 1, yAxisIndex: 1, data: latestStatuses.map(([, value]) => value), barMaxWidth: 14, itemStyle: { color: "#0f9f8f", borderRadius: [0, 4, 4, 0] } }
+        ]
+      });
+    }
+    return { hasData, filteredPoints, comparisonPoints };
+  };
+
+  const getFilteredBreakagePoints = (points, filters, enabledFilters = null) => points.map((point) => {
+    const rows = (point.collectionBreakdown || []).filter((row) => analyticsRowMatches(row, filters, null, enabledFilters));
+    return { label: point.label, rowCount: rows.length, ptpBrokenCr: round(rows.reduce((sum, row) => sum + Number(row.breakage?.ptpBrokenCr || 0), 0), 2), commitmentBrokenCr: round(rows.reduce((sum, row) => sum + Number(row.breakage?.commitmentBrokenCr || 0), 0), 2) };
+  });
+
+  const renderBreakageChart = (points, context = null) => {
+    const filteredPoints = getFilteredBreakagePoints(points, context?.filters, context?.enabledFilters);
+    const comparisonPoints = getTrendComparisonPoints(points, context, analyticsFilterDefinitions, getFilteredBreakagePoints);
+    const hasData = (comparisonPoints.length ? comparisonPoints.flatMap((item) => item.points) : filteredPoints).some((point) => point.ptpBrokenCr > 0 || point.commitmentBrokenCr > 0);
+    if (usesTrendEcharts("trendBreakageChart")) {
+      setTrendEchart("trendBreakageChart", trendEchartOption({
+        labels: getTrendComparisonLabels(filteredPoints, context), valueFormatter: (value) => `Rs. ${Number(value || 0).toFixed(2)} Cr`, axisName: "Rs. Cr",
+        series: comparisonPoints.length ? comparisonPoints.flatMap(({ label, palette, points: groupPoints }) => [{ name: `${label} · PTP broken`, type: "line", data: groupPoints.map((point) => point.ptpBrokenCr), itemStyle: { color: palette.primary }, lineStyle: { color: palette.primary, width: 3 } }, { name: `${label} · Commitment broken`, type: "line", data: groupPoints.map((point) => point.commitmentBrokenCr), itemStyle: { color: palette.secondary }, lineStyle: { color: palette.secondary, width: 2, type: "dashed" } }]) : [{ name: "PTP broken", type: "line", data: filteredPoints.map((point) => point.ptpBrokenCr), itemStyle: { color: "#dc2626" }, lineStyle: { color: "#dc2626", width: 3 } }, { name: "Commitment broken", type: "line", data: filteredPoints.map((point) => point.commitmentBrokenCr), itemStyle: { color: "#d97706" }, lineStyle: { color: "#d97706", width: 3 } }]
+      }));
+    }
+    return { hasData, filteredPoints, comparisonPoints };
   };
 
   const financialRiskRowMatches = (row, filters, ignoredKey = null, enabledFilters = null) => financialRiskFilterDefinitions.every(({ key }) => {
@@ -2151,7 +2405,7 @@
     return { hasData, filteredPoints };
   };
 
-  const renderCharts = (points, closingStatus, collectionContext = null, invoiceSubmissionContext = null, agingBucketsContext = null, cnAdvContext = null, provisioningContext = null, writtenOffContext = null) => {
+  const renderCharts = (points, closingStatus, collectionContext = null, invoiceSubmissionContext = null, agingBucketsContext = null, cnAdvContext = null, provisioningContext = null, writtenOffContext = null, documentUploadsContext = null, submissionCycleContext = null, issueAnalyticsContext = null, breakageContext = null) => {
     const labels = points.map((point) => point.label);
     const totals = getPointTotals(points);
     renderInsightCards(points);
@@ -2163,6 +2417,10 @@
     const cnAdvResult = renderCnAdvChart(points, cnAdvContext);
     const provisioningResult = renderProvisioningChart(points, provisioningContext);
     const writtenOffResult = renderWrittenOffChart(points, writtenOffContext);
+    const documentUploadsResult = renderDocumentUploadsChart(points, documentUploadsContext);
+    const submissionCycleResult = renderSubmissionCycleChart(points, submissionCycleContext);
+    const issueAnalyticsResult = renderIssueAnalyticsChart(points, issueAnalyticsContext);
+    const breakageResult = renderBreakageChart(points, breakageContext);
 
     setChart("trendOperationsChart", {
       type: "line",
@@ -2371,7 +2629,7 @@
       })
     });
     renderStatusPies(closingStatus);
-    return { collectionResult, invoiceSubmissionResult, agingBucketsResult, cnAdvResult, provisioningResult, writtenOffResult };
+    return { collectionResult, invoiceSubmissionResult, agingBucketsResult, cnAdvResult, provisioningResult, writtenOffResult, documentUploadsResult, submissionCycleResult, issueAnalyticsResult, breakageResult };
   };
 
   const markTrendsVisible = () => {
@@ -2471,6 +2729,34 @@
     const writtenOffNoData = $("trendWrittenOffNoData");
     const writtenOffNoDataClear = $("trendWrittenOffNoDataClear");
     const writtenOffScopeMeta = $("trendWrittenOffScopeMeta");
+    const documentUploadsFilterTray = $("trendDocumentUploadsFilterTray");
+    const documentUploadsFilterRoot = $("trendDocumentUploadsFilterRoot");
+    const documentUploadsFilterGrid = $("trendDocumentUploadsFilterGrid");
+    const documentUploadsFilterChips = $("trendDocumentUploadsFilterChips");
+    const documentUploadsNoData = $("trendDocumentUploadsNoData");
+    const documentUploadsNoDataClear = $("trendDocumentUploadsNoDataClear");
+    const documentUploadsScopeMeta = $("trendDocumentUploadsScopeMeta");
+    const submissionCycleFilterTray = $("trendSubmissionCycleFilterTray");
+    const submissionCycleFilterRoot = $("trendSubmissionCycleFilterRoot");
+    const submissionCycleFilterGrid = $("trendSubmissionCycleFilterGrid");
+    const submissionCycleFilterChips = $("trendSubmissionCycleFilterChips");
+    const submissionCycleNoData = $("trendSubmissionCycleNoData");
+    const submissionCycleNoDataClear = $("trendSubmissionCycleNoDataClear");
+    const submissionCycleScopeMeta = $("trendSubmissionCycleScopeMeta");
+    const issueAnalyticsFilterTray = $("trendIssueAnalyticsFilterTray");
+    const issueAnalyticsFilterRoot = $("trendIssueAnalyticsFilterRoot");
+    const issueAnalyticsFilterGrid = $("trendIssueAnalyticsFilterGrid");
+    const issueAnalyticsFilterChips = $("trendIssueAnalyticsFilterChips");
+    const issueAnalyticsNoData = $("trendIssueAnalyticsNoData");
+    const issueAnalyticsNoDataClear = $("trendIssueAnalyticsNoDataClear");
+    const issueAnalyticsScopeMeta = $("trendIssueAnalyticsScopeMeta");
+    const breakageFilterTray = $("trendBreakageFilterTray");
+    const breakageFilterRoot = $("trendBreakageFilterRoot");
+    const breakageFilterGrid = $("trendBreakageFilterGrid");
+    const breakageFilterChips = $("trendBreakageFilterChips");
+    const breakageNoData = $("trendBreakageNoData");
+    const breakageNoDataClear = $("trendBreakageNoDataClear");
+    const breakageScopeMeta = $("trendBreakageScopeMeta");
     const rangeButtons = Array.from(document.querySelectorAll("[data-trend-range]"));
     if (!toggleBtn || !trendView || !yearInput || !rangeSelect || !periodSelect) return;
 
@@ -2502,6 +2788,10 @@
     const usesCnAdvWorkspace = Boolean(cnAdvFilterTray && cnAdvFilterRoot && cnAdvFilterGrid && cnAdvFilterChips && cnAdvNoData);
     const usesProvisioningWorkspace = Boolean(provisioningFilterTray && provisioningFilterRoot && provisioningFilterGrid && provisioningFilterChips && provisioningNoData);
     const usesWrittenOffWorkspace = Boolean(writtenOffFilterTray && writtenOffFilterRoot && writtenOffFilterGrid && writtenOffFilterChips && writtenOffNoData);
+    const usesDocumentUploadsWorkspace = Boolean(documentUploadsFilterTray && documentUploadsFilterRoot && documentUploadsFilterGrid && documentUploadsFilterChips && documentUploadsNoData);
+    const usesSubmissionCycleWorkspace = Boolean(submissionCycleFilterTray && submissionCycleFilterRoot && submissionCycleFilterGrid && submissionCycleFilterChips && submissionCycleNoData);
+    const usesIssueAnalyticsWorkspace = Boolean(issueAnalyticsFilterTray && issueAnalyticsFilterRoot && issueAnalyticsFilterGrid && issueAnalyticsFilterChips && issueAnalyticsNoData);
+    const usesBreakageWorkspace = Boolean(breakageFilterTray && breakageFilterRoot && breakageFilterGrid && breakageFilterChips && breakageNoData);
     const collectionAllRows = trendHistoryData.monthKeys.flatMap((key) => trendHistoryData.months[key]?.collectionBreakdown || []);
     const collectionCatalogs = Object.fromEntries(collectionFilterDefinitions.map(({ key }) => [
       key,
@@ -2534,6 +2824,11 @@
         .sort((left, right) => String(left).localeCompare(String(right)))
     ]));
     const financialRiskCatalogs = Object.fromEntries(financialRiskFilterDefinitions.map(({ key }) => [
+      key,
+      [...new Set(collectionAllRows.map((row) => row[key]).filter(Boolean))]
+        .sort((left, right) => String(left).localeCompare(String(right)))
+    ]));
+    const analyticsCatalogs = Object.fromEntries(analyticsFilterDefinitions.map(({ key }) => [
       key,
       [...new Set(collectionAllRows.map((row) => row[key]).filter(Boolean))]
         .sort((left, right) => String(left).localeCompare(String(right)))
@@ -2577,6 +2872,18 @@
       writtenOffFilters: Object.fromEntries(financialRiskFilterDefinitions.map(({ key }) => [key, new Set()])),
       writtenOffFilterEnabled: Object.fromEntries(financialRiskFilterDefinitions.map(({ key }) => [key, true])),
       writtenOffComparison: { enabled: false, groups: [{ filters: {} }, { filters: {} }] },
+      documentUploadsFilters: Object.fromEntries(analyticsFilterDefinitions.map(({ key }) => [key, new Set()])),
+      documentUploadsFilterEnabled: Object.fromEntries(analyticsFilterDefinitions.map(({ key }) => [key, true])),
+      documentUploadsComparison: { enabled: false, groups: [{ filters: {} }, { filters: {} }] },
+      submissionCycleFilters: Object.fromEntries(analyticsFilterDefinitions.map(({ key }) => [key, new Set()])),
+      submissionCycleFilterEnabled: Object.fromEntries(analyticsFilterDefinitions.map(({ key }) => [key, true])),
+      submissionCycleComparison: { enabled: false, groups: [{ filters: {} }, { filters: {} }] },
+      issueAnalyticsFilters: Object.fromEntries(analyticsFilterDefinitions.map(({ key }) => [key, new Set()])),
+      issueAnalyticsFilterEnabled: Object.fromEntries(analyticsFilterDefinitions.map(({ key }) => [key, true])),
+      issueAnalyticsComparison: { enabled: false, groups: [{ filters: {} }, { filters: {} }] },
+      breakageFilters: Object.fromEntries(analyticsFilterDefinitions.map(({ key }) => [key, new Set()])),
+      breakageFilterEnabled: Object.fromEntries(analyticsFilterDefinitions.map(({ key }) => [key, true])),
+      breakageComparison: { enabled: false, groups: [{ filters: {} }, { filters: {} }] },
       currentTrendPoints: [],
       range: "yearly",
       isTrendsVisible: false,
@@ -2607,8 +2914,7 @@
     const invoiceSubmissionFilterSearches = {};
     const agingBucketsFilterSearches = {};
     const cnAdvFilterSearches = {};
-    const provisioningFilterSearches = {};
-    const writtenOffFilterSearches = {};
+    const metricFilterSearches = { provisioning: {}, writtenOff: {}, documentUploads: {}, submissionCycle: {}, issueAnalytics: {}, breakage: {} };
 
     yearInput.min = String(minYear);
     yearInput.max = String(maxYear);
@@ -3475,28 +3781,32 @@
       noDataClear,
       scopeMeta,
       isAvailable,
-      renderMetric
+      renderMetric,
+      definitions = financialRiskFilterDefinitions,
+      catalogs = financialRiskCatalogs,
+      rowMatches = financialRiskRowMatches,
+      chartId
     }) => {
       const filtersKey = `${id}Filters`;
       const enabledKey = `${id}FilterEnabled`;
-      const searches = id === "provisioning" ? provisioningFilterSearches : writtenOffFilterSearches;
-      const attrPrefix = id === "provisioning" ? "provisioning" : "written-off";
+      const searches = metricFilterSearches[id] || (metricFilterSearches[id] = {});
+      const attrPrefix = id.replace(/([A-Z])/g, "-$1").toLowerCase();
       if (!(tray && root && grid && chips && noData) || !isAvailable) return null;
       const getRows = () => state.currentTrendPoints.flatMap((point) => point.collectionBreakdown || []);
       const isInactive = (key) => !(state[filtersKey][key] instanceof Set) || !state[filtersKey][key].size;
       const getAvailable = (key) => new Set(getRows()
-        .filter((row) => financialRiskRowMatches(row, state[filtersKey], key, state[enabledKey]))
+        .filter((row) => rowMatches(row, state[filtersKey], key, state[enabledKey]))
         .map((row) => row[key]).filter(Boolean));
       const getSummary = (key) => {
         const selected = state[filtersKey][key] || new Set();
         if (!selected.size) return "Nothing selected";
-        if (selected.size === (financialRiskCatalogs[key] || []).length) return "All selected";
+        if (selected.size === (catalogs[key] || []).length) return "All selected";
         return selected.size === 1 ? [...selected][0] : `${selected.size} selected`;
       };
       const getDisplay = (key) => {
         const selected = [...(state[filtersKey][key] || new Set())];
         if (!selected.length) return "Nothing selected";
-        if (selected.length === (financialRiskCatalogs[key] || []).length) return "All selected";
+        if (selected.length === (catalogs[key] || []).length) return "All selected";
         return selected.length <= 2 ? selected.join(", ") : `${selected.slice(0, 2).join(", ")} +${selected.length - 2}`;
       };
       const getContext = () => ({
@@ -3510,7 +3820,7 @@
         if (!except) root.open = false;
       };
       const syncChips = () => {
-        const activeDefinitions = financialRiskFilterDefinitions.filter(({ key }) => !isInactive(key));
+        const activeDefinitions = definitions.filter(({ key }) => !isInactive(key));
         chips.hidden = !activeDefinitions.length;
         chips.innerHTML = activeDefinitions.map(({ key, label: filterLabel }) => `<div class="trendCollectionAppliedFilter${state[enabledKey][key] ? "" : " is-disabled"}">
           <button type="button" class="trendCollectionFilterVisibility" data-${attrPrefix}-filter-toggle="${escapeHtml(key)}" aria-pressed="${state[enabledKey][key] ? "true" : "false"}" aria-label="${state[enabledKey][key] ? "Disable" : "Enable"} ${escapeHtml(filterLabel)} filter" title="${state[enabledKey][key] ? "Disable" : "Enable"} ${escapeHtml(filterLabel)} filter"><i class="bi ${state[enabledKey][key] ? "bi-eye" : "bi-eye-slash"}" aria-hidden="true"></i></button>
@@ -3520,8 +3830,8 @@
       };
       const syncGrid = (openKey = null) => {
         const rootWasOpen = root.open;
-        grid.innerHTML = financialRiskFilterDefinitions.map(({ key, label: filterLabel }) => {
-          const catalog = financialRiskCatalogs[key] || [];
+        grid.innerHTML = definitions.map(({ key, label: filterLabel }) => {
+          const catalog = catalogs[key] || [];
           const selected = state[filtersKey][key] || new Set();
           const available = getAvailable(key);
           const searchValue = String(searches[key] || "");
@@ -3538,14 +3848,14 @@
       const syncResult = (result) => {
         const hasData = Boolean(result?.hasData);
         noData.hidden = hasData;
-        const canvas = $(`trend${id === "provisioning" ? "Provisioning" : "WrittenOff"}Chart`);
+        const canvas = $(chartId);
         if (canvas) { canvas.style.opacity = hasData ? "1" : "0.12"; canvas.style.pointerEvents = hasData ? "auto" : "none"; }
-        const configured = financialRiskFilterDefinitions.filter(({ key }) => !isInactive(key));
+        const configured = definitions.filter(({ key }) => !isInactive(key));
         const activeCount = configured.filter(({ key }) => state[enabledKey][key]).length;
         const pausedCount = configured.length - activeCount;
         if (!scopeMeta) return;
         if (!activeCount && !pausedCount) { scopeMeta.textContent = defaultMeta; return; }
-        const customers = new Set(getRows().filter((row) => financialRiskRowMatches(row, state[filtersKey], null, state[enabledKey])).map((row) => row.customerName)).size;
+        const customers = new Set(getRows().filter((row) => rowMatches(row, state[filtersKey], null, state[enabledKey])).map((row) => row.customerName)).size;
         scopeMeta.textContent = `${activeCount} filter${activeCount === 1 ? "" : "s"} applied${pausedCount ? ` | ${pausedCount} paused` : ""} | ${customers} customer${customers === 1 ? "" : "s"}`;
       };
       const sync = (openKey = null, rerenderChart = true) => {
@@ -3555,7 +3865,7 @@
         if (rerenderChart) syncResult(renderMetric(state.currentTrendPoints, getContext()));
       };
       const reset = (key = "all") => {
-        financialRiskFilterDefinitions.forEach((definition) => {
+        definitions.forEach((definition) => {
           if (key !== "all" && definition.key !== key) return;
           state[filtersKey][definition.key] = new Set();
           state[enabledKey][definition.key] = true;
@@ -3569,8 +3879,8 @@
         event.preventDefault();
         event.stopPropagation();
         const key = button.closest(`[data-${attrPrefix}-filter-key]`)?.dataset[`${id}FilterKey`];
-        if (!key || !financialRiskCatalogs[key]) return;
-        state[filtersKey][key] = button.dataset[`${id}FilterAction`] === "clear" ? new Set() : new Set(financialRiskCatalogs[key]);
+        if (!key || !catalogs[key]) return;
+        state[filtersKey][key] = button.dataset[`${id}FilterAction`] === "clear" ? new Set() : new Set(catalogs[key]);
         sync(key);
       });
       grid.addEventListener("change", (event) => {
@@ -3615,12 +3925,32 @@
     const provisioningWorkspace = createFinancialRiskWorkspace({
       id: "provisioning", label: "Provisioning", defaultMeta: "Provision value movement across the selected period", metricKey: "provisioningCr",
       tray: provisioningFilterTray, root: provisioningFilterRoot, grid: provisioningFilterGrid, chips: provisioningFilterChips, noData: provisioningNoData, noDataClear: provisioningNoDataClear, scopeMeta: provisioningScopeMeta,
-      isAvailable: usesProvisioningWorkspace, renderMetric: renderProvisioningChart
+      isAvailable: usesProvisioningWorkspace, renderMetric: renderProvisioningChart, chartId: "trendProvisioningChart"
     });
     const writtenOffWorkspace = createFinancialRiskWorkspace({
       id: "writtenOff", label: "Written Off", defaultMeta: "Written-off value movement across the selected period", metricKey: "writtenOffCr",
       tray: writtenOffFilterTray, root: writtenOffFilterRoot, grid: writtenOffFilterGrid, chips: writtenOffFilterChips, noData: writtenOffNoData, noDataClear: writtenOffNoDataClear, scopeMeta: writtenOffScopeMeta,
-      isAvailable: usesWrittenOffWorkspace, renderMetric: renderWrittenOffChart
+      isAvailable: usesWrittenOffWorkspace, renderMetric: renderWrittenOffChart, chartId: "trendWrittenOffChart"
+    });
+    const documentUploadsWorkspace = createFinancialRiskWorkspace({
+      id: "documentUploads", label: "Document uploads", defaultMeta: "Hard-copy document uploads across the selected period",
+      tray: documentUploadsFilterTray, root: documentUploadsFilterRoot, grid: documentUploadsFilterGrid, chips: documentUploadsFilterChips, noData: documentUploadsNoData, noDataClear: documentUploadsNoDataClear, scopeMeta: documentUploadsScopeMeta,
+      isAvailable: usesDocumentUploadsWorkspace, renderMetric: renderDocumentUploadsChart, definitions: analyticsFilterDefinitions, catalogs: analyticsCatalogs, rowMatches: analyticsRowMatches, chartId: "trendDocumentUploadsChart"
+    });
+    const submissionCycleWorkspace = createFinancialRiskWorkspace({
+      id: "submissionCycle", label: "Submission cycle", defaultMeta: "Average days from document readiness to submission",
+      tray: submissionCycleFilterTray, root: submissionCycleFilterRoot, grid: submissionCycleFilterGrid, chips: submissionCycleFilterChips, noData: submissionCycleNoData, noDataClear: submissionCycleNoDataClear, scopeMeta: submissionCycleScopeMeta,
+      isAvailable: usesSubmissionCycleWorkspace, renderMetric: renderSubmissionCycleChart, definitions: analyticsFilterDefinitions, catalogs: analyticsCatalogs, rowMatches: analyticsRowMatches, chartId: "trendSubmissionCycleChart"
+    });
+    const issueAnalyticsWorkspace = createFinancialRiskWorkspace({
+      id: "issueAnalytics", label: "Issue analytics", defaultMeta: "Resolution time, TAT, and the latest closing sub-status mix",
+      tray: issueAnalyticsFilterTray, root: issueAnalyticsFilterRoot, grid: issueAnalyticsFilterGrid, chips: issueAnalyticsFilterChips, noData: issueAnalyticsNoData, noDataClear: issueAnalyticsNoDataClear, scopeMeta: issueAnalyticsScopeMeta,
+      isAvailable: usesIssueAnalyticsWorkspace, renderMetric: renderIssueAnalyticsChart, definitions: analyticsFilterDefinitions, catalogs: analyticsCatalogs, rowMatches: analyticsRowMatches, chartId: "trendIssueAnalyticsChart"
+    });
+    const breakageWorkspace = createFinancialRiskWorkspace({
+      id: "breakage", label: "PTP and commitment breakage", defaultMeta: "Broken PTP and non-PTP commitment value across the selected period",
+      tray: breakageFilterTray, root: breakageFilterRoot, grid: breakageFilterGrid, chips: breakageFilterChips, noData: breakageNoData, noDataClear: breakageNoDataClear, scopeMeta: breakageScopeMeta,
+      isAvailable: usesBreakageWorkspace, renderMetric: renderBreakageChart, definitions: analyticsFilterDefinitions, catalogs: analyticsCatalogs, rowMatches: analyticsRowMatches, chartId: "trendBreakageChart"
     });
 
     const createComparisonWorkspace = ({ id, definitions, catalogs, filtersKey, enabledKey, tray, chips, getRows, rowMatches, rerender, seriesKey = [] }) => {
@@ -3844,6 +4174,22 @@
       id: "writtenOff", definitions: financialRiskFilterDefinitions, catalogs: financialRiskCatalogs, filtersKey: "writtenOffFilters", enabledKey: "writtenOffFilterEnabled",
       tray: writtenOffFilterTray, chips: writtenOffFilterChips, getRows: () => state.currentTrendPoints.flatMap((point) => point.collectionBreakdown || []), rowMatches: financialRiskRowMatches, rerender: () => writtenOffWorkspace?.sync()
     });
+    comparisonWorkspaces.documentUploads = createComparisonWorkspace({
+      id: "documentUploads", definitions: analyticsFilterDefinitions, catalogs: analyticsCatalogs, filtersKey: "documentUploadsFilters", enabledKey: "documentUploadsFilterEnabled",
+      tray: documentUploadsFilterTray, chips: documentUploadsFilterChips, getRows: () => state.currentTrendPoints.flatMap((point) => point.collectionBreakdown || []), rowMatches: analyticsRowMatches, rerender: () => documentUploadsWorkspace?.sync()
+    });
+    comparisonWorkspaces.submissionCycle = createComparisonWorkspace({
+      id: "submissionCycle", definitions: analyticsFilterDefinitions, catalogs: analyticsCatalogs, filtersKey: "submissionCycleFilters", enabledKey: "submissionCycleFilterEnabled",
+      tray: submissionCycleFilterTray, chips: submissionCycleFilterChips, getRows: () => state.currentTrendPoints.flatMap((point) => point.collectionBreakdown || []), rowMatches: analyticsRowMatches, rerender: () => submissionCycleWorkspace?.sync()
+    });
+    comparisonWorkspaces.issueAnalytics = createComparisonWorkspace({
+      id: "issueAnalytics", definitions: analyticsFilterDefinitions, catalogs: analyticsCatalogs, filtersKey: "issueAnalyticsFilters", enabledKey: "issueAnalyticsFilterEnabled",
+      tray: issueAnalyticsFilterTray, chips: issueAnalyticsFilterChips, getRows: () => state.currentTrendPoints.flatMap((point) => point.collectionBreakdown || []), rowMatches: analyticsRowMatches, rerender: () => issueAnalyticsWorkspace?.sync()
+    });
+    comparisonWorkspaces.breakage = createComparisonWorkspace({
+      id: "breakage", definitions: analyticsFilterDefinitions, catalogs: analyticsCatalogs, filtersKey: "breakageFilters", enabledKey: "breakageFilterEnabled",
+      tray: breakageFilterTray, chips: breakageFilterChips, getRows: () => state.currentTrendPoints.flatMap((point) => point.collectionBreakdown || []), rowMatches: analyticsRowMatches, rerender: () => breakageWorkspace?.sync()
+    });
 
     const render = () => {
       syncTrendControls();
@@ -3868,6 +4214,10 @@
       if (usesCnAdvWorkspace) syncCnAdvWorkspace(null, false);
       provisioningWorkspace?.sync(null, false);
       writtenOffWorkspace?.sync(null, false);
+      documentUploadsWorkspace?.sync(null, false);
+      submissionCycleWorkspace?.sync(null, false);
+      issueAnalyticsWorkspace?.sync(null, false);
+      breakageWorkspace?.sync(null, false);
       const chartResults = renderCharts(
         periodData.points,
         periodData.closingStatus,
@@ -3876,7 +4226,11 @@
         usesAgingBucketsWorkspace ? getAgingBucketsContext() : null,
         usesCnAdvWorkspace ? getCnAdvContext() : null,
         provisioningWorkspace?.getContext() || null,
-        writtenOffWorkspace?.getContext() || null
+        writtenOffWorkspace?.getContext() || null,
+        documentUploadsWorkspace?.getContext() || null,
+        submissionCycleWorkspace?.getContext() || null,
+        issueAnalyticsWorkspace?.getContext() || null,
+        breakageWorkspace?.getContext() || null
       );
       syncCollectionResultState(chartResults.collectionResult);
       if (usesInvoiceSubmissionWorkspace) syncInvoiceSubmissionResultState(chartResults.invoiceSubmissionResult);
@@ -3884,6 +4238,10 @@
       if (usesCnAdvWorkspace) syncCnAdvResultState(chartResults.cnAdvResult);
       provisioningWorkspace?.syncResult(chartResults.provisioningResult);
       writtenOffWorkspace?.syncResult(chartResults.writtenOffResult);
+      documentUploadsWorkspace?.syncResult(chartResults.documentUploadsResult);
+      submissionCycleWorkspace?.syncResult(chartResults.submissionCycleResult);
+      issueAnalyticsWorkspace?.syncResult(chartResults.issueAnalyticsResult);
+      breakageWorkspace?.syncResult(chartResults.breakageResult);
       if (usesPlanPortfolioWorkspace) syncPlanPortfolioResultState(renderPlanPortfolioChart(periodData.points, getPlanPortfolioContext()));
       if (usesVisitsWorkspace) syncVisitsResultState(renderVisitsChart(periodData.points, getVisitsContext()));
 
@@ -4379,6 +4737,10 @@
       if (!cnAdvFilterRoot?.contains(event.target)) closeCnAdvFilterMenus();
       if (!provisioningWorkspace?.root.contains(event.target)) provisioningWorkspace?.closeMenus();
       if (!writtenOffWorkspace?.root.contains(event.target)) writtenOffWorkspace?.closeMenus();
+      if (!documentUploadsWorkspace?.root.contains(event.target)) documentUploadsWorkspace?.closeMenus();
+      if (!submissionCycleWorkspace?.root.contains(event.target)) submissionCycleWorkspace?.closeMenus();
+      if (!issueAnalyticsWorkspace?.root.contains(event.target)) issueAnalyticsWorkspace?.closeMenus();
+      if (!breakageWorkspace?.root.contains(event.target)) breakageWorkspace?.closeMenus();
       if (!visitsCustomerPicker?.contains(event.target) && visitsCustomerPicker) visitsCustomerPicker.open = false;
     });
     document.addEventListener("keydown", (event) => {
@@ -4391,6 +4753,10 @@
         closeCnAdvFilterMenus();
         provisioningWorkspace?.closeMenus();
         writtenOffWorkspace?.closeMenus();
+        documentUploadsWorkspace?.closeMenus();
+        submissionCycleWorkspace?.closeMenus();
+        issueAnalyticsWorkspace?.closeMenus();
+        breakageWorkspace?.closeMenus();
         if (visitsCustomerPicker) visitsCustomerPicker.open = false;
       }
     });
