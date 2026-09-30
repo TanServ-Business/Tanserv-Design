@@ -357,6 +357,17 @@
   color: #896b14;
 }
 
+.opAvailablePreset {
+  display: inline-flex;
+  padding: 5px 11px;
+  border: 1px solid #b9def0;
+  border-radius: 999px;
+  background: #e7f4fb;
+  color: #31536b;
+  font-size: 10px;
+  font-weight: 800;
+}
+
 .opIntro {
   margin: 0 0 26px;
   color: #4b5563;
@@ -1018,4 +1029,384 @@
   .opUserModal footer {
     flex-wrap: wrap;
   }
+}
+
+/* Operational parity overrides. These selectors deliberately outrank the broad
+   legacy header rules that previously painted section headers purple. */
+.opPage {
+  padding: 48px 48px 64px;
+}
+
+.opInvoiceWorkspace .opWorkspaceBody {
+  padding: 24px;
+}
+
+.opAgingTable thead th,
+.opDispositionTable thead th,
+.opDocumentTable thead th,
+.opNotificationTable thead th,
+.opBulkTable thead th,
+.opPresetTable thead th,
+.opExistingContactModal thead th {
+  background: #55257f !important;
+  color: #fff !important;
+}
+
+.opAgingTable tbody td {
+  height: 49px !important;
+  padding-block: 12px !important;
+}
+
+.opAgingTable input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+}
+
+.opBucketCards:has(.opBucketEmpty) {
+  display: block;
+  max-width: none;
+}
+
+.opBucketEmpty {
+  min-height: 184px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 18px;
+  border: 1px solid #d9dde5;
+  border-radius: 9px;
+  color: #42464d;
+  font-size: 16px;
+}
+
+.opBucketEmpty i {
+  color: #a0a3a8;
+  font-size: 34px;
+}
+
+.opBucketCards article > header {
+  background: var(--op-group-color, #118dff) !important;
+}
+
+.opBucketModal {
+  width: min(800px, calc(100vw - 96px)) !important;
+  border-radius: 16px !important;
+}
+
+.opBucketModal > header,
+.opDocumentModal > header,
+.opUserModal > header,
+.opExistingContactModal > header,
+.opPresetModal > header {
+  background: #f4eafa !important;
+  color: #55257f !important;
+}
+
+.opBucketForm {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.opBucketForm > label {
+  display: grid;
+  gap: 9px;
+}
+
+.opBucketForm > label > span,
+.opBucketForm legend {
+  color: #657184;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .03em;
+}
+
+.opBucketForm input[type="text"] {
+  min-height: 41px;
+  padding: 9px 11px;
+  border: 1px solid #dfe3ea;
+  border-radius: 10px;
+  font: inherit;
+  font-size: 13px;
+}
+
+.opBucketForm input[type="color"] {
+  width: 100%;
+  height: 41px;
+  padding: 7px 10px;
+  border: 1px solid #dfe3ea;
+  border-radius: 8px;
+  background: #f4f4f5;
+}
+
+.opBucketForm fieldset {
+  grid-column: 1 / -1;
+  min-width: 0;
+  margin: 4px 0 0;
+  padding: 14px 16px 16px;
+  border: 1px solid #dfe3ea;
+  border-radius: 9px;
+  background: #fafbfc;
+}
+
+.opBucketForm legend {
+  padding: 0 0 10px;
+}
+
+.opBucketPicker {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.opBucketPicker button {
+  min-height: 38px;
+  padding: 8px 12px;
+  border: 1px solid #dce1e8;
+  border-radius: 10px;
+  background: #fff;
+  color: #1f2937;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.opBucketPicker button.is-selected {
+  border-color: #55257f;
+  background: #eee4f7;
+  color: #55257f;
+  box-shadow: inset 0 0 0 1px #55257f;
+  font-weight: 800;
+}
+
+.opBucketPicker button:disabled {
+  background: #f3f4f6;
+  color: #a3a9b3;
+  cursor: not-allowed;
+}
+
+.opBucketModal > footer .adminPrimary:disabled {
+  opacity: .48;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.opDispositionWrap {
+  border-radius: 10px;
+}
+
+.opDispositionTable {
+  min-width: 980px !important;
+  table-layout: fixed;
+}
+
+.opDispositionTable th:nth-child(1) { width: 24%; }
+.opDispositionTable th:nth-child(2) { width: 27%; }
+.opDispositionTable th:nth-child(3) { width: 30%; }
+.opDispositionTable th:nth-child(4) { width: 10%; }
+.opDispositionTable th:nth-child(5) { width: 9%; }
+
+.opDispositionTable td {
+  white-space: normal !important;
+  vertical-align: middle;
+}
+
+.opDispositionTable .opBroadStatus {
+  padding-left: 20px !important;
+  color: #344054;
+  font-weight: 800;
+}
+
+.opDispositionTable .opPrimaryStatus {
+  padding: 16px !important;
+  border-left: 1px solid #eef0f3;
+}
+
+.opPrimaryStatus > span {
+  display: block;
+}
+
+.opAddSub {
+  min-height: 44px;
+  margin-top: 12px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.opInlineSubStatus {
+  max-width: 302px;
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px solid #dce1e8;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 5px 12px rgba(15, 23, 42, .12);
+}
+
+.opInlineSubStatus > input {
+  min-height: 41px;
+  padding: 8px 10px;
+  border: 1px solid #dfe3ea;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 13px;
+}
+
+.opInlineSubStatus label {
+  display: grid;
+  gap: 6px;
+  color: #657184;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.opInlineSubStatus input[type="color"] {
+  width: 48px;
+  height: 28px;
+}
+
+.opInlineSubStatus footer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.opPurgeCard {
+  max-width: 472px;
+  margin: 8px auto 0;
+  padding: 24px;
+  background: #fff;
+}
+
+.opPurgeCard > header {
+  min-height: auto;
+  padding: 0 !important;
+  border: 0 !important;
+  background: #fff !important;
+  color: #55257f !important;
+}
+
+.opPurgeCard > header h2 {
+  color: #55257f !important;
+  font-size: 21px !important;
+}
+
+.opPurgeCard > header .adminSecondary {
+  min-width: 100px;
+}
+
+.opPurgeCard > p {
+  color: #4b5563 !important;
+}
+
+.opPurgeCard select {
+  color: #1f2937 !important;
+}
+
+.opWarning {
+  background: #fff9e9 !important;
+  color: #6a5315 !important;
+}
+
+.opSingleColumn,
+.opUserModal .opFormGrid {
+  grid-template-columns: 1fr;
+}
+
+.opDocumentModal {
+  width: min(714px, 100%) !important;
+}
+
+.opDocumentModal .opModalBody {
+  padding: 22px 20px 32px;
+}
+
+.opHierarchyCanvas {
+  min-width: 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 46px 42px;
+  padding: 44px 24px;
+  background: #fff;
+}
+
+.opOperationalLane {
+  grid-column: 1 / -1;
+}
+
+.opHierarchyLane:nth-child(4) {
+  grid-column: auto;
+}
+
+.opOperationalTree {
+  max-width: 520px;
+  width: 100%;
+}
+
+.opUserModal {
+  width: min(714px, 100%) !important;
+}
+
+.opUserModal .opFormGrid {
+  gap: 22px;
+}
+
+.opUserActions {
+  min-width: max-content;
+}
+
+.opRolePill.opRole-admin {
+  border-color: #efcaca;
+  background: #fdeaea;
+  color: #8f3030;
+}
+
+.opRolePill.opRole-agent {
+  border-color: #ddd1ee;
+  background: #f3edfb;
+  color: #7138b3;
+}
+
+.opExistingContactModal {
+  width: min(714px, calc(100vw - 32px)) !important;
+  position: relative;
+  z-index: 2;
+}
+
+.opExistingContactModal .opModalBody {
+  padding-bottom: 0;
+}
+
+.opExistingContactModal .adminTable {
+  min-width: 700px;
+}
+
+.opExistingContactModal .adminPrimary {
+  min-width: 126px;
+}
+
+.opHasNestedModal {
+  background: rgba(15, 23, 42, .68) !important;
+}
+
+.opHasNestedModal .opModalUnderlay {
+  position: absolute;
+  inset: 36px auto auto 50%;
+  width: min(714px, calc(100vw - 32px));
+  min-height: 600px;
+  transform: translateX(-50%);
+  opacity: .36;
+}
+
+.opNotificationSearch {
+  min-height: 44px;
+  max-width: 450px;
+  margin-bottom: 16px;
+  border-radius: 12px;
+}
+
+.opNotificationTable .opSwitch input:focus-visible + span {
+  outline: 3px solid #aa84e6;
+  outline-offset: 3px;
 }

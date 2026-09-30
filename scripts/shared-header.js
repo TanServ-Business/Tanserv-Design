@@ -614,10 +614,6 @@
             <span>Account Settings</span>
           </button>
           ${emailActionMarkup}
-          <button class="userPopupAction" type="button" id="openTutorialBtn">
-            <i class="bi bi-mortarboard" aria-hidden="true"></i>
-            <span>Tutorials</span>
-          </button>
           <button class="userPopupAction" type="button">
             <i class="bi bi-key" aria-hidden="true"></i>
             <span>Change password</span>
@@ -2791,15 +2787,6 @@
     wireSideNav();
     initNotifications();
 
-    // Load the shared, page-aware tutorial after the common shell is available.
-    // Keeping it separate prevents every module from carrying its own copy.
-    if (!window.IneburaTutorials && !document.getElementById("ineburaTutorialScript")) {
-      const tutorialScript = document.createElement("script");
-      tutorialScript.id = "ineburaTutorialScript";
-    tutorialScript.src = resolvePath("scripts/tutorial-splash.js?v=20260730-annotations-v9");
-      tutorialScript.defer = true;
-      document.body.appendChild(tutorialScript);
-    }
   };
 
   if (document.readyState === "loading") {

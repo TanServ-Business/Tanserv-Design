@@ -1,0 +1,307 @@
+{
+  "routes": [
+    {
+      "label": "Dashboard",
+      "ref": "https://testclient.inebura.ai/admin/dashboard",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=dashboard",
+      "key": "dashboard"
+    },
+    {
+      "label": "Branch Master",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/modules/mstoff/branchmaster",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=branch-master",
+      "key": "branch-master"
+    },
+    {
+      "label": "Holiday Master",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/modules/mstoff/holidaymaster",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=holiday-master",
+      "key": "holiday-master"
+    },
+    {
+      "label": "Bank Master",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/modules/mstoff/bankmaster",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=bank-master",
+      "key": "bank-master"
+    },
+    {
+      "label": "Internal Company Contact",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/modules/mstoff/internalcompanycontact",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=internal-contacts",
+      "key": "internal-contacts"
+    },
+    {
+      "label": "Invoice Preferences",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/invoice-setup",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=invoice-preferences",
+      "key": "invoice-preferences"
+    },
+    {
+      "label": "Document Setup",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/document-setup",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=document-setup",
+      "key": "document-setup"
+    },
+    {
+      "label": "Role and Display Name Setup",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/role-display-name-setup",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=role-display",
+      "key": "role-display"
+    },
+    {
+      "label": "User Setup",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/user-setup",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=user-setup",
+      "key": "user-setup"
+    },
+    {
+      "label": "Notification Manager",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/whatsApp-declaration",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=notification-manager",
+      "key": "notification-manager"
+    },
+    {
+      "label": "Invoice Submission process",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/document-strategy",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=submission-process",
+      "key": "submission-process"
+    },
+    {
+      "label": "Module Configuration",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/module-configuration",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=module-configuration",
+      "key": "module-configuration"
+    },
+    {
+      "label": "Portfolio Transfer",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/modules/ar/portfolioreallocationupload",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=portfolio-transfer",
+      "key": "portfolio-transfer"
+    },
+    {
+      "label": "Bulk Document Upload",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/modules/doc/bulkdocumentupload",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=bulk-document-upload",
+      "key": "bulk-document-upload"
+    },
+    {
+      "label": "GRN Upload",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/modules/ar/grndateupload",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=grn-upload",
+      "key": "grn-upload"
+    },
+    {
+      "label": "CN/Advance Upload",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/modules/ar/cnupload",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=cn-advance-upload",
+      "key": "cn-advance-upload"
+    },
+    {
+      "label": "Payment Receipt Upload",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/modules/ar/paymentrecieptupload",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=payment-receipt-upload",
+      "key": "payment-receipt-upload"
+    },
+    {
+      "label": "Customer Portfolio Transfer",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/modules/ar/customerportfoliotransfer",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=customer-portfolio-transfer",
+      "key": "customer-portfolio-transfer"
+    },
+    {
+      "label": "Group Master",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/modules/customeronboarding/groupmaster",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=group-master",
+      "key": "group-master"
+    },
+    {
+      "label": "Customer Master",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/modules/customeronboarding/customermaster",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=customer-master",
+      "key": "customer-master"
+    },
+    {
+      "label": "Customer Contacts",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/modules/customeronboarding/customercontactupload",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=customer-contacts",
+      "key": "customer-contacts"
+    },
+    {
+      "label": "Template Master",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/modules/emailsetup/commeventtemplate",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=template-master",
+      "key": "template-master"
+    },
+    {
+      "label": "Email Sender SMTP Setup",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/modules/emailsetup/emailsendersetting",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=smtp-setup",
+      "key": "smtp-setup"
+    },
+    {
+      "label": "Email Sender Account Setup",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/modules/emailsetup/emailsenderaccount",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=sender-account",
+      "key": "sender-account"
+    },
+    {
+      "label": "Strategy Manager",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/modules/ar/strategy",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=strategy-manager",
+      "key": "strategy-manager"
+    },
+    {
+      "label": "Invoice Upload",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/modules/invoiceupload",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=invoice-upload",
+      "key": "invoice-upload"
+    },
+    {
+      "label": "Invoice reallocation",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/modules/invoicereallocation",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=invoice-reallocation",
+      "key": "invoice-reallocation"
+    },
+    {
+      "label": "Invoice Deletion",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/modules/invoicedelete",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=invoice-deletion",
+      "key": "invoice-deletion"
+    },
+    {
+      "label": "Change Password - Admin",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/change-password-sidebar",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=change-password",
+      "key": "change-password"
+    },
+    {
+      "label": "Client Master",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/client-master",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=client-master",
+      "key": "client-master"
+    },
+    {
+      "label": "Audit Retention & Purge",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/modules/audit/auditsettings",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=audit-retention",
+      "key": "audit-retention"
+    },
+    {
+      "label": "Audit Trail",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/modules/audit/audittrail",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=audit-trail",
+      "key": "audit-trail"
+    },
+    {
+      "label": "Help & Support",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/modules/help/support",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=help-support",
+      "key": "help-support"
+    }
+  ],
+  "notes": {
+    "01-dashboard": "Close first-viewport hierarchy; live/sample counts intentionally differ. Lower dashboard remains to inspect.",
+    "02-branch-master": "P2: local outer padding 16px vs reference48px; Create Branch vs Create New; table proportions and header styling differ. Single-line local tabs intentional.",
+    "02a-branch-create": "P1: form contract mismatch: local City/State/Country/Region mandatory editable/dropdowns while reference location fields appear derived/read-only; placeholders and title differ. Local dense mixed-case labels vs uppercase spacious reference.",
+    "03-holiday-master": "P2: shared Office Setup padding/header-color/action-label drift; matching four-column table. Sample counts excluded.",
+    "03a-holiday-create": "P2: correct four-field structure and placeholders; local loses rounded dialog corners, differs label weight, background blur, checkbox size and button styling.",
+    "03b-holiday-states": "Close: searchable dropdown shows corresponding state names/codes and scroll; subtle weight/spacing mismatch.",
+    "04-bank-master": "P2: shared Office Setup spacing and Create Bank label differ; local tab underline touches text at this width; source itself clips toolbar/action column. Local search moves below tabs.",
+    "04a-bank-create": "Close field, title and placeholder match; P3 local placeholder bold, gradient Save and backdrop blur differ.",
+    "05-internal-contacts": "P2 shared Office Setup spacing; long Create Internal Company Contact replaces Create New and pushes toolbar to second row; active tab underline overlaps text.",
+    "05a-contact-create": "P2: fields/placeholders largely match but local uses two columns where reference stacks one column at746px, reducing form height by375px; gender/department affordances differ.",
+    "06-invoice-preferences": "P2: matching aging bucket structure but table proportions/header color/outer margins drift. Saved checkbox selection is data-dependent.",
+    "06a-custom-aging": "State mismatch: source empty, local sample cards. Must add empty-state preview; cannot establish populated-card parity from this source state.",
+    "06b-create-bucket": "P1: missing Group Color control, missing consecutive-selection grid and buckets beyond151–180; wrong title, placeholder and Save Group label.",
+    "06c-dispositions": "P1: local hierarchy omits multiple reference primary-status groups (Red Flag, Further Action, Material/Service issues) from DOM; row height/grid styling and Add Sub Status sizing differ.",
+    "06d-substatus": "P1: reference inline editor Display Value, Code, Color replaced by modal Sub Status, Color; Code missing and interaction pattern wrong.",
+    "06e-purge-policy": "P1: local purple panel header renders dark purple title almost invisible; source white background. Control and warning structure otherwise present.",
+    "07-document-setup": "P2: shared layout/table-color drift; source category badges wrap awkwardly at746, local stays one line (do not reproduce source defect without decision).",
+    "07a-document-presets": "P1: local Add Selected looks enabled with zero selection unlike disabled source; missing Select documents to add footer; local Status badges clipped at right. Same columns otherwise.",
+    "07b-document-create": "P2: fields/placeholders match but reference single-column form vs local split first row; dialog dimensions/placement differ.",
+    "08-role-display": "P1 responsive mismatch: reference wraps Support/View roles below Operational hierarchy; local fixed-width chart pushes them off-screen horizontally, large blank lower canvas.",
+    "08a-role-names": "P2: correct three controls and disabled defaults; local two-column layout instead of source stacked fields, shorter panel.",
+    "09-user-setup": "P1: Send Creds row action missing locally (DOM). P2: role filter shows truncated A, uniform badge colors and email ellipsis differ. Source toolbar itself overlaps at746px.",
+    "09a-user-create": "P2: correct step1 fields and note; local two-column form vs reference one column and different modal height.",
+    "09b-user-existing": "P1: existing-contact checkbox fails to open reference second-level picker; local remains on step1 after checking.",
+    "09c-user-bulk": "P2: same upload/history structure; row density, heading color, date format and outer layout differ. Counts excluded.",
+    "10-notification-manager": "P2 visual: same columns/switches but shared padding/color drift. Accessibility: local search accessible name is icon and switches unnamed in DOM; reference switches named WhatsApp: On. Live switches not toggled (may persist).",
+    "11-submission-process": "P1: local Strategy Manager wrongly includes Push/Email settings above list; source is strategy list only. Different strategy states/type terminology and CTA.",
+    "11a-submission-create": "P1: missing searchable full document checklist, agent-selection help and strategy explanation; checkbox replaces switch; five local document options vs reference16; Save instead of Create Strategy.",
+    "11b-push-email": "P1: reference two white sections with KAM/KAS/Manager switches and Submit; local single low-contrast purple header, checkboxes and Save Changes. Sender/default values data-dependent.",
+    "12-module-configuration": "Close: four cards, text, disabled controls and spacing align after intentional single-line tab height difference. Local tabs scroll internally; reference has page overflow. No major first-tab field gap observed.",
+    "12a-config-edit": "Close:500px dialog, four unchecked fields, Cancel/Apply and spacing closely match; local adds background blur. This does not validate other configuration tabs.",
+    "12b-visit": "P1: missing Current Start/End Time cards, dropdown substitutes Yes/No radios; RPC marked mandatory locally unlike reference; missing start-time required marker. Low-contrast purple panel header.",
+    "12c-monthend": "P1/P2: core manual/automatic sections exist; local DOM omits Bucket This Would Close/Last Closed/Would Run At summary and retry explanations; body typography, client badge and spacing drift.",
+    "12d-monthend-auto": "P1/P2: schedule exists but native radios replace month-segment buttons, text input lacks source calendar affordance, low-contrast purple schedule heading. Recipients is textbox locally vs source multiselect combobox. Saved dates/sample defaults excluded. Scroll positions differ.",
+    "12e-client-confirmation": "P1/P2: heading shortened, low-contrast local panel, missing pagination/sort affordances and status badges; sample counts excluded. Reference status pill has severe narrow-width wrapping; do not copy defect.",
+    "12f-cc-upload": "P1: enabled Upload before file selection vs disabled Start Upload; wrong title, file-types text vs10MB hint, misplaced/renamed download button.",
+    "12g-pdc": "P1: checkbox vs switch; missing auto-clear and Ops helper text; premature Save Changes visible while locked; low-contrast panel headings.",
+    "12h-pdc-user": "P1: searchable inline user popover replaced by modal native select and Add User step.",
+    "12i-escalation": "P1/P2: source lavender headers/search integrated with cards; local dark-on-purple headings, search below, no footer guidance, Name instead of Process, different action layout.",
+    "12j-process-create": "P2: four-step flow exists but source bullet introduction replaced by dense inline step text, extra Cancel footer, different modal width.",
+    "12k-process-name": "P2: wrong placeholder (source blank), missing helper text, oversized local wizard shell.",
+    "12l-process-status": "P1: source optional-field explanatory badge missing; local Sub Status initially enabled vs disabled source; select styling/layout differ.",
+    "12m-process-matrix": "P1: missing Create new matrix route from wizard and reuse helper text; wrong placeholder.",
+    "12n-matrix-new": "P2: source640x500 reserved dialog vs local wider/shallow; missing empty-state/helper copy.",
+    "12o-matrix-level": "P1: source numbered Level1 with remove and Approver selector; local Approver Role plus Level Name, lacks remove control/numbered level presentation.",
+    "12p-issue-tracker": "P1/P2: local plain checkbox replaces reference switch/card; helper copy differs, missing existing-setup intro, low-contrast heading. Source page scrolls horizontally when last tab selected, cropping title; local active tab remains offscreen.",
+    "13-portfolio-transfer": "P1: local failed status is green like success, Progress cells blank, Failed download shown on success rows too. P2 shared padding/table/toolbar drift. Source has severe vertical status-pill wrapping.",
+    "13a-portfolio-upload": "P2: same upload content; local wider dialog and full-width stacked footer buttons vs600px reference and inline footer.",
+    "14-bulk-document-upload": "P1/P2: missing yellow guidance panel, native file control vs styled Browse, document options limited locally, missing table pagination/sort; different action placement.",
+    "14a-limbo": "P2: correctly switches to Client/File/Type/Actions table; local lacks pagination and reference icons/styling. Edit detail not yet inspected.",
+    "15-grn-upload": "P1/P2: shared bulk-table parity gaps: blank local progress, failed download displayed on success rows, shared padding/header/toolbar drift. Failed badges green locally; compare source color by module. Source narrow-width status wrapping also defective.",
+    "16-cn-advance-upload": "P1/P2: shared bulk-table parity gaps: blank local progress, failed download displayed on success rows, shared padding/header/toolbar drift. Failed badges green locally; compare source color by module. Source narrow-width status wrapping also defective.",
+    "17-payment-receipt-upload": "P1/P2: shared bulk-table parity gaps: blank local progress, failed download displayed on success rows, shared padding/header/toolbar drift. Failed badges green locally; compare source color by module. Source narrow-width status wrapping also defective.",
+    "18-customer-portfolio-transfer": "P1/P2: blank local progress and unconditional Failed action; shared table/toolbar/padding drift. Both source/local use green failure badge here (source UX inconsistency).",
+    "15a-grn-dialog": "P2: matching upload title and file types, but local wider modal, stacked full-width footer actions and different download button; source600px with inline footer.",
+    "16a-cn-dialog": "P2: matching upload title and file types, but local wider modal, stacked full-width footer actions and different download button; source600px with inline footer.",
+    "17a-payment-dialog": "P2: matching upload title and file types, but local wider modal, stacked full-width footer actions and different download button; source600px with inline footer.",
+    "18a-customer-transfer-dialog": "P2: matching upload title and file types, but local wider modal, stacked full-width footer actions and different download button; source600px with inline footer. Required-column guidance exists but wording/color differ (yellow reference, lavender local);10MB hint moved.",
+    "19-group-master": "P2: Create New is renamed Add New Group; outer margins are 16px vs 48px; local two-column table has an unnecessary horizontal scrollbar and tab underline touches text.",
+    "19a-group-create": "P2: Three fields match, but local dialog is about 710px vs 500px, textarea is shorter, and Save Group is renamed Save.",
+    "20-customer-master": "P1: Actions moved from first to last column, hiding Edit beyond horizontal scroll. P2: copy and margins differ, local customer names lose bold emphasis. Sample records/counts excluded.",
+    "20a-customer-create": "P2: Field inventory and required markers are largely present, but plain Enter placeholders are rewritten; dropdown DOM uses search controls instead of reference carets. Both forms are single-column here; local vertical spacing is denser and modal/header/footer styling differs.",
+    "20b-customer-bulk": "P1: Wrong table schema: local Company/Status replaces Count/File Name, losing uploaded file identification. Local rows with rejected records lack Failed download action. P2: Upload File renamed Bulk Upload; row density differs.",
+    "21-customer-contacts": "P1: Table schema/order differs: reference Name, Email, Phone, Customer, Actions; local Customer, Name, Email, Department, Phone Number, Actions. P2: Added search, changed title copy and Create New label.",
+    "21a-customer-contact-create": "P2: Field and Department option inventory matches closely. Labels switch from uppercase to title case; spacing, search input corners and Save Contact label differ. Full Name is disabled locally; reference DOM does not mark disabled (derivation behavior not tested).",
+    "22-template-master": "P1: Description column replaced by Status, Edit moved offscreen to last column, and local invents Preview/Duplicate/Activate/Delete actions absent in reference. P2: global margins and code emphasis differ.",
+    "22a-template-edit": "Reference-specific failure: first record Edit returned Failed to initiate edit. Local first Edit opened no editor/new tab. Later reference IssueTrackerYourTurn record worked; see 22b.",
+    "23-smtp-setup": "P2: Missing account-role explanations and client heading, and missing masked-value visibility controls; adds pagination to fixed two-account table. Integration guide omission may be intentional under prior tutorial-removal instruction; confirm before restoring.",
+    "23a-smtp-edit": "P1 reference risk: Edit exposes existing credentials as visible text; they were replaced with redaction text in unsaved fields before this distributed capture, then discarded. Do not replicate secret exposure. P2: Local uses simple radios instead of provider logo tiles; shortened title, missing Email Type required marker, different disabled-field fill and spacing.",
+    "24-sender-account": "P1/P2: Local adds Sender Account Type column, pushing Edit beyond horizontal scroll; reference has three columns and fits. Missing role-explanation panel and client badge; unnecessary pagination.",
+    "24a-sender-edit": "P1: Local Update enabled before OTP verification while reference disabled; local shows OTP text field prematurely. P2: Send OTP/Test Email stacked full-width with duplicate labels; reference Test Email is footer action. No emails or OTPs sent.",
+    "25-strategy-manager": "P1/P2: Entire landing composition differs: local boxed header, blue full-width CTA, stacked filters and narrow wrapping name column vs reference purple CTA, inline filters and single-line names. Local Active/Inactive status filter conflicts with displayed Running state; search lacks accessible name.",
+    "25a-strategy-create": "P1/P2: Local missing Reminder Type/Template/Notification Mode required markers and remove-template control on initial block. Running renamed Active; extra Back to list/Cancel actions; reference three-column field rows become large single-column blocks. Native select vs searchable reference dropdown.",
+    "25b-strategy-template": "P1/P2: Same Both/Invoice/ReminderForPaymentDue selection, but local automatically selects Custom while reference requires Notification Mode choice. Local template option set is shorter; aging defaults differ (2 vs 19 selected), needs business confirmation. Both hierarchy and bucket sections exist. Screenshots have different vertical offsets; reference also overflows horizontally.",
+    "26-invoice-upload": "P1/P2: Local table pushes actions beyond horizontal scroll at 1112px while reference fits; progress uses purple bare bars instead of green bar plus 100% — Complete text. Create New loses secondary-button hierarchy. Shared table header color/copy differ; green failure badges exist on reference too.",
+    "26a-invoice-create": "Close: field inventory, required markers, three-column structure and footer match. P2: Invoice Date/Due Date use native dd/mm/yyyy UI vs custom dd-mm-yyyy; disabled ownership fields lack search icons. Modal blur and field spacing differ.",
+    "26b-invoice-bulk": "P1/P2: Local title duplicates Upload; file hint adds CSV to reference xlsx/xls; local Upload enabled without file while reference DOM disables it. Download Template position/style and modal vertical spacing differ.",
+    "27-invoice-reallocation": "P1: Wrong workflow: reference per-row Reallocate; local introduces bulk role/assignee/reason form and filters. Missing Client Code/KAM/KAS columns. P1 visual readability: dark heading on purple. P2: Wrong copy and action taxonomy.",
+    "27a-reallocation-dialog": "P1: Reference Edit Invoice dialog for Agent/Manager/KAM/KAS is absent from local row actions (Select/View Invoice instead). Local inline bulk form is shown as the alternative, not an equivalent modal.",
+    "28-invoice-deletion": "P1: Reference starts with search-only state; local immediately shows invented bulk-deletion reason form, date/branch filters and sample rows. Dark-on-purple heading unreadable. Search-result and confirmation states need separate verification; no deletion attempted.",
+    "29-change-password": "P1/P2: Reference compact centered 505px card becomes full-width nested tab/card with unreadable dark-purple heading; local adds Change Password tab absent in reference, and replaces custom user picker with native select. ",
+    "30-client-master": "P1/P2: Missing logo-edit affordance and renewal-days badge, extra Client Accounts/Text Setup tabs, empty purple heading bar, unreadable Sub Clients heading, smaller logo without dashed frame. Duplicate empty messages. Source counts empty state as 1 record (reference defect, do not copy).",
+    "30a-client-create": "P2: Three fields/placeholders match; local 720px two-column dialog vs 600px single-column, title-case labels instead of uppercase, different footer and button sizes.",
+    "31-audit-retention": "P1/P2: Repeated dark-on-purple low-contrast headers; added tab/nested cards; missing explanatory helper paragraphs and last-purge timestamp/reason; oversized notification days field. Correct main control inventory/default values.",
+    "31a-purge-history": "P1: Missing permanent-deletion warning paragraph above purge controls. P2: Run Purge Now loses red danger styling, history lacks status badge and pagination. No purge or dry-run executed. Lower-panel screenshots taken with End; layout density causes different sections visible.",
+    "32-audit-trail": "P2: Correct filter/table inventory, but added tab, altered grid/button placement, duplicate empty messages and heavier typography. Local entity trigger has generic role, missing dropdown caret/expanded semantics.",
+    "32a-audit-entity-picker": "P1/P2: Local entity menu is clipped by card bottom; loses visible continuation. Search receives focus automatically on reference but not local. Option inventory broadly aligns.",
+    "32b-audit-results": "P2: Local result lacks Created/Updated colored badge and pagination; timestamp format and View changes border differ. Sample values excluded.",
+    "32c-audit-details": "P2: Local flattens revision card, removes action badge and old/new color differentiation, uses much taller table rows and Cancel instead of Close. Generic sample schema (name, no disabled) does not demonstrate entity-specific Bank Details fields. Modal exposed without dialog role in local snapshot.",
+    "33-help-support": "Close content and visual language: hero, search, shortcuts, FAQs and category inventory align. P2: Local lacks 24px outer gutter/top gap; seven category columns instead of reference six at 1112px.",
+    "33a-help-article": "Close: observed article content, permission chips and section order match. P2: local title header lacks lavender fill, close button has browser-default square border, background blur missing and footer button oversized. Other 99 article bodies not individually audited.",
+    "33b-create-ticket": "P2: Local adds Attachment section absent from observed reference form, expands Description placeholder, removes lavender title and blur, uses default square close and oversized footer controls. Category/Priority options align. No ticket submitted.",
+    "33c-my-tickets": "P2: Summary counters lose white cards, colored left borders and bold value hierarchy; New Ticket uses different style. Correct tabs/status filters and empty-state message. No reference tickets available, so conversation detail unverified.",
+    "33d-feedback": "Close: rating, category/module fields, placeholders and section structure align. P2: inherited outer gutter/hero offsets and submit styling differ. Rating buttons are icon-only in reference; accessibility needs explicit 1–5 labels. No feedback sent.",
+    "22b-template-editor": "P1: Reference opens full editor with Event Type, Recipient Role, Comm Mode, schedule, code, description, subject, content/source/preview and Disabled control; local Edit does nothing on sampled row. Different sample record content is not the issue: the editor surface is missing.",
+    "25c-strategy-email-sender": "P1/P2: Reference sender summary banner and selectable account cards replaced with plain text/native radios. Cancel/Save disabled semantics match, but local disabled Save appears strongly active. Missing iconography/badge/helper panel, altered header structure.",
+    "29a-password-fields": "Close field inventory: New/Confirm Password and Cancel/Update appear after selection. P2: Missing footer separator; full-width layout and title/typography mismatch persist. Password values and submission not tested.",
+    "28a-deletion-search": "Reference searched a known observed invoice; local searched its own sample invoice. Compare workflow, not row values. No destructive action clicked. P1: Local table omits Client Code, Customer Code, Current Net Due, Agent/Manager/KAM/KAS and Due Date; uses No/Select pill action instead of row checkbox.",
+    "01a-dashboard-lower": "P2: Local trend adds Customers series/summary instead of reference Today summary; Live Sessions renamed Sessions; Daily Activity Feed Live badge replaced Today; session headers lack sort affordances. Current local empty session data prevents populated-row visual comparison; reference has four rows. P1: Local charts show non-zero activity/session bars while adjacent totals and durations read zero, so sample states are internally inconsistent. Hour chart stops at 6 PM instead of 24 hours; local colored area fills differ from reference.",
+    "00-navigation": "P1/P2: Notification Manager is top-level in reference but nested under Operational Setup locally. Sidebar width ~300 vs 280 CSS px, header/menu spacing and font sizes differ; footer not pinned to bottom locally; blur absent. All destination labels/routes otherwise present.",
+    "00a-directory": "P1: Reference large centered modal with close, A–Z rail and single-column contact rows is replaced by small header popover/two-column cards. Missing phone/customer details and alphabet navigation, no visible close control. Sample names not compared.",
+    "00b-directory-add": "P1/P2: Use Email for Communication starts checked locally vs unchecked reference; wrong checkbox card layout. Core field inventory exists; local uses native dropdowns, smaller dialog, title-case labels and denser spacing.",
+    "00c-notifications": "P1: local notification badge shows 2 while the open panel says No notifications yet; its sample state is internally inconsistent. Reference shows two timestamped cards. P2: panel width and heading treatment differ. Different notification text is not a defect. At this wider viewport the local hour chart also stops well before the available card width."
+  }
+}

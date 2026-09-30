@@ -1,0 +1,1616 @@
+{
+  "date": "2026-09-05",
+  "viewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "scope": "Read-only complete Admin navigation landing-page audit plus selected linked pages, tabs and popups. Not exhaustive state or responsive certification.",
+  "reference": "https://testclient.inebura.ai/admin/dashboard",
+  "local": "http://127.0.0.1:8765/pages/admin.html",
+  "routes": [
+    {
+      "name": "Branch Master",
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/mstoff/branchmaster"
+    },
+    {
+      "name": "Holiday Master",
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/mstoff/holidaymaster"
+    },
+    {
+      "name": "Bank Master",
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/mstoff/bankmaster"
+    },
+    {
+      "name": "Internal Company Contact",
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/mstoff/internalcompanycontact"
+    },
+    {
+      "name": "Invoice Preferences",
+      "url": "https://testclient.inebura.ai/admin/dashboard/invoice-setup"
+    },
+    {
+      "name": "Document Setup",
+      "url": "https://testclient.inebura.ai/admin/dashboard/document-setup"
+    },
+    {
+      "name": "Role and Display Name Setup",
+      "url": "https://testclient.inebura.ai/admin/dashboard/role-display-name-setup"
+    },
+    {
+      "name": "User Setup",
+      "url": "https://testclient.inebura.ai/admin/dashboard/user-setup"
+    },
+    {
+      "name": "Notification Manager",
+      "url": "https://testclient.inebura.ai/admin/dashboard/whatsApp-declaration"
+    },
+    {
+      "name": "Invoice Submission process",
+      "url": "https://testclient.inebura.ai/admin/dashboard/document-strategy"
+    },
+    {
+      "name": "Module Configuration",
+      "url": "https://testclient.inebura.ai/admin/dashboard/module-configuration"
+    },
+    {
+      "name": "Portfolio Transfer",
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/ar/portfolioreallocationupload"
+    },
+    {
+      "name": "Bulk Document Upload",
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/doc/bulkdocumentupload"
+    },
+    {
+      "name": "GRN Upload",
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/ar/grndateupload"
+    },
+    {
+      "name": "CN/Advance Upload",
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/ar/cnupload"
+    },
+    {
+      "name": "Payment Receipt Upload",
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/ar/paymentrecieptupload"
+    },
+    {
+      "name": "Customer Portfolio Transfer",
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/ar/customerportfoliotransfer"
+    },
+    {
+      "name": "Group Master",
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/customeronboarding/groupmaster"
+    },
+    {
+      "name": "Customer Master",
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/customeronboarding/customermaster"
+    },
+    {
+      "name": "Customer Contacts",
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/customeronboarding/customercontactupload"
+    },
+    {
+      "name": "Template Master",
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/emailsetup/commeventtemplate"
+    },
+    {
+      "name": "Email Sender SMTP Setup",
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/emailsetup/emailsendersetting"
+    },
+    {
+      "name": "Email Sender Account Setup",
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/emailsetup/emailsenderaccount"
+    },
+    {
+      "name": "Strategy Manager",
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/ar/strategy"
+    },
+    {
+      "name": "Invoice Upload",
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/invoiceupload"
+    },
+    {
+      "name": "Invoice reallocation",
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/invoicereallocation"
+    },
+    {
+      "name": "Invoice Deletion",
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/invoicedelete"
+    },
+    {
+      "name": "Change Password - Admin",
+      "url": "https://testclient.inebura.ai/admin/dashboard/change-password-sidebar"
+    },
+    {
+      "name": "Client Master",
+      "url": "https://testclient.inebura.ai/admin/dashboard/client-master"
+    },
+    {
+      "name": "Audit Retention & Purge",
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/audit/auditsettings"
+    },
+    {
+      "name": "Audit Trail",
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/audit/audittrail"
+    },
+    {
+      "name": "Help & Support",
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/help/support"
+    }
+  ],
+  "localRoutes": [
+    {
+      "name": "Branch Master",
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=branch-master"
+    },
+    {
+      "name": "Holiday Master",
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=holiday-master"
+    },
+    {
+      "name": "Bank Master",
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=bank-master"
+    },
+    {
+      "name": "Internal Company Contact",
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=internal-contacts"
+    },
+    {
+      "name": "Invoice Preferences",
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=invoice-preferences"
+    },
+    {
+      "name": "Document Setup",
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=document-setup"
+    },
+    {
+      "name": "Role and Display Name Setup",
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=role-display"
+    },
+    {
+      "name": "User Setup",
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=user-setup"
+    },
+    {
+      "name": "Notification Manager",
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=notification-manager"
+    },
+    {
+      "name": "Invoice Submission process",
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=submission-process"
+    },
+    {
+      "name": "Module Configuration",
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=module-configuration"
+    },
+    {
+      "name": "Portfolio Transfer",
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=portfolio-transfer"
+    },
+    {
+      "name": "Bulk Document Upload",
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=bulk-document-upload"
+    },
+    {
+      "name": "GRN Upload",
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=grn-upload"
+    },
+    {
+      "name": "CN/Advance Upload",
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=cn-advance-upload"
+    },
+    {
+      "name": "Payment Receipt Upload",
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=payment-receipt-upload"
+    },
+    {
+      "name": "Customer Portfolio Transfer",
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=customer-portfolio-transfer"
+    },
+    {
+      "name": "Group Master",
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=group-master"
+    },
+    {
+      "name": "Customer Master",
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=customer-master"
+    },
+    {
+      "name": "Customer Contacts",
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=customer-contacts"
+    },
+    {
+      "name": "Template Master",
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=template-master"
+    },
+    {
+      "name": "Email Sender SMTP Setup",
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=smtp-setup"
+    },
+    {
+      "name": "Email Sender Account Setup",
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=sender-account"
+    },
+    {
+      "name": "Strategy Manager",
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=strategy-manager"
+    },
+    {
+      "name": "Invoice Upload",
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=invoice-upload"
+    },
+    {
+      "name": "Invoice reallocation",
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=invoice-reallocation"
+    },
+    {
+      "name": "Invoice Deletion",
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=invoice-deletion"
+    },
+    {
+      "name": "Change Password - Admin",
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=change-password"
+    },
+    {
+      "name": "Client Master",
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=client-master"
+    },
+    {
+      "name": "Audit Retention & Purge",
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=audit-retention"
+    },
+    {
+      "name": "Audit Trail",
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=audit-trail"
+    },
+    {
+      "name": "Help & Support",
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=help-support"
+    }
+  ],
+  "captures": [
+    {
+      "key": "01-dashboard-local-desktop",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/01-dashboard-local-desktop.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=dashboard",
+      "width": 1440
+    },
+    {
+      "key": "02-branch-master-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/02-branch-master-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=branch-master",
+      "width": 1440
+    },
+    {
+      "key": "03-holiday-master-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/03-holiday-master-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=holiday-master",
+      "width": 1440
+    },
+    {
+      "key": "04-bank-master-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/04-bank-master-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=bank-master",
+      "width": 1440
+    },
+    {
+      "key": "05-internal-contacts-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/05-internal-contacts-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=internal-contacts",
+      "width": 1440
+    },
+    {
+      "key": "06-invoice-preferences-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/06-invoice-preferences-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=invoice-preferences",
+      "width": 1440
+    },
+    {
+      "key": "07-document-setup-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/07-document-setup-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=document-setup",
+      "width": 1440
+    },
+    {
+      "key": "08-role-display-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/08-role-display-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=role-display",
+      "width": 1440
+    },
+    {
+      "key": "09-user-setup-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/09-user-setup-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=user-setup",
+      "width": 1440
+    },
+    {
+      "key": "01-dashboard-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/01-dashboard-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard",
+      "width": 1440
+    },
+    {
+      "key": "02-branch-master-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/02-branch-master-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/mstoff/branchmaster",
+      "width": 1440
+    },
+    {
+      "key": "03-holiday-master-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/03-holiday-master-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/mstoff/holidaymaster",
+      "width": 1440
+    },
+    {
+      "key": "02a-branch-create-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/02a-branch-create-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/mstoff/branchmaster",
+      "width": 1440
+    },
+    {
+      "key": "02a-branch-create-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/02a-branch-create-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=branch-master",
+      "width": 1440
+    },
+    {
+      "key": "04-bank-master-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/04-bank-master-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/mstoff/bankmaster",
+      "width": 1440
+    },
+    {
+      "key": "05-internal-contacts-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/05-internal-contacts-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/mstoff/internalcompanycontact",
+      "width": 1440
+    },
+    {
+      "key": "06-invoice-preferences-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/06-invoice-preferences-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/invoice-setup",
+      "width": 1440
+    },
+    {
+      "key": "07-document-setup-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/07-document-setup-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/document-setup",
+      "width": 1440
+    },
+    {
+      "key": "08-role-display-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/08-role-display-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/role-display-name-setup",
+      "width": 1440
+    },
+    {
+      "key": "09-user-setup-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/09-user-setup-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/user-setup",
+      "width": 1440
+    },
+    {
+      "key": "10-notification-manager-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/10-notification-manager-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/whatsApp-declaration",
+      "width": 1440
+    },
+    {
+      "key": "10-notification-manager-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/10-notification-manager-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=notification-manager",
+      "width": 1440
+    },
+    {
+      "key": "11-submission-process-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/11-submission-process-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/document-strategy",
+      "width": 1440
+    },
+    {
+      "key": "11-submission-process-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/11-submission-process-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=submission-process",
+      "width": 1440
+    },
+    {
+      "key": "12-module-configuration-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/12-module-configuration-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/module-configuration",
+      "width": 1440
+    },
+    {
+      "key": "12-module-configuration-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/12-module-configuration-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=module-configuration",
+      "width": 1440
+    },
+    {
+      "key": "13-portfolio-transfer-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/13-portfolio-transfer-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/ar/portfolioreallocationupload",
+      "width": 1440
+    },
+    {
+      "key": "13-portfolio-transfer-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/13-portfolio-transfer-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=portfolio-transfer",
+      "width": 1440
+    },
+    {
+      "key": "14-bulk-document-upload-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/14-bulk-document-upload-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/doc/bulkdocumentupload",
+      "width": 1440
+    },
+    {
+      "key": "14-bulk-document-upload-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/14-bulk-document-upload-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=bulk-document-upload",
+      "width": 1440
+    },
+    {
+      "key": "15-grn-upload-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/15-grn-upload-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/ar/grndateupload",
+      "width": 1440
+    },
+    {
+      "key": "15-grn-upload-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/15-grn-upload-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=grn-upload",
+      "width": 1440
+    },
+    {
+      "key": "16-cn-advance-upload-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/16-cn-advance-upload-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/ar/cnupload",
+      "width": 1440
+    },
+    {
+      "key": "16-cn-advance-upload-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/16-cn-advance-upload-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=cn-advance-upload",
+      "width": 1440
+    },
+    {
+      "key": "17-payment-receipt-upload-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/17-payment-receipt-upload-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/ar/paymentrecieptupload",
+      "width": 1440
+    },
+    {
+      "key": "17-payment-receipt-upload-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/17-payment-receipt-upload-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=payment-receipt-upload",
+      "width": 1440
+    },
+    {
+      "key": "18-customer-portfolio-transfer-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/18-customer-portfolio-transfer-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/ar/customerportfoliotransfer",
+      "width": 1440
+    },
+    {
+      "key": "18-customer-portfolio-transfer-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/18-customer-portfolio-transfer-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=customer-portfolio-transfer",
+      "width": 1440
+    },
+    {
+      "key": "19-group-master-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/19-group-master-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/customeronboarding/groupmaster",
+      "width": 1440
+    },
+    {
+      "key": "19-group-master-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/19-group-master-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=group-master",
+      "width": 1440
+    },
+    {
+      "key": "20-customer-master-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/20-customer-master-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/customeronboarding/customermaster",
+      "width": 1440
+    },
+    {
+      "key": "20-customer-master-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/20-customer-master-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=customer-master",
+      "width": 1440
+    },
+    {
+      "key": "21-customer-contacts-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/21-customer-contacts-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/customeronboarding/customercontactupload",
+      "width": 1440
+    },
+    {
+      "key": "21-customer-contacts-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/21-customer-contacts-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=customer-contacts",
+      "width": 1440
+    },
+    {
+      "key": "22-template-master-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/22-template-master-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/emailsetup/commeventtemplate",
+      "width": 1440
+    },
+    {
+      "key": "22-template-master-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/22-template-master-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=template-master",
+      "width": 1440
+    },
+    {
+      "key": "23-smtp-setup-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/23-smtp-setup-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/emailsetup/emailsendersetting",
+      "width": 1440
+    },
+    {
+      "key": "23-smtp-setup-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/23-smtp-setup-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=smtp-setup",
+      "width": 1440
+    },
+    {
+      "key": "24-sender-account-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/24-sender-account-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/emailsetup/emailsenderaccount",
+      "width": 1440
+    },
+    {
+      "key": "24-sender-account-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/24-sender-account-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=sender-account",
+      "width": 1440
+    },
+    {
+      "key": "25-strategy-manager-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/25-strategy-manager-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/ar/strategy",
+      "width": 1440
+    },
+    {
+      "key": "25-strategy-manager-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/25-strategy-manager-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=strategy-manager",
+      "width": 1440
+    },
+    {
+      "key": "26-invoice-upload-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/26-invoice-upload-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/invoiceupload",
+      "width": 1440
+    },
+    {
+      "key": "26-invoice-upload-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/26-invoice-upload-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=invoice-upload",
+      "width": 1440
+    },
+    {
+      "key": "27-invoice-reallocation-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/27-invoice-reallocation-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/invoicereallocation",
+      "width": 1440
+    },
+    {
+      "key": "27-invoice-reallocation-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/27-invoice-reallocation-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=invoice-reallocation",
+      "width": 1440
+    },
+    {
+      "key": "28-invoice-deletion-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/28-invoice-deletion-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/invoicedelete",
+      "width": 1440
+    },
+    {
+      "key": "28-invoice-deletion-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/28-invoice-deletion-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=invoice-deletion",
+      "width": 1440
+    },
+    {
+      "key": "29-change-password-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/29-change-password-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/change-password-sidebar",
+      "width": 1440
+    },
+    {
+      "key": "29-change-password-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/29-change-password-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=change-password",
+      "width": 1440
+    },
+    {
+      "key": "30-client-master-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/30-client-master-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/client-master",
+      "width": 1440
+    },
+    {
+      "key": "30-client-master-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/30-client-master-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=client-master",
+      "width": 1440
+    },
+    {
+      "key": "31-audit-retention-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/31-audit-retention-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/audit/auditsettings",
+      "width": 1440
+    },
+    {
+      "key": "31-audit-retention-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/31-audit-retention-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=audit-retention",
+      "width": 1440
+    },
+    {
+      "key": "32-audit-trail-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/32-audit-trail-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/audit/audittrail",
+      "width": 1440
+    },
+    {
+      "key": "32-audit-trail-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/32-audit-trail-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=audit-trail",
+      "width": 1440
+    },
+    {
+      "key": "33-help-support-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/33-help-support-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/help/support",
+      "width": 1440
+    },
+    {
+      "key": "33-help-support-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/33-help-support-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=help-support",
+      "width": 1440
+    },
+    {
+      "key": "33a-create-ticket-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/33a-create-ticket-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/help/support",
+      "width": 1440
+    },
+    {
+      "key": "33a-create-ticket-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/33a-create-ticket-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=help-support",
+      "width": 1440
+    },
+    {
+      "key": "33b-feedback-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/33b-feedback-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/help/support",
+      "width": 1440
+    },
+    {
+      "key": "33b-feedback-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/33b-feedback-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=help-support",
+      "width": 1440
+    },
+    {
+      "key": "03a-holiday-create-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/03a-holiday-create-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/mstoff/holidaymaster",
+      "width": 1440
+    },
+    {
+      "key": "03a-holiday-create-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/03a-holiday-create-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=holiday-master",
+      "width": 1440
+    },
+    {
+      "key": "03b-holiday-states-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/03b-holiday-states-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/mstoff/holidaymaster",
+      "width": 1440
+    },
+    {
+      "key": "03b-holiday-states-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/03b-holiday-states-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=holiday-master",
+      "width": 1440
+    },
+    {
+      "key": "04a-bank-create-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/04a-bank-create-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/mstoff/bankmaster",
+      "width": 1440
+    },
+    {
+      "key": "04a-bank-create-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/04a-bank-create-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=bank-master",
+      "width": 1440
+    },
+    {
+      "key": "05a-contact-create-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/05a-contact-create-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/mstoff/internalcompanycontact",
+      "width": 1440
+    },
+    {
+      "key": "05a-contact-create-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/05a-contact-create-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=internal-contacts",
+      "width": 1440
+    },
+    {
+      "key": "06a-custom-aging-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/06a-custom-aging-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/invoice-setup",
+      "width": 1440
+    },
+    {
+      "key": "06a-custom-aging-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/06a-custom-aging-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=invoice-preferences",
+      "width": 1440
+    },
+    {
+      "key": "06b-create-bucket-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/06b-create-bucket-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/invoice-setup",
+      "width": 1440
+    },
+    {
+      "key": "06b-create-bucket-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/06b-create-bucket-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=invoice-preferences",
+      "width": 1440
+    },
+    {
+      "key": "06c-dispositions-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/06c-dispositions-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/invoice-setup",
+      "width": 1440
+    },
+    {
+      "key": "06c-dispositions-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/06c-dispositions-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=invoice-preferences&view=dispositions",
+      "width": 1440
+    },
+    {
+      "key": "06d-purge-policy-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/06d-purge-policy-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/invoice-setup",
+      "width": 1440
+    },
+    {
+      "key": "06d-purge-policy-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/06d-purge-policy-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=invoice-preferences&view=purge",
+      "width": 1440
+    },
+    {
+      "key": "07a-document-create-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/07a-document-create-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/document-setup",
+      "width": 1440
+    },
+    {
+      "key": "07a-document-create-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/07a-document-create-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=document-setup",
+      "width": 1440
+    },
+    {
+      "key": "07b-document-presets-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/07b-document-presets-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/document-setup",
+      "width": 1440
+    },
+    {
+      "key": "07b-document-presets-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/07b-document-presets-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=document-setup",
+      "width": 1440
+    },
+    {
+      "key": "08a-role-names-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/08a-role-names-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/role-display-name-setup",
+      "width": 1440
+    },
+    {
+      "key": "08a-role-names-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/08a-role-names-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=role-display&view=display-names",
+      "width": 1440
+    },
+    {
+      "key": "09a-user-create-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/09a-user-create-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/user-setup",
+      "width": 1440
+    },
+    {
+      "key": "09a-user-create-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/09a-user-create-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=user-setup",
+      "width": 1440
+    },
+    {
+      "key": "09b-user-bulk-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/09b-user-bulk-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/user-setup",
+      "width": 1440
+    },
+    {
+      "key": "09b-user-bulk-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/09b-user-bulk-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=user-setup&view=bulk-user",
+      "width": 1440
+    },
+    {
+      "key": "11a-submission-create-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/11a-submission-create-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/document-strategy",
+      "width": 1440
+    },
+    {
+      "key": "11a-submission-create-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/11a-submission-create-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=submission-process",
+      "width": 1440
+    },
+    {
+      "key": "11b-push-settings-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/11b-push-settings-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/document-strategy",
+      "width": 1440
+    },
+    {
+      "key": "11b-push-settings-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/11b-push-settings-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=submission-process&view=push-settings",
+      "width": 1440
+    },
+    {
+      "key": "12a-visit-config-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/12a-visit-config-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/module-configuration",
+      "width": 1440
+    },
+    {
+      "key": "12a-visit-config-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/12a-visit-config-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=module-configuration&view=visit",
+      "width": 1440
+    },
+    {
+      "key": "12b-monthend-config-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/12b-monthend-config-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/module-configuration",
+      "width": 1440
+    },
+    {
+      "key": "12b-monthend-config-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/12b-monthend-config-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=module-configuration&view=monthend",
+      "width": 1440
+    },
+    {
+      "key": "12c-client-confirmation-config-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/12c-client-confirmation-config-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/module-configuration",
+      "width": 1440
+    },
+    {
+      "key": "12c-client-confirmation-config-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/12c-client-confirmation-config-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=module-configuration&view=client-confirmation",
+      "width": 1440
+    },
+    {
+      "key": "12d-pdc-config-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/12d-pdc-config-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/module-configuration",
+      "width": 1440
+    },
+    {
+      "key": "12d-pdc-config-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/12d-pdc-config-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=module-configuration&view=pdc",
+      "width": 1440
+    },
+    {
+      "key": "12e-escalation-config-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/12e-escalation-config-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/module-configuration",
+      "width": 1440
+    },
+    {
+      "key": "12e-escalation-config-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/12e-escalation-config-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=module-configuration&view=escalation",
+      "width": 1440
+    },
+    {
+      "key": "12f-issue-tracker-config-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/12f-issue-tracker-config-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/module-configuration",
+      "width": 1440
+    },
+    {
+      "key": "12f-issue-tracker-config-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/12f-issue-tracker-config-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=module-configuration&view=issue-tracker",
+      "width": 1440
+    },
+    {
+      "key": "13a-portfolio-upload-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/13a-portfolio-upload-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/ar/portfolioreallocationupload",
+      "width": 1440
+    },
+    {
+      "key": "13a-portfolio-upload-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/13a-portfolio-upload-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=portfolio-transfer",
+      "width": 1440
+    },
+    {
+      "key": "19a-group-create-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/19a-group-create-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/customeronboarding/groupmaster",
+      "width": 1440
+    },
+    {
+      "key": "19a-group-create-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/19a-group-create-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=group-master",
+      "width": 1440
+    },
+    {
+      "key": "20a-customer-create-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/20a-customer-create-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/customeronboarding/customermaster",
+      "width": 1440
+    },
+    {
+      "key": "20a-customer-create-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/20a-customer-create-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=customer-master",
+      "width": 1440
+    },
+    {
+      "key": "21a-customer-contact-create-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/21a-customer-contact-create-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/customeronboarding/customercontactupload",
+      "width": 1440
+    },
+    {
+      "key": "21a-customer-contact-create-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/21a-customer-contact-create-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=customer-contacts",
+      "width": 1440
+    },
+    {
+      "key": "20b-customer-bulk-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/20b-customer-bulk-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/customeronboarding/customercontactupload",
+      "width": 1440
+    },
+    {
+      "key": "20b-customer-bulk-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/20b-customer-bulk-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=customer-master&view=bulk-upload",
+      "width": 1440
+    },
+    {
+      "key": "22a-template-edit-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/22a-template-edit-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/emailsetup/commeventtemplate",
+      "width": 1440
+    },
+    {
+      "key": "22a-template-edit-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/22a-template-edit-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=template-master",
+      "width": 1440
+    },
+    {
+      "key": "25a-strategy-create-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/25a-strategy-create-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/ar/strategy",
+      "width": 1440
+    },
+    {
+      "key": "25a-strategy-create-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/25a-strategy-create-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=strategy-manager&view=create",
+      "width": 1440
+    },
+    {
+      "key": "26a-invoice-create-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/26a-invoice-create-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/modules/invoiceupload",
+      "width": 1440
+    },
+    {
+      "key": "26a-invoice-create-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/26a-invoice-create-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=invoice-upload",
+      "width": 1440
+    },
+    {
+      "key": "30a-subclient-create-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/30a-subclient-create-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard/client-master",
+      "width": 1440
+    },
+    {
+      "key": "30a-subclient-create-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/30a-subclient-create-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=client-master",
+      "width": 1440
+    },
+    {
+      "key": "01a-directory-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/01a-directory-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard",
+      "width": 1440
+    },
+    {
+      "key": "01a-directory-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/01a-directory-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=dashboard",
+      "width": 1440
+    },
+    {
+      "key": "01b-directory-add-reference",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/01b-directory-add-reference.jpg",
+      "height": 1000,
+      "url": "https://testclient.inebura.ai/admin/dashboard",
+      "width": 1440
+    },
+    {
+      "key": "01b-directory-add-local",
+      "file": "/Users/devashishrattan/Developer/Git/Tanserv-Design/artifacts/admin-audit-2026-09-05/01b-directory-add-local.jpg",
+      "height": 1000,
+      "url": "http://127.0.0.1:8765/pages/admin.html?module=dashboard",
+      "width": 1440
+    }
+  ],
+  "notes": [
+    {
+      "step": 1,
+      "name": "Dashboard",
+      "health": "Mismatch",
+      "notes": "Same navigation branding and headline metrics; local content starts farther inward and lower; activity chart is narrow rather than full-width. Local nonzero bars/gauge conflict with zero totals. Full reference is internally scrollable; lower sections not included in this pass."
+    },
+    {
+      "step": 2,
+      "name": "Branch Master",
+      "health": "Mismatch",
+      "notes": "Base layout close; Create New renamed Create Branch; sorting added to extra columns. Create dialog is 720px vs reference800px with different grid, title and placeholders; adds Status and required City/State/Country/Region instead of grey lookup fields."
+    },
+    {
+      "step": 3,
+      "name": "Holiday Master",
+      "health": "Close base; not exact",
+      "notes": "One-line tabs preserved, main columns match. Create New renamed Create Holiday; column widths and badge colours differ. Sample rows omit multi-state +1 badge state present in reference."
+    },
+    {
+      "step": 4,
+      "name": "Bank Master",
+      "health": "Mismatch",
+      "notes": "Same search/table purpose and single-line tabs. Delete action missing from every local row; Create New renamed Create Bank; actions alignment and header height differ."
+    },
+    {
+      "step": 5,
+      "name": "Internal Company Contact",
+      "health": "Close base; not exact",
+      "notes": "Matching columns and edit pattern. Long Create Internal Company Contact replaces Create New; tabs tighter, table positioning/type differ; sample row counts not treated as defect."
+    },
+    {
+      "step": 6,
+      "name": "Invoice Preferences",
+      "health": "Mismatch",
+      "notes": "Tabs and bucket fields present. Select column disproportionately wide locally, pushing bucket name and values to right; selected defaults differ. Custom aging, dispositions and purge policy were also inspected; see secondary states."
+    },
+    {
+      "step": 7,
+      "name": "Document Setup",
+      "health": "Mismatch",
+      "notes": "Preset/Create/Edit/Delete controls present. Local table has taller rows (~88px vs~65px), different column widths and badge styling; only7 rows fit vs10 reference."
+    },
+    {
+      "step": 8,
+      "name": "Role and Display Name Setup",
+      "health": "Mismatch",
+      "notes": "Role cards/connectors exist. Reference has four horizontal groups; local Customer Roles wraps below support group with purple instead of yellow heading, requiring extra scroll. Confirmed at the matched desktop viewport."
+    },
+    {
+      "step": 9,
+      "name": "User Setup",
+      "health": "Mismatch",
+      "notes": "Core columns/Edit/Pwd/Suspend/Delete present. Missing Bulk Send Creds and per-row Send Creds; role colour semantics collapsed to green; toolbar and table spacing differ. No live credential send invoked."
+    },
+    {
+      "step": 10,
+      "name": "Notification Manager",
+      "health": "Close base; not exact",
+      "notes": "Search, four columns, switches and pagination preserved. Slight row density, column widths, switch colour and footer/background differences. Live switches deliberately not toggled because may save immediately."
+    },
+    {
+      "step": 11,
+      "name": "Invoice Submission process",
+      "health": "Major mismatch",
+      "notes": "Reference default Strategy Manager shows a two-row strategy list with Create New. Local injects Push Settings/Email Settings on this tab, pushing list below viewport; Add Strategy replaces Create New. Dark text on purple settings headings creates obvious contrast risk."
+    },
+    {
+      "step": 12,
+      "name": "Module Configuration",
+      "health": "Major mismatch",
+      "notes": "Seven tabs present; default panel fields represented. Local adds large purple title bars with dark text, oversized cards/full-width TDS field and left Edit button rather than source compact white cards/right Edit. GRN pushed below fold. Contrast risk on dark purple headings."
+    },
+    {
+      "step": 13,
+      "name": "Portfolio Transfer",
+      "health": "Mismatch",
+      "notes": "Correct8columns/upload action. Validation failures green instead of red; Failed shown on every row including zero rejects; progress lacks Complete100% label and uses purple; company format and subtitle differ."
+    },
+    {
+      "step": 14,
+      "name": "Bulk Document Upload",
+      "health": "Mismatch",
+      "notes": "Document type/file controls and Limbo action exist. Reference yellow guidance banner missing; one-row toolbar split across three rows locally; larger table text, no shown sorting controls, no pagination in local one-row sample."
+    },
+    {
+      "step": 15,
+      "name": "GRN Upload",
+      "health": "Mismatch",
+      "notes": "Columns match. Same failure badge/Failed-on-success/progress-label defects as Portfolio Transfer; custom subtitle not source copy."
+    },
+    {
+      "step": 16,
+      "name": "CN/Advance Upload",
+      "health": "Mismatch",
+      "notes": "Correct columns but wrong widths/status variants; Failed displayed for zero rejects, unlabelled purple progress instead of green Complete100%; red rejection counts absent."
+    },
+    {
+      "step": 17,
+      "name": "Payment Receipt Upload",
+      "health": "Mismatch",
+      "notes": "Same shell and columns; failure status green, rejection counts uncoloured, progress unlabeled/purple and failure action styling wrong. Sample number of rows not itself a defect."
+    },
+    {
+      "step": 18,
+      "name": "Customer Portfolio Transfer",
+      "health": "Mismatch",
+      "notes": "Column set and subtitle preserved. Source itself uses green validation-failure badges; not counted as parity defect on this page. Local still shows Failed on all successes, loses red/green count styling and Complete100% progress label."
+    },
+    {
+      "step": 19,
+      "name": "Group Master",
+      "health": "Close base; not exact",
+      "notes": "Four tabs and table/Edit/Delete present. Create New renamed Add New Group; smaller action buttons and different header/border treatment; subtitle altered."
+    },
+    {
+      "step": 20,
+      "name": "Customer Master",
+      "health": "Mismatch",
+      "notes": "Tabs/search/create/table present. Reference Actions is first and Edit always visible; local starts with Customer Code so edit affordance not visible without horizontal scroll. Columns compressed, subtitle and search ellipsis differ. Full offscreen columns pending."
+    },
+    {
+      "step": 21,
+      "name": "Customer Contacts",
+      "health": "Mismatch",
+      "notes": "Reference Name/Email/Phone/Customer/Actions versus local Customer/Name/Email/Department/Phone Number/Actions. Extra search, renamed Add New Contact, wrong order and extra Department column."
+    },
+    {
+      "step": 22,
+      "name": "Template Master",
+      "health": "Major mismatch",
+      "notes": "Tabs present but reference begins Actions/Edit; local moves actions to clipped far right, adds Status and Preview, and omits the Description column. Schedule exists in both. Reference includes WhatsApp and long token-bearing subjects; local samples do not demonstrate those states."
+    },
+    {
+      "step": 23,
+      "name": "Email Sender SMTP Setup",
+      "health": "Mismatch",
+      "notes": "Two account categories and masked fields preserved. Missing full setup guidance, integration document link, client heading and reveal-eye affordances; added pagination/sorting. Credential-bearing edits/reveals excluded intentionally."
+    },
+    {
+      "step": 24,
+      "name": "Email Sender Account Setup",
+      "health": "Mismatch",
+      "notes": "Two account rows/Edit available. Missing purpose guidance and client badge; extra Sender Account Type column, sorting and pagination not in reference."
+    },
+    {
+      "step": 25,
+      "name": "Strategy Manager",
+      "health": "Major mismatch",
+      "notes": "Strategy columns/filters/action types exist. Different hero/card style, blue CTA, no visible strategy count; equal-width columns narrow name and wrap actions, rows~95px vs~57px. Source10 rows visible vs local6."
+    },
+    {
+      "step": 26,
+      "name": "Invoice Upload",
+      "health": "Mismatch",
+      "notes": "Create and Bulk Upload present. Create uses primary instead of outline styling; reference download icons replaced by buttons; unlabelled purple progress and Failed-on-success repeat. Table typography/density differ."
+    },
+    {
+      "step": 27,
+      "name": "Invoice reallocation",
+      "health": "Major mismatch",
+      "notes": "Source uses searchable invoice table with Client Code/KAM/KAS and per-row Reallocate. Replica substitutes bulk-role/assignee/reason form, extra filters, Select/View Invoice actions; omits Client Code/KAM/KAS columns. This is a different workflow, with low-contrast heading."
+    },
+    {
+      "step": 28,
+      "name": "Invoice Deletion",
+      "health": "Major mismatch",
+      "notes": "Source initial state only search, no records shown before query. Local instead opens bulk deletion reason/details form plus filters and seeded records. Workflow/empty state differ. No deletion clicked."
+    },
+    {
+      "step": 29,
+      "name": "Change Password - Admin",
+      "health": "Mismatch",
+      "notes": "Select-user initial task preserved. Reference centered narrow card; local full-width nested cards, added Change Password tab and low-contrast purple heading; subtitle differs. No passwords entered."
+    },
+    {
+      "step": 30,
+      "name": "Client Master",
+      "health": "Major mismatch",
+      "notes": "Client details and subclient table present. Adds Client Accounts/Text Setup tabs, moves actions below, shrinks logo and omits its edit affordance, loses renewal/status chips, adds empty purple bar and duplicate empty-state copy. Low-contrast Sub Clients heading."
+    },
+    {
+      "step": 31,
+      "name": "Audit Retention & Purge",
+      "health": "Major mismatch",
+      "notes": "Primary policy inputs/checks exist. Local adds tab/purple banners and inflated full-width form; source compact retention, override, run-purge cards all fit first viewport. Missing per-field explanatory copy and last-purge timestamp/reason. No purge/save run."
+    },
+    {
+      "step": 32,
+      "name": "Audit Trail",
+      "health": "Mismatch",
+      "notes": "Six filters and data columns exist. Local adds redundant Audit Trail tab, moves Search/Export and adds duplicate No records found plus instruction outside table; table text larger, card much taller."
+    },
+    {
+      "step": 33,
+      "name": "Help & Support",
+      "health": "Close base; not exact",
+      "notes": "Hero/search/chips/FAQ/category content and tabs closely recreated. Reference hero inset24px; local edge-to-edge. Source6 category cards per row vs local7, different outer padding and card proportions."
+    }
+  ],
+  "states": [
+    {
+      "key": "33a-create-ticket",
+      "step": 33,
+      "health": "Mismatch",
+      "notes": "Same category and priority options, subject/description fields. Local adds Attachment block absent from source and longer description placeholder, different header/close/footer styling."
+    },
+    {
+      "key": "33b-feedback",
+      "step": 33,
+      "health": "Close visible portion",
+      "notes": "Visible feedback rating, type, module, subject and body fields closely match; same24px layout offset. Footer/options not fully tested."
+    },
+    {
+      "key": "03a-holiday-create",
+      "step": 3,
+      "health": "Close fields; visual mismatch",
+      "notes": "Exact field labels/placeholders and two-column arrangement retained. Outer rounding broken locally (square header/footer corners); state input taller, weekly-off checkbox/footer styling differ."
+    },
+    {
+      "key": "03b-holiday-states",
+      "step": 3,
+      "health": "Close visible options",
+      "notes": "Visible first six states/codes and searchable dropdown appearance match closely; full list and weekly-off/calendar branches not exercised."
+    },
+    {
+      "key": "04a-bank-create",
+      "step": 4,
+      "health": "Close",
+      "notes": "Bank Name field/title/placeholder and800px modal align; minor type/button/backdrop differences."
+    },
+    {
+      "key": "05a-contact-create",
+      "step": 5,
+      "health": "Close fields; controls differ",
+      "notes": "All visible fields/required markers and grid match. Local gender/department search-icon inputs replace source dropdown chevrons; minor typography/footer spacing differences. Full lookup options unverified."
+    },
+    {
+      "key": "06a-custom-aging",
+      "step": 6,
+      "health": "Different state",
+      "notes": "Reference empty custom-group state, local populated cards; cannot validate populated card fidelity. Create Bucket toolbar occupies separate row locally."
+    },
+    {
+      "key": "06b-create-bucket",
+      "step": 6,
+      "health": "Major mismatch",
+      "notes": "Missing Group Color and consecutive-selection instructions;19 bucket chips replaced with native8-option list. Wrong title/placeholder/Save Group label and dialog dimensions."
+    },
+    {
+      "key": "06c-dispositions",
+      "step": 6,
+      "health": "Mismatch",
+      "notes": "Broad/Primary/Substatus/Colour hierarchy recognizable; source far denser with narrower first columns. Local replaces some sub-status wording/sets; colour controls visually differ."
+    },
+    {
+      "key": "06d-purge-policy",
+      "step": 6,
+      "health": "Mismatch",
+      "notes": "Count/Edit/warning preserved. Local narrower/taller card and purple header with unreadable dark title; warning wrapping differs. No edits/saves."
+    },
+    {
+      "key": "07a-document-create",
+      "step": 7,
+      "health": "Close fields; visual mismatch",
+      "notes": "Four field labels/placeholders and required flags match. Local720px rather than800px modal, different vertical spacing/buttons and native select replacing source category lookup."
+    },
+    {
+      "key": "07b-document-presets",
+      "step": 7,
+      "health": "Mismatch",
+      "notes": "Preset table/category/status closely represented. Local Add Selected appears enabled with nothing selected; source disabled and helper Select documents to add missing. Different max-height/row fit."
+    },
+    {
+      "key": "08a-role-names",
+      "step": 8,
+      "health": "Close initial state",
+      "notes": "Labels/placeholders/helper and disabled controls match; local form28px shorter and native select chevrons differ. Dependent options not fully compared."
+    },
+    {
+      "key": "09a-user-create",
+      "step": 9,
+      "health": "Close Step1",
+      "notes": "Hierarchy note, existing-contact option, six fields and mandatory markers retained. Local shorter dialog, tighter rows/smaller footer buttons. Step2 and role-dependent branches not reached."
+    },
+    {
+      "key": "09b-user-bulk",
+      "step": 9,
+      "health": "Close base",
+      "notes": "Upload history columns, status/count badges and conditional failed icons represented well. Date format, title/button sizing and columns differ. Upload modal not yet checked."
+    },
+    {
+      "key": "11a-submission-create",
+      "health": "Major mismatch",
+      "note": "Source has an 800px Add Strategy form, full-width Strategy Type, helper text, Agent Selection switch, searchable 16-document checkbox list, and Create Strategy. Local uses a compact 720px form, plain checkbox, five document options, no document search or explanatory text, and Save."
+    },
+    {
+      "key": "11b-push-settings",
+      "health": "Major mismatch",
+      "note": "Source stacks Email Configuration and Include Contacts cards, uses three switches and a left Submit button. Local compresses these into a two-column fieldset with checkboxes, purple heading bar, and right Save Changes; select placeholder/default differs."
+    },
+    {
+      "key": "12a-visit-config",
+      "health": "Major mismatch",
+      "note": "Missing the two current-time summary panels. Local replaces Yes/No radio group with select, changes four-column fields to two columns, adds purple heading and description, and loses required-marker parity."
+    },
+    {
+      "key": "12b-monthend-config",
+      "health": "Mismatch",
+      "note": "Manual mode content and radio choices are largely present. Local loses the client pill, adds spacing and height, and pushes ODM Report Email below the viewport. Automatic schedule and lower recipient controls are not covered."
+    },
+    {
+      "key": "12c-client-confirmation-config",
+      "health": "Major mismatch",
+      "note": "One plain local status row omits the yellow completed/validation-failure variants, green/red counts and conditional download icons. Added purple heading and compressed content. Sample values are not treated as data-sync errors."
+    },
+    {
+      "key": "12d-pdc-config",
+      "health": "Mismatch",
+      "note": "Local substitutes checkbox for switch, omits auto-clear/helper guidance, adds Save Changes in read-only state, uses plain Active text instead of badge and Remove text instead of trash icon. Enlarged stacked cards and purple heading bars differ substantially."
+    },
+    {
+      "key": "12e-escalation-config",
+      "health": "Mismatch",
+      "note": "Both process/matrix lists and actions exist. Local moves search to separate rows, loses explanatory copy and destructive red Delete styling, changes Process to Name, and greatly enlarges cards with dark-on-purple headings. Create/View/Edit branches remain unverified."
+    },
+    {
+      "key": "12f-issue-tracker-config",
+      "health": "Mismatch",
+      "note": "Switch replaced by checkbox; helper copy, card layout and Save alignment differ. Local heading computed colour rgb(31,41,55) on rgb(92,37,141), 19px/700; visually hard to read. No switch changes saved."
+    },
+    {
+      "key": "13a-portfolio-upload",
+      "health": "Close, with differences",
+      "note": "Matching 600px dialog, file formats, drop zone, template download and footer actions. Local is shorter, has different spacing, template button treatment and footer button sizes. No file selection/upload performed; other upload variants are not inferred from this one."
+    },
+    {
+      "key": "19a-group-create",
+      "health": "Mismatch",
+      "note": "Same three fields, but source is a 500px single-column modal with full-width description and Save Group. Local is 720px, two columns, half-width description, and Save."
+    },
+    {
+      "key": "20a-customer-create",
+      "health": "Major mismatch",
+      "note": "Source is an 850px two-column scrollable form; local is 900px three columns. Enter placeholders become field-specific text, selector affordances differ, and source header/footer spacing and scroll treatment are not matched. Source lower fields/options not fully inspected."
+    },
+    {
+      "key": "21a-customer-contact-create",
+      "health": "Mismatch",
+      "note": "Nine fields present, but Customer should span full width; all following field pairings shift. Local is 720px instead of 800px and Save replaces Save Contact. Dropdown option inventories remain unverified."
+    },
+    {
+      "key": "20b-customer-bulk",
+      "health": "Major mismatch",
+      "note": "Wrong table schema: Count and File Name are replaced by Company and Progress, Status is relocated, and failed-file download icons are missing for rejected rows. Upload File becomes Bulk Upload. This is a linked page, beyond the 33 menu landing pages."
+    },
+    {
+      "key": "22a-template-edit",
+      "health": "Blocked comparison",
+      "note": "The first live Edit action returned \u201cFailed to initiate edit\u201d. Local first Edit left the table visible in the captured state. Editor-field parity cannot be assessed from this attempt; do not copy the reference error as the intended editor design."
+    },
+    {
+      "key": "25a-strategy-create",
+      "health": "Major mismatch",
+      "note": "Local adds top Back/Cancel controls, changes purple actions to blue and Running to Active, omits template trash and several required markers, enables Notification Mode before template selection, and places Schedule beside Notification Settings instead of the full-width initial prompt. Dependent target/template/schedule branches not verified."
+    },
+    {
+      "key": "26a-invoice-create",
+      "health": "Close, with differences",
+      "note": "24 visible fields, three-column grid, labels, placeholders and Save Invoice align closely. Missing search icons on disabled assignment fields, native date formatting/icons, spacing and button dimensions differ. Lookup results, date-picker states and validations not tested."
+    },
+    {
+      "key": "30a-subclient-create",
+      "health": "Mismatch",
+      "note": "Source is 600px single-column; local is 720px two-column, with smaller footer buttons. The same three labels/placeholders exist. Local keyboard spot check passed: initial focus on close, Shift+Tab stayed inside modal, Escape closed it and restored focus to Create Sub Client."
+    },
+    {
+      "key": "01a-directory",
+      "health": "Major mismatch",
+      "note": "Reference opens a centered 900px modal with overlay, close button, one-column contact rows, role badges and A\u2013Z rail. Local opens a small top-right popover, two-column avatar cards, no phone lines or alphabet rail, and no modal backdrop."
+    },
+    {
+      "key": "01b-directory-add",
+      "health": "Mismatch",
+      "note": "Same ten principal fields plus communication checkbox, but local 720px modal differs from source 800px; checkbox is centered in a half-width box and starts checked while reference is inline and unchecked. Contact-type conditional variants/options unverified."
+    },
+    {
+      "key": "02a-branch-create",
+      "health": "Mismatch",
+      "note": "Local 720px form differs from reference 800px: GST and addresses span full width, title and placeholders differ, an extra Status field appears, and geographic fields have different required/lookup presentation."
+    }
+  ]
+}

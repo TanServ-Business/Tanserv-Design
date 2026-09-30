@@ -1087,3 +1087,600 @@ body {
     height: 60vh;
   }
 }
+
+/* =========================================================
+   TestClient desktop parity overrides
+   ========================================================= */
+.smPage {
+  padding: 48px;
+  background: #f5f7fb;
+}
+
+.smScreen {
+  gap: 18px;
+}
+
+#smListScreen .smHero {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 0 0 6px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+#smListScreen .smHero > div {
+  border-left: 5px solid #6b2aa0;
+  padding-left: 14px;
+}
+
+#smListScreen .smEyebrow {
+  display: none;
+}
+
+#smListScreen .smHero h1 {
+  margin: 0 0 6px;
+  font-size: 24px;
+  line-height: 1.15;
+  color: #182230;
+}
+
+#smListScreen .smHero p {
+  font-size: 13px;
+  color: #64748b;
+}
+
+.smPrimaryBtn,
+#smCreateNewBtn {
+  background: linear-gradient(135deg, #5d258e 0%, #8735ef 100%);
+  border-color: #68269e;
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(92, 37, 141, .18);
+}
+
+.smPrimaryBtn:hover,
+#smCreateNewBtn:hover {
+  background: #4f1f79;
+  border-color: #4f1f79;
+}
+
+#smCreateNewBtn {
+  min-width: 195px;
+  min-height: 44px;
+  border-radius: 13px;
+  font-size: 14px;
+}
+
+.smListShell {
+  overflow: hidden;
+  border: 1px solid #dfe5ee;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, .06);
+}
+
+.adminStrategyTabs {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  min-height: 54px;
+  padding: 0 24px;
+  border-bottom: 1px solid #dfe5ee;
+  background: #fff;
+}
+
+.adminStrategyTabs a {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 54px;
+  color: #687385;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.adminStrategyTabs a.is-active {
+  color: #5c258d;
+}
+
+.adminStrategyTabs a.is-active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: #5c258d;
+}
+
+.smToolbar {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) 120px 120px minmax(100px, 1fr);
+  gap: 10px;
+  align-items: center;
+  padding: 24px 24px 12px;
+  border-bottom: 0;
+}
+
+.smToolbar .smSearchField,
+.smToolbar .smToolbarSelect {
+  width: 100%;
+  min-height: 38px;
+  border-radius: 9px;
+}
+
+.adminStrategyCount {
+  justify-self: end;
+  padding: 0;
+  color: #637083;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.smTableWrap {
+  margin: 0 24px;
+  border: 1px solid #e2e7ee;
+  border-radius: 14px;
+  overflow: auto;
+}
+
+.smTable {
+  min-width: 1040px;
+  table-layout: fixed;
+}
+
+.smTable th:first-child,
+.smTable td:first-child {
+  width: 500px;
+}
+
+.smTable th:nth-child(2),
+.smTable td:nth-child(2) {
+  width: 120px;
+}
+
+.smTable thead,
+.smTable thead tr,
+.smTable thead th,
+.smTable th {
+  position: static;
+  background: #54217e;
+  color: #fff;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 11px;
+}
+
+.smTable th,
+.smTable td {
+  padding: 13px 16px;
+}
+
+.smTable tbody tr {
+  height: 56px;
+}
+
+.smTable .smTableActions {
+  flex-wrap: nowrap;
+}
+
+.smCellTitle {
+  color: #182230;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.smStatusPill.is-active {
+  background: #eff9f2;
+  border-color: #cbe8d4;
+  color: #286441;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.smStatusPill.is-inactive {
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.adminStrategyPager {
+  min-height: 58px;
+  margin: 14px 24px 0;
+  border-top: 1px dashed #e2e7ee;
+}
+
+.adminStrategyPager > span {
+  margin-right: auto;
+  color: #64748b;
+  font-size: 11px;
+}
+
+.adminStrategyPager button {
+  min-width: 34px;
+  min-height: 34px;
+  padding: 5px 9px;
+}
+
+/* Builder */
+#smBuilderScreen .smBuilderHeader {
+  padding: 18px 14px;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: none;
+}
+
+#smBuilderScreen .smBuilderHeaderMain {
+  gap: 0;
+}
+
+#smBuilderScreen .smBuilderHeaderMain > button,
+#smBuilderScreen .smBuilderHeaderActions {
+  display: none !important;
+}
+
+.smBuilderHeader h1 {
+  font-size: 24px;
+  margin: 4px 0 6px;
+}
+
+.smBuilderShell {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+#smForm {
+  padding: 0;
+  gap: 16px;
+}
+
+.smSection,
+.smSubSection,
+.smTemplateCard,
+.smTemplatePanel {
+  border-color: #dfe5ee;
+  background: #fff;
+  border-radius: 14px;
+}
+
+.smSection {
+  padding: 16px;
+}
+
+.smSectionHead,
+.smTemplateCardHead,
+.smTemplatePanelHead,
+.smBuilderFooter {
+  flex-direction: row;
+  align-items: flex-start;
+}
+
+.smSectionHead + .smGrid,
+.smSectionHead + .smSubSection {
+  margin-top: 14px;
+}
+
+.smGrid3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.smField > span,
+.smTemplateField > span,
+.smStatusToggle > span:first-child {
+  color: #667184;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .07em;
+}
+
+.smStatusToggle {
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+
+.smStatusToggle > span:first-child {
+  padding-top: 5px;
+}
+
+.smStatusToggle input:checked {
+  background: #5c258d;
+  border-color: #5c258d;
+}
+
+.smTemplateStack {
+  margin-top: 12px;
+}
+
+.smTemplateCard {
+  padding: 16px;
+}
+
+.smTemplateCard.is-active {
+  border-color: #b9cadc;
+  box-shadow: 0 0 0 2px rgba(92, 37, 141, .08);
+}
+
+.smTemplateHeaderTools .smMetaPill {
+  order: -1;
+}
+
+.smTemplateHeaderTools [data-remove-template] {
+  width: 32px;
+  min-width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #dc5d63;
+  font-size: 15px;
+}
+
+.smTemplateOverviewGrid {
+  grid-template-columns: 1fr;
+}
+
+.smTemplateSupportGrid {
+  grid-template-columns: minmax(280px, .9fr) minmax(420px, 1.1fr);
+}
+
+.smChecklistCard.is-compact {
+  grid-template-columns: repeat(4, minmax(72px, 1fr));
+}
+
+.adminAgingActions {
+  margin-left: auto;
+}
+
+.adminStrategyTemplatePrompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 110px;
+  gap: 6px;
+  border: 1px dashed #d9dfe8;
+  border-radius: 12px;
+  background: #fff;
+  color: #94a3b8;
+  text-align: center;
+}
+
+.adminStrategyTemplatePrompt i {
+  font-size: 18px;
+  color: #cbd5e1;
+}
+
+.adminStrategyTemplatePrompt strong {
+  color: #64748b;
+  font-size: 12px;
+}
+
+.adminStrategyTemplatePrompt span {
+  font-size: 11px;
+}
+
+.smBuilderFooter {
+  position: sticky;
+  bottom: 0;
+  z-index: 4;
+  align-items: center;
+  margin: 0 2px;
+  padding: 12px 6px;
+  background: rgba(245, 247, 251, .96);
+  backdrop-filter: blur(6px);
+}
+
+.smBuilderFooter #smFooterCancelBtn::after {
+  content: "Back";
+  font-size: 12px;
+}
+
+.smBuilderFooter #smFooterCancelBtn {
+  font-size: 0;
+}
+
+/* Sender selection */
+.adminStrategySender {
+  margin-top: 18px;
+  padding: 24px;
+  border: 1px solid #dfe5ee;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, .06);
+}
+
+.adminSenderBanner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  border: 1px solid #e4d8ef;
+  border-radius: 14px;
+  background: #fbf7ff;
+}
+
+.adminSenderBanner > span:nth-child(2) {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.adminSenderBanner small {
+  color: #725683;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.adminSenderBanner strong {
+  color: #1f2937;
+  font-size: 13px;
+}
+
+.adminSenderIcon,
+.adminSenderChoiceIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: #fff;
+  color: #5c258d;
+  border: 1px solid #eadff2;
+}
+
+.adminSenderBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border: 1px solid #a8dfb4;
+  border-radius: 999px;
+  background: #e8f9eb;
+  color: #357144;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.adminSenderQuestion {
+  margin: 22px 0 12px;
+}
+
+.adminSenderQuestion h3,
+.adminSenderChoices legend {
+  margin: 0 0 5px;
+  color: #182230;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.adminSenderQuestion p {
+  margin: 0;
+  color: #64748b;
+  font-size: 12px;
+}
+
+.adminSenderChoices {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.adminSenderChoices legend {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.adminSenderChoice {
+  position: relative;
+  display: grid;
+  grid-template-columns: 42px 1fr 18px;
+  gap: 12px;
+  align-items: center;
+  min-height: 94px;
+  padding: 15px 18px;
+  border: 1px solid #dfe5ee;
+  border-radius: 14px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.adminSenderChoice.is-selected {
+  border-color: #5c258d;
+  background: #fcf9ff;
+}
+
+.adminSenderChoice input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.adminSenderChoice > span:nth-of-type(2) {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.adminSenderChoice strong {
+  color: #182230;
+  font-size: 13px;
+}
+
+.adminSenderChoice small {
+  color: #64748b;
+  font-size: 11px;
+}
+
+.adminSenderChoiceIcon {
+  background: #f6f7fa;
+  color: #64748b;
+}
+
+.adminSenderChoice.is-selected .adminSenderChoiceIcon {
+  background: #5c258d;
+  color: #fff;
+}
+
+.adminSenderCheck {
+  visibility: hidden;
+  color: #5c258d;
+}
+
+.adminSenderChoice.is-selected .adminSenderCheck {
+  visibility: visible;
+}
+
+.adminSenderHelp {
+  display: flex;
+  gap: 8px;
+  margin: 18px 0;
+  padding: 12px 14px;
+  border: 1px solid #dfe5ee;
+  border-radius: 10px;
+  background: #f8fafc;
+  color: #64748b;
+  font-size: 11px;
+}
+
+.adminSenderHelp a {
+  color: #5c258d;
+  font-weight: 700;
+}
+
+.adminSenderFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 14px;
+  border-top: 1px dashed #e2e7ee;
+}
+
+.adminSenderFooter button {
+  min-width: 110px;
+}
+
+.adminSenderFooter .adminPrimary:disabled {
+  background: #a98bbb;
+  border-color: #a98bbb;
+  box-shadow: none;
+  opacity: .72;
+}

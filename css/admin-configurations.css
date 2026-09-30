@@ -1,0 +1,71 @@
+/* Only Module Configuration > Configurations; other tabs retain their styles. */
+html:has(.adminConfigurationsPage),body:has(.adminConfigurationsPage) { height:100%; overflow:hidden; }
+body:has(.adminConfigurationsPage) #adminPageContent { height:calc(100vh - 71px); overflow-y:auto; }
+body:has(.adminConfigurationsPage) .adminSharedHeader { height:71px; min-height:71px; }
+.adminRuntimePage.adminConfigurationsPage { padding:48px 48px 64px; line-height:1.5; }
+.adminConfigurationsPage .adminPageHero { margin-bottom:24px; }
+.adminConfigurationsPage .adminPageHero h1 { margin:0; font-size:24px; line-height:36px; font-weight:800; letter-spacing:-.48px; color:#1e293b; }
+.adminConfigurationsPage .adminPageHero span { display:block; margin-top:4px; font-size:14px; line-height:21px; font-weight:500; color:#64748b; }
+.adminConfigurationsPage .adminPageHero>div::before { top:2px; bottom:auto; height:32px; }
+.adminConfigurationsPage .adminSourceWorkspace { overflow:visible; box-shadow:0 10px 24px rgba(15,23,42,.04); }
+.adminConfigurationsPage .adminWorkspaceHeader { display:flex; min-height:54px; padding:8px 24px 0; border-radius:15px 15px 0 0; }
+.adminConfigurationsPage .adminWorkspaceTabs { width:100%; height:auto; scrollbar-width:none; }
+.adminConfigurationsPage .adminWorkspaceTabs::-webkit-scrollbar { display:none; }
+.adminConfigurationsPage .adminRuntimeTabs { height:auto; gap:0; overflow:visible; }
+.adminConfigurationsPage .adminRuntimeTabs a { width:auto; min-width:0; flex:1 1 0; white-space:normal; text-align:center; padding:12px 4px; font-size:14px; line-height:21px; font-weight:600; color:#64748b; }
+.adminConfigurationsPage .adminRuntimeTabs a.is-active { color:#5c258d; }
+.adminConfigurationsPage .adminRuntimeTabs a.is-active::after { height:3px; border-radius:0; background:#5c258d; }
+.adminConfigurationsPage .adminWorkspaceBody { padding:40px 24px 24px; }
+.adminConfigurations { padding:16px; color:#0f172a; }
+.adminConfigurationToolbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; }
+.adminConfigurationToolbar p { margin:0; font-size:16px; line-height:24px; color:rgba(33,37,41,.75); }
+.adminConfigurationCTA { border:0; border-radius:14px; height:48px; min-width:140px; padding:0 24px; background:linear-gradient(135deg,#5c258d,#7c3aed); color:#fff; font:800 16px/24px Calibri,'Segoe UI',Arial,sans-serif; letter-spacing:.02em; box-shadow:0 10px 22px rgba(92,37,141,.25); cursor:pointer; }
+.adminConfigurationCard { padding:16px; margin:0 0 16px; border:1px solid #e2e8f4; border-radius:16px; background:#fff; box-shadow:0 10px 24px rgba(15,23,42,.04); }
+.adminConfigurationRow { display:flex; justify-content:space-between; align-items:flex-start; }
+.adminConfigurationCopy { min-width:0; }
+.adminConfigurationCard h2 { margin:0 0 4px; font-size:16px; font-weight:700; line-height:1.2; color:#0f172a; letter-spacing:normal; }
+.adminConfigurationCard p { margin:0; font-size:14px; line-height:21px; color:rgba(33,37,41,.75); }
+.adminConfigurationToggle { display:inline-flex; flex:none; margin:0 0 6px; }
+.adminConfigurationToggle.is-disabled { opacity:.9; }
+.adminConfigurationToggle input { appearance:none; -webkit-appearance:none; position:relative; width:44px; height:24px; padding:0; margin:0; border:0; border-radius:999px; background:#94a3b8; cursor:pointer; transition:background .2s; }
+.adminConfigurationToggle input::after { content:""; position:absolute; top:3px; left:3px; width:18px; height:18px; border-radius:50%; background:#fff; box-shadow:0 2px 4px rgba(0,0,0,.08); transition:transform .2s; }
+.adminConfigurationToggle input:checked { background:#5c258d; box-shadow:0 5px 12px rgba(92,37,141,.18); }
+.adminConfigurationToggle input:checked::after { transform:translateX(20px); }
+.adminConfigurationToggle input:disabled { opacity:.9; cursor:default; }
+.adminConfigurationField { display:flex; flex-direction:column; gap:6px; margin:16px 0 12px; }
+.adminConfigurationTDS { max-width:180px; }
+.adminConfigurationGRN { max-width:380px; }
+.adminConfigurationField>label { margin:0 0 2px; font-size:12px; font-weight:600; line-height:18px; letter-spacing:.48px; text-transform:uppercase; color:#64748b; }
+.adminConfigurationField>label span { color:#dc2626; }
+.adminConfigurationField input { box-sizing:border-box; width:100%; min-width:0; height:40px; border:1px solid #e2e8f4; border-radius:10px; padding:8px 10px; font:13px/19.5px Manrope,Arial,sans-serif; color:#0f172a; background:#fff; }
+.adminConfigurationField input:disabled { background:#f0edf8; }
+.adminConfigurationSelect { position:relative; }
+.adminConfigurationSelect>button { display:block; width:100%; text-align:left; position:relative; border:1px solid #e2e8f4; border-radius:10px; padding:8px 32px 8px 10px; background:#fff; color:#0f172a; font:400 13px/19.5px Calibri,'Segoe UI',Arial,sans-serif; cursor:pointer; }
+.adminConfigurationSelect>button:disabled { background:#f1f5f9; cursor:default; opacity:1; }
+.adminConfigurationSelect>button[aria-expanded=true] { border-color:#9b72ba; box-shadow:0 0 0 2px rgba(92,37,141,.12); }
+.adminConfigurationSelect>button>i { position:absolute; right:10px; top:50%; transform:translateY(-50%); font-size:12px; color:#64748b; pointer-events:none; }
+.adminConfigurationSelect [role=listbox] { position:absolute; top:calc(100% + 4px); left:0; width:100%; z-index:30; border:1px solid #e2e8f4; border-radius:10px; padding:4px; background:#fff; box-shadow:0 8px 20px rgba(15,23,42,.1); overflow:hidden; }
+.adminConfigurationSelect [role=option] { display:flex; align-items:center; gap:8px; width:100%; padding:9px 12px; border:0; border-radius:8px; text-align:left; background:transparent; color:#0f172a; font:400 13px/19.5px Calibri,'Segoe UI',Arial,sans-serif; cursor:pointer; }
+.adminConfigurationSelect [aria-selected=true] { background:#f3eafa; font-weight:600; }
+.adminConfigurationSelect [role=option] i { color:#5c258d; }
+.adminConfigurationSelect [role=option]:hover { background:#f3eafa; }
+.adminConfigurations [hidden] { display:none!important; }
+.adminConfigurations input:focus-visible,.adminConfigurationSelect button:focus-visible { outline:2px solid #aa84e6; outline-offset:2px; }
+.adminConfigurationFooter { display:flex; justify-content:flex-start; padding-top:24px; }
+.adminConfigurationSave { height:48px; border:0; border-radius:14px; padding:0 24px; background:#4b1f73; color:#fff; font:700 16px/24px Calibri,'Segoe UI',Arial,sans-serif; cursor:pointer; }
+.adminModalBackdrop:has(.adminConfigurationModal) { padding:16px; background:rgba(15,23,42,.5); }
+.adminModalCard.adminConfigurationModal { width:500px!important; max-width:100%!important; border:0; border-radius:16px; box-shadow:0 24px 48px rgba(15,23,42,.18); overflow:hidden; }
+.adminConfigurationModal>header { padding:16px 20px; gap:12px; background:#f6effb; border-bottom:1px solid #d7c3ea; }
+.adminConfigurationModal h2 { margin:0; font:700 16px/19.2px Calibri,'Segoe UI',Arial,sans-serif; color:#4b1f73; }
+.adminConfigurationClose { width:32px; height:32px; border:1px solid #e2e8f4; border-radius:8px; padding:1px 6px; background:#fff; color:#64748b; font:14px/21px Calibri,'Segoe UI',Arial,sans-serif; cursor:pointer; }
+.adminConfigurationChoices { padding:20px; overflow-y:auto; }
+.adminConfigurationChoices>div { height:24px; margin:0 0 8px; }
+.adminConfigurationChoices label { display:flex; align-items:center; gap:8px; margin:0 0 6px; font:400 12px/18px Calibri,'Segoe UI',Arial,sans-serif; color:#666; }
+.adminConfigurationChoices input { width:13px; height:13px; padding:0; margin:0; }
+.adminConfigurationModal>footer { padding:14px 20px; gap:10px; border-top:1px solid #e2e8f4; background:#f8fafc; }
+.adminConfigurationModal>footer button { width:100px; min-width:100px; height:36px; padding:0; border-radius:10px; font-size:13px; line-height:19.5px; }
+.adminConfigurationCancel { border:1px solid #d7c3ea; background:#fff; color:#491e70; font-weight:700; cursor:pointer; }
+@media(max-width:760px) {
+  .adminRuntimePage.adminConfigurationsPage { padding:48px 48px 64px; }
+  .adminConfigurationsPage .adminWorkspaceHeader { flex-wrap:nowrap; }
+}
