@@ -457,3 +457,52 @@ Implementation checklist: scoped layout, selective editing, dropdown, keyboard
 checks, preview boundary and desktop/mobile comparisons complete.
 
 final result: passed
+
+## Invoice Master — 1 October 2026
+
+### Comparison target and evidence
+
+- Approved visual: `/workspace/generated_images/exec-3dac0eed-9598-400f-b233-8baf96a1ebf1.png`, with the user's subsequent 70/30 panel split.
+- Component styling authority: `LPagent.html` Invoice Summary and `css/styles.css` `.infoCard`, `.kv`, and `.outstandingTable`.
+- Implementation: `http://127.0.0.1:8765/pages/admin.html?module=invoice-master`.
+- State: searched `INV-2026-1042`, original demo data, newest timeline entry expanded.
+- Source pixels: 1487 × 1058, normalized to 1440 × 1024; implementation viewport and pixels: 1440 × 1024, deviceScaleFactor 1.
+- Full comparison: `artifacts/invoice-master/design-comparison.png` (source left, implementation right).
+- Focused card comparison: `artifacts/invoice-master/cards-comparison.png`; card regions normalized for the requested wider left panel.
+- Rendered states: `artifacts/invoice-master/desktop.png`, `empty.png`, `bulk-preview.png`, `responsive-390.png`, and `responsive-810.png`.
+- Chromium browser capture was used because the in-app browser automation tool was unavailable.
+
+### Findings and comparison history
+
+1. [P1, resolved] Generic global `header` rules painted invoice headings purple and flattened their layout. Evidence: `artifacts/invoice-master/initial-style-conflict.png`. Scoped background, padding, and display rules now restore the neutral workspace and stacked title/caption. Verified in the latest desktop capture.
+2. [P2, resolved] Remote icon fonts were missing in the initial browser capture. Bootstrap Icons now use the latest main branch's existing local assets, restoring search/navigation/action affordances without a runtime CDN dependency.
+3. [P2, resolved] The initial Overdue treatment was neutral purple. The current chip and summary value use the expected red treatment; the green collection amount remains legible.
+4. No remaining actionable P0/P1/P2 findings in the approved invoice workspace. Decorative icons are hidden from accessible button names; native dialogs provide focus containment and Escape dismissal.
+
+### Fidelity surfaces
+
+- Typography: actual LPagent card rules retained (11px uppercase titles, 14px key/value rows, bold right-aligned values); the generated mock's larger raster type is treated as illustrative. Labels and long addresses wrap.
+- Layout: measured desktop panel widths are 952px and 408px excluding the 16px gap, exactly 70/30. Two cards sit side by side, summary has two columns, and the action footer remains reachable. Panels/cards stack at smaller widths with no page-level horizontal overflow.
+- Colors: source card background `#fbfcff`, border `#e6e9ef`, dashed separators `#e7ebf5`, purple actions, red Overdue/Delete, and green collection value.
+- Assets: supplied Inebura logo and original admin shared header retained; this integration boundary intentionally differs from the mock's simplified white header. Original Bootstrap Icons are used, including locally bundled fonts.
+- Content: all 42 template fields, four invoice/status fields, four assignees, and three additional financial figures are present (53 fields total). Missing source values display an em dash. Broad/primary/substatus are view only. Timeline reads the agent's existing saved Activity Trail and status overrides; admin edits add local audit entries.
+
+### Verification
+
+- `node scripts/validate-admin-modules.js`: 33 definitions and all tab targets pass after integration with the latest main branch.
+- `node scripts/validate-invoice-master.js`: CSV quoting/multiline cells, Excel date round-trip, company-scoped identity, duplicate rows, blank/zero updates, protected statuses, date validation, and stale previews pass.
+- Browser flow: empty/not-found/search, all fields, exact 70/30, edit, reallocation, mixed valid/error CSV updates, Excel updates, CSV additions, export, deletion/reload, shared agent history, legacy invoice routes, and an unaffected Branch Master route pass.
+- Responsive checks: 390px and 810px, no horizontal overflow.
+- Browser page errors: none. JavaScript syntax and `git diff --check` pass.
+- Prototype limitation: changes persist in browser-local storage; no backend service was added. Monthly figures unavailable in existing invoice data remain blank rather than receiving invented calculations.
+- Integration with main commit `6453a30`: preserved the newer admin header, shared assets, configuration styles, and module renderers. Invoice routes have a dedicated renderer owner. All 29 existing admin tests pass; invoice browser workflows and responsive screenshots were checked again on the integrated code.
+
+### Implementation checklist
+
+- [x] Search-first consolidated module; no initial invoice list.
+- [x] LPagent card styling and exact desktop 70/30 split.
+- [x] Invoice actions and reviewed CSV/Excel updates.
+- [x] Read-only collection statuses and shared agent timeline.
+- [x] Browser workflows, responsive captures, and static checks.
+
+final result: passed

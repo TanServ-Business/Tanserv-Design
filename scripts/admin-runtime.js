@@ -8,6 +8,7 @@
 
   const parameters = new URLSearchParams(window.location.search);
   const moduleId = parameters.get("module") || "branch-master";
+  if (["invoice-master", "invoice-upload", "invoice-reallocation", "invoice-deletion"].includes(moduleId)) return;
   const viewId = parameters.get("view") || "";
   const modules = window.IneburaAdminModules || {};
   const definition = modules[moduleId];

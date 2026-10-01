@@ -39,6 +39,12 @@
   ];
 
   const modules = {
+    "invoice-master": {
+      id: "invoice-master",
+      title: "Invoice Master",
+      description: "Find an invoice to view details and manage updates.",
+      customBlocks: [{ id: "invoice-search", type: "invoice-workspace" }]
+    },
     "template-master": {
       id: "template-master",
       title: "Communication Setup",

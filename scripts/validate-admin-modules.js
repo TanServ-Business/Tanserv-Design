@@ -27,7 +27,7 @@ const expected = [
   "portfolio-transfer", "bulk-document-upload", "grn-upload", "cn-advance-upload", "payment-receipt-upload", "customer-portfolio-transfer",
   "group-master", "customer-master", "customer-contacts",
   "template-master", "smtp-setup", "sender-account",
-  "invoice-upload", "invoice-reallocation", "invoice-deletion",
+  "invoice-master", "invoice-upload", "invoice-reallocation", "invoice-deletion",
   "change-password", "client-master", "audit-retention", "audit-trail", "help-support",
 ];
 

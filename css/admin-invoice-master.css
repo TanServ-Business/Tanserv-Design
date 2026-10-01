@@ -1,0 +1,107 @@
+.imPage { padding: 28px 32px 24px; color: #111827; }
+.imHero { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 20px; padding: 0; background: transparent; border: 0; }
+.imHero h1 { margin: 0 0 6px; font-size: 28px; }
+.imHero p { margin: 0; color: #64748b; font-size: 15px; }
+.imSearch { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
+.imSearch label { font-weight: 700; color: #52627b; }
+.imSearch input { width: min(480px, 40vw); height: 44px; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px 14px; font: inherit; background: #fff; }
+.imPage button, .imDialog button { cursor: pointer; font: inherit; }
+.imPage button:focus-visible, .imDialog :focus-visible { outline: 3px solid #b499e6; outline-offset: 3px; }
+.imTextButton { border: 0; background: transparent; color: #55227d; padding: 10px 6px; font-weight: 700; }
+.imPage .adminPrimary, .imPage .adminSecondary, .imDialog .adminPrimary, .imDialog .adminSecondary { display: inline-flex; justify-content: center; align-items: center; gap: 8px; padding: 11px 16px; border-radius: 5px; white-space: nowrap; }
+.imPage .adminPrimary, .imDialog .adminPrimary { background: #55227d; border: 1px solid #55227d; color: #fff; }
+.imPage .adminSecondary, .imDialog .adminSecondary { border: 1px solid #55227d; color: #55227d; background: #fff; }
+.imPage button:hover, .imDialog button:hover { filter: brightness(.96); }
+.imPage button:disabled, .imDialog button:disabled { opacity: .5; cursor: default; }
+.imWorkspace { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 3fr); gap: 16px; height: calc(100dvh - 246px); min-height: 520px; }
+.imPanel { min-width: 0; background: #fff; border: 1px solid #e2e8f4; border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; }
+.imDetailsScroll, .imTimelineScroll { min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 18px; scrollbar-width: thin; }
+.imDetailsScroll { flex: 1; }
+.imInvoiceHeader { display: block; padding: 0; background: transparent; border: 0; margin-bottom: 16px; }
+.imInvoiceHeader h2 { margin: 0 0 6px; display: flex; gap: 14px; align-items: center; flex-wrap: wrap; font-size: 24px; }
+.imInvoiceHeader p { margin: 0; color: #64748b; }
+.imStatus { font-size: 12px; padding: 5px 10px; border-radius: 999px; background: #f5eefb; color: #55227d; font-weight: 700; }
+.imStatus.imOverdue { background: #fee2e2; color: #b91c1c; }
+.imSummaryGrid .imOverdue { color: #b91c1c; }
+.imCards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.imPage .infoCard { padding: 12px; min-width: 0; }
+.imPage .infoCardTitle { margin-bottom: 8px; }
+.imCardHeading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.imCardHeading small { font-size: 12px; color: #64748b; }
+.imPage .kv { gap: 12px; align-items: baseline; }
+.imPage .kv span { min-width: 0; overflow-wrap: anywhere; }
+.imPage .kv strong { max-width: 62%; text-align: right; overflow-wrap: anywhere; }
+.imPage .kv i { font-size: 11px; margin-left: 5px; color: #64748b; }
+.imPage .imSummary { grid-column: 1 / -1; }
+.imSummaryGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; }
+.imSummaryNote { color: #64748b; font-size: 12px; text-transform: none; letter-spacing: normal; font-weight: 400; }
+.imMoney .kv strong { white-space: nowrap; }
+.imMoney .imCollected { color: #15803d; }
+.imActions { display: flex; flex-wrap: wrap; gap: 10px; padding: 12px 16px; border-top: 1px solid #e2e8f4; }
+.imPage .imDelete, .imDialog .imDelete { margin-left: auto; color: #dc2626; border-color: #dc2626; }
+.imTimelineHeading { display: block; padding: 18px 18px 10px; background: #fff; border: 0; }
+.imTimelineHeading h2 { margin: 0 0 5px; font-size: 22px; }
+.imTimelineHeading p { margin: 0; color: #64748b; font-size: 13px; }
+.imTimelineScroll { flex: 1; padding-top: 8px; }
+.imTrail { position: relative; padding-left: 14px; }
+.imTrail::before { content: ""; position: absolute; left: 8px; top: 12px; bottom: 12px; width: 2px; background: #e2e8f0; }
+.imEvent { position: relative; margin: 0 0 12px; padding: 10px 12px; border-radius: 12px; background: #f7f8fb; border: 1px solid #e4e9f2; }
+.imEvent::before { content: ""; position: absolute; left: -11px; top: 16px; width: 10px; height: 10px; border-radius: 50%; background: var(--event-color, #55227d); box-shadow: 0 0 0 3px #fff; }
+.imEvent summary { cursor: pointer; display: flex; justify-content: space-between; gap: 8px; list-style: none; }
+.imEvent summary::-webkit-details-marker { display: none; }
+.imEvent summary strong { display: block; font-size: 13px; }
+.imEvent summary small { display: block; margin-top: 3px; color: #64748b; font-size: 11px; }
+.imEvent[open] { background: #fff; }
+.imEvent .imEventBody { margin-top: 10px; font-size: 12px; }
+.imEventBody .kv { font-size: 12px; padding: 6px 0; }
+.imEventBadge { align-self: flex-start; color: #55227d; background: #f5eefb; border-radius: 999px; padding: 3px 7px; font-size: 10px; white-space: nowrap; }
+.imEmpty { background: #fff; border: 1px solid #e2e8f4; border-radius: 8px; padding: 90px 20px; text-align: center; color: #64748b; }
+.imEmpty h2 { color: #111827; margin: 16px 0 8px; font-size: 21px; }
+.imEmpty > i { color: #55227d; font-size: 30px; }
+.imDialog { padding: 0; border: 1px solid #e2e8f4; border-radius: 12px; width: min(880px, calc(100vw - 40px)); max-height: 90dvh; color: #111827; }
+.imDialog::backdrop { background: rgb(15 23 42 / 42%); }
+.imDialogHeader, .imDialogFooter { display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 16px 20px; background: #fff; }
+.imDialogHeader { border-bottom: 1px solid #e2e8f4; }
+.imDialogHeader h2 { margin: 0; font-size: 21px; }
+.imDialogBody { padding: 18px 20px; overflow: auto; max-height: calc(90dvh - 154px); }
+.imDialogFooter { border-top: 1px solid #e2e8f4; justify-content: flex-end; }
+.imForm { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.imForm label, .imUploadControls label { display: flex; flex-direction: column; gap: 7px; color: #52627b; font-size: 13px; }
+.imForm input, .imForm select, .imForm textarea, .imUploadControls select { padding: 10px; min-width: 0; border-radius: 5px; border: 1px solid #cbd5e1; font: inherit; background: #fff; color: #111827; }
+.imForm .imWide { grid-column: 1 / -1; }
+.imNotice { padding: 12px; background: #f5eefb; border-radius: 6px; color: #55227d; font-size: 13px; margin: 0 0 16px; }
+.imError { color: #b91c1c; font-size: 13px; }
+.imUploadControls { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.imDropzone { display: block; margin: 18px 0 12px; padding: 22px; border: 1px dashed #b499e6; border-radius: 8px; background: #faf8fd; }
+.imDropzone input { display: block; margin-top: 12px; max-width: 100%; }
+.imPreviewSummary { font-weight: 700; margin-top: 20px; }
+.imPreviewWrap { overflow: auto; margin: 12px 0; }
+.imPreviewTable { width: 100%; border-collapse: collapse; font-size: 12px; text-align: left; }
+.imPreviewTable th { background: #f5eefb; color: #55227d; }
+.imPreviewTable th, .imPreviewTable td { padding: 9px 10px; border-bottom: 1px solid #e2e8f4; vertical-align: top; }
+.imPreviewTable .imRejected { background: #fff1f2; }
+.imPreviewTable ul { margin: 0; padding-left: 15px; }
+.imPreviewTable li { margin-bottom: 4px; }
+@media (max-width: 960px) {
+  .imPage { padding: 22px 20px; }
+  .imWorkspace { height: auto; grid-template-columns: 1fr; }
+  .imDetailsScroll { max-height: 70dvh; }
+  .imTimelineScroll { max-height: 480px; }
+  .imSearch { flex-wrap: wrap; }
+  .imSearch input { width: min(480px, 65vw); }
+}
+@media (max-width: 600px) {
+  .imHero { flex-direction: column; }
+  .imPage { padding: 18px 12px; }
+  .imSearch { gap: 10px; }
+  .imSearch label { width: 100%; }
+  .imSearch input { width: 100%; }
+  .imCards, .imSummaryGrid, .imForm, .imUploadControls { grid-template-columns: 1fr; }
+  .imSummaryGrid { gap: 0; }
+  .imDetailsScroll, .imTimelineScroll { padding: 14px; }
+  .imActions { gap: 8px; }
+  .imActions button { flex: 1; }
+  .imInvoiceHeader h2 { font-size: 21px; }
+  .imSummaryNote { display: block; margin-top: 5px; }
+  .imDialog { width: calc(100vw - 20px); }
+}

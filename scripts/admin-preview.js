@@ -13,7 +13,8 @@
   window.IneburaAdminPage = Object.freeze({
     module,
     view: params.get("view") || "",
-    renderer: ["dashboard", "help-support", "strategy-manager"].includes(module) ? "composed"
+    renderer: ["invoice-master", "invoice-upload", "invoice-reallocation", "invoice-deletion"].includes(module) ? "invoice"
+      : ["dashboard", "help-support", "strategy-manager"].includes(module) ? "composed"
       : ["invoice-preferences", "document-setup", "role-display", "user-setup", "notification-manager"].includes(module) ? "operational"
       : ["module-configuration", "bulk-document-upload", "client-master", "audit-retention", "audit-trail", "change-password"].includes(module) ? "specialized" : "registry",
   });
