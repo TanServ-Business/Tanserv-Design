@@ -1,0 +1,818 @@
+[
+  {
+    "file": "01-dashboard-local-desktop.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "84ebc264a732e854b57a246925a2bf97bcbe15975e9820b8814db17fec828d08"
+  },
+  {
+    "file": "02-branch-master-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "128476952d86c042aec99a3cd8adb0c0e1eaa2880309f0ab4feb423e1225602f"
+  },
+  {
+    "file": "03-holiday-master-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "10f6bf23633839f32404781e3c2c22cb561537edbc8dd02fa73df445bdd8b3cc"
+  },
+  {
+    "file": "04-bank-master-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "4c8e9ed007f8620017a654bcdf6cdd6c35f5e1a269b57a1e1bd1395e8924360c"
+  },
+  {
+    "file": "05-internal-contacts-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "da26e0c8882ae0a67863536cfe858725dbb561e9c5979c02d18a7314d075b5a5"
+  },
+  {
+    "file": "06-invoice-preferences-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "35e1ab32340efa9df17ac272d4d598ab21fbde24c7ae02d247e5848780df6a0e"
+  },
+  {
+    "file": "07-document-setup-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "8516aa4c8f35616d4929de3c24d0c0babeca2b67a69280f718df6cf8b2817341"
+  },
+  {
+    "file": "08-role-display-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "2521c8841ce3e3e15717bc220772b35239721a3a5ed24cc10c17b4fb70c5b7cb"
+  },
+  {
+    "file": "09-user-setup-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "677194c9a4cfd961ff3f916fc33aba948fd7a9910efcfbc9bbef99afa705e83b"
+  },
+  {
+    "file": "01-dashboard-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "f216be2f3722e9abcfd2aebc57a2363bcdcebecd434a6da09575965cca7d5b53"
+  },
+  {
+    "file": "02-branch-master-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "1d81d67421135f7f96b5eedbb6b1707ad9c9c8248425ca82bcdeda311dbf2206"
+  },
+  {
+    "file": "03-holiday-master-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "d4b6fb5dac723c870365ed05e9774fa95f824bb314d24ec0e1bf18c1406f7585"
+  },
+  {
+    "file": "02a-branch-create-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "246a81ac248d936f8af05c3863aa5b2f9c549ca313ac939334849ca033d64581"
+  },
+  {
+    "file": "02a-branch-create-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "ec2cce00262f0e2f098962bcb6998d8d2df30bcf9886a0267dbccaee73c7ac7f"
+  },
+  {
+    "file": "04-bank-master-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "8ca5ee99afa22372dc67769cabc7724d4cb621e9c101ea4a89d6ecae8539e8f9"
+  },
+  {
+    "file": "05-internal-contacts-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "9d8981fa3ac35106f2414326807625500f8a9a625c4eea9bfabfc7f6da3e4025"
+  },
+  {
+    "file": "06-invoice-preferences-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "1b84a08fc436b787e1113cd9f0474b94e01bfac2d4b96082ccb85a9586d69dcf"
+  },
+  {
+    "file": "07-document-setup-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "c66fd4084dd72ec8480f29f0848f44bb975b198d203e7581188f39221b6d59b3"
+  },
+  {
+    "file": "08-role-display-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "687749f3011575b6fedc7e0fd00a7c188a0c7ca8f878fc3fc69bab3aca02ff5b"
+  },
+  {
+    "file": "09-user-setup-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "e870daf8fd04e5918941edf948e42dc677e4d371306aa7625a75d0628ca22455"
+  },
+  {
+    "file": "10-notification-manager-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "3247957527723d3581853f17992636d8f5be125cf12f0e16d3b7d9a1f74b5503"
+  },
+  {
+    "file": "10-notification-manager-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "9b034be232e4c0104ec110967b14b6584e6741c8ba7f4f06fe21f036038c0bc2"
+  },
+  {
+    "file": "11-submission-process-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "c7de49d002ed1b3bee5f27b092f0cfef8dd861430d64429899c8824721378f68"
+  },
+  {
+    "file": "11-submission-process-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "913df9234e6335a96f02a2759ee39f4882bc4635d971026c503c8c539b6a6a5b"
+  },
+  {
+    "file": "12-module-configuration-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "7915a195e0eb26afa2027fd03a4e4325f48756d156ce181d1f1ecdd3df9e0d22"
+  },
+  {
+    "file": "12-module-configuration-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "f626052e0c2893a8dc363fc46e4e6ea3b98fce16e810ea7a46cc23d64f1ec78b"
+  },
+  {
+    "file": "13-portfolio-transfer-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "f6f98f735cf53823797c7d11e43d94bd63cb43c06d89a3d24ae4ba290273b690"
+  },
+  {
+    "file": "13-portfolio-transfer-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "3e1901269e62f7800d6e4453a83967f6db56e86547417ddb85816e0985805722"
+  },
+  {
+    "file": "14-bulk-document-upload-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "987c0035498197548fcbb503cb9ab7ace1a187bd92b127e106473f4ae3b9f046"
+  },
+  {
+    "file": "14-bulk-document-upload-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "6fd096217de59007b17c70f0ee45dc3e2b306be839c152ffc72616cbc5e0db85"
+  },
+  {
+    "file": "15-grn-upload-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "67228af264a971254c546adfeb8582959c0c482800ec95f6bcd97ef54e893780"
+  },
+  {
+    "file": "15-grn-upload-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "c8eb7d5e3c4085adc24aa0a76e6365d6d012916d61167895be6cbb1a99927aa4"
+  },
+  {
+    "file": "16-cn-advance-upload-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "8eab076ecde5d7fbd81b4e5e65e0e223af04d8e5c885a8be6e2e21cda04e93b7"
+  },
+  {
+    "file": "16-cn-advance-upload-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "df8b2bbf54c64f4093e0b6e9b0bb41d2a7521782a2a9307c715186d25bd20ab5"
+  },
+  {
+    "file": "17-payment-receipt-upload-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "a9129802cf712299e10b6c5841dfc0ab31779b0a148f2aca5c85025175e39719"
+  },
+  {
+    "file": "17-payment-receipt-upload-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "386a95c0d26eba529ff5490d0a44d3b0f3c7a05228373a3ac16f114c5539dd18"
+  },
+  {
+    "file": "18-customer-portfolio-transfer-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "502ad60d3355c17127a6c78d1f261fbc56a1680558ceedfb38206b61a73855d0"
+  },
+  {
+    "file": "18-customer-portfolio-transfer-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "686c484aa99fa965f6e47de76ac346def4f307417a1bdc0a01e6d58b9ccaefd3"
+  },
+  {
+    "file": "19-group-master-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "10f11d40737a82aed187002fa99947cc1b766bd28cd34547d6e3bcd85c28c33c"
+  },
+  {
+    "file": "19-group-master-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "1cafa91276d8c528586a40d7c9e54b9c544548137acccc1700946e7a63b0b24f"
+  },
+  {
+    "file": "20-customer-master-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "bb5e5ed8ab59e25005d8067643eabab4ad8d0c6ab87b3d641f8226bd22ae19cc"
+  },
+  {
+    "file": "20-customer-master-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "d4a8348f23757ba49c7570521243a9ecebf7c8a8ab4d93248a348fdbb066cdfe"
+  },
+  {
+    "file": "21-customer-contacts-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "f8d1cef522a9ff4f6460c090c56391baa0b18aa7675c84d6785baeb392ad600a"
+  },
+  {
+    "file": "21-customer-contacts-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "89b34a7e6f7b30bd44a8bed80246e9e5b0efbd05a6f07db575822faa345bae94"
+  },
+  {
+    "file": "22-template-master-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "ca459eff494f46c1ee273738112631b9d733fd6a60587d4a6bd20d602ba04a93"
+  },
+  {
+    "file": "22-template-master-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "4f7746169f07aa14bdae0900474c6ebe1794f53a117c01b1389b99bb14c57010"
+  },
+  {
+    "file": "23-smtp-setup-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "e2a5bd0f9c041c86b20c3f21cd6bed91b386a2f311aa43ebe26628909424dfbe"
+  },
+  {
+    "file": "23-smtp-setup-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "da4be51813996e3553d309f235ef1e90610b12f8692368a24651490a73a47ac1"
+  },
+  {
+    "file": "24-sender-account-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "1e7ca5ebd08cf4702f13c87439ab54dfba6345dad548463107aa276c7adb70ad"
+  },
+  {
+    "file": "24-sender-account-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "3adb4660209ba24b47bbe42727b274749db0aeeb9d2ada37d1cc6691920104d9"
+  },
+  {
+    "file": "25-strategy-manager-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "32a18ae6fa7caa3aed61d4c375882102840a6f46cc407974e24bacb8632d3eb6"
+  },
+  {
+    "file": "25-strategy-manager-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "c4564864a983cad4be722d33d8994f0bd7168599f7e1417c18dcdcbfe26cd1ec"
+  },
+  {
+    "file": "26-invoice-upload-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "b69898434605674c4e11cfeb24dc1f4c6841b500f1b966919ebd6ed88a90a490"
+  },
+  {
+    "file": "26-invoice-upload-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "d5546fdbad701486217bc471690ae11394e28f59b3b10fcd64b41ced047109fb"
+  },
+  {
+    "file": "27-invoice-reallocation-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "4e22accb8787f70d3cf4efc2b9ccba14bff140da97f84604708dd0d7a84528d8"
+  },
+  {
+    "file": "27-invoice-reallocation-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "befdbd5e072076663f789f9f6f0709f95b117d9bbfbcdb7ff015651351b204ef"
+  },
+  {
+    "file": "28-invoice-deletion-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "dde51e086f9b8a553b06ce58f2f0ff429ce69d68b52437f30d040a01ef153bd6"
+  },
+  {
+    "file": "28-invoice-deletion-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "2cd7c921a3a80dc2f40f1e805b2071c478974fe3f509431fe9a38d686a070788"
+  },
+  {
+    "file": "29-change-password-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "81d1ac79a7f53b9e211b0cef9c01b9d25f68a6317b795dddd45bae1e2f5a6018"
+  },
+  {
+    "file": "29-change-password-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "d1e360dddaace5b1487260e10127c54a7f0407af46e61da4816e2d9cfd49ee0a"
+  },
+  {
+    "file": "30-client-master-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "942bdc2f7dfcb39de8c41d721bd4dd4d9d02e55f7173e0c1a5fc589013ee0fc3"
+  },
+  {
+    "file": "30-client-master-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "3c96352f09755360706d3784ea58a95419cdf77acff6d4730d9bcdc9b90a779e"
+  },
+  {
+    "file": "31-audit-retention-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "3319761f95a8aad5a4ecdf1860bd236eea25a15b88c03cb1bfc93192908f3359"
+  },
+  {
+    "file": "31-audit-retention-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "28c82de0eeb3e5d78e9323544d261f94f24c3118d7540fb7567c800770ea087f"
+  },
+  {
+    "file": "32-audit-trail-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "e7dcb8c9a8a0de15cfcd56b7b590ee0d224f201a086d1ec65724c7ae397e66c4"
+  },
+  {
+    "file": "32-audit-trail-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "dfb8b8df0144a9bc55408345ae538f13c64d562a3de7e35068b243d14046c5be"
+  },
+  {
+    "file": "33-help-support-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "a519339155500b5fba8ad3a488654630bbb2603956a4af8691d1885e46d44133"
+  },
+  {
+    "file": "33-help-support-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "98f137d797847849a3669f70b7b273ca1ece01ca2748bfb34cbeaaf997b3b827"
+  },
+  {
+    "file": "33a-create-ticket-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "db19243963d5b68ba38377e974e29cec803be715f386bd67f3d2d19907a2fbde"
+  },
+  {
+    "file": "33a-create-ticket-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "40f7bf6e96268c58f2d23611147317efc7015f23a914a2148146865776d98aee"
+  },
+  {
+    "file": "33b-feedback-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "b55269d1b6b8bd6525ae776809171df6d2783d539bbde4b38efb3b622f91e742"
+  },
+  {
+    "file": "33b-feedback-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "49baa26de4d49203ec17ac46b824e917706ba88a1c7fed63bd50f9728e800bc9"
+  },
+  {
+    "file": "03a-holiday-create-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "f527e8b3a48877def54532e14833a72a3d049df5ddb5e292d4a453c87bc85e7a"
+  },
+  {
+    "file": "03a-holiday-create-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "998311b3d7e4c29224f151b103d71f94fb079469a3f7c61937f87f31aaf0e107"
+  },
+  {
+    "file": "03b-holiday-states-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "637d27e6511c56b5cfb58f89e5b6e13a6f5804afc89b82bfd33b5536a3ea79cf"
+  },
+  {
+    "file": "03b-holiday-states-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "b63f56c77c8c8ce5237241e88ae4492b56283239cdafbce6119a867d4ed44bc8"
+  },
+  {
+    "file": "04a-bank-create-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "ef4aa01931a2669e7d7f9ec38b82a904494c397ee4107a59450ebe7ecfae030c"
+  },
+  {
+    "file": "04a-bank-create-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "f3333eed8df8f380c6519516f15c5c3acc710f83812de443c7523d8f81b31f23"
+  },
+  {
+    "file": "05a-contact-create-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "dbbe1ca2572dd04b73c7d4a55d08ebc387b032aff5041860ebbad3d0cc9c820e"
+  },
+  {
+    "file": "05a-contact-create-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "b12fb334f2d0180fa45bb0cb6c40749a76f4e4e630335aac8abd969bd0e899e3"
+  },
+  {
+    "file": "06a-custom-aging-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "8322af73c47cf06cb8e945c300cab58dc28511a1090ad4d67ae1653de9ccb907"
+  },
+  {
+    "file": "06a-custom-aging-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "b49b28499dc1d0b6b7c489b0baa04313f509ac4737ea0d7b6c428af73732a1b2"
+  },
+  {
+    "file": "06b-create-bucket-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "a04ac8b4593e32a0d13010735813e523fe57920e8b0a22b0a70c4299293113a7"
+  },
+  {
+    "file": "06b-create-bucket-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "fed618b549898e78adf607c2e92aa98693c0c0faf114cde0069f8553c57c2d50"
+  },
+  {
+    "file": "06c-dispositions-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "853afce385458438e33bb4da8f54c062d037f78d0cbce23bc43923b59a33986d"
+  },
+  {
+    "file": "06c-dispositions-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "f2ca0fc8635ce0eb56f7d3d28f3cd0732d8b6d718e20c02a4ccf2a580cd5b140"
+  },
+  {
+    "file": "06d-purge-policy-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "a276c43682286378edf9844307fe65e2f7342cbbb1625c9a3cd6db539bdcc2a0"
+  },
+  {
+    "file": "06d-purge-policy-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "cf61cb058340067cc37ea51ab2399fc6791cfd5bfaa0d8b187f728a324e1d32b"
+  },
+  {
+    "file": "07a-document-create-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "d2c90e5b90920fc5107cfd689a5783fefdab475a79639d2d9863c3ac20290e90"
+  },
+  {
+    "file": "07a-document-create-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "1dbb858c10147e79544babeab5d6f2552bef7ce443ab8acc09f438ffd03ffb51"
+  },
+  {
+    "file": "07b-document-presets-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "2e6af1374ee2770266e70cb7c82a7b880e5ab117761f36f4c292e7ed0f8ae55f"
+  },
+  {
+    "file": "07b-document-presets-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "59fa63547809d0346b167c0be8d9a3638e28b8a57590f602a6d31c2757fa5f3f"
+  },
+  {
+    "file": "08a-role-names-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "e7a59ef562c8e992516ca35db1a7ba3415310fc7f7d78407b3482b7fb084d293"
+  },
+  {
+    "file": "08a-role-names-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "fce2bfbed234557f3348f58b2bf61f48082a05eb25de538bedae0a7634d41134"
+  },
+  {
+    "file": "09a-user-create-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "a3ad3a42f8e3e317cb00c52065579a6b6ddc2e545bd272097ec49dfde2c1e520"
+  },
+  {
+    "file": "09a-user-create-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "1617f96944a09100b23226fb820ce0451b9066747e3e02d9ca85a1e115dc0944"
+  },
+  {
+    "file": "09b-user-bulk-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "c0bdf5bc81652f45d0c6012f12c98a4b26772260bd4d159a292bf2ebc11717c6"
+  },
+  {
+    "file": "09b-user-bulk-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "94f973036904cc6df36cbc74ad6bf1f466d0489e9630f5e1a9771a26ebd6a324"
+  },
+  {
+    "file": "11a-submission-create-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "2105bd20d9b17d7d511a97103abfb41ee4a966dd8d371ba09ef27a308b2e8872"
+  },
+  {
+    "file": "11a-submission-create-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "1a3464e616af1464060355524ad57b7b8d37997da46fc3adc4c8633f2f634a88"
+  },
+  {
+    "file": "11b-push-settings-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "7d379fbfde4026e4222201226c73f877e5e6eceeb1175c7f4399ef148bb26735"
+  },
+  {
+    "file": "11b-push-settings-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "62c33d4eac4dc1f43271b35aef82762b48b539c318ecd4dc1ede0c5ac113270c"
+  },
+  {
+    "file": "12a-visit-config-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "3d631cd42bd3ddeb13db9045e1bc4c862bea2dbdab7a9081df2c5f17c7fe5507"
+  },
+  {
+    "file": "12a-visit-config-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "c83df80b18d354257582a02364e56873794bfa36fd39b5cc1b0c486dd3b3e2b7"
+  },
+  {
+    "file": "12b-monthend-config-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "bd689754896c9805d090c921fda8065750629ad4b93ec16ec5585367e231c0cb"
+  },
+  {
+    "file": "12b-monthend-config-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "939575dfd4327698b61c37f120a266d9a10e87f19b994df68d8b8bd649bfd91e"
+  },
+  {
+    "file": "12c-client-confirmation-config-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "80aa8c5ab391672c0447e7851b787d94141fb8f0626c006433e4d4381f063ee7"
+  },
+  {
+    "file": "12c-client-confirmation-config-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "e0519a9c543afd4af49764e65a9ed9817b05286eba002f7ea84b1430607b58fe"
+  },
+  {
+    "file": "12d-pdc-config-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "4c87b0220cc640e64c4d95e55a02742fe4f34f7e403a5406ce354fda2ab888e7"
+  },
+  {
+    "file": "12d-pdc-config-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "4efca4e5917f87d450b40125040cafd03169711f3d5574e7558057acb6985f54"
+  },
+  {
+    "file": "12e-escalation-config-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "13ef84c7801b9e9d772bed16cce3b98d405b8da1e1eb47ce31e40c095c9752e3"
+  },
+  {
+    "file": "12e-escalation-config-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "c9c70768a0600e273bc68c0012cdc2a2cce6aaec0c65ec5405b8e74984f5228a"
+  },
+  {
+    "file": "12f-issue-tracker-config-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "7c6332f2e7adbebe2f4e6dca4a9df1147674117f6e45b028a59fdf98cc498c4e"
+  },
+  {
+    "file": "12f-issue-tracker-config-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "9a4bfc4bf9143fd54c4c8ca74b74fe9e94e49ff6550c8fff1c39b42590d496a9"
+  },
+  {
+    "file": "13a-portfolio-upload-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "4c24284a15baa6c5fff846d8f60096f501c249c0e010fd8a301817868b0bf7f0"
+  },
+  {
+    "file": "13a-portfolio-upload-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "1d34d9e97aed56d2f124b5e2277a476c3f4a492aecd83538ad7c3fc482b16e4a"
+  },
+  {
+    "file": "19a-group-create-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "a8990159940cb1c3891ecb0b06f8eeb28621d37c3f1fc64fe90077d435be5238"
+  },
+  {
+    "file": "19a-group-create-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "6e45b256030b324c0ee03fe3061cd578406de19583defd32580888d6a41c754c"
+  },
+  {
+    "file": "20a-customer-create-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "96b458d5db3021603d318738f89684e9fa897d8720a6870e2a3db3142d92da7a"
+  },
+  {
+    "file": "20a-customer-create-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "03140163a22ba137325c12e0840110b20904477bada3baba43144f8ccd53ac84"
+  },
+  {
+    "file": "21a-customer-contact-create-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "1397a607cd8d84dfad6bb3948a4dc91819eebf3a584a2a7e221508c9019d398b"
+  },
+  {
+    "file": "21a-customer-contact-create-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "a6ad6568b5190e2770633966d0f0e3686ef040a43d5a210f1c06278dc49780ce"
+  },
+  {
+    "file": "20b-customer-bulk-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "3fef02a8d14394c8ad69385484b3594f4f5e94d0ed6df4393d7a46473745770d"
+  },
+  {
+    "file": "20b-customer-bulk-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "f379138d8032e083515dcc3d52ff81df720b8b226038cfd47df45d618a5209cd"
+  },
+  {
+    "file": "22a-template-edit-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "c1ae60f24e7b966b300d2c9e3b9816ed9770793506551b284bb68eb725da6179"
+  },
+  {
+    "file": "22a-template-edit-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "87f4754c2e589b5b58e670d6325569211f3a8e8a59d8ea7c5c3ae4137c845324"
+  },
+  {
+    "file": "25a-strategy-create-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "a962feebd45cd1324573d154095cd50e6c7191647d817cd4736849be17e0174a"
+  },
+  {
+    "file": "25a-strategy-create-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "db257e9c0eb2c90bb7f8ec33debf8b8ddafa919b901edb52e04e7a0c3d81aa82"
+  },
+  {
+    "file": "26a-invoice-create-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "b8698077b9a0b55b808ead6cdb7e7d674e2649eb54305cd95c7c0f1dc3ef501b"
+  },
+  {
+    "file": "26a-invoice-create-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "be42e0c8a44e19fe5d1780bd24121e73b561be85be2c603448f46d47f1f3c21e"
+  },
+  {
+    "file": "30a-subclient-create-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "c1c79699be1944226016613d3df23c4e2dabeba32f38e743d4b5476bcd65b3ec"
+  },
+  {
+    "file": "30a-subclient-create-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "ab0cbd4c33cc3bfd9c7703e93cf905666ad5817ef958a4ecb5880622e5f95219"
+  },
+  {
+    "file": "01a-directory-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "e7c6259420e8dd2f7564e2631f7c9e2a27c919ea183e2fe75b9ebbef105cc3d5"
+  },
+  {
+    "file": "01a-directory-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "12332097329501c8c95a4e28a3bd932c3f699f0f6120de1c5c3f15d89f44c892"
+  },
+  {
+    "file": "01b-directory-add-reference.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "9105d2b06bc9fd0017ed573b3620906950a4edd3e38817c92893fadea1fa524b"
+  },
+  {
+    "file": "01b-directory-add-local.jpg",
+    "width": 1440,
+    "height": 1000,
+    "sha256": "54620afa1afcbe35f2ac8cbdc7435ae45c74ebdd0b179b68282ef347c276a772"
+  }
+]

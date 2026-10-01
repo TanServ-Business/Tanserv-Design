@@ -1,0 +1,3306 @@
+{
+  "metadata": {
+    "date": "2026-09-07",
+    "scope": "Complete Admin navigation; sampled nested states; design-only comparison",
+    "verdict": "Not an exact match; not ready for UI-parity sign-off",
+    "destinations": 33,
+    "pairedStates": 103,
+    "screenshots": 206,
+    "source": "Current-run browser captures; original JPEG bytes preserved",
+    "viewport": "Matched within pairs at 746×1120 or 1112×1120 CSS pixels. Browser screenshot output sometimes proportionally rescales around scrollbars. Different modules used different widths. Some scrolled states have different vertical offsets.",
+    "routeMetadata": "URLs identify module landing routes, not guaranteed deep-state URLs. Per-capture DOM and original viewport records were not retained; encoded image dimensions and hashes are verified directly from saved files.",
+    "privacy": "Contains tenant-visible names, contact details and account information; share only with authorized reviewers. SMTP credential fields in the distributed capture contain unsaved redaction text; nothing was saved to the source portal."
+  },
+  "routes": [
+    {
+      "label": "Dashboard",
+      "ref": "https://testclient.inebura.ai/admin/dashboard",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=dashboard",
+      "key": "dashboard"
+    },
+    {
+      "label": "Branch Master",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/modules/mstoff/branchmaster",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=branch-master",
+      "key": "branch-master"
+    },
+    {
+      "label": "Holiday Master",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/modules/mstoff/holidaymaster",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=holiday-master",
+      "key": "holiday-master"
+    },
+    {
+      "label": "Bank Master",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/modules/mstoff/bankmaster",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=bank-master",
+      "key": "bank-master"
+    },
+    {
+      "label": "Internal Company Contact",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/modules/mstoff/internalcompanycontact",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=internal-contacts",
+      "key": "internal-contacts"
+    },
+    {
+      "label": "Invoice Preferences",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/invoice-setup",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=invoice-preferences",
+      "key": "invoice-preferences"
+    },
+    {
+      "label": "Document Setup",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/document-setup",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=document-setup",
+      "key": "document-setup"
+    },
+    {
+      "label": "Role and Display Name Setup",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/role-display-name-setup",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=role-display",
+      "key": "role-display"
+    },
+    {
+      "label": "User Setup",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/user-setup",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=user-setup",
+      "key": "user-setup"
+    },
+    {
+      "label": "Notification Manager",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/whatsApp-declaration",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=notification-manager",
+      "key": "notification-manager"
+    },
+    {
+      "label": "Invoice Submission process",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/document-strategy",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=submission-process",
+      "key": "submission-process"
+    },
+    {
+      "label": "Module Configuration",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/module-configuration",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=module-configuration",
+      "key": "module-configuration"
+    },
+    {
+      "label": "Portfolio Transfer",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/modules/ar/portfolioreallocationupload",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=portfolio-transfer",
+      "key": "portfolio-transfer"
+    },
+    {
+      "label": "Bulk Document Upload",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/modules/doc/bulkdocumentupload",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=bulk-document-upload",
+      "key": "bulk-document-upload"
+    },
+    {
+      "label": "GRN Upload",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/modules/ar/grndateupload",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=grn-upload",
+      "key": "grn-upload"
+    },
+    {
+      "label": "CN/Advance Upload",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/modules/ar/cnupload",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=cn-advance-upload",
+      "key": "cn-advance-upload"
+    },
+    {
+      "label": "Payment Receipt Upload",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/modules/ar/paymentrecieptupload",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=payment-receipt-upload",
+      "key": "payment-receipt-upload"
+    },
+    {
+      "label": "Customer Portfolio Transfer",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/modules/ar/customerportfoliotransfer",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=customer-portfolio-transfer",
+      "key": "customer-portfolio-transfer"
+    },
+    {
+      "label": "Group Master",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/modules/customeronboarding/groupmaster",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=group-master",
+      "key": "group-master"
+    },
+    {
+      "label": "Customer Master",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/modules/customeronboarding/customermaster",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=customer-master",
+      "key": "customer-master"
+    },
+    {
+      "label": "Customer Contacts",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/modules/customeronboarding/customercontactupload",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=customer-contacts",
+      "key": "customer-contacts"
+    },
+    {
+      "label": "Template Master",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/modules/emailsetup/commeventtemplate",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=template-master",
+      "key": "template-master"
+    },
+    {
+      "label": "Email Sender SMTP Setup",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/modules/emailsetup/emailsendersetting",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=smtp-setup",
+      "key": "smtp-setup"
+    },
+    {
+      "label": "Email Sender Account Setup",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/modules/emailsetup/emailsenderaccount",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=sender-account",
+      "key": "sender-account"
+    },
+    {
+      "label": "Strategy Manager",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/modules/ar/strategy",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=strategy-manager",
+      "key": "strategy-manager"
+    },
+    {
+      "label": "Invoice Upload",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/modules/invoiceupload",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=invoice-upload",
+      "key": "invoice-upload"
+    },
+    {
+      "label": "Invoice reallocation",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/modules/invoicereallocation",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=invoice-reallocation",
+      "key": "invoice-reallocation"
+    },
+    {
+      "label": "Invoice Deletion",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/modules/invoicedelete",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=invoice-deletion",
+      "key": "invoice-deletion"
+    },
+    {
+      "label": "Change Password - Admin",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/change-password-sidebar",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=change-password",
+      "key": "change-password"
+    },
+    {
+      "label": "Client Master",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/client-master",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=client-master",
+      "key": "client-master"
+    },
+    {
+      "label": "Audit Retention & Purge",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/modules/audit/auditsettings",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=audit-retention",
+      "key": "audit-retention"
+    },
+    {
+      "label": "Audit Trail",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/modules/audit/audittrail",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=audit-trail",
+      "key": "audit-trail"
+    },
+    {
+      "label": "Help & Support",
+      "ref": "https://testclient.inebura.ai/admin/dashboard/modules/help/support",
+      "local": "http://127.0.0.1:8765/pages/admin.html?module=help-support",
+      "key": "help-support"
+    }
+  ],
+  "shots": [
+    {
+      "step": 1,
+      "key": "00-navigation",
+      "module": 0,
+      "label": "Navigation",
+      "health": "Significant gap",
+      "note": "P1/P2: Notification Manager is top-level in reference but nested under Operational Setup locally. Sidebar width ~300 vs 280 CSS px, header/menu spacing and font sizes differ; footer not pinned to bottom locally; blur absent. All destination labels/routes otherwise present.",
+      "route": {
+        "label": "Dashboard",
+        "ref": "https://testclient.inebura.ai/admin/dashboard",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=dashboard",
+        "key": "dashboard"
+      },
+      "images": {
+        "testclient": {
+          "file": "00-navigation-testclient.jpg",
+          "width": 1112,
+          "height": 1120,
+          "bytes": 41221,
+          "sha256": "cc6479e99f23587c7152eea547a03c17aa625147c09d259a9d3396787abc7782"
+        },
+        "tanserv": {
+          "file": "00-navigation-tanserv.jpg",
+          "width": 1097,
+          "height": 1105,
+          "bytes": 74541,
+          "sha256": "8761c94971e3892cf3ddece48fe8b8e6808d12408a9a78105e99d32823533bc4"
+        }
+      }
+    },
+    {
+      "step": 2,
+      "key": "00a-directory",
+      "module": 0,
+      "label": "Directory",
+      "health": "Significant gap",
+      "note": "P1: Reference large centered modal with close, A–Z rail and single-column contact rows is replaced by small header popover/two-column cards. Missing phone/customer details and alphabet navigation, no visible close control. Sample names not compared.",
+      "route": {
+        "label": "Dashboard",
+        "ref": "https://testclient.inebura.ai/admin/dashboard",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=dashboard",
+        "key": "dashboard"
+      },
+      "images": {
+        "testclient": {
+          "file": "00a-directory-testclient.jpg",
+          "width": 1112,
+          "height": 1120,
+          "bytes": 130540,
+          "sha256": "84a290e8f892553eacf53fa5adb54b35d7cac01c20e21554b7fc3875231c5a5c"
+        },
+        "tanserv": {
+          "file": "00a-directory-tanserv.jpg",
+          "width": 1097,
+          "height": 1105,
+          "bytes": 107428,
+          "sha256": "e3b8a623bd6829b4427922ab26181d214e04c5c27ab6637ac839ef5016e610ab"
+        }
+      }
+    },
+    {
+      "step": 3,
+      "key": "00b-directory-add",
+      "module": 0,
+      "label": "Directory Add",
+      "health": "Significant gap",
+      "note": "P1/P2: Use Email for Communication starts checked locally vs unchecked reference; wrong checkbox card layout. Core field inventory exists; local uses native dropdowns, smaller dialog, title-case labels and denser spacing.",
+      "route": {
+        "label": "Dashboard",
+        "ref": "https://testclient.inebura.ai/admin/dashboard",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=dashboard",
+        "key": "dashboard"
+      },
+      "images": {
+        "testclient": {
+          "file": "00b-directory-add-testclient.jpg",
+          "width": 1112,
+          "height": 1120,
+          "bytes": 80389,
+          "sha256": "14af938931137457fe8cf69dd96c7f60644c5f6e5bee6504325b6d026e9bbe25"
+        },
+        "tanserv": {
+          "file": "00b-directory-add-tanserv.jpg",
+          "width": 1097,
+          "height": 1105,
+          "bytes": 63653,
+          "sha256": "3980afe026f0163e4a820274a4cc313d8f979978da874858d3e57aa497a68a3a"
+        }
+      }
+    },
+    {
+      "step": 4,
+      "key": "00c-notifications",
+      "module": 0,
+      "label": "Notifications",
+      "health": "Significant gap",
+      "note": "P1: local notification badge shows 2 while the open panel says No notifications yet; its sample state is internally inconsistent. Reference shows two timestamped cards. P2: panel width and heading treatment differ. Different notification text is not a defect. At this wider viewport the local hour chart also stops well before the available card width.",
+      "route": {
+        "label": "Dashboard",
+        "ref": "https://testclient.inebura.ai/admin/dashboard",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=dashboard",
+        "key": "dashboard"
+      },
+      "images": {
+        "testclient": {
+          "file": "00c-notifications-testclient.jpg",
+          "width": 1112,
+          "height": 1120,
+          "bytes": 135282,
+          "sha256": "6025350f4a03e1351eb2bbdb7cadeeee4f5db67844f95749fd7c95077be6082c"
+        },
+        "tanserv": {
+          "file": "00c-notifications-tanserv.jpg",
+          "width": 1097,
+          "height": 1105,
+          "bytes": 101645,
+          "sha256": "ed823c3a99df84ec9a2c429f910ce6638307ba2c44857b5a41ded6d9e6f5dfd6"
+        }
+      }
+    },
+    {
+      "step": 5,
+      "key": "01-dashboard",
+      "module": 1,
+      "label": "Dashboard",
+      "health": "Close / minor drift",
+      "note": "Close first-viewport hierarchy; live/sample counts intentionally differ. Lower-chart and sample-state findings are documented in 01a and 00c.",
+      "route": {
+        "label": "Dashboard",
+        "ref": "https://testclient.inebura.ai/admin/dashboard",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=dashboard",
+        "key": "dashboard"
+      },
+      "images": {
+        "testclient": {
+          "file": "01-dashboard-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 63081,
+          "sha256": "84f45cbb9b8c0a6b4a6056b75c508d52b39f6a634a2cd99169696e66caad5133"
+        },
+        "tanserv": {
+          "file": "01-dashboard-tanserv.jpg",
+          "width": 731,
+          "height": 1097,
+          "bytes": 55002,
+          "sha256": "bb3aa37d114f831f783188c2781bc03f12dd2289353502657c4b096088938242"
+        }
+      }
+    },
+    {
+      "step": 6,
+      "key": "01a-dashboard-lower",
+      "module": 1,
+      "label": "Dashboard Lower",
+      "health": "Significant gap",
+      "note": "P2: Local trend adds Customers series/summary instead of reference Today summary; Live Sessions renamed Sessions; Daily Activity Feed Live badge replaced Today; session headers lack sort affordances. Current local empty session data prevents populated-row visual comparison; reference has four rows. P1: Local charts show non-zero activity/session bars while adjacent totals and durations read zero, so sample states are internally inconsistent. Hour chart stops at 6 PM instead of 24 hours; local colored area fills differ from reference.",
+      "route": {
+        "label": "Dashboard",
+        "ref": "https://testclient.inebura.ai/admin/dashboard",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=dashboard",
+        "key": "dashboard"
+      },
+      "images": {
+        "testclient": {
+          "file": "01a-dashboard-lower-testclient.jpg",
+          "width": 1112,
+          "height": 1120,
+          "bytes": 100108,
+          "sha256": "082c7c2b6e869d25f16420d71772c00d3341442179a288a161d81c5cf9f44b46"
+        },
+        "tanserv": {
+          "file": "01a-dashboard-lower-tanserv.jpg",
+          "width": 1097,
+          "height": 1105,
+          "bytes": 88348,
+          "sha256": "6708b73a43aff1b0e8410eb6c1a53d033b08cc04a8c105508d1ac69bef00268b"
+        }
+      }
+    },
+    {
+      "step": 7,
+      "key": "02-branch-master",
+      "module": 2,
+      "label": "Branch Master",
+      "health": "Visual drift",
+      "note": "P2: local outer padding 16px vs reference48px; Create Branch vs Create New; table proportions and header styling differ. Single-line local tabs intentional.",
+      "route": {
+        "label": "Branch Master",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/mstoff/branchmaster",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=branch-master",
+        "key": "branch-master"
+      },
+      "images": {
+        "testclient": {
+          "file": "02-branch-master-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 43114,
+          "sha256": "dd30948f661d87c3018508e11e33dc832cb9ca4315155ac72c9bd13848625559"
+        },
+        "tanserv": {
+          "file": "02-branch-master-tanserv.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 49624,
+          "sha256": "44ae526ad9a66d220a8f311e1af552d2f29bc89ea5a81df6e6344b1b95b8a065"
+        }
+      }
+    },
+    {
+      "step": 8,
+      "key": "02a-branch-create",
+      "module": 2,
+      "label": "Branch Create",
+      "health": "Significant gap",
+      "note": "P1: required-marker and control-type mismatch in City/State/Country/Region; the reference location fields look derived while the local form presents editable controls. Actual derivation/read-only behavior was not tested. P2: placeholders, title, label casing and spacing differ.",
+      "route": {
+        "label": "Branch Master",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/mstoff/branchmaster",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=branch-master",
+        "key": "branch-master"
+      },
+      "images": {
+        "testclient": {
+          "file": "02a-branch-create-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 46196,
+          "sha256": "aa3f45e3e886e03a0bc6f1b9dd6b03359f0447fb211e59601860b8a39e8d134e"
+        },
+        "tanserv": {
+          "file": "02a-branch-create-tanserv.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 44039,
+          "sha256": "4781a5e7124f277a6b510b746445e4a1247ef8165ed71de2ba1e27da49a80867"
+        }
+      }
+    },
+    {
+      "step": 9,
+      "key": "03-holiday-master",
+      "module": 3,
+      "label": "Holiday Master",
+      "health": "Visual drift",
+      "note": "P2: shared Office Setup padding/header-color/action-label drift; matching four-column table. Sample counts excluded.",
+      "route": {
+        "label": "Holiday Master",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/mstoff/holidaymaster",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=holiday-master",
+        "key": "holiday-master"
+      },
+      "images": {
+        "testclient": {
+          "file": "03-holiday-master-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 68600,
+          "sha256": "75260a48b03ba8989a76930cdd73989254e3c8f1840728a3426cf11a817c0f34"
+        },
+        "tanserv": {
+          "file": "03-holiday-master-tanserv.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 55255,
+          "sha256": "6a471b5cb4c24abff54daff6993ad7581c3e045e69c1a5837ff7ae0bab53f5d0"
+        }
+      }
+    },
+    {
+      "step": 10,
+      "key": "03a-holiday-create",
+      "module": 3,
+      "label": "Holiday Create",
+      "health": "Visual drift",
+      "note": "P2: correct four-field structure and placeholders; local loses rounded dialog corners, differs label weight, background blur, checkbox size and button styling.",
+      "route": {
+        "label": "Holiday Master",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/mstoff/holidaymaster",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=holiday-master",
+        "key": "holiday-master"
+      },
+      "images": {
+        "testclient": {
+          "file": "03a-holiday-create-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 45572,
+          "sha256": "a72fcec72f508a2fd9c3e02ed444a721af4add85d9fab3605020af1e8362ca3f"
+        },
+        "tanserv": {
+          "file": "03a-holiday-create-tanserv.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 32647,
+          "sha256": "60dc296a3a584ee4cae993f601c5f09aa3dd7f71ee39f0c6a546c531f8a5bba3"
+        }
+      }
+    },
+    {
+      "step": 11,
+      "key": "03b-holiday-states",
+      "module": 3,
+      "label": "Holiday States",
+      "health": "Close / minor drift",
+      "note": "Close: searchable dropdown shows corresponding state names/codes and scroll; subtle weight/spacing mismatch.",
+      "route": {
+        "label": "Holiday Master",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/mstoff/holidaymaster",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=holiday-master",
+        "key": "holiday-master"
+      },
+      "images": {
+        "testclient": {
+          "file": "03b-holiday-states-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 47785,
+          "sha256": "2887b19e8ef50e4b58cad24fbfd9435be2b73daf782c4aeb74502bb9cc414d21"
+        },
+        "tanserv": {
+          "file": "03b-holiday-states-tanserv.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 34811,
+          "sha256": "3a07ae348b3b3552eb5cf988434e2180d0bf9995cb50c495768d59099da81b7e"
+        }
+      }
+    },
+    {
+      "step": 12,
+      "key": "04-bank-master",
+      "module": 4,
+      "label": "Bank Master",
+      "health": "Visual drift",
+      "note": "P2: shared Office Setup spacing and Create Bank label differ; local tab underline touches text at this width; source itself clips toolbar/action column. Local search moves below tabs.",
+      "route": {
+        "label": "Bank Master",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/mstoff/bankmaster",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=bank-master",
+        "key": "bank-master"
+      },
+      "images": {
+        "testclient": {
+          "file": "04-bank-master-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 79620,
+          "sha256": "cecd8808a35b8f64d5a167cce988bd20ef5b30cd1e38c8ddaa969e28c4a3329e"
+        },
+        "tanserv": {
+          "file": "04-bank-master-tanserv.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 84435,
+          "sha256": "6558503b5ecb623581df08b584e0f842e61feb34f750de19f46af081cb8306b2"
+        }
+      }
+    },
+    {
+      "step": 13,
+      "key": "04a-bank-create",
+      "module": 4,
+      "label": "Bank Create",
+      "health": "Close / minor drift",
+      "note": "Close field, title and placeholder match; P3 local placeholder bold, gradient Save and backdrop blur differ.",
+      "route": {
+        "label": "Bank Master",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/mstoff/bankmaster",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=bank-master",
+        "key": "bank-master"
+      },
+      "images": {
+        "testclient": {
+          "file": "04a-bank-create-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 55890,
+          "sha256": "38216f92da68234cf4dfc6352fcd823b532726b18c860cca0e63bb9d8fad2453"
+        },
+        "tanserv": {
+          "file": "04a-bank-create-tanserv.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 44191,
+          "sha256": "176fde4fa684fc76be6d03e47efcdb5ca214cef33f3575b6b4e4ad87a993575a"
+        }
+      }
+    },
+    {
+      "step": 14,
+      "key": "05-internal-contacts",
+      "module": 5,
+      "label": "Internal Contacts",
+      "health": "Visual drift",
+      "note": "P2 shared Office Setup spacing; long Create Internal Company Contact replaces Create New and pushes toolbar to second row; active tab underline overlaps text.",
+      "route": {
+        "label": "Internal Company Contact",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/mstoff/internalcompanycontact",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=internal-contacts",
+        "key": "internal-contacts"
+      },
+      "images": {
+        "testclient": {
+          "file": "05-internal-contacts-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 51805,
+          "sha256": "d0669c4e8411d17f19bfa04fbea9c8396c3d01f89aa06c13a36865dfed9d39aa"
+        },
+        "tanserv": {
+          "file": "05-internal-contacts-tanserv.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 45816,
+          "sha256": "03cfe74d7af2143a098743ae1d648d015accc636c200271fe14819a0c626263e"
+        }
+      }
+    },
+    {
+      "step": 15,
+      "key": "05a-contact-create",
+      "module": 5,
+      "label": "Contact Create",
+      "health": "Visual drift",
+      "note": "P2: fields/placeholders largely match but local uses two columns where reference stacks one column at746px, reducing form height by375px; gender/department affordances differ.",
+      "route": {
+        "label": "Internal Company Contact",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/mstoff/internalcompanycontact",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=internal-contacts",
+        "key": "internal-contacts"
+      },
+      "images": {
+        "testclient": {
+          "file": "05a-contact-create-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 42547,
+          "sha256": "c1abeba9eeab128d7c4d06d6722936f3c59b76e011f2d3a215602c4d77067718"
+        },
+        "tanserv": {
+          "file": "05a-contact-create-tanserv.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 37429,
+          "sha256": "1df7685a5781bf517a2eaa1ed698b8f30e8c9c54cbafe1b3bc2e83005f6e96cd"
+        }
+      }
+    },
+    {
+      "step": 16,
+      "key": "06-invoice-preferences",
+      "module": 6,
+      "label": "Invoice Preferences",
+      "health": "Visual drift",
+      "note": "P2: matching aging bucket structure but table proportions/header color/outer margins drift. Saved checkbox selection is data-dependent.",
+      "route": {
+        "label": "Invoice Preferences",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/invoice-setup",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=invoice-preferences",
+        "key": "invoice-preferences"
+      },
+      "images": {
+        "testclient": {
+          "file": "06-invoice-preferences-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 60013,
+          "sha256": "9a6dbaf58bcdd1c9732d0b127ae368f787d842f7659c17cd54ad1e40efdf17d9"
+        },
+        "tanserv": {
+          "file": "06-invoice-preferences-tanserv.jpg",
+          "width": 731,
+          "height": 1097,
+          "bytes": 51712,
+          "sha256": "334b66857bc4ba75185e8228ae66facad4d70991c725685bd4d5e7a68de88c23"
+        }
+      }
+    },
+    {
+      "step": 17,
+      "key": "06a-custom-aging",
+      "module": 6,
+      "label": "Custom Aging",
+      "health": "State unverified",
+      "note": "State mismatch: source empty, local sample cards. Must add empty-state preview; cannot establish populated-card parity from this source state.",
+      "route": {
+        "label": "Invoice Preferences",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/invoice-setup",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=invoice-preferences",
+        "key": "invoice-preferences"
+      },
+      "images": {
+        "testclient": {
+          "file": "06a-custom-aging-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 34256,
+          "sha256": "665aecaaeb5df559cc8d75c9bedd7805d3a7596c4f7555dcbfc6baed30cd5967"
+        },
+        "tanserv": {
+          "file": "06a-custom-aging-tanserv.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 44302,
+          "sha256": "601ce0feda8aa4a3df34d38fcfd4c404a760e47768e806e239a08404d0cff6c2"
+        }
+      }
+    },
+    {
+      "step": 18,
+      "key": "06b-create-bucket",
+      "module": 6,
+      "label": "Create Bucket",
+      "health": "Significant gap",
+      "note": "P1: missing Group Color control, missing consecutive-selection grid and buckets beyond151–180; wrong title, placeholder and Save Group label.",
+      "route": {
+        "label": "Invoice Preferences",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/invoice-setup",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=invoice-preferences",
+        "key": "invoice-preferences"
+      },
+      "images": {
+        "testclient": {
+          "file": "06b-create-bucket-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 52748,
+          "sha256": "cd6f33509ef92d6184b01c9ad75a09dee2b7316d1b2ec25068cab98df5ce2ae6"
+        },
+        "tanserv": {
+          "file": "06b-create-bucket-tanserv.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 33137,
+          "sha256": "fe1ebecba176c03df75b9a875541fbdc6b1186fb2b4b31724536006f7e55b9ba"
+        }
+      }
+    },
+    {
+      "step": 19,
+      "key": "06c-dispositions",
+      "module": 6,
+      "label": "Dispositions",
+      "health": "Significant gap",
+      "note": "P1: local hierarchy omits multiple reference primary-status groups (Red Flag, Further Action, Material/Service issues) from DOM; row height/grid styling and Add Sub Status sizing differ.",
+      "route": {
+        "label": "Invoice Preferences",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/invoice-setup",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=invoice-preferences",
+        "key": "invoice-preferences"
+      },
+      "images": {
+        "testclient": {
+          "file": "06c-dispositions-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 70696,
+          "sha256": "21a2eae62629c42d15f593b2b139e9a79957c02235177228ee4049d8ce66b2cb"
+        },
+        "tanserv": {
+          "file": "06c-dispositions-tanserv.jpg",
+          "width": 731,
+          "height": 1097,
+          "bytes": 59605,
+          "sha256": "17c5d097b855124466249c8e87f255906a3a8134c04f6cd50a817fafc9c3ecdf"
+        }
+      }
+    },
+    {
+      "step": 20,
+      "key": "06d-substatus",
+      "module": 6,
+      "label": "Substatus",
+      "health": "Significant gap",
+      "note": "P1: reference inline editor Display Value, Code, Color replaced by modal Sub Status, Color; Code missing and interaction pattern wrong.",
+      "route": {
+        "label": "Invoice Preferences",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/invoice-setup",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=invoice-preferences",
+        "key": "invoice-preferences"
+      },
+      "images": {
+        "testclient": {
+          "file": "06d-substatus-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 58288,
+          "sha256": "046d72a64887b1536065eb4fa00a78868ce1685386eb5fd595e6a6813b463912"
+        },
+        "tanserv": {
+          "file": "06d-substatus-tanserv.jpg",
+          "width": 731,
+          "height": 1097,
+          "bytes": 41156,
+          "sha256": "7cedc93b7e5ef6cd17a77508392a442e85c8dc524d895108f35fcfb8ae6c53fe"
+        }
+      }
+    },
+    {
+      "step": 21,
+      "key": "06e-purge-policy",
+      "module": 6,
+      "label": "Purge Policy",
+      "health": "Significant gap",
+      "note": "P1: local purple panel header renders dark purple title almost invisible; source white background. Control and warning structure otherwise present.",
+      "route": {
+        "label": "Invoice Preferences",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/invoice-setup",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=invoice-preferences",
+        "key": "invoice-preferences"
+      },
+      "images": {
+        "testclient": {
+          "file": "06e-purge-policy-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 42291,
+          "sha256": "6f9487816c989d15cb743bff14c7850d1ebefffdb8ec3c8026ed1d9927505c2c"
+        },
+        "tanserv": {
+          "file": "06e-purge-policy-tanserv.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 43171,
+          "sha256": "ae17d4f860eb1ef9589252670cdbee8e9a9301aab71304c709d2fdbed8e08df5"
+        }
+      }
+    },
+    {
+      "step": 22,
+      "key": "07-document-setup",
+      "module": 7,
+      "label": "Document Setup",
+      "health": "Visual drift",
+      "note": "P2: shared layout/table-color drift; source category badges wrap awkwardly at746, local stays one line (do not reproduce source defect without decision).",
+      "route": {
+        "label": "Document Setup",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/document-setup",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=document-setup",
+        "key": "document-setup"
+      },
+      "images": {
+        "testclient": {
+          "file": "07-document-setup-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 62671,
+          "sha256": "5a73e25c8a3b77cfee8cd00893c9ba22d7c7fcffe306372211b1cfa95ebfd361"
+        },
+        "tanserv": {
+          "file": "07-document-setup-tanserv.jpg",
+          "width": 731,
+          "height": 1097,
+          "bytes": 55044,
+          "sha256": "0a502625f5d84c9ec3e123fd1c5a86b8e42ac7c8ffe21f1dcee1601e80a72c2f"
+        }
+      }
+    },
+    {
+      "step": 23,
+      "key": "07a-document-presets",
+      "module": 7,
+      "label": "Document Presets",
+      "health": "Significant gap",
+      "note": "P1: local Add Selected looks enabled with zero selection unlike disabled source; missing Select documents to add footer; local Status badges clipped at right. Same columns otherwise.",
+      "route": {
+        "label": "Document Setup",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/document-setup",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=document-setup",
+        "key": "document-setup"
+      },
+      "images": {
+        "testclient": {
+          "file": "07a-document-presets-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 76496,
+          "sha256": "0661cbf93a337a56a7742e1eeb8eed4b87349234bbd5d480df5ab7dedc38924b"
+        },
+        "tanserv": {
+          "file": "07a-document-presets-tanserv.jpg",
+          "width": 731,
+          "height": 1097,
+          "bytes": 71383,
+          "sha256": "75755ca2c6bd684a41b6a576839ff633e0df42094d91b0ad80868ef55fa010d1"
+        }
+      }
+    },
+    {
+      "step": 24,
+      "key": "07b-document-create",
+      "module": 7,
+      "label": "Document Create",
+      "health": "Visual drift",
+      "note": "P2: fields/placeholders match but reference single-column form vs local split first row; dialog dimensions/placement differ.",
+      "route": {
+        "label": "Document Setup",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/document-setup",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=document-setup",
+        "key": "document-setup"
+      },
+      "images": {
+        "testclient": {
+          "file": "07b-document-create-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 48549,
+          "sha256": "0ef7c98e7b69a98b67459618f1ebd3246a22ca8200405298bc64d60a58ae71b2"
+        },
+        "tanserv": {
+          "file": "07b-document-create-tanserv.jpg",
+          "width": 731,
+          "height": 1097,
+          "bytes": 43192,
+          "sha256": "0e4ea80d38103ce043b33a5f560d600cef6bf356df9419b5d2891dc4fae12a36"
+        }
+      }
+    },
+    {
+      "step": 25,
+      "key": "08-role-display",
+      "module": 8,
+      "label": "Role Display",
+      "health": "Significant gap",
+      "note": "P1 responsive mismatch: reference wraps Support/View roles below Operational hierarchy; local fixed-width chart pushes them off-screen horizontally, large blank lower canvas.",
+      "route": {
+        "label": "Role and Display Name Setup",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/role-display-name-setup",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=role-display",
+        "key": "role-display"
+      },
+      "images": {
+        "testclient": {
+          "file": "08-role-display-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 63927,
+          "sha256": "27714edf9ea9d8b6131f992344a6c84b81a9a5aa8aabb288d19b9c876149f20b"
+        },
+        "tanserv": {
+          "file": "08-role-display-tanserv.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 52159,
+          "sha256": "a2b1833649df63ebba815aea9da998290c96f40aa7336da9a327c48c4f0a8baa"
+        }
+      }
+    },
+    {
+      "step": 26,
+      "key": "08a-role-names",
+      "module": 8,
+      "label": "Role Names",
+      "health": "Visual drift",
+      "note": "P2: correct three controls and disabled defaults; local two-column layout instead of source stacked fields, shorter panel.",
+      "route": {
+        "label": "Role and Display Name Setup",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/role-display-name-setup",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=role-display",
+        "key": "role-display"
+      },
+      "images": {
+        "testclient": {
+          "file": "08a-role-names-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 45759,
+          "sha256": "d6e75c4aa992b52e52bb2be02dee3d90ea521235a1a4378f73bf2844ebf6a032"
+        },
+        "tanserv": {
+          "file": "08a-role-names-tanserv.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 44740,
+          "sha256": "310e62b6a989538a99682485b2d07e56e23e0747793740e5178e8582c2d21ae0"
+        }
+      }
+    },
+    {
+      "step": 27,
+      "key": "09-user-setup",
+      "module": 9,
+      "label": "User Setup",
+      "health": "Significant gap",
+      "note": "P1: Send Creds row action missing locally (DOM). P2: role filter shows truncated A, uniform badge colors and email ellipsis differ. Source toolbar itself overlaps at746px.",
+      "route": {
+        "label": "User Setup",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/user-setup",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=user-setup",
+        "key": "user-setup"
+      },
+      "images": {
+        "testclient": {
+          "file": "09-user-setup-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 76150,
+          "sha256": "d2c39ed69bde63129fbd7bfca704b421cb4cf391d5a76b3f3d2b53c22df43a69"
+        },
+        "tanserv": {
+          "file": "09-user-setup-tanserv.jpg",
+          "width": 731,
+          "height": 1097,
+          "bytes": 66106,
+          "sha256": "2d5ccfaa7cc87cccac8eb121ef905042891b888d7424634fac45ede7180fee07"
+        }
+      }
+    },
+    {
+      "step": 28,
+      "key": "09a-user-create",
+      "module": 9,
+      "label": "User Create",
+      "health": "Visual drift",
+      "note": "P2: correct step1 fields and note; local two-column form vs reference one column and different modal height.",
+      "route": {
+        "label": "User Setup",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/user-setup",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=user-setup",
+        "key": "user-setup"
+      },
+      "images": {
+        "testclient": {
+          "file": "09a-user-create-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 50490,
+          "sha256": "0316ed54892908e67a535f8b53bdbeceb59ea6e7eb6515e5b9a7998c5ddb5b02"
+        },
+        "tanserv": {
+          "file": "09a-user-create-tanserv.jpg",
+          "width": 731,
+          "height": 1097,
+          "bytes": 47762,
+          "sha256": "eed2c7afc063d91ac580a118bbcdece59ec0fa7bc424324163efcf58446291fb"
+        }
+      }
+    },
+    {
+      "step": 29,
+      "key": "09b-user-existing",
+      "module": 9,
+      "label": "User Existing",
+      "health": "Significant gap",
+      "note": "P1: existing-contact checkbox fails to open reference second-level picker; local remains on step1 after checking.",
+      "route": {
+        "label": "User Setup",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/user-setup",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=user-setup",
+        "key": "user-setup"
+      },
+      "images": {
+        "testclient": {
+          "file": "09b-user-existing-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 66630,
+          "sha256": "797aace07bb5c4445fa59ca583243e410040d837e133e24cefca80fffe325a24"
+        },
+        "tanserv": {
+          "file": "09b-user-existing-tanserv.jpg",
+          "width": 731,
+          "height": 1097,
+          "bytes": 47935,
+          "sha256": "294ff90520eb23c351cf9732cf4938cedc023d1fca3f785025d242b74b6ef47c"
+        }
+      }
+    },
+    {
+      "step": 30,
+      "key": "09c-user-bulk",
+      "module": 9,
+      "label": "User Bulk",
+      "health": "Visual drift",
+      "note": "P2: same upload/history structure; row density, heading color, date format and outer layout differ. Counts excluded.",
+      "route": {
+        "label": "User Setup",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/user-setup",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=user-setup",
+        "key": "user-setup"
+      },
+      "images": {
+        "testclient": {
+          "file": "09c-user-bulk-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 61681,
+          "sha256": "8eedc8e8fc0a0d4202449c8f30911981b04d1e911e2c4563a0bc18f23403163f"
+        },
+        "tanserv": {
+          "file": "09c-user-bulk-tanserv.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 51841,
+          "sha256": "680cd9f6f4443891ee07596b724f79f1ec88205f5792d416db5d4ffe2e9ce792"
+        }
+      }
+    },
+    {
+      "step": 31,
+      "key": "10-notification-manager",
+      "module": 10,
+      "label": "Notification Manager",
+      "health": "Visual drift",
+      "note": "P2 visual: same columns/switches but shared padding/color drift. Accessibility: local search accessible name is icon and switches unnamed in DOM; reference switches named WhatsApp: On. Live switches not toggled (may persist).",
+      "route": {
+        "label": "Notification Manager",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/whatsApp-declaration",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=notification-manager",
+        "key": "notification-manager"
+      },
+      "images": {
+        "testclient": {
+          "file": "10-notification-manager-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 81538,
+          "sha256": "b176f0cea0c33e792c82f07e17afbef2ffb6d3d854dd83a86519170b0188970d"
+        },
+        "tanserv": {
+          "file": "10-notification-manager-tanserv.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 74968,
+          "sha256": "44206bf59b57fad442c93431f4f9853755883e56c2dc5885193a30f1f6183ff7"
+        }
+      }
+    },
+    {
+      "step": 32,
+      "key": "11-submission-process",
+      "module": 11,
+      "label": "Submission Process",
+      "health": "Significant gap",
+      "note": "P1: local Strategy Manager wrongly includes Push/Email settings above list; source is strategy list only. Different strategy states/type terminology and CTA.",
+      "route": {
+        "label": "Invoice Submission process",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/document-strategy",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=submission-process",
+        "key": "submission-process"
+      },
+      "images": {
+        "testclient": {
+          "file": "11-submission-process-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 48930,
+          "sha256": "29759fca244e5d84c891603cfe932880f1671fe3f6592944b04fabf828238dd6"
+        },
+        "tanserv": {
+          "file": "11-submission-process-tanserv.jpg",
+          "width": 731,
+          "height": 1097,
+          "bytes": 60471,
+          "sha256": "97a3f8b0c11cb04853b430199fd4ea097758332fc09bc36137e8fb6a70347409"
+        }
+      }
+    },
+    {
+      "step": 33,
+      "key": "11a-submission-create",
+      "module": 11,
+      "label": "Submission Create",
+      "health": "Significant gap",
+      "note": "P1: missing searchable full document checklist, agent-selection help and strategy explanation; checkbox replaces switch; five local document options vs reference16; Save instead of Create Strategy.",
+      "route": {
+        "label": "Invoice Submission process",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/document-strategy",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=submission-process",
+        "key": "submission-process"
+      },
+      "images": {
+        "testclient": {
+          "file": "11a-submission-create-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 55967,
+          "sha256": "becfd1f0451f3c157b063035f3abc0049b1aca73f618b677b17cb8d9532760a4"
+        },
+        "tanserv": {
+          "file": "11a-submission-create-tanserv.jpg",
+          "width": 731,
+          "height": 1097,
+          "bytes": 46028,
+          "sha256": "bb7ceba615997aa5bbf1e043a9b902adad787b6ea084b3a52862ee47a923cfff"
+        }
+      }
+    },
+    {
+      "step": 34,
+      "key": "11b-push-email",
+      "module": 11,
+      "label": "Push Email",
+      "health": "Significant gap",
+      "note": "P1: reference two white sections with KAM/KAS/Manager switches and Submit; local single low-contrast purple header, checkboxes and Save Changes. Sender/default values data-dependent.",
+      "route": {
+        "label": "Invoice Submission process",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/document-strategy",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=submission-process",
+        "key": "submission-process"
+      },
+      "images": {
+        "testclient": {
+          "file": "11b-push-email-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 41088,
+          "sha256": "cb6a64db702069d23c67446ee0ff6cdcb76ae9a0d5557aaca5f194fad37154e8"
+        },
+        "tanserv": {
+          "file": "11b-push-email-tanserv.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 40612,
+          "sha256": "a5019bc0e6c26c6db3fb84cc04a0b53b010cf1ad5c0b0c13f99025b91b295b27"
+        }
+      }
+    },
+    {
+      "step": 35,
+      "key": "12-module-configuration",
+      "module": 12,
+      "label": "Module Configuration",
+      "health": "Close / minor drift",
+      "note": "Close: four cards, text, disabled controls and spacing align after intentional single-line tab height difference. Local tabs scroll internally; reference has page overflow. No major first-tab field gap observed.",
+      "route": {
+        "label": "Module Configuration",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/module-configuration",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=module-configuration",
+        "key": "module-configuration"
+      },
+      "images": {
+        "testclient": {
+          "file": "12-module-configuration-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 80115,
+          "sha256": "c7495ca9e583f0355421f5b75d3514a2379ef27384981e18988e3506b335b655"
+        },
+        "tanserv": {
+          "file": "12-module-configuration-tanserv.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 77586,
+          "sha256": "7792ba0610e657d6b934689dc5d2085355f3c32127d70db60e0beac4533a9134"
+        }
+      }
+    },
+    {
+      "step": 36,
+      "key": "12a-config-edit",
+      "module": 12,
+      "label": "Config Edit",
+      "health": "Close / minor drift",
+      "note": "Close:500px dialog, four unchecked fields, Cancel/Apply and spacing closely match; local adds background blur. This does not validate other configuration tabs.",
+      "route": {
+        "label": "Module Configuration",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/module-configuration",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=module-configuration",
+        "key": "module-configuration"
+      },
+      "images": {
+        "testclient": {
+          "file": "12a-config-edit-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 60841,
+          "sha256": "f1df677c42471ced68096f71b4a07fbb08006f9560b28b8cbaa6a6a486b4ae9b"
+        },
+        "tanserv": {
+          "file": "12a-config-edit-tanserv.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 44437,
+          "sha256": "548179734d124b9224a2b5cafda0ba327f69f52221e706d32ea75634cc9b2360"
+        }
+      }
+    },
+    {
+      "step": 37,
+      "key": "12b-visit",
+      "module": 12,
+      "label": "Visit",
+      "health": "Significant gap",
+      "note": "P1: missing Current Start/End Time cards, dropdown substitutes Yes/No radios; RPC marked mandatory locally unlike reference; missing start-time required marker. Low-contrast purple panel header.",
+      "route": {
+        "label": "Module Configuration",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/module-configuration",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=module-configuration",
+        "key": "module-configuration"
+      },
+      "images": {
+        "testclient": {
+          "file": "12b-visit-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 56216,
+          "sha256": "70e86617662b7be1d1c8eeb45ccbe560ec839981cf919e468331e6588d1df2c6"
+        },
+        "tanserv": {
+          "file": "12b-visit-tanserv.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 50378,
+          "sha256": "1faadf507288e60050de4a0b9ab8d5094ffac66a4aa51e61cb06c73c3cec4c00"
+        }
+      }
+    },
+    {
+      "step": 38,
+      "key": "12c-monthend",
+      "module": 12,
+      "label": "Monthend",
+      "health": "Significant gap",
+      "note": "P1/P2: core manual/automatic sections exist; local DOM omits Bucket This Would Close/Last Closed/Would Run At summary and retry explanations; body typography, client badge and spacing drift.",
+      "route": {
+        "label": "Module Configuration",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/module-configuration",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=module-configuration",
+        "key": "module-configuration"
+      },
+      "images": {
+        "testclient": {
+          "file": "12c-monthend-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 100930,
+          "sha256": "a1ab6021effd7134cd8d5e44b110341f7a3e5926c8ff084fb3bea245e721f562"
+        },
+        "tanserv": {
+          "file": "12c-monthend-tanserv.jpg",
+          "width": 731,
+          "height": 1097,
+          "bytes": 97426,
+          "sha256": "cb1691554d197432f2e9cf1d4aac3cf8cb5e34283f31e6d55d030061762db39f"
+        }
+      }
+    },
+    {
+      "step": 39,
+      "key": "12d-monthend-auto",
+      "module": 12,
+      "label": "Monthend Auto",
+      "health": "Significant gap",
+      "note": "P1/P2: schedule exists but native radios replace month-segment buttons, text input lacks source calendar affordance, low-contrast purple schedule heading. Recipients is textbox locally vs source multiselect combobox. Saved dates/sample defaults excluded. Scroll positions differ.",
+      "route": {
+        "label": "Module Configuration",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/module-configuration",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=module-configuration",
+        "key": "module-configuration"
+      },
+      "images": {
+        "testclient": {
+          "file": "12d-monthend-auto-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 76676,
+          "sha256": "efdaebb7f7748ad01097e1dc3ac445fd2de2a50d8279abe22385d8746c1bebbe"
+        },
+        "tanserv": {
+          "file": "12d-monthend-auto-tanserv.jpg",
+          "width": 731,
+          "height": 1097,
+          "bytes": 75404,
+          "sha256": "f7b2cf61f769c786aac270d1263d6939b0b65de5f69b5716cfed0638efcf271c"
+        }
+      }
+    },
+    {
+      "step": 40,
+      "key": "12e-client-confirmation",
+      "module": 12,
+      "label": "Client Confirmation",
+      "health": "Significant gap",
+      "note": "P1/P2: heading shortened, low-contrast local panel, missing pagination/sort affordances and status badges; sample counts excluded. Reference status pill has severe narrow-width wrapping; do not copy defect.",
+      "route": {
+        "label": "Module Configuration",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/module-configuration",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=module-configuration",
+        "key": "module-configuration"
+      },
+      "images": {
+        "testclient": {
+          "file": "12e-client-confirmation-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 56509,
+          "sha256": "bb12a1aae3d77e7fb77bf1c10ca3e5737b4ad6783e46b1297ffa1c14a569f95c"
+        },
+        "tanserv": {
+          "file": "12e-client-confirmation-tanserv.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 47875,
+          "sha256": "a5ecdf32827dcd717b25e51971944d99dadf984a9d2d38eccfd2bfb97535c466"
+        }
+      }
+    },
+    {
+      "step": 41,
+      "key": "12f-cc-upload",
+      "module": 12,
+      "label": "Cc Upload",
+      "health": "Significant gap",
+      "note": "P1: enabled Upload before file selection vs disabled Start Upload; wrong title, file-types text vs10MB hint, misplaced/renamed download button.",
+      "route": {
+        "label": "Module Configuration",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/module-configuration",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=module-configuration",
+        "key": "module-configuration"
+      },
+      "images": {
+        "testclient": {
+          "file": "12f-cc-upload-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 44270,
+          "sha256": "fa1038c7d1f4b0b87a9fc465f438271de0e1409ef707e44731c768560c733e47"
+        },
+        "tanserv": {
+          "file": "12f-cc-upload-tanserv.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 36618,
+          "sha256": "2a2562e76e2e0c8ff9e4a51869e86378d8ba4d8710e39e166f796f6ff2e9ac95"
+        }
+      }
+    },
+    {
+      "step": 42,
+      "key": "12g-pdc",
+      "module": 12,
+      "label": "Pdc",
+      "health": "Significant gap",
+      "note": "P1: checkbox vs switch; missing auto-clear and Ops helper text; premature Save Changes visible while locked; low-contrast panel headings.",
+      "route": {
+        "label": "Module Configuration",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/module-configuration",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=module-configuration",
+        "key": "module-configuration"
+      },
+      "images": {
+        "testclient": {
+          "file": "12g-pdc-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 66487,
+          "sha256": "e57d05bb0545eace27e691e6a2c2bc631c7c72b2506813ad6a022c19de80dff0"
+        },
+        "tanserv": {
+          "file": "12g-pdc-tanserv.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 60494,
+          "sha256": "661ffea6b90d14a49cc18b4e603fc40e572d9136d03a10b59a3cce6a5d67687d"
+        }
+      }
+    },
+    {
+      "step": 43,
+      "key": "12h-pdc-user",
+      "module": 12,
+      "label": "Pdc User",
+      "health": "Significant gap",
+      "note": "P1: searchable inline user popover replaced by modal native select and Add User step.",
+      "route": {
+        "label": "Module Configuration",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/module-configuration",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=module-configuration",
+        "key": "module-configuration"
+      },
+      "images": {
+        "testclient": {
+          "file": "12h-pdc-user-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 66695,
+          "sha256": "bac7484739d3e13ea99eb1df5de37ce9eb7a3199b6e6944e5f9073898fbf7f9e"
+        },
+        "tanserv": {
+          "file": "12h-pdc-user-tanserv.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 38926,
+          "sha256": "8f6e116bfba823d4b0fe7f83a0759b368aaf8e0f42280d3c3360dc2c6e5c550b"
+        }
+      }
+    },
+    {
+      "step": 44,
+      "key": "12i-escalation",
+      "module": 12,
+      "label": "Escalation",
+      "health": "Significant gap",
+      "note": "P1/P2: source lavender headers/search integrated with cards; local dark-on-purple headings, search below, no footer guidance, Name instead of Process, different action layout.",
+      "route": {
+        "label": "Module Configuration",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/module-configuration",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=module-configuration",
+        "key": "module-configuration"
+      },
+      "images": {
+        "testclient": {
+          "file": "12i-escalation-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 66012,
+          "sha256": "b9fe0cf830c15758d86824e024d4566f1db6f0bfd558eaada5bd1d23d9166380"
+        },
+        "tanserv": {
+          "file": "12i-escalation-tanserv.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 58344,
+          "sha256": "24a5e9c63639fac5496a44906cbcf5686d1e88840cc3acf4d905395afd423f37"
+        }
+      }
+    },
+    {
+      "step": 45,
+      "key": "12j-process-create",
+      "module": 12,
+      "label": "Process Create",
+      "health": "Visual drift",
+      "note": "P2: four-step flow exists but source bullet introduction replaced by dense inline step text, extra Cancel footer, different modal width.",
+      "route": {
+        "label": "Module Configuration",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/module-configuration",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=module-configuration",
+        "key": "module-configuration"
+      },
+      "images": {
+        "testclient": {
+          "file": "12j-process-create-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 58387,
+          "sha256": "3a3242ac8e1209307f1cdf7430e87b36551f5631b7fc0356273a45522a5bd4dd"
+        },
+        "tanserv": {
+          "file": "12j-process-create-tanserv.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 43522,
+          "sha256": "5307b198cc74113b2683ffdc960508e630b85ef39705193d9d5f29bb5ceb4042"
+        }
+      }
+    },
+    {
+      "step": 46,
+      "key": "12k-process-name",
+      "module": 12,
+      "label": "Process Name",
+      "health": "Visual drift",
+      "note": "P2: wrong placeholder (source blank), missing helper text, oversized local wizard shell.",
+      "route": {
+        "label": "Module Configuration",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/module-configuration",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=module-configuration",
+        "key": "module-configuration"
+      },
+      "images": {
+        "testclient": {
+          "file": "12k-process-name-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 53907,
+          "sha256": "cab072b2f9cd835a6f829f86edaca73787417446c8b108782ad02338a0193aa0"
+        },
+        "tanserv": {
+          "file": "12k-process-name-tanserv.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 41157,
+          "sha256": "c6c1dbc0949207159121b1325a43e8ae034618eafb241abf543a89f16d71c2a5"
+        }
+      }
+    },
+    {
+      "step": 47,
+      "key": "12l-process-status",
+      "module": 12,
+      "label": "Process Status",
+      "health": "Significant gap",
+      "note": "P1: source optional-field explanatory badge missing; local Sub Status initially enabled vs disabled source; select styling/layout differ.",
+      "route": {
+        "label": "Module Configuration",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/module-configuration",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=module-configuration",
+        "key": "module-configuration"
+      },
+      "images": {
+        "testclient": {
+          "file": "12l-process-status-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 55111,
+          "sha256": "315ce4a480c1e0f9911292d64431af8f0ef217b603747b8c4f603ebf2d9fbef8"
+        },
+        "tanserv": {
+          "file": "12l-process-status-tanserv.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 43115,
+          "sha256": "e35c94986f3d55079c090c9ff269d02451ea47124b3e57465118f02661449922"
+        }
+      }
+    },
+    {
+      "step": 48,
+      "key": "12m-process-matrix",
+      "module": 12,
+      "label": "Process Matrix",
+      "health": "Significant gap",
+      "note": "P1: missing Create new matrix route from wizard and reuse helper text; wrong placeholder.",
+      "route": {
+        "label": "Module Configuration",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/module-configuration",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=module-configuration",
+        "key": "module-configuration"
+      },
+      "images": {
+        "testclient": {
+          "file": "12m-process-matrix-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 55089,
+          "sha256": "1fa1dd3bf44ff37ad7f5afe53e5ec1412dbaee90288da225de6a37350427b6b3"
+        },
+        "tanserv": {
+          "file": "12m-process-matrix-tanserv.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 42961,
+          "sha256": "91368b1dea17f0119556fd1ef8e758b163139167556ce7165b40776ce45e631a"
+        }
+      }
+    },
+    {
+      "step": 49,
+      "key": "12n-matrix-new",
+      "module": 12,
+      "label": "Matrix New",
+      "health": "Visual drift",
+      "note": "P2: source640x500 reserved dialog vs local wider/shallow; missing empty-state/helper copy.",
+      "route": {
+        "label": "Module Configuration",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/module-configuration",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=module-configuration",
+        "key": "module-configuration"
+      },
+      "images": {
+        "testclient": {
+          "file": "12n-matrix-new-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 50205,
+          "sha256": "d87c448f16e4bacbbe4397cfb22a09a98077e886cad1b3bfce97eaf98c399ca6"
+        },
+        "tanserv": {
+          "file": "12n-matrix-new-tanserv.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 37915,
+          "sha256": "12e59052360d29bfff2d385be6249e042a220bc7f532b5fc619608ca89aab23e"
+        }
+      }
+    },
+    {
+      "step": 50,
+      "key": "12o-matrix-level",
+      "module": 12,
+      "label": "Matrix Level",
+      "health": "Significant gap",
+      "note": "P1: source numbered Level1 with remove and Approver selector; local Approver Role plus Level Name, lacks remove control/numbered level presentation.",
+      "route": {
+        "label": "Module Configuration",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/module-configuration",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=module-configuration",
+        "key": "module-configuration"
+      },
+      "images": {
+        "testclient": {
+          "file": "12o-matrix-level-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 51747,
+          "sha256": "666813143a372d3bcfff708ef7858f10a1fdcc5b4a89966653462948548b2efb"
+        },
+        "tanserv": {
+          "file": "12o-matrix-level-tanserv.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 40501,
+          "sha256": "7c5d7bbde15fce67c05ed24053adb9d114fe308a4dd7ad5ef1c6658a4d733741"
+        }
+      }
+    },
+    {
+      "step": 51,
+      "key": "12p-issue-tracker",
+      "module": 12,
+      "label": "Issue Tracker",
+      "health": "Significant gap",
+      "note": "P1/P2: local plain checkbox replaces reference switch/card; helper copy differs, missing existing-setup intro, low-contrast heading. Source page scrolls horizontally when last tab selected, cropping title; local active tab remains offscreen.",
+      "route": {
+        "label": "Module Configuration",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/module-configuration",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=module-configuration",
+        "key": "module-configuration"
+      },
+      "images": {
+        "testclient": {
+          "file": "12p-issue-tracker-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 42121,
+          "sha256": "ea790aa272f6bef3e78878216af544ec524e27288e6f4a599d177317c9b0452e"
+        },
+        "tanserv": {
+          "file": "12p-issue-tracker-tanserv.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 40719,
+          "sha256": "07f1a3a042ed5a185bf401a807b70a7c959554d70ff783d942ae03632ece9bb6"
+        }
+      }
+    },
+    {
+      "step": 52,
+      "key": "13-portfolio-transfer",
+      "module": 13,
+      "label": "Portfolio Transfer",
+      "health": "Significant gap",
+      "note": "P1: local failed status is green like success, Progress cells blank, Failed download shown on success rows too. P2 shared padding/table/toolbar drift. Source has severe vertical status-pill wrapping.",
+      "route": {
+        "label": "Portfolio Transfer",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/ar/portfolioreallocationupload",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=portfolio-transfer",
+        "key": "portfolio-transfer"
+      },
+      "images": {
+        "testclient": {
+          "file": "13-portfolio-transfer-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 53767,
+          "sha256": "90c4672100b378ae2cee7d11a99b254d61bdb67595413fc3f46a49db1edb0747"
+        },
+        "tanserv": {
+          "file": "13-portfolio-transfer-tanserv.jpg",
+          "width": 731,
+          "height": 1097,
+          "bytes": 76982,
+          "sha256": "d02d2cc9ca2dfbc99e0c06f53e42b13bce2ab2ca5903177497c05df88f8d8428"
+        }
+      }
+    },
+    {
+      "step": 53,
+      "key": "13a-portfolio-upload",
+      "module": 13,
+      "label": "Portfolio Upload",
+      "health": "Visual drift",
+      "note": "P2: same upload content; local wider dialog and full-width stacked footer buttons vs600px reference and inline footer.",
+      "route": {
+        "label": "Portfolio Transfer",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/ar/portfolioreallocationupload",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=portfolio-transfer",
+        "key": "portfolio-transfer"
+      },
+      "images": {
+        "testclient": {
+          "file": "13a-portfolio-upload-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 48824,
+          "sha256": "a71f17cd538210dca708002394facef15fe8131af2b03a010aaadf6d50e41dac"
+        },
+        "tanserv": {
+          "file": "13a-portfolio-upload-tanserv.jpg",
+          "width": 731,
+          "height": 1097,
+          "bytes": 48148,
+          "sha256": "f67387ecc82393b149da3626af71645120f9370c1505a066a9bfd6b4b29aac73"
+        }
+      }
+    },
+    {
+      "step": 54,
+      "key": "14-bulk-document-upload",
+      "module": 14,
+      "label": "Bulk Document Upload",
+      "health": "Significant gap",
+      "note": "P1/P2: missing yellow guidance panel, native file control vs styled Browse, document options limited locally, missing table pagination/sort; different action placement.",
+      "route": {
+        "label": "Bulk Document Upload",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/doc/bulkdocumentupload",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=bulk-document-upload",
+        "key": "bulk-document-upload"
+      },
+      "images": {
+        "testclient": {
+          "file": "14-bulk-document-upload-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 100395,
+          "sha256": "4bfbebb50254846dcb7ea8b2d4cf2ebd4b46ad6288c2d8c6b24d139dec2d5fdb"
+        },
+        "tanserv": {
+          "file": "14-bulk-document-upload-tanserv.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 73709,
+          "sha256": "2cbd167f98e8fc3a49636eab44555ac5ed0175cc47b60480afcbb926c54dd593"
+        }
+      }
+    },
+    {
+      "step": 55,
+      "key": "14a-limbo",
+      "module": 14,
+      "label": "Limbo",
+      "health": "Visual drift",
+      "note": "P2: correctly switches to Client/File/Type/Actions table; local lacks pagination and reference icons/styling. Edit detail not inspected.",
+      "route": {
+        "label": "Bulk Document Upload",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/doc/bulkdocumentupload",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=bulk-document-upload",
+        "key": "bulk-document-upload"
+      },
+      "images": {
+        "testclient": {
+          "file": "14a-limbo-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 85437,
+          "sha256": "a1e65ae9dd0f4d67ea5c8f21984ed49cd30f25edf7e97c65e9b2fc1c97c7d144"
+        },
+        "tanserv": {
+          "file": "14a-limbo-tanserv.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 69343,
+          "sha256": "1ae3f98850d34708850b4c60a1b7ed3f6826e4c02ec4ea77e2cb8e82b72cb6cc"
+        }
+      }
+    },
+    {
+      "step": 56,
+      "key": "15-grn-upload",
+      "module": 15,
+      "label": "Grn Upload",
+      "health": "Significant gap",
+      "note": "P1/P2: shared bulk-table parity gaps: blank local progress, failed download displayed on success rows, shared padding/header/toolbar drift. Failed badges green locally; compare source color by module. Source narrow-width status wrapping also defective.",
+      "route": {
+        "label": "GRN Upload",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/ar/grndateupload",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=grn-upload",
+        "key": "grn-upload"
+      },
+      "images": {
+        "testclient": {
+          "file": "15-grn-upload-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 53414,
+          "sha256": "a2aa8aa132f2c3bff523dde0642f16a8ec8fe00c06edc21334268d11b1c49de9"
+        },
+        "tanserv": {
+          "file": "15-grn-upload-tanserv.jpg",
+          "width": 731,
+          "height": 1097,
+          "bytes": 76415,
+          "sha256": "0bda2c7f952277ce023c8d0f75469ec8bacc2c3103833608173605e5cb2e0150"
+        }
+      }
+    },
+    {
+      "step": 57,
+      "key": "15a-grn-dialog",
+      "module": 15,
+      "label": "Grn Dialog",
+      "health": "Visual drift",
+      "note": "P2: matching upload title and file types, but local wider modal, stacked full-width footer actions and different download button; source600px with inline footer.",
+      "route": {
+        "label": "GRN Upload",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/ar/grndateupload",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=grn-upload",
+        "key": "grn-upload"
+      },
+      "images": {
+        "testclient": {
+          "file": "15a-grn-dialog-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 48599,
+          "sha256": "df03839328932de503b2df221c2ab0e3ba908fe8a8ebe0c8d85631dd3f1410c6"
+        },
+        "tanserv": {
+          "file": "15a-grn-dialog-tanserv.jpg",
+          "width": 731,
+          "height": 1097,
+          "bytes": 47637,
+          "sha256": "21cc1a6a57f9d81e512557f3919faf2a6ca880eda9a4b90826bf9bb19345a6fe"
+        }
+      }
+    },
+    {
+      "step": 58,
+      "key": "16-cn-advance-upload",
+      "module": 16,
+      "label": "Cn Advance Upload",
+      "health": "Significant gap",
+      "note": "P1/P2: shared bulk-table parity gaps: blank local progress, failed download displayed on success rows, shared padding/header/toolbar drift. Failed badges green locally; compare source color by module. Source narrow-width status wrapping also defective.",
+      "route": {
+        "label": "CN/Advance Upload",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/ar/cnupload",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=cn-advance-upload",
+        "key": "cn-advance-upload"
+      },
+      "images": {
+        "testclient": {
+          "file": "16-cn-advance-upload-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 57419,
+          "sha256": "715c7ae749f197060f1236fa4aac387f701f6e4fab07fd7f28b33d76697d77fd"
+        },
+        "tanserv": {
+          "file": "16-cn-advance-upload-tanserv.jpg",
+          "width": 731,
+          "height": 1097,
+          "bytes": 76483,
+          "sha256": "d18d8369614a6e2689b9171eb3a4af4bc56677fbe45847afd68c914d64d84a4e"
+        }
+      }
+    },
+    {
+      "step": 59,
+      "key": "16a-cn-dialog",
+      "module": 16,
+      "label": "Cn Dialog",
+      "health": "Visual drift",
+      "note": "P2: matching upload title and file types, but local wider modal, stacked full-width footer actions and different download button; source600px with inline footer.",
+      "route": {
+        "label": "CN/Advance Upload",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/ar/cnupload",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=cn-advance-upload",
+        "key": "cn-advance-upload"
+      },
+      "images": {
+        "testclient": {
+          "file": "16a-cn-dialog-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 50279,
+          "sha256": "2d4b21dd0b20a4cef4e852d77b6d3ef26cbd655f1143aaab8952acf51dfb4155"
+        },
+        "tanserv": {
+          "file": "16a-cn-dialog-tanserv.jpg",
+          "width": 731,
+          "height": 1097,
+          "bytes": 48228,
+          "sha256": "35f4d5d3b262450c475a31297b29d287f23b6035d3217847c87e1b56c9a372e2"
+        }
+      }
+    },
+    {
+      "step": 60,
+      "key": "17-payment-receipt-upload",
+      "module": 17,
+      "label": "Payment Receipt Upload",
+      "health": "Significant gap",
+      "note": "P1/P2: shared bulk-table parity gaps: blank local progress, failed download displayed on success rows, shared padding/header/toolbar drift. Failed badges green locally; compare source color by module. Source narrow-width status wrapping also defective.",
+      "route": {
+        "label": "Payment Receipt Upload",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/ar/paymentrecieptupload",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=payment-receipt-upload",
+        "key": "payment-receipt-upload"
+      },
+      "images": {
+        "testclient": {
+          "file": "17-payment-receipt-upload-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 49207,
+          "sha256": "d59b9d9333878b76312e4e4f8e706a27a570c0ca81f76a7e569284dcbee1677c"
+        },
+        "tanserv": {
+          "file": "17-payment-receipt-upload-tanserv.jpg",
+          "width": 731,
+          "height": 1097,
+          "bytes": 76829,
+          "sha256": "f66b30a06d314a51e9661c2c026268c37612f440c7e9f9fbfee6414eeada3cc4"
+        }
+      }
+    },
+    {
+      "step": 61,
+      "key": "17a-payment-dialog",
+      "module": 17,
+      "label": "Payment Dialog",
+      "health": "Visual drift",
+      "note": "P2: matching upload title and file types, but local wider modal, stacked full-width footer actions and different download button; source600px with inline footer.",
+      "route": {
+        "label": "Payment Receipt Upload",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/ar/paymentrecieptupload",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=payment-receipt-upload",
+        "key": "payment-receipt-upload"
+      },
+      "images": {
+        "testclient": {
+          "file": "17a-payment-dialog-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 46025,
+          "sha256": "3c1ada8036022f4b30237e4596dc187c839af5244cee641b9d2478f8770f7acf"
+        },
+        "tanserv": {
+          "file": "17a-payment-dialog-tanserv.jpg",
+          "width": 731,
+          "height": 1097,
+          "bytes": 48674,
+          "sha256": "2a37681347276e47536d82906287e7685941ca7c6a2d7a3a0ff50da03398643f"
+        }
+      }
+    },
+    {
+      "step": 62,
+      "key": "18-customer-portfolio-transfer",
+      "module": 18,
+      "label": "Customer Portfolio Transfer",
+      "health": "Significant gap",
+      "note": "P1/P2: blank local progress and unconditional Failed action; shared table/toolbar/padding drift. Both source/local use green failure badge here (source UX inconsistency).",
+      "route": {
+        "label": "Customer Portfolio Transfer",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/ar/customerportfoliotransfer",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=customer-portfolio-transfer",
+        "key": "customer-portfolio-transfer"
+      },
+      "images": {
+        "testclient": {
+          "file": "18-customer-portfolio-transfer-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 53239,
+          "sha256": "aae3a652eabf0af493f5ef5dcda5d7f4d7326402351b35c7e745a0ac903d7c43"
+        },
+        "tanserv": {
+          "file": "18-customer-portfolio-transfer-tanserv.jpg",
+          "width": 731,
+          "height": 1097,
+          "bytes": 76624,
+          "sha256": "e762249b3b40c60ba746ecc7517aa70968d58ab5d7557fb4655fed287883166f"
+        }
+      }
+    },
+    {
+      "step": 63,
+      "key": "18a-customer-transfer-dialog",
+      "module": 18,
+      "label": "Customer Transfer Dialog",
+      "health": "Visual drift",
+      "note": "P2: matching upload title and file types, but local wider modal, stacked full-width footer actions and different download button; source600px with inline footer. Required-column guidance exists but wording/color differ (yellow reference, lavender local);10MB hint moved.",
+      "route": {
+        "label": "Customer Portfolio Transfer",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/ar/customerportfoliotransfer",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=customer-portfolio-transfer",
+        "key": "customer-portfolio-transfer"
+      },
+      "images": {
+        "testclient": {
+          "file": "18a-customer-transfer-dialog-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 60203,
+          "sha256": "0c27288d4a6f59d328582d19f8d43e3ab04814fea614cc23fb6ea6873a37a287"
+        },
+        "tanserv": {
+          "file": "18a-customer-transfer-dialog-tanserv.jpg",
+          "width": 731,
+          "height": 1097,
+          "bytes": 56944,
+          "sha256": "47632cac5f779431657c19044f248425944093b1bd2fd663304aa8e136fee2e8"
+        }
+      }
+    },
+    {
+      "step": 64,
+      "key": "19-group-master",
+      "module": 19,
+      "label": "Group Master",
+      "health": "Visual drift",
+      "note": "P2: Create New is renamed Add New Group; outer margins are 16px vs 48px; local two-column table has an unnecessary horizontal scrollbar and tab underline touches text.",
+      "route": {
+        "label": "Group Master",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/customeronboarding/groupmaster",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=group-master",
+        "key": "group-master"
+      },
+      "images": {
+        "testclient": {
+          "file": "19-group-master-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 45452,
+          "sha256": "9e170be48895aff2897f236d12aeb490784a48708ad3c9d6f519519f55d02861"
+        },
+        "tanserv": {
+          "file": "19-group-master-tanserv.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 46206,
+          "sha256": "2a4b4eaba220ca54ef616cb49582ff04628b0a81982156fb76f69375b3c48f34"
+        }
+      }
+    },
+    {
+      "step": 65,
+      "key": "19a-group-create",
+      "module": 19,
+      "label": "Group Create",
+      "health": "Visual drift",
+      "note": "P2: Three fields match, but local dialog is about 710px vs 500px, textarea is shorter, and Save Group is renamed Save.",
+      "route": {
+        "label": "Group Master",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/customeronboarding/groupmaster",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=group-master",
+        "key": "group-master"
+      },
+      "images": {
+        "testclient": {
+          "file": "19a-group-create-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 37566,
+          "sha256": "60b6f818c817fedcf5ec76856ae66101170ff0ed71c5239fb00d53ddad023afa"
+        },
+        "tanserv": {
+          "file": "19a-group-create-tanserv.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 32877,
+          "sha256": "2136de7d456037991f64616b8cd2ba1cf3b85f1acae261784b69465bc8de6446"
+        }
+      }
+    },
+    {
+      "step": 66,
+      "key": "20-customer-master",
+      "module": 20,
+      "label": "Customer Master",
+      "health": "Significant gap",
+      "note": "P1: Actions moved from first to last column, hiding Edit beyond horizontal scroll. P2: copy and margins differ, local customer names lose bold emphasis. Sample records/counts excluded.",
+      "route": {
+        "label": "Customer Master",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/customeronboarding/customermaster",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=customer-master",
+        "key": "customer-master"
+      },
+      "images": {
+        "testclient": {
+          "file": "20-customer-master-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 78105,
+          "sha256": "83ba5a3612a78e77a6f8791005111e61a8f573ea7a12a00923a229dde3672ae6"
+        },
+        "tanserv": {
+          "file": "20-customer-master-tanserv.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 49494,
+          "sha256": "719b624d609663d9df38bb8ae5ffacf376eaa73a186c8fd62dfd75b997137f8d"
+        }
+      }
+    },
+    {
+      "step": 67,
+      "key": "20a-customer-create",
+      "module": 20,
+      "label": "Customer Create",
+      "health": "Visual drift",
+      "note": "P2: Field inventory and required markers are largely present, but plain Enter placeholders are rewritten; dropdown DOM uses search controls instead of reference carets. Both forms are single-column here; local vertical spacing is denser and modal/header/footer styling differs.",
+      "route": {
+        "label": "Customer Master",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/customeronboarding/customermaster",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=customer-master",
+        "key": "customer-master"
+      },
+      "images": {
+        "testclient": {
+          "file": "20a-customer-create-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 45729,
+          "sha256": "438f18d39ca5f85f4dcf1e4a079bf7639d6f94293f104596b686518ba02acf0b"
+        },
+        "tanserv": {
+          "file": "20a-customer-create-tanserv.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 50713,
+          "sha256": "c9c2a10335f1fcd3734f559a52c3c5ef682c808b03af15d4a22b0be89d388e8a"
+        }
+      }
+    },
+    {
+      "step": 68,
+      "key": "20b-customer-bulk",
+      "module": 20,
+      "label": "Customer Bulk",
+      "health": "Significant gap",
+      "note": "P1: Wrong table schema: local Company/Status replaces Count/File Name, losing uploaded file identification. Local rows with rejected records lack Failed download action. P2: Upload File renamed Bulk Upload; row density differs.",
+      "route": {
+        "label": "Customer Master",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/customeronboarding/customermaster",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=customer-master",
+        "key": "customer-master"
+      },
+      "images": {
+        "testclient": {
+          "file": "20b-customer-bulk-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 63267,
+          "sha256": "d9b2d1e9a702b849fe204f0a31df03af0689edb996fb89c2e3f3dbaeed2af37a"
+        },
+        "tanserv": {
+          "file": "20b-customer-bulk-tanserv.jpg",
+          "width": 731,
+          "height": 1097,
+          "bytes": 73265,
+          "sha256": "56385c98d227f4a5735336991acb0c6efd80d6d7ac478d5645f31808ba864803"
+        }
+      }
+    },
+    {
+      "step": 69,
+      "key": "21-customer-contacts",
+      "module": 21,
+      "label": "Customer Contacts",
+      "health": "Significant gap",
+      "note": "P1: Table schema/order differs: reference Name, Email, Phone, Customer, Actions; local Customer, Name, Email, Department, Phone Number, Actions. P2: Added search, changed title copy and Create New label.",
+      "route": {
+        "label": "Customer Contacts",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/customeronboarding/customercontactupload",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=customer-contacts",
+        "key": "customer-contacts"
+      },
+      "images": {
+        "testclient": {
+          "file": "21-customer-contacts-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 80304,
+          "sha256": "5c6104d16203f3be0b81550652e9d67658f138778fa42caa3d8a807ca585259d"
+        },
+        "tanserv": {
+          "file": "21-customer-contacts-tanserv.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 47665,
+          "sha256": "ab9a3c03661db97e895062e72895aec0bb39ebbe6723bde767e7dce5e75e63ec"
+        }
+      }
+    },
+    {
+      "step": 70,
+      "key": "21a-customer-contact-create",
+      "module": 21,
+      "label": "Customer Contact Create",
+      "health": "Visual drift",
+      "note": "P2: Field and Department option inventory matches closely. Labels switch from uppercase to title case; spacing, search input corners and Save Contact label differ. Full Name is disabled locally; reference DOM does not mark disabled (derivation behavior not tested).",
+      "route": {
+        "label": "Customer Contacts",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/customeronboarding/customercontactupload",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=customer-contacts",
+        "key": "customer-contacts"
+      },
+      "images": {
+        "testclient": {
+          "file": "21a-customer-contact-create-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 41443,
+          "sha256": "7c43e83a3fe65c6d51e7b62dd372b8fb809839529dacc40409e8c8328c52b975"
+        },
+        "tanserv": {
+          "file": "21a-customer-contact-create-tanserv.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 39674,
+          "sha256": "628efeee7d224773d01e4f07c2806ba3a3bffdbe0c584bb9ac45c3598f37b510"
+        }
+      }
+    },
+    {
+      "step": 71,
+      "key": "22-template-master",
+      "module": 22,
+      "label": "Template Master",
+      "health": "Significant gap",
+      "note": "P1: Description column replaced by Status, Edit moved offscreen to last column, and local invents Preview/Duplicate/Activate/Delete actions absent in reference. P2: global margins and code emphasis differ.",
+      "route": {
+        "label": "Template Master",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/emailsetup/commeventtemplate",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=template-master",
+        "key": "template-master"
+      },
+      "images": {
+        "testclient": {
+          "file": "22-template-master-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 68565,
+          "sha256": "26d34936ca17f0f1829ef375a210cbd5c7fbb304b47f6fadd1c2c4f95235765e"
+        },
+        "tanserv": {
+          "file": "22-template-master-tanserv.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 47802,
+          "sha256": "b23005d81e3da9fef62a64146a549487af3aa63aac73cd9040b75e4eea4be915"
+        }
+      }
+    },
+    {
+      "step": 72,
+      "key": "22a-template-edit",
+      "module": 22,
+      "label": "Template Edit",
+      "health": "Reference error / local gap",
+      "note": "Reference-specific failure: first record Edit returned Failed to initiate edit. Local first Edit opened no editor/new tab. Later reference IssueTrackerYourTurn record worked; see 22b.",
+      "route": {
+        "label": "Template Master",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/emailsetup/commeventtemplate",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=template-master",
+        "key": "template-master"
+      },
+      "images": {
+        "testclient": {
+          "file": "22a-template-edit-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 69810,
+          "sha256": "a5666fff431cfc9b0e77d9d489b9ad8ca609259f89a69e55ea110f8961fc7133"
+        },
+        "tanserv": {
+          "file": "22a-template-edit-tanserv.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 53000,
+          "sha256": "d48d542c406a27d9525afa2b83fb005a635ec983337f8af21df3e4c303325726"
+        }
+      }
+    },
+    {
+      "step": 73,
+      "key": "22b-template-editor",
+      "module": 22,
+      "label": "Template Editor",
+      "health": "Significant gap",
+      "note": "P1: Reference opens full editor with Event Type, Recipient Role, Comm Mode, schedule, code, description, subject, content/source/preview and Disabled control; local Edit does nothing on sampled row. Different sample record content is not the issue: the editor surface is missing.",
+      "route": {
+        "label": "Template Master",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/emailsetup/commeventtemplate",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=template-master",
+        "key": "template-master"
+      },
+      "images": {
+        "testclient": {
+          "file": "22b-template-editor-testclient.jpg",
+          "width": 1112,
+          "height": 1120,
+          "bytes": 77839,
+          "sha256": "f5742081425f69a1ff9eaf9916159b3c0cd21c2d0778a56cc4645d33590c9c63"
+        },
+        "tanserv": {
+          "file": "22b-template-editor-tanserv.jpg",
+          "width": 1112,
+          "height": 1120,
+          "bytes": 63829,
+          "sha256": "2cb3fcbd41fc8f522f9c7c50a5097ecf0f0a0e10da997297be589e4bc9ea22b2"
+        }
+      }
+    },
+    {
+      "step": 74,
+      "key": "23-smtp-setup",
+      "module": 23,
+      "label": "Smtp Setup",
+      "health": "Visual drift",
+      "note": "P2: Missing account-role explanations and client heading, and missing masked-value visibility controls; adds pagination to fixed two-account table. Integration guide omission may be intentional under prior tutorial-removal instruction; confirm before restoring.",
+      "route": {
+        "label": "Email Sender SMTP Setup",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/emailsetup/emailsendersetting",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=smtp-setup",
+        "key": "smtp-setup"
+      },
+      "images": {
+        "testclient": {
+          "file": "23-smtp-setup-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 90291,
+          "sha256": "fb6e0b60c0faf1484eb2d52a1672a5ce131104296ad814f451786570b06d4f16"
+        },
+        "tanserv": {
+          "file": "23-smtp-setup-tanserv.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 47804,
+          "sha256": "a7c72460dd59fda4a09469718c748be92534359c95759a2683af074301e9d145"
+        }
+      }
+    },
+    {
+      "step": 75,
+      "key": "23a-smtp-edit",
+      "module": 23,
+      "label": "Smtp Edit",
+      "health": "Significant gap",
+      "note": "P1 reference risk: Edit exposes existing credentials as visible text; they were replaced with redaction text in unsaved fields before this distributed capture, then discarded. Do not replicate secret exposure. P2: Local uses simple radios instead of provider logo tiles; shortened title, missing Email Type required marker, different disabled-field fill and spacing.",
+      "route": {
+        "label": "Email Sender SMTP Setup",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/emailsetup/emailsendersetting",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=smtp-setup",
+        "key": "smtp-setup"
+      },
+      "images": {
+        "testclient": {
+          "file": "23a-smtp-edit-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 48175,
+          "sha256": "21c1f2686ee41c94ffa1cd7f150b0b740d7979bb9d38d1b9c14a7ec1ddb3f3ae"
+        },
+        "tanserv": {
+          "file": "23a-smtp-edit-tanserv.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 42624,
+          "sha256": "9a6018f0f8a091e7a82cde8ba13f21cf3e9ea30483f36074b4690083513dc7d4"
+        }
+      }
+    },
+    {
+      "step": 76,
+      "key": "24-sender-account",
+      "module": 24,
+      "label": "Sender Account",
+      "health": "Significant gap",
+      "note": "P1/P2: Local adds Sender Account Type column, pushing Edit beyond horizontal scroll; reference has three columns and fits. Missing role-explanation panel and client badge; unnecessary pagination.",
+      "route": {
+        "label": "Email Sender Account Setup",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/emailsetup/emailsenderaccount",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=sender-account",
+        "key": "sender-account"
+      },
+      "images": {
+        "testclient": {
+          "file": "24-sender-account-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 69132,
+          "sha256": "dec347a447e5d62e00feadd190b2ac78a27d4bbef621b3540d84e5be239fd19b"
+        },
+        "tanserv": {
+          "file": "24-sender-account-tanserv.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 49116,
+          "sha256": "97ac1d713af08eacca24d93f09085dbe4f9d44f7af9b5bff9a68543e68025486"
+        }
+      }
+    },
+    {
+      "step": 77,
+      "key": "24a-sender-edit",
+      "module": 24,
+      "label": "Sender Edit",
+      "health": "Significant gap",
+      "note": "P1: Local Update enabled before OTP verification while reference disabled; local shows OTP text field prematurely. P2: Send OTP/Test Email stacked full-width with duplicate labels; reference Test Email is footer action. No emails or OTPs sent.",
+      "route": {
+        "label": "Email Sender Account Setup",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/emailsetup/emailsenderaccount",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=sender-account",
+        "key": "sender-account"
+      },
+      "images": {
+        "testclient": {
+          "file": "24a-sender-edit-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 41685,
+          "sha256": "1d171d8967e44a0644a241d93f421396f4c6d0843675351c310b35267fcf4380"
+        },
+        "tanserv": {
+          "file": "24a-sender-edit-tanserv.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 39880,
+          "sha256": "6f65358430d2398364d59096015f9c7d46d3beb6aacb8f380919234da63ce13b"
+        }
+      }
+    },
+    {
+      "step": 78,
+      "key": "25-strategy-manager",
+      "module": 25,
+      "label": "Strategy Manager",
+      "health": "Significant gap",
+      "note": "P1/P2: Entire landing composition differs: local boxed header, blue full-width CTA, stacked filters and narrow wrapping name column vs reference purple CTA, inline filters and single-line names. Local Active/Inactive status filter conflicts with displayed Running state; search lacks accessible name.",
+      "route": {
+        "label": "Strategy Manager",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/ar/strategy",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=strategy-manager",
+        "key": "strategy-manager"
+      },
+      "images": {
+        "testclient": {
+          "file": "25-strategy-manager-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 74223,
+          "sha256": "d13ac8f3a0c94df53d2371fcb82e72c4e5d65528c7732ab1fa42433075584832"
+        },
+        "tanserv": {
+          "file": "25-strategy-manager-tanserv.jpg",
+          "width": 731,
+          "height": 1097,
+          "bytes": 59131,
+          "sha256": "59374d373ff952cac175733c18541b7c9220b4e4c7232678486a131ced2c7767"
+        }
+      }
+    },
+    {
+      "step": 79,
+      "key": "25a-strategy-create",
+      "module": 25,
+      "label": "Strategy Create",
+      "health": "Significant gap",
+      "note": "P1/P2: Local missing Reminder Type/Template/Notification Mode required markers and remove-template control on initial block. Running renamed Active; extra Back to list/Cancel actions; reference three-column field rows become large single-column blocks. Native select vs searchable reference dropdown.",
+      "route": {
+        "label": "Strategy Manager",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/ar/strategy",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=strategy-manager",
+        "key": "strategy-manager"
+      },
+      "images": {
+        "testclient": {
+          "file": "25a-strategy-create-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 71666,
+          "sha256": "a35dfaee3fef2710fc8f757acb467727297f61a3b9b0739a6e0cd72e130f9fa1"
+        },
+        "tanserv": {
+          "file": "25a-strategy-create-tanserv.jpg",
+          "width": 731,
+          "height": 1097,
+          "bytes": 58463,
+          "sha256": "f742bdcad000fd8b834d0dff1fd77f84ef4af4133a9767d43d77db9539a7d162"
+        }
+      }
+    },
+    {
+      "step": 80,
+      "key": "25b-strategy-template",
+      "module": 25,
+      "label": "Strategy Template",
+      "health": "Significant gap",
+      "note": "P1/P2: Same Both/Invoice/ReminderForPaymentDue selection, but local automatically selects Custom while reference requires Notification Mode choice. Local template option set is shorter; aging defaults differ (2 vs 19 selected), needs business confirmation. Both hierarchy and bucket sections exist. Screenshots have different vertical offsets; reference also overflows horizontally.",
+      "route": {
+        "label": "Strategy Manager",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/ar/strategy",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=strategy-manager",
+        "key": "strategy-manager"
+      },
+      "images": {
+        "testclient": {
+          "file": "25b-strategy-template-testclient.jpg",
+          "width": 746,
+          "height": 1120,
+          "bytes": 95963,
+          "sha256": "642736e86801f2f85fc3e05b2ad0abe5ec6f42749bb29b0eefe4baa94843ef55"
+        },
+        "tanserv": {
+          "file": "25b-strategy-template-tanserv.jpg",
+          "width": 731,
+          "height": 1097,
+          "bytes": 70666,
+          "sha256": "da561e321e32e483810f8f7f98acf379d8e1d0d458137370e307d4a306f720cd"
+        }
+      }
+    },
+    {
+      "step": 81,
+      "key": "25c-strategy-email-sender",
+      "module": 25,
+      "label": "Strategy Email Sender",
+      "health": "Significant gap",
+      "note": "P1/P2: Reference sender summary banner and selectable account cards replaced with plain text/native radios. Cancel/Save disabled semantics match, but local disabled Save appears strongly active. Missing iconography/badge/helper panel, altered header structure.",
+      "route": {
+        "label": "Strategy Manager",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/ar/strategy",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=strategy-manager",
+        "key": "strategy-manager"
+      },
+      "images": {
+        "testclient": {
+          "file": "25c-strategy-email-sender-testclient.jpg",
+          "width": 1112,
+          "height": 1120,
+          "bytes": 68320,
+          "sha256": "9846b8d9c6a0226a0fcec744cc0e6a33346020ef0b604d117f6ace982110a702"
+        },
+        "tanserv": {
+          "file": "25c-strategy-email-sender-tanserv.jpg",
+          "width": 1097,
+          "height": 1105,
+          "bytes": 57291,
+          "sha256": "9b14f4e14b72ff9360fb4631d180e05d4f225274787e5c7452446ef88dfed92f"
+        }
+      }
+    },
+    {
+      "step": 82,
+      "key": "26-invoice-upload",
+      "module": 26,
+      "label": "Invoice Upload",
+      "health": "Significant gap",
+      "note": "P1/P2: Local table pushes actions beyond horizontal scroll at 1112px while reference fits; progress uses purple bare bars instead of green bar plus 100% — Complete text. Create New loses secondary-button hierarchy. Shared table header color/copy differ; green failure badges exist on reference too.",
+      "route": {
+        "label": "Invoice Upload",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/invoiceupload",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=invoice-upload",
+        "key": "invoice-upload"
+      },
+      "images": {
+        "testclient": {
+          "file": "26-invoice-upload-testclient.jpg",
+          "width": 1112,
+          "height": 1120,
+          "bytes": 102684,
+          "sha256": "f75f0fa31ab6041e79e7d59e8c18510da2b0041f07bbccc126c7b0c1fb0b7e01"
+        },
+        "tanserv": {
+          "file": "26-invoice-upload-tanserv.jpg",
+          "width": 1097,
+          "height": 1105,
+          "bytes": 90834,
+          "sha256": "f199a8c4be7539077e5026f56680486f725aeaad4f49273e9ef6e78aff3ff898"
+        }
+      }
+    },
+    {
+      "step": 83,
+      "key": "26a-invoice-create",
+      "module": 26,
+      "label": "Invoice Create",
+      "health": "Close / minor drift",
+      "note": "Close: field inventory, required markers, three-column structure and footer match. P2: Invoice Date/Due Date use native dd/mm/yyyy UI vs custom dd-mm-yyyy; disabled ownership fields lack search icons. Modal blur and field spacing differ.",
+      "route": {
+        "label": "Invoice Upload",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/invoiceupload",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=invoice-upload",
+        "key": "invoice-upload"
+      },
+      "images": {
+        "testclient": {
+          "file": "26a-invoice-create-testclient.jpg",
+          "width": 1112,
+          "height": 1120,
+          "bytes": 93289,
+          "sha256": "25e8d0d7c2d7fdf0b6d3548af99f979a72e46e045097925cb36fe3dd1e8b3e45"
+        },
+        "tanserv": {
+          "file": "26a-invoice-create-tanserv.jpg",
+          "width": 1097,
+          "height": 1105,
+          "bytes": 83026,
+          "sha256": "be7b66744641d381e4a42a553ab356b09a8069f78e062f5533b0c23cf1c779b4"
+        }
+      }
+    },
+    {
+      "step": 84,
+      "key": "26b-invoice-bulk",
+      "module": 26,
+      "label": "Invoice Bulk",
+      "health": "Significant gap",
+      "note": "P1/P2: Local title duplicates Upload; file hint adds CSV to reference xlsx/xls; local Upload enabled without file while reference DOM disables it. Download Template position/style and modal vertical spacing differ.",
+      "route": {
+        "label": "Invoice Upload",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/invoiceupload",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=invoice-upload",
+        "key": "invoice-upload"
+      },
+      "images": {
+        "testclient": {
+          "file": "26b-invoice-bulk-testclient.jpg",
+          "width": 1112,
+          "height": 1120,
+          "bytes": 74088,
+          "sha256": "987873fb0ed95df5eb7e0b4ec7f4876d45238a7a73c4e1a9e5aa016282de3a21"
+        },
+        "tanserv": {
+          "file": "26b-invoice-bulk-tanserv.jpg",
+          "width": 1097,
+          "height": 1105,
+          "bytes": 58024,
+          "sha256": "28701b30730866f3eb9941f11050586f58384d6c1624c60fcf4de2b2c5c2aac9"
+        }
+      }
+    },
+    {
+      "step": 85,
+      "key": "27-invoice-reallocation",
+      "module": 27,
+      "label": "Invoice Reallocation",
+      "health": "Significant gap",
+      "note": "P1: Wrong workflow: reference per-row Reallocate; local introduces bulk role/assignee/reason form and filters. Missing Client Code/KAM/KAS columns. P1 visual readability: dark heading on purple. P2: Wrong copy and action taxonomy.",
+      "route": {
+        "label": "Invoice reallocation",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/invoicereallocation",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=invoice-reallocation",
+        "key": "invoice-reallocation"
+      },
+      "images": {
+        "testclient": {
+          "file": "27-invoice-reallocation-testclient.jpg",
+          "width": 1112,
+          "height": 1120,
+          "bytes": 97333,
+          "sha256": "742a86a6b6b37dfb0394b5a38546ee5c764c49e46e5a1aab0937cb9ab449e9dc"
+        },
+        "tanserv": {
+          "file": "27-invoice-reallocation-tanserv.jpg",
+          "width": 1112,
+          "height": 1120,
+          "bytes": 84534,
+          "sha256": "8fa1ff96925fdd32aae5f18ab1900d1e8570d88c91e543c5ce5e66a7c2a70278"
+        }
+      }
+    },
+    {
+      "step": 86,
+      "key": "27a-reallocation-dialog",
+      "module": 27,
+      "label": "Reallocation Dialog",
+      "health": "Significant gap",
+      "note": "P1: Reference Edit Invoice dialog for Agent/Manager/KAM/KAS is absent from local row actions (Select/View Invoice instead). Local inline bulk form is shown as the alternative, not an equivalent modal.",
+      "route": {
+        "label": "Invoice reallocation",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/invoicereallocation",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=invoice-reallocation",
+        "key": "invoice-reallocation"
+      },
+      "images": {
+        "testclient": {
+          "file": "27a-reallocation-dialog-testclient.jpg",
+          "width": 1112,
+          "height": 1120,
+          "bytes": 98435,
+          "sha256": "a94cff4f92da1a7cb82338d8d21f34f686d96e4872073887a2c48c6f6abfea9c"
+        },
+        "tanserv": {
+          "file": "27a-reallocation-dialog-tanserv.jpg",
+          "width": 1112,
+          "height": 1120,
+          "bytes": 84534,
+          "sha256": "8fa1ff96925fdd32aae5f18ab1900d1e8570d88c91e543c5ce5e66a7c2a70278"
+        }
+      }
+    },
+    {
+      "step": 87,
+      "key": "28-invoice-deletion",
+      "module": 28,
+      "label": "Invoice Deletion",
+      "health": "Significant gap",
+      "note": "P1: reference starts with a search-only state; local immediately shows a bulk-deletion reason form, date/branch filters and sample rows absent from the reference. Dark-on-purple heading is difficult to read. Search results are covered in 28a; destructive confirmation was not tested.",
+      "route": {
+        "label": "Invoice Deletion",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/invoicedelete",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=invoice-deletion",
+        "key": "invoice-deletion"
+      },
+      "images": {
+        "testclient": {
+          "file": "28-invoice-deletion-testclient.jpg",
+          "width": 1112,
+          "height": 1120,
+          "bytes": 29657,
+          "sha256": "e81e0a4622e8b2826c1c937018fb65efe5a8f24426d4b55c18be77c615d7e51e"
+        },
+        "tanserv": {
+          "file": "28-invoice-deletion-tanserv.jpg",
+          "width": 1112,
+          "height": 1120,
+          "bytes": 82851,
+          "sha256": "c6148045082d65db623497c0690a87e3241b58910b5e062bc9c4c1585d66d599"
+        }
+      }
+    },
+    {
+      "step": 88,
+      "key": "28a-deletion-search",
+      "module": 28,
+      "label": "Deletion Search",
+      "health": "Significant gap",
+      "note": "Reference searched a known observed invoice; local searched its own sample invoice. Compare workflow, not row values. No destructive action clicked. P1: Local table omits Client Code, Customer Code, Current Net Due, Agent/Manager/KAM/KAS and Due Date; uses No/Select pill action instead of row checkbox.",
+      "route": {
+        "label": "Invoice Deletion",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/invoicedelete",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=invoice-deletion",
+        "key": "invoice-deletion"
+      },
+      "images": {
+        "testclient": {
+          "file": "28a-deletion-search-testclient.jpg",
+          "width": 1112,
+          "height": 1120,
+          "bytes": 49143,
+          "sha256": "eaf0ea2f0d776fe206de7c631282ee868903d342976642026d4eb52da5f85d93"
+        },
+        "tanserv": {
+          "file": "28a-deletion-search-tanserv.jpg",
+          "width": 1112,
+          "height": 1120,
+          "bytes": 75861,
+          "sha256": "39c6b1baea7cb6ba4eff0f0584e82fe186ba7854bb3025d9ae0f762eb9d9c200"
+        }
+      }
+    },
+    {
+      "step": 89,
+      "key": "29-change-password",
+      "module": 29,
+      "label": "Change Password",
+      "health": "Significant gap",
+      "note": "P1/P2: Reference compact centered 505px card becomes full-width nested tab/card with unreadable dark-purple heading; local adds Change Password tab absent in reference, and replaces custom user picker with native select. ",
+      "route": {
+        "label": "Change Password - Admin",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/change-password-sidebar",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=change-password",
+        "key": "change-password"
+      },
+      "images": {
+        "testclient": {
+          "file": "29-change-password-testclient.jpg",
+          "width": 1112,
+          "height": 1120,
+          "bytes": 29635,
+          "sha256": "d6d0b310a53cdc65459d5a00f994e420f9c9b5ca82cc4de5dd570ffa5dbd9b97"
+        },
+        "tanserv": {
+          "file": "29-change-password-tanserv.jpg",
+          "width": 1112,
+          "height": 1120,
+          "bytes": 41874,
+          "sha256": "1cc3820b34f0866fe5ea00fb260129e2221ea3ec6adf0003b94220e5f740cf42"
+        }
+      }
+    },
+    {
+      "step": 90,
+      "key": "29a-password-fields",
+      "module": 29,
+      "label": "Password Fields",
+      "health": "Close / minor drift",
+      "note": "Close field inventory: New/Confirm Password and Cancel/Update appear after selection. P2: Missing footer separator; full-width layout and title/typography mismatch persist. Password values and submission not tested.",
+      "route": {
+        "label": "Change Password - Admin",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/change-password-sidebar",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=change-password",
+        "key": "change-password"
+      },
+      "images": {
+        "testclient": {
+          "file": "29a-password-fields-testclient.jpg",
+          "width": 1112,
+          "height": 1120,
+          "bytes": 37861,
+          "sha256": "cb0934d66b48cf03367b3bd9619c6c1128dcb3a383fd7d8944ea7375415789aa"
+        },
+        "tanserv": {
+          "file": "29a-password-fields-tanserv.jpg",
+          "width": 1112,
+          "height": 1120,
+          "bytes": 49246,
+          "sha256": "0e79f0b34989e57888c6180d8446325d1baaf36075b753ea0daef50a3ffd12d3"
+        }
+      }
+    },
+    {
+      "step": 91,
+      "key": "30-client-master",
+      "module": 30,
+      "label": "Client Master",
+      "health": "Significant gap",
+      "note": "P1/P2: Missing logo-edit affordance and renewal-days badge, extra Client Accounts/Text Setup tabs, empty purple heading bar, unreadable Sub Clients heading, smaller logo without dashed frame. Duplicate empty messages. Source counts empty state as 1 record (reference defect, do not copy).",
+      "route": {
+        "label": "Client Master",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/client-master",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=client-master",
+        "key": "client-master"
+      },
+      "images": {
+        "testclient": {
+          "file": "30-client-master-testclient.jpg",
+          "width": 1112,
+          "height": 1120,
+          "bytes": 60834,
+          "sha256": "db770abdbb9e79fc565fbfe63df453441ebf13be1f232cbcb78ee6231a7f3643"
+        },
+        "tanserv": {
+          "file": "30-client-master-tanserv.jpg",
+          "width": 1112,
+          "height": 1120,
+          "bytes": 70644,
+          "sha256": "cb554d7289deb784043999e9edd4a3791c4d4c326d26f931b32ff5d56d1f70d8"
+        }
+      }
+    },
+    {
+      "step": 92,
+      "key": "30a-client-create",
+      "module": 30,
+      "label": "Client Create",
+      "health": "Visual drift",
+      "note": "P2: Three fields/placeholders match; local 720px two-column dialog vs 600px single-column, title-case labels instead of uppercase, different footer and button sizes.",
+      "route": {
+        "label": "Client Master",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/client-master",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=client-master",
+        "key": "client-master"
+      },
+      "images": {
+        "testclient": {
+          "file": "30a-client-create-testclient.jpg",
+          "width": 1112,
+          "height": 1120,
+          "bytes": 52254,
+          "sha256": "d79c08f1fce27bdb02a92a7f431ea2cfaf184510ced54f1ef8ebf018422c339a"
+        },
+        "tanserv": {
+          "file": "30a-client-create-tanserv.jpg",
+          "width": 1112,
+          "height": 1120,
+          "bytes": 47377,
+          "sha256": "251fc9f03540c6ebfbc32fa4e8ec912bb0b43bedb197f7391aa10ae4ddbcfa67"
+        }
+      }
+    },
+    {
+      "step": 93,
+      "key": "31-audit-retention",
+      "module": 31,
+      "label": "Audit Retention",
+      "health": "Significant gap",
+      "note": "P1/P2: Repeated dark-on-purple low-contrast headers; added tab/nested cards; missing explanatory helper paragraphs and last-purge timestamp/reason; oversized notification days field. Correct main control inventory/default values.",
+      "route": {
+        "label": "Audit Retention & Purge",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/audit/auditsettings",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=audit-retention",
+        "key": "audit-retention"
+      },
+      "images": {
+        "testclient": {
+          "file": "31-audit-retention-testclient.jpg",
+          "width": 1112,
+          "height": 1120,
+          "bytes": 92437,
+          "sha256": "2f2ab057313b527489633d3721cc5cdd4a4aa73bd145801c03948a85dbf924b1"
+        },
+        "tanserv": {
+          "file": "31-audit-retention-tanserv.jpg",
+          "width": 1097,
+          "height": 1105,
+          "bytes": 61989,
+          "sha256": "14f875be4ffae3a7855bbc698f74861e3dd0ae694bfcaee73e59eb4fb1814d38"
+        }
+      }
+    },
+    {
+      "step": 94,
+      "key": "31a-purge-history",
+      "module": 31,
+      "label": "Purge History",
+      "health": "Significant gap",
+      "note": "P1: Missing permanent-deletion warning paragraph above purge controls. P2: Run Purge Now loses red danger styling, history lacks status badge and pagination. No purge or dry-run executed. Lower-panel screenshots taken with End; layout density causes different sections visible.",
+      "route": {
+        "label": "Audit Retention & Purge",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/audit/auditsettings",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=audit-retention",
+        "key": "audit-retention"
+      },
+      "images": {
+        "testclient": {
+          "file": "31a-purge-history-testclient.jpg",
+          "width": 1112,
+          "height": 1120,
+          "bytes": 97462,
+          "sha256": "a41fe202fd119912b9a6f175b8d6aabe5345001e6a58d6bcd6228bbe460ab5a8"
+        },
+        "tanserv": {
+          "file": "31a-purge-history-tanserv.jpg",
+          "width": 1097,
+          "height": 1105,
+          "bytes": 65288,
+          "sha256": "048918516149c235ddc006cc6919d06e14afe5837d5748424e82e5fb60777d71"
+        }
+      }
+    },
+    {
+      "step": 95,
+      "key": "32-audit-trail",
+      "module": 32,
+      "label": "Audit Trail",
+      "health": "Visual drift",
+      "note": "P2: Correct filter/table inventory, but added tab, altered grid/button placement, duplicate empty messages and heavier typography. Local entity trigger has generic role, missing dropdown caret/expanded semantics.",
+      "route": {
+        "label": "Audit Trail",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/audit/audittrail",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=audit-trail",
+        "key": "audit-trail"
+      },
+      "images": {
+        "testclient": {
+          "file": "32-audit-trail-testclient.jpg",
+          "width": 1112,
+          "height": 1120,
+          "bytes": 46262,
+          "sha256": "9853b5c30eba02aa31d3c379cca24d1ef297eabea35d1bb9adfe9a6828649b34"
+        },
+        "tanserv": {
+          "file": "32-audit-trail-tanserv.jpg",
+          "width": 1112,
+          "height": 1120,
+          "bytes": 49639,
+          "sha256": "0a6a4b3f57d34b8278a9bc3a733f37333d7968e63a9de97ce7068a34f61b2e25"
+        }
+      }
+    },
+    {
+      "step": 96,
+      "key": "32a-audit-entity-picker",
+      "module": 32,
+      "label": "Audit Entity Picker",
+      "health": "Significant gap",
+      "note": "P1/P2: Local entity menu is clipped by card bottom; loses visible continuation. Search receives focus automatically on reference but not local. Option inventory broadly aligns.",
+      "route": {
+        "label": "Audit Trail",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/audit/audittrail",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=audit-trail",
+        "key": "audit-trail"
+      },
+      "images": {
+        "testclient": {
+          "file": "32a-audit-entity-picker-testclient.jpg",
+          "width": 1112,
+          "height": 1120,
+          "bytes": 54023,
+          "sha256": "a8dd976dfe88611cbffadd3e3b58cb95dc135e90ce97dfc9af4da08af7fac768"
+        },
+        "tanserv": {
+          "file": "32a-audit-entity-picker-tanserv.jpg",
+          "width": 1112,
+          "height": 1120,
+          "bytes": 58297,
+          "sha256": "bca04f8b57378f003b60f095d220a69db5f71f4da4d903e9e4d5c102fd41cca8"
+        }
+      }
+    },
+    {
+      "step": 97,
+      "key": "32b-audit-results",
+      "module": 32,
+      "label": "Audit Results",
+      "health": "Visual drift",
+      "note": "P2: Local result lacks Created/Updated colored badge and pagination; timestamp format and View changes border differ. Sample values excluded.",
+      "route": {
+        "label": "Audit Trail",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/audit/audittrail",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=audit-trail",
+        "key": "audit-trail"
+      },
+      "images": {
+        "testclient": {
+          "file": "32b-audit-results-testclient.jpg",
+          "width": 1112,
+          "height": 1120,
+          "bytes": 58927,
+          "sha256": "d59ff53b87fef40f02f0e86f1bbd73635214e5bff95e4d30a8b91dec38b9a997"
+        },
+        "tanserv": {
+          "file": "32b-audit-results-tanserv.jpg",
+          "width": 1112,
+          "height": 1120,
+          "bytes": 50493,
+          "sha256": "96fce54b3b9c80d5c6b49cc75c39c28a0a817f0dc4f4167159ce5ef5eb9849ca"
+        }
+      }
+    },
+    {
+      "step": 98,
+      "key": "32c-audit-details",
+      "module": 32,
+      "label": "Audit Details",
+      "health": "Visual drift",
+      "note": "P2: Local flattens revision card, removes action badge and old/new color differentiation, uses much taller table rows and Cancel instead of Close. Generic sample schema (name, no disabled) does not demonstrate entity-specific Bank Details fields. Modal exposed without dialog role in local snapshot.",
+      "route": {
+        "label": "Audit Trail",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/audit/audittrail",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=audit-trail",
+        "key": "audit-trail"
+      },
+      "images": {
+        "testclient": {
+          "file": "32c-audit-details-testclient.jpg",
+          "width": 1112,
+          "height": 1120,
+          "bytes": 56443,
+          "sha256": "dcc4e9fd93f2d9db6bbe1695d92a8e490c5eab1d1b9dfcb8181d3d3991a9276b"
+        },
+        "tanserv": {
+          "file": "32c-audit-details-tanserv.jpg",
+          "width": 1112,
+          "height": 1120,
+          "bytes": 46963,
+          "sha256": "63979326c348784175b254e09846c16642688adb0571af5035f8c88d8282321e"
+        }
+      }
+    },
+    {
+      "step": 99,
+      "key": "33-help-support",
+      "module": 33,
+      "label": "Help Support",
+      "health": "Close / minor drift",
+      "note": "Close content and visual language: hero, search, shortcuts, FAQs and category inventory align. P2: Local lacks 24px outer gutter/top gap; seven category columns instead of reference six at 1112px.",
+      "route": {
+        "label": "Help & Support",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/help/support",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=help-support",
+        "key": "help-support"
+      },
+      "images": {
+        "testclient": {
+          "file": "33-help-support-testclient.jpg",
+          "width": 1112,
+          "height": 1120,
+          "bytes": 91819,
+          "sha256": "103dfe3460f4ed0d1e5bc5b0a421c975ab53c4ecb3aad54db047cebc504c6304"
+        },
+        "tanserv": {
+          "file": "33-help-support-tanserv.jpg",
+          "width": 1097,
+          "height": 1105,
+          "bytes": 83755,
+          "sha256": "d723a48806c4d826e2a0914c88f6463fc81a3db8da5b0868422221dc68cf3c81"
+        }
+      }
+    },
+    {
+      "step": 100,
+      "key": "33a-help-article",
+      "module": 33,
+      "label": "Help Article",
+      "health": "Close / minor drift",
+      "note": "Close: observed article content, permission chips and section order match. P2: local title header lacks lavender fill, close button has browser-default square border, background blur missing and footer button oversized. Other 99 article bodies not individually audited.",
+      "route": {
+        "label": "Help & Support",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/help/support",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=help-support",
+        "key": "help-support"
+      },
+      "images": {
+        "testclient": {
+          "file": "33a-help-article-testclient.jpg",
+          "width": 1112,
+          "height": 1120,
+          "bytes": 88054,
+          "sha256": "784dc72c005067d3723f8aee7993e0b1b8a7b9897018ccf08f9bc3abc2bf55d0"
+        },
+        "tanserv": {
+          "file": "33a-help-article-tanserv.jpg",
+          "width": 1097,
+          "height": 1105,
+          "bytes": 90239,
+          "sha256": "0e9d9df37d7ce7aa70399905c1e2decefbb6e8840c1b362d66244420b2e734f4"
+        }
+      }
+    },
+    {
+      "step": 101,
+      "key": "33b-create-ticket",
+      "module": 33,
+      "label": "Create Ticket",
+      "health": "Visual drift",
+      "note": "P2: Local adds Attachment section absent from observed reference form, expands Description placeholder, removes lavender title and blur, uses default square close and oversized footer controls. Category/Priority options align. No ticket submitted.",
+      "route": {
+        "label": "Help & Support",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/help/support",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=help-support",
+        "key": "help-support"
+      },
+      "images": {
+        "testclient": {
+          "file": "33b-create-ticket-testclient.jpg",
+          "width": 1112,
+          "height": 1120,
+          "bytes": 52783,
+          "sha256": "6d1b6b396c7ce2e5f818b6a0d94eecbad78d82c2719391b773747e3fdb1390fd"
+        },
+        "tanserv": {
+          "file": "33b-create-ticket-tanserv.jpg",
+          "width": 1097,
+          "height": 1105,
+          "bytes": 71143,
+          "sha256": "1561c4d128da4801ac08f556a37ea9f6c2c8736abb891740699f69c8d334b184"
+        }
+      }
+    },
+    {
+      "step": 102,
+      "key": "33c-my-tickets",
+      "module": 33,
+      "label": "My Tickets",
+      "health": "Visual drift",
+      "note": "P2: Summary counters lose white cards, colored left borders and bold value hierarchy; New Ticket uses different style. Correct tabs/status filters and empty-state message. No reference tickets available, so conversation detail unverified.",
+      "route": {
+        "label": "Help & Support",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/help/support",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=help-support",
+        "key": "help-support"
+      },
+      "images": {
+        "testclient": {
+          "file": "33c-my-tickets-testclient.jpg",
+          "width": 1112,
+          "height": 1120,
+          "bytes": 56144,
+          "sha256": "17f45e10d2d7bde909af886476837d6ea053cd3491cfbad7ad3ec1b0a67d68bf"
+        },
+        "tanserv": {
+          "file": "33c-my-tickets-tanserv.jpg",
+          "width": 1097,
+          "height": 1105,
+          "bytes": 49551,
+          "sha256": "8ae9f6e7b0bf11482b0353729581caa3a1ceed122bc50fb32b7c976ee767c140"
+        }
+      }
+    },
+    {
+      "step": 103,
+      "key": "33d-feedback",
+      "module": 33,
+      "label": "Feedback",
+      "health": "Close / minor drift",
+      "note": "Close: rating, category/module fields, placeholders and section structure align. P2: inherited outer gutter/hero offsets and submit styling differ. Rating buttons are icon-only in reference; accessibility needs explicit 1–5 labels. No feedback sent.",
+      "route": {
+        "label": "Help & Support",
+        "ref": "https://testclient.inebura.ai/admin/dashboard/modules/help/support",
+        "local": "http://127.0.0.1:8765/pages/admin.html?module=help-support",
+        "key": "help-support"
+      },
+      "images": {
+        "testclient": {
+          "file": "33d-feedback-testclient.jpg",
+          "width": 1112,
+          "height": 1120,
+          "bytes": 74712,
+          "sha256": "d221c714dbb68f287c802ebc2343fad258909a4b10d36e11045ecb72c28e9e02"
+        },
+        "tanserv": {
+          "file": "33d-feedback-tanserv.jpg",
+          "width": 1097,
+          "height": 1105,
+          "bytes": 68058,
+          "sha256": "913f44929fa5353e8fcbb683eaa93d01eec5ddbd5970998048e0d47d018d0c51"
+        }
+      }
+    }
+  ]
+}

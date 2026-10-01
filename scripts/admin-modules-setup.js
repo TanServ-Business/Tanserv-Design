@@ -17,6 +17,63 @@
   const states = ["Haryana", "Maharashtra", "Karnataka", "Tamil Nadu", "Delhi", "West Bengal"];
   const branches = ["TestClient Gurugram", "TestClient Mumbai", "TestClient Bengaluru"];
   const roles = ["Collection Agent", "Collection Manager", "Supervisor", "KAM", "KAS", "Finance Controller"];
+  const internalContactDepartments = [
+    "Biomedical HOD", "Hygiene Associate", "Manager", "Manager - Purchase", "Manager QC",
+    "Marketing HOD", "Managing Director", "online upload", "Operation Executive", "Pharmacist",
+    "Purchase Executive", "Purchase HOD", "Purchase Manager", "Biomedical Executive", "Head",
+    "Store - LDC", "Store - HOD", "Medical Superintendant", "End User - Associate (Govt.)",
+    "End User - HOD (Govt.)", "Medical Director", "Dean (Govt.)", "Deputy Commandant (Defence)",
+    "Commandant (Defence)", "Dealing Clerk - PCDA (Defence)", "Account Officer- PCDA (Defence)",
+    "Asst. Account Officer- PCDA (Defence)", "Paying Account Officer (Govt.)", "GM", "Sales",
+    "Operations", "Supply Chain", "Purchase", "Procurement", "Sourcing", "Store", "Materials",
+    "Owner", "Administration", "PPC", "Director", "export", "Accounts", "HOD", "Lab Incharge",
+    "Marketing", "Operation HOD", "Plant HOD", "QC", "QC HOD", "Accounts Manager",
+    "Account Executive", "Accounts HOD", "Accounts Asst. Manager", "CFO"
+  ];
+
+  const bankPageNames = {
+    1: [
+      "Abhyudaya Co-Op Bank", "ABN Amro Bank Credit Card", "ABU DHABI COMMERCIAL BANK",
+      "Ahmedabad District Central Co-Op Bank Ltd", "Ahmedabad Mercantile Co-Op Bank Ltd",
+      "Ahmednagar Merchants Co-op. Bank Ltd", "ALLAHABAD BANK", "Allahabad UP Gramin Bank",
+      "AMBARNATH JAI HIND COOP BANK LTD", "American Express Credit Card"
+    ],
+    2: [
+      "ANDHRA BANK", "Andhra Bank Credit Card", "Andhra Pradesh Grameena Vikas Bank",
+      "ANDHRA PRAGATHI GRAMEENA BANK", "AP Mahesh Co-Op Urban Bank Ltd", "Apna Sahakari Bank Ltd",
+      "Arunachal Pradesh Rural Bank", "Aryavart Gramin Bank", "Assam Gramin Vikash Bank",
+      "AU small Finance Bank"
+    ],
+    3: [
+      "AXIS BANK", "Baitarani Gramin Bank", "Ballia Etawah Gramin Bank", "BANDHAN BANK LIMITED",
+      "Bangiya Gramin Vikash Bank", "BANK OF AMERICA", "Bank of Bahrain and Kuwait",
+      "BANK OF BARODA (BOB)", "Bank Of Baroda Credit Card", "BANK OF CEYLON"
+    ],
+    4: [
+      "BANK OF INDIA (BOI)", "Bank Of India Credit Card", "BANK OF MAHARASHTRA",
+      "Bank of Nova Scotia", "Bank of Tokyo-Mitsubishi UFJ Ltd", "Barclays Bank PLC",
+      "Barclays Credit Card", "Baroda Gujarat Gramin Bank",
+      "Baroda Rajasthan Kshetriya Gramin Bank", "Baroda Uttar Pradesh Gramin Bank"
+    ],
+    5: [
+      "Bassein Catholic Co-Op Bank Ltd", "Bharat Co-Op Bank Mumbai Ltd", "Bhartiya Mahila Bank",
+      "Bihar Kshetriya Gramin Bank", "BNP Paribas", "CANARA BANK", "Canara Bank Credit Card",
+      "Catholic Syrian Bank Ltd", "CENTRAL BANK OF INDIA (CBI)", "Chaitanya Godavari Grameena Bank"
+    ],
+    29: [
+      "VIJAYA BANK (VB)", "Vijaya Credit Card", "Vishweshwar Co-Op Bank Ltd",
+      "Visveshwaraya Gramin Bank", "Wainganga Krishna Gramin Bank",
+      "West Bengal State Co-Op Bank", "Yadagiri Lakshmi Narasimha Swamy Co-Op Urban Bank Ltd",
+      "YES BANK", "Zila Sahkari Bank"
+    ]
+  };
+  const bankSeedRows = Object.entries(bankPageNames).flatMap(([sourcePage, names]) => names.map((name, index) => ({
+    id: `bank-${sourcePage}-${String(index + 1).padStart(2, "0")}`,
+    name,
+    createdOn: "2026-06-26",
+    updatedOn: "2026-06-26",
+    sourcePage: Number(sourcePage)
+  })));
 
   const auditColumns = [
     { key: "createdOn", label: "Created On", type: "date" },
@@ -79,55 +136,61 @@
 
     "holiday-master": {
       id: "holiday-master",
+      dataVersion: 3,
       title: "Office Setup",
       description: "Manage your branch locations, holidays, bank details, and contacts.",
       sectionTitle: "Holiday Master",
       tabs: officeTabs,
+      pageSize: 5,
+      tableIntro: "Please upload the holiday calendar for all your locations.",
+      hideReset: true,
       columns: [
-        { key: "name", label: "Holiday Name" },
-        { key: "state", label: "State" },
+        { key: "name", label: "Holiday Name", sortable: true },
+        { key: "state", label: "State", type: "stateBadge", sortable: false },
         { key: "date", label: "Holiday Date", type: "date" },
-        { key: "optional", label: "Optional", type: "boolean" },
-        { key: "status", label: "Status", type: "status" }
       ],
       seedRows: [
-        { id: "hol-001", name: "Republic Day", state: "All India", date: "2026-01-26", optional: "No", status: "Active" },
-        { id: "hol-002", name: "Holi", state: "Haryana", date: "2026-03-04", optional: "No", status: "Active" },
-        { id: "hol-003", name: "Maharashtra Day", state: "Maharashtra", date: "2026-05-01", optional: "No", status: "Active" },
-        { id: "hol-004", name: "Diwali", state: "All India", date: "2026-11-08", optional: "No", status: "Active" }
-      ],
-      searchPlaceholder: "Search holiday name or state",
-      filters: [
-        { key: "state", label: "State", type: "select", options: ["All India", ...states] },
-        { key: "dateFrom", label: "From date", type: "date" },
-        { key: "dateTo", label: "To date", type: "date" },
-        { key: "status", label: "Status", type: "select", options: activeOptions }
+        { id: "hol-001", name: "Holiday2", state: "ALL STATE", date: "2026-07-03", weeklyOff: false },
+        { id: "hol-002", name: "Holiday 1", state: "ALL STATE", date: "2026-07-02", weeklyOff: false },
+        { id: "hol-003", name: "Gandhi Jayanti", state: "ALL STATE", date: "2026-10-02", weeklyOff: false },
+        { id: "hol-004", name: "Republic Day", state: "ALL STATE", date: "2026-01-26", weeklyOff: false },
+        { id: "hol-005", name: "Independence Day", state: "ALL STATE", date: "2026-08-15", weeklyOff: false }
       ],
       create: {
         label: "Create Holiday",
-        title: "Add Holiday",
+        title: "Create Holiday Master",
+        editTitle: "Edit Holiday Master",
+        successMessage: "Holiday created successfully",
+        updateMessage: "Holiday updated successfully",
         fields: [
-          { key: "name", label: "Holiday Name", type: "text", required: true, placeholder: "Enter holiday name", span: 2 },
-          { key: "state", label: "Applicable State", type: "select", required: true, options: ["All India", ...states] },
-          { key: "date", label: "Holiday Date", type: "date", required: true },
-          { key: "optional", label: "Optional Holiday", type: "select", required: true, options: yesNo },
-          { key: "status", label: "Status", type: "select", required: true, options: activeOptions }
+          { key: "name", label: "Holiday Name", type: "text", required: true, placeholder: "Enter Holiday Name", maxLength: 100 },
+          { key: "date", label: "Holiday Date", type: "date", required: true, minToday: true },
+          {
+            key: "state",
+            label: "State",
+            type: "tag-multiselect",
+            required: true,
+            placeholder: "Type to add State(s)...",
+            options: [
+              { value: "Maharashtra", label: "Maharashtra", code: "MAH" },
+              { value: "Uttar Pradesh", label: "Uttar Pradesh", code: "UTT" },
+              { value: "Delhi", label: "Delhi", code: "DEL" },
+              { value: "Jharkhand", label: "Jharkhand", code: "JHA" },
+              { value: "Madhya Pradesh", label: "Madhya Pradesh", code: "MAD" },
+              { value: "Rajasthan", label: "Rajasthan", code: "RAJ" },
+              { value: "Himachal Pradesh", label: "Himachal Pradesh", code: "HIM" },
+              { value: "Haryana", label: "Haryana", code: "HAR" },
+              { value: "Uttarakhand", label: "Uttarakhand", code: "UTT" },
+              { value: "Punjab", label: "Punjab", code: "PUN" }
+            ]
+          },
+          { key: "weeklyOff", label: "Weekly Off", checkboxLabel: "Mark as Weekly Off", type: "checkbox" }
         ]
       },
       rowActions: [
-        { id: "edit", label: "Edit", kind: "form" },
-        { id: "delete", label: "Delete", kind: "danger", confirmTitle: "Delete holiday?", confirmBody: "The holiday will be removed from this dummy calendar only." }
+        { id: "edit", label: "Edit", kind: "form" }
       ],
-      customBlocks: [
-        {
-          type: "infoBanner",
-          icon: "calendar-check",
-          title: "Holiday calendar",
-          body: "Maintain state-wise holidays used for visit and activity planning.",
-          actions: [{ id: "download-holiday-calendar", label: "Download Calendar", kind: "download" }]
-        }
-      ],
-      emptyMessage: "No holidays found for the selected period."
+      emptyMessage: "No holidays found."
     },
 
     "bank-master": {
@@ -136,33 +199,36 @@
       description: "Manage your branch locations, holidays, bank details, and contacts.",
       sectionTitle: "Bank Master",
       tabs: officeTabs,
+      dataVersion: 2,
+      pageSize: 10,
+      hideReset: true,
+      headerSearch: true,
+      sourcePagination: { total: 289, pageCount: 29, pages: [1, 2, 3, 4, 5, "…", 29] },
       columns: [
         { key: "name", label: "Bank Name" },
-        { key: "shortName", label: "Short Name" },
-        { key: "status", label: "Status", type: "status" },
-        ...auditColumns
+        { key: "createdOn", label: "Created On", type: "date", format: "dd-mm-yyyy" },
+        { key: "updatedOn", label: "Last Updated", type: "date", format: "dd-mm-yyyy" }
       ],
-      seedRows: [
-        { id: "bank-001", name: "HDFC Bank", shortName: "HDFC", status: "Active", createdOn: "2026-01-08", updatedOn: "2026-07-18" },
-        { id: "bank-002", name: "ICICI Bank", shortName: "ICICI", status: "Active", createdOn: "2026-01-08", updatedOn: "2026-07-18" },
-        { id: "bank-003", name: "State Bank of India", shortName: "SBI", status: "Active", createdOn: "2026-01-10", updatedOn: "2026-07-21" }
-      ],
-      searchPlaceholder: "Search bank name",
-      filters: [{ key: "status", label: "Status", type: "select", options: activeOptions }],
+      seedRows: bankSeedRows,
+      searchPlaceholder: "Search bank name...",
+      newRowDefaults: { createdOn: "2026-08-24", updatedOn: "2026-08-24", sourcePage: 1 },
       create: {
         label: "Create Bank",
-        title: "Create Bank",
+        title: "Create Bank Master",
+        editTitle: "Edit Bank Master",
+        validationToast: "Please enter a valid bank name",
+        validationToastTitle: "Warning",
+        successMessage: "Bank created successfully",
+        updateMessage: "Bank updated successfully",
         fields: [
-          { key: "name", label: "Bank Name", type: "text", required: true, placeholder: "Enter bank name", span: 2 },
-          { key: "shortName", label: "Short Name", type: "text", required: true, placeholder: "Enter abbreviation" },
-          { key: "status", label: "Status", type: "select", required: true, options: activeOptions }
+          { key: "name", label: "Bank Name", type: "text", required: true, placeholder: "Enter Bank Name", validationMessage: "Bank Name is required", span: 2 }
         ]
       },
       rowActions: [
         { id: "edit", label: "Edit", kind: "form" },
-        { id: "delete", label: "Delete", kind: "danger", confirmTitle: "Delete bank?", confirmBody: "This removes the dummy bank record. Existing prototype records are unaffected." }
+        { id: "delete", label: "Delete", kind: "danger", confirmTitle: "Confirm Delete", confirmBody: "Are you sure you want to delete {name}?", confirmLabel: "Delete" }
       ],
-      emptyMessage: "No banks have been configured."
+      emptyMessage: "No banks found."
     },
 
     "internal-contacts": {
@@ -171,40 +237,41 @@
       description: "Manage your branch locations, holidays, bank details, and contacts.",
       sectionTitle: "Internal Company Contacts",
       tabs: officeTabs,
+      dataVersion: 3,
+      pageSize: 10,
+      hideReset: true,
       columns: [
         { key: "name", label: "Name" },
         { key: "email", label: "Email" },
-        { key: "department", label: "Department" },
-        { key: "mobile", label: "Mobile No." },
-        { key: "branch", label: "Branch" },
-        { key: "status", label: "Status", type: "status" }
+        { key: "department", label: "Department", sortable: false },
+        { key: "mobile", label: "Mobile No." }
       ],
       seedRows: [
-        { id: "contact-001", name: "Aditi Mehra", email: "aditi.mehra@testclient.example", department: "Finance", mobile: "+91 98765 41021", branch: "TestClient Gurugram", status: "Active" },
-        { id: "contact-002", name: "Kunal Shah", email: "kunal.shah@testclient.example", department: "Treasury", mobile: "+91 98765 41028", branch: "TestClient Mumbai", status: "Active" },
-        { id: "contact-003", name: "Riya Nair", email: "riya.nair@testclient.example", department: "Legal", mobile: "+91 98765 41035", branch: "TestClient Bengaluru", status: "Active" }
-      ],
-      searchPlaceholder: "Search name, email or department",
-      filters: [
-        { key: "department", label: "Department", type: "select", options: ["Finance", "Treasury", "Legal", "Sales", "Operations"] },
-        { key: "branch", label: "Branch", type: "select", options: branches },
-        { key: "status", label: "Status", type: "select", options: activeOptions }
+        { id: "contact-001", name: "Rajneesh Pandey", firstName: "Rajneesh", lastName: "Pandey", fullName: "Rajneesh Pandey", gender: "Male", email: "rajneesh.pandey+postinternal@tanserv.com", department: "Accounts Manager", mobile: "5678565634", commContact: true },
+        { id: "contact-002", name: "admin TestClient", firstName: "admin", lastName: "TestClient", fullName: "admin TestClient", gender: "Male", email: "rajneesh.pandey@tanserv.com", department: "", mobile: "7459996796", commContact: false }
       ],
       create: {
-        label: "Create Contact",
-        title: "Add Internal Company Contact",
+        label: "Create Internal Company Contact",
+        title: "Create Internal Company Contact",
+        editTitle: "Edit Internal Company Contact",
+        validationToastTitle: "Warning",
+        validationToast: "Please fill in all required fields correctly",
+        successMessage: "Internal company contact created successfully",
+        updateMessage: "Internal company contact updated successfully",
         fields: [
-          { key: "name", label: "Name", type: "text", required: true, placeholder: "Enter full name" },
-          { key: "department", label: "Department", type: "select", required: true, options: ["Finance", "Treasury", "Legal", "Sales", "Operations"] },
-          { key: "email", label: "Email ID", type: "email", required: true, placeholder: "name@company.com" },
-          { key: "mobile", label: "Mobile Number", type: "tel", required: true, placeholder: "+91 98765 43210" },
-          { key: "branch", label: "Branch", type: "select", required: true, options: branches },
-          { key: "status", label: "Status", type: "select", required: true, options: activeOptions }
+          { key: "firstName", label: "First Name", type: "text", required: true, placeholder: "First Name", validationMessage: "First Name is required" },
+          { key: "lastName", label: "Last Name", type: "text", required: true, placeholder: "Last Name", validationMessage: "Last Name is required" },
+          { key: "fullName", label: "Full Name", type: "text", disabled: true },
+          { key: "gender", label: "Gender", type: "search-select", required: true, placeholder: "Select Gender", validationMessage: "Gender is required", options: ["Male", "Female", "Others"] },
+          { key: "department", label: "Department", type: "search-select", required: true, placeholder: "Select Department", validationMessage: "Department is required", options: internalContactDepartments },
+          { key: "emailId", label: "Email ID", type: "email", required: true, placeholder: "Email ID", validationMessage: "Email is required" },
+          { key: "phoneNumber1", label: "Phone Number 1", type: "tel", required: true, placeholder: "10 digit number", maxLength: 10, validationMessage: "Phone Number is required" },
+          { key: "phoneNumber2", label: "Phone Number 2", type: "tel", placeholder: "10 digit number", maxLength: 10 },
+          { key: "commContact", label: "Is Communication Contact?", type: "checkbox", span: 2 }
         ]
       },
       rowActions: [
-        { id: "edit", label: "Edit", kind: "form" },
-        { id: "delete", label: "Delete", kind: "danger", confirmTitle: "Delete contact?", confirmBody: "This removes the internal contact from the dummy directory." }
+        { id: "edit", label: "Edit", kind: "form" }
       ],
       emptyMessage: "No internal contacts found."
     },

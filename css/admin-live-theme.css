@@ -15,6 +15,17 @@ body[data-admin-role="admin"] {
   font-family: Calibri, "Segoe UI", Arial, sans-serif;
 }
 
+html:has(.adminRuntimePage[data-admin-module="bank-master"]),
+body:has(.adminRuntimePage[data-admin-module="bank-master"]) {
+  scrollbar-width: none;
+}
+
+html:has(.adminRuntimePage[data-admin-module="bank-master"])::-webkit-scrollbar,
+body:has(.adminRuntimePage[data-admin-module="bank-master"])::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
 .adminRuntimePage {
   max-width: none;
   padding: 46px 48px 54px;
@@ -128,6 +139,35 @@ body[data-admin-role="admin"] {
   justify-content: flex-end;
   gap: 9px;
   flex: 0 0 auto;
+}
+
+.adminHeaderSearch {
+  width: 208px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 0 12px;
+  border: 1px solid var(--admin-live-border);
+  border-radius: 12px;
+  background: #fff;
+  color: #94a3b8;
+}
+
+.adminHeaderSearch:focus-within {
+  border-color: var(--admin-live-purple);
+  box-shadow: 0 0 0 3px rgba(92, 37, 141, 0.1);
+}
+
+.adminHeaderSearch input {
+  min-width: 0;
+  flex: 1;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--admin-live-text);
+  font: inherit;
+  font-size: 13px;
 }
 
 .adminPrimary,
@@ -676,6 +716,829 @@ body[data-admin-role="admin"] {
   color: #8791a3;
 }
 
+.adminRuntimePage[data-admin-module="holiday-master"] .adminTableIntro {
+  margin: 0 0 15px;
+  color: #5f6b7c;
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+.adminRuntimePage[data-admin-module="holiday-master"] .adminPageHero {
+  margin-bottom: 30px;
+}
+
+.adminRuntimePage[data-admin-module="holiday-master"] .adminWorkspaceTabs {
+  overflow-x: auto;
+}
+
+.adminRuntimePage[data-admin-module="holiday-master"] .adminRuntimeTabs a {
+  width: auto;
+  white-space: nowrap;
+}
+
+.adminRuntimePage[data-admin-module="holiday-master"] .adminTable {
+  min-width: 100%;
+}
+
+.adminRuntimePage[data-admin-module="holiday-master"] .adminTable tbody td:first-child {
+  font-weight: 700;
+}
+
+.adminRuntimePage[data-admin-module="holiday-master"] .adminWorkspaceBody {
+  padding-top: 45px;
+}
+
+.adminRuntimePage[data-admin-module="holiday-master"] .adminTable thead th {
+  padding-block: 18px;
+}
+
+.adminRuntimePage[data-admin-module="holiday-master"] .adminTable tbody td {
+  height: 61px;
+}
+
+.adminRuntimePage[data-admin-module="holiday-master"] .adminPager {
+  padding-bottom: 8px;
+}
+
+.adminRuntimePage[data-admin-module="holiday-master"] .adminTable th:nth-child(1),
+.adminRuntimePage[data-admin-module="holiday-master"] .adminTable td:nth-child(1) {
+  width: 26%;
+}
+
+.adminRuntimePage[data-admin-module="holiday-master"] .adminTable th:nth-child(2),
+.adminRuntimePage[data-admin-module="holiday-master"] .adminTable td:nth-child(2) {
+  width: 21%;
+}
+
+.adminRuntimePage[data-admin-module="holiday-master"] .adminTable th:nth-child(3),
+.adminRuntimePage[data-admin-module="holiday-master"] .adminTable td:nth-child(3) {
+  width: 21%;
+}
+
+.adminRuntimePage[data-admin-module="holiday-master"] .adminTable th:nth-child(4),
+.adminRuntimePage[data-admin-module="holiday-master"] .adminTable td:nth-child(4) {
+  width: 32%;
+}
+
+.adminRuntimePage[data-admin-module="holiday-master"] .adminRuntimeRowActions button {
+  min-width: 141px;
+}
+
+.adminRuntimePage[data-admin-module="bank-master"] .adminPageHero {
+  margin-bottom: 30px;
+}
+
+.adminRuntimePage[data-admin-module="bank-master"] .adminWorkspaceTabs {
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.adminRuntimePage[data-admin-module="bank-master"] .adminWorkspaceTabs::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+.adminRuntimePage[data-admin-module="bank-master"] .adminRuntimeTabs a {
+  width: auto;
+  white-space: nowrap;
+}
+
+.adminRuntimePage[data-admin-module="bank-master"] .adminWorkspaceActions > .adminPrimary {
+  min-width: 152px;
+  min-height: 48px;
+  font-size: 15px;
+}
+
+.adminRuntimePage[data-admin-module="bank-master"] .adminWorkspaceBody {
+  padding-top: 40px;
+}
+
+.adminRuntimePage[data-admin-module="bank-master"] .adminTable {
+  min-width: 780px;
+  font-size: 13px;
+}
+
+.adminRuntimePage[data-admin-module="bank-master"] .adminTable th:nth-child(1),
+.adminRuntimePage[data-admin-module="bank-master"] .adminTable td:nth-child(1) {
+  width: 40%;
+}
+
+.adminRuntimePage[data-admin-module="bank-master"] .adminTable th:nth-child(2),
+.adminRuntimePage[data-admin-module="bank-master"] .adminTable td:nth-child(2),
+.adminRuntimePage[data-admin-module="bank-master"] .adminTable th:nth-child(3),
+.adminRuntimePage[data-admin-module="bank-master"] .adminTable td:nth-child(3) {
+  width: 16%;
+}
+
+.adminRuntimePage[data-admin-module="bank-master"] .adminTable th:nth-child(4),
+.adminRuntimePage[data-admin-module="bank-master"] .adminTable td:nth-child(4) {
+  width: 28%;
+}
+
+.adminRuntimePage[data-admin-module="bank-master"] .adminTable tbody td {
+  height: 65px;
+}
+
+.adminRuntimePage[data-admin-module="bank-master"] .adminTable tbody td:first-child {
+  font-weight: 700;
+}
+
+.adminRuntimePage[data-admin-module="bank-master"] .adminRuntimeRowActions button {
+  min-width: 100px;
+}
+
+.adminModalBackdrop.is-bank-master {
+  align-items: flex-start;
+  overflow-y: auto;
+  padding: 80px 20px 40px;
+}
+
+.adminModalBackdrop.is-bank-master.is-bank-delete {
+  align-items: center;
+  padding: 18px;
+}
+
+.adminBankModal {
+  width: min(800px, calc(100vw - 40px));
+  max-width: none;
+  max-height: none;
+  margin: 0 auto;
+}
+
+.adminBankModal .adminRecordForm {
+  min-height: 110px;
+  grid-template-columns: 1fr;
+  padding: 23px 20px 17px;
+}
+
+.adminBankModal .adminRuntimeField {
+  gap: 10px;
+}
+
+.adminBankModal .adminRuntimeField.is-invalid {
+  padding-bottom: 7px;
+}
+
+.adminBankModal .adminRuntimeField > span {
+  color: #475569;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.adminBankModal .adminRuntimeField input {
+  width: calc(100% + 2px);
+  margin-left: -1px;
+  min-height: 40px;
+  border-radius: 8px;
+  font-family: Manrope, Calibri, "Segoe UI", Arial, sans-serif;
+  font-size: 13px;
+}
+
+.adminBankModal .adminRuntimeField.is-invalid input,
+.adminBankModal .adminRuntimeField.is-invalid input:focus {
+  border-color: var(--admin-live-purple);
+  box-shadow: 0 0 0 1px rgba(92, 37, 141, 0.08);
+}
+
+.adminBankModal footer {
+  min-height: 65px;
+  padding-block: 14px;
+}
+
+.adminBankModal footer .adminPrimary,
+.adminBankModal footer .adminSecondary,
+.adminBankDeleteModal footer .adminPrimary,
+.adminBankDeleteModal footer .adminSecondary {
+  min-width: 100px;
+  min-height: 36px;
+}
+
+.adminBankDeleteModal {
+  width: min(500px, 100%);
+  margin: auto;
+}
+
+.adminBankDeleteModal > p {
+  min-height: 59px;
+  margin: 0;
+  padding: 22px 20px;
+  color: #475569;
+  font-size: 13px;
+}
+
+.adminBankDeleteModal footer {
+  min-height: 65px;
+  padding-block: 14px;
+}
+
+.adminBankDeleteModal .adminDangerButton {
+  border-color: #b91c1c;
+  background: #dc3f4e;
+  box-shadow: none;
+}
+
+.adminRuntimePage[data-admin-module="internal-contacts"] .adminPageHero {
+  margin-bottom: 30px;
+}
+
+.adminRuntimePage[data-admin-module="internal-contacts"] .adminWorkspaceTabs {
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.adminRuntimePage[data-admin-module="internal-contacts"] .adminWorkspaceTabs::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+.adminRuntimePage[data-admin-module="internal-contacts"] .adminRuntimeTabs a {
+  width: auto;
+  white-space: nowrap;
+}
+
+.adminRuntimePage[data-admin-module="internal-contacts"] .adminWorkspaceActions > .adminPrimary {
+  min-width: 153px;
+  min-height: 48px;
+  font-size: 15px;
+}
+
+.adminRuntimePage[data-admin-module="internal-contacts"] .adminTable {
+  min-width: 805px;
+  font-size: 12px;
+}
+
+.adminRuntimePage[data-admin-module="internal-contacts"] .adminWorkspaceBody {
+  padding-bottom: 44px;
+}
+
+.adminRuntimePage[data-admin-module="internal-contacts"] .adminTable thead th {
+  height: 48px;
+}
+
+.adminRuntimePage[data-admin-module="internal-contacts"] .adminTable th:nth-child(1),
+.adminRuntimePage[data-admin-module="internal-contacts"] .adminTable td:nth-child(1) {
+  width: 18%;
+}
+
+.adminRuntimePage[data-admin-module="internal-contacts"] .adminTable th:nth-child(2),
+.adminRuntimePage[data-admin-module="internal-contacts"] .adminTable td:nth-child(2) {
+  width: 36%;
+}
+
+.adminRuntimePage[data-admin-module="internal-contacts"] .adminTable th:nth-child(3),
+.adminRuntimePage[data-admin-module="internal-contacts"] .adminTable td:nth-child(3) {
+  width: 18%;
+}
+
+.adminRuntimePage[data-admin-module="internal-contacts"] .adminTable th:nth-child(4),
+.adminRuntimePage[data-admin-module="internal-contacts"] .adminTable td:nth-child(4) {
+  width: 14%;
+}
+
+.adminRuntimePage[data-admin-module="internal-contacts"] .adminTable th:nth-child(5),
+.adminRuntimePage[data-admin-module="internal-contacts"] .adminTable td:nth-child(5) {
+  width: 14%;
+}
+
+.adminRuntimePage[data-admin-module="internal-contacts"] .adminTable tbody td {
+  height: 64px;
+}
+
+.adminRuntimePage[data-admin-module="internal-contacts"] .adminTable tbody td:first-child {
+  font-weight: 800;
+}
+
+.adminRuntimePage[data-admin-module="internal-contacts"] .adminRuntimeRowActions button {
+  min-width: 100px;
+  min-height: 38px;
+}
+
+.adminModalBackdrop.is-internal-contacts {
+  align-items: flex-start;
+  overflow-y: auto;
+  padding: 80px 20px 40px;
+}
+
+.adminInternalContactsModal {
+  width: min(800px, calc(100vw - 40px));
+  max-width: none;
+  max-height: none;
+  margin: 0 auto;
+}
+
+.adminInternalContactsModal .adminRecordForm {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 16px;
+  row-gap: 26px;
+  padding: 20px 20px 17px;
+  overflow: visible;
+}
+
+.adminInternalContactsModal .adminRuntimeField,
+.adminInternalContactsModal .adminSearchSelectField {
+  position: relative;
+  gap: 10px;
+}
+
+.adminInternalContactsModal .adminRuntimeField > span,
+.adminInternalContactsModal .adminSearchSelectField > span {
+  color: #475569;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.adminInternalContactsModal .adminRuntimeField input,
+.adminInternalContactsModal .adminSearchSelectControl {
+  min-height: 40px;
+  border-radius: 8px;
+  font-family: Manrope, Calibri, "Segoe UI", Arial, sans-serif;
+  font-size: 13px;
+}
+
+.adminInternalContactsModal .adminRuntimeField input,
+.adminInternalContactsModal .adminSearchSelectControl input[type="text"] {
+  font-weight: 400;
+}
+
+.adminInternalContactsModal .adminRuntimeField input:disabled {
+  border-color: #e4dfeb;
+  background: #f2eef7;
+  color: #64748b;
+  opacity: 1;
+}
+
+.adminSearchSelectControl {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  border: 1px solid var(--admin-live-border);
+  background: #fff;
+}
+
+.adminSearchSelectControl input[type="text"] {
+  min-width: 0;
+  flex: 1;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  cursor: pointer;
+}
+
+.adminSearchSelectControl > button {
+  width: 38px;
+  align-self: stretch;
+  border: 0;
+  background: transparent;
+  color: #7c8797;
+  cursor: pointer;
+}
+
+.adminSearchSelectField.is-invalid .adminSearchSelectControl {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.08);
+}
+
+.adminSearchSelectMenu {
+  position: absolute;
+  z-index: 80;
+  inset: calc(100% - 2px) 0 auto;
+  max-height: 232px;
+  overflow-y: auto;
+  padding: 5px;
+  border: 1px solid var(--admin-live-border);
+  border-radius: 9px;
+  background: #fff;
+  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.16);
+}
+
+.adminSearchSelectMenu[hidden] {
+  display: none;
+}
+
+.adminSearchSelectMenu button {
+  width: 100%;
+  min-height: 32px;
+  padding: 7px 10px;
+  border: 0;
+  border-radius: 6px;
+  background: #fff;
+  color: #334155;
+  font: inherit;
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.adminSearchSelectMenu button:hover,
+.adminSearchSelectMenu button:focus {
+  outline: 0;
+  background: #f7f1fb;
+  color: var(--admin-live-purple);
+}
+
+.adminInternalContactsModal .adminCheckField {
+  min-height: 24px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.adminInternalContactsModal .adminCheckField input {
+  width: 13px;
+  height: 13px;
+  margin: 0;
+  accent-color: var(--admin-live-purple);
+}
+
+.adminInternalContactsModal .adminCheckField span,
+.adminInternalContactsModal .adminCheckField strong {
+  display: inline;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.adminInternalContactsModal .adminFieldError {
+  margin-top: 5px;
+}
+
+.adminInternalContactsModal footer {
+  min-height: 65px;
+  padding-block: 14px;
+}
+
+.adminInternalContactsModal footer .adminPrimary,
+.adminInternalContactsModal footer .adminSecondary {
+  min-width: 100px;
+  min-height: 36px;
+}
+
+.adminInternalContactsModal h2 {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.adminStateBadge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 4px 10px;
+  border: 1px solid #bfdbfe;
+  border-radius: 999px;
+  background: #dbeafe;
+  color: #1d4ed8;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.adminModalBackdrop.is-holiday-master {
+  align-items: flex-start;
+  overflow-y: auto;
+  padding-top: 80px;
+  padding-bottom: 40px;
+}
+
+.adminHolidayModal {
+  width: min(800px, 100%);
+  max-height: none;
+  overflow: visible;
+  margin: 0 auto;
+}
+
+.adminHolidayModal .adminRecordForm {
+  overflow: visible;
+}
+
+.adminHolidayModal .adminRuntimeField > span,
+.adminHolidayModal .adminFieldLabel {
+  color: #475569;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.adminHolidayModal .adminRuntimeField input,
+.adminHolidayModal .adminRuntimeField select,
+.adminHolidayModal .adminCheckLine {
+  min-height: 40px;
+  border-radius: 8px;
+}
+
+.adminHolidayModal .adminRecordForm {
+  row-gap: 26px;
+  padding-bottom: 40px;
+}
+
+.adminHolidayModal .adminRuntimeField {
+  gap: 10px;
+}
+
+.adminHolidayModal footer {
+  padding-block: 12px;
+}
+
+.adminHolidayModal footer .adminPrimary,
+.adminHolidayModal footer .adminSecondary {
+  min-width: 100px;
+  min-height: 36px;
+}
+
+.adminRuntimeField.is-invalid input,
+.adminTagSelectField.is-invalid .adminTagSelectControl {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.08);
+}
+
+.adminHolidayModal .adminRuntimeField.is-invalid input,
+.adminHolidayModal .adminTagSelectField.is-invalid .adminTagSelectControl {
+  border-color: var(--admin-live-border);
+  box-shadow: none;
+}
+
+.adminHolidayModal .adminRuntimeField.is-invalid input:focus,
+.adminHolidayModal .adminTagSelectField.is-invalid .adminTagSelectControl:focus-within {
+  border-color: var(--admin-live-purple);
+  box-shadow: 0 0 0 3px rgba(92, 37, 141, 0.1);
+}
+
+.adminFieldError {
+  color: #dc2626 !important;
+  font-size: 10px !important;
+  font-weight: 650 !important;
+}
+
+.adminFieldError[hidden] {
+  display: none !important;
+}
+
+.adminCheckSection {
+  display: grid;
+  align-content: start;
+  gap: 17px;
+}
+
+.adminHolidayModal .adminCheckLine {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.adminCheckLine input {
+  min-width: 30px;
+  width: 30px;
+  height: 20px;
+  padding: 0;
+  appearance: none;
+  border: 1px solid #64748b;
+  border-radius: 2px;
+  background: #fff;
+  accent-color: var(--admin-live-purple);
+}
+
+.adminCheckLine input:checked {
+  border-color: var(--admin-live-purple);
+  background: var(--admin-live-purple);
+  box-shadow: inset 0 0 0 5px #fff;
+}
+
+.adminCheckLine input:disabled + span {
+  color: #94a3b8;
+}
+
+.adminCheckLine input:disabled {
+  border-color: #94a3b8;
+  background: #f1f5f9;
+}
+
+.adminTagSelectField {
+  position: relative;
+}
+
+.adminTagSelectControl {
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 9px;
+  border: 1px solid var(--admin-live-border);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.adminTagSearchIcon {
+  color: #94a3b8;
+  font-size: 13px;
+}
+
+.adminTagSelectControl:focus-within {
+  border-color: var(--admin-live-purple);
+  box-shadow: 0 0 0 3px rgba(92, 37, 141, 0.1);
+}
+
+.adminTagChips {
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+  padding: 5px 8px;
+  border-radius: 6px;
+  background: #f8fafc;
+}
+
+.adminTagChips:empty {
+  display: none;
+}
+
+.adminTagChips button {
+  min-height: 26px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border: 1px solid #bfdbfe;
+  border-radius: 999px;
+  background: #dbeafe;
+  color: #1d4ed8;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.adminTagChips button i {
+  font-size: 12px;
+}
+
+.adminTagSearch {
+  min-width: 90px !important;
+  min-height: 28px !important;
+  flex: 1;
+  padding: 3px 2px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.adminTagMenu {
+  position: absolute;
+  z-index: 120;
+  inset: calc(100% - 1px) 0 auto;
+  max-height: 244px;
+  overflow-y: auto;
+  padding: 5px;
+  border: 1px solid var(--admin-live-border);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 16px 30px rgba(15, 23, 42, 0.16);
+}
+
+.adminTagMenu[hidden] {
+  display: none !important;
+}
+
+.adminTagMenu button {
+  width: 100%;
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 6px;
+  background: #fff;
+  color: #334155;
+  font: inherit;
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.adminTagMenu button:hover,
+.adminTagMenu button:focus-visible {
+  outline: 0;
+  background: #f6f0fb;
+  color: var(--admin-live-purple);
+}
+
+.adminTagMenu button small {
+  color: #2563eb;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.adminTagMenu button[hidden] {
+  display: none !important;
+}
+
+.adminToast.is-error {
+  z-index: 140;
+  top: 16px;
+  right: 16px;
+  bottom: auto;
+  width: min(320px, calc(100vw - 32px));
+  display: grid;
+  grid-template-columns: 20px 1fr;
+  gap: 3px 8px;
+  padding: 12px 36px 12px 14px;
+  border-left: 4px solid #dc2626;
+  border-radius: 8px;
+  background: #fff7f7;
+  color: #334155;
+}
+
+.adminToast.is-error > i {
+  grid-row: 1 / 3;
+  align-self: start;
+  margin-top: 2px;
+  color: #7f1d1d;
+  font-size: 14px;
+}
+
+.adminToast.is-error strong {
+  grid-column: 2;
+  color: #b91c1c;
+  font-size: 13px;
+}
+
+.adminToast.is-error span {
+  grid-column: 2;
+  color: #64748b;
+  font-size: 11px;
+}
+
+.adminToast.is-error button {
+  position: absolute;
+  inset: 8px 10px auto auto;
+  border: 0;
+  background: transparent;
+  color: #64748b;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.adminToast.is-warning {
+  z-index: 140;
+  top: 17px;
+  right: 20px;
+  bottom: auto;
+  width: min(320px, calc(100vw - 32px));
+  display: grid;
+  grid-template-columns: 20px 1fr;
+  gap: 4px 8px;
+  padding: 13px 36px 13px 14px;
+  border-left: 4px solid #d97706;
+  border-radius: 12px;
+  background: #fffbeb;
+  color: #334155;
+}
+
+.adminToast.is-warning > i {
+  grid-row: 1 / 3;
+  align-self: start;
+  margin-top: 2px;
+  color: #92400e;
+  font-size: 14px;
+}
+
+.adminToast.is-warning strong {
+  grid-column: 2;
+  color: #92400e;
+  font-size: 13px;
+}
+
+.adminToast.is-warning span {
+  grid-column: 2;
+  color: #78350f;
+  font-size: 11px;
+}
+
+.adminToast.is-warning button {
+  position: absolute;
+  inset: 8px 10px auto auto;
+  border: 0;
+  background: transparent;
+  color: #a16207;
+  font-size: 18px;
+  cursor: pointer;
+}
+
 @media (max-width: 980px) {
   .adminAuditFilterGrid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -683,6 +1546,22 @@ body[data-admin-role="admin"] {
 }
 
 @media (max-width: 700px) {
+  html:has(.adminRuntimePage[data-admin-module="holiday-master"]),
+  body:has(.adminRuntimePage[data-admin-module="holiday-master"]) {
+    scrollbar-width: none;
+  }
+
+  html:has(.adminRuntimePage[data-admin-module="holiday-master"])::-webkit-scrollbar,
+  body:has(.adminRuntimePage[data-admin-module="holiday-master"])::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+  }
+
+  body:has(.adminRuntimePage[data-admin-module="holiday-master"]) .adminSharedHeader {
+    min-height: 71px;
+    height: 71px;
+  }
+
   .adminRuntimePage {
     padding: 46px 48px 56px;
   }
@@ -776,5 +1655,239 @@ body[data-admin-role="admin"] {
   .adminRuntimeUploadButtons {
     margin-inline: -16px;
     padding-inline: 16px;
+  }
+
+  .adminRuntimePage[data-admin-module="holiday-master"] {
+    padding: 46px 48px 56px;
+  }
+
+  .adminRuntimePage[data-admin-module="holiday-master"] .adminPageHero span {
+    line-height: 1.45;
+  }
+
+  .adminRuntimePage[data-admin-module="holiday-master"] .adminTableIntro {
+    margin-bottom: 21px;
+  }
+
+  .adminRuntimePage[data-admin-module="holiday-master"] .adminSourceWorkspace {
+    min-width: 0;
+  }
+
+  .adminRuntimePage[data-admin-module="holiday-master"] .adminWorkspaceHeader {
+    min-height: 64px;
+    display: flex;
+  }
+
+  .adminRuntimePage[data-admin-module="holiday-master"] .adminWorkspaceTabs,
+  .adminRuntimePage[data-admin-module="holiday-master"] .adminRuntimeTabs {
+    height: 64px;
+  }
+
+  .adminRuntimePage[data-admin-module="holiday-master"] .adminRuntimeTabs a {
+    width: auto;
+    white-space: nowrap;
+  }
+
+  .adminRuntimePage[data-admin-module="holiday-master"] .adminRuntimeTabs a:nth-child(n) {
+    width: auto;
+  }
+
+  .adminRuntimePage[data-admin-module="holiday-master"] .adminWorkspaceActions {
+    display: none;
+  }
+
+  .adminRuntimePage[data-admin-module="bank-master"] {
+    padding: 57px 48px 56px;
+  }
+
+  body:has(.adminRuntimePage[data-admin-module="bank-master"]) .adminSharedHeader {
+    min-height: 71px;
+    height: 71px;
+  }
+
+  .adminRuntimePage[data-admin-module="bank-master"] .adminPageHero span {
+    line-height: 1.45;
+  }
+
+  .adminRuntimePage[data-admin-module="bank-master"] .adminSourceWorkspace {
+    width: 279px;
+    min-width: 0;
+  }
+
+  .adminRuntimePage[data-admin-module="bank-master"] .adminWorkspaceHeader {
+    min-height: 64px;
+    display: flex;
+  }
+
+  .adminRuntimePage[data-admin-module="bank-master"] .adminWorkspaceTabs,
+  .adminRuntimePage[data-admin-module="bank-master"] .adminRuntimeTabs {
+    height: 64px;
+  }
+
+  .adminRuntimePage[data-admin-module="bank-master"] .adminRuntimeTabs a,
+  .adminRuntimePage[data-admin-module="bank-master"] .adminRuntimeTabs a:nth-child(n) {
+    width: auto;
+    white-space: nowrap;
+  }
+
+  .adminRuntimePage[data-admin-module="bank-master"] .adminWorkspaceActions {
+    display: none;
+  }
+
+  .adminRuntimePage[data-admin-module="bank-master"] .adminTable {
+    min-width: 780px;
+  }
+
+  html:has(.adminRuntimePage[data-admin-module="internal-contacts"]),
+  body:has(.adminRuntimePage[data-admin-module="internal-contacts"]) {
+    scrollbar-width: none;
+  }
+
+  html:has(.adminRuntimePage[data-admin-module="internal-contacts"])::-webkit-scrollbar,
+  body:has(.adminRuntimePage[data-admin-module="internal-contacts"])::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+  }
+
+  body:has(.adminRuntimePage[data-admin-module="internal-contacts"]) .adminSharedHeader {
+    min-height: 71px;
+    height: 71px;
+  }
+
+  .adminRuntimePage[data-admin-module="internal-contacts"] {
+    padding: 50px 48px 56px;
+  }
+
+  .adminRuntimePage[data-admin-module="internal-contacts"] .adminPageHero span {
+    line-height: 1.45;
+  }
+
+  .adminRuntimePage[data-admin-module="internal-contacts"] .adminSourceWorkspace {
+    width: 294px;
+    min-width: 0;
+  }
+
+  .adminRuntimePage[data-admin-module="internal-contacts"] .adminWorkspaceHeader {
+    min-height: 64px;
+    display: flex;
+  }
+
+  .adminRuntimePage[data-admin-module="internal-contacts"] .adminWorkspaceTabs,
+  .adminRuntimePage[data-admin-module="internal-contacts"] .adminRuntimeTabs {
+    height: 64px;
+  }
+
+  .adminRuntimePage[data-admin-module="internal-contacts"] .adminRuntimeTabs a,
+  .adminRuntimePage[data-admin-module="internal-contacts"] .adminRuntimeTabs a:nth-child(n) {
+    width: auto;
+    white-space: nowrap;
+  }
+
+  .adminRuntimePage[data-admin-module="internal-contacts"] .adminWorkspaceActions {
+    display: none;
+  }
+
+  .adminRuntimePage[data-admin-module="internal-contacts"] .adminTable {
+    min-width: 805px;
+  }
+
+  .adminRuntimePage[data-admin-module="holiday-master"] .adminTable {
+    min-width: 100%;
+  }
+
+  .adminRuntimePage[data-admin-module="holiday-master"] .adminStateBadge {
+    max-width: 30px;
+    justify-content: center;
+    padding-inline: 8px;
+    white-space: normal;
+    word-break: break-all;
+    line-height: 1.65;
+    text-align: center;
+  }
+
+  .adminToast.is-error,
+  .adminToast.is-warning {
+    top: 0;
+    right: auto;
+    left: 0;
+    padding-block: 14px;
+  }
+
+  .adminModalBackdrop.is-holiday-master {
+    padding: 80px 16px 40px;
+  }
+
+  .adminModalBackdrop.is-bank-master {
+    padding: 80px 16px 40px;
+  }
+
+  .adminModalBackdrop.is-internal-contacts {
+    padding: 80px 16px 40px;
+  }
+
+  .adminHolidayModal {
+    width: 100%;
+  }
+
+  .adminBankModal,
+  .adminBankDeleteModal {
+    width: 100%;
+  }
+
+  .adminInternalContactsModal {
+    width: 100%;
+    height: calc(100vh - 38px);
+    max-height: none;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .adminInternalContactsModal .adminRecordForm {
+    min-height: 0;
+    flex: 1 1 auto;
+    grid-template-columns: 1fr;
+    row-gap: 26px;
+    padding: 23px 20px 30px;
+    overflow-y: auto;
+  }
+
+  .adminInternalContactsModal h2 {
+    font-size: 15px;
+  }
+
+  .adminInternalContactsModal header,
+  .adminInternalContactsModal footer {
+    flex: 0 0 65px;
+    padding-inline: 20px;
+  }
+
+  .adminBankModal .adminRecordForm {
+    padding: 23px 20px 17px;
+  }
+
+  .adminBankModal header,
+  .adminBankModal footer,
+  .adminBankDeleteModal header,
+  .adminBankDeleteModal footer {
+    padding-inline: 20px;
+  }
+
+  .adminHolidayModal .adminRecordForm {
+    grid-template-columns: 1fr;
+    padding: 24px 16px 23px;
+  }
+
+  .adminHolidayModal .adminCheckSection {
+    margin-top: 12px;
+  }
+
+  .adminHolidayModal header,
+  .adminHolidayModal footer {
+    padding-inline: 16px;
+  }
+
+  .adminHolidayModal footer {
+    padding-block: 14px;
   }
 }

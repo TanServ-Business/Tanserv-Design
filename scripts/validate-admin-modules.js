@@ -13,6 +13,7 @@ vm.createContext(context);
   "admin-modules-setup.js",
   "admin-modules-config.js",
   "admin-modules-operations.js",
+  "admin-parity-definitions.js",
 ].forEach((fileName) => {
   const source = fs.readFileSync(path.join(__dirname, fileName), "utf8");
   vm.runInContext(source, context, { filename: fileName });
@@ -23,7 +24,7 @@ const expected = [
   "branch-master", "holiday-master", "bank-master", "internal-contacts",
   "invoice-preferences", "document-setup", "role-display", "user-setup", "notification-manager",
   "submission-process", "module-configuration", "strategy-manager",
-  "portfolio-transfer", "bulk-document-upload", "grn-upload", "cn-advance-upload", "payment-receipt-upload",
+  "portfolio-transfer", "bulk-document-upload", "grn-upload", "cn-advance-upload", "payment-receipt-upload", "customer-portfolio-transfer",
   "group-master", "customer-master", "customer-contacts",
   "template-master", "smtp-setup", "sender-account",
   "invoice-upload", "invoice-reallocation", "invoice-deletion",

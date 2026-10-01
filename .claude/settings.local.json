@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -r \"window.location\\\\|href=\" /Users/devashishrattan/Developer/Git/Tanserv-Design/scripts/*.js)",
+      "Bash(ls:*)"
+    ]
+  }
+}
