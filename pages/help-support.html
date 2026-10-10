@@ -593,6 +593,10 @@
   const getMyTickets = () => getTickets().filter(isMyTicket);
 
   // ── Knowledge Base articles ─────────────────────────────
+  const issueGuide = ({ id, title, roles, purpose, prerequisites, steps, note, validation, commonIssues, minutes = 2 }) => ({
+    id, cat: "issue-tracker", title, meta: `Issue Tracker · ${minutes} min read`, roles,
+    body: `<h4>Purpose</h4><p>${purpose}</p><h4>Prerequisites</h4><ul>${prerequisites.map(item => `<li>${item}</li>`).join("")}</ul><h4>Steps</h4><ol>${steps.map(item => `<li>${item}</li>`).join("")}</ol><div class="kbArticleNote" role="note"><strong>Important note</strong><p>${note}</p></div><h4>Validation</h4><ul>${validation.map(item => `<li>${item}</li>`).join("")}</ul><h4>Common issues</h4><ul>${commonIssues.map(item => `<li>${item}</li>`).join("")}</ul>`
+  });
   const kbArticles = [
     {
       id: "kb-001", cat: "invoice-billing",
@@ -622,13 +626,25 @@
       roles: ["Agent", "Agent cum Manager"],
       body: `<h4>What Is Aging?</h4><p>Invoice aging measures how many days remain or have passed relative to the invoice due date.</p><h4>Data Inputs Used</h4><ul><li>Invoice date</li><li>Customer credit period</li><li>Calculated due date</li><li>Current system date</li></ul><h4>Aging Buckets</h4><ul><li><code>Not Due</code> - within credit period</li><li><code>1-30 days</code> - early overdue</li><li><code>31-60 days</code> - moderate risk</li><li><code>61-90 days</code> - high risk</li><li><code>90+ days</code> - critical overdue</li></ul><h4>How To Validate Aging</h4><ol><li>Open invoice details and note invoice date + credit days.</li><li>Compute due date and compare with system date.</li><li>Check whether dashboard bucket matches the expected range.</li><li>If mismatch exists, raise correction with invoice ID and expected bucket.</li></ol>`
     },
-    {
-      id: "kb-005", cat: "issue-tracker",
-      title: "How to raise a dispute on an invoice",
-      meta: "Issue Tracker · 2 min read",
-      roles: ["Agent", "Manager", "Supervisor", "KAM", "KAS", "Action Owner", "CC", "HO"],
-      body: `<h4>When To Raise A Dispute</h4><p>Use dispute flow when invoice amount, tax, quantity, or contract terms do not match commercial agreement.</p><h4>Details To Keep Ready</h4><ul><li>Invoice ID and customer name</li><li>Reason category (billing, tax, quantity, duplicate, and so on)</li><li>Evidence files: PO, GRN, contract, or tax document</li><li>Expected corrected value</li></ul><h4>Steps</h4><ol><li>Open the invoice in dashboard.</li><li>Click <strong>Activity → Add Issue</strong>.</li><li>Select broad status <code>Further Action Required</code>.</li><li>Choose dispute sub-status (for example <em>Wrong Billing</em> or <em>Tax Issue</em>).</li><li>Add clear remarks with expected correction and submit.</li></ol><h4>After Submission</h4><p>The case is routed to <strong>Issue Tracker</strong> for review, action, and closure updates.</p>`
-    },
+    issueGuide({
+      id: "kb-005", title: "How to create an invoice issue from an activity", roles: ["Agent"], minutes: 3,
+      purpose: "Create an Issue Tracker record for an invoice that needs further action.",
+      prerequisites: ["Sign in as an Agent.", "Identify the correct customer and invoice.", "Know who should own the required action."],
+      steps: [
+        "From the Agent dashboard, click <strong>Total Net Due</strong> to open <strong>All Customers</strong>.",
+        "Find the customer and invoice. Verify the customer code and invoice number.",
+        "Click <strong>New activity</strong> on the invoice’s row. Confirm the invoice number in <strong>Update Disposition</strong>.",
+        "Select the appropriate <strong>Activity type</strong> and <strong>Sub Status</strong>. Check the automatically filled <strong>Broad Status</strong> and <strong>Primary status</strong>. The selected Sub Status must map to <strong>External Dependency</strong> to create an issue.",
+        "Keep <strong>Add to issue tracker</strong> selected.",
+        "Select the appropriate <strong>Action Owner</strong> and, where required, the configured <strong>Approval Process</strong>.",
+        "Enter remarks that explain the issue and the action needed.",
+        "Review the details and click <strong>Submit activity</strong>.",
+        "Check the invoice’s <strong>Activity Trail</strong> for the Issue Tracker entry and its <strong>Issue ID</strong>. Use that ID to find the issue in Issue Tracker."
+      ],
+      note: "An activity creates an issue only when its Sub Status maps to <strong>External Dependency</strong> and <strong>Add to issue tracker</strong> remains selected.",
+      validation: ["The Activity Trail shows the issue creation entry against the intended invoice.", "The entry includes an Issue ID and the selected Action Owner.", "The issue can be found in Issue Tracker using its ID or invoice number."],
+      commonIssues: ["Starting <strong>New activity</strong> from the wrong invoice row.", "Selecting a Sub Status that does not map to <strong>External Dependency</strong>.", "Clearing <strong>Add to issue tracker</strong>.", "Leaving <strong>Action Owner</strong> unselected.", "Assuming submission succeeded without checking the Activity Trail."]
+    }),
     {
       id: "kb-006", cat: "invoice-billing",
       title: "How to log a PTP (Promise to Pay) in Invoice Activity",
@@ -1510,7 +1526,192 @@
       meta: "Visit Module · 2 min read",
       roles: ["Manager","Supervisor","KAS"],
       body: `<h4>Purpose</h4><p>Check an agent’s planned visits and activity for a selected date.</p><h4>Prerequisites</h4><ul><li>Sign in with a Manager, Supervisor, or KAS account.</li><li>Open Visit Module Review from Open Visit Review.</li></ul><h4>Steps</h4><ol><li>Review Unique Visits This Month, Agent on Field Visit, and Approval Pending at the top of Visit Planner.</li><li>Use the calendar arrows or view selector to locate the required date.</li><li>Select the date in the calendar.</li><li>Select the intended agent in the Agents list or search for that agent.</li><li>Confirm the date and agent shown in the Review plan panel.</li><li>Review the plan table for customer code, customer name, visit reason, agent, KAM, KAS, and visit status.</li><li>Check Remarks and Activity Trail for that date and agent.</li></ol><p><strong>Important note:</strong> The review panel may show “No visits scheduled for this agent” when the selected date has no plan records.</p><h4>Validation</h4><ul><li>The Review plan heading shows the intended date.</li><li>The selected agent’s name appears above the plan table.</li><li>Any plan rows and trail entries belong to the selected date and agent.</li></ul><h4>Common issues</h4><ul><li>Reviewing the correct agent on the wrong date.</li><li>Mistaking an empty plan for a loading failure.</li><li>Reading another agent’s activity trail without checking the selected name.</li></ul>`
-    }
+    },
+    issueGuide({
+      id: "kb-143", title: "How to find and track an issue in Issue Tracker", roles: ["Agent", "Manager", "Action Owner", "Approver"],
+      purpose: "Find an invoice issue, check who is responsible for it, and open its details.",
+      prerequisites: ["Have access to Issue Tracker.", "Keep an Issue ID, invoice number, customer code, or customer name ready."],
+      steps: [
+        "Open <strong>Issue Tracker</strong> from the main menu.",
+        "Choose the relevant tab: <strong>My Work</strong> for open issues needing your action; <strong>Open Issues</strong> for other open issues visible to you; or <strong>Closed</strong> for completed issues visible to you.",
+        "Enter the Issue ID, invoice number, customer code, or customer name in <strong>Search invoice, customer or issue</strong>.",
+        "If needed, use <strong>Filters</strong> to narrow the results. Clear active filters if the expected issue does not appear.",
+        "Expand the invoice group if its issue rows are collapsed.",
+        "Check <strong>Customer code</strong>, <strong>Customer name</strong>, <strong>Invoice no.</strong>, and <strong>Issue ID</strong> to confirm the record.",
+        "Review <strong>Assigned to</strong>, <strong>Issue created</strong>, and <strong>Open days</strong> to understand its current ownership and age.",
+        "Click <strong>Open task</strong> to view an open issue. For a closed issue, click <strong>View</strong>."
+      ],
+      note: "<strong>Waiting on others</strong> is a summary card, not a separate issue-list tab. Issue visibility depends on your role and the issue’s workflow stage.",
+      validation: ["The Issue ID belongs to the intended customer and invoice.", "<strong>Assigned to</strong> identifies the current assignee.", "<strong>Open task</strong> or <strong>View</strong> opens the issue you selected."],
+      commonIssues: ["Searching in <strong>My Work</strong> when the issue does not currently need your action.", "Overlooking an active filter or a collapsed invoice group.", "Selecting a similar customer name without checking the code and invoice number.", "Assuming every role can see an issue at every workflow stage."]
+    }),
+    issueGuide({
+      id: "kb-144", title: "How to review an issue in Issue Tracker", roles: ["Agent", "Manager", "Action Owner", "Approver"],
+      purpose: "Understand the issue’s status, ownership, history, and next step before taking action.",
+      prerequisites: ["Find the correct issue in Issue Tracker.", "Click <strong>Open task</strong> or <strong>View</strong> to open its detail page."],
+      steps: [
+        "Check the page heading and status. Confirm the <strong>Invoice no.</strong>, <strong>Issue ID</strong>, customer code, and customer name below the heading.",
+        "Read the <strong>Current action</strong> panel to see whether you need to act or are tracking the issue.",
+        "Review the workflow strip: <strong>Previous update</strong>, <strong>Current assignee</strong>, and <strong>Next step</strong>.",
+        "Read <strong>Issue context</strong> for the Primary status, Sub status, Action owner, approval matrix, and Agent’s original remark.",
+        "Review <strong>Existing Documents</strong> where documents are available for the issue.",
+        "Check <strong>Approval route</strong> for the Manager review stage and any configured approver levels.",
+        "Expand <strong>Action trail</strong>. Read recorded actions, users, times, remarks, and attachments, starting with the latest update.",
+        "Use <strong>Complete details</strong> to verify the invoice and issue references before taking any action."
+      ],
+      note: "The <strong>Action owner</strong> and <strong>Current assignee</strong> may be different. Current assignee holds the present workflow step; Action owner is responsible for the issue’s action.",
+      validation: ["The Issue ID, invoice number, and customer match the intended record.", "The current assignee and next step are clear.", "The latest Action trail entry explains the most recent update."],
+      commonIssues: ["Opening an issue with a similar invoice or customer name without checking its Issue ID.", "Treating the Agent’s original remark as the latest update.", "Confusing Action owner with Current assignee.", "Taking action before reviewing the Action trail and approval progress."]
+    }),
+    issueGuide({
+      id: "kb-145", title: "How to provide a resolution for an issue", roles: ["Action Owner"],
+      purpose: "Record what resolved the issue and send it for review.",
+      prerequisites: ["Open the correct issue in Issue Tracker.", "Review its <strong>Issue context</strong>, <strong>Existing Documents</strong>, and <strong>Action trail</strong>.", "Have the resolution details and any supporting document ready."],
+      steps: [
+        "Confirm the <strong>Issue ID</strong> and invoice number on the detail page.",
+        "Check <strong>Current action</strong> and <strong>Current assignee</strong> to confirm the issue is ready for your resolution.",
+        "Click <strong>Provide resolution</strong>.",
+        "In <strong>Add resolution</strong>, enter a clear explanation in <strong>Resolution</strong>. State what was done and the outcome.",
+        "Use <strong>Browse</strong> to attach supporting documents if needed. Check the files listed as ready to attach.",
+        "Click <strong>Submit resolution</strong>.",
+        "Check the confirmation and <strong>Action trail</strong>. The issue moves to resolution review for the Agent."
+      ],
+      note: "<strong>Share update</strong> adds a remark or document without completing the resolution step. Use <strong>Submit resolution</strong> to send the resolution for review.",
+      validation: ["The Action trail records the resolution and any listed attachments.", "The workflow moves to resolution review.", "<strong>Current assignee</strong> reflects the review handoff."],
+      commonIssues: ["Using <strong>Share update</strong> when you intend to submit the resolution.", "Opening a similarly named issue without checking its Issue ID.", "Submitting a document without explaining the outcome when an explanation is needed.", "Assuming that providing a resolution closes the issue automatically."]
+    }),
+    issueGuide({
+      id: "kb-146", title: "How to reassign an issue’s Action Owner", roles: ["Agent", "Manager"],
+      purpose: "Change who is responsible for the issue’s action and record why the ownership changed.",
+      prerequisites: ["Open the correct issue in Issue Tracker.", "Identify the new Action Owner and the reason for reassignment."],
+      steps: [
+        "Confirm the <strong>Issue ID</strong>, invoice number, and current <strong>Action owner</strong>.",
+        "Review <strong>Current assignee</strong> and the latest <strong>Action trail</strong> entry to understand the present workflow step.",
+        "Expand <strong>Actions</strong> and click <strong>Reassign owner</strong>.",
+        "In <strong>Reassign action owner</strong>, select the new <strong>Action owner</strong>.",
+        "Enter a remark explaining the reassignment.",
+        "Review the selection and click <strong>Reassign</strong>.",
+        "Check the confirmation, updated <strong>Action owner</strong>, and new <strong>Action trail</strong> entry."
+      ],
+      note: "Action Owner and Current assignee are different fields. During review or approval, changing the Action Owner does not necessarily move the current step to the new owner. Check <strong>Current assignee</strong> after reassignment.",
+      validation: ["<strong>Action owner</strong> shows the selected person.", "<strong>Action trail</strong> records the reassignment and remark.", "<strong>Current assignee</strong> reflects the actual workflow step."],
+      commonIssues: ["Reassigning without checking the Issue ID.", "Selecting the wrong person from the Action owner list.", "Leaving the required remark blank.", "Assuming the current approval or review step changes automatically."]
+    }),
+    issueGuide({
+      id: "kb-147", title: "How to change an issue’s approval process", roles: ["Agent", "Manager"],
+      purpose: "Request a different configured approval process for an open issue.",
+      prerequisites: ["Open the correct issue in Issue Tracker.", "Identify the approval process that should apply.", "Review the current <strong>Approval route</strong> and <strong>Action trail</strong>."],
+      steps: [
+        "Confirm the <strong>Issue ID</strong> and invoice number.",
+        "Expand <strong>Actions</strong> and click <strong>Change process</strong>.",
+        "Select the required <strong>Approval process</strong>.",
+        "Enter a remark explaining why the process is changing.",
+        "Review the selection and click <strong>Save process</strong>.",
+        "Check the confirmation and <strong>Action trail</strong> for the process-change request.",
+        "Review <strong>Current assignee</strong> and approval status to follow the next review step."
+      ],
+      note: "<strong>Save process</strong> requests a change; it does not approve the new route. An approval already in progress may be cancelled before the new route proceeds.",
+      validation: ["The Action trail records the requested process and remark.", "The issue shows the next reviewer as <strong>Current assignee</strong>.", "After review, <strong>Approval route</strong> reflects the approved process."],
+      commonIssues: ["Choosing a process without checking the current route.", "Leaving the required remark blank.", "Assuming <strong>Save process</strong> completes approval.", "Trying to change the process on a closed issue."]
+    }),
+    issueGuide({
+      id: "kb-148", title: "How to approve or reject an issue as a Manager", roles: ["Manager"],
+      purpose: "Review a new or corrected issue and decide whether it should continue through the approval process or return to the Agent for correction.",
+      prerequisites: ["The issue must be open and awaiting your Manager review."],
+      steps: [
+        "Open <strong>Issue Tracker → My Work</strong> and select the issue.",
+        "Confirm the <strong>Issue ID</strong>, customer, and invoice.",
+        "Review <strong>Issue context</strong>, the Agent’s remark, <strong>Existing Documents</strong>, <strong>Approval route</strong>, and <strong>Action trail</strong>.",
+        "In <strong>Your required action</strong>, select <strong>Manager approval</strong>.",
+        "Choose <strong>Approve</strong> to continue processing, or <strong>Reject</strong> to return the issue to the Agent for correction. You can add supporting context before deciding.",
+        "Check the <strong>Action trail</strong> and <strong>Current assignee</strong> to confirm the result."
+      ],
+      note: "An Admin can turn off Manager review in <strong>Issue Tracker Configuration</strong> when it is not required. For newly created issues, the workflow then moves to the first configured approver, or directly to the Action Owner if there is no approval stage. When Manager review is required, a rejection returns the issue to the Agent for correction.",
+      validation: ["The decision appears in the <strong>Action trail</strong>.", "<strong>Current assignee</strong> shows who needs to act next."],
+      commonIssues: ["<strong>Manager approval</strong> is unavailable because the issue is not assigned to you for review.", "Approving without checking the Agent’s latest remark or supporting documents.", "Assuming Manager approval completes every configured approval stage."]
+    }),
+    issueGuide({
+      id: "kb-149", title: "How to approve or reject an issue as an Approver", roles: ["Approver"],
+      purpose: "Review an issue at your approval level and decide whether it should continue or return to the Agent for correction.",
+      prerequisites: ["The issue must be open and awaiting your approval in <strong>My Work</strong>."],
+      steps: [
+        "Open <strong>Issue Tracker → My Work</strong> and select <strong>Open task</strong> for the issue.",
+        "Confirm the <strong>Issue ID</strong>, customer, and invoice.",
+        "Review <strong>Issue context</strong>, remarks, <strong>Existing Documents</strong>, <strong>Approval route</strong>, and <strong>Action trail</strong>.",
+        "Under <strong>Your required action</strong>, select <strong>Approver L1 approval</strong> or the level assigned to you.",
+        "Confirm that you are shown as the <strong>Assigned approver</strong>. Add supporting context or documents if needed.",
+        "Select <strong>Approve</strong> to advance the issue, or <strong>Reject</strong> to return it to the Agent for correction.",
+        "Check the <strong>Action trail</strong>, <strong>Approval route</strong>, and <strong>Current assignee</strong> to confirm the result."
+      ],
+      note: "Approval levels are completed in sequence. <strong>Approve</strong> sends the issue to the next Approver; final approval sends it to the Action Owner for resolution. <strong>Reject</strong> returns it to the Agent for correction. Adding a remark alone does not record an approval decision.",
+      validation: ["Your decision appears in the <strong>Action trail</strong>.", "<strong>Approval route</strong> shows the updated level.", "<strong>Current assignee</strong> identifies who acts next."],
+      commonIssues: ["The approval action is unavailable because another Approver or level is assigned.", "Adding a remark without selecting <strong>Approve</strong> or <strong>Reject</strong>.", "Assuming approval at an intermediate level sends the issue directly to the Action Owner."]
+    }),
+    issueGuide({
+      id: "kb-150", title: "How to correct and resubmit an issue after rejection", roles: ["Agent"],
+      purpose: "Respond to a Manager’s or Approver’s rejection and send the issue back through its approval route.",
+      prerequisites: ["The issue must show <strong>Rejected · correction required</strong> and be assigned to you."],
+      steps: [
+        "Open <strong>Issue Tracker → My Work</strong> and select the rejected issue.",
+        "Confirm the <strong>Issue ID</strong> and invoice, then read the rejection reason in <strong>Previous update</strong> and the <strong>Action trail</strong>.",
+        "Review any requested documents and attach supporting files if needed.",
+        "In <strong>Add remark</strong>, enter a clear corrective remark explaining what you addressed.",
+        "Select <strong>Share update</strong>.",
+        "Check the <strong>Action trail</strong> and <strong>Current assignee</strong> to confirm the issue has returned to its configured approval route."
+      ],
+      note: "The Agent’s corrective remark resubmits the issue automatically. Attaching documents without a remark does not resubmit it. There is no separate <strong>Resend for Approval</strong> action.",
+      validation: ["The <strong>Action trail</strong> records your corrective remark.", "The correction-required state clears.", "<strong>Current assignee</strong> shows the next reviewer."],
+      commonIssues: ["Leaving the corrective remark blank.", "Attaching a document and expecting it to resubmit by itself.", "Looking for a separate <strong>Resend for Approval</strong> button."]
+    }),
+    issueGuide({
+      id: "kb-151", title: "How to review a submitted issue resolution", roles: ["Agent"],
+      purpose: "Review the Action Owner’s submitted resolution and decide whether to accept it, close the issue, or return it for further work.",
+      prerequisites: ["A resolution must be awaiting your review."],
+      steps: [
+        "Open <strong>Issue Tracker → My Work</strong> and select the issue.",
+        "Confirm the <strong>Issue ID</strong> and invoice. Review the submitted resolution in the <strong>Action trail</strong> and check <strong>Existing Documents</strong>.",
+        "Under <strong>Your required action</strong>, select <strong>Review resolution</strong>.",
+        "Enter a remark explaining your decision.",
+        "Choose <strong>Accept and close</strong>, <strong>Accept resolution</strong> to keep the issue open, or <strong>Reject resolution</strong> to return it to the Action Owner.",
+        "Check the <strong>Action trail</strong>, issue status, and <strong>Current assignee</strong> to confirm the result."
+      ],
+      note: "Only the issue’s Agent can decide a submitted resolution. The decision completes the review of that resolution version. <strong>Share update</strong> adds a remark or document but does not accept or reject the resolution.",
+      validation: ["The <strong>Action trail</strong> records the decision and remark.", "<strong>Reject resolution</strong> returns the issue to the Action Owner.", "<strong>Accept resolution</strong> keeps it open; <strong>Accept and close</strong> changes its status to <strong>Closed</strong>."],
+      commonIssues: ["Selecting <strong>Accept resolution</strong> when the issue is ready to close.", "Trying to decide a resolution version that has already been reviewed.", "Using <strong>Share update</strong> instead of <strong>Review resolution</strong>."]
+    }),
+    issueGuide({
+      id: "kb-152", title: "How to close an issue from Actions", roles: ["Agent", "Manager"],
+      purpose: "Close an open issue after checking that its resolution and supporting information are complete.",
+      prerequisites: ["Locate the correct open issue and review its latest updates before closing it."],
+      steps: [
+        "Open <strong>Issue Tracker</strong> and locate the issue.",
+        "Confirm the <strong>Issue ID</strong> and invoice. Review the <strong>Action trail</strong>, <strong>Existing Documents</strong>, and current approval or resolution status.",
+        "Expand <strong>Actions</strong> and select <strong>Close issue</strong>.",
+        "Enter the required remark explaining why the issue can be closed. Attach supporting evidence if needed.",
+        "Select <strong>Close issue</strong> to confirm.",
+        "Verify that the status is <strong>Closed</strong> and the closure appears in the <strong>Action trail</strong>."
+      ],
+      note: "<strong>Close issue</strong> is separate from <strong>Accept and close</strong> during the Agent’s resolution review. Closing an issue ends any active approval request, so check outstanding work before using it.",
+      validation: ["The issue appears under <strong>Closed</strong>.", "The <strong>Action trail</strong> records the closure and remark.", "The issue has no current assignee."],
+      commonIssues: ["Leaving the required closure remark blank.", "Closing before checking the latest resolution or supporting documents.", "Trying to close an issue that is already closed."]
+    }),
+    issueGuide({
+      id: "kb-153", title: "How to reopen a closed issue", roles: ["Agent", "Manager"],
+      purpose: "Return a closed issue to active work when further action is required.",
+      prerequisites: ["The issue must be <strong>Closed</strong>.", "Keep the reason for reopening ready."],
+      steps: [
+        "Open <strong>Issue Tracker → Closed</strong> and locate the issue.",
+        "Select <strong>View</strong> and confirm the <strong>Issue ID</strong> and invoice.",
+        "Review the closure remark and recent <strong>Action trail</strong>.",
+        "Expand <strong>Actions</strong> and select <strong>Reopen issue</strong>.",
+        "Enter the required remark explaining what further work is needed.",
+        "Select <strong>Reopen issue</strong> to confirm.",
+        "Check the issue status, <strong>Current assignee</strong>, and <strong>Action trail</strong>."
+      ],
+      note: "Reopening keeps the same <strong>Issue ID</strong> and history. When the Agent reopens an issue, it follows the configured review route. When the Manager reopens it, it goes to the Action Owner.",
+      validation: ["The issue status is <strong>Open</strong>.", "The <strong>Action trail</strong> records the reopening remark.", "<strong>Current assignee</strong> shows who acts next."],
+      commonIssues: ["Leaving the required reopening remark blank.", "Reopening the wrong issue without checking its ID and invoice.", "Assuming reopening creates a new <strong>Issue ID</strong>."]
+    })
   ];
 
   function refreshCategoryCounts() {

@@ -732,6 +732,25 @@
   font-size: 12px;
 }
 
+.kbArticleBody .kbArticleNote {
+  margin: 16px 0;
+  padding: 12px 14px;
+  border: 1px solid #dac5ed;
+  border-left: 4px solid #5c258d;
+  border-radius: 8px;
+  background: #faf6ff;
+}
+
+.kbArticleBody .kbArticleNote > strong:first-child {
+  display: block;
+  color: #4b1d73;
+  margin-bottom: 4px;
+}
+
+.kbArticleBody .kbArticleNote p {
+  margin: 0;
+}
+
 /* ── Ticket Section ─────────────────────────────────────────── */
 .ticketKpiRow {
   display: grid;
