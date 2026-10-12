@@ -52,7 +52,7 @@
         </tr></thead>
         <tbody>${rows.length ? rows.map(row => `<tr>
           <td><span class="adminSubmissionStatus${row.status === 'RUNNING' ? '' : ' is-muted'}"><i class="bi bi-play-fill" aria-hidden="true"></i>${escapeHtml(row.status)}</span></td>
-          <td><span class="adminSubmissionStrategyName"><strong>${escapeHtml(row.strategyName)}</strong><small>${escapeHtml(row.strategySubtitle || '')}</small></span></td>
+          <td><span class="adminSubmissionStrategyName"><strong>${escapeHtml(row.strategyName)}</strong><small>${escapeHtml(row.strategySubtitle || '')}</small>${row.batchInvoicesInOneEmail ? `<small>Bulk email after ${escapeHtml(row.bulkSendAfterDays)} ${Number(row.bulkSendAfterDays) === 1 ? 'day' : 'days'} in Inebura</small>` : ''}</span></td>
           <td><span class="adminSubmissionApplyOn">${escapeHtml(row.applyOn)}</span></td>
           <td>${escapeHtml(row.strategyType)}</td>
           <td>${row.agentSelection ? 'Yes' : 'No'}</td>
@@ -95,6 +95,10 @@
           <label class="adminSubmissionFormField adminSubmissionWide"><span>STRATEGY TYPE <abbr title="Required">*</abbr></span><select name="strategyType" required>${['Invoice','Invoice + Docs(In 1 Shot)','Invoice + Docs(Sequentially)'].map(type => `<option value="${escapeHtml(type)}" ${type === (record?.strategyType || 'Invoice') ? 'selected' : ''}>${escapeHtml(type)}</option>`).join('')}</select></label>
           <p class="adminSubmissionTypeHint" id="submissionTypeHint">${escapeHtml(typeHint(record?.strategyType || 'Invoice'))}</p>
           <label class="adminSubmissionAgent"><input type="checkbox" name="agentSelection" ${record?.agentSelection ? 'checked' : ''} /><strong>Agent<br />Selection</strong><span>The agent can also select documents that should go with the strategy. Turning this on will allow manual agent selections.</span></label>
+          <section class="adminSubmissionBulk" aria-labelledby="submissionBulkTitle">
+            <label class="adminSubmissionBulkToggle"><input type="checkbox" name="batchInvoicesInOneEmail" ${record?.batchInvoicesInOneEmail ? 'checked' : ''} /><span><strong id="submissionBulkTitle">Submit multiple invoices in one email</strong><small>All eligible invoices for the same customer will be sent in one email once all necessary documents are tagged.</small></span></label>
+            <div class="adminSubmissionBulkDelay" ${record?.batchInvoicesInOneEmail ? '' : 'hidden'}><label class="adminSubmissionFormField" for="submissionBulkDays"><span>Bulk send after <abbr title="Required when bulk email is enabled">*</abbr></span><span class="adminSubmissionBulkInput"><input id="submissionBulkDays" name="bulkSendAfterDays" type="number" min="0" step="1" inputmode="numeric" value="${record?.batchInvoicesInOneEmail && Number.isInteger(Number(record.bulkSendAfterDays)) ? escapeHtml(record.bulkSendAfterDays) : ''}" /><span>days</span></span></label><small>Count from when each invoice is added to Inebura. Only invoices with all required documents tagged are eligible for the customer's email.</small></div>
+          </section>
           <div class="adminSubmissionDocuments"><label class="adminSubmissionFormField" for="submissionDocumentSearch">SELECT DOCUMENTS</label><div class="adminSubmissionDocumentSearch"><i class="bi bi-search" aria-hidden="true"></i><input id="submissionDocumentSearch" type="search" placeholder="Search documents..." /></div>
             <div class="adminSubmissionDocumentList"><label class="adminSubmissionSelectAll"><input type="checkbox" id="submissionSelectAll" />SELECT ALL <span id="submissionSelectedCount">${selected.size} selected</span></label><div id="submissionDocumentOptions">${documentNames.map(name => `<label data-document-name="${escapeHtml(name)}"><input type="checkbox" value="${escapeHtml(name)}" ${selected.has(name) ? 'checked' : ''} />${escapeHtml(name)}</label>`).join('')}</div></div>
           </div>
@@ -115,6 +119,14 @@
     syncCount();
     form.elements.applyOn.addEventListener('change', () => { form.querySelector('.adminSubmissionProductField').hidden = form.elements.applyOn.value !== 'PRODUCT'; });
     form.elements.strategyType.addEventListener('change', () => { form.querySelector('#submissionTypeHint').textContent = typeHint(form.elements.strategyType.value); });
+    const syncBulkDelay = () => {
+      const enabled = form.elements.batchInvoicesInOneEmail.checked;
+      form.elements.bulkSendAfterDays.disabled = !enabled;
+      form.elements.bulkSendAfterDays.required = enabled;
+      form.querySelector('.adminSubmissionBulkDelay').hidden = !enabled;
+    };
+    form.elements.batchInvoicesInOneEmail.addEventListener('change', syncBulkDelay);
+    syncBulkDelay();
     form.querySelector('#submissionDocumentSearch').addEventListener('input', event => {
       const term = event.target.value.trim().toLowerCase();
       form.querySelectorAll('#submissionDocumentOptions label').forEach(label => { label.hidden = !label.dataset.documentName.toLowerCase().includes(term); });
@@ -128,7 +140,8 @@
       if (!name) { form.elements.strategyName.focus(); return; }
       const applyOn = form.elements.applyOn.value;
       const selectedDocuments = documentInputs.filter(input => input.checked).map(input => input.value);
-      const next = {id: record?.id || `submission-${Date.now()}`,status: record?.status || 'RUNNING',strategyName:name,strategySubtitle:applyOn === 'PRODUCT' ? (form.elements.productCategory.value || 'Product') : 'Xeon Infraservices Pvt Ltd',applyOn,strategyType:form.elements.strategyType.value,agentSelection:form.elements.agentSelection.checked,productCategory:form.elements.productCategory.value,selectedDocuments,documents:[`${selectedDocuments.length} DOCS`]};
+      const batchInvoicesInOneEmail = form.elements.batchInvoicesInOneEmail.checked;
+      const next = {id: record?.id || `submission-${Date.now()}`,status: record?.status || 'RUNNING',strategyName:name,strategySubtitle:applyOn === 'PRODUCT' ? (form.elements.productCategory.value || 'Product') : 'Xeon Infraservices Pvt Ltd',applyOn,strategyType:form.elements.strategyType.value,agentSelection:form.elements.agentSelection.checked,batchInvoicesInOneEmail,bulkSendAfterDays:batchInvoicesInOneEmail ? Number(form.elements.bulkSendAfterDays.value) : null,productCategory:form.elements.productCategory.value,selectedDocuments,documents:[`${selectedDocuments.length} DOCS`]};
       if (editing) strategies = strategies.map(item => item.id === record.id ? next : item);
       else strategies.push(next);
       save(); closeModal(); render(); notify(editing ? 'Strategy updated in this preview.' : 'Strategy created in this preview.');

@@ -85,16 +85,28 @@
 .adminSubmissionFormField abbr{color:#b42318;text-decoration:none}
 .adminSubmissionFormField input,.adminSubmissionFormField select,.adminSubmissionNewProduct{width:100%;height:40px;min-height:40px;box-sizing:border-box;border:1px solid #e0e4eb;border-radius:9px;padding:9px 10px;background:#fff;color:#1f2937;font:inherit;font-size:12px;font-weight:500;letter-spacing:0}
 .adminSubmissionFormField input:focus-visible,.adminSubmissionFormField select:focus-visible,.adminSubmissionDocumentSearch input:focus-visible,.adminSubmissionNewProduct:focus-visible{outline:2px solid #7138db;outline-offset:2px}
-.adminSubmissionWide,.adminSubmissionTypeHint,.adminSubmissionAgent,.adminSubmissionDocuments,.adminSubmissionProductField{grid-column:1/-1}
+.adminSubmissionWide,.adminSubmissionTypeHint,.adminSubmissionAgent,.adminSubmissionBulk,.adminSubmissionDocuments,.adminSubmissionProductField{grid-column:1/-1}
 .adminSubmissionTypeHint{margin:-10px 0 0;padding:9px 12px;border-radius:5px;background:#e7f6fa;color:#317a8e;font-size:12px}
 .adminSubmissionAgent{display:flex;align-items:center;gap:12px;padding:15px 16px;border-radius:7px;background:#f6f7f9;color:#667085;font-size:12px}
-.adminSubmissionAgent input{appearance:none;position:relative;width:42px;height:22px;flex:none;margin:0;border:1px solid #c9ced8;border-radius:999px;background:#d8dce5;cursor:pointer;transition:background .15s ease}
-.adminSubmissionAgent input::before{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 3px #0002;transition:transform .15s ease}
-.adminSubmissionAgent input:checked{border-color:#55227d;background:#55227d}
-.adminSubmissionAgent input:checked::before{transform:translateX(20px)}
-.adminSubmissionAgent input:focus-visible{outline:2px solid #7138db;outline-offset:2px}
+.adminSubmissionAgent input,.adminSubmissionBulkToggle input{appearance:none;position:relative;width:42px;height:22px;flex:none;margin:0;border:1px solid #c9ced8;border-radius:999px;background:#d8dce5;cursor:pointer;transition:background .15s ease}
+.adminSubmissionAgent input::before,.adminSubmissionBulkToggle input::before{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 3px #0002;transition:transform .15s ease}
+.adminSubmissionAgent input:checked,.adminSubmissionBulkToggle input:checked{border-color:#55227d;background:#55227d}
+.adminSubmissionAgent input:checked::before,.adminSubmissionBulkToggle input:checked::before{transform:translateX(20px)}
+.adminSubmissionAgent input:focus-visible,.adminSubmissionBulkToggle input:focus-visible{outline:2px solid #7138db;outline-offset:2px}
 .adminSubmissionAgent strong{min-width:90px;line-height:1.25}
 .adminSubmissionAgent span{color:#475467;line-height:1.45}
+.adminSubmissionBulk{display:grid;gap:14px;padding:15px 16px;border:1px solid #e6dded;border-radius:9px;background:#faf8fc}
+.adminSubmissionBulkToggle{display:flex;align-items:center;gap:12px;cursor:pointer}
+.adminSubmissionBulkToggle>span{display:grid;gap:4px;color:#344054;font-size:12px;line-height:1.4}
+.adminSubmissionBulkToggle strong{font-size:13px;color:#1f2937}
+.adminSubmissionBulkToggle small{font-size:12px;color:#667085}
+.adminSubmissionBulkDelay{display:grid;gap:7px;padding-left:54px;letter-spacing:0}
+.adminSubmissionBulkDelay[hidden]{display:none}
+.adminSubmissionBulkDelay .adminSubmissionFormField{display:flex;align-items:center;gap:12px;letter-spacing:0}
+.adminSubmissionBulkDelay .adminSubmissionFormField>span:first-child{white-space:nowrap;color:#475467}
+.adminSubmissionBulkDelay>small{color:#667085;font-size:11px;line-height:1.4}
+.adminSubmissionBulkInput{display:inline-flex;align-items:center;gap:8px;color:#475467;font-size:12px;font-weight:600}
+.adminSubmissionBulkInput input{width:80px;height:38px;min-height:38px;text-align:center}
 .adminSubmissionDocuments{display:grid;gap:10px;margin-top:4px}
 .adminSubmissionDocumentSearch{display:flex;align-items:center;gap:8px;min-height:40px;border:1px solid #e0e4eb;border-radius:9px;padding:0 12px;color:#9aa4b2}
 .adminSubmissionDocumentSearch input{width:100%;border:0;outline:0;background:transparent;font-size:12px}
@@ -113,4 +125,4 @@
 .adminSubmissionNewProduct{max-width:210px}
 .adminSubmissionDeleteModal{width:min(460px,calc(100vw - 32px))}
 .adminSubmissionDeleteModal>p{margin:0;padding:22px;color:#475467;font-size:13px}
-@media(max-width:700px){.adminRuntimePage[data-admin-module="submission-process"] .adminWorkspaceBody:has(.adminSubmissionStrategy){padding:20px 16px}.adminSubmissionStrategyFields{grid-template-columns:1fr}.adminSubmissionStrategyModal{height:min(650px,calc(100vh - 24px))}.adminSubmissionAgent{align-items:flex-start;flex-wrap:wrap}.adminSubmissionAgent span{width:100%}.adminSubmissionProductField{flex-wrap:wrap}.adminSubmissionStrategyModal>footer{gap:10px}.adminSubmissionModalActions{flex-wrap:wrap;justify-content:flex-end}}
+@media(max-width:700px){.adminRuntimePage[data-admin-module="submission-process"] .adminWorkspaceBody:has(.adminSubmissionStrategy){padding:20px 16px}.adminSubmissionStrategyFields{grid-template-columns:1fr}.adminSubmissionStrategyModal{height:min(650px,calc(100vh - 24px))}.adminSubmissionAgent{align-items:flex-start;flex-wrap:wrap}.adminSubmissionAgent span{width:100%}.adminSubmissionBulkDelay{padding-left:0}.adminSubmissionProductField{flex-wrap:wrap}.adminSubmissionStrategyModal>footer{gap:10px}.adminSubmissionModalActions{flex-wrap:wrap;justify-content:flex-end}}
