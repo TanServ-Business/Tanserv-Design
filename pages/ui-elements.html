@@ -1439,7 +1439,7 @@
         <button class="btnPrimary" type="button" id="autoFillBtn">Auto-fill</button>
         <button class="btnSecondary" type="button">Save Draft</button>
         <button class="btnCTA" type="button" id="formSubmitBtn">Submit</button>
-        <span class="autoFillHint">Auto-fill will populate sample values.</span>
+        <span class="autoFillHint">Auto-fill uses demo-only values and a fresh sample password. Never enter real credentials.</span>
       </div>
     </section>
 
@@ -2207,16 +2207,19 @@
       const autoFillBtn = document.getElementById("autoFillBtn");
       if (autoFillBtn) {
         autoFillBtn.addEventListener("click", () => {
+          // This is a local UI demo, not an account credential or authentication flow.
+          const demoPassword = Array.from(crypto.getRandomValues(new Uint32Array(4)),
+            word => word.toString(16).padStart(8, "0")).join("");
           const values = {
-            formUsername: "manish.kumar",
-            formEmail: "manish.kumar@inebura.com",
+            formUsername: "demo.user",
+            formEmail: "demo.user@example.com",
             formPhone: "9876543210",
             formAmount: "12500",
             formDate: new Date().toISOString().slice(0, 10),
             formRole: "Manager",
             formStatus: "Active",
-            formPassword: "Inebura@123",
-            formConfirm: "Inebura@123",
+            formPassword: demoPassword,
+            formConfirm: demoPassword,
             formNotes: "Auto-filled sample data for CRM form."
           };
           Object.entries(values).forEach(([id, value]) => {
