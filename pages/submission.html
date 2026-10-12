@@ -5,7 +5,7 @@
   <title>Inebura | Submission Details</title>
   <link rel="stylesheet" href="../assets/submission-reference/app.css">
   <link rel="stylesheet" href="../css/shared-header.css">
-  <link rel="stylesheet" href="../css/submission.css?v=20261012-inverted-document-pills-v1">
+  <link rel="stylesheet" href="../css/submission.css?v=20261012-review-v1">
 </head>
 <body class="submissionPage dashboard-shell" data-root-path="../" data-relationship-name="TestClient" data-relationship-logo-src="assets/submission-reference/client-logo.jpg" data-relationship-logo-alt="Client logo">
   <div data-shared-header></div>
@@ -16,7 +16,7 @@
     <section id="sjList" class="sjList" aria-labelledby="sjListHeading">
       <div class="sjListTop"><div class="sjTabs" role="tablist" aria-label="Submission views"><button type="button" data-view="all" role="tab" aria-selected="true">All Invoices <span id="sjAllCount"></span></button><button type="button" data-view="submitted" role="tab" aria-selected="false">Submitted <span id="sjSubmittedCount"></span></button><button type="button" data-view="pending" role="tab" aria-selected="false">All Pending <span id="sjPendingCount"></span></button></div><button class="sjButton" id="sjRulesBtn" type="button"><i class="bi bi-info-circle" aria-hidden="true"></i> Review rules</button></div>
       <div id="sjPendingViews" class="sjTabs sjPendingTabs" role="tablist" aria-label="Pending invoice views" hidden><button type="button" data-pending-view="pending" role="tab" aria-selected="false" tabindex="-1">All Pending <span id="sjPendingAllCount"></span></button><button type="button" data-pending-view="review" role="tab" aria-selected="true">Needs Review <span id="sjReviewCount"></span></button></div>
-      <div class="sjSectionIntro"><div><h2 id="sjListHeading">Dependencies ready for review</h2><p id="sjListDescription"></p></div><div id="sjBulk" hidden><span id="sjSelectedCount"></span><button id="sjBulkUpdate" class="sjPrimary" type="button">Manual update</button></div></div>
+      <div class="sjSectionIntro"><div><h2 id="sjListHeading">Dependencies ready for review</h2><p id="sjListDescription"></p></div><div id="sjBulk" hidden><span id="sjSelectedCount"></span><button id="sjBulkReview" class="sjButton" type="button">Review blockers</button><button id="sjBulkUpdate" class="sjPrimary" type="button">Manual update</button></div></div>
       <div class="sjFilters">
         <label class="sjSearch"><i class="bi bi-search" aria-hidden="true"></i><input type="search" id="sjSearch" placeholder="Search invoice, customer or document" aria-label="Search submission records"></label>
         <div class="sjFilterField sjReasonFilter"><label for="sjReason">Reason</label><select id="sjReason"><option value="">All reasons</option><option>Rejected by Customer -Supporting Docs required</option><option>Rejected by Customer -Invoice Not correct</option><option>Not Received By Customer</option><option>Invoice Cancelled</option><option>Docs Pending</option><option value="ready">Scheduled for submission</option></select></div>
@@ -32,10 +32,10 @@
   </main>
   <dialog class="sjDialog sjReviewDialog" id="sjReviewDialog" aria-labelledby="sjReviewTitle"><form id="sjIssueForm">
     <header class="sjDialogHead"><div><span class="sjEyebrow">NON-SUBMISSION REVIEW</span><h2 id="sjReviewTitle">Raise a non-submission issue</h2></div><button class="sjIconButton" type="button" data-close="sjReviewDialog" aria-label="Close review"><i class="bi bi-x-lg" aria-hidden="true"></i></button></header>
-    <p id="sjReviewContext" class="sjContext"></p><p class="sjHint">Only the five approved non-submission reasons can become issues. Select the recorded reason to escalate; for Docs Pending, each selected missing document creates one issue.</p>
+    <p id="sjReviewContext" class="sjContext"></p><p class="sjHint">Select only the blockers you want to escalate. None are selected by default. For Docs Pending, each selected missing document creates one issue.</p>
     <div id="sjReviewItems"></div>
     <details class="sjExistingDocuments" id="sjExistingDocuments"><summary class="sjExistingDocumentsHead"><div><h3>Existing Documents</h3><p>Documents available for the affected customer and invoices</p></div><span class="sjExistingDocumentsMeta"><span class="sjExistingDocumentsCount" id="sjExistingDocumentsCount">0</span><i class="bi bi-chevron-down" aria-hidden="true"></i></span></summary><div class="sjExistingDocumentsBody" id="sjExistingDocumentsBody"></div></details>
-    <div class="sjFormGrid"><label>Action owner for selected issues <span class="sjRequired">*</span><select id="sjIssueOwner" required></select></label><label>Approval process<select id="sjIssueProcess"></select></label><label class="sjFull">Remarks <span class="sjRequired">*</span><textarea id="sjIssueRemark" rows="3" required maxlength="1000" placeholder="Describe the dependency and what needs to happen…"></textarea></label></div>
+    <div class="sjFormGrid"><label>Action owner for selected issues <span class="sjRequired">*</span><select id="sjIssueOwner" required></select></label><label>Approval process<select id="sjIssueProcess"></select></label><label class="sjFull">Remarks <span class="sjRequired">*</span><textarea id="sjIssueRemark" rows="3" required maxlength="1000" placeholder="Describe the dependency and what needs to happen…"></textarea></label></div><p id="sjIssueRoute" class="sjIssueRoute"></p>
     <p id="sjIssueError" class="sjError" role="alert"></p><div id="sjIssueConfirm" class="sjConfirm" aria-live="polite"></div>
     <footer class="sjDialogFooter"><button id="sjDeferFromReview" class="sjButton" type="button">Defer review</button><div><button class="sjButton" type="button" data-close="sjReviewDialog">Keep tracking</button><button id="sjCreateIssues" class="sjPrimary" type="submit">Create issues</button></div></footer>
   </form></dialog>
@@ -59,6 +59,7 @@
   <dialog class="sjDialog" id="sjRulesDialog" aria-labelledby="sjRulesTitle"><div><header class="sjDialogHead"><h2 id="sjRulesTitle">Review rules</h2><button class="sjIconButton" type="button" data-close="sjRulesDialog" aria-label="Close review rules"><i class="bi bi-x-lg" aria-hidden="true"></i></button></header><p class="sjContext">Rules flag dependencies for a person to review. They never create an issue automatically.</p><div class="sjRuleRow"><i class="bi bi-check-circle" aria-hidden="true"></i><span>Needs Review after <strong id="sjReviewDays">7</strong> calendar days from the invoice date. The client admin configures this threshold.</span></div><div class="sjRuleRow"><i class="bi bi-check-circle" aria-hidden="true"></i><span>A deferred review returns on its chosen date, even if the blocker or affected invoices change.</span></div><div class="sjRuleRow"><i class="bi bi-check-circle" aria-hidden="true"></i><span>Manually submitted invoices are excluded from automatic submission.</span></div><footer class="sjDialogFooter"><button class="sjButton" type="button" data-close="sjRulesDialog">Close</button></footer></div></dialog>
   <script src="../scripts/shared-header.js?v=20261012-index-route-v1"></script>
   <script src="../bin/IssueTracker/js/issue-tracker-config.js?v=20261009-submission-scope-v2"></script>
-  <script src="../scripts/submission-journey-core.js?v=20261012-neutral-invoice-ids-v1"></script>
-  <script src="../scripts/submission.js?v=20261012-review-reasons-v1"></script>
+  <script src="../scripts/submission-journey-core.js?v=20261012-review-v1"></script>
+  <script src="../scripts/submission-strategy-core.js?v=20261012-review-v1"></script>
+  <script src="../scripts/submission.js?v=20261012-review-v1"></script>
 </body></html>

@@ -72,7 +72,7 @@
   const closed = issue => String(issue.status).toLowerCase() === 'closed' || issue.workflowStep === 'closed';
   const uid = prefix => `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
   function event(state, data) { state.events.push({ id: uid('EVT'), at: new Date().toISOString(), by: 'System', ...data }); }
-  function requirements(invoice) { return invoice.requirements || []; }
+  function requirements(invoice) { return invoice.effectiveRequirements || invoice.requirements || []; }
   function attachmentMatches(requirement, attachment, invoice) {
     if (attachment.requirementId !== requirement.id && attachment.requirement !== requirement.name) return false;
     if (attachment.scope !== requirement.scope) return false;
@@ -92,8 +92,8 @@
     const groups = new Map();
     state.invoices.filter(invoice => !submitted(invoice)).forEach(invoice => {
       const docs = missing(state, invoice, attachments);
-      const documentReason = !invoice.reason || invoice.reason === 'Docs Pending';
-      const dependencies = documentReason && docs.length ? docs : (invoice.reason ? [{ id: `reason:${invoice.reason}`, name: invoice.reason, scope: 'invoice', kind: 'reason' }] : []);
+      const dependencies = [...docs];
+      if (invoice.reason && (invoice.reason !== 'Docs Pending' || !docs.length)) dependencies.push({ id: `reason:${invoice.reason}`, name: invoice.reason, scope: 'invoice', kind: 'reason' });
       dependencies.forEach(requirement => {
         const key = dependencyKey(invoice, requirement);
         if (!groups.has(key)) groups.set(key, { key, requirement, scope: requirement.scope, code: invoice.code, customer: invoice.name, invoices: [], qualifying: [] });
@@ -137,11 +137,21 @@
           state.documentEvents[signature] = true; changed = true;
         }
       });
-      if (requirements(invoice).length && available.length === requirements(invoice).length && !invoice.documentsReadyAt) {
-        const times = available.map(doc => doc.uploadedAt).filter(value => Number.isFinite(Date.parse(value))).sort();
-        invoice.documentsReadyAt = times.length === available.length ? times.at(-1) : '';
-        if (invoice.reason === 'Docs Pending') invoice.reason = '';
-        event(state, { type: 'document', invoiceNos: [invoice.invoiceNo], at: invoice.documentsReadyAt || new Date().toISOString(), what: 'All required documents available', remark: 'Document readiness updated. Issue closure remains in Issue Tracker.' });
+      if (requirements(invoice).length && available.length === requirements(invoice).length) {
+        if (!invoice.documentsReadyAt) {
+          const times = available.map(doc => doc.uploadedAt).filter(value => Number.isFinite(Date.parse(value))).sort();
+          invoice.documentsReadyAt = times.length === available.length ? times.at(-1) : '';
+          event(state, { type: 'document', invoiceNos: [invoice.invoiceNo], at: invoice.documentsReadyAt || new Date().toISOString(), what: 'All required documents available', remark: 'Document readiness updated.' });
+          changed = true;
+        }
+        if (invoice.reason === 'Docs Pending') {
+          invoice.reason = '';
+          event(state, { type: 'document', invoiceNos: [invoice.invoiceNo], what: 'Docs Pending cleared', remark: 'All required documents are available.' });
+          changed = true;
+        }
+      } else if (invoice.documentsReadyAt) {
+        invoice.documentsReadyAt = '';
+        event(state, { type:'document', invoiceNos:[invoice.invoiceNo], what:'Document readiness lost', remark:'A required document is no longer available under the current submission strategy.' });
         changed = true;
       }
     });
@@ -160,8 +170,9 @@
     state.reviews[group.key] = { until, remark: remark.trim(), by, invoiceNos: group.invoices.map(invoice => invoice.invoiceNo) };
     event(state, { type: 'review', key: group.key, invoiceNos: group.invoices.map(row => row.invoiceNo), by, what: 'Review deferred', remark: `${group.requirement.name} · ${remark.trim()} · Review on ${until}` });
   }
-  function saveManual(state, invoiceNos, update, by) {
+  function saveManual(state, invoiceNos, update, by, actorRole = '') {
     if (!invoiceNos.length || invoiceNos.some(id => !state.invoices.some(row => row.invoiceNo === id))) throw new Error('Select valid invoices.');
+    if (update.submissionStatus === 'Not Submitted' && invoiceNos.some(id => submitted(state.invoices.find(row => row.invoiceNo === id))) && actorRole !== 'agent') throw new Error('Only an Agent can return a submitted invoice to Not Submitted.');
     const { invoiceNo:ignored, ...fields } = update;
     update = fields;
     if (!['Submitted','Not Submitted'].includes(update.submissionStatus)) throw new Error('Choose Submitted or Not Submitted first.');
@@ -213,6 +224,33 @@
         issue.actionTrail ||= [];
         issue.actionTrail.push({ type: 'impact', who: 'System', what: 'Submission impact updated', when: new Date().toISOString(), remark: `${ids.length} currently blocked; ${issue.affectedInvoices.length} invoices linked in total.` });
       }
+    });
+    issues.filter(issue => issue.source === 'submission-module' && issue.issueReason === 'Docs Pending' && !closed(issue)).forEach(issue => {
+      const affected = state.invoices.filter(invoice => (issue.affectedInvoices || []).some(item => (item.invoiceNo || item) === invoice.invoiceNo));
+      if (!affected.length) return;
+      const stillMissing = affected.some(invoice => missing(state, invoice, attachments).some(requirement =>
+        issue.documentRequirementId?.startsWith('reason:') || !issue.documentRequirementId || requirement.id === issue.documentRequirementId));
+      if (stillMissing) return;
+      const at = new Date().toISOString();
+      issue.status = 'Closed'; issue.workflowStep = 'closed'; issue.assignedTo = ''; issue.assignmentRole = '';
+      if (issue.managerApprovalStatus === 'Pending') issue.managerApprovalStatus = 'Superseded';
+      if (issue.matrixApprovalStatus === 'pending') issue.matrixApprovalStatus = 'superseded';
+      issue.actionTrail ||= [];
+      issue.actionTrail.push({ type:'closure', who:'System', what:'closed the document issue', when:at, remark:'All required documents for this dependency are available.' });
+      event(state, { type:'issue', at, issueId:issue.id, invoiceNos:affected.map(invoice => invoice.invoiceNo), what:'Docs Pending issue closed', remark:`${issue.id} closed automatically after the required documents became available.` });
+      changed = true;
+    });
+    return changed;
+  }
+  function reconcileApprovalRequests(issues, requests) {
+    let changed = false;
+    requests.forEach(request => {
+      if (request.status !== 'pending' || !issues.some(issue => issue.id === request.issue?.id && closed(issue))) return;
+      const at = new Date().toISOString();
+      request.status = 'superseded'; request.updatedAt = at;
+      request.trail ||= [];
+      request.trail.push({ action:'superseded', by:'System', at, remark:'The linked document issue closed when its requirements were met.' });
+      changed = true;
     });
     return changed;
   }
@@ -346,6 +384,17 @@
     }
     return added;
   }
+  function addDemoStrategyDocuments(state) {
+    if (state.demoStrategyDocumentsAdded || !state.invoices.some(invoice => invoice.invoiceNo === 'AMS-0001')) return false;
+    state.invoices.filter(invoice => !submitted(invoice) && !invoice.reason && invoice.requirements?.some(item => item.id === 'invoice-copy')).forEach(invoice => {
+      ['PAYMENT RECEIPT','PURCHASE ORDER'].forEach(name => {
+        const requirementId=`strategy-${name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+        if (!state.documents.some(document => document.invoiceNo === invoice.invoiceNo && document.requirementId === requirementId)) state.documents.push({ requirementId, requirement:name, scope:'invoice', invoiceNo:invoice.invoiceNo, customerCode:invoice.code, name:`${invoice.invoiceNo}-${name.toLowerCase().replace(/\s+/g, '-')}.pdf`, uploadedAt:'2026-10-09T05:00:00Z', uploadedBy:'Admin bulk upload' });
+      });
+    });
+    state.demoStrategyDocumentsAdded=true;
+    return true;
+  }
   function seed() {
     const invoices = [], documents = [], events = [];
     const req = (id, name, scope) => ({ id, name, scope });
@@ -368,6 +417,7 @@
     documents.push({ requirementId:'invoice-copy',requirement:'Invoice Copy',scope:'invoice',invoiceNo:'INV261000',name:'INV261000.pdf',uploadedAt:'2026-10-09T05:00:00Z',uploadedBy:'Admin' });
     const state = { version:1,settings:{ autoSubmission:true,reviewDays:7 },invoices,documents,events,reviews:{},flags:{} };
     addDispositionExamples(state);
+    addDemoStrategyDocuments(state);
     return state;
   }
   function load(storage) {
@@ -380,8 +430,9 @@
       const renamed = renameLegacyDemoInvoices(state, storage);
       state = renamed.state;
       const addedExamples = state.invoices.some(invoice => invoice.invoiceNo === 'AMS-0001') && state.invoices.some(invoice => invoice.invoiceNo === 'INV261000') && addDispositionExamples(state);
+      const addedStrategyDocuments = addDemoStrategyDocuments(state);
       const normalised = normaliseSubmissionState(state);
-      if (normalised || addedExamples || renamed.changed) transaction(storage,{ [KEY]:state, ...renamed.linked });
+      if (normalised || addedExamples || addedStrategyDocuments || renamed.changed) transaction(storage,{ [KEY]:state, ...renamed.linked });
       return state;
     }
     const state = seed(), updates = JSON.parse(storage.getItem('submissionLiveReplicaUpdates') || '{}');
@@ -391,5 +442,5 @@
     normaliseSubmissionState(state);
     return state;
   }
-  return { KEY,REVIEW_RULES_KEY,issueReasons,issueReasonForGroup,readReviewDays,saveReviewDays,clone,keyDate,today,days,submitted,manualFlow,normaliseSubmission,closed,uid,event,requirements,attachmentMatches,missing,dependencyKey,issueAffects,agentCanView,linkedIssues,blockers,observe,defer,saveManual,eligibleForAutomation,reconcileIssues,impact,issueMetrics,readIssues,issueAttachments,transaction,promote,seed,load };
+  return { KEY,REVIEW_RULES_KEY,issueReasons,issueReasonForGroup,readReviewDays,saveReviewDays,clone,keyDate,today,days,submitted,manualFlow,normaliseSubmission,closed,uid,event,requirements,attachmentMatches,missing,dependencyKey,issueAffects,agentCanView,linkedIssues,blockers,observe,defer,saveManual,eligibleForAutomation,reconcileIssues,reconcileApprovalRequests,impact,issueMetrics,readIssues,issueAttachments,transaction,promote,seed,load };
 });

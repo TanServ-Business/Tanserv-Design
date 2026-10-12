@@ -46,7 +46,7 @@
 
 .sjDateRangeTrigger{height:36px;width:100%;display:flex;align-items:center;gap:8px;border:1px solid var(--sj-border);border-radius:8px;padding:8px 10px;background:#fff;color:var(--sj-ink);font-size:12px;text-align:left}
 .sjDateRangeTrigger>span{flex:1;white-space:nowrap}.sjDateRangeTrigger .bi:last-child{color:var(--sj-muted);font-size:10px}
-.sjDateRangeTrigger:focus-visible,select:focus-visible{outline:none;background-color:#f2edf7}
+.sjDateRangeTrigger:focus-visible,select:focus-visible{outline:3px solid #8b5ec5;outline-offset:2px;background-color:#f2edf7}
 .sjDateRangeDialog{width:min(650px,calc(100% - 28px))}
 .sjDateRangeHelp{margin:0 0 16px;color:var(--sj-muted);font-size:12px}
 .sjRangeNav{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:13px}.sjRangeNav>span{font-size:13px;font-weight:650;color:var(--sj-ink)}
@@ -149,7 +149,16 @@
 .sjExistingDocumentChips{display:flex;flex-wrap:wrap;gap:8px}
 .sjExistingDocumentChip{display:inline-flex;align-items:center;gap:6px;max-width:100%;padding:6px 11px;border:1px solid #ded0f3;border-radius:999px;background:#f8f3ff;color:var(--sj-purple);font-size:12px;font-weight:650;overflow-wrap:anywhere}
 .sjExistingDocumentChip--inverted{border-color:var(--sj-purple);background:var(--sj-purple);color:#fff}
+.sjExistingDocumentChip.is-sample{border-style:dashed;background:#fff;color:#64748b}
+.sjExistingDocumentChip small{font-size:10px;font-weight:600;opacity:.85}
 .sjExistingDocumentChip i{font-size:12px}
 .sjExistingDocumentsNone{margin:0;color:var(--sj-muted);font-size:12px}
 @media(max-width:600px){.sjExistingDocumentRows{grid-template-columns:1fr}}
 @media(max-width:600px){.sjActivityCard .sjDetailContentHeader{flex-wrap:wrap}.sjActivityCard .sjDetailContentHeader label{margin-left:auto}}
+.sjNextStep{padding:13px 15px;margin:0 0 17px;border:1px solid #e7d5b5;border-left:4px solid #b47b25;border-radius:8px;background:#fff9ed;color:#35291c}
+.sjNextStep strong{display:block;font-size:13px}
+.sjNextStep p{font-size:12px;line-height:1.5;margin:4px 0 0}
+.sjIssueRoute{margin:15px 0 0;padding:11px 13px;border-radius:8px;background:#f5f2f8;color:#4d3b60;font-size:12px}
+.sjActivityCard:not(.is-expanded) .sjTimeline>li:nth-child(n+6){display:none}
+.sjMoreActivity{margin:0 0 12px 27px;font-size:12px}
+@media(max-width:700px){.sjTable th:nth-child(4),.sjTable td:nth-child(4){position:sticky;left:0;z-index:2;min-width:125px;background:#fff;box-shadow:1px 0 3px #1720331a}.sjTable th:nth-child(4){z-index:4;background:var(--sj-purple)}.sjTable th:last-child,.sjTable td:last-child{position:sticky;right:0;z-index:3;background:#fff;box-shadow:-1px 0 3px #1720331a}.sjTable th:last-child{z-index:4;background:var(--sj-purple)}}

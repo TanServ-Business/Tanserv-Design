@@ -31,13 +31,13 @@
         </div>
         <footer><p id="adminSubmissionEmailMessage" role="status" aria-live="polite"></p><button class="adminPrimary" type="button" id="adminSubmissionEmailSave">Submit</button></footer>
       </section>`;
-    const previewStorage = window.IneburaAdminPreviewStorage;
+    const previewStorage = window.localStorage;
     let saved = {};
-    try { saved = JSON.parse(previewStorage?.getItem('submissionPushEmail:v1') || '{}'); } catch (_) { /* Retain reference defaults. */ }
+    try { saved = JSON.parse(previewStorage?.getItem('submissionPushEmail:review-v1') || '{}'); } catch (_) { /* Retain reference defaults. */ }
     body.querySelectorAll('.adminSubmissionEmailContacts input').forEach(input => { input.checked = Array.isArray(saved.contacts) && saved.contacts.includes(input.value); });
     document.getElementById('adminSubmissionEmailSave').addEventListener('click', () => {
       const contacts = [...body.querySelectorAll('.adminSubmissionEmailContacts input:checked')].map(input => input.value);
-      previewStorage?.setItem('submissionPushEmail:v1', JSON.stringify({ sender: 'system.uat@tanserv.com', contacts }));
+      previewStorage?.setItem('submissionPushEmail:review-v1', JSON.stringify({ sender: 'system.uat@tanserv.com', contacts }));
       document.getElementById('adminSubmissionEmailMessage').textContent = 'Push email settings saved in this preview.';
     });
     return;
@@ -63,7 +63,7 @@
         <div class="adminReviewRulesNote" aria-label="How review works">
           <h3>How review works</h3>
           <ul>
-            <li>Pending invoices that reach this age appear in Needs Review. A missing document alone does not create an issue.</li>
+            <li>Pending invoices with a blocker appear in Needs Review when they reach this age. A missing document alone does not create an issue.</li>
             <li>If review is deferred, it returns on the chosen date even when the blocker or affected invoices change.</li>
             <li>Invoices recorded as submitted manually are excluded from the next automatic submission run.</li>
           </ul>

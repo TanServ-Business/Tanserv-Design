@@ -4,6 +4,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
 const C = require('./submission-journey-core.js');
+const S = require('./submission-strategy-core.js');
 class Storage {
   constructor(seed = {}) { this.data = new Map(Object.entries(seed).map(([key,value]) => [key, JSON.stringify(value)])); }
   getItem(key) { return this.data.has(key) ? this.data.get(key) : null; }
@@ -89,6 +90,22 @@ test('recent non-submission reason does not bypass the invoice-age review rule',
   const groups=C.blockers(state,[],'2026-10-09');
   assert.equal(groups.find(group=>group.invoices[0].invoiceNo==='FT6567567').eligible,false);
   assert.equal(groups.find(group=>group.invoices[0].invoiceNo==='DV5623526').eligible,false);
+});
+test('a recorded reason does not hide an independently missing document',()=>{
+  const state=C.seed(), invoice=state.invoices.find(row=>row.invoiceNo==='AMS-0001');
+  invoice.reason='Not Received By Customer';
+  const own=C.blockers(state,[],'2026-10-09').filter(group=>group.invoices.some(row=>row.invoiceNo===invoice.invoiceNo));
+  assert(own.some(group=>group.requirement.id==='purchase-order'));
+  assert(own.some(group=>group.requirement.name==='Not Received By Customer'));
+});
+test('document readiness clears when a required attachment is removed',()=>{
+  const state=C.seed(), invoice=state.invoices.find(row=>row.invoiceNo==='INV261000');
+  assert(invoice.documentsReadyAt);
+  state.documents=state.documents.filter(document=>document.invoiceNo!==invoice.invoiceNo || document.requirementId!=='invoice-copy');
+  assert(C.missing(state,invoice).length>0);
+  assert.equal(C.observe(state,[],'2026-10-12'),true);
+  assert.equal(invoice.documentsReadyAt,'');
+  assert(state.events.some(event=>event.what==='Document readiness lost'&&event.invoiceNos.includes(invoice.invoiceNo)));
 });
 test('explicit document scope prevents invoice attachment reuse and permits customer reuse',()=>{
   const state=C.seed(), a=state.invoices[0], b=state.invoices[1];
@@ -188,11 +205,22 @@ test('pending manual update never suppresses automation or removes configured re
   const state=C.seed(), invoice=state.invoices[0];C.saveManual(state,[invoice.invoiceNo],{submissionStatus:'Not Submitted',activityType:'No Activity',submissionSubStatus:'Docs Pending',missingIds:['purchase-order']},'Agent');
   assert.equal(invoice.automationSuppressed,false);assert.equal(invoice.requirements.length,2);
   C.saveManual(state,[invoice.invoiceNo],completedUpdate(),'Agent');
-  C.saveManual(state,[invoice.invoiceNo],completedUpdate({submissionStatus:'Not Submitted',activityType:'No Activity',submissionSubStatus:'Docs Pending'}),'Agent');
+  C.saveManual(state,[invoice.invoiceNo],completedUpdate({submissionStatus:'Not Submitted',activityType:'No Activity',submissionSubStatus:'Docs Pending'}),'Agent','agent');
   assert.equal(invoice.submissionStatus,'Not Submitted');assert.equal(invoice.submissionMedium,'');assert.equal(invoice.submissionDestination,'');
   assert.equal(invoice.submissionDate,'');assert.equal(invoice.submissionType,'');assert.equal(invoice.invoiceType,'');assert.equal(invoice.sentTo,'');
   assert.equal(invoice.automationSuppressed,false);assert.equal(invoice.requirements.length,2);
   assert.equal(invoice.firstSubmittedAt,'2026-10-09');assert(state.events.some(item=>item.what==='Invoice returned to Not Submitted'));
+});
+test('only an Agent can return a completed invoice to Not Submitted',()=>{
+  const state=C.seed(), invoice=state.invoices[0];
+  C.saveManual(state,[invoice.invoiceNo],completedUpdate(),'Agent');
+  const before=C.clone(state), correction={submissionStatus:'Not Submitted',activityType:'No Activity',submissionSubStatus:'Invoice Cancelled'};
+  assert.throws(()=>C.saveManual(state,[invoice.invoiceNo],correction,'Manager','manager'),/Only an Agent/);
+  assert.throws(()=>C.saveManual(state,[invoice.invoiceNo],correction,'Unknown'),/Only an Agent/);
+  assert.deepEqual(state,before);
+  C.saveManual(state,[invoice.invoiceNo],correction,'Agent','agent');
+  assert.equal(invoice.submissionStatus,'Not Submitted');
+  assert(state.events.some(event=>event.what==='Invoice returned to Not Submitted'));
 });
 test('Manual completion uses two broad statuses and activity-dependent sub-statuses',()=>{
   const cases=[
@@ -269,12 +297,66 @@ test('saved legacy completion statuses migrate with destinations, mediums and hi
   assert.deepEqual(C.load(storage),loaded);
   assert(!C.submitted({}));
 });
-test('document arrival clears waiting and recalculates readiness without closing an issue',()=>{
+test('document arrival closes the matching Docs Pending issue and pending approval',()=>{
   const f=fixture(), group=purchaseGroup(f.state), result=C.promote(f.state,[group.key],f.fields,f.config,f.storage,f.by);
   const attachment={requirementId:'purchase-order',requirement:'Purchase Order',scope:'customer',customerCode:group.code,name:'PO.pdf',uploadedAt:'2026-10-09T08:00:00Z',uploadedBy:'Owner'};
   C.observe(result.state,result.issues,'2026-10-09',[attachment]);
+  C.reconcileIssues(result.state,result.issues,[attachment]);
   assert.equal(result.state.invoices[0].reason,'');assert(C.eligibleForAutomation(result.state,result.state.invoices[0],[attachment]));
-  assert.equal(result.issues[0].status,'Open');assert(result.state.invoices[0].documentsReadyAt);
+  assert.equal(result.issues[0].status,'Closed');assert(result.state.invoices[0].documentsReadyAt);
+  assert(result.state.events.some(item=>item.what==='Docs Pending issue closed'));
+  const requests=[{status:'pending',issue:{id:result.issues[0].id},trail:[]}];
+  assert(C.reconcileApprovalRequests(result.issues,requests));assert.equal(requests[0].status,'superseded');
+});
+test('a later Docs Pending update clears when documents were already ready',()=>{
+  const state=C.seed(), invoice=state.invoices.find(row=>row.invoiceNo==='INV261000');
+  C.saveManual(state,[invoice.invoiceNo],{submissionStatus:'Not Submitted',activityType:'No Activity',submissionSubStatus:'Docs Pending'},'Agent');
+  assert.equal(invoice.reason,'Docs Pending');
+  C.observe(state,[]);
+  assert.equal(invoice.reason,'');assert(C.eligibleForAutomation(state,invoice));
+});
+test('strategy modes, categories and bulk document rule are enforced',()=>{
+  const company={id:'company',applyOn:'COMPANY',strategyType:'Invoice',batchInvoicesInOneEmail:false};
+  const product={id:'product',applyOn:'PRODUCT',productCategory:'Services',strategyType:'Invoice',batchInvoicesInOneEmail:false};
+  assert.match(S.validate([company],product),/company-wide/);
+  assert.match(S.validate([product],company),/only strategy/);
+  assert.match(S.validate([],{...product,productCategory:''}),/product category/);
+  assert.match(S.validate([product],{...product,id:'other'}),/already has a strategy/);
+  assert.match(S.validate([],{...product,batchInvoicesInOneEmail:true,bulkSendAfterDays:2,strategyType:'Invoice + Docs(Sequentially)'}),/Sequential/);
+  assert.equal(S.validate([],{...product,batchInvoicesInOneEmail:true,bulkSendAfterDays:2,strategyType:'Invoice + Docs(In 1 Shot)'}),'');
+  assert.equal(S.resolve({productCategory:'Services'},[product]).id,'product');
+  assert.equal(S.resolve({productCategory:'Other'},[product]),null);
+});
+test('batch preview separates customer, strategy and recipient list and respects each invoice wait',()=>{
+  const state=C.seed(), now=new Date('2026-10-12T13:00:00Z');
+  state.invoices=[
+    {invoiceNo:'ONE',code:'A',name:'Alpha',productCategory:'Services',createdAt:'2026-10-09T06:00:00Z',requirements:[],submissionRecipients:'first@example.test'},
+    {invoiceNo:'TWO',code:'A',name:'Alpha',productCategory:'Services',createdAt:'2026-10-09T06:00:00Z',requirements:[],submissionRecipients:'first@example.test'},
+    {invoiceNo:'THREE',code:'A',name:'Alpha',productCategory:'Services',createdAt:'2026-10-09T06:00:00Z',requirements:[],submissionRecipients:'second@example.test'},
+    {invoiceNo:'FOUR',code:'B',name:'Beta',productCategory:'Services',createdAt:'2026-10-09T06:00:00Z',requirements:[],submissionRecipients:'first@example.test'},
+    {invoiceNo:'WAIT',code:'A',name:'Alpha',productCategory:'Services',createdAt:'2026-10-12T06:00:00Z',requirements:[],submissionRecipients:'first@example.test'},
+    {invoiceNo:'OTHER',code:'A',name:'Alpha',productCategory:'Goods',createdAt:'2026-10-09T06:00:00Z',requirements:[],submissionRecipients:'first@example.test'}
+  ];
+  const strategies=[{id:'services',applyOn:'PRODUCT',productCategory:'Services',status:'RUNNING',batchInvoicesInOneEmail:true,bulkSendAfterDays:2},{id:'goods',applyOn:'PRODUCT',productCategory:'Goods',status:'RUNNING',batchInvoicesInOneEmail:true,bulkSendAfterDays:2}];
+  const plan=S.plan(state,strategies,C,[],now);
+  assert.deepEqual(plan.batches.map(batch=>batch.invoices),[['ONE','TWO'],['THREE'],['FOUR'],['OTHER']]);
+  assert.equal(plan.decisions.get('WAIT').reason,'Waiting for bulk send date');
+  strategies[0].status='PAUSED';
+  assert.equal(S.plan(state,strategies,C,[],now).decisions.get('ONE').reason,'Submission strategy is paused');
+});
+test('the default strategy keeps ten demo invoices eligible at the next run',()=>{
+  const state=C.seed();
+  state.invoices.forEach(invoice=>{invoice.effectiveRequirements=S.requirements(invoice,S.resolve(invoice,S.defaultStrategies));});
+  const plan=S.plan(state,S.defaultStrategies,C,[],new Date('2026-10-12T12:30:00Z'));
+  assert.equal(plan.batches.reduce((total,batch)=>total+batch.invoices.length,0),10);
+  assert.equal(S.requirements(state.invoices[0],S.defaultStrategies[0]).find(item=>item.name.toUpperCase()==='PURCHASE ORDER').scope,'customer');
+  assert.equal(S.validate([],{...S.defaultStrategies[0],recipientList:'invalid-address'}),'Enter valid customer email addresses, separated by commas.');
+});
+test('documents do not automatically close issues raised for another reason',()=>{
+  const state=C.seed(), invoice=state.invoices.find(row=>row.invoiceNo==='INV261000');
+  const issue={id:'REJECTION',source:'submission-module',issueReason:'Not Received By Customer',status:'Open',invoiceNo:invoice.invoiceNo,documentScope:'invoice',documentRequirementId:'reason:Not Received By Customer',affectedInvoices:[{invoiceNo:invoice.invoiceNo}]};
+  C.reconcileIssues(state,[issue]);
+  assert.equal(issue.status,'Open');
 });
 test('shared issue links new invoices and retains historical links after manual completion',()=>{
   const f=fixture(), result=C.promote(f.state,[purchaseGroup(f.state).key],f.fields,f.config,f.storage,f.by), issue=result.issues[0];

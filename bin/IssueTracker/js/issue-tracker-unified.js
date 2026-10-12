@@ -189,6 +189,22 @@
       }
       write(KEYS.base, base);
     }
+    if (issue.source === 'submission-module' && issue.issueReason === 'Docs Pending' && window.SubmissionJourney) {
+      try {
+        const C = window.SubmissionJourney;
+        const state = C.load(localStorage);
+        const custom = read(KEYS.custom, []);
+        const linked = C.readIssues(localStorage);
+        const attachments = C.issueAttachments(linked);
+        const requests = read(KEYS.requests, []);
+        const changed = C.reconcileIssues(state, custom, attachments);
+        const observed = C.observe(state, linked, C.today(), attachments);
+        const approvalsChanged = C.reconcileApprovalRequests(custom, requests);
+        if (changed || observed || approvalsChanged) C.transaction(localStorage, { [C.KEY]:state, ...(changed ? { [KEYS.custom]:custom } : {}), ...(approvalsChanged ? { [KEYS.requests]:requests } : {}) });
+      } catch (error) {
+        toast('Document saved. Refresh Submission Details to reconcile the linked issue.', 'error');
+      }
+    }
     data = loadData();
   }
 

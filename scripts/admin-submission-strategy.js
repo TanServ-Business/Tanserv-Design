@@ -5,10 +5,11 @@
   if (page?.module !== 'submission-process' || page.view) return;
   const body = document.querySelector('.adminRuntimePage[data-admin-module="submission-process"] .adminWorkspaceBody');
   const modal = document.getElementById('adminModal');
-  const previewStorage = window.IneburaAdminPreviewStorage;
-  if (!body || !modal || !previewStorage) return;
+  const previewStorage = window.localStorage;
+  const strategyRules = window.SubmissionStrategy;
+  if (!body || !modal || !strategyRules) return;
 
-  const key = 'submissionStrategies:v1';
+  const key = strategyRules.KEY;
   const documentNames = [
     'EMAIL COMMUNICATION (CUSTOMER)', 'EMAIL COMMUNICATION (INVOICE)', 'GR NUMBER',
     'INVOICE ACKNOWLEDGEMENT', 'WORK ORDER', 'PREVENTIVE MAINTENANCE REPORT',
@@ -25,6 +26,7 @@
   let sortKey = '';
   let sortDirection = 1;
   let returnFocus = null;
+  let dirtyCheck = () => false;
   const save = () => previewStorage.setItem(key, JSON.stringify(strategies));
   const notify = text => {
     const toast = document.getElementById('adminToast');
@@ -40,7 +42,7 @@
     body.innerHTML = `<section class="adminSubmissionStrategy" aria-labelledby="submissionStrategyTitle">
       <header class="adminSubmissionStrategyHeader">
         <h2 id="submissionStrategyTitle">Invoice Submission Processes</h2>
-        <button class="adminPrimary" type="button" data-submission-action="create"><i class="bi bi-plus-circle" aria-hidden="true"></i>Create New</button>
+        <div class="adminSubmissionHeaderActions"><button class="adminSecondary" type="button" data-submission-action="preview">Preview next run</button><button class="adminPrimary" type="button" data-submission-action="create"><i class="bi bi-plus-circle" aria-hidden="true"></i>Create New</button></div>
       </header>
       <div class="adminSubmissionStrategyTableWrap"><table class="adminSubmissionStrategyTable">
         <thead><tr>
@@ -63,10 +65,12 @@
     </section>`;
   }
 
-  const closeModal = () => {
+  const closeModal = (discard = false) => {
+    if (!discard && dirtyCheck() && !window.confirm('Discard your unsaved strategy changes?')) return;
     modal.classList.remove('is-open');
     modal.setAttribute('aria-hidden', 'true');
     modal.innerHTML = '';
+    dirtyCheck = () => false;
     if (returnFocus?.isConnected) returnFocus.focus();
   };
   const showModal = markup => {
@@ -74,12 +78,16 @@
     modal.innerHTML = markup;
     modal.classList.add('is-open');
     modal.setAttribute('aria-hidden', 'false');
-    modal.querySelector('form input:not([type=checkbox])')?.focus();
+    (modal.querySelector('form input:not([type=checkbox])') || modal.querySelector('.adminModalClose'))?.focus();
   };
 
   function openForm(record = null) {
     const editing = Boolean(record);
     const selected = new Set(record?.selectedDocuments || []);
+    const productCategories = [...new Set(['Services',...strategies.map(row => row.productCategory),record?.productCategory].filter(Boolean))];
+    const otherStrategies = strategies.filter(row => row.id !== record?.id);
+    const companyExists = otherStrategies.some(row => row.applyOn === 'COMPANY');
+    const productExists = otherStrategies.some(row => row.applyOn === 'PRODUCT');
     const typeHint = type => type === 'Invoice + Docs(In 1 Shot)'
       ? 'This will share all the selected documents and invoice once all are uploaded.'
       : type === 'Invoice + Docs(Sequentially)'
@@ -90,10 +98,11 @@
       <form id="submissionStrategyForm">
         <div class="adminSubmissionStrategyFields">
           <label class="adminSubmissionFormField"><span>STRATEGY NAME <abbr title="Required">*</abbr></span><input name="strategyName" type="text" placeholder="e.g. Master Strategy" maxlength="100" required value="${escapeHtml(record?.strategyName || '')}" /></label>
-          <label class="adminSubmissionFormField"><span>APPLY ON <abbr title="Required">*</abbr></span><select name="applyOn" required><option value="">Select...</option><option value="COMPANY" ${record?.applyOn === 'COMPANY' ? 'selected' : ''}>Company</option><option value="PRODUCT" ${record?.applyOn === 'PRODUCT' ? 'selected' : ''}>Product</option></select></label>
-          <div class="adminSubmissionProductField" ${record?.applyOn === 'PRODUCT' ? '' : 'hidden'}><label class="adminSubmissionFormField">PRODUCT CATEGORY<select name="productCategory"><option value="">Select Product</option><option value="Services" ${record?.productCategory === 'Services' ? 'selected' : ''}>Services</option></select></label><button type="button" class="adminSecondary" data-submission-action="add-product"><i class="bi bi-plus-lg" aria-hidden="true"></i>Add New</button></div>
+          <label class="adminSubmissionFormField"><span>APPLY ON <abbr title="Required">*</abbr></span><select name="applyOn" required><option value="">Select...</option><option value="COMPANY" ${record?.applyOn === 'COMPANY' ? 'selected' : ''} ${productExists ? 'disabled' : ''}>Company-wide</option><option value="PRODUCT" ${record?.applyOn === 'PRODUCT' ? 'selected' : ''} ${companyExists ? 'disabled' : ''}>Product category</option></select><small>Choose one company-wide strategy or separate product-category strategies.</small></label>
+          <div class="adminSubmissionProductField" ${record?.applyOn === 'PRODUCT' ? '' : 'hidden'}><label class="adminSubmissionFormField">PRODUCT CATEGORY <abbr title="Required for product strategy">*</abbr><select name="productCategory"><option value="">Select Product</option>${productCategories.map(value=>`<option value="${escapeHtml(value)}" ${record?.productCategory === value ? 'selected' : ''}>${escapeHtml(value)}</option>`).join('')}</select></label><button type="button" class="adminSecondary" data-submission-action="add-product"><i class="bi bi-plus-lg" aria-hidden="true"></i>Add New</button></div>
           <label class="adminSubmissionFormField adminSubmissionWide"><span>STRATEGY TYPE <abbr title="Required">*</abbr></span><select name="strategyType" required>${['Invoice','Invoice + Docs(In 1 Shot)','Invoice + Docs(Sequentially)'].map(type => `<option value="${escapeHtml(type)}" ${type === (record?.strategyType || 'Invoice') ? 'selected' : ''}>${escapeHtml(type)}</option>`).join('')}</select></label>
           <p class="adminSubmissionTypeHint" id="submissionTypeHint">${escapeHtml(typeHint(record?.strategyType || 'Invoice'))}</p>
+          <label class="adminSubmissionFormField adminSubmissionWide"><span>CUSTOMER RECIPIENT LIST</span><input name="recipientList" type="text" value="${escapeHtml(record?.recipientList || '')}" placeholder="Optional — use invoice customer recipients" /><small>Separate bulk emails are prepared when the recipient list differs. Separate multiple addresses with commas.</small></label>
           <label class="adminSubmissionAgent"><input type="checkbox" name="agentSelection" ${record?.agentSelection ? 'checked' : ''} /><strong>Agent<br />Selection</strong><span>The agent can also select documents that should go with the strategy. Turning this on will allow manual agent selections.</span></label>
           <section class="adminSubmissionBulk" aria-labelledby="submissionBulkTitle">
             <label class="adminSubmissionBulkToggle"><input type="checkbox" name="batchInvoicesInOneEmail" ${record?.batchInvoicesInOneEmail ? 'checked' : ''} /><span><strong id="submissionBulkTitle">Submit multiple invoices in one email</strong><small>All eligible invoices for the same customer will be sent in one email once all necessary documents are tagged.</small></span></label>
@@ -104,10 +113,11 @@
           </div>
         </div>
       </form>
-      <footer><button type="button" class="adminSecondary" data-submission-action="close-modal">Cancel</button><span class="adminSubmissionModalActions">${editing ? `<button type="button" class="adminSubmissionPause" data-submission-action="toggle-status">${record.status === 'RUNNING' ? 'Pause' : 'Resume'} Strategy</button>` : ''}<button type="submit" form="submissionStrategyForm" class="adminPrimary">${editing ? 'Save Changes' : 'Create Strategy'}</button></span></footer>
+      <p id="submissionStrategyError" class="adminSubmissionFormError" role="alert"></p><footer><button type="button" class="adminSecondary" data-submission-action="close-modal">Cancel</button><span class="adminSubmissionModalActions">${editing ? `<button type="button" class="adminSubmissionPause" data-submission-action="toggle-status">${record.status === 'RUNNING' ? 'Pause' : 'Resume'} Strategy</button>` : ''}<button type="submit" form="submissionStrategyForm" class="adminPrimary">${editing ? 'Save Changes' : 'Create Strategy'}</button></span></footer>
     </section>`);
 
     const form = modal.querySelector('#submissionStrategyForm');
+    const snapshot = () => JSON.stringify([...new FormData(form)]);
     const documentInputs = [...form.querySelectorAll('#submissionDocumentOptions input')];
     const all = form.querySelector('#submissionSelectAll');
     const syncCount = () => {
@@ -117,16 +127,25 @@
       all.indeterminate = count > 0 && count < documentInputs.length;
     };
     syncCount();
-    form.elements.applyOn.addEventListener('change', () => { form.querySelector('.adminSubmissionProductField').hidden = form.elements.applyOn.value !== 'PRODUCT'; });
+    form.elements.applyOn.addEventListener('change', () => { const product = form.elements.applyOn.value === 'PRODUCT'; form.querySelector('.adminSubmissionProductField').hidden = !product; form.elements.productCategory.required = product; });
+    form.elements.productCategory.required = record?.applyOn === 'PRODUCT';
     form.elements.strategyType.addEventListener('change', () => { form.querySelector('#submissionTypeHint').textContent = typeHint(form.elements.strategyType.value); });
     const syncBulkDelay = () => {
       const enabled = form.elements.batchInvoicesInOneEmail.checked;
       form.elements.bulkSendAfterDays.disabled = !enabled;
       form.elements.bulkSendAfterDays.required = enabled;
       form.querySelector('.adminSubmissionBulkDelay').hidden = !enabled;
+      const sequential = [...form.elements.strategyType.options].find(option => option.value === 'Invoice + Docs(Sequentially)');
+      if (sequential) sequential.disabled = enabled;
+      if (enabled && form.elements.strategyType.value === 'Invoice + Docs(Sequentially)') {
+        form.elements.strategyType.value = 'Invoice + Docs(In 1 Shot)';
+        form.querySelector('#submissionTypeHint').textContent = 'Bulk email waits until all selected documents are uploaded.';
+      }
     };
     form.elements.batchInvoicesInOneEmail.addEventListener('change', syncBulkDelay);
     syncBulkDelay();
+    const original = snapshot();
+    dirtyCheck = () => snapshot() !== original;
     form.querySelector('#submissionDocumentSearch').addEventListener('input', event => {
       const term = event.target.value.trim().toLowerCase();
       form.querySelectorAll('#submissionDocumentOptions label').forEach(label => { label.hidden = !label.dataset.documentName.toLowerCase().includes(term); });
@@ -141,15 +160,18 @@
       const applyOn = form.elements.applyOn.value;
       const selectedDocuments = documentInputs.filter(input => input.checked).map(input => input.value);
       const batchInvoicesInOneEmail = form.elements.batchInvoicesInOneEmail.checked;
-      const next = {id: record?.id || `submission-${Date.now()}`,status: record?.status || 'RUNNING',strategyName:name,strategySubtitle:applyOn === 'PRODUCT' ? (form.elements.productCategory.value || 'Product') : 'Xeon Infraservices Pvt Ltd',applyOn,strategyType:form.elements.strategyType.value,agentSelection:form.elements.agentSelection.checked,batchInvoicesInOneEmail,bulkSendAfterDays:batchInvoicesInOneEmail ? Number(form.elements.bulkSendAfterDays.value) : null,productCategory:form.elements.productCategory.value,selectedDocuments,documents:[`${selectedDocuments.length} DOCS`]};
+      const next = {id: record?.id || `submission-${Date.now()}`,status: record?.status || 'RUNNING',strategyName:name,strategySubtitle:applyOn === 'PRODUCT' ? form.elements.productCategory.value : 'Xeon Infraservices Pvt Ltd',applyOn,strategyType:form.elements.strategyType.value,agentSelection:form.elements.agentSelection.checked,batchInvoicesInOneEmail,bulkSendAfterDays:batchInvoicesInOneEmail ? Number(form.elements.bulkSendAfterDays.value) : null,productCategory:applyOn === 'PRODUCT' ? form.elements.productCategory.value : '',recipientList:form.elements.recipientList.value.trim(),selectedDocuments,documents:[`${selectedDocuments.length} DOCS`]};
+      const error = strategyRules.validate(strategies,next);
+      if (error) { form.querySelector('#submissionStrategyError').textContent = error; return; }
       if (editing) strategies = strategies.map(item => item.id === record.id ? next : item);
       else strategies.push(next);
-      save(); closeModal(); render(); notify(editing ? 'Strategy updated in this preview.' : 'Strategy created in this preview.');
+      save(); closeModal(true); render(); notify(editing ? 'Strategy updated in this preview.' : 'Strategy created in this preview.');
     });
     modal.querySelector('[data-submission-action="toggle-status"]')?.addEventListener('click', () => {
+      if (dirtyCheck() && !window.confirm('Discard your unsaved edits and change the strategy status?')) return;
       const nextStatus = record.status === 'RUNNING' ? 'PAUSED' : 'RUNNING';
       strategies = strategies.map(item => item.id === record.id ? {...item,status:nextStatus} : item);
-      save(); closeModal(); render(); notify(`Strategy ${nextStatus.toLowerCase()} in this preview.`);
+      save(); closeModal(true); render(); notify(`Strategy ${nextStatus.toLowerCase()} in this preview.`);
     });
     modal.querySelector('[data-submission-action="add-product"]').addEventListener('click', () => {
       const field = form.querySelector('.adminSubmissionProductField');
@@ -171,6 +193,27 @@
   function openDelete(record) {
     showModal(`<section class="adminModalCard adminSubmissionDeleteModal" role="dialog" aria-modal="true" aria-labelledby="submissionDeleteTitle"><header><h2 id="submissionDeleteTitle">Delete Strategy</h2><button type="button" class="adminModalClose" data-submission-action="close-modal" aria-label="Close"><i class="bi bi-x-lg"></i></button></header><p>Delete <strong>${escapeHtml(record.strategyName)}</strong> from this preview?</p><footer><button type="button" class="adminSecondary" data-submission-action="close-modal">Cancel</button><button type="button" class="adminSubmissionDeleteButton" data-submission-action="confirm-delete" data-id="${escapeHtml(record.id)}">Delete</button></footer></section>`);
   }
+  function openPreview() {
+    try {
+      const C=window.SubmissionJourney;
+      const state=C.load(localStorage);
+      const issues=C.readIssues(localStorage);
+      const attachments=C.issueAttachments(issues);
+      let master=[];
+      try { master=JSON.parse(localStorage.getItem('ineburaAdminInvoiceMaster:v1')||'[]'); } catch (_) { master=[]; }
+      if (!Array.isArray(master)) master=[];
+      state.invoices.forEach(invoice=>{const row=master.find(item=>String(item?.fields?.['Invoice No']||'')===String(invoice.invoiceNo)&&String(item.fields['Customer Code']||'')===String(invoice.code));if(row?.fields?.['Product Category'])invoice.productCategory=row.fields['Product Category'];});
+      state.invoices.forEach(invoice => { invoice.effectiveRequirements=strategyRules.requirements(invoice,strategyRules.resolve(invoice,strategies)); });
+      const now=new Date(), parts=Object.fromEntries(new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Kolkata',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(now).map(part=>[part.type,part.value]));
+      let run=new Date(`${parts.year}-${parts.month}-${parts.day}T18:00:00+05:30`);
+      if (run <= now) run=new Date(run.getTime()+86400000);
+      const plan=strategyRules.plan(state,strategies,C,attachments,run);
+      const waiting=[...plan.decisions.values()].filter(item=>!item.ready&&item.reason!=='Already submitted').reduce((counts,item)=>{counts[item.reason]=(counts[item.reason]||0)+1;return counts;},{});
+      const schedule=new Intl.DateTimeFormat('en-IN',{timeZone:'Asia/Kolkata',day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}).format(run);
+      const batches=plan.batches.map(batch=>`<tr><td>${escapeHtml(batch.customer)}<small>${escapeHtml(batch.customerCode)}</small></td><td>${escapeHtml(batch.strategyName)}</td><td>${escapeHtml(batch.recipients.join(', '))}</td><td>${escapeHtml(batch.invoices.join(', '))}</td></tr>`).join('');
+      showModal(`<section class="adminModalCard adminSubmissionStrategyModal adminSubmissionPreview" role="dialog" aria-modal="true" aria-labelledby="submissionPreviewTitle"><header><h2 id="submissionPreviewTitle">Next submission run</h2><button type="button" class="adminModalClose" data-submission-action="close-modal" aria-label="Close"><i class="bi bi-x-lg"></i></button></header><div class="adminSubmissionPreviewBody"><p><strong>${escapeHtml(schedule)} IST</strong> · ${plan.batches.length} email batch${plan.batches.length===1?'':'es'} · ${plan.batches.reduce((total,batch)=>total+batch.invoices.length,0)} eligible invoices</p><p>This is a plan only. No email is sent from this preview.</p><div class="adminSubmissionStrategyTableWrap"><table class="adminSubmissionStrategyTable"><thead><tr><th>Customer</th><th>Strategy</th><th>Recipient list</th><th>Invoices</th></tr></thead><tbody>${batches||'<tr><td colspan="4">No invoice is eligible for this run.</td></tr>'}</tbody></table></div><h3>Waiting or blocked</h3><ul>${Object.entries(waiting).map(([reason,count])=>`<li>${escapeHtml(reason)}: ${count} invoice${count===1?'':'s'}</li>`).join('')||'<li>None</li>'}</ul></div><footer><button type="button" class="adminSecondary" data-submission-action="close-modal">Close</button></footer></section>`);
+    } catch (error) { notify(error.message || 'Could not prepare the run preview.'); }
+  }
 
   body.addEventListener('click', event => {
     const sort = event.target.closest('[data-submission-sort]');
@@ -178,6 +221,7 @@
     const button = event.target.closest('[data-submission-action]');
     if (!button) return;
     if (button.dataset.submissionAction === 'create') openForm();
+    if (button.dataset.submissionAction === 'preview') openPreview();
     const record = strategies.find(item => item.id === button.dataset.id);
     if (button.dataset.submissionAction === 'edit' && record) openForm(record);
     if (button.dataset.submissionAction === 'delete' && record) openDelete(record);
@@ -192,5 +236,10 @@
       save(); closeModal(); render(); notify('Strategy deleted from this preview.');
     }
   });
+  document.addEventListener('keydown', event => {
+    if (event.key !== 'Escape' || !modal.classList.contains('is-open') || !dirtyCheck()) return;
+    event.preventDefault(); event.stopImmediatePropagation();
+    closeModal();
+  }, true);
   render();
 })();

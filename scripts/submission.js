@@ -1,7 +1,7 @@
 /* Interactive submission review prototype; no live submission or email calls. */
 (() => {
   'use strict';
-  const C = window.SubmissionJourney, $ = id => document.getElementById(id);
+  const C = window.SubmissionJourney, S = window.SubmissionStrategy, $ = id => document.getElementById(id);
   const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[char]));
   const money = value => `₹${Number(value || 0).toLocaleString('en-IN')}`;
   const date = value => { const key = C.keyDate(value); return /^\d{4}-\d{2}-\d{2}$/.test(key) ? key.split('-').reverse().join('-') : 'Not available'; };
@@ -31,7 +31,8 @@
     if(poDate)order.push(['PO date',date(poDate)]);
     if(poValue)order.push(['PO value',money(poValue)]);
     if(subclientNames)order.push(['Sub-clients',subclientNames]);
-    const submission=[['Source',invoice.source],['Created in Inebura',date(invoice.createdAt)],['Documents ready',invoice.documentsReadyAt?date(invoice.documentsReadyAt):'Not recorded'],['First recorded submission',invoice.firstSubmittedAt||invoice.submissionDate?date(invoice.firstSubmittedAt||invoice.submissionDate):'Not submitted yet'],['Submission medium',submissionMedium(invoice)],['Submission sub-status',done?invoice.submissionSubStatus||(submissionSource(invoice)==='external'?'—':'Not recorded'):'—'],['Submission destination',done?invoice.submissionDestination||(submissionSource(invoice)==='external'?'—':'Not recorded'):'—']];
+    const firstSubmission=invoice.firstSubmittedAt||invoice.submissionDate?date(invoice.firstSubmittedAt||invoice.submissionDate):done&&submissionSource(invoice)==='external'?'Submitted externally · date not recorded':'Not submitted yet';
+    const submission=[['Source',invoice.source],['Created in Inebura',date(invoice.createdAt)],['Documents ready',invoice.documentsReadyAt?date(invoice.documentsReadyAt):'Not recorded'],['First recorded submission',firstSubmission],['Update recorded on',invoice.submissionRecordedAt?timestamp(invoice.submissionRecordedAt):'Not recorded'],['Submission medium',submissionMedium(invoice)],['Submission sub-status',done?invoice.submissionSubStatus||(submissionSource(invoice)==='external'?'—':'Not recorded'):'—'],['Submission destination',done?invoice.submissionDestination||(submissionSource(invoice)==='external'?'—':'Not recorded'):'—']];
     const age=C.days(invoice.invoiceDate,done?invoice.firstSubmittedAt||invoice.submissionDate:C.today());
     return `<section class="sjInvoiceOverview" aria-label="Invoice and submission details"><dl class="sjDetailFacts"><div><dt>Invoice value</dt><dd>${money(invoice.value)}</dd></div><div><dt>Invoice date</dt><dd>${date(invoice.invoiceDate)}</dd></div><div><dt>Due date</dt><dd>${date(invoice.dueDate)}</dd></div><div><dt>Invoice aging</dt><dd>${duration(age)}</dd></div></dl><div class="sjOverviewSections"><section class="sjOverviewGroup"><h3>Ownership</h3><dl class="sjOverviewGrid">${ownership.map(([label,value])=>cell(label,value)).join('')}</dl></section><section class="sjOverviewGroup"><h3>Order &amp; organisation</h3><dl class="sjOverviewGrid">${order.map(([label,value])=>cell(label,value)).join('')}</dl></section><section class="sjOverviewGroup sjOverviewGroup--submission"><h3>Submission record</h3><dl class="sjOverviewGrid">${submission.map(([label,value])=>cell(label,value)).join('')}</dl></section></div></section>`;
   }
@@ -47,19 +48,32 @@
     return `${count} invoice${count === 1 ? '' : 's'} will be submitted at ${runTime}, ${runDate}`;
   }
   const pill = (text, tone = '') => `<span class="sjPill ${tone}">${esc(text)}</span>`;
-  let state, issues = [], groups = [], attachments = [], view = 'all', selectedInvoice = '', timelineFilter = '', page = 1, sort = 'impact', direction = -1;
-  let reviewKeys = [], deferKeys = [], manualIds = [], inlineManualInvoice = '', selected = new Set(), returnFocus = null;
+  let state, issues = [], groups = [], attachments = [], strategies = [], view = 'all', selectedInvoice = '', timelineFilter = '', page = 1, sort = 'impact', direction = -1;
+  let reviewKeys = [], deferKeys = [], manualIds = [], inlineManualInvoice = '', manualSnapshot = '', selected = new Set(), returnFocus = null;
   let invoiceFrom = '', invoiceTo = '', draftFrom = '', draftTo = '', rangeMonth;
   const currentUser = () => { const config = window.IssueTrackerConfig; const user = localStorage.getItem('issue_tracker_active_user_agent') || localStorage.getItem('activeUserName'); return config.roleOf(user) === 'agent' ? user : config.defaultUser('agent'); };
+  const activeRole = () => { const config=window.IssueTrackerConfig; const user=localStorage.getItem('activeUserName') || localStorage.getItem('issue_tracker_active_user_agent') || config.defaultUser('agent'); return config.roleOf(user); };
   const notice = (text, error = false, html = false) => { $('sjNotice').hidden = false; $('sjNotice').classList.toggle('error', error); html ? $('sjNotice').innerHTML = text : $('sjNotice').textContent = text; };
   const persist = next => { C.transaction(localStorage, { [C.KEY]: next }); state = next; };
   function refresh() {
     state = C.load(localStorage);
+    strategies = S.read(localStorage,S.defaultStrategies);
     issues = C.readIssues(localStorage); attachments = C.issueAttachments(issues);
     const next = C.clone(state), custom = JSON.parse(localStorage.getItem('customIssues') || '[]');
-    const changed = C.reconcileIssues(next, custom, attachments), observed = C.observe(next, issues, C.today(), attachments);
-    if (changed || observed || !localStorage.getItem(C.KEY)) {
-      C.transaction(localStorage, { [C.KEY]: next, ...(changed ? { customIssues: custom } : {}) }); state = next;
+    const requests = JSON.parse(localStorage.getItem('approval_requests') || '[]');
+    const requirementsChanged = next.invoices.reduce((changed, invoice) => {
+      const masterCategory=invoiceMasterDetails(invoice)?.fields?.['Product Category'];
+      if (masterCategory && invoice.productCategory !== masterCategory) { invoice.productCategory=masterCategory; changed=true; }
+      const strategy = S.resolve(invoice,strategies);
+      const required = S.requirements(invoice,strategy);
+      if (JSON.stringify(invoice.effectiveRequirements || []) === JSON.stringify(required)) return changed;
+      invoice.effectiveRequirements = required; return true;
+    },false);
+    const changed = C.reconcileIssues(next, custom, attachments);
+    const approvalsChanged = C.reconcileApprovalRequests(custom,requests);
+    const observed = C.observe(next, issues, C.today(), attachments);
+    if (requirementsChanged || changed || approvalsChanged || observed || !localStorage.getItem(C.KEY)) {
+      C.transaction(localStorage, { [C.KEY]: next, ...(changed ? { customIssues: custom } : {}), ...(approvalsChanged ? { approval_requests: requests } : {}) }); state = next;
       issues = C.readIssues(localStorage); attachments = C.issueAttachments(issues);
     }
     groups = C.blockers(state, issues, C.today(), attachments);
@@ -69,14 +83,22 @@
   const reviewInvoiceNos = () => new Set(groups.filter(group => group.eligible).flatMap(group => group.qualifying.map(invoice => invoice.invoiceNo)));
   const reviewGroupsForInvoice = invoice => invoiceGroups(invoice).filter(group => group.eligible && group.qualifying.some(row => row.invoiceNo === invoice.invoiceNo));
   const invoiceIssues = invoice => C.linkedIssues(issues, invoice).filter(issue=>C.agentCanView(issue,currentUser()));
-  const openSubmissionIssues = () => issues.filter(issue => issue.source === 'submission-module' && C.agentCanView(issue,currentUser()) && !C.closed(issue));
+  const openSubmissionIssues = () => issues.filter(issue => issue.source === 'submission-module' && !C.closed(issue));
   const awaitingApproval = issue => {
     const step = String(issue.workflowStep || '');
     if (['manager-review','reopen-manager-review'].includes(step) || step.startsWith('approver-l')) return true;
     if (step) return false;
     return String(issue.managerApprovalStatus || '').toLowerCase() === 'pending' || String(issue.matrixApprovalStatus || issue.approvalStatus || '').toLowerCase() === 'pending';
   };
-  const awaitingDocuments = invoice => !C.submitted(invoice) && (!invoice.reason || invoice.reason === 'Docs Pending') && C.missing(state,invoice,attachments).length > 0;
+  const awaitingDocuments = invoice => !C.submitted(invoice) && C.missing(state,invoice,attachments).length > 0;
+  const nextRun = (now = new Date()) => {
+    const parts = Object.fromEntries(new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Kolkata',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(now).map(part=>[part.type,part.value]));
+    let run = new Date(`${parts.year}-${parts.month}-${parts.day}T18:00:00+05:30`);
+    if (run <= now) run = new Date(run.getTime()+86400000);
+    return run;
+  };
+  const nextPlan = () => S.plan(state,strategies,C,attachments,nextRun());
+  const decisionFor = invoice => S.assessment(state,invoice,S.resolve(invoice,strategies),C,attachments,nextRun());
   const groupState = group => group.issue ? 'linked' : group.deferred ? 'deferred' : group.eligible ? 'eligible' : 'waiting';
   function groupStateHTML(group) {
     if (group.issue) return `${pill('Issue raised','blue')}<small>${C.agentCanView(group.issue,currentUser())?esc(group.issue.id):'Covered by an existing issue'}</small>`;
@@ -87,7 +109,7 @@
   function filteredRows() {
     const query = $('sjSearch').value.trim().toLowerCase(), reason = $('sjReason').value, review = $('sjReviewFilter').value;
     const from = invoiceFrom, to = invoiceTo;
-    const matchInvoice = invoice => (!reason || (reason === 'ready' ? C.eligibleForAutomation(state, invoice, attachments) : invoice.reason === reason)) && (!from || C.keyDate(invoice.invoiceDate) >= from) && (!to || C.keyDate(invoice.invoiceDate) <= to);
+    const matchInvoice = invoice => (!reason || (reason === 'ready' ? decisionFor(invoice).ready : reason === 'Docs Pending' ? invoice.reason === reason || awaitingDocuments(invoice) : invoice.reason === reason)) && (!from || C.keyDate(invoice.invoiceDate) >= from) && (!to || C.keyDate(invoice.invoiceDate) <= to);
     const reviewNos = view === 'review' ? reviewInvoiceNos() : null;
     const linkedIssues = review === 'linked' ? openSubmissionIssues() : [];
     const rows = state.invoices.filter(invoice => (view === 'all' || C.submitted(invoice) === (view === 'submitted')) && (!reviewNos || reviewNos.has(invoice.invoiceNo)) && matchInvoice(invoice) && (!review || (review === 'documents' ? awaitingDocuments(invoice) : review === 'linked' ? linkedIssues.some(issue => C.issueAffects(issue,invoice)) : (view === 'review' ? reviewGroupsForInvoice(invoice) : invoiceGroups(invoice)).some(group => groupState(group) === review))) && (!query || [invoice.invoiceNo,invoice.code,invoice.name,invoice.reason,invoice.submissionStatus,invoice.submissionSubStatus,submissionMedium(invoice),...C.requirements(invoice).map(req => req.name)].join(' ').toLowerCase().includes(query)));
@@ -99,7 +121,7 @@
   }
   function render() {
     if (!selectedInvoice) { restoreManualDialog(); inlineManualInvoice = ''; }
-    const pending = state.invoices.filter(row => !C.submitted(row)), ready = pending.filter(row => C.eligibleForAutomation(state,row,attachments));
+    const pending = state.invoices.filter(row => !C.submitted(row)), ready = nextPlan().batches.flatMap(batch => batch.invoices);
     const submitted = state.invoices.filter(C.submitted);
     const submissionCounts = submitted.reduce((counts, invoice) => { counts[submissionSource(invoice)]++; return counts; }, { manual:0, automated:0, external:0, unspecified:0 });
     const submissionSummary = `Manual: ${submissionCounts.manual} · Automated: ${submissionCounts.automated} · Externally submitted: ${submissionCounts.external}${submissionCounts.unspecified ? ` · Unspecified: ${submissionCounts.unspecified}` : ''}`;
@@ -147,8 +169,9 @@
     const ownGroups=invoiceGroups(invoice), ownIssues=invoiceIssues(invoice), open=ownIssues.filter(issue=>!C.closed(issue));
     const group = view === 'review' ? reviewGroupsForInvoice(invoice)[0] : ownGroups.find(item=>item.issue)||ownGroups.find(item=>item.eligible)||ownGroups.find(item=>item.deferred)||ownGroups[0];
     const done=C.submitted(invoice), age=C.days(invoice.invoiceDate,done?invoice.firstSubmittedAt||invoice.submissionDate:C.today());
-    const reason=done?'':invoice.reason||'Scheduled for submission';
-    const reviewStatus=group?group.issue?pill('Issue raised','blue'):group.deferred?pill('Deferred','gray'):group.eligible?pill(group.previousIssue?'Review recurrence':'Needs review','amber'):pill('Waiting','gray'):open.length?pill(`${open.length} open issue${open.length===1?'':'s'}`,'blue'):pill(done?'Complete':'No review needed','gray');
+    const reason=done?'':invoice.reason|| (awaitingDocuments(invoice)?'Docs Pending':decisionFor(invoice).reason);
+    const needsReview=ownGroups.some(item=>item.eligible), issueCount=new Set([...open.map(issue=>issue.id),...ownGroups.filter(item=>item.issue).map(item=>item.issue.id)]).size;
+    const reviewStatus=done?pill('Complete','gray'):[needsReview?pill('Needs review','amber'):'',issueCount?pill(`${issueCount} open issue${issueCount===1?'':'s'}`,'blue'):'',!needsReview&&!issueCount?group?.deferred?pill('Deferred','gray'):group?pill('Waiting','gray'):pill('No review needed','gray'):''].join(' ');
     return `<tr><td><input type="checkbox" data-select="${esc(invoice.invoiceNo)}" aria-label="Select ${esc(invoice.invoiceNo)}" ${selected.has(invoice.invoiceNo)?'checked':''} ${done?'disabled':''}></td><td>${esc(invoice.code)}</td><td>${esc(invoice.name)}</td><td><button class="sjLink" data-invoice="${esc(invoice.invoiceNo)}" type="button">${esc(invoice.invoiceNo)}</button></td><td>${date(invoice.invoiceDate)}</td><td>${money(invoice.value)}</td><td><strong>${duration(age)}</strong></td><td>${pill(done?invoice.submissionStatus:'Not Submitted',done?'green':'amber')}</td><td>${esc(done?invoice.submissionSubStatus||(submissionSource(invoice)==='external'?'—':'Not recorded'):'—')}</td><td>${esc(submissionMedium(invoice))}</td><td><span class="sjReason" title="${esc(reason || 'No reason recorded')}">${esc(reason || '—')}</span></td><td>${reviewStatus}</td><td><div class="sjRowActions"><button class="sjButton" type="button" data-invoice="${esc(invoice.invoiceNo)}">${done?'View':'Update'}</button></div></td></tr>`;
   }
   function existingDocumentsFor(invoiceNos,customerCodes) {
@@ -164,24 +187,40 @@
     const documents=existingDocumentsFor(new Set([invoice.invoiceNo]),new Set([invoice.code]));
     const demoNames=['Invoice','Payment Receipt','Delivery Challan','Invoice Acknowledgment','GR Number','Email Communication (Invoice)'];
     const labelFor=document=>document.requirement==='Invoice Copy'?'Invoice':document.requirement||'Document';
-    const labels=[...new Set([...demoNames,...documents.map(labelFor)])];
-    return `<details class="sjExistingDocuments sjDetailExistingDocuments" open><summary class="sjExistingDocumentsHead"><div><h3>Existing Documents</h3><p>Documents available for this customer across all invoices</p></div><span class="sjExistingDocumentsMeta"><span class="sjExistingDocumentsCount">${labels.length}</span><i class="bi bi-chevron-down" aria-hidden="true"></i></span></summary><div class="sjExistingDocumentsBody"><div class="sjExistingDocumentChips">${labels.map(label=>{const document=documents.find(item=>labelFor(item)===label);return `<span class="sjExistingDocumentChip${label==='Invoice'||label==='Payment Receipt'?' sjExistingDocumentChip--inverted':''}" title="${esc(document?`${document.name} · ${document.uploadedBy||'User'} · ${timestamp(document.uploadedAt)}`:'Demo document placeholder')}"><i class="bi bi-paperclip" aria-hidden="true"></i>${esc(label)}</span>`;}).join('')}</div></div></details>`;
+    const actual=documents.map(document=>`<span class="sjExistingDocumentChip sjExistingDocumentChip--inverted" title="${esc(`${document.name} · ${document.scope} document · ${document.uploadedBy||'User'} · ${timestamp(document.uploadedAt)}`)}"><i class="bi bi-paperclip" aria-hidden="true"></i>${esc(labelFor(document))}<small>Attached</small></span>`).join('');
+    const actualTypes=new Set(documents.map(labelFor).map(label=>label.toLowerCase()));
+    const samples=demoNames.filter(label=>!actualTypes.has(label.toLowerCase())).map(label=>`<span class="sjExistingDocumentChip is-sample" title="Sample document type; no file is attached"><i class="bi bi-file-earmark" aria-hidden="true"></i>${esc(label)}<small>Sample</small></span>`).join('');
+    return `<details class="sjExistingDocuments sjDetailExistingDocuments" open><summary class="sjExistingDocumentsHead"><div><h3>Existing Documents</h3><p>Shared customer files and documents tagged to this invoice · ${documents.length} available</p></div><span class="sjExistingDocumentsMeta"><span class="sjExistingDocumentsCount">${documents.length}</span><i class="bi bi-chevron-down" aria-hidden="true"></i></span></summary><div class="sjExistingDocumentsBody"><div class="sjExistingDocumentChips">${actual}${samples}</div></div></details>`;
+  }
+  function nextStepHTML(invoice, ownGroups, ownIssues) {
+    const waiting=ownGroups.filter(group=>group.eligible);
+    const open=new Set([...ownIssues.filter(issue=>!C.closed(issue)).map(issue=>issue.id),...ownGroups.filter(group=>group.issue).map(group=>group.issue.id)]);
+    const missing=C.missing(state,invoice,attachments);
+    const decision=decisionFor(invoice);
+    const message=waiting.length ? `${waiting.length} blocker${waiting.length===1?' needs':'s need'} review. Choose whether to raise an issue or defer review.`
+      : open.size ? `${open.size} issue${open.size===1?' is':'s are'} open. Track ownership and approvals in Issue Tracker while the invoice remains pending.`
+      : missing.length ? `${missing.length} required document${missing.length===1?' is':'s are'} missing. Add the files in the document module; this invoice stays pending.`
+      : invoice.reason ? `${invoice.reason} is recorded. Review the reason before attempting submission.`
+      : decision.ready ? `Eligible for the next demonstration run at ${timestamp(nextRun())}.` : `${decision.reason}${decision.readyAt?` · Eligible after ${timestamp(decision.readyAt)}`:''}.`;
+    return `<div class="sjNextStep" role="status"><strong>Next step</strong><p>${esc(message)}</p></div>`;
   }
   function renderDetail() {
     const invoice=state.invoices.find(row=>row.invoiceNo===selectedInvoice); if(!invoice){selectedInvoice='';render();return;}
     restoreManualDialog();
     const ownGroups=invoiceGroups(invoice), ownIssues=invoiceIssues(invoice), done=C.submitted(invoice);
+    const correction=done && activeRole()==='agent';
     $('sjDetail').innerHTML=`<header class="sjDetailHead"><div><button type="button" class="sjLink sjBack" data-back aria-label="Return to invoice list" title="Return to invoice list"><i class="bi bi-arrow-left" aria-hidden="true"></i></button><h2>${esc(invoice.invoiceNo)} ${pill(invoice.submissionStatus,done?'green':'amber')}</h2><p>${esc(invoice.name)} · ${esc(invoice.code)}</p></div></header>
       <div class="sjDetailLayout"><div class="sjDetailMain">
         ${invoiceOverviewHTML(invoice,done)}
         ${existingDocumentsCardHTML(invoice)}
-        ${!done?'<section id="sjUpdateSection" class="sjUpdateSection sjDialog sjManualDialog" aria-labelledby="sjManualTitle"></section>':''}
+        ${!done||correction?`<section id="sjUpdateSection" class="sjUpdateSection sjDialog sjManualDialog" aria-labelledby="sjManualTitle">${done?'<div class="sjNextStep" role="status"><strong>Correct this record</strong><p>If this submission was recorded in error, return the invoice to Not Submitted. The previous submission stays in the activity timeline.</p></div>':nextStepHTML(invoice,ownGroups,ownIssues)}</section>`:''}
       </div><section id="sjTimelineSection" class="sjActivityCard" aria-label="Activity timeline">${timelineHTML(invoice,ownIssues)}</section></div>`;
-    if (!done) {
+    prepareTimeline();
+    if (!done || correction) {
       $('sjUpdateSection').append($('sjManualForm'));
       $('sjInlineReview').dataset.raiseInvoice=invoice.invoiceNo;
-      $('sjInlineReview').hidden=!ownGroups.some(group=>C.issueReasonForGroup(group));
-      if (inlineManualInvoice !== invoice.invoiceNo) { configureManual([invoice.invoiceNo]); inlineManualInvoice = invoice.invoiceNo; }
+      $('sjInlineReview').hidden=done||!ownGroups.some(group=>C.issueReasonForGroup(group));
+      if (inlineManualInvoice !== invoice.invoiceNo || ($('sjManualTitle').textContent === 'Correct submission') !== correction) { configureManual([invoice.invoiceNo],correction); inlineManualInvoice = invoice.invoiceNo; }
     } else inlineManualInvoice = '';
   }
   function timelineHTML(invoice, ownIssues) {
@@ -193,6 +232,16 @@
     });
     const seen=new Set(), visible=events.filter(item=>{const signature=item.issueId?`${item.issueId}|${/created issue|Issue raised/.test(item.what)?'created':`${item.at}|${item.what}`}`:item.id;if(seen.has(signature))return false;seen.add(signature);return !timelineFilter||item.type===timelineFilter;}).sort((a,b)=>Date.parse(b.at)-Date.parse(a.at));
     return `<div class="sjDetailContentHeader"><div><span class="sjEyebrow">WHAT HAPPENED</span><h3>Activity timeline</h3></div><label><span class="sjSrOnly">Filter timeline</span><select id="sjTimelineFilter">${[['','All activity'],['invoice','Invoice creation'],['document','Documents'],['submission','Submission updates'],['automation','Automation'],['review','Review / deferral'],['issue','Issues / approvals']].map(([value,label])=>`<option value="${value}" ${timelineFilter===value?'selected':''}>${label}</option>`).join('')}</select></label></div>${visible.length?`<ol class="sjTimeline">${visible.map(item=>`<li><time>${timestamp(item.at)}</time><div><h4>${esc(item.what)}</h4><p>${esc(String(item.remark||'').replace(/\b1 invoices\b/g,'1 invoice'))}</p><small>${esc(item.by||'System')}${item.issueId?` · ${ownIssues.find(issue=>issue.id===item.issueId)?`<a href="${esc(issueURL(ownIssues.find(issue=>issue.id===item.issueId)))}">${esc(item.issueId)}</a>`:esc(item.issueId)}`:''}</small>${item.data?`<details><summary>Submission details</summary><dl>${Object.entries(item.data).filter(([key,value])=>value&&key!=='missingIds').map(([key,value])=>`<dt>${esc(({activityType:'Activity type',submissionStatus:'Submission status',submissionSubStatus:'Sub-status / reason',submissionMedium:'Submission medium',submissionDestination:'Submission destination',submissionDate:'Submission date',submissionType:'Submission type',invoiceType:'Invoice type',sentTo:'Sent to / received by',courierName:'Courier',courierDate:'Courier date',courierAwb:'AWB',remarks:'Remarks'})[key]||key)}</dt><dd>${esc(Array.isArray(value)?value.join(', '):value)}</dd>`).join('')}</dl></details>`:''}</div></li>`).join('')}</ol>`:'<p class="sjTimelineEmpty">No activity has been recorded for this filter.</p>'}`;
+  }
+  function prepareTimeline() {
+    const card=$('sjTimelineSection'), count=card?.querySelectorAll('.sjTimeline > li').length || 0;
+    if (!card) return;
+    card.classList.remove('is-expanded');
+    if (count <= 5) return;
+    const button=document.createElement('button');
+    button.type='button';button.className='sjButton sjMoreActivity';button.dataset.toggleHistory='';button.setAttribute('aria-expanded','false');
+    button.textContent=`Show ${count-5} older activities`;
+    card.append(button);
   }
   function openDialog(id) { returnFocus=document.activeElement; $(id).showModal(); }
   function closeDialog(id) { $(id).close(); if(returnFocus?.isConnected)returnFocus.focus(); }
@@ -245,7 +294,7 @@
     renderReviewDocuments(chosen);
     const affected=new Set(chosen.flatMap(group=>group.invoices.map(row=>row.invoiceNo))).size;
     $('sjReviewContext').textContent=`${chosen.length} dependenc${chosen.length===1?'y':'ies'} · ${affected} distinct invoice${affected===1?'':'s'} affected. Customer-level issues include all currently affected invoices, not only those meeting the age rule.`;
-    $('sjReviewItems').innerHTML=chosen.map((group,index)=>{const reason=C.issueReasonForGroup(group);return `<section class="sjReviewItem"><div class="sjReviewItemTop"><input id="sjPromote${index}" type="checkbox" data-promote="${esc(group.key)}" aria-label="Raise issue for ${esc(reason)}${group.requirement.kind==='reason'?'':` · ${esc(group.requirement.name)}`}" ${group.issue||group.previousIssue?'disabled':'checked'}><label for="sjPromote${index}"><strong>${esc(reason)}</strong> ${pill(group.scope==='customer'?'Customer document':'Invoice reason','gray')}<small>${group.requirement.kind==='reason'?'':`Missing: ${esc(group.requirement.name)} · `}${esc(group.customer)} · ${esc(group.trigger)}${group.deferred?` · Deferred to ${date(group.review.until)}`:''}</small></label></div>${impactHTML(group.invoices,group.qualifying.length)}${group.issue||group.previousIssue?`<p class="sjHint">${group.issue?'An open issue already covers this dependency.':'A previous issue is closed. Review it and use the existing reopen workflow if this dependency has returned.'} ${C.agentCanView(group.issue||group.previousIssue,currentUser())?`<a href="${esc(issueURL(group.issue||group.previousIssue))}">Open ${esc((group.issue||group.previousIssue).id)}</a>`:'Issue details follow Issue Tracker access permissions.'}</p>`:''}</section>`;}).join('');
+    $('sjReviewItems').innerHTML=chosen.map((group,index)=>{const reason=C.issueReasonForGroup(group);return `<section class="sjReviewItem"><div class="sjReviewItemTop"><input id="sjPromote${index}" type="checkbox" data-promote="${esc(group.key)}" aria-label="Raise issue for ${esc(reason)}${group.requirement.kind==='reason'?'':` · ${esc(group.requirement.name)}`}" ${group.issue||group.previousIssue?'disabled':''}><label for="sjPromote${index}"><strong>${esc(reason)}</strong> ${pill(group.scope==='customer'?'Customer document':group.requirement.kind==='reason'?'Invoice reason':'Invoice document','gray')}<small>${group.requirement.kind==='reason'?'':`Missing: ${esc(group.requirement.name)} · `}${esc(group.customer)} · ${esc(group.trigger)}${group.deferred?` · Deferred to ${date(group.review.until)}`:''}</small></label></div>${impactHTML(group.invoices,group.qualifying.length)}${group.issue||group.previousIssue?`<p class="sjHint">${group.issue?'An open issue already covers this dependency.':'A previous issue is closed. Review it and use the existing reopen workflow if this dependency has returned.'} ${C.agentCanView(group.issue||group.previousIssue,currentUser())?`<a href="${esc(issueURL(group.issue||group.previousIssue))}">Open ${esc((group.issue||group.previousIssue).id)}</a>`:'Issue details follow Issue Tracker access permissions.'}</p>`:''}</section>`;}).join('');
     const config=window.IssueTrackerConfig, approvals=config.ensureApprovalData();
     $('sjIssueOwner').innerHTML='<option value="">Select action owner</option>'+config.usersForRole('action-owner').map(user=>`<option>${esc(user.name)}</option>`).join('');
     $('sjIssueProcess').innerHTML='<option value="">No approval process</option>'+approvals.processes.map(process=>`<option value="${esc(process.id)}">${esc(process.process)}</option>`).join('');
@@ -257,6 +306,8 @@
     const keys=selectedReviewKeys(), chosen=keys.map(key=>groups.find(group=>group.key===key)).filter(Boolean), affected=new Set(chosen.flatMap(group=>group.invoices.map(row=>row.invoiceNo))).size;
     $('sjCreateIssues').textContent=`Create ${keys.length} issue${keys.length===1?'':'s'}`; $('sjCreateIssues').disabled=!keys.length;
     $('sjIssueConfirm').innerHTML=`<strong>${keys.length} issue${keys.length===1?'':'s'} · ${affected} distinct invoice${affected===1?'':'s'} impacted</strong><br>${chosen.map(group=>`${esc(C.issueReasonForGroup(group))}${group.requirement.kind==='reason'?'':` · ${esc(group.requirement.name)}`} → ${group.invoices.length} invoice(s) · Owner: ${esc($('sjIssueOwner').value||'Select above')}`).join('<br>')}`;
+    const skipManager=Boolean(window.IssueTrackerConfig.settings().skipManagerApproval);
+    $('sjIssueRoute').textContent=`Route: ${skipManager?'Manager review skipped':'Manager review first'}${$('sjIssueProcess').value?' · selected approval process':' · no additional approval process'} · action owner: ${$('sjIssueOwner').value||'choose above'}.`;
   }
   function openDefer(keys) {
     refresh(); deferKeys=[...new Set(keys)].filter(key=>groups.some(group=>group.key===key&&!group.issue));
@@ -270,15 +321,18 @@
     const form=$('sjManualForm'), dialog=$('sjManualDialog');
     if(form && form.parentElement !== dialog) dialog.append(form);
   }
-  function configureManual(ids) {
-    manualIds=ids.filter(id=>state.invoices.some(row=>row.invoiceNo===id&&!C.submitted(row)));
+  function configureManual(ids, correction = false) {
+    manualIds=ids.filter(id=>state.invoices.some(row=>row.invoiceNo===id&&(correction ? C.submitted(row) && activeRole()==='agent' : !C.submitted(row))));
     if(!manualIds.length){notice('Select pending invoices for a manual update.');return false;}
-    $('sjManualForm').reset();setOptions('sjManualStatus',['Submitted','Not Submitted'],'Select submission status');setOptions('sjManualMedium',[],'Select status first');setManualActivityOptions();
+    $('sjManualForm').reset();setOptions('sjManualStatus',correction?['Not Submitted']:['Submitted','Not Submitted'],'Select submission status');setOptions('sjManualMedium',[],'Select status first');setManualActivityOptions();
+    $('sjManualTitle').textContent=correction?'Correct submission':'Update submission';
     $('sjManualContext').textContent=manualIds.length===1?`${manualIds[0]} · ${state.invoices.find(row=>row.invoiceNo===manualIds[0]).name}`:`${manualIds.length} invoices selected. Each invoice will receive its own activity record.`;
     const reqs=[...new Map(manualIds.flatMap(id=>C.missing(state,state.invoices.find(row=>row.invoiceNo===id),attachments)).map(req=>[`${req.scope}|${req.id}`,req])).values()];
     $('sjMissingChoices').innerHTML=reqs.length?reqs.map(req=>`<label><input type="checkbox" data-missing="${esc(req.id)}" checked> ${esc(req.name)} <small>${req.scope}</small></label>`).join(''):'<p class="sjHint">No configured missing documents. The selected non-submission reason will still be recorded and can be reviewed.</p>';
-    $('sjSubmissionDate').max=C.today();$('sjCourierDate').max=C.today();$('sjManualError').textContent='';$('sjManualSave').textContent='Save update';return true;
+    $('sjSubmissionDate').max=C.today();$('sjCourierDate').max=C.today();$('sjManualError').textContent='';$('sjManualSave').textContent='Save update';
+    manualSnapshot=JSON.stringify([...new FormData($('sjManualForm'))]);return true;
   }
+  const hasUnsavedManual=()=>Boolean(selectedInvoice && inlineManualInvoice === selectedInvoice && manualSnapshot && JSON.stringify([...new FormData($('sjManualForm'))]) !== manualSnapshot);
   function openManual(ids) {
     refresh(); restoreManualDialog();
     if(configureManual(ids))openDialog('sjManualDialog');
@@ -317,6 +371,7 @@
     if(button.id==='sjDateRangeTrigger'){openRangeCalendar();return;}
     if(button.dataset.rangeMonth){rangeMonth=new Date(rangeMonth.getFullYear(),rangeMonth.getMonth()+Number(button.dataset.rangeMonth),1);renderRangeCalendar();return;}
     if(button.dataset.rangeDay){const day=button.dataset.rangeDay;if(!draftFrom||draftTo){draftFrom=day;draftTo='';}else if(day<draftFrom){draftTo=draftFrom;draftFrom=day;}else draftTo=day;renderRangeCalendar();$('sjRangeMonths').querySelector(`[data-range-day="${day}"]`)?.focus();return;}
+    if(button.hasAttribute('data-toggle-history')){const expanded=$('sjTimelineSection').classList.toggle('is-expanded');button.setAttribute('aria-expanded',String(expanded));button.textContent=expanded?'Show recent activity':`Show ${$('sjTimelineSection').querySelectorAll('.sjTimeline > li').length-5} older activities`;return;}
     if(button.id==='sjDateRangeApply'){setDateRange(draftFrom,draftTo);closeDialog('sjDateRangeDialog');page=1;render();return;}
     if(button.id==='sjDateRangeClear'){setDateRange();closeDialog('sjDateRangeDialog');page=1;render();return;}
     if(button.dataset.close){closeDialog(button.dataset.close);return;}
@@ -324,7 +379,7 @@
     if(button.dataset.view){view=button.dataset.view==='pending'?'review':button.dataset.view;page=1;selected.clear();if(['linked','documents'].includes($('sjReviewFilter').value))$('sjReviewFilter').value='';render();return;}
     if(button.dataset.summary){selectedInvoice='';view=button.dataset.summary==='issues'?'all':button.dataset.summary==='pending'?'review':button.dataset.summary==='documents'?'pending':button.dataset.summary;page=1;selected.clear();if(['review','issues','documents'].includes(button.dataset.summary)){['sjSearch','sjReason','sjReviewFilter'].forEach(id=>$(id).value='');setDateRange();}$('sjReviewFilter').value=button.dataset.summary==='issues'?'linked':button.dataset.summary==='documents'?'documents':'';render();return;}
     if(button.dataset.invoice){openInvoice(button.dataset.invoice);return;}
-    if(button.hasAttribute('data-back')){selectedInvoice='';render();document.querySelector(view==='review'?'[data-pending-view="review"]':`[data-view="${view}"]`)?.focus();return;}
+    if(button.hasAttribute('data-back')){if(hasUnsavedManual()&&!window.confirm('Discard your unsaved submission update?'))return;selectedInvoice='';render();document.querySelector(view==='review'?'[data-pending-view="review"]':`[data-view="${view}"]`)?.focus();return;}
     if(button.dataset.review){openReview([button.dataset.review]);return;}
     if(button.dataset.reviewInvoice){const invoice=state.invoices.find(row=>row.invoiceNo===button.dataset.reviewInvoice);if(invoice)openReview(reviewGroupsForInvoice(invoice).map(group=>group.key));return;}
     if(button.dataset.raiseInvoice){openReview(invoiceGroups(state.invoices.find(row=>row.invoiceNo===button.dataset.raiseInvoice)).map(group=>group.key));return;}
@@ -341,14 +396,15 @@
   document.addEventListener('change',event=>{
     if(event.target.dataset.select){event.target.checked?selected.add(event.target.dataset.select):selected.delete(event.target.dataset.select);render();}
     if(event.target.id==='sjSelectAll'){filteredRows().slice((page-1)*10,page*10).filter(row=>!C.submitted(row)).forEach(row=>event.target.checked?selected.add(row.invoiceNo):selected.delete(row.invoiceNo));render();}
-    if(event.target.dataset.promote||event.target.id==='sjIssueOwner')updateConfirmation();
-    if(event.target.id==='sjTimelineFilter'){timelineFilter=event.target.value;const invoice=state.invoices.find(row=>row.invoiceNo===selectedInvoice);if(invoice){$('sjTimelineSection').innerHTML=timelineHTML(invoice,invoiceIssues(invoice));$('sjTimelineFilter').focus();}}
+    if(event.target.dataset.promote||['sjIssueOwner','sjIssueProcess'].includes(event.target.id))updateConfirmation();
+    if(event.target.id==='sjTimelineFilter'){timelineFilter=event.target.value;const invoice=state.invoices.find(row=>row.invoiceNo===selectedInvoice);if(invoice){$('sjTimelineSection').innerHTML=timelineHTML(invoice,invoiceIssues(invoice));prepareTimeline();$('sjTimelineFilter').focus();}}
   });
   ['sjSearch','sjReason','sjReviewFilter'].forEach(id=>$(id).addEventListener(id==='sjSearch'?'input':'change',()=>{page=1;render();}));
   $('sjDateRangeDialog').addEventListener('close',()=>$('sjDateRangeTrigger').setAttribute('aria-expanded','false'));
   $('sjClear').addEventListener('click',()=>{['sjSearch','sjReason','sjReviewFilter'].forEach(id=>$(id).value='');setDateRange();page=1;render();});
   $('sjPrev').addEventListener('click',()=>{page--;render();});$('sjNext').addEventListener('click',()=>{page++;render();});
   $('sjBulkUpdate').addEventListener('click',()=>openManual([...selected]));
+  $('sjBulkReview').addEventListener('click',()=>openReview(groups.filter(group=>group.invoices.some(row=>selected.has(row.invoiceNo))).map(group=>group.key)));
   $('sjDeferFromReview').addEventListener('click',()=>openDefer(selectedReviewKeys().length?selectedReviewKeys():reviewKeys));
   $('sjManualStatus').addEventListener('change',()=>{const status=$('sjManualStatus').value;setOptions('sjManualMedium',status==='Submitted'?['Manual','External']:status==='Not Submitted'?['Manual']:[],'Select medium');if(status==='Not Submitted')$('sjManualMedium').value='Manual';setManualActivityOptions();});
   $('sjManualMedium').addEventListener('change',setManualActivityOptions);
@@ -356,12 +412,18 @@
   $('sjManualForm').addEventListener('submit',event=>{
     event.preventDefault(); if(!$('sjManualForm').reportValidity())return;
     try {
-      refresh(); if(manualIds.some(id=>!state.invoices.some(row=>row.invoiceNo===id&&!C.submitted(row))))throw new Error('An invoice changed while this form was open. Close it and review the latest status.');
+      if (manualIds.length > 1) {
+        const names=[...new Set(state.invoices.filter(row=>manualIds.includes(row.invoiceNo)).map(row=>row.name))];
+        if (!window.confirm(`Apply this update to ${manualIds.length} invoices for ${names.join(', ')}?\n\n${manualIds.join(', ')}`)) return;
+      }
+      refresh(); if(manualIds.some(id=>!state.invoices.some(row=>row.invoiceNo===id&&(!C.submitted(row)||$('sjManualStatus').value==='Not Submitted'&&activeRole()==='agent'))))throw new Error('An invoice changed while this form was open. Close it and review the latest status.');
       const status=$('sjManualStatus').value, missingIds=[...document.querySelectorAll('[data-missing]:checked')].map(input=>input.dataset.missing);
+      const raiseIssue=status==='Not Submitted'&&document.querySelector('[name=sjEscalate]:checked')?.value==='raise';
       if(!$('sjMissingFields').hidden&&document.querySelector('[data-missing]')&&!missingIds.length)throw new Error('Select the missing document(s) for this reason.');
       const update={activityType:$('sjActivity').value,submissionStatus:status,submissionSubStatus:$('sjManualSub').value,submissionMedium:status==='Submitted'?$('sjManualMedium').value:'',submissionDestination:$('sjCompletedFields').hidden?'':$('sjManualDestination').value,submissionDate:$('sjDelivery').hidden?'':$('sjSubmissionDate').value,submissionType:$('sjDelivery').hidden?'':$('sjSubmissionType').value,invoiceType:$('sjDelivery').hidden?'':$('sjInvoiceType').value,sentTo:$('sjSentFields').hidden?'':$('sjSentTo').value,courierName:$('sjCourier').hidden?'':$('sjCourierName').value,courierDate:$('sjCourier').hidden?'':$('sjCourierDate').value,courierAwb:$('sjCourier').hidden?'':$('sjCourierAwb').value,remarks:$('sjManualDetails').hidden?'':$('sjManualRemark').value,missingIds};
-      const next=C.clone(state); C.saveManual(next,manualIds,update,currentUser());persist(next);refresh();if($('sjManualDialog').open)closeDialog('sjManualDialog');selected.clear();inlineManualInvoice='';render();notice(status==='Not Submitted'?'Non-submission reason saved. No issue has been created.':`${$('sjManualMedium').value} submission saved. Automatic submission is skipped.`);
-      if(status==='Not Submitted'&&document.querySelector('[name=sjEscalate]:checked').value==='raise')openReview(groups.filter(group=>group.invoices.some(row=>manualIds.includes(row.invoiceNo))&&(!missingIds.length||missingIds.includes(group.requirement.id)||group.requirement.kind==='reason')).map(group=>group.key));
+      const correcting=manualIds.some(id=>C.submitted(state.invoices.find(row=>row.invoiceNo===id)));
+      const next=C.clone(state); C.saveManual(next,manualIds,update,currentUser(),activeRole());persist(next);refresh();if($('sjManualDialog').open)closeDialog('sjManualDialog');selected.clear();inlineManualInvoice='';render();notice(status==='Not Submitted'?correcting?'Submission corrected to Not Submitted. Previous submission remains in the timeline. No issue has been created.':'Non-submission reason saved. No issue has been created.':`${$('sjManualMedium').value} submission saved. Automatic submission is skipped.`);
+      if(raiseIssue)openReview(groups.filter(group=>group.invoices.some(row=>manualIds.includes(row.invoiceNo))&&(!missingIds.length||missingIds.includes(group.requirement.id)||group.requirement.kind==='reason')).map(group=>group.key));
     }catch(error){$('sjManualError').textContent=error.message;}
   });
   $('sjIssueForm').addEventListener('submit',event=>{
@@ -378,6 +440,7 @@
   $('sjRulesBtn').addEventListener('click',()=>{$('sjReviewDays').textContent=state.settings.reviewDays;openDialog('sjRulesDialog');});
   window.addEventListener('focus',()=>{if(document.querySelector('dialog[open]'))return;try{refresh();render();}catch(error){notice(error.message,true);}});
   window.addEventListener('storage',()=>{if(document.querySelector('dialog[open]'))return;try{refresh();render();}catch(error){notice(error.message,true);}});
+  window.addEventListener('beforeunload',event=>{if(!hasUnsavedManual())return;event.preventDefault();event.returnValue='';});
   function headerAssets(){const logo=$('relationshipLogo');if(logo)logo.innerHTML='<img src="../assets/submission-reference/client-logo.jpg" alt="Client logo">';const avatar=$('headerUserAvatar');if(avatar)avatar.innerHTML='<img src="../assets/submission-reference/avatar.png" alt="User profile">';const badge=document.querySelector('.notification-badge');if(badge)badge.textContent='5';}
   try{refresh();render();const target=new URLSearchParams(location.search).get('invoice');if(target&&state.invoices.some(row=>row.invoiceNo===target))openInvoice(target);}catch(error){notice(error.message,true);$('sjList').hidden=true;}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',headerAssets);else headerAssets();
