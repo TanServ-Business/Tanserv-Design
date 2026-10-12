@@ -1,0 +1,124 @@
+Window: "Inebura 3.0", App: Safari.
+0 standard window Inebura 3.0, ID: SafariWindow?IsSecure=true&UUID=953E25C6-E61B-4E33-9ED5-5ED57F99181E, Secondary Actions: Raise
+	1 split group
+		2 splitter (disabled, settable, float) -1
+		3 tab group
+			4 scroll area
+				5 HTML content Description: Inebura 3.0, URL: testclient.inebura.ai/dashboard/modules/ar/submissiondetails
+					6 container
+						7 button Open menu
+						8 button Go to dashboard
+						9 text Go to Dashboard
+						10 image Client logo
+						11 button Directory
+						12 pop-up button Start Tutorial
+						13 button Notifications
+						14 pop-up button User profile
+						15 heading Submission Details, Value: 1
+							16 text Submission Details
+						17 text Capture invoice submissions individually or in bulk. SUBMITTED INVOICES 732 NON SUBMITTED INVOICES 8 EXTERNALLY SUBMITTED 731 QUICK INFO Physical Submission 0 Emailed 1 Externally Submitted 731 INVOICES 
+						18 text field (settable) Search invoice no, customer name or customer code
+						19 button Submission Status ALL 
+						20 button Submission Date ALL
+						21 table
+							22 row (selectable) Description: Click to sort
+Click to sort
+Click to sort
+Click to sort
+Click to sort
+Click to sort
+Click to sort
+Click to sort
+Click to sort, Value: Customer Code
+
+
+Customer Name
+
+
+Invoice No
+
+
+Invoice Date
+
+
+Due Date
+
+
+Invoice Status
+
+
+Invoice Value
+
+
+Submission Status
+
+
+Submission Date
+
+
+Action
+								23 tickbox 0
+							24 row (selectable)
+								25 cell (selectable) 0-10
+							26 row (selectable)
+								27 cell (selectable) 0-10
+							28 row (selectable)
+								29 cell (selectable) 0-10
+							30 row (selectable)
+								31 cell (selectable) 0-10
+							32 row (selectable)
+								33 cell (selectable) 0-10
+							34 row (selectable)
+								35 cell (selectable) 0-10
+							36 row (selectable)
+								37 cell (selectable) 0-10
+							38 row (selectable)
+								39 cell (selectable) 0-10
+							40 row (selectable)
+								41 cell (selectable) 0-10
+							42 row (selectable)
+								43 cell (selectable) 0-10
+						44 text Showing 1–8 of 8
+						45 content list
+							46 button ‹
+							47 button 1
+							48 button ›
+	49 tab group Description: Tab bar, 1 tab, 2 pinned tabs, ID: TabBar?isSeparate=false
+		50 tab Inbox | Action | Workingremotely | 8505040 | Details, Value: off, ID: TabBarTab?isNarrow=true&isExpanded=false&tabCount=&isPinned=true&isCluster=false&clusterID=&isActive=false
+			51 image FaviconImageView
+		52 tab Your work, Value: off, ID: TabBarTab?isNarrow=true&isExpanded=false&tabCount=&isPinned=true&isCluster=false&clusterID=&isActive=false
+			53 image FaviconImageView
+		54 tab Inebura 3.0, Help: To interact with the items in this button, press Control-Option-Shift-Down Arrow., Value: on, Secondary Actions: close tab, ID: TabBarTab?isNarrow=false&isExpanded=false&tabCount=&isPinned=false&isCluster=false&clusterID=&isActive=true
+			55 image FaviconImageView
+			56 text Value: Inebura 3.0, ID: UnifiedTabBarButton._titleTextField
+	57 toolbar
+		58 container Secondary Actions: Move previous, Move next, Remove from toolbar
+			59 button Description: show sidebar, Help: Show sidebar, ID: SidebarButton
+			60 menu button Description: Tab Group picker, ID: TabGroupPickerButton?TabGroup=
+		61 container BackForwardSegmentedControl
+			62 button Description: Go back, Help: Show the previous page, ID: BackButton
+			63 button (disabled) Description: Go forward, Help: Show the next page, ID: ForwardButton
+		64 container Secondary Actions: Move previous, Move next, Remove from toolbar
+			65 button Page Menu, ID: AssistantButton
+			66 button Add page to Reading List, ID: OneStepBookmarkingButton
+			67 text field (settable) Description: smart search field, Value: https://testclient.inebura.ai/dashboard/modules/ar/submissiondetails, ID: WEB_BROWSER_ADDRESS_AND_SEARCH_FIELD
+			68 button Reload this page, ID: ReloadButton
+		69 button Description: Downloads, ID: DownloadsButton, Secondary Actions: Move previous, Move next, Remove from toolbar
+		70 button Description: Share, ID: ShareButton, Secondary Actions: Move previous, Move next, Remove from toolbar
+		71 button Description: New Tab, ID: NewTabButton, Secondary Actions: Move previous, Move next, Remove from toolbar
+		72 button Description: Tab Overview, ID: TabOverviewButton, Secondary Actions: Move previous, Remove from toolbar
+	73 close button
+	74 full screen button Help: this button also has an action to zoom the window, Secondary Actions: zoom the window
+	75 minimise button
+76 menu bar
+	77 Safari
+	78 File
+	79 Edit
+	80 View, ID: SafariViewMenu
+	81 History
+	82 Bookmarks, ID: SafariBookmarksMenu
+	83 Develop
+	84 Window, ID: SafariWindowMenu
+	85 Help, ID: SafariHelpMenu
+
+The focused UI element is 5 HTML content Description: Inebura 3.0, URL: testclient.inebura.ai/dashboard/modules/ar/submissiondetails

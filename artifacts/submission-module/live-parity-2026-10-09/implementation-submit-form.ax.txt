@@ -1,0 +1,136 @@
+Window: "Inebura | Submission Details", App: Safari.
+0 standard window Inebura | Submission Details, ID: SafariWindow?IsSecure=false&UUID=953E25C6-E61B-4E33-9ED5-5ED57F99181E, Secondary Actions: Raise
+	1 split group
+		2 splitter (disabled, settable, float) -1
+		3 tab group
+			4 scroll area
+				5 HTML content Description: Inebura | Submission Details, URL: 127.0.0.1:8765/pages/submission.html
+					6 container
+						7 button Open menu
+						8 link Inebura logo, Value: 127.0.0.1:8765/pages/Dashboard_Agent.html
+						9 image Client logo
+						10 pop-up button Directory
+						11 button Start Tutorial
+						12 button Notifications
+						13 pop-up button User
+					14 container
+						15 heading Submission Details, Value: 1
+							16 text Submission Details
+						17 text Capture invoice submissions individually or in bulk. SUBMITTED INVOICES 732 NON SUBMITTED INVOICES 8 EXTERNALLY SUBMITTED 731
+						18 text QUICK INFO
+						19 text Physical Submission 0 Emailed 1 Externally Submitted 731 INVOICES
+						20 text field (settable) Search invoice no, customer name or customer code
+						21 pop-up button Submission Status NOT SUBMITTED 
+						22 pop-up button Submission Date ALL
+						23 button Clear Filters
+						24 table Submission invoices
+							25 row (selectable) Select all invoices, Description: Select all invoices
+Click to sort
+Click to sort
+Click to sort
+Click to sort
+Click to sort
+Click to sort
+Click to sort
+Click to sort
+Click to sort, Value: Customer Code
+
+
+Customer Name
+
+
+Invoice No
+
+
+Invoice Date
+
+
+Due Date
+
+
+Invoice Status
+
+
+Invoice Value
+
+
+Submission Status
+
+
+Submission Date
+
+
+Action
+								26 tickbox (disabled) Select all invoices, Value: 1
+							27 row (selectable)
+								28 cell (selectable) Select TVS545661
+									29 tickbox (disabled) Select TVS545661, Value: 1
+								30 cell (selectable) 94669526
+								31 cell (selectable) Raos Health Care
+								32 cell (selectable) TVS545661
+								33 cell (selectable) 21-08-2026
+								34 cell (selectable) 21-08-2026
+								35 cell (selectable) Not Submitted & Untouched
+								36 cell (selectable) ₹10,000
+								37 cell (selectable) Not Submitted
+								38 cell (selectable) —
+								39 cell (selectable) Submit
+Add Issue
+						40 text SUBMISSION FORM ACTIVITY TYPE *
+						41 pop-up button Select, Description: ACTIVITY TYPE * Select
+						42 text SUBMISSION STATUS *
+						43 pop-up button (disabled) Select Activity Type first, Description: SUBMISSION STATUS * Select Activity Type first
+						44 text SUBMISSION SUB STATUS *
+						45 pop-up button (disabled) Select Submission Status first, Description: SUBMISSION SUB STATUS * Select Submission Status first
+						46 text ACTIVITY REMARKS
+						47 text entry area (settable) ACTIVITY REMARKS, Value: [text entry area], Placeholder: Add remarks...
+							48 text Add remarks...
+						49 button Submit
+						50 button Clear
+						51 button Close
+					52 menu Secondary Actions: Cancel
+					53 menu Secondary Actions: Cancel
+					54 menu Secondary Actions: Cancel
+					55 menu Secondary Actions: Cancel
+	56 tab group Description: Tab bar, 2 tabs, 2 pinned tabs, ID: TabBar?isSeparate=false
+		57 tab Inbox | Action | Workingremotely | 8505040 | Details, Value: off, ID: TabBarTab?isNarrow=true&isExpanded=false&tabCount=&isPinned=true&isCluster=false&clusterID=&isActive=false
+			58 image FaviconImageView
+		59 tab Your work, Value: off, ID: TabBarTab?isNarrow=true&isExpanded=false&tabCount=&isPinned=true&isCluster=false&clusterID=&isActive=false
+			60 image FaviconImageView
+		61 tab Inebura 3.0, Value: off, Secondary Actions: close tab, ID: TabBarTab?isNarrow=false&isExpanded=false&tabCount=&isPinned=false&isCluster=false&clusterID=&isActive=false
+			62 image FaviconImageView
+			63 text Value: Inebura 3.0, ID: UnifiedTabBarButton._titleTextField
+		64 tab Inebura | Submission Details, Help: To interact with the items in this button, press Control-Option-Shift-Down Arrow., Value: on, Secondary Actions: close tab, ID: TabBarTab?isNarrow=false&isExpanded=false&tabCount=&isPinned=false&isCluster=false&clusterID=&isActive=true
+			65 image FaviconImageView
+			66 text Value: Inebura | Submission Details, ID: UnifiedTabBarButton._titleTextField
+	67 toolbar
+		68 container Secondary Actions: Move previous, Move next, Remove from toolbar
+			69 button Description: show sidebar, Help: Show sidebar, ID: SidebarButton
+			70 menu button Description: Tab Group picker, ID: TabGroupPickerButton?TabGroup=
+		71 container BackForwardSegmentedControl
+			72 button Description: Go back, Help: Show the previous page, ID: BackButton
+			73 button (disabled) Description: Go forward, Help: Show the next page, ID: ForwardButton
+		74 container Secondary Actions: Move previous, Move next, Remove from toolbar
+			75 button Page Menu, ID: AssistantButton
+			76 button Add page to Reading List, ID: OneStepBookmarkingButton
+			77 text field (settable) Description: smart search field, Value: 127.0.0.1:8765/pages/submission.html, ID: WEB_BROWSER_ADDRESS_AND_SEARCH_FIELD
+			78 button Reload this page, ID: ReloadButton
+		79 button Description: Downloads, ID: DownloadsButton, Secondary Actions: Move previous, Move next, Remove from toolbar
+		80 button Description: Share, ID: ShareButton, Secondary Actions: Move previous, Move next, Remove from toolbar
+		81 button Description: New Tab, ID: NewTabButton, Secondary Actions: Move previous, Move next, Remove from toolbar
+		82 button Description: Tab Overview, ID: TabOverviewButton, Secondary Actions: Move previous, Remove from toolbar
+	83 close button
+	84 full screen button Help: this button also has an action to zoom the window, Secondary Actions: zoom the window
+	85 minimise button
+86 menu bar
+	87 Safari
+	88 File
+	89 Edit
+	90 View, ID: SafariViewMenu
+	91 History
+	92 Bookmarks, ID: SafariBookmarksMenu
+	93 Develop
+	94 Window, ID: SafariWindowMenu
+	95 Help, ID: SafariHelpMenu
+
+The focused UI element is 5 HTML content Description: Inebura | Submission Details, URL: 127.0.0.1:8765/pages/submission.html

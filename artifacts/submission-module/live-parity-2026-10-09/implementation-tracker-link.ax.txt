@@ -1,0 +1,176 @@
+Window: "Inebura | Issue Tracker Detail", App: Safari.
+0 standard window Inebura | Issue Tracker Detail, ID: SafariWindow?IsSecure=false&UUID=953E25C6-E61B-4E33-9ED5-5ED57F99181E, Secondary Actions: Raise
+	1 split group
+		2 splitter (disabled, settable, float) -1
+		3 tab group
+			4 scroll area
+				5 HTML content Description: Inebura | Issue Tracker Detail, URL: 127.0.0.1:8765/pages/issuetrackerdetail.html?invoice=TVS545662&issue=ISS_SUB_1791529020174_zcj7j&role=agent&user=Aditi+Sharma
+					6 container
+						7 button Open menu
+						8 link Inebura logo, Value: 127.0.0.1:8765/pages/Dashboard_Agent.html
+						9 image Apollo logo
+						10 pop-up button Clients
+						11 pop-up button Directory
+						12 button Notifications
+						13 pop-up button User
+					14 container
+						15 link Back to My Work, Value: 127.0.0.1:8765/pages/issuetrackerLP.html?view=my-work&role=agent&user=Aditi+Sharma
+						16 heading Delivery Challan Required, Value: 1
+							17 text Delivery Challan Required
+						18 text Approval pending
+						19 text Invoice no.: TVS545662 · Issue ID: ISS_SUB_1791529020174_zcj7j · 94669526 · Raos Health Care
+						20 summary Admin preview, Value: off
+							21 text Admin preview
+						22 container Current issue action
+							23 text TRACKING ONLY
+							24 heading Assigned to Mukesh Mishra, Value: 2
+								25 text Assigned to Mukesh Mishra
+							26 text Track progress here, or contribute documents and remarks without advancing Mukesh Mishra’s step.
+							27 text  With Mukesh Mishra
+							28 container Workflow handoff
+								29 text PREVIOUS UPDATE
+								30 text Aditi Sharma
+								31 text created issue from submission CURRENT ASSIGNEE
+								32 text Mukesh Mishra
+								33 text Manager review NEXT STEP
+								34 text Neha Gupta
+								35 text Provide resolution
+							36 heading Issue context, Value: 2
+								37 text Issue context
+							38 text Primary status
+							39 text Payment Processing
+							40 text Sub status
+							41 text Delivery Challan Required
+							42 text Action owner
+							43 text Neha Gupta
+							44 text Approval matrix
+							45 text Not selected
+							46 text Agent's original remark
+							47 text Local prototype QA: document dependency test.
+							48 summary Existing Documents Documents available for this customer across all invoices 0, Value: off
+								49 heading Existing Documents, Value: 3
+									50 text Existing Documents
+								51 text Documents available for this customer across all invoices
+								52 text 0
+							53 summary Actions Administrative and exception actions, Value: off
+								54 heading Actions, Value: 3
+									55 text Actions
+								56 text Administrative and exception actions
+							57 heading Add remark, Value: 3
+								58 text Add remark
+							59 text Currently assigned to Mukesh Mishra. Your update will not advance their step.
+							60 text No workflow change 
+							61 text Attach supporting documents
+							62 text PDF, JPG, PNG, DOCX or XLSX Delivery Challan Required is requested for this issue · New uploads are reusable across this customer's invoices
+							63 button Browse
+							64 text YOUR REMARK
+							65 text entry area (settable) YOUR REMARK, Value: [text entry area], Placeholder: Explain what you checked, attached or decided. This is shown to the next person.
+								66 text Explain what you checked, attached or decided. This is shown to the next person.
+							67 text 0 / 1000
+							68 button Share update
+							69 text  Shares the remark and any attached documents without changing the current assignment.
+							70 container (expanded) Secondary Actions: Collapse
+								71 summary Value: on, Action trail 1 Aditi Sharma · created issue from submission REMARK · Local prototype QA: document dependency test.
+9 Oct 2026 at 12:27 PM
+									72 text Action trail
+									73 text 1
+									74 text Aditi Sharma · created issue from submission
+									75 text REMARK · Local prototype QA: document dependency test.
+									76 text 9 Oct 2026 at 12:27 PM
+								77 container
+									78 text REMARK Aditi Sharma created issue from submission 9 Oct 2026 at 12:27 PM Local prototype QA: document dependency test.
+						79 container Complete issue details
+							80 text CURRENT ASSIGNEE Mukesh Mishra Manager review
+							81 heading Approval route, Value: 2
+								82 text Approval route
+							83 text Manager review
+							84 text Mukesh Mishra
+							85 text CURRENT No approval matrix selected Highest approver first
+							86 container Approval hierarchy, highest approver first
+								87 text No approvers are configured.
+							88 heading Complete details, Value: 2
+								89 text Complete details
+							90 text Reference information for this issue.
+							91 description list
+								92 text Customer code
+								93 text 94669526
+								94 text Customer name
+								95 text Raos Health Care
+								96 text Invoice no.
+								97 text TVS545662
+								98 text Invoice date
+								99 text 21-08-2026
+								100 text Invoice value
+								101 text ₹10,000
+								102 text Issue no.
+								103 text ISS_SUB_1791529020174_zcj7j
+								104 text Primary status
+								105 text Payment Processing
+								106 text Substatus
+								107 text Delivery Challan Required
+								108 text Agent
+								109 text Aditi Sharma
+								110 text Manager
+								111 text Mukesh Mishra
+								112 text FPR / SPR
+								113 text — / —
+								114 text Action owner
+								115 text Neha Gupta
+								116 text Current step
+								117 text Manager review
+								118 text Current assignee
+								119 text Mukesh Mishra
+								120 text Manager approval
+								121 text pending
+								122 text Matrix approval
+								123 text not submitted
+								124 text Invoice due amount
+								125 text ₹10,000
+								126 text Invoice due date
+								127 text 21-08-2026
+								128 text Region
+								129 text —
+					130 file upload button
+				131 scroll bar (settable, float) 0
+	132 tab group Description: Tab bar, 2 tabs, 2 pinned tabs, ID: TabBar?isSeparate=false
+		133 tab Inbox | Action | Workingremotely | 8505040 | Details, Value: off, ID: TabBarTab?isNarrow=true&isExpanded=false&tabCount=&isPinned=true&isCluster=false&clusterID=&isActive=false
+			134 image FaviconImageView
+		135 tab Your work, Value: off, ID: TabBarTab?isNarrow=true&isExpanded=false&tabCount=&isPinned=true&isCluster=false&clusterID=&isActive=false
+			136 image FaviconImageView
+		137 tab Inebura 3.0, Value: off, Secondary Actions: close tab, ID: TabBarTab?isNarrow=false&isExpanded=false&tabCount=&isPinned=false&isCluster=false&clusterID=&isActive=false
+			138 image FaviconImageView
+			139 text Value: Inebura 3.0, ID: UnifiedTabBarButton._titleTextField
+		140 tab Inebura | Issue Tracker Detail, Help: To interact with the items in this button, press Control-Option-Shift-Down Arrow., Value: on, Secondary Actions: close tab, ID: TabBarTab?isNarrow=false&isExpanded=false&tabCount=&isPinned=false&isCluster=false&clusterID=&isActive=true
+			141 image FaviconImageView
+			142 text Value: Inebura | Issue Tracker Detail, ID: UnifiedTabBarButton._titleTextField
+	143 toolbar
+		144 container Secondary Actions: Move previous, Move next, Remove from toolbar
+			145 button Description: show sidebar, Help: Show sidebar, ID: SidebarButton
+			146 menu button Description: Tab Group picker, ID: TabGroupPickerButton?TabGroup=
+		147 container BackForwardSegmentedControl
+			148 button Description: Go back, Help: Show the previous page, ID: BackButton
+			149 button (disabled) Description: Go forward, Help: Show the next page, ID: ForwardButton
+		150 container Secondary Actions: Move previous, Move next, Remove from toolbar
+			151 button Page Menu, ID: AssistantButton
+			152 button Add page to Reading List, ID: OneStepBookmarkingButton
+			153 text field (settable) Description: smart search field, ID: WEB_BROWSER_ADDRESS_AND_SEARCH_FIELD, Value: 127.0.0.1:8765/pages/issuetrackerdetail.html?invoice=TVS545662&issue=ISS_SUB_1791529020174_zcj7j&role=agent&user=Aditi+Sharma
+			154 button Reload this page, ID: ReloadButton
+		155 button Description: Downloads, ID: DownloadsButton, Secondary Actions: Move previous, Move next, Remove from toolbar
+		156 button Description: Share, ID: ShareButton, Secondary Actions: Move previous, Move next, Remove from toolbar
+		157 button Description: New Tab, ID: NewTabButton, Secondary Actions: Move previous, Move next, Remove from toolbar
+		158 button Description: Tab Overview, ID: TabOverviewButton, Secondary Actions: Move previous, Remove from toolbar
+	159 close button
+	160 full screen button Help: this button also has an action to zoom the window, Secondary Actions: zoom the window
+	161 minimise button
+162 menu bar
+	163 Safari
+	164 File
+	165 Edit
+	166 View, ID: SafariViewMenu
+	167 History
+	168 Bookmarks, ID: SafariBookmarksMenu
+	169 Develop
+	170 Window, ID: SafariWindowMenu
+	171 Help, ID: SafariHelpMenu
+
+The focused UI element is 5 HTML content Description: Inebura | Issue Tracker Detail, URL: 127.0.0.1:8765/pages/issuetrackerdetail.html?invoice=TVS545662&issue=ISS_SUB_1791529020174_zcj7j&role=agent&user=Aditi+Sharma

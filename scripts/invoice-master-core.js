@@ -118,7 +118,24 @@
     });
     return next;
   };
-  const api = { headers, dates, numbers, required, normalize, locked, convert, validate, parseCSV, preview, apply, identity, clone };
+  const missingAssignments = (record) => ["agent", "manager"].filter((role) => !String(record[role] ?? "").trim());
+  const allocate = (baselines, current, company, assignments) => {
+    if (!baselines.length) throw new Error("Select at least one invoice");
+    const values = Object.fromEntries(["agent", "manager"].map((role) => [role, String(assignments[role] || "").trim()]));
+    if (!values.agent && !values.manager) throw new Error("Choose an Agent or Manager");
+    const next = clone(current), changes = [];
+    baselines.forEach((baseline) => {
+      if (baseline.company !== company) throw new Error("Invoice is outside the selected company");
+      const target = next.find((r) => identity(r) === identity(baseline));
+      if (!target || JSON.stringify(target) !== JSON.stringify(baseline)) throw new Error("An invoice changed. Close and review the allocation again.");
+      const fields = missingAssignments(target).filter((role) => values[role]).map((role) => ({ field: role, before: target[role] || "", after: values[role] }));
+      fields.forEach((change) => { target[change.field] = change.after; });
+      if (fields.length) changes.push({ identity: identity(target), fields });
+    });
+    if (!changes.length) throw new Error("The selected invoices have no missing assignments for the chosen role");
+    return { next, changes };
+  };
+  const api = { headers, dates, numbers, required, normalize, locked, convert, validate, parseCSV, preview, apply, identity, clone, missingAssignments, allocate };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   else root.IneburaInvoiceCore = api;
 })(typeof window === "undefined" ? globalThis : window);

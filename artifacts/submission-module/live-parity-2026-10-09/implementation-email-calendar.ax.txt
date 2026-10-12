@@ -1,0 +1,194 @@
+Window: "Inebura | Submission Details", App: Safari.
+0 standard window Inebura | Submission Details, ID: SafariWindow?IsSecure=false&UUID=953E25C6-E61B-4E33-9ED5-5ED57F99181E, Secondary Actions: Raise
+	1 split group
+		2 splitter (disabled, settable, float) -1
+		3 tab group
+			4 scroll area
+				5 HTML content Description: Inebura | Submission Details, URL: 127.0.0.1:8765/pages/submission.html
+					6 container
+						7 button Open menu
+						8 link Inebura logo, Value: 127.0.0.1:8765/pages/Dashboard_Agent.html
+						9 image Client logo
+						10 pop-up button Directory
+						11 button Start Tutorial
+						12 button Notifications
+						13 pop-up button User
+					14 container
+						15 heading Submission Details, Value: 1
+							16 text Submission Details
+						17 text Capture invoice submissions individually or in bulk. SUBMITTED INVOICES 732 NON SUBMITTED INVOICES 8 EXTERNALLY SUBMITTED 731
+						18 text QUICK INFO
+						19 text Physical Submission 0 Emailed 1 Externally Submitted 731 INVOICES
+						20 text field (settable) Search invoice no, customer name or customer code
+						21 pop-up button Submission Status ALL 
+						22 pop-up button Submission Date ALL
+						23 table Submission invoices
+							24 row (selectable) Select all invoices, Description: Select all invoices
+Click to sort
+Click to sort
+Click to sort
+Click to sort
+Click to sort
+Click to sort
+Click to sort
+Click to sort
+Click to sort, Value: Customer Code
+
+
+Customer Name
+
+
+Invoice No
+
+
+Invoice Date
+
+
+Due Date
+
+
+Invoice Status
+
+
+Invoice Value
+
+
+Submission Status
+
+
+Submission Date
+
+
+Action
+								25 tickbox (disabled) Select all invoices, Value: 0
+							26 row (selectable)
+								27 cell (selectable) Select TN200009
+									28 tickbox (disabled) Select TN200009, Value: 1
+								29 cell (selectable) 94060526
+								30 cell (selectable) ALLIANCE MEDICAL SYSTEMS
+								31 cell (selectable) TN200009
+								32 cell (selectable) 07-06-2026
+								33 cell (selectable) 07-06-2026
+								34 cell (selectable) Submitted & Tracking
+								35 cell (selectable) ₹1,34,187
+								36 cell (selectable) External Submission
+								37 cell (selectable) 29-09-2026
+								38 cell (selectable) Submit
+							39 row (selectable)
+								40 cell (selectable) Select TN200011
+									41 tickbox (disabled) Select TN200011, Value: 1
+								42 cell (selectable) 94060526
+								43 cell (selectable) ALLIANCE MEDICAL SYSTEMS
+								44 cell (selectable) TN200011
+								45 cell (selectable) 03-06-2026
+								46 cell (selectable) 13-06-2026
+								47 cell (selectable) Submitted & Tracking
+								48 cell (selectable) ₹1,45,100
+								49 cell (selectable) External Submission
+								50 cell (selectable) 30-09-2026
+								51 cell (selectable) Submit
+						52 text SUBMISSION FORM ACTIVITY TYPE *
+						53 pop-up button ACTIVITY TYPE * Emailed
+						54 text SUBMISSION STATUS *
+						55 pop-up button SUBMISSION STATUS * Email Sent
+						56 text SUBMISSION SUB STATUS *
+						57 pop-up button SUBMISSION SUB STATUS * Vendor HelpDesk
+						58 text SUBMISSION TYPE *
+						59 pop-up button SUBMISSION TYPE * Select
+						60 text INVOICE TYPE *
+						61 pop-up button INVOICE TYPE * Select
+						62 text SUBMISSION DATE *
+						63 text field (settable) Submission Date, Value: —, Placeholder: Select date
+						64 button Choose submission date
+						65 text SENT TO / RECEIVED BY *
+						66 text field (settable) SENT TO / RECEIVED BY *, Placeholder: Enter Name
+						67 text ACTIVITY REMARKS
+						68 text entry area (settable) ACTIVITY REMARKS, Value: [text entry area], Placeholder: Add remarks...
+							69 text Add remarks...
+						70 button Submit
+						71 button Clear
+						72 button Close
+					73 menu Secondary Actions: Cancel
+					74 menu Secondary Actions: Cancel
+					75 menu Secondary Actions: Cancel
+					76 menu Secondary Actions: Cancel
+					77 container Choose date
+						78 button Previous month
+						79 text October 2026
+						80 button Next month
+						81 text Su Mo Tu We Th Fr Sa
+						82 button 1
+						83 button 2
+						84 button 3
+						85 button 4
+						86 button 5
+						87 button 6
+						88 button 7
+						89 button 8
+						90 button 9
+						91 button (disabled) 10
+						92 button (disabled) 11
+						93 button (disabled) 12
+						94 button (disabled) 13
+						95 button (disabled) 14
+						96 button (disabled) 15
+						97 button (disabled) 16
+						98 button (disabled) 17
+						99 button (disabled) 18
+						100 button (disabled) 19
+						101 button (disabled) 20
+						102 button (disabled) 21
+						103 button (disabled) 22
+						104 button (disabled) 23
+						105 button (disabled) 24
+						106 button (disabled) 25
+						107 button (disabled) 26
+						108 button (disabled) 27
+						109 button (disabled) 28
+						110 button (disabled) 29
+						111 button (disabled) 30
+						112 button (disabled) 31
+						113 button Clear
+						114 button Today
+	115 tab group Description: Tab bar, 2 tabs, 2 pinned tabs, ID: TabBar?isSeparate=false
+		116 tab Inbox | Action | Workingremotely | 8505040 | Details, Value: off, ID: TabBarTab?isNarrow=true&isExpanded=false&tabCount=&isPinned=true&isCluster=false&clusterID=&isActive=false
+			117 image FaviconImageView
+		118 tab Your work, Value: off, ID: TabBarTab?isNarrow=true&isExpanded=false&tabCount=&isPinned=true&isCluster=false&clusterID=&isActive=false
+			119 image FaviconImageView
+		120 tab Inebura 3.0, Value: off, Secondary Actions: close tab, ID: TabBarTab?isNarrow=false&isExpanded=false&tabCount=&isPinned=false&isCluster=false&clusterID=&isActive=false
+			121 image FaviconImageView
+			122 text Value: Inebura 3.0, ID: UnifiedTabBarButton._titleTextField
+		123 tab Inebura | Submission Details, Help: To interact with the items in this button, press Control-Option-Shift-Down Arrow., Value: on, Secondary Actions: close tab, ID: TabBarTab?isNarrow=false&isExpanded=false&tabCount=&isPinned=false&isCluster=false&clusterID=&isActive=true
+			124 image FaviconImageView
+			125 text Value: Inebura | Submission Details, ID: UnifiedTabBarButton._titleTextField
+	126 toolbar
+		127 container Secondary Actions: Move previous, Move next, Remove from toolbar
+			128 button Description: show sidebar, Help: Show sidebar, ID: SidebarButton
+			129 menu button Description: Tab Group picker, ID: TabGroupPickerButton?TabGroup=
+		130 container BackForwardSegmentedControl
+			131 button Description: Go back, Help: Show the previous page, ID: BackButton
+			132 button (disabled) Description: Go forward, Help: Show the next page, ID: ForwardButton
+		133 container Secondary Actions: Move previous, Move next, Remove from toolbar
+			134 button Page Menu, ID: AssistantButton
+			135 button Add page to Reading List, ID: OneStepBookmarkingButton
+			136 text field (settable) Description: smart search field, Value: 127.0.0.1:8765/pages/submission.html, ID: WEB_BROWSER_ADDRESS_AND_SEARCH_FIELD
+			137 button Reload this page, ID: ReloadButton
+		138 button Description: Downloads, ID: DownloadsButton, Secondary Actions: Move previous, Move next, Remove from toolbar
+		139 button Description: Share, ID: ShareButton, Secondary Actions: Move previous, Move next, Remove from toolbar
+		140 button Description: New Tab, ID: NewTabButton, Secondary Actions: Move previous, Move next, Remove from toolbar
+		141 button Description: Tab Overview, ID: TabOverviewButton, Secondary Actions: Move previous, Remove from toolbar
+	142 close button
+	143 full screen button Help: this button also has an action to zoom the window, Secondary Actions: zoom the window
+	144 minimise button
+145 menu bar
+	146 Safari
+	147 File
+	148 Edit
+	149 View, ID: SafariViewMenu
+	150 History
+	151 Bookmarks, ID: SafariBookmarksMenu
+	152 Develop
+	153 Window, ID: SafariWindowMenu
+	154 Help, ID: SafariHelpMenu
+
+The focused UI element is 5 HTML content Description: Inebura | Submission Details, URL: 127.0.0.1:8765/pages/submission.html

@@ -462,7 +462,7 @@
   </div>
 </main>
 
-<script src="../scripts/shared-header.js?v=20260821-shell"></script>
+<script src="../scripts/shared-header.js?v=20261012-index-route-v1"></script>
   <script src="../scripts/customer-notes.js"></script>
 <script>
   (() => {
@@ -683,7 +683,7 @@
           const agentName = actionBtn.getAttribute("data-agent");
           if (!agentName) return;
           const name = encodeURIComponent(agentName);
-          window.location.href = `../LPagent.html?role=manager&agent=${name}`;
+          window.location.href = `../index.html?role=manager&agent=${name}`;
           return;
         }
         const row = event.target.closest("tr[data-agent]");
@@ -1022,7 +1022,7 @@
         const moduleKey = item.getAttribute("data-module");
         if (moduleKey === "visit") window.location.href = "visitmodule.html";
         if (moduleKey === "visit-review") window.location.href = "visitmoduleReview.html";
-        if (moduleKey === "landing") window.location.href = "../LPagent.html";
+        if (moduleKey === "landing") window.location.href = "../index.html";
         if (moduleKey === "landing-manager") window.location.href = "LPmanager.html";
         if (moduleKey === "landing-backend") window.location.href = "LPbackend.html";
       });

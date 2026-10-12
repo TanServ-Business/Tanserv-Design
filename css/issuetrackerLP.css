@@ -865,3 +865,6 @@
   .workActions .dangerButton { width: 100%; }
   .formGrid { grid-template-columns: 1fr; }
 }
+
+/* A shared document dependency remains one canonical issue. */
+.sharedIssueImpact{margin-bottom:22px;padding-bottom:18px;border-bottom:1px solid #e2e8f0}.sharedIssueImpact h2{color:#5c258d}.sharedIssueImpact p{font-size:12px;color:#64748b;line-height:1.6}.sharedIssueImpact summary{font-size:13px;font-weight:600;color:#5c258d;cursor:pointer}.sharedIssueInvoiceList{max-height:280px;overflow:auto;margin-top:10px}.sharedIssueInvoiceList a{display:flex;justify-content:space-between;gap:12px;font-size:12px;border-bottom:1px solid #edf0f5;padding:9px 0;color:#5c258d;text-decoration:none}.sharedIssueInvoiceList a:hover{text-decoration:underline}

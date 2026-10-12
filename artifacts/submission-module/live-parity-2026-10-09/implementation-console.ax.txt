@@ -1,0 +1,269 @@
+Window: "Inebura | Submission Details", App: Safari.
+0 standard window Inebura | Submission Details, ID: SafariWindow?IsSecure=false&UUID=953E25C6-E61B-4E33-9ED5-5ED57F99181E, Secondary Actions: Raise
+	1 split group
+		2 splitter (disabled, settable, float) -1
+		3 tab group
+			4 scroll area
+				5 HTML content inspector-resource:///Main.html
+					6 button Close
+					7 button Dock to left of window
+					8 button Dock to right of window
+					9 button Detach into separate window
+					10 button Start element selection (⇧⌘C)
+					11 button Device Settings
+					12 tab group (selectable)
+						13 tab (selectable) Elements
+						14 tab (selected) Console
+						15 tab (selectable) Sources
+						16 tab (selectable) Network
+						17 tab (selectable) Timelines
+						18 tab (selectable) Storage
+						19 tab (selectable) Graphics
+						20 tab (selectable) Layers
+						21 tab (selectable) Audit
+						22 tab (selectable) Search (⇧⌘F)
+						23 tab (selectable) Settings (⌘,)
+					24 container Console
+						25 search text field (settable)  
+						26 button (disabled) Find Previous (⇧⌘G)
+						27 button (disabled) Find Next (⌘G)
+						28 text All
+						29 text Evaluations
+						30 text Errors
+						31 text Warnings
+						32 text Logs
+						33 button Other filter options…
+						34 tickbox (settable, integer) Emulate User Gesture, Help: Run console commands as if inside a user gesture, Value: 0
+						35 button Run Console Snippet…
+						36 button Collect garbage
+						37 button Clear log (⌘K or ⌃L)
+						38 text Console opened at 12:28:33 PM
+					39 text entry area (settable) Console prompt, Value: [text entry area: Console prompt], Secondary Actions: Show Writing Tools
+					40 container
+					41 container Execution context for $0
+						42 text Auto — Page
+			43 scroll area
+				44 HTML content Description: Inebura | Submission Details, URL: 127.0.0.1:8765/pages/submission.html
+					45 container
+						46 button Open menu
+						47 link Inebura logo, Value: 127.0.0.1:8765/pages/Dashboard_Agent.html
+						48 image Client logo
+						49 pop-up button Directory
+						50 button Start Tutorial
+						51 button Notifications
+						52 pop-up button User
+					53 container
+						54 heading Submission Details, Value: 1
+							55 text Submission Details
+						56 text Capture invoice submissions individually or in bulk. SUBMITTED INVOICES 732 NON SUBMITTED INVOICES 8 EXTERNALLY SUBMITTED 731
+						57 text QUICK INFO
+						58 text Physical Submission 0 Emailed 1 Externally Submitted 731 INVOICES
+						59 text field (settable) Search invoice no, customer name or customer code
+						60 pop-up button Submission Status NOT SUBMITTED 
+						61 pop-up button Submission Date ALL
+						62 button Clear Filters
+						63 table Submission invoices
+							64 row (selectable) Select all invoices, Description: Select all invoices
+Click to sort
+Click to sort
+Click to sort
+Click to sort
+Click to sort
+Click to sort
+Click to sort
+Click to sort
+Click to sort, Value: Customer Code
+
+
+Customer Name
+
+
+Invoice No
+
+
+Invoice Date
+
+
+Due Date
+
+
+Invoice Status
+
+
+Invoice Value
+
+
+Submission Status
+
+
+Submission Date
+
+
+Action
+								65 tickbox Select all invoices, Value: 0
+							66 row (selectable)
+								67 cell (selectable) Select TVS545661
+									68 tickbox Select TVS545661, Value: 0
+								69 cell (selectable) 94669526
+								70 cell (selectable) Raos Health Care
+								71 cell (selectable) TVS545661
+								72 cell (selectable) 21-08-2026
+								73 cell (selectable) 21-08-2026
+								74 cell (selectable) Not Submitted & Tracking
+								75 cell (selectable) ₹10,000
+								76 cell (selectable) Not Submitted
+								77 cell (selectable) 09-10-2026
+								78 cell (selectable) Submit
+Add Issue
+							79 row (selectable)
+								80 cell (selectable) Select TVS545662
+									81 tickbox Select TVS545662, Value: 0
+								82 cell (selectable) 94669526
+								83 cell (selectable) Raos Health Care
+								84 cell (selectable) TVS545662
+								85 cell (selectable) 21-08-2026
+								86 cell (selectable) 21-08-2026
+								87 cell (selectable) Not Submitted & Untouched
+								88 cell (selectable) ₹10,000
+								89 cell (selectable) Not Submitted
+								90 cell (selectable) —
+								91 cell (selectable) Submit
+Add Issue
+							92 row (selectable)
+								93 cell (selectable) Select IV523232
+									94 tickbox Select IV523232, Value: 0
+								95 cell (selectable) 94060526
+								96 cell (selectable) ALLIANCE MEDICAL SYSTEMS
+								97 cell (selectable) IV523232
+								98 cell (selectable) 01-09-2026
+								99 cell (selectable) 25-09-2026
+								100 cell (selectable) Not Submitted & Untouched
+								101 cell (selectable) ₹21,000
+								102 cell (selectable) Not Submitted
+								103 cell (selectable) —
+								104 cell (selectable) Submit
+Add Issue
+							105 row (selectable)
+								106 cell (selectable) Select FT6567567
+									107 tickbox Select FT6567567, Value: 0
+								108 cell (selectable) 94496698
+								109 cell (selectable) Criticam Medical Systems LLP
+								110 cell (selectable) FT6567567
+								111 cell (selectable) 09-09-2026
+								112 cell (selectable) 02-10-2026
+								113 cell (selectable) Not Submitted & Tracking
+								114 cell (selectable) ₹3,31,000
+								115 cell (selectable) Not Submitted
+								116 cell (selectable) —
+								117 cell (selectable) Submit
+Add Issue
+							118 row (selectable)
+								119 cell (selectable) Select DV5623526
+									120 tickbox Select DV5623526, Value: 0
+								121 cell (selectable) 6734001
+								122 cell (selectable) Forties Hospital Noida
+								123 cell (selectable) DV5623526
+								124 cell (selectable) 02-09-2026
+								125 cell (selectable) 02-09-2026
+								126 cell (selectable) Not Submitted & Untouched
+								127 cell (selectable) ₹17,000
+								128 cell (selectable) Not Submitted
+								129 cell (selectable) —
+								130 cell (selectable) Submit
+Add Issue
+							131 row (selectable)
+								132 cell (selectable) Select SU6472864327
+									133 tickbox Select SU6472864327, Value: 0
+								134 cell (selectable) 94266641
+								135 cell (selectable) PRAMODINI MEDICARE LIMITED
+								136 cell (selectable) SU6472864327
+								137 cell (selectable) 07-09-2026
+								138 cell (selectable) 23-09-2026
+								139 cell (selectable) Not Submitted & Untouched
+								140 cell (selectable) ₹21,000
+								141 cell (selectable) Not Submitted
+								142 cell (selectable) —
+								143 cell (selectable) Submit
+Add Issue
+							144 row (selectable)
+								145 cell (selectable) Select TN656457687
+									146 tickbox Select TN656457687, Value: 0
+								147 cell (selectable) 94060526
+								148 cell (selectable) ALLIANCE MEDICAL SYSTEMS
+								149 cell (selectable) TN656457687
+								150 cell (selectable) 29-09-2026
+								151 cell (selectable) 12-04-2048
+								152 cell (selectable) Not Submitted & Untouched
+								153 cell (selectable) ₹8,76,78,76,687
+								154 cell (selectable) Not Submitted
+								155 cell (selectable) —
+								156 cell (selectable) Submit
+Add Issue
+							157 row (selectable)
+								158 cell (selectable) Select CF54561
+									159 tickbox Select CF54561, Value: 0
+								160 cell (selectable) 94003975
+								161 cell (selectable) POSTGRADUATE INSTT OF MEDICAL
+								162 cell (selectable) CF54561
+								163 cell (selectable) 08-09-2026
+								164 cell (selectable) 30-09-2026
+								165 cell (selectable) Not Submitted & Untouched
+								166 cell (selectable) ₹21,000
+								167 cell (selectable) Not Submitted
+								168 cell (selectable) —
+								169 cell (selectable) Submit
+Add Issue
+						170 text Showing 1–8 of 8
+						171 container Invoice pages
+							172 content list
+								173 container ‹
+									174 button (disabled) ‹
+								175 button 1
+								176 container ›
+									177 button (disabled) ›
+					178 menu Secondary Actions: Cancel
+					179 menu Secondary Actions: Cancel
+					180 menu Secondary Actions: Cancel
+					181 menu Secondary Actions: Cancel
+	182 tab group Description: Tab bar, 2 tabs, 2 pinned tabs, ID: TabBar?isSeparate=false
+		183 tab Inbox | Action | Workingremotely | 8505040 | Details, Value: off, ID: TabBarTab?isNarrow=true&isExpanded=false&tabCount=&isPinned=true&isCluster=false&clusterID=&isActive=false
+			184 image FaviconImageView
+		185 tab Your work, Value: off, ID: TabBarTab?isNarrow=true&isExpanded=false&tabCount=&isPinned=true&isCluster=false&clusterID=&isActive=false
+			186 image FaviconImageView
+		187 tab Inebura 3.0, Value: off, Secondary Actions: close tab, ID: TabBarTab?isNarrow=false&isExpanded=false&tabCount=&isPinned=false&isCluster=false&clusterID=&isActive=false
+			188 image FaviconImageView
+			189 text Value: Inebura 3.0, ID: UnifiedTabBarButton._titleTextField
+		190 tab Inebura | Submission Details, Help: To interact with the items in this button, press Control-Option-Shift-Down Arrow., Value: on, Secondary Actions: close tab, ID: TabBarTab?isNarrow=false&isExpanded=false&tabCount=&isPinned=false&isCluster=false&clusterID=&isActive=true
+			191 image FaviconImageView
+			192 text Value: Inebura | Submission Details, ID: UnifiedTabBarButton._titleTextField
+	193 toolbar
+		194 container Secondary Actions: Move previous, Move next, Remove from toolbar
+			195 button Description: show sidebar, Help: Show sidebar, ID: SidebarButton
+			196 menu button Description: Tab Group picker, ID: TabGroupPickerButton?TabGroup=
+		197 container BackForwardSegmentedControl
+			198 button Description: Go back, Help: Show the previous page, ID: BackButton
+			199 button (disabled) Description: Go forward, Help: Show the next page, ID: ForwardButton
+		200 container Secondary Actions: Move previous, Move next, Remove from toolbar
+			201 button Page Menu, ID: AssistantButton
+			202 button Add page to Reading List, ID: OneStepBookmarkingButton
+			203 text field (settable) Description: smart search field, Value: 127.0.0.1:8765/pages/submission.html, ID: WEB_BROWSER_ADDRESS_AND_SEARCH_FIELD
+			204 button Reload this page, ID: ReloadButton
+		205 button Description: Downloads, ID: DownloadsButton, Secondary Actions: Move previous, Move next, Remove from toolbar
+		206 button Description: Share, ID: ShareButton, Secondary Actions: Move previous, Move next, Remove from toolbar
+		207 button Description: New Tab, ID: NewTabButton, Secondary Actions: Move previous, Move next, Remove from toolbar
+		208 button Description: Tab Overview, ID: TabOverviewButton, Secondary Actions: Move previous, Remove from toolbar
+	209 close button
+	210 full screen button Help: this button also has an action to zoom the window, Secondary Actions: zoom the window
+	211 minimise button
+212 menu bar
+	213 Safari
+	214 File
+	215 Edit
+	216 View, ID: SafariViewMenu
+	217 History
+	218 Bookmarks, ID: SafariBookmarksMenu
+	219 Develop
+	220 Window, ID: SafariWindowMenu
+	221 Help, ID: SafariHelpMenu
+
+The focused UI element is 39 text entry area (settable) Console prompt, Value: [text entry area: Console prompt], Secondary Actions: Show Writing Tools

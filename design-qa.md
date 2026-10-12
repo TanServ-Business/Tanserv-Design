@@ -463,7 +463,7 @@ final result: passed
 ### Comparison target and evidence
 
 - Approved visual: `/workspace/generated_images/exec-3dac0eed-9598-400f-b233-8baf96a1ebf1.png`, with the user's subsequent 70/30 panel split.
-- Component styling authority: `LPagent.html` Invoice Summary and `css/styles.css` `.infoCard`, `.kv`, and `.outstandingTable`.
+- Component styling authority: `index.html` Invoice Summary and `css/styles.css` `.infoCard`, `.kv`, and `.outstandingTable`.
 - Implementation: `http://127.0.0.1:8765/pages/admin.html?module=invoice-master`.
 - State: searched `INV-2026-1042`, original demo data, newest timeline entry expanded.
 - Source pixels: 1487 × 1058, normalized to 1440 × 1024; implementation viewport and pixels: 1440 × 1024, deviceScaleFactor 1.
@@ -506,3 +506,314 @@ final result: passed
 - [x] Browser workflows, responsive captures, and static checks.
 
 final result: passed
+
+## Invoice Master — Bulk uploads and unallocated invoices — 5 October 2026
+
+### Scope and references
+
+- User requested room in the existing design for upload history and unallocated invoices. Only Agent and Manager determine whether an invoice is unallocated; either missing role qualifies. KAM and KAS do not affect the queue.
+- Source visual: user-supplied `Screenshot 2026-10-05 at 11.36.02 AM.png` (Desktop attachment; actual filename contains a narrow no-break space before AM). Its upload-history table supplies the table pattern. The other supplied screenshot shows reallocation headings in a loading state, not populated invoice data.
+- Existing detail-layout reference: `artifacts/invoice-master/desktop.png` (1440 × 1024).
+- This is an extension of the reference mockup, not a pixel-for-pixel recreation or a development benchmark. The three-view navigation, Agent/Manager queue, unchanged counts and review status are intentional additions. Current company branding and the admin shell are retained.
+
+### Evidence and visual comparison
+
+- Evidence folder: `artifacts/invoice-master/2026-10-05/`.
+- Full-view combined comparison: `uploads-comparison.jpg`. The source's browser chrome is cropped; app content is normalized to a common 1280px image width. Source attachment includes 1920px-wide app content; implementation is captured at a 1440 × 1000 CSS viewport. Compare structure and table styling, not absolute density or sample row counts.
+- Focused readable table comparison: `tables-comparison.jpg`.
+- Existing/new detail comparison: `details-comparison.jpg`. Extra navigation uses vertical space; the cards, key/value summary, 70/30 panel structure and independent scrolling are preserved.
+- Final desktop views: `uploads-desktop.jpg`, `unallocated-desktop.jpg` (1440 × 1000). Detail evidence `details-desktop.jpg` is 1425 × 990 as returned by the browser during viewport transition; used for composition only, not pixel measurements.
+- Mobile viewport: 390 × 844. Evidence: `uploads-mobile.jpg` (390 × 844), `unallocated-mobile.jpg` (375 × 812 returned by the browser capture). DOM overflow checks showed no page-level horizontal overflow. Tables scroll within their own container.
+- No exact pixel/density match is claimed across these different source and browser surfaces.
+
+### Findings and iteration
+
+- [P2, resolved] At the default narrow desktop width, table actions initially sat outside the visible table area. The Action column is now sticky at the right edge for both tables. Post-fix desktop and mobile captures show View result and Allocate remain visible while the remaining table scrolls.
+- Checkbox row rerendering now restores focus to the selected invoice checkbox so keyboard selection can continue.
+- No remaining actionable P0/P1/P2 visual findings for the requested extension.
+
+### Required fidelity surfaces
+
+- Typography: existing admin fonts and hierarchy reused; compact table labels and smaller date/customer-code metadata remain readable. Long filenames wrap.
+- Layout: three named views under the existing heading; search-first detail view retained; list cards use existing spacing, rounded borders and horizontal table scrolling. Mobile controls stack.
+- Colors: existing purple navigation/actions and table headers retained; missing assignments and partial-error outcomes use amber; saved counts and complete progress use green.
+- Assets: existing logos and bundled Bootstrap icons reused; no replacement illustration or new image asset was introduced.
+- Copy: queue explicitly says Agent or Manager; allocation fills missing roles only; reviewed uploads remain visibly not applied; completed uploads with rejected rows say Completed with errors.
+
+### Functional verification
+
+- Invoice Master and admin-module validators passed; all 34 admin tests passed (29 existing plus 5 allocation tests). Syntax and diff checks passed.
+- New unit coverage: only Agent/Manager affect the queue; whitespace counts as missing; existing roles/KAM/KAS and other companies remain untouched; partial allocation leaves the other role missing; stale/deleted/foreign targets and no-op allocations are rejected without mutating input.
+- Browser: initial empty search view, empty upload history, CSV review with three valid rows and one negative-amount rejection, Apply valid rows, persisted upload result, rejected-row reason, queue count, role filters, multiple-invoice Agent allocation, individual Manager allocation, queue removal only once both roles exist, and persistence after reload verified.
+- Demo additions were created through the upload flow using `allocation-demo.csv`; original saved invoice records and seed data were not overwritten. Two sample invoices remain in the browser preview queue for review.
+- Original demo INV-2026-1042 still opens with its details and timeline. Browser error logs were empty during the tested flows.
+- Error-report download button was exercised, but the in-app browser download-event wait timed out; filesystem delivery was not verified. No claim of verified download completion is made.
+- No backend integration, production company data or external deployment was involved.
+
+### Checklist
+
+- [x] Dedicated Bulk uploads history view and retained upload entry point.
+- [x] Agent/Manager-only unallocated queue, count, search and role filters.
+- [x] Individual and selected-invoice allocation with a required reason.
+- [x] Existing assignments protected during allocation.
+- [x] Existing invoice details retained.
+- [x] Desktop/mobile visual comparison and scoped regression checks.
+
+final result: passed
+
+## Live Invoice Upload / Reallocation parity — pending authenticated inspection
+
+- Requested source: `https://testclient.inebura.ai/admin/dashboard/modules/invoiceupload`.
+- The current browser request redirected to the live login page. The supplied username was entered, and the authenticated tab/pop-up inspection requires the user to complete sign-in.
+- No source tab, form or dialog has been accepted as visual evidence for this parity pass. Existing local implementations and older screenshots are not treated as proof of current live behavior.
+- No parity edits have been made. Preserve the existing mockup until the live upload, create, result and reallocation controls can be captured and compared.
+- Blocker: authenticated access to the live source. Prior local prototype QA remains a separate result.
+
+final result: blocked
+
+## 2026-10-05 — Authenticated Invoice Upload / Reallocation reference
+
+This supersedes the earlier entry blocked on sign-in. Inspected the authenticated TestClient Invoice Master in the browser. No invoices were created, uploaded, updated or deleted on live.
+
+### Scope and reference
+- Source: `https://testclient.inebura.ai/admin/dashboard/modules/invoiceupload`.
+- Captured Invoice Upload, Invoice Reallocation, Bulk Invoice Upload, Create Invoice (top/bottom), Edit Invoice reallocation, searchable assignees and the calendar.
+- Desktop comparisons: 1440 × 1000. Mobile checks: 390 × 844.
+- Evidence: `artifacts/invoice-master/live-parity/`; `bulk-comparison.jpg`, `create-comparison.jpg`, `reallocate-comparison.jpg` pair source and local screenshots.
+
+### Reconciled design
+- Upload history uses the live column order, status pills, date format, progress bars, download icons, sorting and pagination. Toolbar exposes Show API uploads, Create New and Bulk Upload.
+- Bulk Invoice Upload matches the measured 600 × 484 dialog, Excel-only drop area, template button and disabled initial Upload button.
+- Create Invoice matches the live field order and required markers, Business Unit assignment mapping, disabled assignment fields, date controls, three-column desktop form and fixed footer.
+- Reallocation uses the live table columns and full Edit Invoice dialog. Invoice fields are disabled; Assignee and Manager are required; KAM and KAS remain optional. Searchable assignment fields replace the earlier simple allocation/reason dialog.
+- Queue eligibility remains Agent OR Manager missing. Missing KAM or KAS alone does not put an invoice in the queue.
+- Preserved the existing search-first Invoice details view, original edit/export/delete/timeline flows and reviewed CSV/Excel upload path. It is the third local navigation item, rather than recreating live's separate Invoice Deletion tab.
+- Mobile retains usable buttons, a horizontally scrolling table and a one-column form. The live site's clipped mobile toolbar was not reproduced.
+- Local demo records and counts differ from live. Search suggestions use the existing local sample records, not the live directory. This is a reference mockup, not a development benchmark or a backend implementation.
+
+### Verification
+- Created DEMO-LIVE-001 through the local form; selected a customer and confirmed related customer fields and calculated due date. It appeared in the reallocation queue.
+- Reallocated that invoice through the full form; Agent and Manager saved, other invoice fields stayed intact, and the invoice left the queue despite blank KAM/KAS.
+- Uploaded `local-upload-test.xlsx`: 13 rows, 12 successful (11 new plus one update), one negative-value row rejected. The rejected invoice was absent from the queue. The existing invoice retained blank-cell values and received the uploaded PO Number. Its activity trail showed the change.
+- Checked search, empty results, 10-row pagination, calendar Today, original INV-2026-1042 details, mobile forms and no page-wide horizontal overflow. Browser error log was empty.
+- `node scripts/validate-invoice-master.js`, `node scripts/validate-admin-modules.js`, and `node --test scripts/test-admin-*.js` passed (34 tests). JavaScript syntax and `git diff --check` passed.
+- Download actions are implemented, but the in-app browser did not expose a completed download event; no completed disk download is claimed. Live submission results and server validation were deliberately not exercised.
+
+**Visual QA: passed for the inspected states.** No unresolved layout defects in those states. Complete parity with unobserved live submission/error states is not claimed; the download completion check remains unverified.
+
+## 2026-10-05 — Stable Invoice Master tab switching
+
+- Reordered navigation: Invoice Details → Invoice Upload → Invoice Reallocation.
+- Removed the tab-dependent page class switch, which changed padding, typography, title and card styling. All three panels now share one persistent shell.
+- Kept a constant action-toolbar footprint; inactive controls are invisible and inert. Moved the details upload action into that toolbar. Reserved the document scrollbar gutter to prevent horizontal movement between short and long panels.
+- Browser verification: repeated switching at the current 963-pixel viewport and at 390 × 844 showed identical title, navigation and tab-header bounds across all three tabs. Mobile had no page-wide horizontal overflow. Selected INV-2026-1042 remained displayed after switching away and back at 1440 × 1000.
+- Invoice and admin-module validators, JavaScript syntax, and diff whitespace checks passed. Existing local changes were retained.
+- Result: passed. Evidence: `artifacts/invoice-master/live-parity/22-stable-tab-order.jpg`.
+
+# Submission Details live replication — 9 October 2026
+
+Source: https://testclient.inebura.ai/dashboard/modules/ar/submissiondetails
+Implementation: http://127.0.0.1:8765/pages/submission.html
+Evidence directory: `artifacts/submission-module/live-parity-2026-10-09/`.
+Source inspected in the user's separate Safari window. No source submissions were saved.
+
+**Comparison targets and evidence**
+- Desktop All: `source-desktop.png` and `implementation-desktop.png`; combined full-view and focused table comparison in `comparison-desktop.png`.
+- Inline single-invoice form: `source-submit-form.png` and `implementation-submit-form.png`; combined full-view and focused form comparison in `comparison-form.png`. The local Add Issue action is an intentional requested extension.
+- Mobile: `source-mobile.png` and `implementation-mobile.png`; content crops normalized to 390 × 844 in `comparison-mobile.png`.
+- Desktop captures are 1920 × 1080 PNGs including Safari chrome; browser content regions are aligned in the composites. Mobile captures are also 1920 × 1080 screen images containing Safari's responsive viewport. Source responsive scale was 99%, implementation 100%; viewport crops are resampled to equal 390 × 844 CSS dimensions before comparison. This normalization avoids attributing screen density or browser framing to app differences.
+- `source-loading.png` is transient and excluded. `source-mobile-form.png` contains a table and is excluded as form evidence.
+
+**Findings and comparison history**
+- Resolved P1: copied stylesheet import residue prevented Bootstrap variables from loading and shortened summary cards. Removed invalid prefix; `implementation-desktop.png` and `comparison-desktop.png` show restored card size and page rhythm.
+- Resolved P2: duplicate status-control ID interfered with the filter/form selectors. Assigned a separate filter ID and verified both controls independently.
+- Resolved P2: dropdown semantics exposed incomplete option lists to Safari accessibility. Replaced conflicting listbox/option semantics with native focusable menu buttons and verified the dependent choices.
+- Resolved P2: custom calendar events reached the outside-click handler after rendering, closing the calendar unexpectedly. Stopped propagation within the calendar and verified date selection and range filtering.
+- Resolved form spacing: restored the source textarea minimum height and removed duplicate date-input borders/padding. The earlier form composite predates the final small height correction; current CSS and the subsequent email/calendar inspection cover that correction.
+- No remaining actionable P0/P1/P2 difference identified in the compared screen states. Small differences in responsive header spacing and antialiasing remain P3 polish.
+
+**Required fidelity surfaces**
+- Fonts/typography: source Arial for main content and captured header fallbacks retained; table labels, text sizes, weights, wrapping and compact form hierarchy compared in focused crops.
+- Spacing/layout rhythm: three summary cards, Quick Info/table proportions, toolbar, table density, inline form and mobile stacking compared against the source. Horizontal table scrolling follows the captured source.
+- Colors/tokens: captured source stylesheet values retained for purple header/table, pale summary cards, badges, borders and form controls.
+- Images/assets: actual source logo, client image, avatar and Bootstrap icon font stored locally in `assets/submission-reference/`; no replacement artwork or hotlinked assets.
+- Copy/content: source headings, table columns, labels, captured status choices and dependent category catalogues retained. First ten All rows and eight pending rows use captured sample values; remaining pagination records are synthetic DEMO fixtures.
+
+**Interaction verification**
+- Search and empty results, status filtering, date range apply/clear, sorting, pagination, row selection and bulk selection exercised locally.
+- Single and bulk inline forms, dependent activity/status/substatus choices, required-field validation and date controls exercised.
+- Local submission save for TVS545661 succeeded and persisted Not Submitted & Tracking with 09-10-2026 submission date; pending count remained eight.
+- Add Issue is present only for Not Submitted rows. A local issue for TVS545662 saved successfully and opened in the existing tracker with the correct invoice/customer context and manager-review route. The invoice stayed Not Submitted & Untouched.
+- Save evidence: `implementation-save-success.png`, `implementation-issue-saved.png`, `implementation-tracker-link.png`. Additional evidence: bulk form, date filter and final Not Submitted screenshots/AX captures.
+- Safari console inspection showed no errors. JavaScript syntax and `git diff --check` passed. Local preview restarted after the meeting pause and restored in the separate Safari window.
+
+**Scope and residual gaps**
+- This is a frontend prototype with local persistence. Live server validation, live save results and approval advancement are unverified.
+- Unobserved source variants and header popup/tutorial behavior are outside the verified parity scope; the prototype reuses existing local header popups and a local tutorial overview.
+- Mobile form parity is unverified because a valid source mobile form capture was unavailable. Mobile summary/filter/table layout is verified.
+
+**Implementation checklist**
+- [x] Captured source assets, desktop/mobile list states and dependent submission options.
+- [x] Matched captured layout and core submission controls.
+- [x] Preserved the requested Not Submitted Add Issue workflow.
+- [x] Compared combined source/local desktop, form and mobile evidence.
+- [x] Verified local save-to-tracker flow, syntax and whitespace.
+
+final result: passed
+
+
+---
+
+# Submission review redesign — 9 October 2026
+
+**Final result: passed**
+
+Scope: the approved redesign of Submission, including human review of non-submission, shared customer dependencies, invoice document scope, deferral and the existing Issue Tracker handoff. This section supersedes the earlier live-replica layout result for Submission. It does not change the other modules' QA findings.
+
+## Comparison target and normalization
+
+- Source visual truth: `artifacts/submission-module/redesign-2026-10-09/source-docs-pending.png`, copied unchanged from the user's screenshot. Original pixels: 2032 × 1162. The app content at (56,128) was cropped to 1920 × 960, excluding the surrounding desktop and Safari chrome.
+- Implementation: `http://127.0.0.1:8765/pages/submission.html`, rendered in the user's separate Safari window. Native captures: 1920 × 1050; the visible web region was cropped at y=90 to 1920 × 960 including the scrollbar gutter. Desktop browser zoom was 100%.
+- Final desktop captures: `desktop-handoff.png`, `desktop-final-review.png`, `desktop-final-pending.png`, `desktop-final-docs-pending-form.png` and `desktop-final-deferred-detail.png` under the same evidence directory.
+- Full-view evidence: `source-redesign-comparison.png`; source and implementation content regions are displayed at the same half scale. This compares theme and product hierarchy, not an unchanged layout.
+- Focused evidence: `form-focused-comparison.png`, plus the full-size `desktop-final-docs-pending-form.png`. Both show No Activity → Not Submitted → Docs Pending, with Work Order, Extension Letter and Letter of Acceptance missing. The old inline form is intentionally a dialog in the approved list/detail workspace. Invoice identifiers and counts differ because the new demonstration includes shared dependencies and the tested workflow state.
+- Responsive Safari controls: 390 × 844 and 1024 × 768, 100% zoom, Pixel Ratio 1x. `mobile-comparison-board.png` contains cropped app regions from the overview, review cards and confirmation. Full native captures remain available. `tablet-fix-comparison.png` combines the tablet before/after evidence; scroll positions differ to expose the previously hidden action column versus the replacement card actions. No mobile source mock was supplied; these checks assess usability rather than mobile pixel parity.
+
+## Findings and comparison history
+
+No actionable P0, P1 or P2 findings remain in the tested scope.
+
+1. **[P1, fixed] Brand fill applied to every header.** The captured global stylesheet painted the page, detail and dialog headings purple. Evidence: `desktop-v1.png`. The redesign now limits the filled header to the app bar and uses transparent content headers. Rechecked in `desktop-final-review.png` and `desktop-final-docs-pending-form.png` against the source.
+2. **[P2, fixed] Native dialog selects were too short.** The earlier `manual-raise-choice.png` and `three-document-review.png` showed approximately 20px-high native controls. Explicit 40px select height restores a practical target and consistent form rhythm. Rechecked in `desktop-final-docs-pending-form.png` and `mobile-review-dialog-390.png`.
+3. **[P2, fixed] Tablet table hid the review actions.** At 1024px the original table exceeded the content width. Evidence: `tablet-review-1024.png`. Needs Review now uses two-column cards at tablet widths and one column on mobile; desktop keeps its table. Rechecked in `tablet-review-final-1024.png` and the combined `tablet-fix-comparison.png`. Review and Defer are visible without horizontal scrolling. All Pending retains its dense invoice table with an explicit horizontal-scroll hint on narrower widths.
+4. **[P2, fixed] Document readiness could imply automation eligibility despite another blocker.** Rows with cancellation or customer rejection now say “Blocked by recorded reason.” Only an invoice with documents available and no blocking reason says “Awaiting automatic submission.” Verified in the final All Pending accessibility state and `desktop-final-pending.png`.
+5. **[P2, fixed] An old pending snapshot could display a submission date as a first submission.** A pending invoice now uses only an actual retained first-submission timestamp for that milestone; an old snapshot's date is not treated as proof. Rechecked in `desktop-final-deferred-detail.png`.
+
+## Required fidelity surfaces
+
+- **Fonts and typography:** retained the captured Arial/Helvetica product family, with clear heading, count, table, label and helper-text levels. The original uppercase form labels intentionally become sentence-case labels in the redesigned dialog. Long rejection reasons wrap; IDs and document names remain readable.
+- **Spacing and layout:** retained the purple app bar, pale page background, lavender summary surfaces and white work area. The approved four overview cards and list/detail workspace intentionally replace the old three cards, Quick Info rail and inline form. Forms stack on mobile; review cards avoid clipped actions at intermediate widths.
+- **Colors and tokens:** existing purple `#5c258d`, neutral borders and muted secondary text are retained. Amber, blue, gray and green distinguish pending/review, linked issues, deferral and completed submission, with text labels in addition to color.
+- **Image quality and assets:** reused the captured Inebura/client logos and avatar plus the existing Bootstrap Icons font. No generated illustration, placeholder logo or handcrafted icon substitute was introduced. Existing Issue Tracker keeps its own shared shell assets.
+- **Copy and content:** the primary choice is explicit: keep tracking without an issue or raise an issue after reviewing impact and ownership. Scope, qualifying versus affected invoice counts, provisional invoice-date aging, deferral, and manual precedence are visible. Missing documents are never called automated failures.
+- **Accessibility and interaction states:** labeled inputs, native dialogs, visible focus, selected tabs, disabled duplicate creation, live status messages and validation are present. Left/right keyboard navigation between Submission views was exercised; detail tab selection restores focus. Mobile primary controls have practical 40px minimum targets. This is a focused product QA pass, not a complete accessibility certification.
+
+## Primary interactions verified in Safari
+
+- The 100-invoice Purchase Order dependency initially showed 90 invoices meeting the example age rule. Expanding impact exposed linked invoices. Creating one reviewed issue created one canonical tracker record, not 100 tickets. Evidence: `shared-review-100.png`, `shared-tracker-100.png`.
+- No Activity → Not Submitted → Docs Pending displayed the three scoped missing documents and the explicit tracking/issue choice. Save and review first saved the reason without creating a ticket, then presented three issue choices. Evidence: `manual-raise-choice.png`, `three-document-review.png`.
+- Deferring those three dependencies to 12 October with a remark removed them from Needs Review. The invoice remained in All Pending with Deferred status and its history. Evidence: `all-pending-deferred.png`, `desktop-final-deferred-detail.png`.
+- Keep tracking closed the mobile review without creating an issue; the issue count remained unchanged. Evidence: `mobile-review-confirmation-390.png`.
+- Completing AMS-0001 manually before the Purchase Order arrived moved it to Submitted and recorded Automatic submission skipped. The shared issue stayed open, retained 100 historical links and showed 99 currently blocked. Evidence: `manual-completion-timeline.png`, `linked-issue-after-manual.png`, `shared-tracker-final-expanded.png`.
+- Re-reviewing AMS-0002 disabled new issue creation and linked the existing canonical issue. Evidence: `duplicate-prevention.png`.
+- The tracker landing showed two open issues across 101 linked invoices, including the existing local invoice issue and the new single shared dependency. Evidence: `shared-tracker-landing-final.png`. Manager review and tracking-only agent behavior remained intact.
+- All Pending deferral filtering, native date validation, tab navigation, impact expansion and tracker links were exercised. No runtime errors appeared in Safari's Console on reload; evidence: `console-final.png`.
+
+## Automated validation
+
+- `node --test scripts/test-submission-journey.js`: **20 passed, 0 failed**. Covers the 1,000-invoice import case without issue creation, 100/90 grouping, immediate exceptions, document scope, deferral return/change, canonical duplicate prevention, separate issues per document, approval route preservation, storage rollback, stale forms, manual precedence, document readiness without issue closure, historical links, closure/reopen cycles, Kolkata calendar dates, agent visibility, migration and tracker document sharing.
+- Existing `bin/IssueTracker/tests/workflow-contract.test.js`: **7 passed**.
+- Syntax checks passed for the five changed JavaScript files. Submission HTML has unique IDs and all linked scripts/styles exist. `git diff --check` passed.
+- Text test outputs are saved as `submission-test-results.txt` and `tracker-test-results.txt` in the evidence directory.
+
+## Open questions and limits
+
+- Seven calendar days from invoice date remains a configurable provisional rule. The business decision between invoice date and Inebura creation date is deliberately unresolved and visible in Review rules.
+- This is a frontend demonstration persisted in the browser. It does not send emails, import real invoices, upload to a backend or run an automatic submission service. Existing document upload modules and Issue Tracker own their normal production responsibilities.
+- Unknown legacy attachment scope is not assumed to be customer-shared. Old status snapshots do not fabricate missing activity history. A legacy issue without a canonical dependency key cannot be conclusively matched to a new dependency.
+- Closure/reopen duration and document-arrival transitions were covered by automated tests; full multi-role closure/reopen and real upload delivery were not repeated in the browser. Cross-browser and production-scale integration remain outside this local prototype check.
+
+## Implementation checklist
+
+- [x] Keep pending invoices visible without generating tickets.
+- [x] Separate Needs Review from All Pending; expose scope and impact.
+- [x] Support tracking, explicit issue creation and dated deferral.
+- [x] Keep customer dependencies canonical and invoice documents isolated.
+- [x] Preserve tracker approvals, agent visibility, resolution and reopen ownership.
+- [x] Record manual completion and suppress automatic submission.
+- [x] Verify desktop, tablet and mobile, inspect console and save comparison evidence.
+- [x] Leave the local preview running and open in the separate Safari window.
+
+## Follow-up polish
+
+- P3: singular/plural wording such as “1 meet the review rule” can be standardized in a later copy pass.
+- The shared-header notification count reflects existing browser demonstration data and differs from the source screenshot; it is outside Submission's redesign.
+
+**final result: passed**
+
+## Submission navigation follow-up — 12 October 2026
+
+- Main tabs are now All Invoices, Submitted and All Pending, in that order. All Invoices remains the default.
+- All Pending contains All Pending and Needs Review subviews. The existing dependency review table, counts and issue workflow are preserved.
+- Safari verified that selecting Needs Review keeps its All Pending parent selected, Submitted hides the nested navigation, and the Needs Review overview card opens the nested review view. Home and Right keys switch and focus the nested tabs correctly.
+- Evidence: `artifacts/submission-module/pending-review-2026-10-12/needs-review.png`.
+- JavaScript syntax, all 20 submission journey tests and whitespace checks passed. This scoped navigation change did not modify review eligibility or issue creation rules.
+
+**final result: passed**
+
+
+## Submission follow-up — All Invoices and full-page detail (9 October 2026)
+
+- All Invoices is now the first and default tab. Safari reload showed all 112 demonstration invoices (108 not submitted and 4 submitted), with both statuses in the same list. Existing Needs Review, All Pending and Submitted views remain available.
+- Clicking View opened submitted TN200011 and pending TVS545661 in the full-page invoice workspace. The overview heading, KPI cards and invoice list were hidden; the application header and invoice actions stayed available. This supersedes the earlier detail layout that retained overview cards.
+- Back restored the overview, selected All Invoices tab, and the TVS545661 search filter. Reload returned to the unfiltered All Invoices default.
+- Select all on the mixed first page selected only its seven pending invoices; the three submitted rows remained disabled and unselected. Manual update remained available for the pending selection.
+- Evidence: `artifacts/submission-module/redesign-2026-10-09/all-invoices-default-v2.png` and `full-page-pending-v2.png`. Desktop Safari visual inspection passed. No responsive CSS or business rules changed in this follow-up; responsive testing from the redesign remains the existing baseline.
+- JavaScript syntax and `git diff --check` passed. No additional unit tests were added for this presentation-only follow-up.
+
+**final result: passed**
+
+
+## Resumed responsive verification — 9 October 2026
+
+- **Source visual truth:** approved prior prototype captures `mobile-top-390.png` and `mobile-detail-top-390.png`, adjusted by the user's explicit All Invoices/default and full-page-detail requests.
+- **Rendered evidence:** `mobile-all-invoices-v2.png`, `mobile-full-page-invoice-v2.png`, `tablet-all-invoices-v2.png`, and `tablet-full-page-invoice-v2.png` in `artifacts/submission-module/redesign-2026-10-09/`.
+- **Viewport and normalization:** Safari responsive mode, mobile 390 × 844 CSS px at 1x (Safari fit displayed 99%), tablet 1024 × 768 CSS px at 1x / 100%. Original captures are 1920 × 1050 pixels including browser chrome. The combined comparison crops each mobile content region to 390 × 840 pixels without rescaling. Minor fit/crop differences are not treated as design drift.
+- **Combined comparison:** `responsive-followup-comparison-v2.png` places prior/current overview and prior/current detail together. Overview counts match. The detail comparison uses different invoices (prior TVS545661, current IV523232), so differences in customer, dates, values and blocker content are expected. It verifies layout and retained styling, not identical invoice data.
+- **Focused comparison:** the mobile captures are readable at their native crop size, including tabs, headings, action buttons and milestone labels; an extra enlarged region was unnecessary for these scoped changes.
+- **Typography:** existing Arial hierarchy, weights and small-label treatment remain consistent with the source. No clipped primary action labels observed.
+- **Spacing/layout:** overview retains two-column mobile KPI cards; detail begins beneath the application header and uses the former overview area. Tablet context/milestone rows fit the viewport. Removing the top overview from detail is the requested intentional composition change.
+- **Colors/tokens:** existing purple navigation/actions, pale overview cards and amber blocked states are preserved.
+- **Assets:** existing logos, avatar and library icons remain sharp and unchanged in these captures.
+- **Copy/content:** All Invoices is first/default; submitted and not submitted records remain together. All Pending, Needs Review and Submitted stay accessible. Invoice-specific actions and status stay visible in detail.
+- **Interaction checks:** mobile keyboard End reached Submitted and scrolled its tab into view; Home restored All Invoices. Clicking IV523232 opened the full-page workspace with no overview/KPI cards. Tablet Back restored the All Invoices overview. The existing horizontal invoice-table overflow remains deliberate and labeled.
+- **Findings:** no actionable P0/P1/P2 differences. No code changes were needed during this resumed check. The separate Safari window has been restored to desktop All Invoices for handoff.
+- **Limits:** focused responsive verification only; the prior console/business-rule test results remain the baseline and were not rerun without a code change.
+- **Checklist:** mobile first/default tab, keyboard tab reachability, full-page invoice detail, tablet overview restoration and desktop handoff all verified.
+
+**final result: passed**
+
+
+## Submission responsive table follow-up — 12 October 2026
+
+- Removed the Needs Review card conversion at widths up to 1100px. Every submission list now retains its table columns and header, with horizontal scrolling on smaller screens.
+- Kept mobile touch-target sizing and extended the horizontal-scroll hint to the review table. Updated the stylesheet cache version.
+- Source inspection and whitespace checks passed. Browser visual verification was unavailable because the in-app browser policy blocked the local file URL; no browser verification is claimed.
+
+
+## Submission scheduled summary — 12 October 2026
+
+- The Not Submitted card now shows the eligible invoice count and next submission date/time using the user-approved demo schedule: daily at 18:00 IST. The main card count continues to include all not-submitted invoices.
+- At or after 18:00 IST, the summary points to the following day. Empty queues and disabled automation have explicit copy. This change displays the demo schedule only and does not execute submissions.
+- JavaScript syntax, whitespace and six focused checks passed, covering count wording, cutoff time, year rollover, the IST calendar date, empty queues and disabled automation.
+
+
+## Needs Review invoice alignment — 12 October 2026
+
+- The Needs Review card, nested tab count and list now use the same set of distinct pending invoices that meet an active review rule. An invoice with several eligible documents appears once. In the unchanged seed on 12 October, this is 97 invoices from 109 not submitted; the 10 underlying dependencies remain available through review.
+- The review panel uses the invoice table at every viewport width. Each row has Review, View and Update actions; Review opens the eligible document or reason groups for that invoice. Customer-level blockers still create one shared issue when explicitly escalated.
+- Source checks verified 97 unique rows, eligible versus recent shared-document invoices, scope/search filters, and review keys for one shared and three invoice dependencies. All 20 submission journey tests, JavaScript syntax and whitespace checks passed.
+
+
+## Open Issues submission handoff — 12 October 2026
+
+- The Open Issues card counts open, visible Issue Tracker tickets created from Submission review. Its subtext counts distinct linked invoices. A shared customer document remains one ticket even when it covers many invoices.
+- Clicking the card opens All Invoices filtered to those linked records, including invoices later submitted manually while the issue remains open. Main-tab navigation clears that shortcut filter.
+- Focused source checks covered issue provenance, closed and inaccessible issues, a shared customer issue, an invoice issue, a submitted linked invoice, the matching list, and navigation. All 20 submission journey tests, JavaScript syntax and whitespace checks passed.
+
+
+## Awaiting documents card — 12 October 2026
+
+- Added a fifth overview card for pending invoices with required documents still missing, excluding invoices whose recorded blocker is a different reason. Distinct customer codes determine the customer count.
+- The card opens All Pending filtered to the same invoice set. On the untouched demo seed it shows 105 invoices across 5 customers; one customer document arriving removes its 100 affected invoices from the count.
+- The five cards use a responsive five-column desktop grid, then three columns with the last card spanning two, and two columns on phones. Focused card/list checks and all 20 submission journey tests passed.

@@ -1,0 +1,139 @@
+Window: "Inebura 3.0", App: Safari.
+0 standard window Inebura 3.0, ID: SafariWindow?IsSecure=true&UUID=953E25C6-E61B-4E33-9ED5-5ED57F99181E, Secondary Actions: Raise
+	1 split group
+		2 splitter (disabled, settable, float) -1
+		3 tab group
+			4 scroll area
+				5 HTML content Description: Inebura 3.0, URL: testclient.inebura.ai/dashboard/modules/ar/submissiondetails
+					6 container
+						7 button Open menu
+						8 button Go to dashboard
+						9 text Go to Dashboard
+						10 image Client logo
+						11 button Directory
+						12 pop-up button Start Tutorial
+						13 button Notifications
+						14 pop-up button User profile
+						15 heading Submission Details, Value: 1
+							16 text Submission Details
+						17 text Capture invoice submissions individually or in bulk. SUBMITTED INVOICES 732 NON SUBMITTED INVOICES 8 EXTERNALLY SUBMITTED 731 QUICK INFO Physical Submission 0 Emailed 1 Externally Submitted 731 INVOICES 
+						18 text field (settable) Search invoice no, customer name or customer code
+						19 button Submission Status NOT SUBMITTED 
+						20 button Submission Date ALL
+						21 button Clear Filters
+						22 table
+							23 row (selectable) Description: Click to sort
+Click to sort
+Click to sort
+Click to sort
+Click to sort
+Click to sort
+Click to sort
+Click to sort
+Click to sort, Value: Customer Code
+
+
+Customer Name
+
+
+Invoice No
+
+
+Invoice Date
+
+
+Due Date
+
+
+Invoice Status
+
+
+Invoice Value
+
+
+Submission Status
+
+
+Submission Date
+
+
+Action
+								24 tickbox (disabled) 0
+							25 row (selectable)
+								26 cell (selectable)
+									27 tickbox (disabled) 1
+								28 cell (selectable) 94669526
+								29 cell (selectable) Raos Health Care
+								30 cell (selectable) TVS545661
+								31 cell (selectable) 21-08-2026
+								32 cell (selectable) 21-08-2026
+								33 cell (selectable) Not Submitted & Untouched
+								34 cell (selectable) ₹10,000
+								35 cell (selectable) Not Submitted
+								36 cell (selectable) —
+								37 cell (selectable) Submit
+						38 text SUBMISSION FORM ACTIVITY TYPE *
+						39 button No Activity 
+						40 text SUBMISSION STATUS *
+						41 button Not Submitted 
+						42 text SUBMISSION SUB STATUS *
+						43 button Rejected by Customer -Invoice Not correct 
+						44 text SUPER SUB STATUS
+						45 button Select super sub status 
+						46 tickbox PRODUCT MENTIONED DIFFERENT, Value: 0
+						47 text PRODUCT MENTIONED DIFFERENT
+						48 tickbox PRICE NOT CORRECT, Value: 0
+						49 text PRICE NOT CORRECT
+						50 tickbox TAX ISSUES, Value: 0
+						51 text TAX ISSUES
+						52 tickbox GST NOT CORRECT, Value: 0
+						53 text GST NOT CORRECT
+						54 tickbox QUANTITY ISSUES, Value: 0
+						55 text QUANTITY ISSUES ACTIVITY REMARKS
+						56 text entry area (settable) Value: [text entry area], Placeholder: Add remarks...
+							57 text Add remarks...
+						58 button Submit
+						59 button Clear
+						60 button Close
+	61 tab group Description: Tab bar, 2 tabs, 2 pinned tabs, ID: TabBar?isSeparate=false
+		62 tab Inbox | Action | Workingremotely | 8505040 | Details, Value: off, ID: TabBarTab?isNarrow=true&isExpanded=false&tabCount=&isPinned=true&isCluster=false&clusterID=&isActive=false
+			63 image FaviconImageView
+		64 tab Your work, Value: off, ID: TabBarTab?isNarrow=true&isExpanded=false&tabCount=&isPinned=true&isCluster=false&clusterID=&isActive=false
+			65 image FaviconImageView
+		66 tab Inebura 3.0, Help: To interact with the items in this button, press Control-Option-Shift-Down Arrow., Value: on, Secondary Actions: close tab, ID: TabBarTab?isNarrow=false&isExpanded=false&tabCount=&isPinned=false&isCluster=false&clusterID=&isActive=true
+			67 image FaviconImageView
+			68 text Value: Inebura 3.0, ID: UnifiedTabBarButton._titleTextField
+		69 tab Inebura | Submission Details, Value: off, Secondary Actions: close tab, ID: TabBarTab?isNarrow=false&isExpanded=false&tabCount=&isPinned=false&isCluster=false&clusterID=&isActive=false
+			70 image FaviconImageView
+			71 text Value: Inebura | Submission Details, ID: UnifiedTabBarButton._titleTextField
+	72 toolbar
+		73 container Secondary Actions: Move previous, Move next, Remove from toolbar
+			74 button Description: show sidebar, Help: Show sidebar, ID: SidebarButton
+			75 menu button Description: Tab Group picker, ID: TabGroupPickerButton?TabGroup=
+		76 container BackForwardSegmentedControl
+			77 button Description: Go back, Help: Show the previous page, ID: BackButton
+			78 button (disabled) Description: Go forward, Help: Show the next page, ID: ForwardButton
+		79 container Secondary Actions: Move previous, Move next, Remove from toolbar
+			80 button Page Menu, ID: AssistantButton
+			81 button Add page to Reading List, ID: OneStepBookmarkingButton
+			82 text field (settable) Description: smart search field, Value: https://testclient.inebura.ai/dashboard/modules/ar/submissiondetails, ID: WEB_BROWSER_ADDRESS_AND_SEARCH_FIELD
+			83 button Reload this page, ID: ReloadButton
+		84 button Description: Downloads, ID: DownloadsButton, Secondary Actions: Move previous, Move next, Remove from toolbar
+		85 button Description: Share, ID: ShareButton, Secondary Actions: Move previous, Move next, Remove from toolbar
+		86 button Description: New Tab, ID: NewTabButton, Secondary Actions: Move previous, Move next, Remove from toolbar
+		87 button Description: Tab Overview, ID: TabOverviewButton, Secondary Actions: Move previous, Remove from toolbar
+	88 close button
+	89 full screen button Help: this button also has an action to zoom the window, Secondary Actions: zoom the window
+	90 minimise button
+91 menu bar
+	92 Safari
+	93 File
+	94 Edit
+	95 View, ID: SafariViewMenu
+	96 History
+	97 Bookmarks, ID: SafariBookmarksMenu
+	98 Develop
+	99 Window, ID: SafariWindowMenu
+	100 Help, ID: SafariHelpMenu
+
+The focused UI element is 5 HTML content Description: Inebura 3.0, URL: testclient.inebura.ai/dashboard/modules/ar/submissiondetails

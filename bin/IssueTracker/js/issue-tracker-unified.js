@@ -2,7 +2,9 @@
   'use strict';
 
   const CONFIG = window.IssueTrackerConfig;
-  CONFIG?.ensureCleanSlate();
+  const submissionIssuesExist = (() => { try { return JSON.parse(localStorage.getItem('customIssues') || '[]').some(issue => issue.source === 'submission-module'); } catch (_) { return false; } })();
+  if (submissionIssuesExist) CONFIG?.ensureWorkflowVersion?.();
+  else CONFIG?.ensureCleanSlate();
 
   const KEYS = {
     base: 'issueTrackerBaseData',
@@ -169,7 +171,7 @@
   }
   function findRecord(invoiceId, issueId) {
     const records = allIssueRecords();
-    return records.find((record) => (!invoiceId || record.invoice.id === invoiceId) && (!issueId || record.issue.id === issueId)) || null;
+    return records.find((record) => (!invoiceId || record.invoice.id === invoiceId || (record.issue.affectedInvoices || []).some(item => item.invoiceNo === invoiceId)) && (!issueId || record.issue.id === issueId)) || null;
   }
   function saveRecord(invoice, issue) {
     if (issue.isCustom) {
@@ -384,19 +386,25 @@
     const approverLevel = String(issue.rejectionKind || '').match(/^approver-l(\d+)$/i)?.[1];
     return approverLevel ? `Approver ${approverLevel}` : 'Approval';
   }
+  function canReviewResolution(issue, role = getRole()) {
+    return !isClosed(issue) && issue.workflowStep === 'resolution-review'
+      && issue.resolutionDecisionVersion !== issue.resolutionVersion
+      && role === 'agent' && samePerson(rolePerson(role), issue.agent);
+  }
   function actionState(issue, role) {
     const request = latestRequest(issue.id);
     const workflow = workflowState(issue, request);
     if (workflow.issueState === 'closed') return { key: 'closed', label: 'Issue completed', meta: 'Workflow complete' };
-    if (workflow.step === 'resolution-review' && ((role === 'agent' && samePerson(rolePerson(role), issue.agent)) || (role === 'manager' && samePerson(rolePerson(role), issue.manager)))) {
-      return { key: 'resolution-review', label: 'Review resolution', meta: 'A formal resolution decision is required' };
+    if (workflow.step === 'resolution-review') {
+      return canReviewResolution(issue, role)
+        ? { key: 'resolution-review', label: 'Review resolution', meta: 'A formal resolution decision is required' }
+        : { key: 'waiting', label: `Assigned to ${workflow.currentAssignee || 'the issue agent'}`, meta: `Resolution review · Waiting for ${workflow.currentAssignee || 'the issue agent'}` };
     }
     const assigned = workflow.currentAssignee;
     const mine = samePerson(assigned, rolePerson(role));
     const decision = approvalDecisionContext(issue, request, role);
     if (!mine) return { key: 'waiting', label: `Assigned to ${assigned || 'another user'}`, meta: `${workflow.label} · Waiting for ${assigned || 'another user'}` };
     if (decision) return { key: 'approval', label: decision.label, meta: decision.kind === 'manager' ? 'Manager decision required' : `Approval level ${decision.level}` };
-    if (workflow.step === 'resolution-review') return { key: 'resolution-review', label: 'Review resolution', meta: 'Accept, accept and close, or reject' };
     if (workflow.step === 'resolution-accepted') return { key: 'documents', label: issue.subStatus, meta: 'Resolution accepted · Assigned to you' };
     if (workflow.step === 'resolution-work') return { key: 'resolution', label: 'Provide resolution', meta: 'Resolution work · Assigned to you' };
     return { key: 'documents', label: issue.subStatus || issue.title || 'Add documents and remarks', meta: `${workflow.label} · Assigned to you` };
@@ -523,12 +531,14 @@
       const mine = open.filter((item) => isMyWork(item, role));
       const waiting = open.filter((item) => actionState(item.issue, role).key === 'waiting');
       const waitingApprovals = waiting.filter((item) => approvalStatus(item.issue) === 'pending');
-      const openInvoices = new Set(open.map((item) => item.invoice.id)).size;
+      const openInvoices = new Set(open.flatMap(({ invoice, issue }) => issue.affectedInvoices?.length ? issue.affectedInvoices.map(item => item.invoiceNo) : [invoice.id])).size;
       const configuredPortfolioCount = Number(read(KEYS.portfolioInvoiceCount, DEFAULT_PORTFOLIO_INVOICE_COUNT));
-      const trackedInvoiceCount = new Set(data.map((invoice) => invoice.id)).size;
+      const trackedInvoiceCount = new Set([...data.map(invoice => invoice.id), ...records.flatMap(({ invoice, issue }) => issue.affectedInvoices?.length ? issue.affectedInvoices.map(item => item.invoiceNo) : [invoice.id])]).size;
       const portfolioInvoiceCount = Math.max(Number.isFinite(configuredPortfolioCount) && configuredPortfolioCount > 0 ? configuredPortfolioCount : DEFAULT_PORTFOLIO_INVOICE_COUNT, trackedInvoiceCount);
       const issueInvoicePercent = portfolioInvoiceCount ? Number(((openInvoices / portfolioInvoiceCount) * 100).toFixed(1)) : 0;
-      const netDue = open.reduce((sum, item) => sum + Number(item.issue.invoiceDueAmount || 0), 0);
+      const invoiceAmounts = new Map();
+      open.forEach(({ invoice, issue }) => (issue.affectedInvoices?.length ? issue.affectedInvoices : [{ invoiceNo: invoice.id, value: issue.invoiceDueAmount }]).forEach(item => invoiceAmounts.set(item.invoiceNo, Number(item.value || 0))));
+      const netDue = [...invoiceAmounts.values()].reduce((sum, value) => sum + value, 0);
       document.getElementById('statMyActions').textContent = mine.length;
       document.getElementById('statOpenIssues').textContent = open.length;
       document.getElementById('statOpenInvoices').textContent = `Across ${openInvoices} invoices`;
@@ -548,7 +558,7 @@
 
       let filtered = view === 'closed' ? closed : (view === 'open' ? open : mine);
       const query = search.value.trim().toLowerCase();
-      if (query) filtered = filtered.filter(({ invoice, issue }) => [invoice.id, invoice.customer, invoice.customerCode, issue.id, issue.title, issue.primaryStatus, issue.subStatus, issue.agent, issue.manager, assignedUser(issue), issue.actionOwner].join(' ').toLowerCase().includes(query));
+      if (query) filtered = filtered.filter(({ invoice, issue }) => [invoice.id, invoice.customer, invoice.customerCode, issue.id, issue.title, issue.primaryStatus, issue.subStatus, issue.agent, issue.manager, assignedUser(issue), issue.actionOwner, ...(issue.affectedInvoices || []).map(item => item.invoiceNo)].join(' ').toLowerCase().includes(query));
       filtered = filtered.filter(({ issue }) => matchesSelectedFilter(agentFilter, issue.agent));
       filtered = filtered.filter(({ issue }) => matchesSelectedFilter(managerFilter, issue.manager));
       filtered = filtered.filter(({ issue }) => matchesSelectedFilter(primaryStatusFilter, issue.primaryStatus));
@@ -578,7 +588,7 @@
           const invoiceValue = Number(invoice.total || issue.invoiceTotal || 0);
           const rejected = isRejected(issue);
           const rejectedMeta = rejected ? `<span class="rejectedRowMeta"><i class="bi bi-exclamation-circle"></i> Rejected by ${esc(issue.rejectedBy || 'approver')} · ${esc(rejectionSourceLabel(issue))} · ${esc(shortDateTime(issue.rejectedAt))}</span>` : '';
-          return `<tr class="issueRow${rejected ? ' is-rejected' : ''}" data-invoice-issue="${esc(invoice.id)}"${collapsed ? ' hidden' : ''}><td><span class="actionName">${esc(issue.subStatus || issue.title || '—')}${rejected ? '<span class="rejectedPill">Rejected</span>' : ''}</span><span class="actionMeta">${esc(state.meta)}</span>${rejectedMeta}</td><td>${esc(invoice.customerCode)}</td><td>${esc(invoice.customer)}</td><td><strong>${esc(invoice.id)}</strong></td><td class="invoiceValueCell">${esc(money(invoiceValue))}</td><td>${esc(issue.id)}</td><td class="assignedToCell"><i class="bi bi-person" aria-hidden="true"></i><span>${esc(assignee)}</span></td><td>${esc(prettyDate(issue.created))}</td><td class="openDaysCell">${esc(issueOpenDays(issue))}</td><td><a class="smallAction${['documents', 'approval', 'resolution', 'resolution-review'].includes(state.key) ? ' is-primary' : ''}" href="issuetrackerdetail.html?${params}">${state.key === 'closed' ? 'View' : 'Open task'}</a></td></tr>`;
+          return `<tr class="issueRow${rejected ? ' is-rejected' : ''}" data-invoice-issue="${esc(invoice.id)}"${collapsed ? ' hidden' : ''}><td><span class="actionName">${esc(issue.documentRequirement || issue.subStatus || issue.title || '—')}${issue.documentScope === 'customer' ? `<span class="actionMeta">Shared customer dependency · ${(issue.affectedInvoices || []).length} invoices impacted</span>` : ''}${rejected ? '<span class="rejectedPill">Rejected</span>' : ''}</span><span class="actionMeta">${esc(state.meta)}</span>${rejectedMeta}</td><td>${esc(invoice.customerCode)}</td><td>${esc(invoice.customer)}</td><td><strong>${esc(invoice.id)}</strong>${issue.documentScope === 'customer' ? `<span class="actionMeta">+ ${Math.max(0, (issue.affectedInvoices || []).length - 1)} linked invoices</span>` : ''}</td><td class="invoiceValueCell">${esc(money(invoiceValue))}</td><td>${esc(issue.id)}</td><td class="assignedToCell"><i class="bi bi-person" aria-hidden="true"></i><span>${esc(assignee)}</span></td><td>${esc(prettyDate(issue.created))}</td><td class="openDaysCell">${esc(issueOpenDays(issue))}</td><td><a class="smallAction${['documents', 'approval', 'resolution', 'resolution-review'].includes(state.key) ? ' is-primary' : ''}" href="issuetrackerdetail.html?${params}">${state.key === 'closed' ? 'View' : 'Open task'}</a></td></tr>`;
         }).join('');
       }).join('');
       body.querySelectorAll('[data-invoice-toggle]').forEach((button) => button.addEventListener('click', () => {
@@ -732,7 +742,7 @@
   }
 
   function documentRequirement(issue) {
-    return issue.subStatus || issue.title || 'Supporting document';
+    return issue.documentRequirement || issue.subStatus || issue.title || 'Supporting document';
   }
   function sameCustomer(left, right) {
     const leftCode = cleanName(left?.customerCode).toLowerCase();
@@ -768,7 +778,11 @@
     allIssueRecords().forEach(({ invoice: sourceInvoice, issue: sourceIssue }) => {
       if (!sameCustomer(invoice, sourceInvoice) || (sourceInvoice.id === invoice.id && sourceIssue.id === issue.id)) return;
       if (!visibilityReleased(sourceIssue) && !canViewIssue(sourceIssue, getRole(), rolePerson(getRole()))) return;
-      (sourceIssue.documents || []).forEach((document) => addDocument(document, sourceInvoice, sourceIssue));
+      (sourceIssue.documents || []).forEach((document) => {
+        const scope = typeof document === 'object' ? document.scope || sourceIssue.documentScope : sourceIssue.documentScope;
+        const taggedInvoice = document?.invoiceNo || document?.sourceInvoice || sourceInvoice.id;
+        if (scope === 'customer' || taggedInvoice === invoice.id) addDocument(document, sourceInvoice, sourceIssue);
+      });
     });
     (request?.trail || []).forEach((entry) => (entry.files || []).forEach((file) => {
       addDocument(file, invoice, issue, { requirement: 'Approval attachment', uploadedBy: entry.by, uploadedAt: entry.at });
@@ -777,7 +791,7 @@
   }
   function renderDocuments(invoice, issue, request) {
     const docs = issueDocuments(invoice, issue, request);
-    if (!docs.length) return `<div class="emptyDocuments"><i class="bi bi-file-earmark" aria-hidden="true"></i><span><strong>No customer documents uploaded</strong><small>Files uploaded from any invoice for this customer will appear here.</small></span></div>`;
+    if (!docs.length) return `<div class="emptyDocuments"><i class="bi bi-file-earmark" aria-hidden="true"></i><span><strong>No customer documents uploaded</strong><small>Customer-scoped documents can be reused; invoice-scoped documents stay with their tagged invoice.</small></span></div>`;
     return `<div class="documentRows">${docs.map((doc) => `<div class="documentRow${doc.shared ? ' is-shared' : ''}"><i class="bi bi-file-earmark-check" aria-hidden="true"></i><span><strong>${esc(doc.requirement || 'Supporting document')}</strong><small title="${esc(doc.name)}">${esc(doc.name)}</small><em><i class="bi bi-link-45deg" aria-hidden="true"></i>${esc(doc.sourceInvoice || invoice.id)} · ${esc(doc.sourceIssue || issue.id)} · ${esc(doc.uploadedBy || 'User')} · ${esc(shortDateTime(doc.uploadedAt))}</em></span><button type="button" data-preview-document="${esc(doc.name)}" title="Preview ${esc(doc.name)}" aria-label="Preview ${esc(doc.name)}"><i class="bi bi-eye"></i></button></div>`).join('')}</div>`;
   }
 
@@ -810,8 +824,8 @@
       if (backLink) backLink.href = `issuetrackerLP.html?${new URLSearchParams({ view: 'my-work', role, user: rolePerson(role) })}`;
       document.getElementById('detail-empty-state').classList.add('hidden');
       document.getElementById('issue-detail-layout').classList.remove('hidden');
-      document.getElementById('detail-title').textContent = issue.subStatus || issue.title || 'Issue detail';
-      document.getElementById('detail-identity').textContent = `Invoice no.: ${invoice.id} · Issue ID: ${issue.id} · ${invoice.customerCode} · ${invoice.customer}`;
+      document.getElementById('detail-title').textContent = issue.documentRequirement || issue.subStatus || issue.title || 'Issue detail';
+      document.getElementById('detail-identity').textContent = issue.documentScope === 'customer' ? `Customer dependency · ${(issue.affectedInvoices || []).length} invoices impacted · Issue ID: ${issue.id} · ${invoice.customerCode} · ${invoice.customer}` : `Invoice no.: ${invoice.id} · Issue ID: ${issue.id} · ${invoice.customerCode} · ${invoice.customer}`;
       const status = document.getElementById('detail-status');
       const rejected = isRejected(issue);
       status.textContent = isClosed(issue) ? 'Closed' : (rejected ? 'Rejected · correction required' : (approvalStatus(issue) === 'pending' ? 'Approval pending' : issue.status || 'Open'));
@@ -958,16 +972,18 @@
     if (role === 'agent') return samePerson(issue.agent, rolePerson(role));
     return role === 'manager' && samePerson(issue.manager, rolePerson(role));
   }
+  function canChangeProcess(issue, role = getRole()) {
+    return !isClosed(issue) && canCloseIssue(issue, role);
+  }
   function renderMoreActions(issue, request) {
     const closed = isClosed(issue);
     const role = getRole();
     const canManage = (role === 'agent' && samePerson(issue.agent, rolePerson(role))) || (role === 'manager' && samePerson(issue.manager, rolePerson(role)));
-    const canChangeProcess = role === 'manager' && samePerson(issue.manager, rolePerson(role));
     const canResolve = !closed && visibilityReleased(issue) && role === 'action-owner' && samePerson(issue.actionOwner, rolePerson(role));
     const actions = [
       ['resolution', 'bi-file-earmark-check', 'Provide resolution', !canResolve, 'Provide a formal resolution', 'Available to the action owner at any open stage'],
       ['assign', 'bi-person-plus', 'Reassign owner', closed || !canManage, 'Reassign the action owner', 'Available to agents and managers'],
-      ['process', 'bi-diagram-3', 'Change process', closed || !canChangeProcess, 'Change the approval process', 'Available to the issue manager'],
+      ['process', 'bi-diagram-3', 'Change process', !canChangeProcess(issue, role), 'Change the approval process', 'Available to the issue agent and manager'],
       ['close', 'bi-lock', 'Close issue', closed || !canCloseIssue(issue), 'Close the issue', 'Available to the agent or issue manager'],
       ['reopen', 'bi-arrow-counterclockwise', 'Reopen issue', !closed || !canCloseIssue(issue), 'Reopen the issue', 'Available to the agent or issue manager']
     ];
@@ -990,6 +1006,7 @@
     document.querySelectorAll('[data-issue-action]').forEach((button) => button.classList.remove('is-active'));
   }
   function openQuickActionPanel(action, issue, request) {
+    if (action === 'resolution-review' && !canReviewResolution(issue)) return;
     const panel = document.getElementById('quick-action-panel');
     if (!panel) return;
     restoreDefaultWorkInputs();
@@ -1052,9 +1069,9 @@
       return true;
     }
     if (['accept-close', 'accept-resolution', 'reject-resolution'].includes(action)) {
+      if (!canReviewResolution(issue)) { toast('Only the issue agent can decide a pending resolution.', 'error'); return false; }
       if (!requireRemark()) return false;
-      decideResolution(invoice, issue, action, remark, pendingFiles);
-      return true;
+      return decideResolution(invoice, issue, action, remark, pendingFiles);
     }
     if (action === 'assign') {
       if (!requireRemark()) return false;
@@ -1072,6 +1089,7 @@
       saveRecord(invoice, issue); toast(`Assigned to ${owner}.`, 'success'); return true;
     }
     if (action === 'process') {
+      if (!canChangeProcess(issue)) { toast('Only the issue agent or manager can change the approval process of an open issue.', 'error'); return false; }
       if (!requireRemark()) return false;
       const processId = document.getElementById('quick-process')?.value;
       const process = approvalData.processes.find((item) => item.id === processId);
@@ -1112,7 +1130,7 @@
     const customerDocuments = issueDocuments(invoice, issue, request);
     const docs = renderDocuments(invoice, issue, request);
     const pendingUpload = `<div id="pending-upload-list" class="uploadFileList${pendingFiles.length ? '' : ' hidden'}"><strong>Ready to attach:</strong> <span>${pendingFiles.map((file) => esc(file.name)).join(', ')}</span></div>`;
-    const upload = `<div class="uploadZone"><span class="uploadIcon"><i class="bi bi-cloud-arrow-up"></i></span><div class="uploadCopy"><strong>Attach supporting documents</strong><span>PDF, JPG, PNG, DOCX or XLSX</span><small>${esc(documentRequirement(issue))} ${customerDocuments.some((item) => String(item.requirement || '').toLowerCase() === documentRequirement(issue).toLowerCase()) ? 'is already available for this customer' : 'is requested for this issue'} · New uploads are reusable across this customer's invoices</small></div><button class="outlineButton uploadAction" type="button" data-trigger-upload data-requirement="${esc(documentRequirement(issue))}"><i class="bi bi-paperclip" aria-hidden="true"></i> Browse</button></div>${pendingUpload}`;
+    const upload = `<div class="uploadZone"><span class="uploadIcon"><i class="bi bi-cloud-arrow-up"></i></span><div class="uploadCopy"><strong>Attach supporting documents</strong><span>PDF, JPG, PNG, DOCX or XLSX</span><small>${esc(documentRequirement(issue))} ${customerDocuments.some((item) => String(item.requirement || '').toLowerCase() === documentRequirement(issue).toLowerCase()) ? 'is already available for this customer' : 'is requested for this issue'} · ${issue.documentScope === 'customer' ? 'Customer-level uploads are reusable across this customer’s invoices' : 'New uploads are tagged to this invoice only'}</small></div><button class="outlineButton uploadAction" type="button" data-trigger-upload data-requirement="${esc(documentRequirement(issue))}"><i class="bi bi-paperclip" aria-hidden="true"></i> Browse</button></div>${pendingUpload}`;
     const remarkLabel = state.key === 'approval' ? 'Additional context (optional)' : (state.key === 'resolution' ? 'Resolution' : 'Your remark');
     const remarkRequired = state.key === 'approval' ? '' : ' <span aria-hidden="true">*</span>';
     const remarkPlaceholder = state.key === 'approval' ? 'Optionally add supporting context for the next person.' : 'Explain what you checked, attached or decided. This is shown to the next person.';
@@ -1134,7 +1152,7 @@
 
   function attachFiles(invoice, issue, files, by) {
     issue.documents = Array.isArray(issue.documents) ? issue.documents : [];
-    files.forEach((file) => issue.documents.push({ name: file.name, requirement: file.requirement, uploadedBy: by, uploadedAt: isoNow(), sourceInvoice: invoice.id, sourceIssue: issue.id, customerCode: invoice.customerCode, customerName: invoice.customer }));
+    files.forEach((file) => issue.documents.push({ name: file.name, requirement: file.requirement, uploadedBy: by, uploadedAt: isoNow(), sourceInvoice: invoice.id, sourceIssue: issue.id, customerCode: invoice.customerCode, customerName: invoice.customer, scope: issue.documentScope || 'invoice', requirementId: issue.documentRequirementId || '', invoiceNo: invoice.id }));
   }
   function addIssueNotification(issue, invoice, type, recipients, title, message) {
     const people = [...new Set((recipients || []).map(cleanName).filter(Boolean))];
@@ -1339,17 +1357,13 @@
     attachFiles(invoice, issue, files, by); issue.stage = 4; issue.workflowStep = 'resolution-review'; issue.resolutionStatus = 'pending-review'; issue.resolutionVersion = Number(issue.resolutionVersion || 0) + 1; issue.resolutionProvidedBy = by; issue.resolutionProvidedAt = isoNow(); issue.assignedTo = issue.agent || 'Rahul Jain'; issue.assignmentRole = 'agent';
     issue.rejectionKind = ''; issue.rejectedBy = ''; issue.rejectedAt = '';
     issue.actionTrail.push({ who: by, what: `provided a resolution and assigned the issue to ${issue.assignedTo} for review`, type: 'resolution', when: isoNow(), remark, files });
-    saveRecord(invoice, issue); addIssueNotification(issue, invoice, 'resolution-review-required', [issue.agent, issue.manager], 'Resolution review required', `${by} provided a resolution for ${issue.subStatus}.`); toast(`Resolution saved and assigned to ${issue.assignedTo} for review.`, 'success');
+    saveRecord(invoice, issue); addIssueNotification(issue, invoice, 'resolution-review-required', [issue.agent], 'Resolution review required', `${by} provided a resolution for ${issue.subStatus}.`); toast(`Resolution saved and assigned to ${issue.assignedTo} for review.`, 'success');
   }
   function decideResolution(invoice, issue, decision, remark, files) {
-    if (issue.workflowStep !== 'resolution-review' || issue.resolutionDecisionVersion === issue.resolutionVersion) {
-      toast('This resolution version has already been decided.', 'error'); return;
+    if (!canReviewResolution(issue)) {
+      toast('Only the issue agent can decide a pending resolution.', 'error'); return false;
     }
     const by = rolePerson(getRole());
-    const role = getRole();
-    if (!(samePerson(by, issue.agent) && role === 'agent') && !(samePerson(by, issue.manager) && role === 'manager')) {
-      toast('Only the issue agent or manager can decide this resolution.', 'error'); return;
-    }
     const now = isoNow();
     attachFiles(invoice, issue, files, by);
     issue.resolutionDecisionVersion = issue.resolutionVersion;
@@ -1357,7 +1371,7 @@
       issue.resolutionStatus = 'rejected'; issue.workflowStep = 'resolution-work'; issue.assignedTo = issue.actionOwner; issue.assignmentRole = 'action-owner';
       issue.rejectionKind = 'resolution'; issue.rejectedBy = by; issue.rejectedAt = now;
       issue.actionTrail.push({ who: by, what: `rejected resolution version ${issue.resolutionVersion} and returned it to ${issue.actionOwner}`, type: 'resolution', when: now, remark, files });
-      saveRecord(invoice, issue); addIssueNotification(issue, invoice, 'resolution-rejected', [issue.actionOwner], 'Resolution rejected', `${by} returned ${issue.subStatus} for a revised resolution.`); toast('Resolution rejected and returned to the action owner.', 'error'); return;
+      saveRecord(invoice, issue); addIssueNotification(issue, invoice, 'resolution-rejected', [issue.actionOwner], 'Resolution rejected', `${by} returned ${issue.subStatus} for a revised resolution.`); toast('Resolution rejected and returned to the action owner.', 'error'); return true;
     }
     issue.rejectionKind = ''; issue.rejectedBy = ''; issue.rejectedAt = '';
     issue.resolutionStatus = 'accepted';
@@ -1368,6 +1382,7 @@
       issue.workflowStep = 'resolution-accepted'; issue.assignedTo = issue.agent; issue.assignmentRole = 'agent';
     }
     saveRecord(invoice, issue); addIssueNotification(issue, invoice, 'resolution-accepted', [issue.actionOwner], 'Resolution accepted', `${by} accepted the resolution for ${issue.subStatus}.`); toast(decision === 'accept-close' ? 'Resolution accepted and issue closed.' : 'Resolution accepted. The issue remains open.', 'success');
+    return true;
   }
 
   function sameApprovalMoment(left, right) {
@@ -1469,7 +1484,8 @@
       ['Issue no.', issue.id], ['Primary status', issue.primaryStatus], ['Substatus', issue.subStatus], ['Agent', issue.agent], ['Manager', issue.manager], ['FPR / SPR', `${issue.fpr || '—'} / ${issue.spr || '—'}`],
       ['Action owner', issue.actionOwner], ['Current step', workflow.label], ['Current assignee', workflow.currentAssignee || '—'], ['Manager approval', managerApprovalStatus(issue)], ['Matrix approval', latestRequest(issue.id)?.status || 'not submitted'], ['Invoice due amount', money(issue.invoiceDueAmount)], ['Invoice due date', prettyDate(issue.invoiceDueDate)], ['Region', issue.region || '—']
     ];
-    document.getElementById('complete-details-panel').innerHTML = `<h2>Complete details</h2><p>Reference information for this issue.</p><dl class="detailList">${fields.map(([label, value]) => `<div><dt>${esc(label)}</dt><dd>${esc(value || '—')}</dd></div>`).join('')}</dl>`;
+    const sharedImpact = issue.documentScope === 'customer' ? `<section class="sharedIssueImpact"><h2>${(issue.affectedInvoices || []).length} invoices impacted</h2><p>One customer-level document issue · ${(issue.activeAffectedInvoiceNos || []).length} currently blocked. Historical links remain after submission.</p><details><summary>View all linked invoices</summary><div class="sharedIssueInvoiceList">${(issue.affectedInvoices || []).map(item => `<a href="submission.html?invoice=${encodeURIComponent(item.invoiceNo)}"><strong>${esc(item.invoiceNo)}</strong><span>${esc(money(item.value))}</span></a>`).join('')}</div></details></section>` : '';
+    document.getElementById('complete-details-panel').innerHTML = `${sharedImpact}<h2>Complete details</h2><p>Reference information for this issue.</p><dl class="detailList">${fields.map(([label, value]) => `<div><dt>${esc(label)}</dt><dd>${esc(value || '—')}</dd></div>`).join('')}</dl>`;
   }
   const landing = document.getElementById('issue-tracker-landing');
   const detail = document.getElementById('issue-detail-page');

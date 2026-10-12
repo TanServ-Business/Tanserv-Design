@@ -1,0 +1,240 @@
+Window: "Inebura 3.0", App: Safari.
+0 standard window Inebura 3.0, ID: SafariWindow?IsSecure=true&UUID=953E25C6-E61B-4E33-9ED5-5ED57F99181E, Secondary Actions: Raise
+	1 split group
+		2 splitter (disabled, settable, float) -1
+		3 tab group
+			4 scroll area
+				5 HTML content Description: Inebura 3.0, URL: testclient.inebura.ai/dashboard/modules/ar/submissiondetails
+					6 container
+						7 button Open menu
+						8 button Go to dashboard
+						9 text Go to Dashboard
+						10 image Client logo
+						11 button Directory
+						12 pop-up button Start Tutorial
+						13 button Notifications
+						14 pop-up button User profile
+						15 heading Submission Details, Value: 1
+							16 text Submission Details
+						17 text Capture invoice submissions individually or in bulk. SUBMITTED INVOICES 732 NON SUBMITTED INVOICES 8 EXTERNALLY SUBMITTED 731 QUICK INFO Physical Submission 0 Emailed 1 Externally Submitted 731 INVOICES 
+						18 text field (settable) Search invoice no, customer name or customer code
+						19 button Submission Status ALL 
+						20 button Submission Date ALL
+						21 text 2 selected
+						22 button Bulk Submit
+						23 table
+							24 row (selectable) Description: Click to sort
+Click to sort
+Click to sort
+Click to sort
+Click to sort
+Click to sort
+Click to sort
+Click to sort
+Click to sort, Value: Customer Code
+
+
+Customer Name
+
+
+Invoice No
+
+
+Invoice Date
+
+
+Due Date
+
+
+Invoice Status
+
+
+Invoice Value
+
+
+Submission Status
+
+
+Submission Date
+
+
+Action
+								25 tickbox 0
+							26 row (selectable)
+								27 cell (selectable)
+									28 tickbox 1
+								29 cell (selectable) 94060526
+								30 cell (selectable) ALLIANCE MEDICAL SYSTEMS
+								31 cell (selectable) TN200009
+								32 cell (selectable) 07-06-2026
+								33 cell (selectable) 07-06-2026
+								34 cell (selectable) Submitted & Tracking
+								35 cell (selectable) ₹1,34,187
+								36 cell (selectable) External Submission
+								37 cell (selectable) 29-09-2026
+								38 cell (selectable) Submit
+							39 row (selectable)
+								40 cell (selectable)
+									41 tickbox 1
+								42 cell (selectable) 94060526
+								43 cell (selectable) ALLIANCE MEDICAL SYSTEMS
+								44 cell (selectable) TN200011
+								45 cell (selectable) 03-06-2026
+								46 cell (selectable) 13-06-2026
+								47 cell (selectable) Submitted & Tracking
+								48 cell (selectable) ₹1,45,100
+								49 cell (selectable) External Submission
+								50 cell (selectable) 30-09-2026
+								51 cell (selectable) Submit
+							52 row (selectable)
+								53 cell (selectable)
+									54 tickbox 0
+								55 cell (selectable) 94060526
+								56 cell (selectable) ALLIANCE MEDICAL SYSTEMS
+								57 cell (selectable) TN200012
+								58 cell (selectable) 25-06-2026
+								59 cell (selectable) 10-07-2026
+								60 cell (selectable) Submitted & Tracking
+								61 cell (selectable) ₹1,32,941
+								62 cell (selectable) External Submission
+								63 cell (selectable) 30-09-2026
+								64 cell (selectable) Submit
+							65 row (selectable)
+								66 cell (selectable)
+									67 tickbox 0
+								68 cell (selectable) 94060526
+								69 cell (selectable) ALLIANCE MEDICAL SYSTEMS
+								70 cell (selectable) TN200013
+								71 cell (selectable) 13-06-2026
+								72 cell (selectable) 03-07-2026
+								73 cell (selectable) Submitted & Tracking
+								74 cell (selectable) ₹1,30,421
+								75 cell (selectable) External Submission
+								76 cell (selectable) 30-09-2026
+								77 cell (selectable) Submit
+							78 row (selectable)
+								79 cell (selectable)
+									80 tickbox 0
+								81 cell (selectable) 94060526
+								82 cell (selectable) ALLIANCE MEDICAL SYSTEMS
+								83 cell (selectable) TN200014
+								84 cell (selectable) 01-06-2026
+								85 cell (selectable) 01-07-2026
+								86 cell (selectable) Submitted & Tracking
+								87 cell (selectable) ₹1,23,024
+								88 cell (selectable) External Submission
+								89 cell (selectable) 30-09-2026
+								90 cell (selectable) Submit
+							91 row (selectable)
+								92 cell (selectable)
+									93 tickbox 0
+								94 cell (selectable) 94060526
+								95 cell (selectable) ALLIANCE MEDICAL SYSTEMS
+								96 cell (selectable) TN200015
+								97 cell (selectable) 30-06-2026
+								98 cell (selectable) 14-08-2026
+								99 cell (selectable) Submitted & Tracking
+								100 cell (selectable) ₹1,20,915
+								101 cell (selectable) External Submission
+								102 cell (selectable) 30-09-2026
+								103 cell (selectable) Submit
+							104 row (selectable)
+								105 cell (selectable)
+									106 tickbox 0
+								107 cell (selectable) 94060526
+								108 cell (selectable) ALLIANCE MEDICAL SYSTEMS
+								109 cell (selectable) TN200017
+								110 cell (selectable) 15-06-2026
+								111 cell (selectable) 15-06-2026
+								112 cell (selectable) Submitted & Tracking
+								113 cell (selectable) ₹1,32,236
+								114 cell (selectable) External Submission
+								115 cell (selectable) 26-06-2026
+								116 cell (selectable) Submit
+							117 row (selectable)
+								118 cell (selectable)
+									119 tickbox 0
+								120 cell (selectable) 94004147
+								121 cell (selectable) ANAMDEV ENGINEERS
+								122 cell (selectable) TN200022
+								123 cell (selectable) 14-06-2026
+								124 cell (selectable) 19-06-2026
+								125 cell (selectable) Submitted & Tracking
+								126 cell (selectable) ₹1,05,472
+								127 cell (selectable) External Submission
+								128 cell (selectable) 26-06-2026
+								129 cell (selectable) Submit
+							130 row (selectable)
+								131 cell (selectable)
+									132 tickbox 0
+								133 cell (selectable) 94004147
+								134 cell (selectable) ANAMDEV ENGINEERS
+								135 cell (selectable) TN200023
+								136 cell (selectable) 21-06-2026
+								137 cell (selectable) 01-07-2026
+								138 cell (selectable) Submitted & Tracking
+								139 cell (selectable) ₹1,02,241
+								140 cell (selectable) External Submission
+								141 cell (selectable) 26-06-2026
+								142 cell (selectable) Submit
+							143 row (selectable)
+								144 cell (selectable)
+									145 tickbox 0
+								146 cell (selectable) 94004147
+								147 cell (selectable) ANAMDEV ENGINEERS
+								148 cell (selectable) TN200024
+								149 cell (selectable) 20-06-2026
+								150 cell (selectable) 05-07-2026
+								151 cell (selectable) Submitted & Tracking
+								152 cell (selectable) ₹1,04,012
+								153 cell (selectable) External Submission
+								154 cell (selectable) 26-06-2026
+								155 cell (selectable) Submit
+						156 text Showing 1–10 of 740
+						157 content list
+							158 button ‹
+							159 button 1
+							160 button 2
+							161 button 3
+							162 container …
+							163 button 74
+							164 button ›
+	165 tab group Description: Tab bar, 1 tab, 2 pinned tabs, ID: TabBar?isSeparate=false
+		166 tab Inbox | Action | Workingremotely | 8505040 | Details, Value: off, ID: TabBarTab?isNarrow=true&isExpanded=false&tabCount=&isPinned=true&isCluster=false&clusterID=&isActive=false
+			167 image FaviconImageView
+		168 tab Your work, Value: off, ID: TabBarTab?isNarrow=true&isExpanded=false&tabCount=&isPinned=true&isCluster=false&clusterID=&isActive=false
+			169 image FaviconImageView
+		170 tab Inebura 3.0, Help: To interact with the items in this button, press Control-Option-Shift-Down Arrow., Value: on, Secondary Actions: close tab, ID: TabBarTab?isNarrow=false&isExpanded=false&tabCount=&isPinned=false&isCluster=false&clusterID=&isActive=true
+			171 image FaviconImageView
+			172 text Value: Inebura 3.0, ID: UnifiedTabBarButton._titleTextField
+	173 toolbar
+		174 container Secondary Actions: Move previous, Move next, Remove from toolbar
+			175 button Description: show sidebar, Help: Show sidebar, ID: SidebarButton
+			176 menu button Description: Tab Group picker, ID: TabGroupPickerButton?TabGroup=
+		177 container BackForwardSegmentedControl
+			178 button Description: Go back, Help: Show the previous page, ID: BackButton
+			179 button (disabled) Description: Go forward, Help: Show the next page, ID: ForwardButton
+		180 container Secondary Actions: Move previous, Move next, Remove from toolbar
+			181 button Page Menu, ID: AssistantButton
+			182 button Add page to Reading List, ID: OneStepBookmarkingButton
+			183 text field (settable) Description: smart search field, Value: https://testclient.inebura.ai/dashboard/modules/ar/submissiondetails, ID: WEB_BROWSER_ADDRESS_AND_SEARCH_FIELD
+			184 button Reload this page, ID: ReloadButton
+		185 button Description: Downloads, ID: DownloadsButton, Secondary Actions: Move previous, Move next, Remove from toolbar
+		186 button Description: Share, ID: ShareButton, Secondary Actions: Move previous, Move next, Remove from toolbar
+		187 button Description: New Tab, ID: NewTabButton, Secondary Actions: Move previous, Move next, Remove from toolbar
+		188 button Description: Tab Overview, ID: TabOverviewButton, Secondary Actions: Move previous, Remove from toolbar
+	189 close button
+	190 full screen button Help: this button also has an action to zoom the window, Secondary Actions: zoom the window
+	191 minimise button
+192 menu bar
+	193 Safari
+	194 File
+	195 Edit
+	196 View, ID: SafariViewMenu
+	197 History
+	198 Bookmarks, ID: SafariBookmarksMenu
+	199 Develop
+	200 Window, ID: SafariWindowMenu
+	201 Help, ID: SafariHelpMenu
+
+The focused UI element is 5 HTML content Description: Inebura 3.0, URL: testclient.inebura.ai/dashboard/modules/ar/submissiondetails

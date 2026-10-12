@@ -1,0 +1,289 @@
+Window: "Inebura | Submission Details", App: Safari.
+0 standard window Inebura | Submission Details, ID: SafariWindow?IsSecure=false&UUID=953E25C6-E61B-4E33-9ED5-5ED57F99181E, Secondary Actions: Raise
+	1 split group
+		2 splitter (disabled, settable, float) -1
+		3 tab group
+			4 scroll area
+				5 HTML content Description: Inebura | Submission Details, URL: 127.0.0.1:8765/pages/submission.html
+					6 container
+						7 button Open menu
+						8 link Inebura logo, Value: 127.0.0.1:8765/pages/Dashboard_Agent.html
+						9 image Client logo
+						10 pop-up button Directory
+						11 button Start Tutorial
+						12 button Notifications
+						13 pop-up button User
+					14 container
+						15 heading Submission Details, Value: 1
+							16 text Submission Details
+						17 text Capture invoice submissions individually or in bulk. SUBMITTED INVOICES 732 NON SUBMITTED INVOICES 8 EXTERNALLY SUBMITTED 731
+						18 text QUICK INFO
+						19 text Physical Submission 0 Emailed 1 Externally Submitted 731 INVOICES
+						20 text field (settable) Search invoice no, customer name or customer code
+						21 pop-up button Submission Status ALL 
+						22 pop-up button Submission Date ALL
+						23 container Select submission date range
+							24 button Previous month
+							25 text October 2026
+							26 button Next month
+							27 text SUN MON TUE WED THU FRI SAT
+							28 button 1
+							29 button 2
+							30 button 3
+							31 button 4
+							32 button 5
+							33 button 6
+							34 button 7
+							35 button 8
+							36 button 9
+							37 button 10
+							38 button 11
+							39 button 12
+							40 button 13
+							41 button 14
+							42 button 15
+							43 button 16
+							44 button 17
+							45 button 18
+							46 button 19
+							47 button 20
+							48 button 21
+							49 button 22
+							50 button 23
+							51 button 24
+							52 button 25
+							53 button 26
+							54 button 27
+							55 button 28
+							56 button 29
+							57 button 30
+							58 button 31
+							59 text SELECT START DATE Start: -- End: --
+							60 button Clear
+							61 button (disabled) Apply
+						62 table Submission invoices
+							63 row (selectable) Select all invoices, Description: Select all invoices
+Click to sort
+Click to sort
+Click to sort
+Click to sort
+Click to sort
+Click to sort
+Click to sort
+Click to sort
+Click to sort, Value: Customer Code
+
+
+Customer Name
+
+
+Invoice No
+
+
+Invoice Date
+
+
+Due Date
+
+
+Invoice Status
+
+
+Invoice Value
+
+
+Submission Status
+
+
+Submission Date
+
+
+Action
+								64 tickbox Select all invoices, Value: 0
+							65 row (selectable)
+								66 cell (selectable) Select TN200009
+									67 tickbox Select TN200009, Value: 0
+								68 cell (selectable) 94060526
+								69 cell (selectable) ALLIANCE MEDICAL SYSTEMS
+								70 cell (selectable) TN200009
+								71 cell (selectable) 07-06-2026
+								72 cell (selectable) 07-06-2026
+								73 cell (selectable) Submitted & Tracking
+								74 cell (selectable) ₹1,34,187
+								75 cell (selectable) External Submission
+								76 cell (selectable) 29-09-2026
+								77 cell (selectable) Submit
+							78 row (selectable)
+								79 cell (selectable) Select TN200011
+									80 tickbox Select TN200011, Value: 0
+								81 cell (selectable) 94060526
+								82 cell (selectable) ALLIANCE MEDICAL SYSTEMS
+								83 cell (selectable) TN200011
+								84 cell (selectable) 03-06-2026
+								85 cell (selectable) 13-06-2026
+								86 cell (selectable) Submitted & Tracking
+								87 cell (selectable) ₹1,45,100
+								88 cell (selectable) External Submission
+								89 cell (selectable) 30-09-2026
+								90 cell (selectable) Submit
+							91 row (selectable)
+								92 cell (selectable) Select TN200012
+									93 tickbox Select TN200012, Value: 0
+								94 cell (selectable) 94060526
+								95 cell (selectable) ALLIANCE MEDICAL SYSTEMS
+								96 cell (selectable) TN200012
+								97 cell (selectable) 25-06-2026
+								98 cell (selectable) 10-07-2026
+								99 cell (selectable) Submitted & Tracking
+								100 cell (selectable) ₹1,32,941
+								101 cell (selectable) External Submission
+								102 cell (selectable) 30-09-2026
+								103 cell (selectable) Submit
+							104 row (selectable)
+								105 cell (selectable) Select TN200013
+									106 tickbox Select TN200013, Value: 0
+								107 cell (selectable) 94060526
+								108 cell (selectable) ALLIANCE MEDICAL SYSTEMS
+								109 cell (selectable) TN200013
+								110 cell (selectable) 13-06-2026
+								111 cell (selectable) 03-07-2026
+								112 cell (selectable) Submitted & Tracking
+								113 cell (selectable) ₹1,30,421
+								114 cell (selectable) External Submission
+								115 cell (selectable) 30-09-2026
+								116 cell (selectable) Submit
+							117 row (selectable)
+								118 cell (selectable) Select TN200014
+									119 tickbox Select TN200014, Value: 0
+								120 cell (selectable) 94060526
+								121 cell (selectable) ALLIANCE MEDICAL SYSTEMS
+								122 cell (selectable) TN200014
+								123 cell (selectable) 01-06-2026
+								124 cell (selectable) 01-07-2026
+								125 cell (selectable) Submitted & Tracking
+								126 cell (selectable) ₹1,23,024
+								127 cell (selectable) External Submission
+								128 cell (selectable) 30-09-2026
+								129 cell (selectable) Submit
+							130 row (selectable)
+								131 cell (selectable) Select TN200015
+									132 tickbox Select TN200015, Value: 0
+								133 cell (selectable) 94060526
+								134 cell (selectable) ALLIANCE MEDICAL SYSTEMS
+								135 cell (selectable) TN200015
+								136 cell (selectable) 30-06-2026
+								137 cell (selectable) 14-08-2026
+								138 cell (selectable) Submitted & Tracking
+								139 cell (selectable) ₹1,20,915
+								140 cell (selectable) External Submission
+								141 cell (selectable) 30-09-2026
+								142 cell (selectable) Submit
+							143 row (selectable)
+								144 cell (selectable) Select TN200017
+									145 tickbox Select TN200017, Value: 0
+								146 cell (selectable) 94060526
+								147 cell (selectable) ALLIANCE MEDICAL SYSTEMS
+								148 cell (selectable) TN200017
+								149 cell (selectable) 15-06-2026
+								150 cell (selectable) 15-06-2026
+								151 cell (selectable) Submitted & Tracking
+								152 cell (selectable) ₹1,32,236
+								153 cell (selectable) External Submission
+								154 cell (selectable) 26-06-2026
+								155 cell (selectable) Submit
+							156 row (selectable)
+								157 cell (selectable) Select TN200022
+									158 tickbox Select TN200022, Value: 0
+								159 cell (selectable) 94004147
+								160 cell (selectable) ANAMDEV ENGINEERS
+								161 cell (selectable) TN200022
+								162 cell (selectable) 14-06-2026
+								163 cell (selectable) 19-06-2026
+								164 cell (selectable) Submitted & Tracking
+								165 cell (selectable) ₹1,05,472
+								166 cell (selectable) External Submission
+								167 cell (selectable) 26-06-2026
+								168 cell (selectable) Submit
+							169 row (selectable)
+								170 cell (selectable) Select TN200023
+									171 tickbox Select TN200023, Value: 0
+								172 cell (selectable) 94004147
+								173 cell (selectable) ANAMDEV ENGINEERS
+								174 cell (selectable) TN200023
+								175 cell (selectable) 21-06-2026
+								176 cell (selectable) 01-07-2026
+								177 cell (selectable) Submitted & Tracking
+								178 cell (selectable) ₹1,02,241
+								179 cell (selectable) External Submission
+								180 cell (selectable) 26-06-2026
+								181 cell (selectable) Submit
+							182 row (selectable)
+								183 cell (selectable) Select TN200024
+									184 tickbox Select TN200024, Value: 0
+								185 cell (selectable) 94004147
+								186 cell (selectable) ANAMDEV ENGINEERS
+								187 cell (selectable) TN200024
+								188 cell (selectable) 20-06-2026
+								189 cell (selectable) 05-07-2026
+								190 cell (selectable) Submitted & Tracking
+								191 cell (selectable) ₹1,04,012
+								192 cell (selectable) External Submission
+								193 cell (selectable) 26-06-2026
+								194 cell (selectable) Submit
+						195 text Showing 1–10 of 740
+						196 container Invoice pages
+							197 content list
+								198 container ‹
+									199 button (disabled) ‹
+								200 button 1
+								201 button 2
+								202 button 3
+								203 container …
+								204 button 74
+								205 button ›
+					206 menu Secondary Actions: Cancel
+					207 menu Secondary Actions: Cancel
+					208 menu Secondary Actions: Cancel
+					209 menu Secondary Actions: Cancel
+	210 tab group Description: Tab bar, 2 tabs, 2 pinned tabs, ID: TabBar?isSeparate=false
+		211 tab Inbox | Action | Workingremotely | 8505040 | Details, Value: off, ID: TabBarTab?isNarrow=true&isExpanded=false&tabCount=&isPinned=true&isCluster=false&clusterID=&isActive=false
+			212 image FaviconImageView
+		213 tab Your work, Value: off, ID: TabBarTab?isNarrow=true&isExpanded=false&tabCount=&isPinned=true&isCluster=false&clusterID=&isActive=false
+			214 image FaviconImageView
+		215 tab Inebura 3.0, Value: off, Secondary Actions: close tab, ID: TabBarTab?isNarrow=false&isExpanded=false&tabCount=&isPinned=false&isCluster=false&clusterID=&isActive=false
+			216 image FaviconImageView
+			217 text Value: Inebura 3.0, ID: UnifiedTabBarButton._titleTextField
+		218 tab Inebura | Submission Details, Help: To interact with the items in this button, press Control-Option-Shift-Down Arrow., Value: on, Secondary Actions: close tab, ID: TabBarTab?isNarrow=false&isExpanded=false&tabCount=&isPinned=false&isCluster=false&clusterID=&isActive=true
+			219 image FaviconImageView
+			220 text Value: Inebura | Submission Details, ID: UnifiedTabBarButton._titleTextField
+	221 toolbar
+		222 container Secondary Actions: Move previous, Move next, Remove from toolbar
+			223 button Description: show sidebar, Help: Show sidebar, ID: SidebarButton
+			224 menu button Description: Tab Group picker, ID: TabGroupPickerButton?TabGroup=
+		225 container BackForwardSegmentedControl
+			226 button Description: Go back, Help: Show the previous page, ID: BackButton
+			227 button (disabled) Description: Go forward, Help: Show the next page, ID: ForwardButton
+		228 container Secondary Actions: Move previous, Move next, Remove from toolbar
+			229 button Page Menu, ID: AssistantButton
+			230 button Add page to Reading List, ID: OneStepBookmarkingButton
+			231 text field (settable) Description: smart search field, Value: 127.0.0.1:8765/pages/submission.html, ID: WEB_BROWSER_ADDRESS_AND_SEARCH_FIELD
+			232 button Reload this page, ID: ReloadButton
+		233 button Description: Downloads, ID: DownloadsButton, Secondary Actions: Move previous, Move next, Remove from toolbar
+		234 button Description: Share, ID: ShareButton, Secondary Actions: Move previous, Move next, Remove from toolbar
+		235 button Description: New Tab, ID: NewTabButton, Secondary Actions: Move previous, Move next, Remove from toolbar
+		236 button Description: Tab Overview, ID: TabOverviewButton, Secondary Actions: Move previous, Remove from toolbar
+	237 close button
+	238 full screen button Help: this button also has an action to zoom the window, Secondary Actions: zoom the window
+	239 minimise button
+240 menu bar
+	241 Safari
+	242 File
+	243 Edit
+	244 View, ID: SafariViewMenu
+	245 History
+	246 Bookmarks, ID: SafariBookmarksMenu
+	247 Develop
+	248 Window, ID: SafariWindowMenu
+	249 Help, ID: SafariHelpMenu
+
+The focused UI element is 5 HTML content Description: Inebura | Submission Details, URL: 127.0.0.1:8765/pages/submission.html

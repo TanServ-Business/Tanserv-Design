@@ -206,6 +206,11 @@ const resolvePath = (path) => {
   return `${rootPath}${cleaned}`;
 };
 
+const isAgentLandingPage = () => {
+  const pathname = window.location.pathname || "";
+  return /(?:^|\/)index\.html$/i.test(pathname) || pathname.endsWith("/");
+};
+
 const readStoredArray = (key) => {
   try {
     const raw = localStorage.getItem(key);
@@ -1396,7 +1401,7 @@ function getSeedStrategyIds() {
 }
 
 function seedStrategyNotifications() {
-  if (!/(?:^|\/)LPagent\.html$/i.test(window.location.pathname || "")) {
+  if (!isAgentLandingPage()) {
     return loadStrategyNotifications();
   }
   const existing = loadStrategyNotifications();
@@ -7972,7 +7977,7 @@ function renderInvoiceTable(invoices) {
   const actionLabel = isManagerView ? "Add remarks" : "New activity";
   const showAgentIconColumns = !isCustomerLandingView;
   const showStatusColumns = !isCustomerLandingView;
-  const showAgingColumn = /(?:^|\/)LPagent\.html$/i.test(window.location.pathname || "");
+  const showAgingColumn = isAgentLandingPage();
   const agingColorPalette = ["#2563eb", "#0f766e", "#7c3aed", "#b45309", "#be185d", "#166534"];
   const customer = getSelectedCustomerRecord();
   const customerId = customer?.id || selectedCustomerId;
@@ -12260,12 +12265,12 @@ function wireSideNavEvents() {
       if (!item) return;
       const moduleKey = item.getAttribute("data-module");
       const activeRole = String(localStorage.getItem("activeUserRole") || "").trim().toLowerCase();
-      const landingPath = activeRole === "customer" ? "pages/LPcustomer.html" : "LPagent.html";
+      const landingPath = activeRole === "customer" ? "pages/LPcustomer.html" : "index.html";
       const destinations = {
         "visit": "pages/visitmodule.html",
         "visit-review": "pages/visitmoduleReview.html",
         "landing": landingPath,
-        "landing-agent": "LPagent.html",
+        "landing-agent": "index.html",
         "landing-customer": "pages/LPcustomer.html",
         "landing-manager": "pages/LPmanager.html",
         "landing-backend": "pages/LPbackend.html",

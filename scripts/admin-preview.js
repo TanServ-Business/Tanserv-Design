@@ -1,4 +1,4 @@
-/* Admin-only preview boundary. Never reads or deletes the user's stored app data. */
+/* Generic Admin preview state stays in memory; Submission review rules use a separate shared local key. */
 (() => {
   "use strict";
   const params = new URLSearchParams(location.search);

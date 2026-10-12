@@ -1,0 +1,111 @@
+Window: "Inebura | Submission Details", App: Safari.
+0 standard window Inebura | Submission Details, ID: SafariWindow?IsSecure=false&UUID=953E25C6-E61B-4E33-9ED5-5ED57F99181E, Secondary Actions: Raise
+	1 split group
+		2 splitter (disabled, settable, float) -1
+		3 tab group
+			4 scroll area
+				5 HTML content Description: Inebura | Submission Details, URL: 127.0.0.1:8765/pages/submission.html
+					6 container
+						7 button Open menu
+						8 link Inebura logo, Value: 127.0.0.1:8765/pages/Dashboard_Agent.html
+						9 image Apollo logo
+						10 pop-up button Directory
+						11 button Notifications
+						12 pop-up button User
+					13 container
+						14 heading Submission Details, Value: 1
+							15 text Submission Details
+						16 text Capture invoice submissions individually or in bulk. SUBMITTED INVOICES 732 NON SUBMITTED INVOICES 8 EXTERNALLY SUBMITTED 731
+						17 text QUICK INFO
+						18 text INVOICES
+						19 text field (settable) Search invoice no, customer name or customer code
+						20 pop-up button (disabled) Submission Status ALL 
+						21 pop-up button Submission Date ALL
+						22 table Submission invoices
+							23 row (selectable) Select all invoices, Description: Select all invoices
+Click to sort
+Click to sort
+Click to sort
+Click to sort
+Click to sort
+Click to sort
+Click to sort
+Click to sort
+Click to sort, Value: Customer Code
+
+
+Customer Name
+
+
+Invoice No
+
+
+Invoice Date
+
+
+Due Date
+
+
+Invoice Status
+
+
+Invoice Value
+
+
+Submission Status
+
+
+Submission Date
+
+
+Action
+								24 tickbox Select all invoices, Value: 0
+						25 container Invoice pages
+							26 content list
+					27 menu Secondary Actions: Cancel
+					28 menu Secondary Actions: Cancel
+					29 menu Secondary Actions: Cancel
+					30 menu Secondary Actions: Cancel
+	31 tab group Description: Tab bar, 2 tabs, 2 pinned tabs, ID: TabBar?isSeparate=false
+		32 tab Inbox | Action | Workingremotely | 8505040 | Details, Value: off, ID: TabBarTab?isNarrow=true&isExpanded=false&tabCount=&isPinned=true&isCluster=false&clusterID=&isActive=false
+			33 image FaviconImageView
+		34 tab Your work, Value: off, ID: TabBarTab?isNarrow=true&isExpanded=false&tabCount=&isPinned=true&isCluster=false&clusterID=&isActive=false
+			35 image FaviconImageView
+		36 tab Inebura 3.0, Value: off, Secondary Actions: close tab, ID: TabBarTab?isNarrow=false&isExpanded=false&tabCount=&isPinned=false&isCluster=false&clusterID=&isActive=false
+			37 image FaviconImageView
+			38 text Value: Inebura 3.0, ID: UnifiedTabBarButton._titleTextField
+		39 tab Inebura | Submission Details, Help: To interact with the items in this button, press Control-Option-Shift-Down Arrow., Value: on, Secondary Actions: close tab, ID: TabBarTab?isNarrow=false&isExpanded=false&tabCount=&isPinned=false&isCluster=false&clusterID=&isActive=true
+			40 image FaviconImageView
+			41 text Value: Inebura | Submission Details, ID: UnifiedTabBarButton._titleTextField
+	42 toolbar
+		43 container Secondary Actions: Move previous, Move next, Remove from toolbar
+			44 button Description: show sidebar, Help: Show sidebar, ID: SidebarButton
+			45 menu button Description: Tab Group picker, ID: TabGroupPickerButton?TabGroup=
+		46 container BackForwardSegmentedControl
+			47 button Description: Go back, Help: Show the previous page, ID: BackButton
+			48 button (disabled) Description: Go forward, Help: Show the next page, ID: ForwardButton
+		49 container Secondary Actions: Move previous, Move next, Remove from toolbar
+			50 button Page Menu, ID: AssistantButton
+			51 button (disabled) Add page to Reading List, ID: OneStepBookmarkingButton
+			52 text field (settable) Description: smart search field, Value: 127.0.0.1:8765/pages/submission.html, ID: WEB_BROWSER_ADDRESS_AND_SEARCH_FIELD
+			53 button Translation Available, ID: TranslationButton
+			54 button Reload this page, ID: ReloadButton
+		55 button Description: Downloads, ID: DownloadsButton, Secondary Actions: Move previous, Move next, Remove from toolbar
+		56 button Description: Share, ID: ShareButton, Secondary Actions: Move previous, Move next, Remove from toolbar
+		57 button Description: New Tab, ID: NewTabButton, Secondary Actions: Move previous, Move next, Remove from toolbar
+		58 button Description: Tab Overview, ID: TabOverviewButton, Secondary Actions: Move previous, Remove from toolbar
+	59 close button
+	60 full screen button Help: this button also has an action to zoom the window, Secondary Actions: zoom the window
+	61 minimise button
+62 menu bar
+	63 Safari
+	64 File
+	65 Edit
+	66 View, ID: SafariViewMenu
+	67 History
+	68 Bookmarks, ID: SafariBookmarksMenu
+	69 Develop
+	70 Window, ID: SafariWindowMenu
+	71 Help, ID: SafariHelpMenu
+
+The focused UI element is 5 HTML content Description: Inebura | Submission Details, URL: 127.0.0.1:8765/pages/submission.html

@@ -8,7 +8,7 @@ The prototype has four separate roles: **Agent**, **Manager**, **Approver**, and
 
 ## User-facing pages
 
-- `LPagent.html`: creates an issue from an External Dependency activity. All primary-status and substatus combinations under External Dependency can be added to Issue Tracker.
+- `index.html`: creates an issue from an External Dependency activity. All primary-status and substatus combinations under External Dependency can be added to Issue Tracker.
 - `pages/issuetrackerLP.html`: overview cards and the invoice-grouped My Work, Open Issues, and Closed tables.
 - `pages/issuetrackerdetail.html`: the complete issue workspace for approvals, documents, remarks, resolutions, and administrative actions.
 - `bin/IssueTracker/escalationMatrix.html`: configures reusable approval processes and approver levels.
@@ -44,18 +44,19 @@ The prototype has four separate roles: **Agent**, **Manager**, **Approver**, and
 
 1. After publication, the current Action Owner can formally provide a resolution as documents, a remark, or both.
 2. A formal resolution submitted during Manager or matrix approval supersedes that approval and assigns the issue to the Agent for Resolution Review.
-3. The Agent or Manager may make the first formal decision on that resolution:
+3. Only the issue's Agent may review and decide the submitted resolution. Each resolution version can be decided once:
    - **Accept and close issue** accepts the contribution and closes the issue.
    - **Accept resolution** accepts the contribution, keeps the issue open, and assigns it to the Agent for the remaining work.
    - **Reject resolution** requires a remark and returns it to the current Action Owner for a revised resolution, without restarting Manager or matrix approval.
 4. Accepted documents satisfy matching document placeholders. A remark-only resolution can satisfy information requests such as a PO number.
+5. Resolution review is assigned and notified only to the issue's Agent. The Manager can monitor and contribute to a visible issue and use the separate Close issue action, but cannot review or decide its resolution.
 
 ### Administrative actions
 
 - Only an Agent or Manager can close an open issue. A closing remark is mandatory, and pending approvals are superseded.
 - Reopening by an Agent returns to Manager approval (or the configured skip route). Reopening by a Manager goes directly to the Action Owner.
 - Reassigning during approval changes the future Action Owner. Reassigning during resolution work changes both Action Owner and current assignee.
-- Changing the approval matrix requires Manager approval and starts the new matrix at L1. Historical decisions remain in the trail.
+- The issue Agent or Manager can request an approval-process change on an open issue with a mandatory remark. Action Owners and Approvers cannot. The request supersedes active approvals, goes to the issue Manager for approval, and starts the new matrix at L1 after acceptance. Historical decisions remain in the trail.
 - There is no separate **Resend for Approval** action.
 
 ## Customer documents
@@ -91,7 +92,7 @@ Invoice/customer portfolio data and approval setup are preserved when issue reco
 3. Manager acceptance routes to matrix L1 or the Action Owner; rejection routes to the Agent.
 4. An Agent corrective remark restarts approval correctly, while another user's remark does not.
 5. Matrix acceptance advances one level and rejection returns to Agent correction without hiding prior history.
-6. A formal resolution supersedes active approval and exposes all three Agent/Manager review decisions.
+6. A formal resolution supersedes active approval, assigns and notifies the issue's Agent, and exposes all three resolution decisions only to that Agent. Manager, Approver, Action Owner, and unrelated users cannot invoke those decisions.
 7. Rejected issues are highlighted in existing tables without adding a new tab.
 8. Customer documents appear across that customer's invoices with source metadata.
 9. In-app notifications use the correct event template and never bypass the publication gate.

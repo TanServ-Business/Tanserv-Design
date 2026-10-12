@@ -1,0 +1,116 @@
+.adminRuntimePage[data-admin-module="submission-process"] .adminSourceWorkspace{overflow:visible;border:0;border-radius:0;background:transparent;box-shadow:none}
+.adminRuntimePage[data-admin-module="submission-process"] .adminWorkspaceHeader{min-height:54px;margin-bottom:24px;border:0;padding:0 24px;background:#fff}
+.adminRuntimePage[data-admin-module="submission-process"] .adminWorkspaceBody{padding:24px 40px 40px;border:1px solid #e2e8f4;border-radius:16px;background:#fff;box-shadow:0 12px 28px rgba(15,23,42,.05)}
+.adminSubmissionStrategyHeader{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:0 0 24px}
+.adminSubmissionStrategyHeader h2{margin:0;color:#667085;font-size:16px;font-weight:500}
+.adminSubmissionStrategyName{display:grid;gap:4px}
+.adminSubmissionStrategyName strong{color:#344054;font-size:12px}
+.adminSubmissionStrategyName small{color:#667085;font-size:11px}
+.adminSubmissionStatus,.adminSubmissionApplyOn{display:inline-flex;align-items:center;padding:5px 10px;border:1px solid #c8ead3;border-radius:999px;background:#e6f8eb;color:#27653e;font-size:10px;font-weight:800;letter-spacing:.03em}
+.adminSubmissionStatus i{margin-right:5px;font-size:8px}
+.adminSubmissionStatus.is-muted{border-color:#e5e7eb;background:#f3f4f6;color:#667085}
+.adminSubmissionApplyOn{border-color:#e5e7eb;background:#fff;color:#344054}
+.adminRuntimePage[data-admin-module="submission-process"] .adminRuntimeTags i{border:1px solid #d0e4f4;background:#e9f5fc;color:#31556d}
+.adminRuntimePage[data-admin-module="submission-process"] .adminPager[hidden]{display:none}
+.adminRuntimePage[data-admin-module="submission-process"] .adminTableWrap{border:0;border-radius:0}
+.adminRuntimePage[data-admin-module="submission-process"] .adminTable thead th:first-child{border-radius:10px 0 0 0}
+.adminRuntimePage[data-admin-module="submission-process"] .adminTable thead th:last-child{border-radius:0 10px 0 0}
+.adminReviewRules{width:100%;max-width:none;box-sizing:border-box;border:1px solid #e2e8f4;border-radius:12px;background:#fff;overflow:hidden;color:#1f2937}
+.adminReviewRulesHeader{padding:20px 24px;border-bottom:1px solid #e2e8f4;background:#fff}
+.adminReviewRulesHeader h2{margin:0 0 5px;font-size:18px;line-height:1.3}
+.adminReviewRulesHeader p{margin:0;color:#64748b;font-size:13px}
+.adminReviewRulesContent{display:grid;gap:24px;padding:24px}
+.adminReviewRulesField{display:grid;gap:8px;max-width:380px;color:#344054;font-size:13px;font-weight:700}
+.adminReviewRulesField abbr{color:#b42318;text-decoration:none}
+.adminReviewRulesField small{color:#64748b;font-size:12px;font-weight:400;line-height:1.4}
+.adminReviewRulesInput{display:flex;align-items:center;gap:10px}
+.adminReviewRulesInput input{width:115px;min-height:40px;border:1px solid #cbd5e1;border-radius:7px;padding:8px 10px;color:#1f2937;font:inherit;font-weight:500}
+.adminReviewRulesInput input:focus-visible{outline:2px solid #7138db;outline-offset:2px}
+.adminReviewRulesInput>span{color:#475467;font-weight:500}
+.adminReviewRulesNote{padding:16px 18px;border:1px solid #e8eaf0;border-radius:9px;background:#f8fafc}
+.adminReviewRulesNote h3{margin:0 0 8px;font-size:13px}
+.adminReviewRulesNote ul{margin:0;padding-left:19px;color:#475467;font-size:12px;line-height:1.6}
+.adminReviewRulesNote li+li{margin-top:6px}
+.adminReviewRulesFooter{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 24px;border-top:1px solid #e2e8f4}
+.adminReviewRulesFooter p{min-height:18px;margin:0;color:#067647;font-size:12px}
+.adminReviewRulesFooter p.is-error{color:#b42318}
+.adminSubmissionEmail{display:grid;gap:24px}
+.adminSubmissionEmailCard{padding:18px 16px 26px;border:1px solid #e5e7eb;border-radius:16px;background:#fff;box-shadow:0 5px 16px rgba(15,23,42,.04)}
+.adminSubmissionEmailCard h2{margin:0 0 16px;color:#667085;font-size:13px;font-weight:700;letter-spacing:.04em}
+.adminSubmissionFailover{padding:20px 16px}
+.adminSubmissionFailover strong{display:flex;align-items:center;gap:10px;color:#111827;font-size:13px}
+.adminSubmissionFailover strong span{padding:5px 10px;border:1px solid #b7e4c5;border-radius:999px;background:#e8f7ec;color:#24713b;font-size:11px}
+.adminSubmissionFailover p{margin:7px 0 0;color:#64748b;font-size:12px;line-height:1.4}
+.adminSubmissionEmailField,.adminSubmissionEmailLabel{display:block;margin:0 0 8px;color:#667085;font-size:12px;font-weight:800}
+.adminSubmissionEmailField abbr{color:#b42318;text-decoration:none}
+.adminSubmissionEmailCard select{width:100%;min-height:40px;padding:8px 10px;border:1px solid #e2e8f4;border-radius:9px;background:#fff;color:#111827;font-size:12px}
+.adminSubmissionEmailContacts{display:flex;gap:18px;flex-wrap:wrap}
+.adminSubmissionEmailContacts label{display:inline-flex;align-items:center;gap:8px;color:#111827;font-size:12px;font-weight:700;cursor:pointer}
+.adminSubmissionEmailContacts input{width:35px;height:19px;margin:0;accent-color:#55227d;cursor:pointer}
+.adminSubmissionEmail>footer{display:flex;justify-content:flex-end;align-items:center;gap:16px}
+.adminSubmissionEmail>footer p{margin:0;color:#067647;font-size:12px}
+@media(max-width:620px){.adminRuntimePage[data-admin-module="submission-process"] .adminWorkspaceHeader{padding:0 16px}.adminRuntimePage[data-admin-module="submission-process"] .adminWorkspaceBody{padding:16px}.adminSubmissionStrategyHeader{align-items:stretch;flex-direction:column}.adminReviewRulesHeader,.adminReviewRulesContent,.adminReviewRulesFooter{padding:16px}.adminReviewRulesFooter{align-items:stretch;flex-direction:column}.adminReviewRulesFooter button{width:100%}}
+
+/* The live Strategy Manager uses the full Admin workspace width. */
+.adminRuntimePage[data-admin-module="submission-process"]{width:100%;max-width:none;box-sizing:border-box}
+.adminRuntimePage[data-admin-module="submission-process"] .adminWorkspaceBody:has(.adminSubmissionStrategy){padding:40px 40px 48px}
+.adminSubmissionStrategy{width:100%;min-width:0}
+.adminSubmissionStrategy>.adminSubmissionStrategyHeader{margin-bottom:24px;padding:0;background:transparent;color:#667085}
+.adminSubmissionStrategyTableWrap{width:100%;overflow-x:auto}
+.adminSubmissionStrategyTable{width:100%;min-width:1020px;border-collapse:separate;border-spacing:0;color:#344054;font-size:12px}
+.adminSubmissionStrategyTable thead th{padding:16px;text-align:left;white-space:nowrap;background:#4b1f75;color:#fff;font-size:11px;font-weight:800}
+.adminSubmissionStrategyTable thead th:first-child{border-radius:10px 0 0 0}
+.adminSubmissionStrategyTable thead th:last-child{border-radius:0 10px 0 0}
+.adminSubmissionStrategyTable th button{display:inline-flex;align-items:center;gap:4px;padding:0;border:0;background:transparent;color:inherit;font:inherit;font-weight:inherit;cursor:pointer}
+.adminSubmissionStrategyTable th i{font-size:9px;color:#aa8dc6}
+.adminSubmissionStrategyTable td{padding:15px 16px;border-bottom:1px solid #eef0f4;vertical-align:middle;white-space:nowrap}
+.adminSubmissionStrategyTable tr:last-child td{border-bottom:0}
+.adminSubmissionStrategyTable tbody tr:hover{background:#fcfbfd}
+.adminSubmissionStrategyTable .adminSubmissionStatus{white-space:nowrap}
+.adminSubmissionStrategyTable .adminSubmissionStrategyName small{min-height:14px}
+.adminSubmissionDocs{display:inline-flex;align-items:center;padding:5px 11px;border:1px solid #d0e4f4;border-radius:999px;background:#e9f5fc;color:#31556d;font-size:11px;font-weight:800;letter-spacing:.03em}
+.adminSubmissionRowActions{display:flex;gap:8px}
+.adminSubmissionRowActions button{display:inline-flex;align-items:center;gap:5px;padding:8px 12px;border:1px solid #e5dcf2;border-radius:8px;background:#f5f0fa;color:#55227d;font-size:11px;font-weight:800;cursor:pointer}
+.adminSubmissionRowActions button:last-child{border-color:#f2d7d8;background:#fff4f4;color:#b42318}
+.adminSubmissionRowActions button:hover{filter:brightness(.96)}
+.adminSubmissionEmpty{padding:30px!important;text-align:center;color:#64748b}
+
+.adminSubmissionStrategyModal{width:min(800px,calc(100vw - 32px));height:min(650px,calc(100vh - 40px));max-height:none;display:flex;flex-direction:column;overflow:hidden;border-radius:16px}
+.adminSubmissionStrategyModal>header{flex:none;padding:18px 20px;background:#f6f0fa;border-bottom:1px solid #e6dded;color:#42205d}
+.adminSubmissionStrategyModal>header h2{font-size:17px}
+.adminSubmissionStrategyModal form{flex:1;min-height:0;overflow-y:auto}
+.adminSubmissionStrategyFields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 24px;padding:20px}
+.adminSubmissionFormField{display:grid;gap:9px;color:#667085;font-size:12px;font-weight:800;letter-spacing:.025em}
+.adminSubmissionFormField>span{display:inline-flex;align-items:center;gap:3px}
+.adminSubmissionFormField abbr{color:#b42318;text-decoration:none}
+.adminSubmissionFormField input,.adminSubmissionFormField select,.adminSubmissionNewProduct{width:100%;height:40px;min-height:40px;box-sizing:border-box;border:1px solid #e0e4eb;border-radius:9px;padding:9px 10px;background:#fff;color:#1f2937;font:inherit;font-size:12px;font-weight:500;letter-spacing:0}
+.adminSubmissionFormField input:focus-visible,.adminSubmissionFormField select:focus-visible,.adminSubmissionDocumentSearch input:focus-visible,.adminSubmissionNewProduct:focus-visible{outline:2px solid #7138db;outline-offset:2px}
+.adminSubmissionWide,.adminSubmissionTypeHint,.adminSubmissionAgent,.adminSubmissionDocuments,.adminSubmissionProductField{grid-column:1/-1}
+.adminSubmissionTypeHint{margin:-10px 0 0;padding:9px 12px;border-radius:5px;background:#e7f6fa;color:#317a8e;font-size:12px}
+.adminSubmissionAgent{display:flex;align-items:center;gap:12px;padding:15px 16px;border-radius:7px;background:#f6f7f9;color:#667085;font-size:12px}
+.adminSubmissionAgent input{appearance:none;position:relative;width:42px;height:22px;flex:none;margin:0;border:1px solid #c9ced8;border-radius:999px;background:#d8dce5;cursor:pointer;transition:background .15s ease}
+.adminSubmissionAgent input::before{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 3px #0002;transition:transform .15s ease}
+.adminSubmissionAgent input:checked{border-color:#55227d;background:#55227d}
+.adminSubmissionAgent input:checked::before{transform:translateX(20px)}
+.adminSubmissionAgent input:focus-visible{outline:2px solid #7138db;outline-offset:2px}
+.adminSubmissionAgent strong{min-width:90px;line-height:1.25}
+.adminSubmissionAgent span{color:#475467;line-height:1.45}
+.adminSubmissionDocuments{display:grid;gap:10px;margin-top:4px}
+.adminSubmissionDocumentSearch{display:flex;align-items:center;gap:8px;min-height:40px;border:1px solid #e0e4eb;border-radius:9px;padding:0 12px;color:#9aa4b2}
+.adminSubmissionDocumentSearch input{width:100%;border:0;outline:0;background:transparent;font-size:12px}
+.adminSubmissionDocumentList{height:242px;overflow:auto;border:1px solid #e0e4eb;border-radius:7px}
+.adminSubmissionDocumentList label{display:flex;align-items:center;gap:7px;min-height:28px;box-sizing:border-box;padding:5px 7px;border-bottom:1px solid #eceff3;color:#344054;font-size:12px;font-weight:750;cursor:pointer}
+.adminSubmissionDocumentList label[hidden]{display:none}
+.adminSubmissionDocumentList input{margin:0;accent-color:#55227d}
+.adminSubmissionSelectAll{position:sticky;top:0;z-index:1;background:#fff}
+.adminSubmissionSelectAll span{margin-left:auto;color:#667085;font-size:11px;font-weight:400}
+.adminSubmissionStrategyModal>footer{flex:none;justify-content:space-between;padding:14px 20px;background:#fafbfc;border-top:1px solid #e0e4eb}
+.adminSubmissionModalActions{display:flex;align-items:center;gap:9px}
+.adminSubmissionPause,.adminSubmissionDeleteButton{min-height:37px;padding:8px 15px;border:1px solid #f0d4d4;border-radius:9px;background:#fbe8e8;color:#922b2b;font-size:12px;font-weight:800;cursor:pointer}
+.adminSubmissionProductField{display:flex;align-items:end;gap:10px}
+.adminSubmissionProductField .adminSubmissionFormField{flex:1}
+.adminSubmissionProductField .adminSecondary{min-height:40px;white-space:nowrap}
+.adminSubmissionNewProduct{max-width:210px}
+.adminSubmissionDeleteModal{width:min(460px,calc(100vw - 32px))}
+.adminSubmissionDeleteModal>p{margin:0;padding:22px;color:#475467;font-size:13px}
+@media(max-width:700px){.adminRuntimePage[data-admin-module="submission-process"] .adminWorkspaceBody:has(.adminSubmissionStrategy){padding:20px 16px}.adminSubmissionStrategyFields{grid-template-columns:1fr}.adminSubmissionStrategyModal{height:min(650px,calc(100vh - 24px))}.adminSubmissionAgent{align-items:flex-start;flex-wrap:wrap}.adminSubmissionAgent span{width:100%}.adminSubmissionProductField{flex-wrap:wrap}.adminSubmissionStrategyModal>footer{gap:10px}.adminSubmissionModalActions{flex-wrap:wrap;justify-content:flex-end}}

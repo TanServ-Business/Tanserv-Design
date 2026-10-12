@@ -226,6 +226,263 @@ test('one approval click renders one trail event while preserving the request au
   assert.match(managerApproval, /startMatrixApproval\(invoice, issue, remark, files, by, approvalDescription\)/, 'manager decision and matrix handoff must be recorded as one combined event');
 });
 
+function loadProcessChangeFixture(role, user) {
+  const issue = {
+    id: 'ISS_PROCESS', invoiceNo: 'INV_PROCESS', isCustom: true, title: 'PO Copy Required', subStatus: 'PO Copy Required',
+    status: 'Open', agent: 'Aditi Sharma', manager: 'Mukesh Mishra', actionOwner: 'Neha Gupta',
+    approvalProcessId: 'PROC_OLD', approvalMatrixId: 'MATRIX_OLD', managerApprovalStatus: 'Approved',
+    matrixApprovalStatus: 'pending', workflowStep: 'approver-l2', assignedTo: 'Priya Verma', assignmentRole: 'approver',
+    initialVisibilityReleased: true, actionTrail: [], documents: []
+  };
+  const matrices = [
+    { id: 'MATRIX_OLD', name: 'Old route', levels: [{ ownerName: 'Anoop Sharma' }, { ownerName: 'Priya Verma' }] },
+    { id: 'MATRIX_NEW', name: 'New route', levels: [{ ownerName: 'Kavita Nair' }, { ownerName: 'Vikram Singh' }] }
+  ];
+  const storage = new LocalStorageFixture({
+    customIssues: json([issue]),
+    approval_processes: json([
+      { id: 'PROC_OLD', process: 'Old process', matrixId: 'MATRIX_OLD' },
+      { id: 'PROC_NEW', process: 'New process', matrixId: 'MATRIX_NEW' }
+    ]),
+    approval_matrices: json(matrices),
+    approval_requests: json([{
+      id: 'APR_OLD', issue: { id: issue.id }, status: 'pending', currentLevel: 2,
+      levels: matrices[0].levels.map((level, index) => ({ ...level, level: index + 1, status: index ? 'pending' : 'approved' })),
+      createdAt: '2026-01-01T00:00:00.000Z', trail: [{ action: 'approved', by: 'Anoop Sharma', level: 1, at: '2026-01-01T00:01:00.000Z' }]
+    }])
+  });
+  const config = loadConfig(storage);
+  storage.setItem(config.KEYS.version, config.VERSION);
+  const fields = {
+    'work-remark': { value: 'Use the revised approval route.', focus() {} },
+    'quick-process': { value: 'PROC_NEW' },
+    'work-form-error': { textContent: '' },
+    'current-action': { innerHTML: '' },
+    'quick-action-panel': { innerHTML: '', dataset: {}, classList: { add() {}, remove() {} }, querySelector() { return null; } }
+  };
+  const location = { search: `?${new URLSearchParams({ role, user })}` };
+  const window = { IssueTrackerConfig: config };
+  const marker = "  const landing = document.getElementById('issue-tracker-landing');";
+  assert.ok(trackerSource.includes(marker));
+  // Expose the real runtime functions inside this VM only; production has no test API.
+  const source = trackerSource.replace(marker, `
+    window.workflowTest = { renderMoreActions, performQuickAction, findRecord, latestRequest, actionState, renderCurrentAction, openQuickActionPanel, decideResolution };
+    ${marker}`);
+  vm.runInNewContext(source, {
+    window, localStorage: storage, location, URLSearchParams, console,
+    document: { getElementById: (id) => fields[id] || null, querySelectorAll: () => [] }
+  }, { filename: TRACKER_PATH });
+  return {
+    storage, fields, api: window.workflowTest,
+    record: () => window.workflowTest.findRecord('INV_PROCESS', issue.id),
+    login(nextRole, nextUser) { location.search = `?${new URLSearchParams({ role: nextRole, user: nextUser })}`; }
+  };
+}
+
+test('Change process is enabled only for the issue Agent and Manager on open issues', () => {
+  const cases = [
+    ['agent', 'Aditi Sharma', true], ['manager', 'Mukesh Mishra', true],
+    ['agent', 'Rahul Jain', false], ['manager', 'Meera Iyer', false],
+    ['approver', 'Priya Verma', false], ['action-owner', 'Neha Gupta', false],
+    ['action-owner', 'Aditi Sharma', false]
+  ];
+  for (const [role, user, allowed] of cases) {
+    const fixture = loadProcessChangeFixture(role, user);
+    const { invoice, issue } = fixture.record();
+    const button = fixture.api.renderMoreActions(issue).match(/<button\b[^>]*data-issue-action="process"[^>]*>/)?.[0];
+    assert.ok(button, 'the process action must remain represented in the action menu');
+    assert.equal(button.includes('aria-disabled="false"'), allowed, `${role}/${user} action availability`);
+    if (!allowed) {
+      const before = json(issue);
+      const storedBefore = [...fixture.storage.values.entries()];
+      assert.equal(fixture.api.performQuickAction('process', invoice, issue, fixture.api.latestRequest(issue.id), []), false);
+      assert.equal(json(issue), before, 'blocked handler must not change the issue');
+      assert.deepEqual([...fixture.storage.values.entries()], storedBefore, 'blocked handler must not change storage');
+    }
+    issue.status = 'Closed';
+    const closedButton = fixture.api.renderMoreActions(issue).match(/<button\b[^>]*data-issue-action="process"[^>]*>/)?.[0];
+    assert.ok(closedButton.includes('aria-disabled="true"'));
+    assert.equal(fixture.api.performQuickAction('process', invoice, issue, null, []), false, 'closed issues cannot change process');
+  }
+});
+
+test('Agent and Manager process changes route through Manager review and preserve approval history', () => {
+  for (const [role, user] of [['agent', 'Aditi Sharma'], ['manager', 'Mukesh Mishra']]) {
+    for (const decision of ['approve', 'reject']) {
+      const fixture = loadProcessChangeFixture(role, user);
+      let { invoice, issue } = fixture.record();
+      fixture.fields['work-remark'].value = '';
+      assert.equal(fixture.api.performQuickAction('process', invoice, issue, fixture.api.latestRequest(issue.id), []), false, 'a process change requires a remark');
+      assert.equal(parse(fixture.storage, 'approval_requests')[0].status, 'pending');
+      fixture.fields['work-remark'].value = 'Use the revised approval route.';
+      fixture.fields['quick-process'].value = 'MISSING_PROCESS';
+      assert.equal(fixture.api.performQuickAction('process', invoice, issue, fixture.api.latestRequest(issue.id), []), false, 'invalid processes must not cancel approvals');
+      assert.equal(parse(fixture.storage, 'approval_requests')[0].status, 'pending');
+      fixture.fields['quick-process'].value = 'PROC_NEW';
+      const files = [{ name: 'route-context.pdf', requirement: 'Supporting document' }];
+      assert.equal(fixture.api.performQuickAction('process', invoice, issue, fixture.api.latestRequest(issue.id), files), true);
+      ({ invoice, issue } = fixture.record());
+      assert.equal(issue.pendingProcessId, 'PROC_NEW');
+      assert.equal(issue.approvalProcessId, 'PROC_OLD', 'the selected process waits for Manager approval');
+      assert.equal(issue.workflowStep, 'manager-review');
+      assert.equal(issue.managerApprovalStatus, 'Pending');
+      assert.equal(issue.assignedTo, 'Mukesh Mishra');
+      assert.equal(issue.assignmentRole, 'manager');
+      assert.equal(issue.initialVisibilityReleased, true);
+      assert.equal(issue.documents[0].uploadedBy, user);
+      const change = issue.actionTrail.at(-1);
+      assert.equal(change.type, 'process');
+      assert.equal(change.who, user);
+      assert.match(change.what, /requested approval process change \(New process\)/);
+      assert.equal(change.remark, 'Use the revised approval route.');
+      assert.equal(change.files[0].name, 'route-context.pdf');
+      let requests = parse(fixture.storage, 'approval_requests');
+      assert.equal(requests[0].status, 'superseded');
+      assert.equal(requests[0].trail[0].action, 'approved', 'the earlier L1 decision remains in the audit');
+      assert.equal(requests[0].trail.at(-1).action, 'superseded');
+
+      fixture.login('manager', 'Mukesh Mishra');
+      assert.equal(fixture.api.performQuickAction(decision, invoice, issue, fixture.api.latestRequest(issue.id), []), true);
+      ({ issue } = fixture.record());
+      requests = parse(fixture.storage, 'approval_requests');
+      assert.equal(issue.pendingProcessId, '');
+      assert.equal(requests[0].status, 'superseded');
+      if (decision === 'approve') {
+        assert.equal(issue.approvalProcessId, 'PROC_NEW');
+        assert.equal(issue.approvalMatrixId, 'MATRIX_NEW');
+        assert.equal(issue.workflowStep, 'approver-l1');
+        assert.equal(issue.assignedTo, 'Kavita Nair');
+        assert.equal(issue.assignmentRole, 'approver');
+        assert.equal(requests.length, 2);
+        assert.equal(requests[1].currentLevel, 1);
+        assert.equal(requests[1].levels[0].status, 'pending');
+        assert.equal(requests[1].levels[1].status, 'waiting');
+        assert.match(issue.actionTrail.at(-1).what, /approved the changed approval process.*Approver 1/);
+      } else {
+        assert.equal(issue.approvalProcessId, 'PROC_OLD');
+        assert.equal(issue.approvalMatrixId, 'MATRIX_OLD');
+        assert.equal(issue.workflowStep, 'agent-correction');
+        assert.equal(issue.assignedTo, 'Aditi Sharma');
+        assert.equal(requests.length, 1);
+        assert.match(issue.actionTrail.at(-1).what, /rejected the approval process change/);
+      }
+      assert.equal(issue.actionTrail.at(-1).who, 'Mukesh Mishra');
+    }
+  }
+});
+
+function loadResolutionReviewFixture(role, user) {
+  const fixture = loadProcessChangeFixture('action-owner', 'Neha Gupta');
+  const { invoice, issue } = fixture.record();
+  fixture.fields['work-remark'].value = 'The requested PO copy is attached.';
+  assert.equal(fixture.api.performQuickAction('resolution', invoice, issue, fixture.api.latestRequest(issue.id), [{ name: 'po.pdf', requirement: 'PO Copy Required' }]), true);
+  fixture.login(role, user);
+  return fixture;
+}
+
+test('resolution submission assigns and notifies only the issue Agent for review', () => {
+  const fixture = loadResolutionReviewFixture('agent', 'Aditi Sharma');
+  const { issue } = fixture.record();
+  assert.equal(issue.workflowStep, 'resolution-review');
+  assert.equal(issue.assignedTo, 'Aditi Sharma');
+  assert.equal(issue.assignmentRole, 'agent');
+  assert.equal(issue.resolutionVersion, 1);
+  assert.equal(parse(fixture.storage, 'approval_requests')[0].status, 'superseded');
+  const notifications = parse(fixture.storage, 'ineburaNotificationCenter');
+  const review = notifications.filter(note => note.type === 'issue-resolution-review-required');
+  assert.equal(review.length, 1);
+  assert.deepEqual(review[0].audienceUsers, ['Aditi Sharma']);
+  assert.equal(issue.actionTrail.at(-1).who, 'Neha Gupta');
+  assert.match(issue.actionTrail.at(-1).what, /assigned the issue to Aditi Sharma for review/);
+});
+
+test('only the issue Agent sees resolution review controls or can invoke resolution decisions', () => {
+  const cases = [
+    ['agent', 'Aditi Sharma', true], ['agent', 'Rahul Jain', false],
+    ['manager', 'Mukesh Mishra', false], ['approver', 'Priya Verma', false],
+    ['action-owner', 'Neha Gupta', false], ['manager', 'Aditi Sharma', false]
+  ];
+  for (const [role, user, allowed] of cases) {
+    const fixture = loadResolutionReviewFixture(role, user);
+    const { invoice, issue } = fixture.record();
+    const request = fixture.api.latestRequest(issue.id);
+    const state = fixture.api.actionState(issue, role);
+    assert.equal(state.key, allowed ? 'resolution-review' : 'waiting', `${role}/${user} review visibility`);
+    fixture.api.renderCurrentAction(invoice, issue, state, request);
+    assert.equal(fixture.fields['current-action'].innerHTML.includes('data-issue-action="resolution-review"'), allowed);
+    fixture.api.openQuickActionPanel('resolution-review', issue, request);
+    const panel = fixture.fields['quick-action-panel'].innerHTML;
+    for (const decision of ['accept-close', 'accept-resolution', 'reject-resolution']) {
+      assert.equal(panel.includes(`data-quick-decision="${decision}"`), allowed);
+      if (allowed) continue;
+      const before = json(issue);
+      const storedBefore = [...fixture.storage.values.entries()];
+      const files = [{ name: 'unauthorized.pdf', requirement: 'Supporting document' }];
+      assert.equal(fixture.api.performQuickAction(decision, invoice, issue, request, files), false);
+      assert.equal(fixture.api.decideResolution(invoice, issue, decision, 'Attempted decision', files), false);
+      assert.equal(json(issue), before, 'blocked decisions cannot mutate resolution, documents or trail');
+      assert.deepEqual([...fixture.storage.values.entries()], storedBefore, 'blocked decisions cannot persist changes or notifications');
+    }
+  }
+});
+
+test('Agent resolution decisions keep their routing, trail, notifications and one-decision version lock', () => {
+  for (const decision of ['accept-close', 'accept-resolution', 'reject-resolution']) {
+    const fixture = loadResolutionReviewFixture('agent', 'Aditi Sharma');
+    let { invoice, issue } = fixture.record();
+    fixture.fields['work-remark'].value = '';
+    assert.equal(fixture.api.performQuickAction(decision, invoice, issue, fixture.api.latestRequest(issue.id), []), false, 'resolution decisions still require a remark');
+    fixture.fields['work-remark'].value = 'Agent reviewed the submitted resolution.';
+    assert.equal(fixture.api.performQuickAction(decision, invoice, issue, fixture.api.latestRequest(issue.id), []), true);
+    ({ invoice, issue } = fixture.record());
+    assert.equal(issue.resolutionDecisionVersion, issue.resolutionVersion);
+    assert.equal(issue.actionTrail.at(-1).who, 'Aditi Sharma');
+    assert.equal(issue.actionTrail.at(-1).type, 'resolution');
+    assert.equal(issue.actionTrail.at(-1).remark, 'Agent reviewed the submitted resolution.');
+    assert.equal(issue.status, decision === 'accept-close' ? 'Closed' : 'Open');
+    assert.equal(issue.workflowStep, decision === 'accept-close' ? 'closed' : (decision === 'accept-resolution' ? 'resolution-accepted' : 'resolution-work'));
+    assert.equal(issue.assignedTo, decision === 'accept-close' ? '' : (decision === 'accept-resolution' ? 'Aditi Sharma' : 'Neha Gupta'));
+    assert.equal(issue.resolutionStatus, decision === 'reject-resolution' ? 'rejected' : 'accepted');
+    const note = parse(fixture.storage, 'ineburaNotificationCenter').find(item => item.type === (decision === 'reject-resolution' ? 'issue-resolution-rejected' : 'issue-resolution-accepted'));
+    assert.deepEqual(note.audienceUsers, ['Neha Gupta']);
+    const storedBefore = [...fixture.storage.values.entries()];
+    assert.equal(fixture.api.performQuickAction(decision, invoice, issue, fixture.api.latestRequest(issue.id), []), false, 'a completed version cannot be decided twice');
+    assert.deepEqual([...fixture.storage.values.entries()], storedBefore);
+    if (decision === 'reject-resolution') {
+      fixture.login('action-owner', 'Neha Gupta');
+      assert.equal(fixture.api.performQuickAction('resolution', invoice, issue, fixture.api.latestRequest(issue.id), []), true);
+      fixture.login('agent', 'Aditi Sharma');
+      ({ invoice, issue } = fixture.record());
+      assert.equal(issue.resolutionVersion, 2);
+      assert.equal(fixture.api.actionState(issue, 'agent').key, 'resolution-review');
+      assert.equal(fixture.api.performQuickAction('accept-resolution', invoice, issue, fixture.api.latestRequest(issue.id), []), true);
+      assert.equal(fixture.record().issue.resolutionDecisionVersion, 2);
+    }
+  }
+});
+
+test('Manager retains independent Close issue and initial approval without deciding a resolution', () => {
+  const fixture = loadResolutionReviewFixture('manager', 'Mukesh Mishra');
+  let { invoice, issue } = fixture.record();
+  const close = fixture.api.renderMoreActions(issue).match(/<button\b[^>]*data-issue-action="close"[^>]*>/)?.[0];
+  assert.ok(close.includes('aria-disabled="false"'));
+  assert.equal(fixture.api.performQuickAction('close', invoice, issue, fixture.api.latestRequest(issue.id), []), true);
+  ({ issue } = fixture.record());
+  assert.equal(issue.status, 'Closed');
+  assert.equal(issue.resolutionStatus, 'pending-review', 'independent closure must not accept or reject the resolution');
+  assert.notEqual(issue.resolutionDecisionVersion, issue.resolutionVersion);
+  assert.equal(issue.actionTrail.at(-1).type, 'closure');
+  assert.equal(issue.actionTrail.at(-1).who, 'Mukesh Mishra');
+
+  const initial = loadProcessChangeFixture('manager', 'Mukesh Mishra');
+  ({ invoice, issue } = initial.record());
+  Object.assign(issue, { workflowStep: 'manager-review', managerApprovalStatus: 'Pending', assignedTo: 'Mukesh Mishra', assignmentRole: 'manager', initialVisibilityReleased: false });
+  assert.equal(initial.api.actionState(issue, 'manager').key, 'approval');
+  assert.equal(initial.api.performQuickAction('approve', invoice, issue, initial.api.latestRequest(issue.id), []), true);
+  assert.equal(initial.record().issue.managerApprovalStatus, 'Approved');
+  assert.equal(initial.record().issue.workflowStep, 'approver-l1');
+});
+
 let failures = 0;
 for (const { name, run } of tests) {
   try {

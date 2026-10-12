@@ -72,6 +72,11 @@
     return true;
   }
 
+  // New submission issues must never be erased by the old demo clean-slate migration.
+  function ensureWorkflowVersion() {
+    localStorage.setItem(KEYS.version, VERSION);
+  }
+
   const usersForRole = (role) => users.filter((user) => user.role === role);
   const defaultUser = (role) => usersForRole(role)[0]?.name || '';
   const roleOf = (name) => users.find((user) => user.name.toLowerCase() === String(name || '').trim().toLowerCase())?.role || '';
@@ -131,6 +136,7 @@
     roleOf,
     settings,
     ensureCleanSlate,
+    ensureWorkflowVersion,
     ensureApprovalData
   };
 })();

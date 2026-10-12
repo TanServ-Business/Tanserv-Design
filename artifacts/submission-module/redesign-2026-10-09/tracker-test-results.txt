@@ -1,0 +1,9 @@
+✓ clean slate removes issues but preserves invoice containers and unrelated app data
+✓ role directory assigns exactly one role per user and derives each role list
+✓ issue tracker has no fallback issue seed path
+✓ every External dependency can create an issue using the exact selected substatus
+✓ initial visibility gate does not notify or expose the Action Owner early
+✓ approved workflow states and primary actions remain represented
+✓ one approval click renders one trail event while preserving the request audit
+
+7 workflow contract tests passed.

@@ -1,0 +1,230 @@
+Window: "Inebura | Submission Details", App: Safari.
+0 standard window Inebura | Submission Details, ID: SafariWindow?IsSecure=false&UUID=953E25C6-E61B-4E33-9ED5-5ED57F99181E, Secondary Actions: Raise
+	1 split group
+		2 splitter (disabled, settable, float) -1
+		3 tab group
+			4 scroll area
+				5 HTML content Description: Inebura | Submission Details, URL: 127.0.0.1:8765/pages/submission.html
+					6 container
+						7 button Open menu
+						8 link Inebura logo, Value: 127.0.0.1:8765/pages/Dashboard_Agent.html
+						9 image Client logo
+						10 pop-up button Directory
+						11 button Start Tutorial
+						12 button Notifications
+						13 pop-up button User
+					14 container
+						15 heading Submission Details, Value: 1
+							16 text Submission Details
+						17 text Capture invoice submissions individually or in bulk. Activity trail saved successfully. SUBMITTED INVOICES 732 NON SUBMITTED INVOICES 8 EXTERNALLY SUBMITTED 731
+						18 text QUICK INFO
+						19 text Physical Submission 0 Emailed 1 Externally Submitted 731 INVOICES
+						20 text field (settable) Search invoice no, customer name or customer code
+						21 pop-up button Submission Status NOT SUBMITTED 
+						22 pop-up button Submission Date ALL
+						23 button Clear Filters
+						24 table Submission invoices
+							25 row (selectable) Select all invoices, Description: Select all invoices
+Click to sort
+Click to sort
+Click to sort
+Click to sort
+Click to sort
+Click to sort
+Click to sort
+Click to sort
+Click to sort, Value: Customer Code
+
+
+Customer Name
+
+
+Invoice No
+
+
+Invoice Date
+
+
+Due Date
+
+
+Invoice Status
+
+
+Invoice Value
+
+
+Submission Status
+
+
+Submission Date
+
+
+Action
+								26 tickbox Select all invoices, Value: 0
+							27 row (selectable)
+								28 cell (selectable) Select TVS545661
+									29 tickbox Select TVS545661, Value: 0
+								30 cell (selectable) 94669526
+								31 cell (selectable) Raos Health Care
+								32 cell (selectable) TVS545661
+								33 cell (selectable) 21-08-2026
+								34 cell (selectable) 21-08-2026
+								35 cell (selectable) Not Submitted & Tracking
+								36 cell (selectable) ₹10,000
+								37 cell (selectable) Not Submitted
+								38 cell (selectable) 09-10-2026
+								39 cell (selectable) Submit
+Add Issue
+							40 row (selectable)
+								41 cell (selectable) Select TVS545662
+									42 tickbox Select TVS545662, Value: 0
+								43 cell (selectable) 94669526
+								44 cell (selectable) Raos Health Care
+								45 cell (selectable) TVS545662
+								46 cell (selectable) 21-08-2026
+								47 cell (selectable) 21-08-2026
+								48 cell (selectable) Not Submitted & Untouched
+								49 cell (selectable) ₹10,000
+								50 cell (selectable) Not Submitted
+								51 cell (selectable) —
+								52 cell (selectable) Submit
+Add Issue
+							53 row (selectable)
+								54 cell (selectable) Select IV523232
+									55 tickbox Select IV523232, Value: 0
+								56 cell (selectable) 94060526
+								57 cell (selectable) ALLIANCE MEDICAL SYSTEMS
+								58 cell (selectable) IV523232
+								59 cell (selectable) 01-09-2026
+								60 cell (selectable) 25-09-2026
+								61 cell (selectable) Not Submitted & Untouched
+								62 cell (selectable) ₹21,000
+								63 cell (selectable) Not Submitted
+								64 cell (selectable) —
+								65 cell (selectable) Submit
+Add Issue
+							66 row (selectable)
+								67 cell (selectable) Select FT6567567
+									68 tickbox Select FT6567567, Value: 0
+								69 cell (selectable) 94496698
+								70 cell (selectable) Criticam Medical Systems LLP
+								71 cell (selectable) FT6567567
+								72 cell (selectable) 09-09-2026
+								73 cell (selectable) 02-10-2026
+								74 cell (selectable) Not Submitted & Tracking
+								75 cell (selectable) ₹3,31,000
+								76 cell (selectable) Not Submitted
+								77 cell (selectable) —
+								78 cell (selectable) Submit
+Add Issue
+							79 row (selectable)
+								80 cell (selectable) Select DV5623526
+									81 tickbox Select DV5623526, Value: 0
+								82 cell (selectable) 6734001
+								83 cell (selectable) Forties Hospital Noida
+								84 cell (selectable) DV5623526
+								85 cell (selectable) 02-09-2026
+								86 cell (selectable) 02-09-2026
+								87 cell (selectable) Not Submitted & Untouched
+								88 cell (selectable) ₹17,000
+								89 cell (selectable) Not Submitted
+								90 cell (selectable) —
+								91 cell (selectable) Submit
+Add Issue
+							92 row (selectable)
+								93 cell (selectable) Select SU6472864327
+									94 tickbox Select SU6472864327, Value: 0
+								95 cell (selectable) 94266641
+								96 cell (selectable) PRAMODINI MEDICARE LIMITED
+								97 cell (selectable) SU6472864327
+								98 cell (selectable) 07-09-2026
+								99 cell (selectable) 23-09-2026
+								100 cell (selectable) Not Submitted & Untouched
+								101 cell (selectable) ₹21,000
+								102 cell (selectable) Not Submitted
+								103 cell (selectable) —
+								104 cell (selectable) Submit
+Add Issue
+							105 row (selectable)
+								106 cell (selectable) Select TN656457687
+									107 tickbox Select TN656457687, Value: 0
+								108 cell (selectable) 94060526
+								109 cell (selectable) ALLIANCE MEDICAL SYSTEMS
+								110 cell (selectable) TN656457687
+								111 cell (selectable) 29-09-2026
+								112 cell (selectable) 12-04-2048
+								113 cell (selectable) Not Submitted & Untouched
+								114 cell (selectable) ₹8,76,78,76,687
+								115 cell (selectable) Not Submitted
+								116 cell (selectable) —
+								117 cell (selectable) Submit
+Add Issue
+							118 row (selectable)
+								119 cell (selectable) Select CF54561
+									120 tickbox Select CF54561, Value: 0
+								121 cell (selectable) 94003975
+								122 cell (selectable) POSTGRADUATE INSTT OF MEDICAL
+								123 cell (selectable) CF54561
+								124 cell (selectable) 08-09-2026
+								125 cell (selectable) 30-09-2026
+								126 cell (selectable) Not Submitted & Untouched
+								127 cell (selectable) ₹21,000
+								128 cell (selectable) Not Submitted
+								129 cell (selectable) —
+								130 cell (selectable) Submit
+Add Issue
+						131 text Showing 1–8 of 8
+						132 container Invoice pages
+							133 content list
+								134 container ‹
+									135 button (disabled) ‹
+								136 button 1
+								137 container ›
+									138 button (disabled) ›
+					139 menu Secondary Actions: Cancel
+					140 menu Secondary Actions: Cancel
+					141 menu Secondary Actions: Cancel
+					142 menu Secondary Actions: Cancel
+	143 tab group Description: Tab bar, 2 tabs, 2 pinned tabs, ID: TabBar?isSeparate=false
+		144 tab Inbox | Action | Workingremotely | 8505040 | Details, Value: off, ID: TabBarTab?isNarrow=true&isExpanded=false&tabCount=&isPinned=true&isCluster=false&clusterID=&isActive=false
+			145 image FaviconImageView
+		146 tab Your work, Value: off, ID: TabBarTab?isNarrow=true&isExpanded=false&tabCount=&isPinned=true&isCluster=false&clusterID=&isActive=false
+			147 image FaviconImageView
+		148 tab Inebura 3.0, Value: off, Secondary Actions: close tab, ID: TabBarTab?isNarrow=false&isExpanded=false&tabCount=&isPinned=false&isCluster=false&clusterID=&isActive=false
+			149 image FaviconImageView
+			150 text Value: Inebura 3.0, ID: UnifiedTabBarButton._titleTextField
+		151 tab Inebura | Submission Details, Help: To interact with the items in this button, press Control-Option-Shift-Down Arrow., Value: on, Secondary Actions: close tab, ID: TabBarTab?isNarrow=false&isExpanded=false&tabCount=&isPinned=false&isCluster=false&clusterID=&isActive=true
+			152 image FaviconImageView
+			153 text Value: Inebura | Submission Details, ID: UnifiedTabBarButton._titleTextField
+	154 toolbar
+		155 container Secondary Actions: Move previous, Move next, Remove from toolbar
+			156 button Description: show sidebar, Help: Show sidebar, ID: SidebarButton
+			157 menu button Description: Tab Group picker, ID: TabGroupPickerButton?TabGroup=
+		158 container BackForwardSegmentedControl
+			159 button Description: Go back, Help: Show the previous page, ID: BackButton
+			160 button (disabled) Description: Go forward, Help: Show the next page, ID: ForwardButton
+		161 container Secondary Actions: Move previous, Move next, Remove from toolbar
+			162 button Page Menu, ID: AssistantButton
+			163 button Add page to Reading List, ID: OneStepBookmarkingButton
+			164 text field (settable) Description: smart search field, Value: 127.0.0.1:8765/pages/submission.html, ID: WEB_BROWSER_ADDRESS_AND_SEARCH_FIELD
+			165 button Reload this page, ID: ReloadButton
+		166 button Description: Downloads, ID: DownloadsButton, Secondary Actions: Move previous, Move next, Remove from toolbar
+		167 button Description: Share, ID: ShareButton, Secondary Actions: Move previous, Move next, Remove from toolbar
+		168 button Description: New Tab, ID: NewTabButton, Secondary Actions: Move previous, Move next, Remove from toolbar
+		169 button Description: Tab Overview, ID: TabOverviewButton, Secondary Actions: Move previous, Remove from toolbar
+	170 close button
+	171 full screen button Help: this button also has an action to zoom the window, Secondary Actions: zoom the window
+	172 minimise button
+173 menu bar
+	174 Safari
+	175 File
+	176 Edit
+	177 View, ID: SafariViewMenu
+	178 History
+	179 Bookmarks, ID: SafariBookmarksMenu
+	180 Develop
+	181 Window, ID: SafariWindowMenu
+	182 Help, ID: SafariHelpMenu
+
+The focused UI element is 5 HTML content Description: Inebura | Submission Details, URL: 127.0.0.1:8765/pages/submission.html

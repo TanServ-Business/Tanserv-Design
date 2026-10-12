@@ -419,7 +419,7 @@
   const dashboardPath = resolvePath(getDashboardPath());
   const getLandingPath = () => {
     const role = (localStorage.getItem("activeUserRole") || "").trim().toLowerCase();
-    return role === "customer" ? "pages/LPcustomer.html" : "LPagent.html";
+    return role === "customer" ? "pages/LPcustomer.html" : "index.html";
   };
   const landingPath = resolvePath(getLandingPath());
 
@@ -664,7 +664,7 @@
         </a>
         <div class="submenu">
           <a class="submenu-link" href="${landingPath}" data-module="landing">Landing Page</a>
-          <a class="submenu-link" href="${resolvePath("LPagent.html")}" data-module="landing-agent">Landing Page - Agent</a>
+          <a class="submenu-link" href="${resolvePath("index.html")}" data-module="landing-agent">Landing Page - Agent</a>
           <a class="submenu-link" href="${resolvePath("pages/LPcustomer.html")}" data-module="landing-customer">Landing Page - Customer</a>
           <a class="submenu-link" href="${resolvePath("pages/LPmanager.html")}" data-module="landing-manager">Landing Page - Manager</a>
           <a class="submenu-link" href="${resolvePath("pages/dashManager.html")}" data-module="landing-manager-drilldown">Landing Page - Manager Drilldown</a>
@@ -1131,13 +1131,13 @@
           const moduleKey = item.getAttribute("data-module");
           if (!moduleKey) return;
           const activeRole = (localStorage.getItem("activeUserRole") || "").trim().toLowerCase();
-          const landingDestination = activeRole === "customer" ? "pages/LPcustomer.html" : "LPagent.html";
+          const landingDestination = activeRole === "customer" ? "pages/LPcustomer.html" : "index.html";
           const destinations = {
             visit: "pages/visitmodule.html",
             "visit-review": "pages/visitmoduleReview.html",
             "visit-manager-plan": "pages/visitmoduleReview.html",
             landing: landingDestination,
-            "landing-agent": "LPagent.html",
+            "landing-agent": "index.html",
             "landing-customer": "pages/LPcustomer.html",
             "landing-manager": "pages/LPmanager.html",
             "landing-manager-drilldown": "pages/dashManager.html",
@@ -1339,8 +1339,8 @@
           ["visit", "Visit Module", "pages/visitmodule.html", "Visit plan and route actions are ready for review."],
           ["visit-review", "Visit Module Review", "pages/visitmoduleReview.html", "Visit approvals are waiting in the manager review queue."],
           ["visit-manager-plan", "Manager Visit Plan", "pages/visitmoduleReview.html", "Manager visit plan has pending field-route updates."],
-          ["landing", "Landing Page", "LPagent.html", "Landing page workbench has refreshed portfolio actions."],
-          ["landing-agent", "Landing Page - Agent", "LPagent.html", "Agent landing page has new invoice follow-up actions."],
+          ["landing", "Landing Page", "index.html", "Landing page workbench has refreshed portfolio actions."],
+          ["landing-agent", "Landing Page - Agent", "index.html", "Agent landing page has new invoice follow-up actions."],
           ["landing-customer", "Landing Page - Customer", "pages/LPcustomer.html", "Customer landing page has new invoice and response updates."],
           ["landing-manager", "Landing Page - Manager", "pages/LPmanager.html", "Manager landing page has team exceptions to review."],
           ["landing-manager-drilldown", "Landing Page - Manager Drilldown", "pages/dashManager.html", "Manager drilldown has a fresh portfolio variance."],
@@ -1397,7 +1397,7 @@
               ["Queue", "High-priority invoices"],
               ["New items", "12"]
             ),
-            ctas: open("Open landing page", "LPagent.html")
+            ctas: open("Open landing page", "index.html")
           },
           {
             id: "dummy-dashboard-alert-1",
@@ -2703,7 +2703,7 @@
         notificationList.addEventListener("click", (event) => {
           const runAction = (action, href) => {
             const role = String(localStorage.getItem("activeUserRole") || "").trim().toLowerCase();
-            const landingPath = role === "customer" ? "pages/LPcustomer.html" : "LPagent.html";
+            const landingPath = role === "customer" ? "pages/LPcustomer.html" : "index.html";
             if (action === "open-pdc") {
               const target = role === "ops" || role === "pdc-ops" ? "pages/PDCOps.html" : "pages/PDCagent.html";
               window.location.href = resolvePath(target);

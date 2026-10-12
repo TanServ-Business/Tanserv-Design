@@ -4,19 +4,19 @@
 Story
 
 ## Summary
-Productize the notification center flow so PDC, email, commitment, issue, and related workflow notifications are generated, filtered, displayed, and routed consistently between `LPagent.html` and `scripts/shared-header.js`.
+Productize the notification center flow so PDC, email, commitment, issue, and related workflow notifications are generated, filtered, displayed, and routed consistently between `index.html` and `scripts/shared-header.js`.
 
 ## Background
-The current prototype uses `LPagent.html` to seed PDC lifecycle demo notifications into browser `localStorage`, while `scripts/shared-header.js` owns the shared notification bell UI, badge count, popup rendering, read state, role/user filtering, issue notification sync, and navigation routing.
+The current prototype uses `index.html` to seed PDC lifecycle demo notifications into browser `localStorage`, while `scripts/shared-header.js` owns the shared notification bell UI, badge count, popup rendering, read state, role/user filtering, issue notification sync, and navigation routing.
 
 This works for the static prototype, but the notification contract is spread across page-level seed logic and shared-header rendering logic. Productizing this needs a single documented notification payload contract and verified behavior across the landing page, notification bell, activity trail, and downstream module routing.
 
 ## Source Anchors
-- `LPagent.html:2987` defines notification storage keys: `ineburaNotificationCenter`, `ineburaPdcRecords`, and `ineburaPdcNotifications`.
-- `LPagent.html:2992` defines the seven PDC lifecycle statuses and app/email copy.
-- `LPagent.html:3072` seeds sample PDC records for `PDC logged`, `PDC dispatched`, `PDC received`, `PDC details incorrect`, `PDC banked`, `PDC cleared`, and `PDC bounced`.
-- `LPagent.html:3196` writes seeded PDC app notifications, email draft notifications, legacy PDC notification entries, and PDC records into `localStorage`.
-- `LPagent.html:3324` renders the LP Agent activity trail from seeded PDC app/email notifications.
+- `index.html:2987` defines notification storage keys: `ineburaNotificationCenter`, `ineburaPdcRecords`, and `ineburaPdcNotifications`.
+- `index.html:2992` defines the seven PDC lifecycle statuses and app/email copy.
+- `index.html:3072` seeds sample PDC records for `PDC logged`, `PDC dispatched`, `PDC received`, `PDC details incorrect`, `PDC banked`, `PDC cleared`, and `PDC bounced`.
+- `index.html:3196` writes seeded PDC app notifications, email draft notifications, legacy PDC notification entries, and PDC records into `localStorage`.
+- `index.html:3324` renders the LP Agent activity trail from seeded PDC app/email notifications.
 - `scripts/shared-header.js:776` initializes the shared notification system when the PDC module script is not present.
 - `scripts/shared-header.js:832` maps active user role to notification audience.
 - `scripts/shared-header.js:853` filters visible notifications by audience, scheduled state, and `audienceUsers`.
@@ -28,7 +28,7 @@ This works for the static prototype, but the notification contract is spread acr
 - `scripts/shared-header.js:2001` performs initial notification sync and listens for relevant `storage` changes.
 
 ## Current Behavior
-- `LPagent.html` seeds PDC notifications directly into `ineburaNotificationCenter` using `type: "pdc"` for app updates and `type: "email"` for email drafts.
+- `index.html` seeds PDC notifications directly into `ineburaNotificationCenter` using `type: "pdc"` for app updates and `type: "email"` for email drafts.
 - The same LP Agent seeding also writes legacy PDC status rows into `ineburaPdcNotifications`.
 - The LP Agent activity trail renders only seeded notification IDs beginning with `seed-lp-pdc-app:` or `seed-lp-pdc-email:`.
 - The shared header renders all visible notifications from `ineburaNotificationCenter`.
@@ -75,7 +75,7 @@ Notification behavior is functional but prototype-oriented. The source of truth,
 - Reworking the visual design of the header or bell popup.
 
 ## QA Checklist
-- Load `LPagent.html` with empty localStorage and confirm PDC app/email notifications seed only when demo mode is enabled.
+- Load `index.html` with empty localStorage and confirm PDC app/email notifications seed only when demo mode is enabled.
 - Open the notification bell and verify title, tag, timestamp, message, details, CTA, and read control for PDC app and email notifications.
 - Mark one notification as read and verify the badge count changes.
 - Use `activeUserRole` values `agent`, `ops`, and `pdc-ops` and verify PDC routing.

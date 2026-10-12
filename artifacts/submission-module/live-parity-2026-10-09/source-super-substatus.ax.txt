@@ -1,0 +1,171 @@
+Window: "Inebura 3.0", App: Safari.
+0 standard window Inebura 3.0, ID: SafariWindow?IsSecure=true&UUID=953E25C6-E61B-4E33-9ED5-5ED57F99181E, Secondary Actions: Raise
+	1 split group
+		2 splitter (disabled, settable, float) -1
+		3 tab group
+			4 scroll area
+				5 HTML content Description: Inebura 3.0, URL: testclient.inebura.ai/dashboard/modules/ar/submissiondetails
+					6 container
+						7 button Open menu
+						8 button Go to dashboard
+						9 text Go to Dashboard
+						10 image Client logo
+						11 button Directory
+						12 pop-up button Start Tutorial
+						13 button Notifications
+						14 pop-up button User profile
+						15 heading Submission Details, Value: 1
+							16 text Submission Details
+						17 text Capture invoice submissions individually or in bulk. SUBMITTED INVOICES 732 NON SUBMITTED INVOICES 8 EXTERNALLY SUBMITTED 731 QUICK INFO Physical Submission 0 Emailed 1 Externally Submitted 731 INVOICES 
+						18 text field (settable) Search invoice no, customer name or customer code
+						19 button Submission Status NOT SUBMITTED 
+						20 button Submission Date ALL
+						21 button Clear Filters
+						22 table
+							23 row (selectable) Description: Click to sort
+Click to sort
+Click to sort
+Click to sort
+Click to sort
+Click to sort
+Click to sort
+Click to sort
+Click to sort, Value: Customer Code
+
+
+Customer Name
+
+
+Invoice No
+
+
+Invoice Date
+
+
+Due Date
+
+
+Invoice Status
+
+
+Invoice Value
+
+
+Submission Status
+
+
+Submission Date
+
+
+Action
+								24 tickbox (disabled) 0
+							25 row (selectable)
+								26 cell (selectable)
+									27 tickbox (disabled) 1
+								28 cell (selectable) 94669526
+								29 cell (selectable) Raos Health Care
+								30 cell (selectable) TVS545661
+								31 cell (selectable) 21-08-2026
+								32 cell (selectable) 21-08-2026
+								33 cell (selectable) Not Submitted & Untouched
+								34 cell (selectable) ₹10,000
+								35 cell (selectable) Not Submitted
+								36 cell (selectable) —
+								37 cell (selectable) Submit
+						38 text SUBMISSION FORM ACTIVITY TYPE *
+						39 button No Activity 
+						40 text SUBMISSION STATUS *
+						41 button Not Submitted 
+						42 text SUBMISSION SUB STATUS *
+						43 button Docs Pending 
+						44 text SUPER SUB STATUS
+						45 button Select super sub status 
+						46 tickbox DIGITAL, Value: 0
+						47 text DIGITAL
+						48 tickbox HARD COPY, Value: 0
+						49 text HARD COPY
+						50 tickbox HARD COPY IN TRIPLICATE (GOVT), Value: 0
+						51 text HARD COPY IN TRIPLICATE (GOVT)
+						52 tickbox WORK ORDER, Value: 0
+						53 text WORK ORDER
+						54 tickbox CONTRACT ORDER, Value: 0
+						55 text CONTRACT ORDER
+						56 tickbox EXTENSION LETTER, Value: 0
+						57 text EXTENSION LETTER
+						58 tickbox LETTER OF INTENT, Value: 0
+						59 text LETTER OF INTENT
+						60 tickbox LETTER OF ACCEPTANCE, Value: 0
+						61 text LETTER OF ACCEPTANCE
+						62 tickbox PURCHASE ORDER, Value: 0
+						63 text PURCHASE ORDER
+						64 tickbox DELIVERY CHALLAN, Value: 0
+						65 text DELIVERY CHALLAN
+						66 tickbox MEASUREMENT BOOK, Value: 0
+						67 text MEASUREMENT BOOK
+						68 tickbox ASSET/INVENTORY ANNEXURE, Value: 0
+						69 text ASSET/INVENTORY ANNEXURE
+						70 tickbox PM REPORT, Value: 0
+						71 text PM REPORT
+						72 tickbox BG, Value: 0
+						73 text BG
+						74 tickbox PBG, Value: 0
+						75 text PBG
+						76 tickbox PF CHALLAN COPY, Value: 0
+						77 text PF CHALLAN COPY
+						78 tickbox ESI CHALLAN COPY, Value: 0
+						79 text ESI CHALLAN COPY
+						80 tickbox WAGES REGISTER, Value: 0
+						81 text WAGES REGISTER
+						82 tickbox GST CHALLAN, Value: 0
+						83 text GST CHALLAN
+						84 tickbox INDEMNITY BOND, Value: 0
+						85 text INDEMNITY BOND
+						86 tickbox AGREEMENT DOCUMENT, Value: 0
+						87 text AGREEMENT DOCUMENT ACTIVITY REMARKS
+						88 text entry area (settable) Value: [text entry area], Placeholder: Add remarks...
+							89 text Add remarks...
+						90 button Submit
+						91 button Clear
+						92 button Close
+	93 tab group Description: Tab bar, 2 tabs, 2 pinned tabs, ID: TabBar?isSeparate=false
+		94 tab Inbox | Action | Workingremotely | 8505040 | Details, Value: off, ID: TabBarTab?isNarrow=true&isExpanded=false&tabCount=&isPinned=true&isCluster=false&clusterID=&isActive=false
+			95 image FaviconImageView
+		96 tab Your work, Value: off, ID: TabBarTab?isNarrow=true&isExpanded=false&tabCount=&isPinned=true&isCluster=false&clusterID=&isActive=false
+			97 image FaviconImageView
+		98 tab Inebura 3.0, Help: To interact with the items in this button, press Control-Option-Shift-Down Arrow., Value: on, Secondary Actions: close tab, ID: TabBarTab?isNarrow=false&isExpanded=false&tabCount=&isPinned=false&isCluster=false&clusterID=&isActive=true
+			99 image FaviconImageView
+			100 text Value: Inebura 3.0, ID: UnifiedTabBarButton._titleTextField
+		101 tab Inebura | Submission Details, Value: off, Secondary Actions: close tab, ID: TabBarTab?isNarrow=false&isExpanded=false&tabCount=&isPinned=false&isCluster=false&clusterID=&isActive=false
+			102 image FaviconImageView
+			103 text Value: Inebura | Submission Details, ID: UnifiedTabBarButton._titleTextField
+	104 toolbar
+		105 container Secondary Actions: Move previous, Move next, Remove from toolbar
+			106 button Description: show sidebar, Help: Show sidebar, ID: SidebarButton
+			107 menu button Description: Tab Group picker, ID: TabGroupPickerButton?TabGroup=
+		108 container BackForwardSegmentedControl
+			109 button Description: Go back, Help: Show the previous page, ID: BackButton
+			110 button (disabled) Description: Go forward, Help: Show the next page, ID: ForwardButton
+		111 container Secondary Actions: Move previous, Move next, Remove from toolbar
+			112 button Page Menu, ID: AssistantButton
+			113 button Add page to Reading List, ID: OneStepBookmarkingButton
+			114 text field (settable) Description: smart search field, Value: https://testclient.inebura.ai/dashboard/modules/ar/submissiondetails, ID: WEB_BROWSER_ADDRESS_AND_SEARCH_FIELD
+			115 button Reload this page, ID: ReloadButton
+		116 button Description: Downloads, ID: DownloadsButton, Secondary Actions: Move previous, Move next, Remove from toolbar
+		117 button Description: Share, ID: ShareButton, Secondary Actions: Move previous, Move next, Remove from toolbar
+		118 button Description: New Tab, ID: NewTabButton, Secondary Actions: Move previous, Move next, Remove from toolbar
+		119 button Description: Tab Overview, ID: TabOverviewButton, Secondary Actions: Move previous, Remove from toolbar
+	120 close button
+	121 full screen button Help: this button also has an action to zoom the window, Secondary Actions: zoom the window
+	122 minimise button
+123 menu bar
+	124 Safari
+	125 File
+	126 Edit
+	127 View, ID: SafariViewMenu
+	128 History
+	129 Bookmarks, ID: SafariBookmarksMenu
+	130 Develop
+	131 Window, ID: SafariWindowMenu
+	132 Help, ID: SafariHelpMenu
+
+The focused UI element is 5 HTML content Description: Inebura 3.0, URL: testclient.inebura.ai/dashboard/modules/ar/submissiondetails

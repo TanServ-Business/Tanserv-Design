@@ -7,7 +7,7 @@ This document summarizes the current project changes in the working tree. The ch
 - `pages/ai-activity-center.html`
 - `css/ai-activity-center.css`
 - `scripts/ai-activity-center.js`
-- `LPagent.html`
+- `index.html`
 - `scripts/app.js`
 - `css/styles.css`
 - `pages/visitmodule.html`
@@ -149,7 +149,7 @@ Legacy states `approved` and `rejected` are normalized to `scheduled` and `revok
 
 ### Email Panel Changes
 
-`LPagent.html` and `scripts/app.js` now support AI-driven email suggestions.
+`index.html` and `scripts/app.js` now support AI-driven email suggestions.
 
 Changes include:
 
@@ -226,7 +226,7 @@ Examples:
 
 ### Activity Modal Changes
 
-`LPagent.html` activity modal was updated:
+`index.html` activity modal was updated:
 
 - Sub-status is the editable primary input.
 - Broad status and primary status are derived and disabled.

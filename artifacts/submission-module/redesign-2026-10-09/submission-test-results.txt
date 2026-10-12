@@ -1,0 +1,28 @@
+✔ 1,000 incomplete imports become visible dependencies, never automatically created issues (18.486666ms)
+✔ customer dependency groups 100 invoices; only 90 meet invoice-date aging (0.641208ms)
+✔ customer rejection qualifies immediately while recent document waits remain pending (0.6955ms)
+✔ explicit document scope prevents invoice attachment reuse and permits customer reuse (0.155625ms)
+✔ defer remains visible, returns on date, and returns earlier on impact change (4.607334ms)
+✔ one customer-document promotion creates one canonical issue for 100 invoices (30.859542ms)
+✔ three selected documents create three separate issues (1.796125ms)
+✔ skipping manager approval preserves sequential approval request behavior (1.835792ms)
+✔ promotion write failure rolls back issues, requests and lifecycle state (1.841375ms)
+✔ stale promotion rechecks latest saved state and refuses completed invoices (2.442709ms)
+✔ manual completion before documents suppresses automatic submission and retains required documents (0.526083ms)
+✔ pending manual update never suppresses automation or removes configured requirements (0.090458ms)
+✔ document arrival clears waiting and recalculates readiness without closing an issue (3.292083ms)
+✔ shared issue links new invoices and retains historical links after manual completion (2.690833ms)
+✔ closure and reopen durations use closed cycles and the current open cycle (0.227708ms)
+✔ old submission snapshots migrate without inventing missing historical events (0.129041ms)
+✔ invoice aging follows Kolkata calendar dates across UTC midnight (0.085458ms)
+✔ agent issue details retain creator visibility while duplicate detection stays global (0.042792ms)
+✔ submission workflow version registration preserves existing tracker data (0.467958ms)
+✔ tracker document list shares explicit customer documents and isolates invoice attachments (0.884875ms)
+ℹ tests 20
+ℹ suites 0
+ℹ pass 20
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 118.99075

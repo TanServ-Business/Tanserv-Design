@@ -8,17 +8,19 @@ Each user has exactly one Issue Tracker role. Admin Preview first selects a role
 - View a new issue during the private Manager publication gate.
 - Receive Manager- or Approver-rejected issues in My Work.
 - Correct an approval rejection by adding a remark; the remark automatically resubmits the issue to the Manager. Documents alone do not resubmit it.
-- Review a submitted resolution and choose Accept and close, Accept resolution, or Reject resolution.
+- Review a submitted resolution on their issue and choose Accept and close, Accept resolution, or Reject resolution. Only the issue's Agent receives the resolution-review assignment and notification; each resolution version can be decided once.
 - Close any open issue with a mandatory remark, or reopen a closed issue through Manager review.
+- Request an approval-process change on their open issue with a mandatory remark; the change goes to the issue Manager for approval.
 - Add remarks and documents to any visible open issue without changing its workflow step.
 
 ## Manager
 
 - Accept a new issue to publish and route it, or reject it to the Agent. A decision remark is mandatory.
 - Monitor permitted team issues in Open Issues, including rejected issues highlighted in red.
-- Review and decide a submitted resolution even when it is not assigned to the Manager; the first formal Agent/Manager decision locks that resolution version.
+- Monitor submitted resolutions and contribute remarks/documents without deciding them. Review resolution, Accept and close, Accept resolution, and Reject resolution are reserved for the issue's Agent; the Manager retains the separate Close issue action.
 - Close any open issue with a mandatory remark or reopen it directly to the Action Owner.
 - Approve an approval-matrix change before the new matrix begins at L1.
+- Request an approval-process change on their open issue with a mandatory remark; the change follows the same Manager review before the new matrix begins.
 - Add remarks and documents to any visible open issue without advancing it.
 
 ## Approver
@@ -46,5 +48,6 @@ Each user has exactly one Issue Tracker role. Admin Preview first selects a role
 - Documents are shared automatically across all issues for the same customer and retain source metadata.
 - Rejected issues remain in the existing tabs and are visually highlighted; there is no Rejected tab.
 - Every decision, contribution, assignment, and state change is written to the action trail.
+- Only the issue Agent and Manager can change its approval process. Approvers and Action Owners cannot.
 - The prototype sends event-specific in-app notifications only.
 - There is no Resubmit button and no Resend for Approval action.
