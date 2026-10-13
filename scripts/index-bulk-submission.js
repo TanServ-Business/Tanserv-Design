@@ -6,17 +6,19 @@
   if (!trigger || !element) return;
   const $ = id => document.getElementById(id);
   const modal = window.bootstrap?.Modal.getOrCreateInstance(element);
-  let ready = [], incomplete = [];
+  let ready = [], incomplete = [], alreadySubmitted = [];
   const names = values => new Set(values.map(value => String(value || '').trim().toUpperCase()));
   function reviewSelection() {
-    ready = []; incomplete = [];
-    let alreadySubmitted = 0;
+    ready = []; incomplete = []; alreadySubmitted = [];
     const strategies = window.SubmissionStrategy?.read(localStorage, window.SubmissionStrategy.defaultStrategies) || [];
     for (const invoiceNo of selectedInvoiceNos) {
       const customer = customersData.find(row => (row.invoices || []).some(invoice => invoice.invoiceNo === invoiceNo));
       const invoice = customer?.invoices.find(row => row.invoiceNo === invoiceNo);
       if (!invoice) continue;
-      if (/submitted/i.test(invoice.invoiceStatus || '') && !/not submitted/i.test(invoice.invoiceStatus || '')) { alreadySubmitted++; continue; }
+      if (/submitted/i.test(invoice.invoiceStatus || '') && !/not submitted/i.test(invoice.invoiceStatus || '')) {
+        alreadySubmitted.push({ invoiceNo, customer: customer.name });
+        continue;
+      }
       const context = { ...invoice, productCategory: invoice.productCategory || customer.product };
       const strategy = window.SubmissionStrategy?.resolve(context, strategies);
       const required = strategy ? window.SubmissionStrategy.requirements(context, strategy).map(item => item.name) : [];
@@ -29,21 +31,33 @@
     $('bulkSubmitSummary').textContent = `${selectedInvoiceNos.size} invoice${selectedInvoiceNos.size === 1 ? '' : 's'} selected`;
     $('bulkSubmitReadyCount').textContent = ready.length;
     $('bulkSubmitPendingCount').textContent = incomplete.length;
-    $('bulkSubmitSubmittedCount').textContent = alreadySubmitted;
+    $('bulkSubmitSubmittedCount').textContent = alreadySubmitted.length;
     $('bulkSubmitMissing').textContent = `${incomplete.length} invoice${incomplete.length === 1 ? '' : 's'} will remain pending until all required documents are attached.`;
     $('bulkSubmitMissing').hidden = incomplete.length === 0;
     $('bulkSubmitReady').textContent = `Submit ${ready.length} ready invoice${ready.length === 1 ? '' : 's'}`;
     $('bulkSubmitReady').disabled = ready.length === 0;
+    const eligibleCount = ready.length + alreadySubmitted.length;
+    $('bulkSubmitAll').textContent = `Submit all ${eligibleCount} invoice${eligibleCount === 1 ? '' : 's'}`;
+    $('bulkSubmitAll').disabled = eligibleCount === 0;
     $('bulkSubmitResult').hidden = true;
   }
   trigger.addEventListener('click', () => { reviewSelection(); modal?.show(); });
-  $('bulkSubmitReady').addEventListener('click', () => {
-    if (!ready.length) return;
+  function submitInvoices(includeAlreadySubmitted) {
+    const invoices = includeAlreadySubmitted ? [...ready, ...alreadySubmitted] : ready;
+    if (!invoices.length) return;
     const requests = JSON.parse(localStorage.getItem('ineburaBulkSubmissionRequests:v1') || '[]');
-    requests.push({ id:`SUB-${Date.now()}`, createdAt:new Date().toISOString(), invoiceNos:ready.map(row => row.invoiceNo), status:'Awaiting Outlook delivery' });
+    requests.push({
+      id:`SUB-${Date.now()}`, createdAt:new Date().toISOString(), invoiceNos:invoices.map(row => row.invoiceNo),
+      resubmissionInvoiceNos:includeAlreadySubmitted ? alreadySubmitted.map(row => row.invoiceNo) : [],
+      status:'Awaiting Outlook delivery'
+    });
     localStorage.setItem('ineburaBulkSubmissionRequests:v1', JSON.stringify(requests));
-    $('bulkSubmitResult').textContent = `Submission requested for ${ready.length} invoice${ready.length === 1 ? '' : 's'}. ${incomplete.length} invoice${incomplete.length === 1 ? '' : 's'} remain pending. Submission completes when Outlook accepts the email.`;
+    const repeatCount = includeAlreadySubmitted ? alreadySubmitted.length : 0;
+    $('bulkSubmitResult').textContent = `Submission requested for ${invoices.length} invoice${invoices.length === 1 ? '' : 's'}${repeatCount ? `, including ${repeatCount} previously submitted` : ''}. ${incomplete.length} invoice${incomplete.length === 1 ? '' : 's'} remain pending. Submission completes when Outlook accepts the email.`;
     $('bulkSubmitResult').hidden = false;
     $('bulkSubmitReady').disabled = true;
-  });
+    $('bulkSubmitAll').disabled = true;
+  }
+  $('bulkSubmitReady').addEventListener('click', () => submitInvoices(false));
+  $('bulkSubmitAll').addEventListener('click', () => submitInvoices(true));
 })();

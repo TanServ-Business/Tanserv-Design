@@ -2912,11 +2912,12 @@
             <div class="bulkSubmitCount"><strong id="bulkSubmitSubmittedCount">0</strong><span>Already submitted</span></div>
           </div>
           <p id="bulkSubmitMissing" class="bulkSubmitMissing" role="status"></p>
-          <p class="bulkSubmitHint">Only invoices with all required documents will be included. The rest stay pending.</p>
+          <p class="bulkSubmitHint">Submit ready invoices only, or include invoices that were already submitted. Invoices missing documents stay pending.</p>
           <div id="bulkSubmitResult" class="bulkSubmitResult" hidden role="status"></div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btnSecondary" data-bs-dismiss="modal">Cancel submission</button>
+          <button type="button" class="btnDanger" data-bs-dismiss="modal">Cancel submission</button>
+          <button type="button" class="btnSecondary" id="bulkSubmitAll">Submit all eligible invoices</button>
           <button type="button" class="btnPrimary" id="bulkSubmitReady">Submit ready invoices</button>
         </div>
       </div>

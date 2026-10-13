@@ -5613,8 +5613,11 @@ table thead th {
 #bulkSubmitInvoicesModal .btnPrimary:hover { background: var(--brand); }
 #bulkSubmitInvoicesModal .btnPrimary:disabled { opacity: .5; cursor: not-allowed; }
 #bulkSubmitInvoicesModal .btnSecondary:hover { background: var(--brand-lighter); }
+#bulkSubmitInvoicesModal .btnSecondary:disabled { opacity: .5; cursor: not-allowed; }
+#bulkSubmitInvoicesModal .btnDanger:hover { background: #fecaca; border-color: #fca5a5; color: #7f1d1d; }
 #bulkSubmitInvoicesModal button:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
-@media (max-width: 575px) {
+#bulkSubmitInvoicesModal .btnDanger:focus-visible { outline-color: #991b1b; }
+@media (max-width: 640px) {
   #bulkSubmitInvoicesModal .bulkSubmitDialog { margin: 16px; }
   #bulkSubmitInvoicesModal .bulkSubmitCounts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   #bulkSubmitInvoicesModal .bulkSubmitCount:last-child { grid-column: 1 / -1; }
