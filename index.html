@@ -2604,6 +2604,8 @@
   </style>
   <script defer src="bin/IssueTracker/js/issue-tracker-config.js?v=20260805-approved-flow-v1"></script>
   <script defer src="scripts/app.js?v=20261012-index-route-v1"></script>
+  <script defer src="scripts/submission-strategy-core.js"></script>
+  <script defer src="scripts/index-bulk-submission.js"></script>
   <script defer src="scripts/customer-notes.js"></script>
 </head>
 <body data-root-path="" data-relationship-name="Apollo" data-relationship-badge="AP" data-relationship-logo-src="assets/apollo-sharkfin-logo.jpeg">
@@ -2799,6 +2801,7 @@
 
           <div class="bulkActions">
             <button class="btnSmall" id="bulkSendEmail" type="button">Send emails</button>
+            <button class="btnSmall" id="bulkSubmitInvoices" type="button">Submit invoices</button>
             <button class="btnSmallPrimary" id="bulkNewActivity" type="button">New activity</button>
           </div>
         </div>
@@ -2890,6 +2893,21 @@
           </div>
           <div id="runningStrategyModalContent" class="runningStrategyEmpty">No running strategy found.</div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="bulkSubmitInvoicesModal" tabindex="-1" aria-labelledby="bulkSubmitInvoicesTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header"><h2 class="modal-title fs-5" id="bulkSubmitInvoicesTitle">Submit selected invoices</h2><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div>
+        <div class="modal-body">
+          <p id="bulkSubmitSummary"></p>
+          <p id="bulkSubmitMissing" class="bulkSubmitMissing" role="status"></p>
+          <p class="bulkSubmitHint">Only invoices with every required document attached can be included. Incomplete invoices remain pending. Each invoice and its supporting-document ZIP stay together; oversized batches are split between invoices under the configured Outlook limit.</p>
+          <div id="bulkSubmitResult" class="bulkSubmitResult" hidden role="status"></div>
+        </div>
+        <div class="modal-footer"><button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel submission</button><button type="button" class="btn btn-primary" id="bulkSubmitReady">Submit invoices with completed documents</button></div>
       </div>
     </div>
   </div>

@@ -76,12 +76,12 @@
   function attachmentMatches(requirement, attachment, invoice) {
     if (attachment.requirementId !== requirement.id && attachment.requirement !== requirement.name) return false;
     if (attachment.scope !== requirement.scope) return false;
-    return requirement.scope === 'customer' ? attachment.customerCode === invoice.code : attachment.invoiceNo === invoice.invoiceNo;
+    return requirement.scope === 'customer' ? attachment.customerCode === invoice.code && (!attachment.invoiceNo || attachment.invoiceNo === invoice.invoiceNo) : attachment.invoiceNo === invoice.invoiceNo;
   }
   function missing(state, invoice, attachments = []) {
     return requirements(invoice).filter(requirement => ![...state.documents, ...attachments].some(document => attachmentMatches(requirement, document, invoice)));
   }
-  const dependencyKey = (invoice, requirement) => requirement.scope === 'customer' ? `customer|${invoice.code}|${requirement.id}` : `invoice|${invoice.invoiceNo}|${requirement.id}`;
+  const dependencyKey = (invoice, requirement) => `invoice|${invoice.invoiceNo}|${requirement.id}`;
   function issueAffects(issue, invoice) {
     if (issue.documentScope === 'customer') return issue.customerCode === invoice.code && (issue.affectedInvoices || []).some(item => (item.invoiceNo || item) === invoice.invoiceNo);
     return issue.invoiceNo === invoice.invoiceNo;
@@ -172,7 +172,10 @@
   }
   function saveManual(state, invoiceNos, update, by, actorRole = '') {
     if (!invoiceNos.length || invoiceNos.some(id => !state.invoices.some(row => row.invoiceNo === id))) throw new Error('Select valid invoices.');
-    if (update.submissionStatus === 'Not Submitted' && invoiceNos.some(id => submitted(state.invoices.find(row => row.invoiceNo === id))) && actorRole !== 'agent') throw new Error('Only an Agent can return a submitted invoice to Not Submitted.');
+    if (update.submissionStatus === 'Not Submitted' && invoiceNos.some(id => submitted(state.invoices.find(row => row.invoiceNo === id)))) {
+      if (actorRole !== 'agent') throw new Error('Only an Agent can return a submitted invoice to Not Submitted.');
+      if (!String(update.remarks || '').trim()) throw new Error('Enter the reason for correcting a completed submission in Remarks.');
+    }
     const { invoiceNo:ignored, ...fields } = update;
     update = fields;
     if (!['Submitted','Not Submitted'].includes(update.submissionStatus)) throw new Error('Choose Submitted or Not Submitted first.');
@@ -212,7 +215,7 @@
       }
       event(state, { at, type: 'submission', invoiceNos: [id], by, what: submitted(invoice) ? update.submissionMedium === 'External' ? 'External submission recorded' : 'Submission recorded manually' : 'Non-submission reason recorded', remark: [update.activityType, update.submissionSubStatus,update.submissionDestination, update.remarks].filter(Boolean).join(' · '), data: clone(update) });
       if (submitted(invoice) && state.settings.autoSubmission) event(state, { at, type: 'automation', invoiceNos: [id], what: 'Automatic submission skipped', remark: 'This invoice already has a completed submission. No automatic attempt will be made.' });
-      if (wasSubmitted && !submitted(invoice)) event(state, { at, type: 'submission', invoiceNos: [id], what: 'Invoice returned to Not Submitted', remark: 'Previous submission records are retained.' });
+      if (wasSubmitted && !submitted(invoice)) event(state, { at, type: 'submission', invoiceNos: [id], what: 'Invoice returned to Not Submitted', remark: `Correction reason: ${update.remarks.trim()} · Previous submission records are retained.` });
     });
   }
   function eligibleForAutomation(state, invoice, attachments = []) { return state.settings.autoSubmission && !submitted(invoice) && !invoice.automationSuppressed && missing(state, invoice, attachments).length === 0 && !invoice.reason; }

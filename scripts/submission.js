@@ -213,7 +213,7 @@
       <div class="sjDetailLayout"><div class="sjDetailMain">
         ${invoiceOverviewHTML(invoice,done)}
         ${existingDocumentsCardHTML(invoice)}
-        ${!done||correction?`<section id="sjUpdateSection" class="sjUpdateSection sjDialog sjManualDialog" aria-labelledby="sjManualTitle">${done?'<div class="sjNextStep" role="status"><strong>Correct this record</strong><p>If this submission was recorded in error, return the invoice to Not Submitted. The previous submission stays in the activity timeline.</p></div>':nextStepHTML(invoice,ownGroups,ownIssues)}</section>`:''}
+        ${!done||correction?`<section id="sjUpdateSection" class="sjUpdateSection sjDialog sjManualDialog" aria-labelledby="sjManualTitle">${done?'<div class="sjNextStep" role="status"><strong>Correct this record</strong><p>Return this invoice to Not Submitted and explain the correction in Remarks. The previous submission stays in the activity timeline.</p></div>':nextStepHTML(invoice,ownGroups,ownIssues)}</section>`:''}
       </div><section id="sjTimelineSection" class="sjActivityCard" aria-label="Activity timeline">${timelineHTML(invoice,ownIssues)}</section></div>`;
     prepareTimeline();
     if (!done || correction) {
@@ -368,8 +368,9 @@
     $('sjFulfilmentFields').hidden=!(delivery||courier);$('sjDelivery').hidden=!delivery;$('sjSentFields').hidden=!(delivery||courier);$('sjCourier').hidden=!courier;
     $('sjEscalationChoice').hidden=status!=='Not Submitted';$('sjInlineIssueFields').hidden=!addIssue;
     $('sjMissingFields').hidden=!addIssue||$('sjManualSub').value!=='Docs Pending';
-    $('sjManualIssueOwner').required=addIssue;$('sjManualIssueProcess').required=addIssue;$('sjManualRemark').required=addIssue;
-    $('sjManualRemarkRequired').hidden=!addIssue;
+    const correction=manualIds.some(id=>C.submitted(state.invoices.find(row=>row.invoiceNo===id)));
+    $('sjManualIssueOwner').required=addIssue;$('sjManualIssueProcess').required=addIssue;$('sjManualRemark').required=addIssue||correction;
+    $('sjManualRemarkRequired').hidden=!(addIssue||correction);
     $('sjManualAutomation').hidden=!(delivery||flow.external);
     ['sjSubmissionType','sjInvoiceType','sjSubmissionDate'].forEach(id=>$(id).required=delivery);$('sjSentTo').required=delivery||courier;['sjCourierName','sjCourierDate','sjCourierAwb'].forEach(id=>$(id).required=courier);
     if(delivery){const previous=$('sjInvoiceType').value;setOptions('sjSubmissionType',[flow.submissionType],'Select type');$('sjSubmissionType').value=flow.submissionType;setOptions('sjInvoiceType',flow.invoiceTypes,'Select invoice type');$('sjInvoiceType').value=flow.invoiceTypes.includes(previous)?previous:flow.invoiceTypes[0];}

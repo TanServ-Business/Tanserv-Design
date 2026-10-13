@@ -78,12 +78,14 @@ test('1,000 incomplete imports become visible dependencies, never automatically 
   state.invoices=Array.from({length:1000},(_,index)=>({...C.clone(first),invoiceNo:`IMPORT-${index}`}));
   state.documents=[];C.observe(state,[],'2026-10-09');
   const groups=C.blockers(state,[],'2026-10-09');
-  assert.equal(groups.find(group=>group.scope==='customer').invoices.length,1000);
+  assert.equal(groups.filter(group=>group.scope==='customer').length,1000);
+  assert(groups.filter(group=>group.scope==='customer').every(group=>group.invoices.length===1));
   assert.equal(groups.filter(group=>group.scope==='invoice').length,1000);
   assert.equal(C.readIssues(new Storage()).length,0);
 });
-test('customer dependency groups 100 invoices; only 90 meet invoice-date aging',()=>{
-  const group=purchaseGroup(C.seed());assert.equal(group.invoices.length,100);assert.equal(group.qualifying.length,90);assert.equal(group.eligible,true);
+test('customer document review counts 100 invoice blockers and 90 meet invoice-date aging',()=>{
+  const groups=C.blockers(C.seed(),[],'2026-10-09').filter(group=>group.requirement.id==='purchase-order');
+  assert.equal(groups.length,100);assert.equal(groups.filter(group=>group.eligible).length,90);
 });
 test('recent non-submission reason does not bypass the invoice-age review rule',()=>{
   const state=C.seed();state.invoices.find(row=>row.invoiceNo==='FT6567567').invoiceDate='2026-10-09';
@@ -119,7 +121,7 @@ test('defer remains visible and waits until the chosen date despite impact chang
   const state=C.seed(), group=purchaseGroup(state);
   C.defer(state,group,'2026-10-12','Customer will share on Monday.','Agent','2026-10-09');
   let current=C.blockers(state,[],'2026-10-10').find(item=>item.key===group.key);assert(current.deferred);assert(!current.eligible);
-  state.invoices[0].submissionStatus='Submitted';
+  state.invoices.find(row=>row.invoiceNo!==group.invoices[0].invoiceNo).submissionStatus='Submitted';
   state.invoices.push({...C.clone(state.invoices[1]),invoiceNo:'NEW-SHARED'});
   current=C.blockers(state,[],'2026-10-10').find(item=>item.key===group.key);assert(current.deferred);assert(!current.eligible);
   assert(C.blockers(state,[],'2026-10-12').find(item=>item.key===group.key).eligible);
@@ -162,12 +164,12 @@ test('issue creation accepts the five reasons and rejects other blockers',()=>{
   assert.throws(()=>C.promote(f.state,[group.key],f.fields,f.config,f.storage,f.by),/five supported non-submission reasons/);
   assert.equal(C.readIssues(f.storage).length,0);
 });
-test('one customer-document promotion creates one canonical issue for 100 invoices',()=>{
+test('one customer-document promotion creates one issue for one invoice',()=>{
   const f=fixture(), group=purchaseGroup(f.state), result=C.promote(f.state,[group.key],f.fields,f.config,f.storage,f.by), issue=result.issues[0];
-  assert.equal(result.issues.length,1);assert.equal(issue.affectedInvoices.length,100);assert.equal(issue.documentScope,'customer');
+  assert.equal(result.issues.length,1);assert.equal(issue.affectedInvoices.length,1);assert.equal(issue.documentScope,'customer');
   assert.equal(issue.issueReason,'Docs Pending');
   assert.equal(issue.workflowStep,'manager-review');assert.equal(issue.initialVisibilityReleased,false);
-  assert.equal(C.readIssues(f.storage).length,1);assert(C.issueAffects(issue,f.state.invoices[99]));
+  assert.equal(C.readIssues(f.storage).length,1);assert(C.issueAffects(issue,group.invoices[0]));assert(!C.issueAffects(issue,f.state.invoices.find(row=>row.invoiceNo!==group.invoices[0].invoiceNo)));
   assert.equal(f.state.invoices[0].submissionStatus,'Not Submitted');
   assert.throws(()=>C.promote(result.state,[group.key],f.fields,f.config,f.storage,f.by),/already has an issue/);
   assert.equal(C.readIssues(f.storage).length,1);
@@ -205,7 +207,7 @@ test('pending manual update never suppresses automation or removes configured re
   const state=C.seed(), invoice=state.invoices[0];C.saveManual(state,[invoice.invoiceNo],{submissionStatus:'Not Submitted',activityType:'No Activity',submissionSubStatus:'Docs Pending',missingIds:['purchase-order']},'Agent');
   assert.equal(invoice.automationSuppressed,false);assert.equal(invoice.requirements.length,2);
   C.saveManual(state,[invoice.invoiceNo],completedUpdate(),'Agent');
-  C.saveManual(state,[invoice.invoiceNo],completedUpdate({submissionStatus:'Not Submitted',activityType:'No Activity',submissionSubStatus:'Docs Pending'}),'Agent','agent');
+  C.saveManual(state,[invoice.invoiceNo],completedUpdate({submissionStatus:'Not Submitted',activityType:'No Activity',submissionSubStatus:'Docs Pending',remarks:'Correcting a mistaken completed submission'}),'Agent','agent');
   assert.equal(invoice.submissionStatus,'Not Submitted');assert.equal(invoice.submissionMedium,'Manual');assert.equal(invoice.method,'Manual');assert.equal(invoice.activityType,'No Activity');assert.equal(invoice.submissionDestination,'');
   assert.equal(invoice.submissionDate,'');assert.equal(invoice.submissionType,'');assert.equal(invoice.invoiceType,'');assert.equal(invoice.sentTo,'');
   assert.equal(invoice.automationSuppressed,false);assert.equal(invoice.requirements.length,2);
@@ -244,10 +246,11 @@ test('failed inline issue creation leaves the submission update untouched',()=>{
 test('only an Agent can return a completed invoice to Not Submitted',()=>{
   const state=C.seed(), invoice=state.invoices[0];
   C.saveManual(state,[invoice.invoiceNo],completedUpdate(),'Agent');
-  const before=C.clone(state), correction={submissionStatus:'Not Submitted',activityType:'No Activity',submissionSubStatus:'Invoice Cancelled'};
+  const before=C.clone(state), correction={submissionStatus:'Not Submitted',activityType:'No Activity',submissionSubStatus:'Invoice Cancelled',remarks:'Submission recorded against the wrong invoice'};
   assert.throws(()=>C.saveManual(state,[invoice.invoiceNo],correction,'Manager','manager'),/Only an Agent/);
   assert.throws(()=>C.saveManual(state,[invoice.invoiceNo],correction,'Unknown'),/Only an Agent/);
   assert.deepEqual(state,before);
+  assert.throws(()=>C.saveManual(state,[invoice.invoiceNo],{...correction,remarks:''},'Agent','agent'),/Remarks/);
   C.saveManual(state,[invoice.invoiceNo],correction,'Agent','agent');
   assert.equal(invoice.submissionStatus,'Not Submitted');
   assert(state.events.some(event=>event.what==='Invoice returned to Not Submitted'));
@@ -357,22 +360,38 @@ test('strategy modes, categories and bulk document rule are enforced',()=>{
   assert.equal(S.resolve({productCategory:'Services'},[product]).id,'product');
   assert.equal(S.resolve({productCategory:'Other'},[product]),null);
 });
-test('batch preview separates customer, strategy and recipient list and respects each invoice wait',()=>{
-  const state=C.seed(), now=new Date('2026-10-12T13:00:00Z');
-  state.invoices=[
+test('bulk grouping waits for every invoice or the oldest invoice deadline',()=>{
+  const state=C.seed(), strategy={id:'bulk',applyOn:'COMPANY',status:'RUNNING',strategyName:'Bulk',strategyType:'Invoice + Docs(In 1 Shot)',selectedDocuments:['INVOICE','DOC A','DOC B'],batchInvoicesInOneEmail:true,bulkSendAfterDays:7};
+  const docs=[{id:'invoice',name:'INVOICE',scope:'invoice'},{id:'a',name:'DOC A',scope:'invoice'},{id:'b',name:'DOC B',scope:'invoice'}];
+  state.invoices=Array.from({length:10},(_,i)=>({invoiceNo:`OLD-${i}`,code:'ABC',name:'Customer ABC',createdAt:'2026-10-01T06:00:00Z',requirements:docs}));
+  state.documents=[];
+  const addDocs=(ids,complete)=>ids.forEach(id=>docs.slice(0,complete?3:2).forEach(doc=>state.documents.push({requirementId:doc.id,scope:'invoice',invoiceNo:id,requirement:doc.name})));
+  addDocs(state.invoices.map(row=>row.invoiceNo),false);addDocs(state.invoices.slice(0,7).map(row=>row.invoiceNo),true);
+  const at=date=>S.plan(state,[strategy],C,[],new Date(date));
+  assert.equal(at('2026-10-03T12:30:00Z').batches.length,0);
+  state.invoices.push(...Array.from({length:10},(_,i)=>({invoiceNo:`NEW-${i}`,code:'ABC',name:'Customer ABC',createdAt:'2026-10-04T06:00:00Z',requirements:docs})));
+  addDocs(state.invoices.slice(10).map(row=>row.invoiceNo),false);
+  addDocs(['OLD-7','OLD-8','OLD-9','NEW-0','NEW-1','NEW-2','NEW-3'],true);
+  assert.equal(at('2026-10-04T12:30:00Z').batches.length,0);
+  const due=at('2026-10-08T12:30:00Z');
+  assert.equal(due.batches.length,1);assert.equal(due.batches[0].invoices.length,14);
+  assert.equal([...due.decisions.values()].filter(row=>row.reason==='Awaiting required documents').length,6);
+  due.batches[0].invoices.forEach(id=>{state.invoices.find(row=>row.invoiceNo===id).submissionStatus='Submitted';});
+  addDocs(state.invoices.filter(row=>!C.submitted(row)).map(row=>row.invoiceNo),true);
+  assert.equal(at('2026-10-09T12:30:00Z').batches[0].invoices.length,6);
+});
+test('bulk email keeps different customer, strategy and recipient groups separate',()=>{
+  const state=C.seed();state.invoices=[
     {invoiceNo:'ONE',code:'A',name:'Alpha',productCategory:'Services',createdAt:'2026-10-09T06:00:00Z',requirements:[],submissionRecipients:'first@example.test'},
     {invoiceNo:'TWO',code:'A',name:'Alpha',productCategory:'Services',createdAt:'2026-10-09T06:00:00Z',requirements:[],submissionRecipients:'first@example.test'},
     {invoiceNo:'THREE',code:'A',name:'Alpha',productCategory:'Services',createdAt:'2026-10-09T06:00:00Z',requirements:[],submissionRecipients:'second@example.test'},
     {invoiceNo:'FOUR',code:'B',name:'Beta',productCategory:'Services',createdAt:'2026-10-09T06:00:00Z',requirements:[],submissionRecipients:'first@example.test'},
-    {invoiceNo:'WAIT',code:'A',name:'Alpha',productCategory:'Services',createdAt:'2026-10-12T06:00:00Z',requirements:[],submissionRecipients:'first@example.test'},
     {invoiceNo:'OTHER',code:'A',name:'Alpha',productCategory:'Goods',createdAt:'2026-10-09T06:00:00Z',requirements:[],submissionRecipients:'first@example.test'}
   ];
-  const strategies=[{id:'services',applyOn:'PRODUCT',productCategory:'Services',status:'RUNNING',batchInvoicesInOneEmail:true,bulkSendAfterDays:2},{id:'goods',applyOn:'PRODUCT',productCategory:'Goods',status:'RUNNING',batchInvoicesInOneEmail:true,bulkSendAfterDays:2}];
-  const plan=S.plan(state,strategies,C,[],now);
+  const strategies=[{id:'services',applyOn:'PRODUCT',productCategory:'Services',status:'RUNNING',batchInvoicesInOneEmail:true,bulkSendAfterDays:7},{id:'goods',applyOn:'PRODUCT',productCategory:'Goods',status:'RUNNING',batchInvoicesInOneEmail:true,bulkSendAfterDays:7}];
+  const plan=S.plan(state,strategies,C,[],new Date('2026-10-12T13:00:00Z'));
   assert.deepEqual(plan.batches.map(batch=>batch.invoices),[['ONE','TWO'],['THREE'],['FOUR'],['OTHER']]);
-  assert.equal(plan.decisions.get('WAIT').reason,'Waiting for bulk send date');
-  strategies[0].status='PAUSED';
-  assert.equal(S.plan(state,strategies,C,[],now).decisions.get('ONE').reason,'Submission strategy is paused');
+  strategies[0].status='PAUSED';assert.equal(S.plan(state,strategies,C,[],new Date('2026-10-12T13:00:00Z')).decisions.get('ONE').reason,'Submission strategy is paused');
 });
 test('the default strategy keeps ten demo invoices eligible at the next run',()=>{
   const state=C.seed();
@@ -388,12 +407,18 @@ test('documents do not automatically close issues raised for another reason',()=
   C.reconcileIssues(state,[issue]);
   assert.equal(issue.status,'Open');
 });
-test('shared issue links new invoices and retains historical links after manual completion',()=>{
-  const f=fixture(), result=C.promote(f.state,[purchaseGroup(f.state).key],f.fields,f.config,f.storage,f.by), issue=result.issues[0];
-  result.state.invoices.push({...C.clone(result.state.invoices[0]),invoiceNo:'NEW-SHARED'});
-  C.reconcileIssues(result.state,[issue]);assert.equal(issue.affectedInvoices.length,101);
-  C.saveManual(result.state,['AMS-0001'],completedUpdate(),f.by);
-  C.reconcileIssues(result.state,[issue]);assert.equal(issue.affectedInvoices.length,101);assert.equal(issue.activeAffectedInvoiceNos.length,100);assert.equal(issue.status,'Open');
+test('customer document issues are separate by invoice and close independently',()=>{
+  const f=fixture(), groups=C.blockers(f.state,[],'2026-10-09').filter(group=>group.requirement.id==='purchase-order');
+  assert(groups.length>1);assert(groups.every(group=>group.invoices.length===1));
+  const selected=groups.slice(0,2), result=C.promote(f.state,selected.map(group=>group.key),f.fields,f.config,f.storage,f.by);
+  assert.equal(result.issues.length,2);
+  const first=selected[0].invoices[0], second=selected[1].invoices[0];
+  assert.notEqual(result.issues[0].invoiceNo,result.issues[1].invoiceNo);
+  const document={requirementId:'purchase-order',requirement:'Purchase Order',scope:'customer',customerCode:first.code,invoiceNo:first.invoiceNo};
+  C.reconcileIssues(result.state,result.issues,[document]);
+  assert.equal(result.issues.find(issue=>issue.invoiceNo===first.invoiceNo).status,'Closed');
+  assert.equal(result.issues.find(issue=>issue.invoiceNo===second.invoiceNo).status,'Open');
+  assert(C.missing(result.state,second,[document]).some(requirement=>requirement.id==='purchase-order'));
 });
 test('closure and reopen durations use closed cycles and the current open cycle',()=>{
   const issue={status:'Open',createdAt:'2026-10-01T08:00:00Z',actionTrail:[{type:'closure',when:'2026-10-03T08:00:00Z'},{type:'reopen',when:'2026-10-06T08:00:00Z'}]};
@@ -431,4 +456,11 @@ test('tracker document list shares explicit customer documents and isolates invo
   ],visibilityReleased:()=>true,canViewIssue:()=>true,getRole:()=> 'agent',rolePerson:()=> 'Aditi Sharma'};
   vm.createContext(sandbox);vm.runInContext(section+'\nthis.docs=issueDocuments(this.invoice,this.issue,null);',Object.assign(sandbox,{invoice,issue}));
   assert.deepEqual(Array.from(sandbox.docs,doc=>doc.name),['shared-po.pdf']);
+});
+
+test('Outlook size splitting keeps each invoice and its ZIP together',()=>{
+  const result=S.splitByAttachmentLimit(['A','B','C','D'],{A:[2,3],B:[3,4],C:[8,4],D:[1,1]},10);
+  assert.deepEqual(result.parts,[['A'],['B','D']]);
+  assert.deepEqual(result.oversized,['C']);assert.deepEqual(result.unknown,[]);
+  assert.deepEqual(S.splitByAttachmentLimit(['A'],{A:[2]},10).unknown,['A']);
 });

@@ -45,7 +45,7 @@
     });
   }
   const recipients = (invoice, strategy) => [...new Set(String(invoice.submissionRecipients || strategy?.recipientList || 'Default customer recipients').split(/[,;]+/).map(item => item.trim().toLowerCase()).filter(Boolean))].sort();
-  function assessment(state, invoice, strategy, core, attachments = [], at = new Date()) {
+  function assessment(state, invoice, strategy, core, attachments = []) {
     if (core.submitted(invoice)) return { ready:false, reason:'Already submitted' };
     if (!state.settings.autoSubmission) return { ready:false, reason:'Automatic submission is off' };
     if (!strategy) return { ready:false, reason:'No matching submission strategy' };
@@ -53,28 +53,55 @@
     if (invoice.automationSuppressed) return { ready:false, reason:'Completed manually or externally' };
     if (invoice.reason) return { ready:false, reason:invoice.reason };
     if (core.missing(state, invoice, attachments).length) return { ready:false, reason:'Awaiting required documents' };
-    if (strategy.batchInvoicesInOneEmail) {
-      const added = Date.parse(invoice.createdAt);
-      if (!Number.isFinite(added)) return { ready:false, reason:'Date added to Inebura is unavailable' };
-      const after = Number(strategy.bulkSendAfterDays);
-      if (!Number.isInteger(after) || after < 0) return { ready:false, reason:'Bulk delay needs configuration' };
-      if (at.getTime() < added + after * 86400000) return { ready:false, reason:'Waiting for bulk send date', readyAt:new Date(added + after * 86400000).toISOString() };
-    }
     return { ready:true, reason:'Scheduled for submission' };
   }
   function plan(state, strategies, core, attachments = [], at = new Date()) {
-    const batches = new Map(), decisions = new Map();
+    const batches = [], decisions = new Map(), cohorts = new Map();
     state.invoices.forEach(invoice => {
       const strategy = resolve(invoice, strategies);
-      const decision = assessment(state, invoice, strategy, core, attachments, at);
+      const decision = assessment(state, invoice, strategy, core, attachments);
       decisions.set(invoice.invoiceNo, decision);
-      if (!decision.ready) return;
+      if (!strategy || ['Already submitted','Automatic submission is off','Submission strategy is paused','Completed manually or externally'].includes(decision.reason)) return;
       const list = recipients(invoice, strategy);
       const key = JSON.stringify([invoice.code, strategy.id, list]);
-      if (!batches.has(key)) batches.set(key, { customerCode:invoice.code, customer:invoice.name, strategyId:strategy.id, strategyName:strategy.strategyName, recipients:list, invoices:[] });
-      batches.get(key).invoices.push(invoice.invoiceNo);
+      if (!cohorts.has(key)) cohorts.set(key, { customerCode:invoice.code, customer:invoice.name, strategyId:strategy.id, strategyName:strategy.strategyName, recipients:list, strategy, rows:[] });
+      cohorts.get(key).rows.push({ invoice, decision });
     });
-    return { batches:[...batches.values()], decisions };
+    cohorts.forEach(cohort => {
+      const { strategy, rows, ...details } = cohort;
+      if (!strategy.batchInvoicesInOneEmail) {
+        rows.filter(row => row.decision.ready).forEach(row => batches.push({ ...details, invoices:[row.invoice.invoiceNo] }));
+        return;
+      }
+      const dates = rows.map(row => Date.parse(row.invoice.createdAt)).filter(Number.isFinite);
+      const firstAdded = dates.length ? Math.min(...dates) : NaN;
+      const delay = Number(strategy.bulkSendAfterDays);
+      const deadline = Number.isFinite(firstAdded) && Number.isInteger(delay) && delay >= 0 ? firstAdded + delay * 86400000 : NaN;
+      const allReady = rows.every(row => row.decision.ready);
+      const expired = Number.isFinite(deadline) && at.getTime() >= deadline;
+      const ready = rows.filter(row => row.decision.ready);
+      if (!allReady && !expired) {
+        ready.forEach(row => decisions.set(row.invoice.invoiceNo, { ready:false, reason:Number.isFinite(deadline) ? 'Waiting for customer batch documents' : 'Date added to Inebura is unavailable', readyAt:Number.isFinite(deadline) ? new Date(deadline).toISOString() : '' }));
+        return;
+      }
+      if (ready.length) batches.push({ ...details, invoices:ready.map(row => row.invoice.invoiceNo), releaseReason:allReady ? 'All documents ready' : 'Bulk wait elapsed' });
+    });
+    return { batches, decisions };
   }
-  return { KEY,defaultStrategies,read,validate,resolve,requirements,recipients,assessment,plan };
+  function splitByAttachmentLimit(invoiceNos, packages, limitBytes) {
+    if (!Number.isFinite(limitBytes) || limitBytes <= 0) throw new Error('The Outlook attachment limit is unavailable.');
+    const parts = [], oversized = [], unknown = [];
+    let current = [], currentBytes = 0;
+    invoiceNos.forEach(invoiceNo => {
+      const files = packages[invoiceNo];
+      if (!Array.isArray(files) || files.length !== 2 || files.some(file => !Number.isFinite(file) || file < 0)) { unknown.push(invoiceNo); return; }
+      const packageBytes = files[0] + files[1];
+      if (packageBytes > limitBytes) { oversized.push(invoiceNo); return; }
+      if (current.length && currentBytes + packageBytes > limitBytes) { parts.push(current); current = []; currentBytes = 0; }
+      current.push(invoiceNo); currentBytes += packageBytes;
+    });
+    if (current.length) parts.push(current);
+    return { parts, oversized, unknown };
+  }
+  return { KEY,defaultStrategies,read,validate,resolve,requirements,recipients,assessment,plan,splitByAttachmentLimit };
 });

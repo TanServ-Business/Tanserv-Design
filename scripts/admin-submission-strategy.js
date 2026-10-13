@@ -28,6 +28,29 @@
   let returnFocus = null;
   let dirtyCheck = () => false;
   const save = () => previewStorage.setItem(key, JSON.stringify(strategies));
+  function scheduledInvoices(strategyId) {
+    try {
+      const C=window.SubmissionJourney, state=C.load(previewStorage), issues=C.readIssues(previewStorage);
+      const attachments=C.issueAttachments(issues);
+      state.invoices.forEach(invoice => { invoice.effectiveRequirements=strategyRules.requirements(invoice,strategyRules.resolve(invoice,strategies)); });
+      const now=new Date(), parts=Object.fromEntries(new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Kolkata',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(now).map(part=>[part.type,part.value]));
+      let run=new Date(`${parts.year}-${parts.month}-${parts.day}T18:00:00+05:30`);
+      if(run<=now) run=new Date(run.getTime()+86400000);
+      return strategyRules.plan(state,strategies,C,attachments,run).batches.filter(batch=>batch.strategyId===strategyId).flatMap(batch=>batch.invoices);
+    } catch (_) { return []; }
+  }
+  function confirmStrategyChange(record) {
+    const scheduled=scheduledInvoices(record.id);
+    if (!scheduled.length) return true;
+    return window.confirm(`${scheduled.length} invoice${scheduled.length===1?' is':'s are'} scheduled for the next 06:00 PM IST run under this strategy. Saving this change stops that plan immediately. All pending invoices will be reassessed under the new strategy. Continue?`);
+  }
+  function recordStrategyChange(record) {
+    try {
+      const C=window.SubmissionJourney, state=C.load(previewStorage);
+      C.event(state,{type:'automation',invoiceNos:state.invoices.filter(invoice=>!C.submitted(invoice)).map(invoice=>invoice.invoiceNo),what:'Submission strategy changed',remark:`${record.strategyName}: previous scheduled plan stopped; pending invoices will follow the current strategy.`});
+      C.transaction(previewStorage,{[C.KEY]:state});
+    } catch (_) { /* Keep the strategy edit available even if demo history is unavailable. */ }
+  }
   const notify = text => {
     const toast = document.getElementById('adminToast');
     if (!toast) return;
@@ -105,8 +128,8 @@
           <label class="adminSubmissionFormField adminSubmissionWide"><span>CUSTOMER RECIPIENT LIST</span><input name="recipientList" type="text" value="${escapeHtml(record?.recipientList || '')}" placeholder="Optional — use invoice customer recipients" /><small>Separate bulk emails are prepared when the recipient list differs. Separate multiple addresses with commas.</small></label>
           <label class="adminSubmissionAgent"><input type="checkbox" name="agentSelection" ${record?.agentSelection ? 'checked' : ''} /><strong>Agent<br />Selection</strong><span>The agent can also select documents that should go with the strategy. Turning this on will allow manual agent selections.</span></label>
           <section class="adminSubmissionBulk" aria-labelledby="submissionBulkTitle">
-            <label class="adminSubmissionBulkToggle"><input type="checkbox" name="batchInvoicesInOneEmail" ${record?.batchInvoicesInOneEmail ? 'checked' : ''} /><span><strong id="submissionBulkTitle">Submit multiple invoices in one email</strong><small>All eligible invoices for the same customer will be sent in one email once all necessary documents are tagged.</small></span></label>
-            <div class="adminSubmissionBulkDelay" ${record?.batchInvoicesInOneEmail ? '' : 'hidden'}><label class="adminSubmissionFormField" for="submissionBulkDays"><span>Bulk send after <abbr title="Required when bulk email is enabled">*</abbr></span><span class="adminSubmissionBulkInput"><input id="submissionBulkDays" name="bulkSendAfterDays" type="number" min="0" step="1" inputmode="numeric" value="${record?.batchInvoicesInOneEmail && Number.isInteger(Number(record.bulkSendAfterDays)) ? escapeHtml(record.bulkSendAfterDays) : ''}" /><span>days</span></span></label><small>Count from when each invoice is added to Inebura. Only invoices with all required documents tagged are eligible for the customer's email.</small></div>
+            <label class="adminSubmissionBulkToggle"><input type="checkbox" name="batchInvoicesInOneEmail" ${record?.batchInvoicesInOneEmail ? 'checked' : ''} /><span><strong id="submissionBulkTitle">Submit multiple invoices in one email</strong><small>A customer batch goes at the next run when every invoice has its required documents, or after the configured wait. At the deadline, only document-complete invoices are sent; incomplete invoices remain pending.</small></span></label>
+            <div class="adminSubmissionBulkDelay" ${record?.batchInvoicesInOneEmail ? '' : 'hidden'}><label class="adminSubmissionFormField" for="submissionBulkDays"><span>Bulk send after <abbr title="Required when bulk email is enabled">*</abbr></span><span class="adminSubmissionBulkInput"><input id="submissionBulkDays" name="bulkSendAfterDays" type="number" min="0" step="1" inputmode="numeric" value="${record?.batchInvoicesInOneEmail && Number.isInteger(Number(record.bulkSendAfterDays)) ? escapeHtml(record.bulkSendAfterDays) : ''}" /><span>days</span></span></label><small>Count from the earliest waiting invoice added to Inebura. New invoices do not restart the wait. At the deadline, send only invoices with all required documents tagged.</small></div>
           </section>
           <div class="adminSubmissionDocuments"><label class="adminSubmissionFormField" for="submissionDocumentSearch">SELECT DOCUMENTS</label><div class="adminSubmissionDocumentSearch"><i class="bi bi-search" aria-hidden="true"></i><input id="submissionDocumentSearch" type="search" placeholder="Search documents..." /></div>
             <div class="adminSubmissionDocumentList"><label class="adminSubmissionSelectAll"><input type="checkbox" id="submissionSelectAll" />SELECT ALL <span id="submissionSelectedCount">${selected.size} selected</span></label><div id="submissionDocumentOptions">${documentNames.map(name => `<label data-document-name="${escapeHtml(name)}"><input type="checkbox" value="${escapeHtml(name)}" ${selected.has(name) ? 'checked' : ''} />${escapeHtml(name)}</label>`).join('')}</div></div>
@@ -163,15 +186,17 @@
       const next = {id: record?.id || `submission-${Date.now()}`,status: record?.status || 'RUNNING',strategyName:name,strategySubtitle:applyOn === 'PRODUCT' ? form.elements.productCategory.value : 'Xeon Infraservices Pvt Ltd',applyOn,strategyType:form.elements.strategyType.value,agentSelection:form.elements.agentSelection.checked,batchInvoicesInOneEmail,bulkSendAfterDays:batchInvoicesInOneEmail ? Number(form.elements.bulkSendAfterDays.value) : null,productCategory:applyOn === 'PRODUCT' ? form.elements.productCategory.value : '',recipientList:form.elements.recipientList.value.trim(),selectedDocuments,documents:[`${selectedDocuments.length} DOCS`]};
       const error = strategyRules.validate(strategies,next);
       if (error) { form.querySelector('#submissionStrategyError').textContent = error; return; }
+      if (editing && !confirmStrategyChange(record)) return;
       if (editing) strategies = strategies.map(item => item.id === record.id ? next : item);
       else strategies.push(next);
-      save(); closeModal(true); render(); notify(editing ? 'Strategy updated in this preview.' : 'Strategy created in this preview.');
+      save(); if (editing) recordStrategyChange(record); closeModal(true); render(); notify(editing ? 'Strategy updated. Pending invoices now follow the new rule.' : 'Strategy created in this preview.');
     });
     modal.querySelector('[data-submission-action="toggle-status"]')?.addEventListener('click', () => {
       if (dirtyCheck() && !window.confirm('Discard your unsaved edits and change the strategy status?')) return;
+      if (!confirmStrategyChange(record)) return;
       const nextStatus = record.status === 'RUNNING' ? 'PAUSED' : 'RUNNING';
       strategies = strategies.map(item => item.id === record.id ? {...item,status:nextStatus} : item);
-      save(); closeModal(true); render(); notify(`Strategy ${nextStatus.toLowerCase()} in this preview.`);
+      save(); recordStrategyChange(record); closeModal(true); render(); notify(`Strategy ${nextStatus.toLowerCase()} in this preview.`);
     });
     modal.querySelector('[data-submission-action="add-product"]').addEventListener('click', () => {
       const field = form.querySelector('.adminSubmissionProductField');
@@ -232,8 +257,10 @@
     if (!button) return;
     if (button.dataset.submissionAction === 'close-modal') closeModal();
     if (button.dataset.submissionAction === 'confirm-delete') {
+      const record=strategies.find(item=>item.id===button.dataset.id);
+      if (record && !confirmStrategyChange(record)) return;
       strategies = strategies.filter(item => item.id !== button.dataset.id);
-      save(); closeModal(); render(); notify('Strategy deleted from this preview.');
+      save(); if(record) recordStrategyChange(record); closeModal(); render(); notify('Strategy deleted from this preview.');
     }
   });
   document.addEventListener('keydown', event => {
