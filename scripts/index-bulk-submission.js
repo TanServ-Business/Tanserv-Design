@@ -26,8 +26,13 @@
       if (/docs?\s*(pending|required)|further docs|invoice copy required/i.test(`${invoice.primaryStatus || ''} ${invoice.status || ''}`) && !missing.length) missing.push('Supporting document flagged as missing');
       (missing.length ? incomplete : ready).push({ invoiceNo, customer:customer.name, missing });
     }
-    $('bulkSubmitSummary').textContent = `${selectedInvoiceNos.size} selected · ${alreadySubmitted} already submitted · ${ready.length} ready to submit.`;
-    $('bulkSubmitMissing').textContent = `${incomplete.length} invoice${incomplete.length === 1 ? '' : 's'} do not have every required document attached and will remain pending.`;
+    $('bulkSubmitSummary').textContent = `${selectedInvoiceNos.size} invoice${selectedInvoiceNos.size === 1 ? '' : 's'} selected`;
+    $('bulkSubmitReadyCount').textContent = ready.length;
+    $('bulkSubmitPendingCount').textContent = incomplete.length;
+    $('bulkSubmitSubmittedCount').textContent = alreadySubmitted;
+    $('bulkSubmitMissing').textContent = `${incomplete.length} invoice${incomplete.length === 1 ? '' : 's'} will remain pending until all required documents are attached.`;
+    $('bulkSubmitMissing').hidden = incomplete.length === 0;
+    $('bulkSubmitReady').textContent = `Submit ${ready.length} ready invoice${ready.length === 1 ? '' : 's'}`;
     $('bulkSubmitReady').disabled = ready.length === 0;
     $('bulkSubmitResult').hidden = true;
   }
@@ -37,7 +42,7 @@
     const requests = JSON.parse(localStorage.getItem('ineburaBulkSubmissionRequests:v1') || '[]');
     requests.push({ id:`SUB-${Date.now()}`, createdAt:new Date().toISOString(), invoiceNos:ready.map(row => row.invoiceNo), status:'Awaiting Outlook delivery' });
     localStorage.setItem('ineburaBulkSubmissionRequests:v1', JSON.stringify(requests));
-    $('bulkSubmitResult').textContent = `${ready.length} document-complete invoice${ready.length === 1 ? '' : 's'} added to this demo submission request. The ${incomplete.length} incomplete invoice${incomplete.length === 1 ? '' : 's'} remain pending. Submitted status requires Outlook to accept the corresponding email part.`;
+    $('bulkSubmitResult').textContent = `Submission requested for ${ready.length} invoice${ready.length === 1 ? '' : 's'}. ${incomplete.length} invoice${incomplete.length === 1 ? '' : 's'} remain pending. Submission completes when Outlook accepts the email.`;
     $('bulkSubmitResult').hidden = false;
     $('bulkSubmitReady').disabled = true;
   });

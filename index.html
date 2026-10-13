@@ -2898,16 +2898,27 @@
   </div>
 
   <div class="modal fade" id="bulkSubmitInvoicesModal" tabindex="-1" aria-labelledby="bulkSubmitInvoicesTitle" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered bulkSubmitDialog">
       <div class="modal-content">
-        <div class="modal-header"><h2 class="modal-title fs-5" id="bulkSubmitInvoicesTitle">Submit selected invoices</h2><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div>
+        <div class="modal-header">
+          <h2 class="modal-title" id="bulkSubmitInvoicesTitle">Submit invoices</h2>
+          <button type="button" class="bulkSubmitClose" data-bs-dismiss="modal" aria-label="Close dialog"><i class="bi bi-x-lg" aria-hidden="true"></i></button>
+        </div>
         <div class="modal-body">
-          <p id="bulkSubmitSummary"></p>
+          <p id="bulkSubmitSummary" class="bulkSubmitSummary"></p>
+          <div class="bulkSubmitCounts" aria-label="Invoice submission eligibility">
+            <div class="bulkSubmitCount bulkSubmitCountReady"><strong id="bulkSubmitReadyCount">0</strong><span>Ready to submit</span></div>
+            <div class="bulkSubmitCount bulkSubmitCountPending"><strong id="bulkSubmitPendingCount">0</strong><span>Missing documents</span></div>
+            <div class="bulkSubmitCount"><strong id="bulkSubmitSubmittedCount">0</strong><span>Already submitted</span></div>
+          </div>
           <p id="bulkSubmitMissing" class="bulkSubmitMissing" role="status"></p>
-          <p class="bulkSubmitHint">Only invoices with every required document attached can be included. Incomplete invoices remain pending. Each invoice and its supporting-document ZIP stay together; oversized batches are split between invoices under the configured Outlook limit.</p>
+          <p class="bulkSubmitHint">Only invoices with all required documents will be included. The rest stay pending.</p>
           <div id="bulkSubmitResult" class="bulkSubmitResult" hidden role="status"></div>
         </div>
-        <div class="modal-footer"><button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel submission</button><button type="button" class="btn btn-primary" id="bulkSubmitReady">Submit invoices with completed documents</button></div>
+        <div class="modal-footer">
+          <button type="button" class="btnSecondary" data-bs-dismiss="modal">Cancel submission</button>
+          <button type="button" class="btnPrimary" id="bulkSubmitReady">Submit ready invoices</button>
+        </div>
       </div>
     </div>
   </div>
