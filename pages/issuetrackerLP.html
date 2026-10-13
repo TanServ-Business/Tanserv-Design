@@ -6,7 +6,7 @@
   <title>Inebura | Issue Tracker</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
   <link rel="stylesheet" href="../css/styles.css" />
-  <link rel="stylesheet" href="../css/issuetrackerLP.css?v=20261009-submission-scope-v2" />
+  <link rel="stylesheet" href="../css/issuetrackerLP.css?v=20261013-submission-issues-v1" />
   <link rel="stylesheet" href="../css/shared-header.css" />
 </head>
 <body class="issueTrackerPage" data-root-path="../" data-relationship-name="Issue Tracker" data-relationship-badge="IT">
@@ -45,6 +45,10 @@
         <span class="overviewIcon"><i class="bi bi-folder2-open" aria-hidden="true"></i></span>
         <div><span>Open issues</span><strong id="statOpenIssues">0</strong><small id="statOpenInvoices">Across 0 invoices</small></div>
       </article>
+      <article class="overviewCard">
+        <span class="overviewIcon"><i class="bi bi-send" aria-hidden="true"></i></span>
+        <div><span>Submission issues</span><strong id="statSubmissionIssues">0</strong><small id="statSubmissionBreakdown">0 open · 0 closed</small></div>
+      </article>
       <article class="overviewCard overviewCard--focus">
         <span class="overviewIcon"><i class="bi bi-clipboard2-check" aria-hidden="true"></i></span>
         <div><span>My action items</span><strong id="statMyActions">0</strong></div>
@@ -64,6 +68,7 @@
         <div class="workTabs" id="issue-view-tabs" role="tablist" aria-label="Issue views">
           <button type="button" class="workTab is-active" data-view="my-work" role="tab" aria-selected="true">My Work <span id="tabMyWorkCount">0</span></button>
           <button type="button" class="workTab" data-view="open" role="tab" aria-selected="false">Open Issues <span id="tabOpenCount">0</span></button>
+          <button type="button" class="workTab" data-view="submission" role="tab" aria-selected="false">Submission Issues <span id="tabSubmissionCount">0</span></button>
           <button type="button" class="workTab" data-view="closed" role="tab" aria-selected="false">Closed <span id="tabClosedCount">0</span></button>
         </div>
         <div class="workTools">
@@ -206,6 +211,6 @@
 
   <script src="../scripts/shared-header.js?v=20261012-index-route-v1"></script>
   <script src="../bin/IssueTracker/js/issue-tracker-config.js?v=20261009-submission-scope-v2"></script>
-  <script src="../bin/IssueTracker/js/issue-tracker-unified.js?v=20261009-submission-scope-v2"></script>
+  <script src="../bin/IssueTracker/js/issue-tracker-unified.js?v=20261013-submission-issues-v1"></script>
 </body>
 </html>

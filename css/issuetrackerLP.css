@@ -209,7 +209,7 @@
 .overviewCards {
   display: grid;
   gap: 10px;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   margin-bottom: 12px;
 }
 
@@ -803,6 +803,12 @@
 
 .hidden { display: none !important; }
 .visuallyHidden { height: 1px; margin: -1px; overflow: hidden; padding: 0; position: absolute; width: 1px; clip: rect(0 0 0 0); white-space: nowrap; }
+
+@media (max-width: 1320px) {
+  .workTableToolbar { align-items: flex-start; flex-direction: column; padding-block: 14px; }
+  .workTabs { min-height: 44px; }
+  .workTools { width: 100%; }
+}
 
 @media (max-width: 1180px) {
   .issueTrackerMain,

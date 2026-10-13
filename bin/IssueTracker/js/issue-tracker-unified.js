@@ -544,6 +544,7 @@
       syncFilterChoice(invoiceDueFilter);
       const open = records.filter((item) => !isClosed(item.issue));
       const closed = records.filter((item) => isClosed(item.issue));
+      const submission = records.filter((item) => item.issue.source === 'submission-module');
       const mine = open.filter((item) => isMyWork(item, role));
       const waiting = open.filter((item) => actionState(item.issue, role).key === 'waiting');
       const waitingApprovals = waiting.filter((item) => approvalStatus(item.issue) === 'pending');
@@ -558,12 +559,16 @@
       document.getElementById('statMyActions').textContent = mine.length;
       document.getElementById('statOpenIssues').textContent = open.length;
       document.getElementById('statOpenInvoices').textContent = `Across ${openInvoices} invoices`;
+      document.getElementById('statSubmissionIssues').textContent = submission.length;
+      const openSubmission = submission.filter((item) => !isClosed(item.issue)).length;
+      document.getElementById('statSubmissionBreakdown').textContent = `${openSubmission} open · ${submission.length - openSubmission} closed`;
       document.getElementById('statWaiting').textContent = waiting.length;
       document.getElementById('statWaitingApprovals').textContent = `${waitingApprovals.length} awaiting approval`;
       document.getElementById('statInvoiceAmount').textContent = money(netDue);
       document.getElementById('statIssueInvoicePercent').textContent = `${issueInvoicePercent}% of portfolio invoices · ${openInvoices} of ${portfolioInvoiceCount}`;
       document.getElementById('tabMyWorkCount').textContent = mine.length;
       document.getElementById('tabOpenCount').textContent = open.length;
+      document.getElementById('tabSubmissionCount').textContent = submission.length;
       document.getElementById('tabClosedCount').textContent = closed.length;
       const openTab = document.querySelector('.workTab[data-view="open"]');
       openTab?.querySelector('.rejectedTabCount')?.remove();
@@ -572,7 +577,7 @@
         if (rejectedCount) openTab?.insertAdjacentHTML('beforeend', `<em class="rejectedTabCount">${rejectedCount} rejected</em>`);
       }
 
-      let filtered = view === 'closed' ? closed : (view === 'open' ? open : mine);
+      let filtered = view === 'closed' ? closed : view === 'submission' ? submission : view === 'open' ? open : mine;
       const query = search.value.trim().toLowerCase();
       if (query) filtered = filtered.filter(({ invoice, issue }) => [invoice.id, invoice.customer, invoice.customerCode, issue.id, issue.title, issue.primaryStatus, issue.subStatus, issue.agent, issue.manager, assignedUser(issue), issue.actionOwner, ...(issue.affectedInvoices || []).map(item => item.invoiceNo)].join(' ').toLowerCase().includes(query));
       filtered = filtered.filter(({ issue }) => matchesSelectedFilter(agentFilter, issue.agent));
@@ -613,7 +618,12 @@
         else collapsedInvoices.add(invoiceId);
         render();
       }));
-      document.getElementById('issue-empty-state').classList.toggle('hidden', groups.length > 0);
+      const emptyState = document.getElementById('issue-empty-state');
+      emptyState.querySelector('strong').textContent = view === 'submission' ? 'No submission issues in this view' : 'No issues in this view';
+      emptyState.querySelector('span').textContent = view === 'submission' && !submission.length
+        ? 'Issues raised from invoice submission will appear here when visible to you.'
+        : 'Try another tab or clear the filters.';
+      emptyState.classList.toggle('hidden', groups.length > 0);
       body.closest('table').classList.toggle('hidden', groups.length === 0);
       document.getElementById('invoice-page-info').textContent = groups.length ? `Showing invoices ${(page - 1) * PAGE_SIZE + 1}–${Math.min(page * PAGE_SIZE, groups.length)} of ${groups.length}` : 'Showing 0 invoices';
       document.getElementById('invoice-page-current').textContent = page;
