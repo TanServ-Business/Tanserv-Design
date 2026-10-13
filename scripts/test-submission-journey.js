@@ -206,10 +206,40 @@ test('pending manual update never suppresses automation or removes configured re
   assert.equal(invoice.automationSuppressed,false);assert.equal(invoice.requirements.length,2);
   C.saveManual(state,[invoice.invoiceNo],completedUpdate(),'Agent');
   C.saveManual(state,[invoice.invoiceNo],completedUpdate({submissionStatus:'Not Submitted',activityType:'No Activity',submissionSubStatus:'Docs Pending'}),'Agent','agent');
-  assert.equal(invoice.submissionStatus,'Not Submitted');assert.equal(invoice.submissionMedium,'');assert.equal(invoice.submissionDestination,'');
+  assert.equal(invoice.submissionStatus,'Not Submitted');assert.equal(invoice.submissionMedium,'Manual');assert.equal(invoice.method,'Manual');assert.equal(invoice.activityType,'No Activity');assert.equal(invoice.submissionDestination,'');
   assert.equal(invoice.submissionDate,'');assert.equal(invoice.submissionType,'');assert.equal(invoice.invoiceType,'');assert.equal(invoice.sentTo,'');
   assert.equal(invoice.automationSuppressed,false);assert.equal(invoice.requirements.length,2);
   assert.equal(invoice.firstSubmittedAt,'2026-10-09');assert(state.events.some(item=>item.what==='Invoice returned to Not Submitted'));
+});
+test('Not Submitted manual updates always use Manual and No Activity',()=>{
+  const state=C.seed(), invoice=state.invoices[0];
+  assert.deepEqual(C.manualFlow('Not Submitted','No Activity','Manual').activities,['No Activity']);
+  assert.throws(()=>C.saveManual(state,[invoice.invoiceNo],{submissionStatus:'Not Submitted',submissionMedium:'Manual',activityType:'Visited',submissionSubStatus:'Invoice Cancelled'},'Agent'),/No Activity/);
+  C.saveManual(state,[invoice.invoiceNo],{submissionStatus:'Not Submitted',submissionSubStatus:'Invoice Cancelled'},'Agent');
+  assert.equal(invoice.submissionMedium,'Manual');assert.equal(invoice.activityType,'No Activity');
+});
+test('inline issue creation saves the reason and issue together',()=>{
+  const f=fixture(), invoice=f.state.invoices[0], process=f.config.ensureApprovalData().processes[0];
+  const update={submissionStatus:'Not Submitted',submissionMedium:'Manual',activityType:'No Activity',submissionSubStatus:'Invoice Cancelled',remarks:'Invoice requires correction'};
+  const key=`invoice|${invoice.invoiceNo}|reason:Invoice Cancelled`, manualUpdate={invoiceNos:[invoice.invoiceNo],update,actorRole:'agent'};
+  const fields={owner:f.fields.owner,process:process.id,remark:update.remarks};
+  assert.throws(()=>C.promote(f.state,[key],{...fields,process:''},f.config,f.storage,f.by,manualUpdate),/Select an approval process/);
+  assert.equal(C.load(f.storage).invoices[0].reason,invoice.reason);
+  const result=C.promote(f.state,[key],fields,f.config,f.storage,f.by,manualUpdate);
+  assert.equal(result.issues.length,1);
+  assert.equal(result.issues[0].issueReason,'Invoice Cancelled');
+  assert.equal(result.issues[0].approvalProcessId,process.id);
+  assert.equal(C.load(f.storage).invoices[0].reason,'Invoice Cancelled');
+  assert.equal(C.load(f.storage).invoices[0].submissionMedium,'Manual');
+  assert.equal(C.readIssues(f.storage).filter(issue=>issue.source==='submission-module').length,1);
+});
+test('failed inline issue creation leaves the submission update untouched',()=>{
+  const f=fixture(), invoice=f.state.invoices[0], process=f.config.ensureApprovalData().processes[0];
+  const before=f.storage.getItem(C.KEY), update={submissionStatus:'Not Submitted',submissionMedium:'Manual',activityType:'No Activity',submissionSubStatus:'Invoice Cancelled',remarks:'Invoice requires correction'};
+  f.storage.fail='customIssues';
+  assert.throws(()=>C.promote(f.state,[`invoice|${invoice.invoiceNo}|reason:Invoice Cancelled`],{owner:f.fields.owner,process:process.id,remark:update.remarks},f.config,f.storage,f.by,{invoiceNos:[invoice.invoiceNo],update,actorRole:'agent'}),/could not be saved/);
+  assert.equal(f.storage.getItem(C.KEY),before);
+  assert.equal(C.readIssues(f.storage).filter(issue=>issue.source==='submission-module').length,0);
 });
 test('only an Agent can return a completed invoice to Not Submitted',()=>{
   const state=C.seed(), invoice=state.invoices[0];

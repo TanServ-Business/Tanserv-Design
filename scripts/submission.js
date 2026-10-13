@@ -8,7 +8,7 @@
   const timestamp = value => Number.isFinite(Date.parse(value)) ? new Intl.DateTimeFormat('en-IN', { timeZone:'Asia/Kolkata',day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit' }).format(new Date(value)) : 'Not available';
   const duration = value => value === null ? 'Not available' : `${value} day${value === 1 ? '' : 's'}`;
   const submissionSource = invoice => invoice.submissionStatus === 'External Submission' || (invoice.submissionMedium || invoice.method) === 'External' ? 'external' : (invoice.submissionMedium || invoice.method) === 'Manual' ? 'manual' : (invoice.submissionMedium || invoice.method) === 'Automated' ? 'automated' : 'unspecified';
-  const submissionMedium = invoice => !C.submitted(invoice) ? '—' : ({ automated:'Automated',manual:'Manual',external:'External' }[submissionSource(invoice)] || 'Not recorded');
+  const submissionMedium = invoice => !C.submitted(invoice) ? invoice.submissionMedium === 'Manual' && invoice.reason ? 'Manual' : '—' : ({ automated:'Automated',manual:'Manual',external:'External' }[submissionSource(invoice)] || 'Not recorded');
   const firstRecorded = (...values) => {
     const found=values.find(value => value != null && String(value).trim() !== '');
     return found === undefined ? '' : found;
@@ -197,7 +197,7 @@
     const open=new Set([...ownIssues.filter(issue=>!C.closed(issue)).map(issue=>issue.id),...ownGroups.filter(group=>group.issue).map(group=>group.issue.id)]);
     const missing=C.missing(state,invoice,attachments);
     const decision=decisionFor(invoice);
-    const message=waiting.length ? `${waiting.length} blocker${waiting.length===1?' needs':'s need'} review. Choose whether to raise an issue or defer review.`
+    const message=waiting.length ? `${waiting.length} blocker${waiting.length===1?' needs':'s need'} review. Record the reason below; add it to Issue Tracker if an owner and approval are needed.`
       : open.size ? `${open.size} issue${open.size===1?' is':'s are'} open. Track ownership and approvals in Issue Tracker while the invoice remains pending.`
       : missing.length ? `${missing.length} required document${missing.length===1?' is':'s are'} missing. Add the files in the document module; this invoice stays pending.`
       : invoice.reason ? `${invoice.reason} is recorded. Review the reason before attempting submission.`
@@ -218,8 +218,6 @@
     prepareTimeline();
     if (!done || correction) {
       $('sjUpdateSection').append($('sjManualForm'));
-      $('sjInlineReview').dataset.raiseInvoice=invoice.invoiceNo;
-      $('sjInlineReview').hidden=done||!ownGroups.some(group=>C.issueReasonForGroup(group));
       if (inlineManualInvoice !== invoice.invoiceNo || ($('sjManualTitle').textContent === 'Correct submission') !== correction) { configureManual([invoice.invoiceNo],correction); inlineManualInvoice = invoice.invoiceNo; }
     } else inlineManualInvoice = '';
   }
@@ -326,23 +324,28 @@
     if(!manualIds.length){notice('Select pending invoices for a manual update.');return false;}
     $('sjManualForm').reset();setOptions('sjManualStatus',correction?['Not Submitted']:['Submitted','Not Submitted'],'Select submission status');setOptions('sjManualMedium',[],'Select status first');setManualActivityOptions();
     $('sjManualTitle').textContent=correction?'Correct submission':'Update submission';
+    const config=window.IssueTrackerConfig, approvals=config.ensureApprovalData();
+    $('sjManualIssueOwner').innerHTML='<option value="">Select action owner</option>'+config.usersForRole('action-owner').map(user=>`<option value="${esc(user.name)}">${esc(user.name)}</option>`).join('');
+    $('sjManualIssueProcess').innerHTML='<option value="">Select approval process</option>'+approvals.processes.map(process=>`<option value="${esc(process.id)}">${esc(process.process)}</option>`).join('');
     $('sjManualContext').textContent=manualIds.length===1?`${manualIds[0]} · ${state.invoices.find(row=>row.invoiceNo===manualIds[0]).name}`:`${manualIds.length} invoices selected. Each invoice will receive its own activity record.`;
     const reqs=[...new Map(manualIds.flatMap(id=>C.missing(state,state.invoices.find(row=>row.invoiceNo===id),attachments)).map(req=>[`${req.scope}|${req.id}`,req])).values()];
-    $('sjMissingChoices').innerHTML=reqs.length?reqs.map(req=>`<label><input type="checkbox" data-missing="${esc(req.id)}" checked> ${esc(req.name)} <small>${req.scope}</small></label>`).join(''):'<p class="sjHint">No configured missing documents. The selected non-submission reason will still be recorded and can be reviewed.</p>';
+    $('sjMissingChoices').innerHTML=reqs.length?reqs.map(req=>`<label><input type="checkbox" data-missing="${esc(req.id)}"> ${esc(req.name)} <small>${req.scope}</small></label>`).join(''):'<p class="sjHint">No configured missing documents are recorded for these invoices.</p>';
     $('sjSubmissionDate').max=C.today();$('sjCourierDate').max=C.today();$('sjManualError').textContent='';$('sjManualSave').textContent='Save update';
-    manualSnapshot=JSON.stringify([...new FormData($('sjManualForm'))]);return true;
+    manualSnapshot=manualFormSnapshot();return true;
   }
-  const hasUnsavedManual=()=>Boolean(selectedInvoice && inlineManualInvoice === selectedInvoice && manualSnapshot && JSON.stringify([...new FormData($('sjManualForm'))]) !== manualSnapshot);
+  const manualFormSnapshot=()=>JSON.stringify([...$('sjManualForm').querySelectorAll('input, select, textarea')].map(field=>[field.id||field.name,field.type==='checkbox'||field.type==='radio'?field.checked:field.value]));
+  const hasUnsavedManual=()=>Boolean(selectedInvoice && inlineManualInvoice === selectedInvoice && manualSnapshot && manualFormSnapshot() !== manualSnapshot);
   function openManual(ids) {
     refresh(); restoreManualDialog();
     if(configureManual(ids))openDialog('sjManualDialog');
   }
   function setManualActivityOptions() {
-    const medium=$('sjManualMedium').value;
+    const status=$('sjManualStatus').value, medium=$('sjManualMedium').value;
     ['sjSubmissionDate','sjSentTo','sjCourierName','sjCourierDate','sjCourierAwb','sjManualRemark'].forEach(id=>$(id).value='');
     setOptions('sjSubmissionType',[],'Select sub-status first');setOptions('sjInvoiceType',[],'Select sub-status first');
-    document.querySelector('[name=sjEscalate][value=track]').checked=true;
-    setOptions('sjActivity',C.manualFlow($('sjManualStatus').value,'',medium).activities,medium?'Select activity':'Select medium first');
+    $('sjAddToIssueTracker').checked=false;
+    setOptions('sjActivity',C.manualFlow(status,'',medium).activities,medium?'Select activity':'Select medium first');
+    if(status==='Not Submitted')$('sjActivity').value='No Activity';
     setManualSubOptions();
   }
   function setManualSubOptions() {
@@ -356,15 +359,21 @@
   }
   function manualChanged() {
     const status=$('sjManualStatus').value, medium=$('sjManualMedium').value, flow=C.manualFlow(status,$('sjActivity').value,medium), delivery=flow.delivery&&$('sjManualSub').value===flow.subStatus, courier=flow.courier;
-    $('sjActivityField').hidden=flow.external;$('sjActivity').required=!flow.external;
+    const addIssue=status==='Not Submitted'&&$('sjAddToIssueTracker').checked;
+    $('sjManualStatusField').classList.toggle('sjFull',status==='Not Submitted');
+    $('sjManualMediumField').hidden=status==='Not Submitted';
+    $('sjActivityField').hidden=flow.external||status==='Not Submitted';$('sjActivity').required=Boolean(status)&&!flow.external;
     $('sjManualDetails').hidden=flow.external||!medium;$('sjManualSub').required=!flow.external;
     $('sjCompletedFields').hidden=!delivery;$('sjManualDestination').required=delivery;
     $('sjFulfilmentFields').hidden=!(delivery||courier);$('sjDelivery').hidden=!delivery;$('sjSentFields').hidden=!(delivery||courier);$('sjCourier').hidden=!courier;
-    $('sjEscalationChoice').hidden=status!=='Not Submitted';$('sjMissingFields').hidden=status!=='Not Submitted'||$('sjManualSub').value!=='Docs Pending';
+    $('sjEscalationChoice').hidden=status!=='Not Submitted';$('sjInlineIssueFields').hidden=!addIssue;
+    $('sjMissingFields').hidden=!addIssue||$('sjManualSub').value!=='Docs Pending';
+    $('sjManualIssueOwner').required=addIssue;$('sjManualIssueProcess').required=addIssue;$('sjManualRemark').required=addIssue;
+    $('sjManualRemarkRequired').hidden=!addIssue;
     $('sjManualAutomation').hidden=!(delivery||flow.external);
     ['sjSubmissionType','sjInvoiceType','sjSubmissionDate'].forEach(id=>$(id).required=delivery);$('sjSentTo').required=delivery||courier;['sjCourierName','sjCourierDate','sjCourierAwb'].forEach(id=>$(id).required=courier);
     if(delivery){const previous=$('sjInvoiceType').value;setOptions('sjSubmissionType',[flow.submissionType],'Select type');$('sjSubmissionType').value=flow.submissionType;setOptions('sjInvoiceType',flow.invoiceTypes,'Select invoice type');$('sjInvoiceType').value=flow.invoiceTypes.includes(previous)?previous:flow.invoiceTypes[0];}
-    $('sjManualSave').textContent=status==='Not Submitted'&&document.querySelector('[name=sjEscalate]:checked').value==='raise'?'Save and review issues':'Save update';
+    $('sjManualSave').textContent=addIssue?'Save update and add to Issue Tracker':'Save update';
   }
   document.addEventListener('click',event=>{
     const button=event.target.closest('button'); if(!button)return;
@@ -382,7 +391,6 @@
     if(button.hasAttribute('data-back')){if(hasUnsavedManual()&&!window.confirm('Discard your unsaved submission update?'))return;selectedInvoice='';render();document.querySelector(view==='review'?'[data-pending-view="review"]':`[data-view="${view}"]`)?.focus();return;}
     if(button.dataset.review){openReview([button.dataset.review]);return;}
     if(button.dataset.reviewInvoice){const invoice=state.invoices.find(row=>row.invoiceNo===button.dataset.reviewInvoice);if(invoice)openReview(reviewGroupsForInvoice(invoice).map(group=>group.key));return;}
-    if(button.dataset.raiseInvoice){openReview(invoiceGroups(state.invoices.find(row=>row.invoiceNo===button.dataset.raiseInvoice)).map(group=>group.key));return;}
     if(button.dataset.defer){openDefer([button.dataset.defer]);return;}
     if(button.dataset.manual){openManual([button.dataset.manual]);return;}
     if(button.dataset.sort){sort===button.dataset.sort?direction*=-1:(sort=button.dataset.sort,direction=sort==='age'?-1:1);page=1;render();}
@@ -408,7 +416,7 @@
   $('sjDeferFromReview').addEventListener('click',()=>openDefer(selectedReviewKeys().length?selectedReviewKeys():reviewKeys));
   $('sjManualStatus').addEventListener('change',()=>{const status=$('sjManualStatus').value;setOptions('sjManualMedium',status==='Submitted'?['Manual','External']:status==='Not Submitted'?['Manual']:[],'Select medium');if(status==='Not Submitted')$('sjManualMedium').value='Manual';setManualActivityOptions();});
   $('sjManualMedium').addEventListener('change',setManualActivityOptions);
-  $('sjActivity').addEventListener('change',setManualSubOptions);$('sjManualSub').addEventListener('change',manualChanged);document.querySelectorAll('[name=sjEscalate]').forEach(input=>input.addEventListener('change',manualChanged));
+  $('sjActivity').addEventListener('change',setManualSubOptions);$('sjManualSub').addEventListener('change',manualChanged);$('sjAddToIssueTracker').addEventListener('change',manualChanged);
   $('sjManualForm').addEventListener('submit',event=>{
     event.preventDefault(); if(!$('sjManualForm').reportValidity())return;
     try {
@@ -417,13 +425,22 @@
         if (!window.confirm(`Apply this update to ${manualIds.length} invoices for ${names.join(', ')}?\n\n${manualIds.join(', ')}`)) return;
       }
       refresh(); if(manualIds.some(id=>!state.invoices.some(row=>row.invoiceNo===id&&(!C.submitted(row)||$('sjManualStatus').value==='Not Submitted'&&activeRole()==='agent'))))throw new Error('An invoice changed while this form was open. Close it and review the latest status.');
-      const status=$('sjManualStatus').value, missingIds=[...document.querySelectorAll('[data-missing]:checked')].map(input=>input.dataset.missing);
-      const raiseIssue=status==='Not Submitted'&&document.querySelector('[name=sjEscalate]:checked')?.value==='raise';
-      if(!$('sjMissingFields').hidden&&document.querySelector('[data-missing]')&&!missingIds.length)throw new Error('Select the missing document(s) for this reason.');
-      const update={activityType:$('sjActivity').value,submissionStatus:status,submissionSubStatus:$('sjManualSub').value,submissionMedium:status==='Submitted'?$('sjManualMedium').value:'',submissionDestination:$('sjCompletedFields').hidden?'':$('sjManualDestination').value,submissionDate:$('sjDelivery').hidden?'':$('sjSubmissionDate').value,submissionType:$('sjDelivery').hidden?'':$('sjSubmissionType').value,invoiceType:$('sjDelivery').hidden?'':$('sjInvoiceType').value,sentTo:$('sjSentFields').hidden?'':$('sjSentTo').value,courierName:$('sjCourier').hidden?'':$('sjCourierName').value,courierDate:$('sjCourier').hidden?'':$('sjCourierDate').value,courierAwb:$('sjCourier').hidden?'':$('sjCourierAwb').value,remarks:$('sjManualDetails').hidden?'':$('sjManualRemark').value,missingIds};
+      const status=$('sjManualStatus').value, addIssue=status==='Not Submitted'&&$('sjAddToIssueTracker').checked;
+      const missingIds=addIssue?[...document.querySelectorAll('[data-missing]:checked')].map(input=>input.dataset.missing):[];
+      if(addIssue&&$('sjManualSub').value==='Docs Pending'&&!missingIds.length)throw new Error('Select the missing document(s) to add to Issue Tracker.');
+      const update={activityType:status==='Not Submitted'?'No Activity':$('sjActivity').value,submissionStatus:status,submissionSubStatus:$('sjManualSub').value,submissionMedium:status==='Not Submitted'?'Manual':$('sjManualMedium').value,submissionDestination:$('sjCompletedFields').hidden?'':$('sjManualDestination').value,submissionDate:$('sjDelivery').hidden?'':$('sjSubmissionDate').value,submissionType:$('sjDelivery').hidden?'':$('sjSubmissionType').value,invoiceType:$('sjDelivery').hidden?'':$('sjInvoiceType').value,sentTo:$('sjSentFields').hidden?'':$('sjSentTo').value,courierName:$('sjCourier').hidden?'':$('sjCourierName').value,courierDate:$('sjCourier').hidden?'':$('sjCourierDate').value,courierAwb:$('sjCourier').hidden?'':$('sjCourierAwb').value,remarks:$('sjManualDetails').hidden?'':$('sjManualRemark').value,missingIds};
       const correcting=manualIds.some(id=>C.submitted(state.invoices.find(row=>row.invoiceNo===id)));
-      const next=C.clone(state); C.saveManual(next,manualIds,update,currentUser(),activeRole());persist(next);refresh();if($('sjManualDialog').open)closeDialog('sjManualDialog');selected.clear();inlineManualInvoice='';render();notice(status==='Not Submitted'?correcting?'Submission corrected to Not Submitted. Previous submission remains in the timeline. No issue has been created.':'Non-submission reason saved. No issue has been created.':`${$('sjManualMedium').value} submission saved. Automatic submission is skipped.`);
-      if(raiseIssue)openReview(groups.filter(group=>group.invoices.some(row=>manualIds.includes(row.invoiceNo))&&(!missingIds.length||missingIds.includes(group.requirement.id)||group.requirement.kind==='reason')).map(group=>group.key));
+      const next=C.clone(state); C.saveManual(next,manualIds,update,currentUser(),activeRole());
+      let created=[];
+      if(addIssue){
+        const keys=C.blockers(next,issues,C.today(),attachments).filter(group=>group.invoices.some(row=>manualIds.includes(row.invoiceNo))&&(update.submissionSubStatus==='Docs Pending'?group.requirement.kind!=='reason'&&missingIds.includes(group.requirement.id):group.requirement.kind==='reason'&&group.requirement.name===update.submissionSubStatus)).map(group=>group.key);
+        if(!keys.length)throw new Error('No matching blocker is available for an issue. Review the reason and selected documents.');
+        const result=C.promote(state,keys,{owner:$('sjManualIssueOwner').value,process:$('sjManualIssueProcess').value,remark:$('sjManualRemark').value.trim()},window.IssueTrackerConfig,localStorage,currentUser(),{invoiceNos:manualIds,update,actorRole:activeRole()});
+        state=result.state;created=result.issues;
+      } else persist(next);
+      refresh();if($('sjManualDialog').open)closeDialog('sjManualDialog');selected.clear();inlineManualInvoice='';render();
+      if(created.length)notice(`${created.length} issue${created.length===1?'':'s'} created with the submission update. ${created.map(issue=>`<a href="${esc(issueURL(issue))}">${esc(issue.documentRequirement)} · Open Issue Tracker</a>`).join(' · ')}`,false,true);
+      else notice(status==='Not Submitted'?correcting?'Submission corrected to Not Submitted. Previous submission remains in the timeline. No issue has been created.':'Non-submission reason saved. No issue has been created.':`${$('sjManualMedium').value} submission saved. Automatic submission is skipped.`);
     }catch(error){$('sjManualError').textContent=error.message;}
   });
   $('sjIssueForm').addEventListener('submit',event=>{
@@ -438,8 +455,8 @@
     try{refresh();const next=C.clone(state);deferKeys.forEach(key=>{const group=groups.find(row=>row.key===key&&!row.issue);if(!group)throw new Error('A dependency changed. Review it again.');C.defer(next,group,$('sjDeferDate').value,$('sjDeferRemark').value,currentUser());});persist(next);refresh();closeDialog('sjDeferDialog');render();notice(`Review deferred to ${date($('sjDeferDate').value)}. The blockers remain visible in All Pending.`);}catch(error){$('sjDeferError').textContent=error.message;}
   });
   $('sjRulesBtn').addEventListener('click',()=>{$('sjReviewDays').textContent=state.settings.reviewDays;openDialog('sjRulesDialog');});
-  window.addEventListener('focus',()=>{if(document.querySelector('dialog[open]'))return;try{refresh();render();}catch(error){notice(error.message,true);}});
-  window.addEventListener('storage',()=>{if(document.querySelector('dialog[open]'))return;try{refresh();render();}catch(error){notice(error.message,true);}});
+  window.addEventListener('focus',()=>{if(document.querySelector('dialog[open]')||hasUnsavedManual())return;try{refresh();render();}catch(error){notice(error.message,true);}});
+  window.addEventListener('storage',()=>{if(document.querySelector('dialog[open]')||hasUnsavedManual())return;try{refresh();render();}catch(error){notice(error.message,true);}});
   window.addEventListener('beforeunload',event=>{if(!hasUnsavedManual())return;event.preventDefault();event.returnValue='';});
   function headerAssets(){const logo=$('relationshipLogo');if(logo)logo.innerHTML='<img src="../assets/submission-reference/client-logo.jpg" alt="Client logo">';const avatar=$('headerUserAvatar');if(avatar)avatar.innerHTML='<img src="../assets/submission-reference/avatar.png" alt="User profile">';const badge=document.querySelector('.notification-badge');if(badge)badge.textContent='5';}
   try{refresh();render();const target=new URLSearchParams(location.search).get('invoice');if(target&&state.invoices.some(row=>row.invoiceNo===target))openInvoice(target);}catch(error){notice(error.message,true);$('sjList').hidden=true;}

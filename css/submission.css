@@ -97,7 +97,6 @@
 .sjUpdateSection .sjDialogHead{margin-bottom:2px}
 .sjUpdateSection .sjDialogHead h2{font-size:19px}
 .sjUpdateSection .sjDialogHead .sjButton{margin-left:auto;white-space:nowrap}
-.sjManualDialog:not(.sjUpdateSection) #sjInlineReview{display:none}
 .sjUpdateSection .sjFormGrid{gap:12px}
 .sjUpdateSection .sjDialogFooter{justify-content:flex-end}
 .sjInvoiceOverview{background:#fff;border:1px solid var(--sj-border);border-radius:12px;margin:0 0 18px;overflow:hidden}
@@ -159,6 +158,14 @@
 .sjNextStep strong{display:block;font-size:13px}
 .sjNextStep p{font-size:12px;line-height:1.5;margin:4px 0 0}
 .sjIssueRoute{margin:15px 0 0;padding:11px 13px;border-radius:8px;background:#f5f2f8;color:#4d3b60;font-size:12px}
+.sjManualDialog .sjInlineIssue{border:1px solid #dce4f2;border-radius:12px;background:#f8f9fc;padding:15px 16px;margin-top:20px}
+.sjManualDialog .sjIssueToggle{display:flex;align-items:flex-start;gap:10px;margin:0;color:#52637e;text-transform:none;letter-spacing:normal;cursor:pointer}
+.sjIssueToggle input{flex:none;margin-top:2px;accent-color:var(--sj-purple)}
+.sjIssueToggle span{display:grid;gap:3px}
+.sjIssueToggle strong{font-size:13px;color:#334155}
+.sjIssueToggle small{font-size:12px;font-weight:400;line-height:1.45;color:#64748b}
+.sjInlineIssue .sjFormGrid{margin-top:17px}
+.sjInlineIssue .sjHint{margin:12px 0 0}
 .sjActivityCard:not(.is-expanded) .sjTimeline>li:nth-child(n+6){display:none}
 .sjMoreActivity{margin:0 0 12px 27px;font-size:12px}
 @media(max-width:700px){.sjTable th:nth-child(4),.sjTable td:nth-child(4){position:sticky;left:0;z-index:2;min-width:125px;background:#fff;box-shadow:1px 0 3px #1720331a}.sjTable th:nth-child(4){z-index:4;background:var(--sj-purple)}.sjTable th:last-child,.sjTable td:last-child{position:sticky;right:0;z-index:3;background:#fff;box-shadow:-1px 0 3px #1720331a}.sjTable th:last-child{z-index:4;background:var(--sj-purple)}}

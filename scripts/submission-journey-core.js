@@ -40,7 +40,7 @@
   const submitted = invoice => ['Submitted','Email Sent','Docs Sent','External Submission','On Premises'].includes(invoice.submissionStatus);
   function manualFlow(status, activity, medium = 'Manual') {
     const external = status === 'Submitted' && medium === 'External';
-    const activities = medium !== 'Manual' ? [] : status === 'Submitted' ? Object.keys(activitySubStatuses) : status === 'Not Submitted' ? ['No Activity',...Object.keys(activitySubStatuses)] : [];
+    const activities = medium !== 'Manual' ? [] : status === 'Submitted' ? Object.keys(activitySubStatuses) : status === 'Not Submitted' ? ['No Activity'] : [];
     const validActivity = activities.includes(activity), complete = status === 'Submitted' && validActivity;
     const subStatus = complete ? activitySubStatuses[activity] : '';
     return { external,activities,subStatuses:complete ? [subStatus] : status === 'Not Submitted' && validActivity ? nonSubmissionReasons : [],subStatus,
@@ -176,6 +176,11 @@
     const { invoiceNo:ignored, ...fields } = update;
     update = fields;
     if (!['Submitted','Not Submitted'].includes(update.submissionStatus)) throw new Error('Choose Submitted or Not Submitted first.');
+    if (update.submissionStatus === 'Not Submitted') {
+      if (update.submissionMedium && update.submissionMedium !== 'Manual') throw new Error('External submission is only available with Submitted.');
+      if (update.activityType && update.activityType !== 'No Activity') throw new Error('No Activity is the only activity for Not Submitted.');
+      update = { ...update, submissionMedium:'Manual', activityType:'No Activity' };
+    }
     if (update.submissionStatus === 'Submitted' && !['Manual','External'].includes(update.submissionMedium)) throw new Error('Choose Manual or External as the submission medium.');
     if (update.submissionStatus === 'Not Submitted' && update.submissionMedium && update.submissionMedium !== 'Manual') throw new Error('External submission is only available with Submitted.');
     const flow = manualFlow(update.submissionStatus,update.activityType,update.submissionMedium || (update.submissionStatus === 'Not Submitted' ? 'Manual' : ''));
@@ -189,7 +194,7 @@
     if ((flow.delivery || flow.courier) && !String(update.sentTo || '').trim()) throw new Error('Enter who the submission was sent to or received by.');
     if (flow.courier && (!String(update.courierName || '').trim() || !String(update.courierAwb || '').trim() || !validPastDate(update.courierDate))) throw new Error('Complete the courier name, date and AWB.');
     update = { ...update,activityType:flow.external ? '' : update.activityType,submissionSubStatus:flow.external ? '' : update.submissionSubStatus,
-      submissionMedium:flow.delivery || flow.external ? update.submissionMedium : '',submissionDestination:flow.delivery ? update.submissionDestination : '',
+      submissionMedium:flow.delivery || flow.external ? update.submissionMedium : update.submissionStatus === 'Not Submitted' ? 'Manual' : '',submissionDestination:flow.delivery ? update.submissionDestination : '',
       submissionDate:flow.delivery ? update.submissionDate : '',submissionType:flow.delivery ? update.submissionType : '',invoiceType:flow.delivery ? update.invoiceType : '',
       sentTo:flow.delivery || flow.courier ? update.sentTo : '',courierName:flow.courier ? update.courierName : '',courierDate:flow.courier ? update.courierDate : '',courierAwb:flow.courier ? update.courierAwb : '',
       remarks:flow.external ? '' : update.remarks || '',missingIds:update.submissionStatus === 'Not Submitted' && update.submissionSubStatus === 'Docs Pending' ? update.missingIds || [] : [] };
@@ -198,7 +203,7 @@
       const invoice = state.invoices.find(row => row.invoiceNo === id), wasSubmitted = submitted(invoice);
       Object.assign(invoice, update, { updatedAt: at });
       if (update.submissionStatus === 'Not Submitted') {
-        invoice.reason = update.submissionSubStatus; invoice.status = 'Not Submitted & Tracking'; invoice.submissionDate = ''; invoice.automationSuppressed = false; invoice.method = ''; invoice.submissionMedium = ''; invoice.submissionDestination = '';
+        invoice.reason = update.submissionSubStatus; invoice.status = 'Not Submitted & Tracking'; invoice.submissionDate = ''; invoice.automationSuppressed = false; invoice.method = 'Manual'; invoice.submissionMedium = 'Manual'; invoice.submissionDestination = '';
         // Manual reporting does not alter configured document requirements.
       } else {
         invoice.reason = ''; invoice.method = update.submissionMedium; invoice.status = 'Submitted & Tracking'; invoice.automationSuppressed = true;
@@ -278,14 +283,20 @@
     try { Object.entries(values).forEach(([key, value]) => storage.setItem(key, JSON.stringify(value))); }
     catch (error) { Object.entries(previous).forEach(([key, value]) => { try { value === null ? storage.removeItem(key) : storage.setItem(key, value); } catch (_) {} }); throw new Error('Changes could not be saved. Check browser storage and try again.'); }
   }
-  function promote(state, selectedKeys, fields, config, storage, by) {
+  function promote(state, selectedKeys, fields, config, storage, by, manualUpdate = null) {
     if (!selectedKeys.length) throw new Error('Select at least one document or reason.');
     if (config.roleOf(fields.owner) !== 'action-owner') throw new Error('Select a valid action owner.');
+    if (manualUpdate && !fields.process) throw new Error('Select an approval process for the issue.');
+    if (manualUpdate && manualUpdate.update?.submissionStatus !== 'Not Submitted') throw new Error('Only a Not Submitted update can be added to Issue Tracker.');
     if (!fields.remark.trim()) throw new Error('Describe what is blocking submission.');
     const { processes, matrices } = config.ensureApprovalData();
     const process = processes.find(item => item.id === fields.process), matrix = matrices.find(item => item.id === process?.matrixId);
     if (fields.process && (!process || !matrix)) throw new Error('Approval process unavailable. Choose it again.');
     state = storage.getItem(KEY) ? load(storage) : state;
+    if (manualUpdate) {
+      state = clone(state);
+      saveManual(state, manualUpdate.invoiceNos, manualUpdate.update, by, manualUpdate.actorRole);
+    }
     config.ensureWorkflowVersion?.();
     const issues = readIssues(storage), attachments = issueAttachments(issues), fresh = blockers(state, issues, today(), attachments);
     const groups = selectedKeys.map(key => fresh.find(group => group.key === key));
