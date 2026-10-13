@@ -225,8 +225,6 @@ test('inline issue creation saves the reason and issue together',()=>{
   const update={submissionStatus:'Not Submitted',submissionMedium:'Manual',activityType:'No Activity',submissionSubStatus:'Invoice Cancelled',remarks:'Invoice requires correction'};
   const key=`invoice|${invoice.invoiceNo}|reason:Invoice Cancelled`, manualUpdate={invoiceNos:[invoice.invoiceNo],update,actorRole:'agent'};
   const fields={owner:f.fields.owner,process:process.id,remark:update.remarks};
-  assert.throws(()=>C.promote(f.state,[key],{...fields,process:''},f.config,f.storage,f.by,manualUpdate),/Select an approval process/);
-  assert.equal(C.load(f.storage).invoices[0].reason,invoice.reason);
   const result=C.promote(f.state,[key],fields,f.config,f.storage,f.by,manualUpdate);
   assert.equal(result.issues.length,1);
   assert.equal(result.issues[0].issueReason,'Invoice Cancelled');
@@ -234,6 +232,18 @@ test('inline issue creation saves the reason and issue together',()=>{
   assert.equal(C.load(f.storage).invoices[0].reason,'Invoice Cancelled');
   assert.equal(C.load(f.storage).invoices[0].submissionMedium,'Manual');
   assert.equal(C.readIssues(f.storage).filter(issue=>issue.source==='submission-module').length,1);
+});
+test('inline issue creation permits no approval process and keeps the action owner',()=>{
+  const f=fixture(), invoice=f.state.invoices[0];
+  const update={submissionStatus:'Not Submitted',submissionMedium:'Manual',activityType:'No Activity',submissionSubStatus:'Invoice Cancelled',remarks:'Invoice requires correction'};
+  const key=`invoice|${invoice.invoiceNo}|reason:Invoice Cancelled`;
+  const result=C.promote(f.state,[key],{owner:f.fields.owner,process:'',remark:update.remarks},f.config,f.storage,f.by,{invoiceNos:[invoice.invoiceNo],update,actorRole:'agent'});
+  assert.equal(result.issues.length,1);
+  assert.equal(result.issues[0].actionOwner,f.fields.owner);
+  assert.equal(result.issues[0].approvalProcessId,'');
+  assert.equal(result.issues[0].workflowStep,'manager-review');
+  assert.equal(C.load(f.storage).invoices[0].reason,'Invoice Cancelled');
+  assert.equal(C.readIssues(f.storage).length,1);
 });
 test('failed inline issue creation leaves the submission update untouched',()=>{
   const f=fixture(), invoice=f.state.invoices[0], process=f.config.ensureApprovalData().processes[0];

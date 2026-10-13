@@ -314,7 +314,7 @@
     $('sjManualTitle').textContent=correction?'Correct submission':'Update submission';
     const config=window.IssueTrackerConfig, approvals=config.ensureApprovalData();
     $('sjManualIssueOwner').innerHTML='<option value="">Select action owner</option>'+config.usersForRole('action-owner').map(user=>`<option value="${esc(user.name)}">${esc(user.name)}</option>`).join('');
-    $('sjManualIssueProcess').innerHTML='<option value="">Select approval process</option>'+approvals.processes.map(process=>`<option value="${esc(process.id)}">${esc(process.process)}</option>`).join('');
+    $('sjManualIssueProcess').innerHTML='<option value="">No approval process</option>'+approvals.processes.map(process=>`<option value="${esc(process.id)}">${esc(process.process)}</option>`).join('');
     $('sjManualContext').textContent=manualIds.length===1?`${manualIds[0]} · ${state.invoices.find(row=>row.invoiceNo===manualIds[0]).name}`:`${manualIds.length} invoices selected. Each invoice will receive its own activity record.`;
     const reqs=[...new Map(manualIds.flatMap(id=>C.missing(state,state.invoices.find(row=>row.invoiceNo===id),attachments)).map(req=>[`${req.scope}|${req.id}`,req])).values()];
     $('sjMissingChoices').innerHTML=reqs.length?reqs.map(req=>`<label><input type="checkbox" data-missing="${esc(req.id)}"> ${esc(req.name)} <small>${req.scope}</small></label>`).join(''):'<p class="sjHint">No configured missing documents are recorded for these invoices.</p>';
@@ -357,7 +357,7 @@
     $('sjEscalationChoice').hidden=status!=='Not Submitted';$('sjInlineIssueFields').hidden=!addIssue;
     $('sjMissingFields').hidden=!addIssue||$('sjManualSub').value!=='Docs Pending';
     const correction=manualIds.some(id=>C.submitted(state.invoices.find(row=>row.invoiceNo===id)));
-    $('sjManualIssueOwner').required=addIssue;$('sjManualIssueProcess').required=addIssue;$('sjManualRemark').required=addIssue||correction;
+    $('sjManualIssueOwner').required=addIssue;$('sjManualIssueProcess').required=false;$('sjManualRemark').required=addIssue||correction;
     $('sjManualRemarkRequired').hidden=!(addIssue||correction);
     $('sjManualAutomation').hidden=!(delivery||flow.external);
     ['sjSubmissionType','sjInvoiceType','sjSubmissionDate'].forEach(id=>$(id).required=delivery);$('sjSentTo').required=delivery||courier;['sjCourierName','sjCourierDate','sjCourierAwb'].forEach(id=>$(id).required=courier);

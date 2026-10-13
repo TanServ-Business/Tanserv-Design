@@ -289,7 +289,6 @@
   function promote(state, selectedKeys, fields, config, storage, by, manualUpdate = null) {
     if (!selectedKeys.length) throw new Error('Select at least one document or reason.');
     if (config.roleOf(fields.owner) !== 'action-owner') throw new Error('Select a valid action owner.');
-    if (manualUpdate && !fields.process) throw new Error('Select an approval process for the issue.');
     if (manualUpdate && manualUpdate.update?.submissionStatus !== 'Not Submitted') throw new Error('Only a Not Submitted update can be added to Issue Tracker.');
     if (!fields.remark.trim()) throw new Error('Describe what is blocking submission.');
     const { processes, matrices } = config.ensureApprovalData();
