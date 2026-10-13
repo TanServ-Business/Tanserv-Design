@@ -80,7 +80,7 @@
           <td><span class="adminSubmissionStrategyName"><strong>${escapeHtml(row.strategyName)}</strong><small>${escapeHtml(row.strategySubtitle || '')}</small>${row.batchInvoicesInOneEmail ? `<small>Bulk email after ${escapeHtml(row.bulkSendAfterDays)} ${Number(row.bulkSendAfterDays) === 1 ? 'day' : 'days'} in Inebura</small>` : ''}</span></td>
           <td><span class="adminSubmissionApplyOn">${escapeHtml(row.applyOn)}</span></td>
           <td>${escapeHtml(row.strategyType)}</td>
-          <td>${row.agentSelection ? 'Yes' : 'No'}</td>
+          <td>${row.agentSelection ? `<span class="adminSubmissionAgentCell">Yes<small>${strategyRules.deliveryMode(row) === 'sequential' ? 'Sequentially' : 'One shot'}</small></span>` : 'No'}</td>
           <td><span class="adminSubmissionDocs">${(row.selectedDocuments || []).length} DOCS</span></td>
           <td><span class="adminSubmissionRowActions"><button type="button" data-submission-action="edit" data-id="${escapeHtml(row.id)}"><i class="bi bi-pencil-square" aria-hidden="true"></i>Edit</button><button type="button" data-submission-action="delete" data-id="${escapeHtml(row.id)}"><i class="bi bi-trash3" aria-hidden="true"></i>Delete</button></span></td>
         </tr>`).join('') : '<tr><td class="adminSubmissionEmpty" colspan="7">No strategies found</td></tr>'}</tbody>
@@ -116,6 +116,7 @@
       : type === 'Invoice + Docs(Sequentially)'
         ? 'The invoice and selected documents will be shared as each is uploaded.'
         : 'Only the invoice will be shared when uploaded.';
+    const agentDelivery = record?.agentDocumentDelivery || (record?.strategyType === 'Invoice + Docs(Sequentially)' ? 'sequential' : 'one-shot');
     showModal(`<section class="adminModalCard adminSubmissionStrategyModal" role="dialog" aria-modal="true" aria-labelledby="submissionStrategyFormTitle">
       <header><h2 id="submissionStrategyFormTitle">${editing ? 'Edit' : 'Add'} Strategy</h2><button type="button" class="adminModalClose" data-submission-action="close-modal" aria-label="Close"><i class="bi bi-x-lg"></i></button></header>
       <form id="submissionStrategyForm">
@@ -127,6 +128,7 @@
           <p class="adminSubmissionTypeHint" id="submissionTypeHint">${escapeHtml(typeHint(record?.strategyType || 'Invoice'))}</p>
           <label class="adminSubmissionFormField adminSubmissionWide"><span>CUSTOMER RECIPIENT LIST</span><input name="recipientList" type="text" value="${escapeHtml(record?.recipientList || '')}" placeholder="Optional — use invoice customer recipients" /><small>Separate bulk emails are prepared when the recipient list differs. Separate multiple addresses with commas.</small></label>
           <label class="adminSubmissionAgent"><input type="checkbox" name="agentSelection" ${record?.agentSelection ? 'checked' : ''} /><strong>Agent<br />Selection</strong><span>The agent can also select documents that should go with the strategy. Turning this on will allow manual agent selections.</span></label>
+          <label class="adminSubmissionFormField adminSubmissionAgentDelivery" ${record?.agentSelection ? '' : 'hidden'}><span>SEND AGENT-SELECTED DOCUMENTS <abbr title="Required when Agent Selection is enabled">*</abbr></span><select name="agentDocumentDelivery"><option value="one-shot" ${agentDelivery === 'one-shot' ? 'selected' : ''}>Send agent selected documents and submission documents in one shot</option><option value="sequential" ${agentDelivery === 'sequential' ? 'selected' : ''}>Send agent selected documents and submission documents sequentially</option></select><small id="agentDocumentDeliveryHint"></small></label>
           <section class="adminSubmissionBulk" aria-labelledby="submissionBulkTitle">
             <label class="adminSubmissionBulkToggle"><input type="checkbox" name="batchInvoicesInOneEmail" ${record?.batchInvoicesInOneEmail ? 'checked' : ''} /><span><strong id="submissionBulkTitle">Submit multiple invoices in one email</strong><small>A customer batch goes at the next run when every invoice has its required documents, or after the configured wait. At the deadline, only document-complete invoices are sent; incomplete invoices remain pending.</small></span></label>
             <div class="adminSubmissionBulkDelay" ${record?.batchInvoicesInOneEmail ? '' : 'hidden'}><label class="adminSubmissionFormField" for="submissionBulkDays"><span>Bulk send after <abbr title="Required when bulk email is enabled">*</abbr></span><span class="adminSubmissionBulkInput"><input id="submissionBulkDays" name="bulkSendAfterDays" type="number" min="0" step="1" inputmode="numeric" value="${record?.batchInvoicesInOneEmail && Number.isInteger(Number(record.bulkSendAfterDays)) ? escapeHtml(record.bulkSendAfterDays) : ''}" /><span>days</span></span></label><small>Count from the earliest waiting invoice added to Inebura. New invoices do not restart the wait. At the deadline, send only invoices with all required documents tagged.</small></div>
@@ -153,6 +155,18 @@
     form.elements.applyOn.addEventListener('change', () => { const product = form.elements.applyOn.value === 'PRODUCT'; form.querySelector('.adminSubmissionProductField').hidden = !product; form.elements.productCategory.required = product; });
     form.elements.productCategory.required = record?.applyOn === 'PRODUCT';
     form.elements.strategyType.addEventListener('change', () => { form.querySelector('#submissionTypeHint').textContent = typeHint(form.elements.strategyType.value); });
+    const syncAgentDelivery = () => {
+      const enabled = form.elements.agentSelection.checked;
+      const field = form.querySelector('.adminSubmissionAgentDelivery');
+      field.hidden = !enabled;
+      form.elements.agentDocumentDelivery.disabled = !enabled;
+      form.elements.agentDocumentDelivery.required = enabled;
+      form.querySelector('#agentDocumentDeliveryHint').textContent = form.elements.agentDocumentDelivery.value === 'sequential'
+        ? 'The invoice can be sent when it is available. Each selected document is sent as it is attached. This timing overrides Strategy Type.'
+        : 'Wait until the invoice, submission documents, and agent-selected documents are uploaded, then send them together in one email. This timing overrides Strategy Type.';
+    };
+    form.elements.agentSelection.addEventListener('change', syncAgentDelivery);
+    form.elements.agentDocumentDelivery.addEventListener('change', syncAgentDelivery);
     const syncBulkDelay = () => {
       const enabled = form.elements.batchInvoicesInOneEmail.checked;
       form.elements.bulkSendAfterDays.disabled = !enabled;
@@ -160,10 +174,14 @@
       form.querySelector('.adminSubmissionBulkDelay').hidden = !enabled;
       const sequential = [...form.elements.strategyType.options].find(option => option.value === 'Invoice + Docs(Sequentially)');
       if (sequential) sequential.disabled = enabled;
+      const agentSequential = [...form.elements.agentDocumentDelivery.options].find(option => option.value === 'sequential');
+      if (agentSequential) agentSequential.disabled = enabled;
+      if (enabled && form.elements.agentDocumentDelivery.value === 'sequential') form.elements.agentDocumentDelivery.value = 'one-shot';
       if (enabled && form.elements.strategyType.value === 'Invoice + Docs(Sequentially)') {
         form.elements.strategyType.value = 'Invoice + Docs(In 1 Shot)';
         form.querySelector('#submissionTypeHint').textContent = 'Bulk email waits until all selected documents are uploaded.';
       }
+      syncAgentDelivery();
     };
     form.elements.batchInvoicesInOneEmail.addEventListener('change', syncBulkDelay);
     syncBulkDelay();
@@ -183,7 +201,7 @@
       const applyOn = form.elements.applyOn.value;
       const selectedDocuments = documentInputs.filter(input => input.checked).map(input => input.value);
       const batchInvoicesInOneEmail = form.elements.batchInvoicesInOneEmail.checked;
-      const next = {id: record?.id || `submission-${Date.now()}`,status: record?.status || 'RUNNING',strategyName:name,strategySubtitle:applyOn === 'PRODUCT' ? form.elements.productCategory.value : 'Xeon Infraservices Pvt Ltd',applyOn,strategyType:form.elements.strategyType.value,agentSelection:form.elements.agentSelection.checked,batchInvoicesInOneEmail,bulkSendAfterDays:batchInvoicesInOneEmail ? Number(form.elements.bulkSendAfterDays.value) : null,productCategory:applyOn === 'PRODUCT' ? form.elements.productCategory.value : '',recipientList:form.elements.recipientList.value.trim(),selectedDocuments,documents:[`${selectedDocuments.length} DOCS`]};
+      const next = {id: record?.id || `submission-${Date.now()}`,status: record?.status || 'RUNNING',strategyName:name,strategySubtitle:applyOn === 'PRODUCT' ? form.elements.productCategory.value : 'Xeon Infraservices Pvt Ltd',applyOn,strategyType:form.elements.strategyType.value,agentSelection:form.elements.agentSelection.checked,agentDocumentDelivery:form.elements.agentSelection.checked ? form.elements.agentDocumentDelivery.value : null,batchInvoicesInOneEmail,bulkSendAfterDays:batchInvoicesInOneEmail ? Number(form.elements.bulkSendAfterDays.value) : null,productCategory:applyOn === 'PRODUCT' ? form.elements.productCategory.value : '',recipientList:form.elements.recipientList.value.trim(),selectedDocuments,documents:[`${selectedDocuments.length} DOCS`]};
       const error = strategyRules.validate(strategies,next);
       if (error) { form.querySelector('#submissionStrategyError').textContent = error; return; }
       if (editing && !confirmStrategyChange(record)) return;
@@ -236,7 +254,8 @@
       const waiting=[...plan.decisions.values()].filter(item=>!item.ready&&item.reason!=='Already submitted').reduce((counts,item)=>{counts[item.reason]=(counts[item.reason]||0)+1;return counts;},{});
       const schedule=new Intl.DateTimeFormat('en-IN',{timeZone:'Asia/Kolkata',day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}).format(run);
       const batches=plan.batches.map(batch=>`<tr><td>${escapeHtml(batch.customer)}<small>${escapeHtml(batch.customerCode)}</small></td><td>${escapeHtml(batch.strategyName)}</td><td>${escapeHtml(batch.recipients.join(', '))}</td><td>${escapeHtml(batch.invoices.join(', '))}</td></tr>`).join('');
-      showModal(`<section class="adminModalCard adminSubmissionStrategyModal adminSubmissionPreview" role="dialog" aria-modal="true" aria-labelledby="submissionPreviewTitle"><header><h2 id="submissionPreviewTitle">Next submission run</h2><button type="button" class="adminModalClose" data-submission-action="close-modal" aria-label="Close"><i class="bi bi-x-lg"></i></button></header><div class="adminSubmissionPreviewBody"><p><strong>${escapeHtml(schedule)} IST</strong> · ${plan.batches.length} email batch${plan.batches.length===1?'':'es'} · ${plan.batches.reduce((total,batch)=>total+batch.invoices.length,0)} eligible invoices</p><p>This is a plan only. No email is sent from this preview.</p><div class="adminSubmissionStrategyTableWrap"><table class="adminSubmissionStrategyTable"><thead><tr><th>Customer</th><th>Strategy</th><th>Recipient list</th><th>Invoices</th></tr></thead><tbody>${batches||'<tr><td colspan="4">No invoice is eligible for this run.</td></tr>'}</tbody></table></div><h3>Waiting or blocked</h3><ul>${Object.entries(waiting).map(([reason,count])=>`<li>${escapeHtml(reason)}: ${count} invoice${count===1?'':'s'}</li>`).join('')||'<li>None</li>'}</ul></div><footer><button type="button" class="adminSecondary" data-submission-action="close-modal">Close</button></footer></section>`);
+      const followUps=plan.documentEmails.map(email=>`<li>${escapeHtml(email.invoiceNo)} · ${escapeHtml(email.document)}</li>`).join('');
+      showModal(`<section class="adminModalCard adminSubmissionStrategyModal adminSubmissionPreview" role="dialog" aria-modal="true" aria-labelledby="submissionPreviewTitle"><header><h2 id="submissionPreviewTitle">Next submission run</h2><button type="button" class="adminModalClose" data-submission-action="close-modal" aria-label="Close"><i class="bi bi-x-lg"></i></button></header><div class="adminSubmissionPreviewBody"><p><strong>${escapeHtml(schedule)} IST</strong> · ${plan.batches.length} email batch${plan.batches.length===1?'':'es'} · ${plan.batches.reduce((total,batch)=>total+batch.invoices.length,0)} eligible invoices${plan.documentEmails.length ? ` · ${plan.documentEmails.length} document follow-up${plan.documentEmails.length===1?'':'s'}` : ''}</p><p>This is a plan only. No email is sent from this preview.</p><div class="adminSubmissionStrategyTableWrap"><table class="adminSubmissionStrategyTable"><thead><tr><th>Customer</th><th>Strategy</th><th>Recipient list</th><th>Invoices</th></tr></thead><tbody>${batches||'<tr><td colspan="4">No invoice is eligible for this run.</td></tr>'}</tbody></table></div>${followUps ? `<h3>Sequential document emails</h3><ul>${followUps}</ul>` : ''}<h3>Waiting or blocked</h3><ul>${Object.entries(waiting).map(([reason,count])=>`<li>${escapeHtml(reason)}: ${count} invoice${count===1?'':'s'}</li>`).join('')||'<li>None</li>'}</ul></div><footer><button type="button" class="adminSecondary" data-submission-action="close-modal">Close</button></footer></section>`);
     } catch (error) { notify(error.message || 'Could not prepare the run preview.'); }
   }
 

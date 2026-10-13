@@ -85,7 +85,7 @@
 .adminSubmissionFormField abbr{color:#b42318;text-decoration:none}
 .adminSubmissionFormField input,.adminSubmissionFormField select,.adminSubmissionNewProduct{width:100%;height:40px;min-height:40px;box-sizing:border-box;border:1px solid #e0e4eb;border-radius:9px;padding:9px 10px;background:#fff;color:#1f2937;font:inherit;font-size:12px;font-weight:500;letter-spacing:0}
 .adminSubmissionFormField input:focus-visible,.adminSubmissionFormField select:focus-visible,.adminSubmissionDocumentSearch input:focus-visible,.adminSubmissionNewProduct:focus-visible{outline:2px solid #7138db;outline-offset:2px}
-.adminSubmissionWide,.adminSubmissionTypeHint,.adminSubmissionAgent,.adminSubmissionBulk,.adminSubmissionDocuments,.adminSubmissionProductField{grid-column:1/-1}
+.adminSubmissionWide,.adminSubmissionTypeHint,.adminSubmissionAgent,.adminSubmissionAgentDelivery,.adminSubmissionBulk,.adminSubmissionDocuments,.adminSubmissionProductField{grid-column:1/-1}
 .adminSubmissionTypeHint{margin:-10px 0 0;padding:9px 12px;border-radius:5px;background:#e7f6fa;color:#317a8e;font-size:12px}
 .adminSubmissionAgent{display:flex;align-items:center;gap:12px;padding:15px 16px;border-radius:7px;background:#f6f7f9;color:#667085;font-size:12px}
 .adminSubmissionAgent input,.adminSubmissionBulkToggle input{appearance:none;position:relative;width:42px;height:22px;flex:none;margin:0;border:1px solid #c9ced8;border-radius:999px;background:#d8dce5;cursor:pointer;transition:background .15s ease}
@@ -95,6 +95,11 @@
 .adminSubmissionAgent input:focus-visible,.adminSubmissionBulkToggle input:focus-visible{outline:2px solid #7138db;outline-offset:2px}
 .adminSubmissionAgent strong{min-width:90px;line-height:1.25}
 .adminSubmissionAgent span{color:#475467;line-height:1.45}
+.adminSubmissionAgentDelivery{margin-top:-12px;padding:0 16px 2px 70px}
+.adminSubmissionAgentDelivery[hidden]{display:none}
+.adminSubmissionAgentDelivery select{max-width:100%}
+.adminSubmissionAgentDelivery small{color:#667085;font-size:11px;font-weight:500;line-height:1.45;letter-spacing:0}
+.adminSubmissionAgentCell small{display:block;margin-top:3px;color:#667085;font-size:11px;font-weight:500}
 .adminSubmissionBulk{display:grid;gap:14px;padding:15px 16px;border:1px solid #e6dded;border-radius:9px;background:#faf8fc}
 .adminSubmissionBulkToggle{display:flex;align-items:center;gap:12px;cursor:pointer}
 .adminSubmissionBulkToggle>span{display:grid;gap:4px;color:#344054;font-size:12px;line-height:1.4}
@@ -125,7 +130,7 @@
 .adminSubmissionNewProduct{max-width:210px}
 .adminSubmissionDeleteModal{width:min(460px,calc(100vw - 32px))}
 .adminSubmissionDeleteModal>p{margin:0;padding:22px;color:#475467;font-size:13px}
-@media(max-width:700px){.adminRuntimePage[data-admin-module="submission-process"] .adminWorkspaceBody:has(.adminSubmissionStrategy){padding:20px 16px}.adminSubmissionStrategyFields{grid-template-columns:1fr}.adminSubmissionStrategyModal{height:min(650px,calc(100vh - 24px))}.adminSubmissionAgent{align-items:flex-start;flex-wrap:wrap}.adminSubmissionAgent span{width:100%}.adminSubmissionBulkDelay{padding-left:0}.adminSubmissionProductField{flex-wrap:wrap}.adminSubmissionStrategyModal>footer{gap:10px}.adminSubmissionModalActions{flex-wrap:wrap;justify-content:flex-end}}
+@media(max-width:700px){.adminRuntimePage[data-admin-module="submission-process"] .adminWorkspaceBody:has(.adminSubmissionStrategy){padding:20px 16px}.adminSubmissionStrategyFields{grid-template-columns:1fr}.adminSubmissionStrategyModal{height:min(650px,calc(100vh - 24px))}.adminSubmissionAgent{align-items:flex-start;flex-wrap:wrap}.adminSubmissionAgent span{width:100%}.adminSubmissionAgentDelivery{padding-left:0}.adminSubmissionBulkDelay{padding-left:0}.adminSubmissionProductField{flex-wrap:wrap}.adminSubmissionStrategyModal>footer{gap:10px}.adminSubmissionModalActions{flex-wrap:wrap;justify-content:flex-end}}
 .adminSubmissionFormError{color:#a53030;font-size:12px;line-height:1.45;margin:12px 22px 0}
 .adminSubmissionHeaderActions{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
 .adminSubmissionPreviewBody{padding:20px 24px;max-height:65vh;overflow:auto}

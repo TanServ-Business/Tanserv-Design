@@ -6,10 +6,13 @@
 })(typeof window === 'undefined' ? globalThis : window, function () {
   'use strict';
   const KEY = 'submissionStrategies:review-v1';
-  const defaultStrategies = [{ id:'submission-xeon-001', status:'RUNNING', strategyName:'Invoice Submission', strategySubtitle:'Xeon Infraservices Pvt Ltd', applyOn:'COMPANY', strategyType:'Invoice + Docs(In 1 Shot)', agentSelection:true, selectedDocuments:['PAYMENT RECEIPT','PURCHASE ORDER','INVOICE'], productCategory:'', batchInvoicesInOneEmail:false, bulkSendAfterDays:null, recipientList:'' }];
+  const defaultStrategies = [{ id:'submission-xeon-001', status:'RUNNING', strategyName:'Invoice Submission', strategySubtitle:'Xeon Infraservices Pvt Ltd', applyOn:'COMPANY', strategyType:'Invoice + Docs(In 1 Shot)', agentSelection:true, agentDocumentDelivery:'one-shot', selectedDocuments:['PAYMENT RECEIPT','PURCHASE ORDER','INVOICE'], productCategory:'', batchInvoicesInOneEmail:false, bulkSendAfterDays:null, recipientList:'' }];
   const names = value => String(value || '').trim().toUpperCase().replace(/\s+/g, ' ');
   const documentName = value => names(value).replace(/^INVOICE COPY$/, 'INVOICE');
   const category = invoice => String(invoice.productCategory || invoice.product || '').trim().toLowerCase();
+  const deliveryMode = strategy => strategy?.agentSelection
+    ? strategy.agentDocumentDelivery || (strategy.strategyType === 'Invoice + Docs(Sequentially)' ? 'sequential' : 'one-shot')
+    : strategy?.strategyType === 'Invoice + Docs(Sequentially)' ? 'sequential' : 'one-shot';
   function read(storage, fallback = []) {
     try { const rows = JSON.parse(storage.getItem(KEY) || 'null'); if (Array.isArray(rows)) return rows; } catch (_) { /* Use demo configuration. */ }
     return JSON.parse(JSON.stringify(fallback));
@@ -24,9 +27,11 @@
       if (others.some(row => row.applyOn === 'PRODUCT' && names(row.productCategory) === names(candidate.productCategory))) return 'This product category already has a strategy.';
     }
     if (candidate.recipientList && String(candidate.recipientList).split(/[,;]+/).some(address => !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(address.trim()))) return 'Enter valid customer email addresses, separated by commas.';
+    if (candidate.agentSelection && !['one-shot','sequential'].includes(deliveryMode(candidate))) return 'Choose how agent-selected documents are sent.';
     if (candidate.batchInvoicesInOneEmail) {
       if (!Number.isInteger(candidate.bulkSendAfterDays) || candidate.bulkSendAfterDays < 0 || candidate.bulkSendAfterDays > 365) return 'Bulk send after must be a whole number from 0 to 365 days.';
       if (candidate.strategyType === 'Invoice + Docs(Sequentially)') return 'Sequential document sending is unavailable with bulk invoice email.';
+      if (candidate.agentSelection && deliveryMode(candidate) === 'sequential') return 'Sequential agent-selected document sending is unavailable with bulk invoice email.';
     }
     return '';
   }
@@ -38,10 +43,13 @@
   }
   function requirements(invoice, strategy) {
     if (!strategy) return invoice.requirements || [];
-    const selected = strategy.strategyType === 'Invoice' ? ['INVOICE'] : [...new Set(['INVOICE',...(strategy.selectedDocuments || [])])];
+    if (!strategy.strategyType && !Array.isArray(strategy.selectedDocuments) && !strategy.agentSelection) return invoice.requirements || [];
+    const agentDocuments = strategy.agentSelection && Array.isArray(invoice.agentSelectedDocuments) ? invoice.agentSelectedDocuments.map(item => typeof item === 'string' ? {name:item} : item).filter(item => item?.name) : [];
+    const selected = strategy.strategyType === 'Invoice' ? ['INVOICE',...agentDocuments.map(item=>item.name)] : ['INVOICE',...(strategy.selectedDocuments || []),...agentDocuments.map(item=>item.name)];
     return [...new Set(selected.map(documentName))].map(name => {
       const existing = (invoice.requirements || []).find(requirement => documentName(requirement.name) === name);
-      return existing || { id:`strategy-${name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`, name, scope:name.includes('(CUSTOMER)') ? 'customer' : 'invoice' };
+      const agentDocument = agentDocuments.find(item => documentName(item.name) === name);
+      return existing || { id:agentDocument?.id || `strategy-${name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`, name, scope:agentDocument?.scope || (name.includes('(CUSTOMER)') ? 'customer' : 'invoice') };
     });
   }
   const recipients = (invoice, strategy) => [...new Set(String(invoice.submissionRecipients || strategy?.recipientList || 'Default customer recipients').split(/[,;]+/).map(item => item.trim().toLowerCase()).filter(Boolean))].sort();
@@ -52,15 +60,24 @@
     if (strategy.status !== 'RUNNING') return { ready:false, reason:'Submission strategy is paused' };
     if (invoice.automationSuppressed) return { ready:false, reason:'Completed manually or externally' };
     if (invoice.reason) return { ready:false, reason:invoice.reason };
-    if (core.missing(state, invoice, attachments).length) return { ready:false, reason:'Awaiting required documents' };
+    const required = requirements(invoice, strategy);
+    const blocking = deliveryMode(strategy) === 'sequential' ? required.filter(item => documentName(item.name) === 'INVOICE') : required;
+    if (core.missing(state, { ...invoice, effectiveRequirements:blocking }, attachments).length) return { ready:false, reason:'Awaiting required documents' };
     return { ready:true, reason:'Scheduled for submission' };
   }
+  function availableDocuments(state, invoice, strategy, core, attachments = []) {
+    return requirements(invoice, strategy).filter(requirement => !core.missing(state, { ...invoice, effectiveRequirements:[requirement] }, attachments).length).map(requirement => documentName(requirement.name));
+  }
   function plan(state, strategies, core, attachments = [], at = new Date()) {
-    const batches = [], decisions = new Map(), cohorts = new Map();
+    const batches = [], documentEmails = [], decisions = new Map(), cohorts = new Map();
     state.invoices.forEach(invoice => {
       const strategy = resolve(invoice, strategies);
       const decision = assessment(state, invoice, strategy, core, attachments);
       decisions.set(invoice.invoiceNo, decision);
+      if (strategy?.status === 'RUNNING' && state.settings.autoSubmission && deliveryMode(strategy) === 'sequential' && core.submitted(invoice) && !invoice.automationSuppressed && Array.isArray(invoice.sequentialSentDocuments)) {
+        const sent = new Set(invoice.sequentialSentDocuments.map(documentName));
+        availableDocuments(state, invoice, strategy, core, attachments).filter(name => name !== 'INVOICE' && !sent.has(name)).forEach(name => documentEmails.push({ invoiceNo:invoice.invoiceNo, customerCode:invoice.code, document:name, strategyId:strategy.id, recipients:recipients(invoice,strategy) }));
+      }
       if (!strategy || ['Already submitted','Automatic submission is off','Submission strategy is paused','Completed manually or externally'].includes(decision.reason)) return;
       const list = recipients(invoice, strategy);
       const key = JSON.stringify([invoice.code, strategy.id, list]);
@@ -70,7 +87,7 @@
     cohorts.forEach(cohort => {
       const { strategy, rows, ...details } = cohort;
       if (!strategy.batchInvoicesInOneEmail) {
-        rows.filter(row => row.decision.ready).forEach(row => batches.push({ ...details, invoices:[row.invoice.invoiceNo] }));
+        rows.filter(row => row.decision.ready).forEach(row => batches.push({ ...details, invoices:[row.invoice.invoiceNo], documents:availableDocuments(state,row.invoice,strategy,core,attachments) }));
         return;
       }
       const dates = rows.map(row => Date.parse(row.invoice.createdAt)).filter(Number.isFinite);
@@ -86,7 +103,7 @@
       }
       if (ready.length) batches.push({ ...details, invoices:ready.map(row => row.invoice.invoiceNo), releaseReason:allReady ? 'All documents ready' : 'Bulk wait elapsed' });
     });
-    return { batches, decisions };
+    return { batches, documentEmails, decisions };
   }
   function splitByAttachmentLimit(invoiceNos, packages, limitBytes) {
     if (!Number.isFinite(limitBytes) || limitBytes <= 0) throw new Error('The Outlook attachment limit is unavailable.');
@@ -103,5 +120,5 @@
     if (current.length) parts.push(current);
     return { parts, oversized, unknown };
   }
-  return { KEY,defaultStrategies,read,validate,resolve,requirements,recipients,assessment,plan,splitByAttachmentLimit };
+  return { KEY,defaultStrategies,read,validate,resolve,requirements,deliveryMode,recipients,assessment,plan,splitByAttachmentLimit };
 });
