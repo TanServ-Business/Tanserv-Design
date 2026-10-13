@@ -446,7 +446,6 @@
   $('sjRulesBtn').addEventListener('click',()=>{$('sjReviewDays').textContent=state.settings.reviewDays;openDialog('sjRulesDialog');});
   window.addEventListener('focus',()=>{if(document.querySelector('dialog[open]')||hasUnsavedManual())return;try{refresh();render();}catch(error){notice(error.message,true);}});
   window.addEventListener('storage',()=>{if(document.querySelector('dialog[open]')||hasUnsavedManual())return;try{refresh();render();}catch(error){notice(error.message,true);}});
-  window.addEventListener('beforeunload',event=>{if(!hasUnsavedManual())return;event.preventDefault();event.returnValue='';});
   function headerAssets(){const logo=$('relationshipLogo');if(logo)logo.innerHTML='<img src="../assets/submission-reference/client-logo.jpg" alt="Client logo">';const avatar=$('headerUserAvatar');if(avatar)avatar.innerHTML='<img src="../assets/submission-reference/avatar.png" alt="User profile">';const badge=document.querySelector('.notification-badge');if(badge)badge.textContent='5';}
   try{refresh();render();const target=new URLSearchParams(location.search).get('invoice');if(target&&state.invoices.some(row=>row.invoiceNo===target))openInvoice(target);}catch(error){notice(error.message,true);$('sjList').hidden=true;}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',headerAssets);else headerAssets();
