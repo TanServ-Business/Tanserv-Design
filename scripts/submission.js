@@ -192,28 +192,16 @@
     const samples=demoNames.filter(label=>!actualTypes.has(label.toLowerCase())).map(label=>`<span class="sjExistingDocumentChip is-sample" title="Sample document type; no file is attached"><i class="bi bi-file-earmark" aria-hidden="true"></i>${esc(label)}<small>Sample</small></span>`).join('');
     return `<details class="sjExistingDocuments sjDetailExistingDocuments" open><summary class="sjExistingDocumentsHead"><div><h3>Existing Documents</h3><p>Shared customer files and documents tagged to this invoice · ${documents.length} available</p></div><span class="sjExistingDocumentsMeta"><span class="sjExistingDocumentsCount">${documents.length}</span><i class="bi bi-chevron-down" aria-hidden="true"></i></span></summary><div class="sjExistingDocumentsBody"><div class="sjExistingDocumentChips">${actual}${samples}</div></div></details>`;
   }
-  function nextStepHTML(invoice, ownGroups, ownIssues) {
-    const waiting=ownGroups.filter(group=>group.eligible);
-    const open=new Set([...ownIssues.filter(issue=>!C.closed(issue)).map(issue=>issue.id),...ownGroups.filter(group=>group.issue).map(group=>group.issue.id)]);
-    const missing=C.missing(state,invoice,attachments);
-    const decision=decisionFor(invoice);
-    const message=waiting.length ? `${waiting.length} blocker${waiting.length===1?' needs':'s need'} review. Record the reason below; add it to Issue Tracker if an owner and approval are needed.`
-      : open.size ? `${open.size} issue${open.size===1?' is':'s are'} open. Track ownership and approvals in Issue Tracker while the invoice remains pending.`
-      : missing.length ? `${missing.length} required document${missing.length===1?' is':'s are'} missing. Add the files in the document module; this invoice stays pending.`
-      : invoice.reason ? `${invoice.reason} is recorded. Review the reason before attempting submission.`
-      : decision.ready ? `Eligible for the next demonstration run at ${timestamp(nextRun())}.` : `${decision.reason}${decision.readyAt?` · Eligible after ${timestamp(decision.readyAt)}`:''}.`;
-    return `<div class="sjNextStep" role="status"><strong>Next step</strong><p>${esc(message)}</p></div>`;
-  }
   function renderDetail() {
     const invoice=state.invoices.find(row=>row.invoiceNo===selectedInvoice); if(!invoice){selectedInvoice='';render();return;}
     restoreManualDialog();
-    const ownGroups=invoiceGroups(invoice), ownIssues=invoiceIssues(invoice), done=C.submitted(invoice);
+    const ownIssues=invoiceIssues(invoice), done=C.submitted(invoice);
     const correction=done && activeRole()==='agent';
     $('sjDetail').innerHTML=`<header class="sjDetailHead"><div><button type="button" class="sjLink sjBack" data-back aria-label="Return to invoice list" title="Return to invoice list"><i class="bi bi-arrow-left" aria-hidden="true"></i></button><h2>${esc(invoice.invoiceNo)} ${pill(invoice.submissionStatus,done?'green':'amber')}</h2><p>${esc(invoice.name)} · ${esc(invoice.code)}</p></div></header>
       <div class="sjDetailLayout"><div class="sjDetailMain">
         ${invoiceOverviewHTML(invoice,done)}
         ${existingDocumentsCardHTML(invoice)}
-        ${!done||correction?`<section id="sjUpdateSection" class="sjUpdateSection sjDialog sjManualDialog" aria-labelledby="sjManualTitle">${done?'<div class="sjNextStep" role="status"><strong>Correct this record</strong><p>Return this invoice to Not Submitted and explain the correction in Remarks. The previous submission stays in the activity timeline.</p></div>':nextStepHTML(invoice,ownGroups,ownIssues)}</section>`:''}
+        ${!done||correction?`<section id="sjUpdateSection" class="sjUpdateSection sjDialog sjManualDialog" aria-labelledby="sjManualTitle">${correction?'<div class="sjNextStep" role="status"><strong>Correct this record</strong><p>Return this invoice to Not Submitted and explain the correction in Remarks. The previous submission stays in the activity timeline.</p></div>':''}</section>`:''}
       </div><section id="sjTimelineSection" class="sjActivityCard" aria-label="Activity timeline">${timelineHTML(invoice,ownIssues)}</section></div>`;
     prepareTimeline();
     if (!done || correction) {
