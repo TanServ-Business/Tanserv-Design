@@ -3,6 +3,7 @@
 .imHero h1 { margin: 0 0 6px; font-size: 28px; }
 .imHero p { margin: 0; color: #64748b; font-size: 15px; }
 .imSearch { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
+.imSearch .imBulkUpdate { margin-left: auto; }
 .imSearch label { font-weight: 700; color: #52627b; }
 .imSearch input { width: min(480px, 40vw); height: 44px; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px 14px; font: inherit; background: #fff; }
 .imPage button, .imDialog button { cursor: pointer; font: inherit; }

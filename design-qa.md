@@ -817,3 +817,21 @@ No actionable P0, P1 or P2 findings remain in the tested scope.
 - Added a fifth overview card for pending invoices with required documents still missing, excluding invoices whose recorded blocker is a different reason. Distinct customer codes determine the customer count.
 - The card opens All Pending filtered to the same invoice set. On the untouched demo seed it shows 105 invoices across 5 customers; one customer document arriving removes its 100 affected invoices from the count.
 - The five cards use a responsive five-column desktop grid, then three columns with the last card spanning two, and two columns on phones. Focused card/list checks and all 20 submission journey tests passed.
+
+## Invoice Master Bulk Update template match 14 October 2026
+
+- Source visual: `/var/folders/zs/r5mst8x161xfsfm7ttkb8hsr0000gp/T/TemporaryItems/NSIRD_screencaptureui_5E8wLc/Screenshot 2026-10-14 at 11.50.33 AM.png` (650 x 546 pixels).
+- Implementation: `artifacts/invoice-master/2026-10-14/bulk-update-template-popup.png`.
+- Viewport: 1280 x 720 CSS pixels, devicePixelRatio 1. Browser capture 1265 x 712 pixels; normalized to 1280 x 720 before comparison. Dialog is 600 x 484 CSS pixels. Source dialog cropped at (29,36), implementation at (332,118).
+- State: empty Excel selection; Upload disabled. Comparison: `artifacts/invoice-master/2026-10-14/bulk-update-template-comparison.png`. Both dialog crops are shown together at 600 x 484; the full dialog comparison is also the focused component comparison, with all controls readable.
+- Fonts/typography: existing Calibri typography matches the template hierarchy, uppercase Excel label and compact button labels. Slight softness in the normalized browser image is capture scaling.
+- Spacing/layout: matched 600 x 484 dialog, pale header, 198px dashed drop area, centered template control and footer with Cancel/Upload. Company selector and Review file removed from this flow.
+- Colors/tokens: reused the existing template modal styles for pale purple header, gray drop area/footer, blue template link and purple actions.
+- Images/assets: Bootstrap cloud upload/download/close icons reused. P3: cloud outline is a slightly different library variant. No custom image assets required.
+- Copy/content: Excel label, file types, drag/drop and browse text, Download Template, Cancel and Upload match. Title intentionally reads Bulk Invoice Update because this action updates existing invoices, rather than adding new invoices.
+- Interaction checks: selecting Excel enables Upload; direct upload of two rows saved the existing invoice and rejected the unknown invoice (1 successful, 1 rejected). Sample City was restored through Edit invoice afterward. Cancel/reopen resets selection and disables Upload. Console errors: none.
+- Regression checks: Invoice Master and Admin module validators pass; all 34 admin tests pass; diff whitespace check passes.
+- Findings: no actionable P0/P1/P2 issues. Existing bulk-upload flow retains add/update behaviour; Bulk Update uses update-only validation.
+- Comparison history: first normalized component comparison passed; no visual corrections required. Remaining P3 differences are the cloud icon variant and capture antialiasing. Reference close-button focus ring is a different interaction state and is not a layout mismatch.
+- Implementation checklist: template modal reused; Review file removed; Excel selection and direct Upload tested; existing-invoice restriction verified.
+- final result: passed
