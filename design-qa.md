@@ -835,3 +835,54 @@ No actionable P0, P1 or P2 findings remain in the tested scope.
 - Comparison history: first normalized component comparison passed; no visual corrections required. Remaining P3 differences are the cloud icon variant and capture antialiasing. Reference close-button focus ring is a different interaction state and is not a layout mismatch.
 - Implementation checklist: template modal reused; Review file removed; Excel selection and direct Upload tested; existing-invoice restriction verified.
 - final result: passed
+
+# Template Master Design QA 15 October 2026
+
+## Comparison target and evidence
+
+Source: Xeon Inebura Communication Setup Template Master, captured on 15 October 2026.
+Implementation: `pages/admin.html?module=template-master`, verified in the browser using the local-only preview at port 8766.
+
+Evidence directory: `artifacts/template-master/2026-10-15/`.
+
+- Source visual truth: `source-list.png`, `source-editor.png`, `source-mobile.png`.
+- Implementation: `implementation-list.png`, `implementation-editor.png`, `implementation-mobile.png`.
+- Full comparisons: `comparison-list.png`, `comparison-editor.png`, `comparison-mobile.png`.
+- Focused comparison: `comparison-editor-focus.png` compares the complete editor at readable scale.
+- Desktop CSS viewport and final pixels: 1753 x 1110 for both source and replica. Mobile CSS viewport and final pixels: 390 x 844 for both. Final captures need no density normalization.
+- States: first page of the default unsorted 110-record catalog, first email editor, and mobile catalog.
+
+## Findings and fidelity surfaces
+
+No actionable P0, P1, or P2 findings remain.
+
+- Fonts and typography: source Calibri stack, 24 px / 36 px title with weight 800, 14 px tab text, 13 px table body, and 11 px table headings are retained.
+- Spacing and layout: matching page margins, failover card, workspace tabs, horizontal table, pagination, 900 px editor, two-column desktop form, and scrollable preview. The mobile table remains horizontally scrollable.
+- Colors and tokens: source purple header and table, lavender editor header, muted text, white cards, light borders, and switch states are retained.
+- Asset fidelity: source Inebura and Xeon logos are bundled locally. Existing Bootstrap Icons supplies the matching controls. The source close SVG is preserved with a standalone XML namespace.
+- Copy and content: all 110 records retain their full original bodies, subjects, codes, event types, roles, modes, schedules, descriptions, notification messages, attachment flags, and disabled state. Initial failover is On; 106 templates are enabled and four disabled.
+
+## Comparison history
+
+1. P2: shared global table styling overrode the source header purple. Fixed using a module-scoped override; final combined desktop evidence confirms the source color.
+2. P2: inherited label margins inflated the editor and the mobile header controls overlapped. Fixed the margins, isolated the content scroll boundary, and retained a compact mobile shell that keeps all header controls accessible. Final editor and mobile comparisons confirm the fixes.
+3. P2: initial preview state used the generic in-memory store, so updates did not survive reload. Replaced it with a dedicated local storage key and verified template, disabled-switch, and failover persistence. Test changes were restored.
+4. P3 refinement: measured and corrected title typography, tab alignment, failover card height, and preview line height. Final desktop, mobile, and focused editor comparisons were inspected after the corrections.
+
+## Intentional offline behavior and residual polish
+
+- The editor selects the stored recipient role correctly; the live editor sometimes displays a blank role despite the row having LICENSEE. Existing values absent from the live option list are retained rather than dropped.
+- All captured bodies remain available, including existing templates longer than the live 4500-character input limit. No source content is truncated.
+- Previews use a sandbox without scripts, forms, or external network loads. Template variables remain literal. Minor differences in preview border radii and inline HTML layout are P3 polish only.
+- The compact mobile shell fits all header controls; the live mobile header clips its final controls.
+- SMTP and sender-account navigation continues to the existing offline modules. This work replaces the requested Template Master module.
+
+## Verification
+
+- Opened every one of the 110 offline editors and compared code, full body, communication mode, and disabled flag against the captured source. Only browser CRLF normalization was allowed. Result: 110 unique records passed (`content-verification.json`).
+- Tested pagination, sorting, editing, cancellation, live WhatsApp preview updates, and reload persistence for subject, disabled state, and failover setting. Original settings were restored after testing.
+- Browser console error checks returned no errors.
+- JavaScript syntax checks and `git diff --check` passed.
+- Word catalog: 57 rendered pages reviewed, with all 110 bodies and all stored notification messages verified against the final document (`document-verification.json`).
+
+final result: passed

@@ -20,6 +20,32 @@ function fixture() {
 }
 const purchaseGroup = state => C.blockers(state,[], '2026-10-09').find(group=>group.requirement.id==='purchase-order');
 const completedUpdate = overrides => ({ submissionStatus:'Submitted',activityType:'Visited',submissionSubStatus:'On Premises',submissionMedium:'Manual',submissionDestination:'Accepted By User',submissionType:'Physical',invoiceType:'Hard Copy',submissionDate:'2026-10-09',sentTo:'Customer reception',...overrides });
+test('acknowledgement evidence is invoice-scoped and counts only after submission', () => {
+  const state=C.seed();
+  const documentInvoice=state.invoices.find(invoice=>invoice.invoiceNo==='TN200011');
+  const intgInvoice=state.invoices.find(invoice=>invoice.invoiceNo==='TN200012');
+  const pendingInvoice=state.invoices.find(invoice=>invoice.invoiceNo==='TN200009');
+  assert.equal(C.acknowledgementProof(state,documentInvoice).source,'Attached document');
+  assert.equal(C.acknowledgementProof(state,intgInvoice).source,"Customer's Acknowledgement");
+  assert.equal(C.acknowledgementProof(state,pendingInvoice),null);
+  assert.equal(C.acknowledgementProof(state,state.invoices.find(invoice=>invoice.invoiceNo==='AMS-0001')),null);
+  state.documents.push({ scope:'customer',customerCode:pendingInvoice.code,requirement:'Invoice Acknowledgment',name:'shared.pdf',uploadedAt:'2026-10-01T07:00:00Z' });
+  assert.equal(C.acknowledgementProof(state,pendingInvoice),null);
+  intgInvoice.lastSubmittedAt='2026-10-02T07:00:00Z';
+  assert.equal(C.acknowledgementProof(state,intgInvoice),null);
+});
+test('only an agent can record acknowledgement with proof for a submitted invoice', () => {
+  const state=C.seed(), invoice=state.invoices.find(row=>row.invoiceNo==='TN200009');
+  assert.throws(()=>C.recordAcknowledgement(state,invoice.invoiceNo,{on:C.today(),proof:'Customer email 123'},'Manager','manager'),/Only an Agent/);
+  assert.throws(()=>C.recordAcknowledgement(state,'AMS-0001',{on:C.today(),proof:'Customer email 123'},'Agent','agent'),/Only submitted/);
+  assert.throws(()=>C.recordAcknowledgement(state,invoice.invoiceNo,{on:C.today(),proof:''},'Agent','agent'),/proof reference/);
+  C.recordAcknowledgement(state,invoice.invoiceNo,{on:C.today(),proof:'Customer email 123',note:'Received by agent'},'Agent','agent');
+  assert.equal(C.acknowledgementProof(state,invoice).source,'Agent update');
+  assert.equal(C.acknowledgementProof(state,invoice).proof,'Customer email 123');
+  assert(state.events.some(event=>event.type==='acknowledgement'&&event.invoiceNos.includes(invoice.invoiceNo)));
+  invoice.submissionStatus='Not Submitted';
+  assert.equal(C.acknowledgementProof(state,invoice),null);
+});
 test('each Reason filter choice has at least ten demo invoices and older sessions gain them once',()=>{
   const state=C.seed();
   for(const reason of C.issueReasons) assert(state.invoices.filter(invoice=>invoice.reason===reason).length>=10);

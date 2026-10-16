@@ -50,8 +50,8 @@
     <section class="adminReviewRules" aria-labelledby="adminReviewRulesTitle">
       <header class="adminReviewRulesHeader">
         <div>
-          <h2 id="adminReviewRulesTitle">Review Rules</h2>
-          <p>Choose when a pending invoice appears in Needs Review.</p>
+          <h2 id="adminReviewRulesTitle">Review rules</h2>
+          <p>Choose when a pending invoice needs review.</p>
         </div>
       </header>
       <div class="adminReviewRulesContent">
@@ -87,7 +87,7 @@
     }
     try {
       const days = journey.saveReviewDays(localStorage, input.value);
-      message.textContent = `Saved. Pending invoices will appear in Needs Review after ${days} calendar ${days === 1 ? 'day' : 'days'} from the invoice date.`;
+      message.textContent = `Review rule saved. Pending invoices will appear in Needs Review after ${days} calendar ${days === 1 ? 'day' : 'days'} from the invoice date.`;
     } catch (error) {
       message.classList.add('is-error');
       message.textContent = error.message || 'The review rule could not be saved.';

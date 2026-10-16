@@ -455,6 +455,7 @@
   </div>
 
   <div class="headerRight">
+    <a class="headerAppSwitch" href="${resolvePath("pages/admin.html?module=dashboard")}">go to admin app</a>
     <div class="headerPopupWrap" id="clientPickerWrap">
       <button class="iconBtn headerIconBtn" type="button" id="clientPickerBtn" aria-label="Clients" aria-haspopup="dialog" aria-expanded="false">
         <i class="bi bi-building" aria-hidden="true"></i>
@@ -690,7 +691,6 @@
           <a class="submenu-link" href="${resolvePath("pages/dashKAM.html")}" data-module="dashboard-kam">Dashboard - KAM</a>
           <a class="submenu-link" href="${resolvePath("pages/dashKAS.html")}" data-module="dashboard-kas">Dashboard - KAS</a>
           <a class="submenu-link" href="${resolvePath("pages/Dashboard_Supervisor.html")}" data-module="dashboard-supervisor">Dashboard - Supervisor</a>
-          <a class="submenu-link" href="${resolvePath("pages/Dashboard_Admin.html")}" data-module="dashboard-admin">Dashboard - Admin</a>
         </div>
       </li>
       <li class="menu-item">

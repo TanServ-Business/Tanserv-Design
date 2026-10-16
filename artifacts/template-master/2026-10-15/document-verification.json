@@ -1,0 +1,11 @@
+{
+  "templates": 110,
+  "email": 78,
+  "whatsapp": 32,
+  "enabled": 106,
+  "disabled": 4,
+  "documentPages": 57,
+  "allBodiesPresent": true,
+  "allNotificationMessagesPresent": true,
+  "docxSha256": "8fe9f2e1f6bf333f4c5a00c0940860fffbf644c0f6bc5ad68bd55bbfec2ae450"
+}

@@ -1,0 +1,772 @@
+[
+  {
+    "number": 1,
+    "code": "CcProcessingInterrupted",
+    "mode": "Email",
+    "text": "Inebura\nHello ${recipientName},\nClient Confirmation for ${period} could not finish on ${failedAt}.\nCurrent cycle status | ${ccBucketStatus}\nReason | ${safeFailureReason}\nReference | ${runReference}\nClient Admins: please review the committed results and the failure before retrying. Invoices that were processed successfully must not be uploaded again.\nSupervisors: please follow up with a Client Admin.\nOpen Inebura (${platformUrl})\nRegards,\nTeam Inebura\n© Inebura Technologies. All rights reserved.",
+    "notification": ""
+  },
+  {
+    "number": 2,
+    "code": "CcClosedNoImpactedInvoices",
+    "mode": "Email",
+    "text": "Client Confirmation closed - no impacted invoices\nHello ${recipientName},\nClient Confirmation for ${period} was closed on ${processedAt} with no impacted invoices.\nNo upload is required for this closure.\n<#if moduleUrl?has_content>\nView results (${moduleUrl})\n</#if>\nRegards,\nTeam Inebura\n© Inebura Technologies. All rights reserved.",
+    "notification": ""
+  },
+  {
+    "number": 3,
+    "code": "CcStillPending",
+    "mode": "Email",
+    "text": "Client Confirmation still pending\nHello ${recipientName},\nClient Confirmation for ${period} remains pending after the processing attempt on ${processedAt}.\nRows that failed: ${failedCount}\nPlease review the error file in Inebura and correct the permitted failed rows.\nThe next Month-End remains blocked until this Client Confirmation is executed.\n<#if moduleUrl?has_content>\nView results (${moduleUrl})\n</#if>\nRegards,\nTeam Inebura\n© Inebura Technologies. All rights reserved.",
+    "notification": ""
+  },
+  {
+    "number": 4,
+    "code": "CcExecutedWithErrors",
+    "mode": "Email",
+    "text": "Client Confirmation executed with errors\nHello ${recipientName},\nClient Confirmation for ${period} was processed on ${processedAt}. The cycle is treated as executed, with some rows requiring correction.\nRows processed successfully in this attempt | ${successCount}\nRows that failed in this attempt | ${failedCount}\nPlease review the error file in Inebura. You may correct originally failed invoices before the next Month-End executes.\nThese failed rows do not block the next Month-End.\n<#if moduleUrl?has_content>\nView results (${moduleUrl})\n</#if>\nRegards,\nTeam Inebura\n© Inebura Technologies. All rights reserved.",
+    "notification": ""
+  },
+  {
+    "number": 5,
+    "code": "CcExecuted",
+    "mode": "Email",
+    "text": "Client Confirmation executed\nHello ${recipientName},\nClient Confirmation for ${period} was successfully executed on ${processedAt}.\nMode: ${executionMode}\nNo further action is required for this run.\n<#if moduleUrl?has_content>\nView results (${moduleUrl})\n</#if>\nRegards,\nTeam Inebura\n© Inebura Technologies. All rights reserved.",
+    "notification": ""
+  },
+  {
+    "number": 6,
+    "code": "CcHeldMonthEndFailed",
+    "mode": "Email",
+    "text": "Client Confirmation held because Month-End failed\nHello ${recipientName},\nClient Confirmation scheduled for ${ccRunAt} did not start because the preceding Month-End for ${period} was not completed successfully.\nClient Confirmation remains pending and cannot run until its Month-End dependency succeeds.\nClient Admins: please review the Month-End failure and coordinate recovery.\nSupervisors: please follow up with a Client Admin.\nReference: ${runReference}\n<#if platformUrl?has_content>\nOpen Inebura (${platformUrl})\n</#if>\nRegards,\nTeam Inebura\n© Inebura Technologies. All rights reserved.",
+    "notification": ""
+  },
+  {
+    "number": 7,
+    "code": "CcPendingEscalation",
+    "mode": "Email",
+    "text": "Escalation: Client Confirmation remains pending\nHello ${recipientName},\nClient Confirmation for ${period} is still pending, and the reminder target of ${ccTargetDate} is approaching.\nClient Admins: please complete Client Confirmation through the applicable upload or No Impacted Invoices action in Inebura.\nSupervisors: please coordinate any collection clarifications with your Agents and follow up with a Client Admin. Only a Client Admin can execute Manual Client Confirmation.\nThe next Month-End remains blocked until this Client Confirmation is executed.\n<#if platformUrl?has_content>\nOpen Inebura (${platformUrl})\n</#if>\nRegards,\nTeam Inebura\n© Inebura Technologies. All rights reserved.",
+    "notification": ""
+  },
+  {
+    "number": 8,
+    "code": "CcPendingReminder",
+    "mode": "Email",
+    "text": "Reminder to complete Client Confirmation\nHello ${recipientName},\nClient Confirmation for ${period} is pending. The reminder target is ${ccTargetDate}.\nPlease upload the impacted-invoice file. If there are no impacted invoices and no primary file has been uploaded, select “Close Client Confirmation - No Impacted Invoices”. If a file has already failed, correct and resubmit the permitted failed rows.\nThis target is a planning reminder, not a hard deadline. However, the next Month-End cannot run while this Client Confirmation remains pending.\n<#if moduleUrl?has_content>\nOpen Client Confirmation (${moduleUrl})\n</#if>\nRegards,\nTeam Inebura\n© Inebura Technologies. All rights reserved.",
+    "notification": ""
+  },
+  {
+    "number": 9,
+    "code": "MonthEndAgentCollectionReminder",
+    "mode": "Email",
+    "text": "Please update collections before Month-End\nHello ${recipientName},\nMonth-End for ${period} is scheduled for ${meRunAt}.\nPlease report and verify collections for your assigned invoices before the run, using the correct Transfer/Collection Date.\nIf you need help resolving a collection discrepancy, contact your Supervisor or Client Admin. You do not need to trigger Month-End yourself.\n<#if portfolioUrl?has_content>\nReview your invoices (${portfolioUrl})\n</#if>\nRegards,\nTeam Inebura\n© Inebura Technologies. All rights reserved.",
+    "notification": ""
+  },
+  {
+    "number": 10,
+    "code": "MonthEndConfigChanged",
+    "mode": "Email",
+    "text": "<#if clientLogo?has_content>\n</#if>\nMonth-End / Client Confirmation settings <#if isNew>configured<#else>updated</#if>\nHello ${recipientName},\n${editedBy}<#if editedByEmail?has_content> (${editedByEmail})</#if> <#if isNew>configured<#else>updated</#if> the Month-End / Client Confirmation settings for ${clientName} on ${editedAt}.\n<#if settingsChanged>\n<#if isNew>Settings<#else>Changes made</#if>\nSetting <#if !isNew> | Old</#if> | <#if isNew>Value<#else>New</#if>\nMonth-End runs <#if !isNew> | ${oldConfig.monthEndRunMode}</#if> | ${newConfig.monthEndRunMode}\nClient Confirmation runs <#if !isNew> | ${oldConfig.ccRunMode}</#if> | ${newConfig.ccRunMode}\nDate mode <#if !isNew> | ${oldConfig.dateMode}</#if> | ${newConfig.dateMode}\nYear type <#if !isNew> | ${oldConfig.yearType}</#if> | ${newConfig.yearType}\n</#if> <#if !isNew && changedCycles?has_content>\nDates changed — ${changedCycles?size} month<#if changedCycles?size != 1>s</#if>\nMonth | Window starts | Month-End | Client Confirmation\n<#list changedCycles as row>\n${row.month} | <#if row.oldWindowStarts?has_content>${row.oldWindowStarts} → </#if>${row.newWindowStarts} | <#if row.oldMonthEndDate?has_content>${row.oldMonthEndDate} → </#if>${row.newMonthEndDate} | <#if row.oldCcDate?has_content>${row.oldCcDate} → </#if>${row.newCcDate}\n</#list> </#if> <#if !settingsChanged && !changedCycles?has_content>\nThe configuration was saved for ${yearLabel}.\n</#if> <#if newConfig.cycles?has_content>\n<#if isNew>Schedule for ${yearLabel}<#else>Full schedule now in force — ${yearLabel}</#if>\nMonth | Window starts | Month-End | Client Confirmation\n<#list newConfig.cycles as row>\n${row.month} | ${row.windowStarts} | ${row.monthEndDate} | ${row.ccDate}\n</#list> </#if>\nPlease review the updated settings. If you do not recognize this change, contact your internal administrator.\n<#if moduleUrl?has_content>\nReview configuration (${moduleUrl})\n</#if>\nNote: A cycle can no longer be edited once it is within two working days of its Month-End date — the same point at which the upcoming Month-End notice goes out. Weekends and holidays do not count towards those two days.\nRegards,\nTeam Inebura\n© Inebura Technologies. All rights reserved.",
+    "notification": ""
+  },
+  {
+    "number": 11,
+    "code": "MonthEndUpcomingNotice",
+    "mode": "Email",
+    "text": "Automatic Month-End scheduled and locked\nHello ${recipientName},\nAutomatic Month-End for ${period} is scheduled for ${meRunAt}.\nMonth-End and Client Confirmation settings were locked on ${lockAt} and can no longer be changed for this run.\nPlease ask Agents to report and verify their collections before Month-End runs.\n<#if monthEndConfigUrl?has_content>\nView schedule (${monthEndConfigUrl})\n</#if>\nRegards,\nTeam Inebura\n© Inebura Technologies. All rights reserved.",
+    "notification": ""
+  },
+  {
+    "number": 12,
+    "code": "MonthEndCycleFailure",
+    "mode": "Email",
+    "text": "Month-End execution failed\nHello ${recipientName},\nMonth-End for ${period}, scheduled for ${meRunAt}, could not be completed.\nReason: ${safeFailureReason}\nReference: ${runReference}\nClient Admins: please review the failure in Inebura and coordinate the next action with your support team.\nSupervisors: please follow up with a Client Admin.\nA Client Admin can re-run this Month-End from the Month-End panel; it closes a fresh window up to the day it is triggered. This reminder is sent every morning at 9:00 AM until that happens.\n<#if platformUrl?has_content>\nOpen Inebura (${platformUrl})\n</#if>\nRegards,\nTeam Inebura\n© Inebura Technologies. All rights reserved.",
+    "notification": ""
+  },
+  {
+    "number": 13,
+    "code": "SuperAdminAttendanceReport",
+    "mode": "Email",
+    "text": "Attendance Report\nAttendance Report\nPeriod: ${period}\nHello,\nPlease find the consolidated attendance summary for all active schemas attached as an Excel report.\nSchemas | Agents | On Leave | Absent | Visit Plan | Grand Total\n${schemaCount} | ${agentCount} | ${totalLeave} | ${totalAbsent} | ${totalVisitPlan} | ${grandTotal}\nThe Excel attachment contains the full breakdown by schema, manager, and agent — including individual On Leave, Absent, and Visit Plan day counts.\nRegards,\nInebura System\n© Inebura Technologies. All rights reserved.",
+    "notification": ""
+  },
+  {
+    "number": 14,
+    "code": "IssueTrackerYourTurn",
+    "mode": "Email",
+    "text": "Dear ${clientFullName},\nThe below mentioned issue(s) have been assigned to you for your Approval.\nClient Name | Customer Name | Customer Code | Assignee | Invoice No | Issue | Remarks | Action Owners\n<#list listOfInvoices as invoiceList>\n${invoiceList.clientName} | ${invoiceList.customerName} | ${invoiceList.customerCode} | ${invoiceList.assignee} | ${invoiceList.invoiceNo} | ${invoiceList.issue} | ${invoiceList.latestRemarks} | ${invoiceList.actionOwners}\n</#list>\nNote: To view the invoices where we need your intervention please click on the below link. You can provide your feedback and attach the concerned documents there\nView & Take Action (https://${subdomain}.inebura.ai/intg/action-owner-link/${token})\nRegards,\nAdmin\n© Inebura Technologies. All rights reserved.",
+    "notification": ""
+  },
+  {
+    "number": 15,
+    "code": "IssueTrackerClosed",
+    "mode": "Email",
+    "text": "Dear ${clientFullName},\n${user} has closed the below mentioned issue(s).\nClient Name | Customer Name | Customer Code | Assignee | Invoice No | Issue | Remarks | Action Owners\n<#list listOfInvoices as invoiceList>\n${invoiceList.clientName} | ${invoiceList.customerName} | ${invoiceList.customerCode} | ${invoiceList.assignee} | ${invoiceList.invoiceNo} | ${invoiceList.issue} | ${invoiceList.latestRemarks} | ${invoiceList.actionOwners}\n</#list>\nNote: To view the invoices where we need your intervention please click on the below link. You can provide your feedback and attach the concerned documents there\nView & Take Action (https://${subdomain}.inebura.ai/intg/action-owner-link/${token})\nRegards,\nAdmin\n© Inebura Technologies. All rights reserved.",
+    "notification": ""
+  },
+  {
+    "number": 16,
+    "code": "IssueTrackerRejection",
+    "mode": "Email",
+    "text": "Dear ${clientFullName},\n${approver} has rejected the below mentioned issue(s).\nClient Name | Customer Name | Customer Code | Assignee | Invoice No | Issue | Remarks | Action Owners\n<#list listOfInvoices as invoiceList>\n${invoiceList.clientName} | ${invoiceList.customerName} | ${invoiceList.customerCode} | ${invoiceList.assignee} | ${invoiceList.invoiceNo} | ${invoiceList.issue} | ${invoiceList.latestRemarks} | ${invoiceList.actionOwners}\n</#list>\nNote: To view the invoices where we need your intervention please click on the below link. You can provide your feedback and attach the concerned documents there\nView & Take Action (https://${subdomain}.inebura.ai/intg/action-owner-link/${token})\nRegards,\nAdmin\n© Inebura Technologies. All rights reserved.",
+    "notification": ""
+  },
+  {
+    "number": 17,
+    "code": "IssueTrackerApproved",
+    "mode": "Email",
+    "text": "Dear ${clientFullName},\n${approver} has provided approval on the below mentioned issue(s\nClient Name | Customer Name | Customer Code | Assignee | Invoice No | Issue | Remarks | Action Owners\n<#list listOfInvoices as invoiceList>\n${invoiceList.clientName} | ${invoiceList.customerName} | ${invoiceList.customerCode} | ${invoiceList.assignee} | ${invoiceList.invoiceNo} | ${invoiceList.issue} | ${invoiceList.latestRemarks} | ${invoiceList.actionOwners}\n</#list>\nNote: To view the invoices where we need your intervention please click on the below link. You can provide your feedback and attach the concerned documents there\nView & Take Action (https://${subdomain}.inebura.ai/intg/action-owner-link/${token})\nRegards,\nAdmin\n© Inebura Technologies. All rights reserved.",
+    "notification": ""
+  },
+  {
+    "number": 18,
+    "code": "IssueTrackerResolution",
+    "mode": "Email",
+    "text": "Dear ${clientFullName},\n${kam} has provided resolution on the below mentioned issue(s)\nClient Name | Customer Name | Customer Code | Assignee | Invoice No | Issue | Remarks | Action Owners\n<#list listOfInvoices as invoiceList>\n${invoiceList.clientName} | ${invoiceList.customerName} | ${invoiceList.customerCode} | ${invoiceList.assignee} | ${invoiceList.invoiceNo} | ${invoiceList.issue} | ${invoiceList.latestRemarks} | ${invoiceList.actionOwners}\n</#list>\nNote: To view the invoices where we need your intervention please click on the below link. You can provide your feedback and attach the concerned documents there\nView & Take Action (https://${subdomain}.inebura.ai/intg/action-owner-link/${token})\nRegards,\nAdmin\n© Inebura Technologies. All rights reserved.",
+    "notification": ""
+  },
+  {
+    "number": 19,
+    "code": "PDCBankingReminderToday",
+    "mode": "Email",
+    "text": "Dear NULL,\nYour cheque is being banked today.\nCheque No: NULL\nAmount: NULL\nBank: NULL\nPlease ensure sufficient funds are available.\nThanks,\nInebura System",
+    "notification": "PDC Banking Today - Cheque NULL"
+  },
+  {
+    "number": 20,
+    "code": "PDCBankingReminder1Day",
+    "mode": "Email",
+    "text": "Dear NULL,\nThis is a reminder that your cheque is scheduled for banking tomorrow.\nCheque No: NULL\nAmount: NULL\nBank: NULL\nPlease ensure sufficient funds are available.\nThanks,\nInebura System",
+    "notification": "PDC Banking Reminder - Cheque NULL tomorrow"
+  },
+  {
+    "number": 21,
+    "code": "PDCBankingReminder2Days",
+    "mode": "Email",
+    "text": "Dear NULL,\nThis is a reminder that your cheque is scheduled for banking on NULL.\nCheque No: NULL\nAmount: NULL\nBank: NULL\nPlease ensure sufficient funds are available.\nThanks,\nInebura System",
+    "notification": "PDC Banking Reminder - Cheque NULL in 2 days"
+  },
+  {
+    "number": 22,
+    "code": "PDCBounced",
+    "mode": "Email",
+    "text": "Dear NULL,\nUnfortunately, your cheque has been bounced by the bank.\nCheque No: NULL\nAmount: NULL\nPDC Date: NULL\nBank: NULL\nPlease contact your agent at the earliest to resolve this matter.\nThanks,\nInebura System",
+    "notification": "PDC Bounced - Cheque NULL, Amount: NULL"
+  },
+  {
+    "number": 23,
+    "code": "PDCCleared",
+    "mode": "Email",
+    "text": "Dear NULL,\nYour cheque has been successfully cleared by the bank.\nCheque No: NULL\nAmount: NULL\nPDC Date: NULL\nBank: NULL\nThank you for the payment.\nThanks,\nInebura System",
+    "notification": "PDC Cleared - Cheque NULL, Amount: NULL"
+  },
+  {
+    "number": 24,
+    "code": "PDCBanked",
+    "mode": "Email",
+    "text": "Dear NULL,\nYour cheque has been presented at the bank for processing.\nCheque No: NULL\nAmount: NULL\nPDC Date: NULL\nBank: NULL\nYou will be notified once the cheque is cleared.\nThanks,\nInebura System",
+    "notification": "PDC Banked - Cheque NULL, Amount: NULL"
+  },
+  {
+    "number": 25,
+    "code": "PDCDetailsIncorrect",
+    "mode": "Email",
+    "text": "Dear NULL,\nThere are discrepancies found in the PDC submitted. The cheque cannot be banked until the issues are resolved.\nCheque No: NULL\nAmount: NULL\nPDC Date: NULL\nBank: NULL\nPlease contact your agent for further details.\nThanks,\nInebura System",
+    "notification": "PDC Details Incorrect - Cheque NULL"
+  },
+  {
+    "number": 26,
+    "code": "PDCDispatched",
+    "mode": "Email",
+    "text": "Dear Team,\nA PDC has been dispatched.\nCheque No: NULL\nAmount: NULL\nPDC Date: NULL\nBank: NULL\nPlease confirm receipt once received.\nThanks,\nInebura System",
+    "notification": "PDC Dispatched - Cheque NULL, Amount: NULL"
+  },
+  {
+    "number": 27,
+    "code": "PDCLogged",
+    "mode": "Email",
+    "text": "Dear Team,\nA new PDC has been logged.\nCheque No: NULL\nAmount: NULL\nPDC Date: NULL\nBank: NULL\nPlease review and take necessary action.\nThanks,\nInebura System",
+    "notification": "New PDC Logged - Cheque NULL, Amount: NULL"
+  },
+  {
+    "number": 28,
+    "code": "VisitPlanApprovalReminder",
+    "mode": "Email",
+    "text": "Dear ${managerName},\nYou have ${pendingCount} visit plan(s) pending approval for ${month}.\n${urgencyText} Please approve or reject all pending plans before the month-end cut-off.\nAgents with pending plans:\n<#list agentNames as agent>\n• ${agent}\n</#list>\nPlease review and take action on pending approvals.\nClick Here (https://${subdomain}.inebura.ai/dashboard/visit-plans)\nRegards,\nInebura System\nSystem-generated reminder from Inebura. Do not reply.\n© Inebura Technologies. All rights reserved.",
+    "notification": ""
+  },
+  {
+    "number": 29,
+    "code": "MonthlyVisitHrReport",
+    "mode": "Email",
+    "text": "Monthly Visit Report\n${month} | Tenant: ${tenantSchema}\nPeriod: ${monthStart} to ${monthEnd}\nAgent Name | Present Days | Absent Days | Leave Days | Total Recorded\n<#list agentRows as row>\n${row.agentName} | ${row.presentDays} | ${row.absentDays} | ${row.leaveDays} | ${row.total}\n</#list>\nTotal | ${grandPresent} | ${grandAbsent} | ${grandLeave} | ${grandTotal}\nClick Here (https://${subdomain}.inebura.ai/dashboard/reports)\nRegards,\nInebura System\nSystem-generated report from Inebura. Do not reply.\n© Inebura Technologies. All rights reserved.",
+    "notification": ""
+  },
+  {
+    "number": 30,
+    "code": "ActionOwnerInviteMail",
+    "mode": "Email",
+    "text": "You're invited to Inebura Ops!\nHi,\n${assignee} has invited you to join ${userClient} on Inebura Ops — the intelligent platform for managing accounts receivable, customer relationships, and collections workflows.\nClick the button below to set up your account. This invitation link will expire in 48 hours.\nInvited By | ${assignee}\nOrganisation | ${userClient}\nAssigned Role | ${UserRole}\nWith Inebura Ops you can:\n• Track receivables and payments\n• Manage customers and credit limits\n• Automate collections workflow\n• Collaborate with your team\nAction Required: Please accept the invitation using the button below.\nAccept Invitation (https://${subDomain}.inebura.ai/invite/${emailId}/${userId})\nIf button doesn't work:\nhttps://${subDomain}.inebura.ai/invite/${emailId}/${userId}\nRegards,\nInebura System\nNeed help? support@inebura.ai\nIf you didn't expect this invitation, ignore this email.\n© 2026 Inebura Ops. All rights reserved.",
+    "notification": ""
+  },
+  {
+    "number": 31,
+    "code": "ReportSchedularTemplate",
+    "mode": "Email",
+    "text": "Hello,\nPlease find your scheduled report ${reportName} attached.\nThe report was generated successfully as per the configured schedule.\nNote: Your scheduled report is ready and has been attached to this email for your review.\nRegards,\nInebura System\n© Inebura Technologies. All rights reserved.",
+    "notification": ""
+  },
+  {
+    "number": 32,
+    "code": "IssueTrackerManagerEmail",
+    "mode": "Email",
+    "text": "Dear ${managerName},\nAgent ${agentName} has created issue request for the below invoice(s). Your approval is required to proceed further.\nClient Name | Customer Name | Customer Code | Invoice No | Issue | Remarks | Created By\n<#list listOfInvoices as invoiceList>\n${invoiceList.clientName} | ${invoiceList.customerName} | ${invoiceList.customerCode} | ${invoiceList.invoiceNo} | ${invoiceList.issue} | ${invoiceList.latestRemarks} | ${invoiceList.createdBy}\n</#list>\nAction Required: Please review the request and provide your approval by clicking the button below.\nReview & Approve (https://${subdomain}.inebura.ai/dashboard/issue-tracker)\nRegards,\nInebura System\n© Inebura Technologies. All rights reserved.",
+    "notification": ""
+  },
+  {
+    "number": 33,
+    "code": "TestEmail",
+    "mode": "Email",
+    "text": "This is a Test Email\nHello,\nThis is a test email sent from the Inebura system to verify that your email service is working correctly.\nNo action is required on your part.\nRegards,\nInebura Admin\n© Inebura Technologies. All rights reserved.",
+    "notification": "This is a Test Email\nHello,\nThis is a test email sent from the Inebura system to verify that your email service is working correctly.\nNo action is required on your part.\nRegards,\nInebura Admin\n© Inebura Technologies. All rights reserved."
+  },
+  {
+    "number": 34,
+    "code": "ClientDeleteEmail",
+    "mode": "Email",
+    "text": "OTP Verification\nDear ${userName},\nYour OTP token for deleting client ${clientName} is:\n${emailOtp}\nBy providing this OTP, you confirm that you agree to permanently remove the client from the platform.\n⚠️ Please note: This is an *irrevocable* process and cannot be undone. client form INEBURA completely.\nBest regards,\nInebura Admin Team\n© Inebura Technologies. All rights reserved.",
+    "notification": "OTP Verification\nDear ${userName},\nYour OTP token for deleting client ${clientName} is:\n${emailOtp}\nBy providing this OTP, you confirm that you agree to permanently remove the client from the platform.\n⚠️ Please note: This is an *irrevocable* process and cannot be undone. client form INEBURA completely.\nBest regards,\nInebura Admin Team\n© Inebura Technologies. All rights reserved."
+  },
+  {
+    "number": 35,
+    "code": "ClientSuspendEmail",
+    "mode": "Email",
+    "text": "OTP Verification\nDear ${userName},\nYour OTP token for disabling client ${clientName} is:\n${phoneOtp}\nBy providing this OTP, you confirm that you agree to disable the client from the platform.\n⚠️ Please note: This action will remove client access completely.\nBest regards,\nInebura Admin Team\n© Inebura Technologies. All rights reserved.",
+    "notification": "OTP Verification\nDear ${userName},\nYour OTP token for disabling client ${clientName} is:\n${emailOtp}\nBy providing this OTP, you confirm that you agree to disable the client from the platform.\n⚠️ Please note: This action will remove client access completely.\nBest regards,\nInebura Admin Team\n© Inebura Technologies. All rights reserved."
+  },
+  {
+    "number": 36,
+    "code": "ActivityReportMail",
+    "mode": "Email",
+    "text": "Dear,\nPlease find the Activity Full Report for user ${clientFullName} .\nRegards\nAdmin",
+    "notification": ""
+  },
+  {
+    "number": 37,
+    "code": "UserCreatedAdmin",
+    "mode": "Email",
+    "text": "Welcome to Inebura!\nHello,\nWe’re excited to inform you that a new account has been successfully created for you in Inebura.\nUser Name: ${userName}\nLogin ID: ${loginUserId}\nTemporary Password: ${tempPassKey}\nClient URL : https://${clientSubDomain} (https://${clientSubDomain})\nNote: Please log in and change your password as soon as possible. Complete onboarding within 7 days.\nLogin to Your Account (https://${clientSubDomain})\nBest regards,\nInebura Admin Team\n© Inebura Technologies. All rights reserved.",
+    "notification": "Welcome to Inebura!"
+  },
+  {
+    "number": 38,
+    "code": "OnBoardingLinkExpired",
+    "mode": "Email",
+    "text": "Onboarding Link Expired\nDear ${clientFullName},\nYour onboarding link has expired as the onboarding process was not completed within the allowed 7-day period. You will not be able to log in until the onboarding is re-initiated.\nAction Required: Please contact the Inebura team to re-initiate your onboarding process.\nRegards,\nInebura Admin Team\n© Inebura Technologies. All rights reserved.",
+    "notification": ""
+  },
+  {
+    "number": 39,
+    "code": "ClientCreationError",
+    "mode": "Email",
+    "text": "Dear,\nThere has been an error in creation of ${clientFullName} .\nRegards\nAdmin",
+    "notification": ""
+  },
+  {
+    "number": 40,
+    "code": "ClientCreation",
+    "mode": "Email",
+    "text": "Welcome to Inebura\nDear,\nClient ${clientFullName} has been successfully created with the domain ${clientSubDomain}.\nLogin Credentials:\nUsername: ${userLoginId}\nPassword: Welcome@123\nNote: Please complete onboarding within 7 days.\nLogin Now (https://${clientSubDomain})\nRegards,\nAdmin\n© Inebura Technologies. All rights reserved.",
+    "notification": ""
+  },
+  {
+    "number": 41,
+    "code": "ODMReportMail",
+    "mode": "Email",
+    "text": "Dear,\nPlease find the ODM and Invoice Tracker Full report for client ${clientFullName} .\nRegards\nAdmin",
+    "notification": ""
+  },
+  {
+    "number": 42,
+    "code": "High Aging Invoices of Total O/S",
+    "mode": "Email",
+    "text": "Dear Sir/Madam,\nWe value your relationship and would request you to clear the below invoices. There is a total of ${Email_PaymentDue.reportData.content[0].totalDueAmount} ${Email_PaymentDue.reportData.content[0].currency} due from ${Email_PaymentDue.reportData.content[0].customerName}.\nBelow are the invoice details.\nInvoice No. | Invoice Date | Purchase Order Number | Invoice Value | Outstanding Amount\n<#list Email_PaymentDue_InvoiceList.reportData.content as invoiceList>\n${invoiceList.invoiceNo} | ${invoiceList.invoiceDate} | ${invoiceList.poNumber} | ${invoiceList.invoiceValue} ${invoiceList.currency} | ${invoiceList.outstandingAmount} ${invoiceList.currency}\n</#list>\nRequest you make the payments and clear the outstanding immediately.\nIf payments have been made against any of the invoice(s), please share with us the payment advice. In case of any other issues with regards to any of these invoices, please let us know about the same.\nTo view your invoices and provide feedback please click on the below link.\nClick Here (https://${subdomain}.inebura.ai/intg/customer-link/${InputParams.token})\nBest Regards,\n${Email_PaymentDue.reportData.content[0].agent}\n© Inebura Technologies. All rights reserved.",
+    "notification": ""
+  },
+  {
+    "number": 43,
+    "code": "Days left to pay your O/S",
+    "mode": "Email",
+    "text": "Dear Sir/Madam,\nBelow invoices will be due with the given days remaining for due date. There is a total of ${Email_PaymentDue.reportData.content[0].totalDueAmount} ${Email_PaymentDue.reportData.content[0].currency} due from ${Email_PaymentDue.reportData.content[0].customerName}.\nBelow are the invoice details.\nInvoice No. | Invoice Date | Purchase Order Number | Invoice Value | Outstanding Amount\n<#list Email_PaymentDue_InvoiceList.reportData.content as invoiceList>\n${invoiceList.invoiceNo} | ${invoiceList.invoiceDate} | ${invoiceList.poNumber} | ${invoiceList.invoiceValue} ${invoiceList.currency} | ${invoiceList.outstandingAmount} ${invoiceList.currency}\n</#list>\nRequest you make the payments and clear the outstanding immediately.\nIf payments have been made against any of the invoice(s), please share with us the payment advice. In case of any other issues with regards to any of these invoices, please let us know about the same.\nTo view your invoices and provide feedback please click on the below link.\nClick Here (https://${subdomain}.inebura.ai/intg/customer-link/${InputParams.token})\nBest Regards,\n${Email_PaymentDue.reportData.content[0].agent}\n© Inebura Technologies. All rights reserved.",
+    "notification": ""
+  },
+  {
+    "number": 44,
+    "code": "Invoices O/S due to given Sub Status",
+    "mode": "Email",
+    "text": "Dear Sir/Madam,\nBelow invoices are due because of the underlying reasons. There is a total of ${Email_PaymentDue.reportData.content[0].totalDueAmount} ${Email_PaymentDue.reportData.content[0].currency} due from ${Email_PaymentDue.reportData.content[0].customerName}.\nBelow are the invoice details.\nInvoice No. | Invoice Date | Purchase Order Number | Invoice Value | Outstanding Amount\n<#list Email_PaymentDue_InvoiceList.reportData.content as invoiceList>\n${invoiceList.invoiceNo} | ${invoiceList.invoiceDate} | ${invoiceList.poNumber} | ${invoiceList.invoiceValue} ${invoiceList.currency} | ${invoiceList.outstandingAmount} ${invoiceList.currency}\n</#list>\nRequest you make the payments and clear the outstanding immediately.\nIf payments have been made against any of the invoice(s), please share with us the payment advice. In case of any other issues with regards to any of these invoices, please let us know about the same.\nTo view your invoices and provide feedback please click on the below link.\nClick Here (https://${subdomain}.inebura.ai/intg/customer-link/${InputParams.token})\nBest Regards,\n${Email_PaymentDue.reportData.content[0].agent}\n© Inebura Technologies. All rights reserved.",
+    "notification": ""
+  },
+  {
+    "number": 45,
+    "code": "Invoices O/S due to given Primary Status",
+    "mode": "Email",
+    "text": "Dear Sir/Madam,\nBelow invoices are due because of the underlying reasons. There is a total of ${Email_PaymentDue.reportData.content[0].totalDueAmount} ${Email_PaymentDue.reportData.content[0].currency} due from ${Email_PaymentDue.reportData.content[0].customerName}.\nBelow are the invoice details.\nInvoice No. | Invoice Date | Purchase Order Number | Invoice Value | Outstanding Amount\n<#list Email_PaymentDue_InvoiceList.reportData.content as invoiceList>\n${invoiceList.invoiceNo} | ${invoiceList.invoiceDate} | ${invoiceList.poNumber} | ${invoiceList.invoiceValue} ${invoiceList.currency} | ${invoiceList.outstandingAmount} ${invoiceList.currency}\n</#list>\nRequest you make the payments and clear the outstanding immediately.\nIf payments have been made against any of the invoice(s), please share with us the payment advice. In case of any other issues with regards to any of these invoices, please let us know about the same.\nTo view your invoices and provide feedback please click on the below link.\nClick Here (https://${subdomain}.inebura.ai/intg/customer-link/${InputParams.token})\nBest Regards,\n${Email_PaymentDue.reportData.content[0].agent}\n© Inebura Technologies. All rights reserved.",
+    "notification": ""
+  },
+  {
+    "number": 46,
+    "code": "Total O/S is past due",
+    "mode": "Email",
+    "text": "Dear Sir/Madam,\nBelow invoices are past due . There is a total of ${Email_PaymentDue.reportData.content[0].totalDueAmount} ${Email_PaymentDue.reportData.content[0].currency} due from ${Email_PaymentDue.reportData.content[0].customerName}.\nBelow are the invoice details.\nInvoice No. | Invoice Date | Purchase Order Number | Invoice Value | Outstanding Amount\n<#list Email_PaymentDue_InvoiceList.reportData.content as invoiceList>\n${invoiceList.invoiceNo} | ${invoiceList.invoiceDate} | ${invoiceList.poNumber} | ${invoiceList.invoiceValue} ${invoiceList.currency} | ${invoiceList.outstandingAmount} ${invoiceList.currency}\n</#list>\nRequest you make the payments and clear the outstanding immediately.\nIf payments have been made against any of the invoice(s), please share with us the payment advice. In case of any other issues with regards to any of these invoices, please let us know about the same.\nTo view your invoices and provide feedback please click on the below link.\nClick Here (https://${subdomain}.inebura.ai/intg/customer-link/${InputParams.token})\nBest Regards,\n${Email_PaymentDue.reportData.content[0].agent}\n© Inebura Technologies. All rights reserved.",
+    "notification": ""
+  },
+  {
+    "number": 47,
+    "code": "Total O/S to become Due",
+    "mode": "Email",
+    "text": "Dear Sir/Madam,\nThe below invoices will be due on given dates. There is a total of ${Email_PaymentDue.reportData.content[0].totalDueAmount} ${Email_PaymentDue.reportData.content[0].currency} due from ${Email_PaymentDue.reportData.content[0].customerName}.\nBelow are the invoice details.\nInvoice No. | Invoice Date | Purchase Order Number | Invoice Value | Outstanding Amount\n<#list Email_PaymentDue_InvoiceList.reportData.content as invoiceList>\n${invoiceList.invoiceNo} | ${invoiceList.invoiceDate} | ${invoiceList.poNumber} | ${invoiceList.invoiceValue} ${invoiceList.currency} | ${invoiceList.outstandingAmount} ${invoiceList.currency}\n</#list>\nRequest you make the payments and clear the outstanding immediately.\nIf payments have been made against any of the invoice(s), please share with us the payment advice. In case of any other issues with regards to any of these invoices, please let us know about the same.\nLook forward to our cooperation.\nTo view your invoices and provide feedback please click on the below link.\nClick Here (https://${subdomain}.inebura.ai/intg/customer-link/${InputParams.token})\nBest Regards,\n${Email_PaymentDue.reportData.content[0].agent}\n© Inebura Technologies. All rights reserved.",
+    "notification": ""
+  },
+  {
+    "number": 48,
+    "code": "Gentle Reminder of Payment of O/S",
+    "mode": "Email",
+    "text": "Dear Sir/Madam,\nThe below invoices have not been paid for a long time. There is a total of ${Email_PaymentDue.reportData.content[0].totalDueAmount} ${Email_PaymentDue.reportData.content[0].currency} due from ${Email_PaymentDue.reportData.content[0].customerName}.\nBelow are the invoice details.\nInvoice No. | Invoice Date | Purchase Order Number | Invoice Value | Outstanding Amount\n<#list Email_PaymentDue_InvoiceList.reportData.content as invoiceList>\n${invoiceList.invoiceNo} | ${invoiceList.invoiceDate} | ${invoiceList.poNumber} | ${invoiceList.invoiceValue} ${invoiceList.currency} | ${invoiceList.outstandingAmount} ${invoiceList.currency}\n</#list>\nRequest you make the payments and clear the outstanding immediately.\nIf payments have been made against any of the invoice(s), please share with us the payment advice. In case of any other issues with regards to any of these invoices, please let us know about the same.\nWe are in the process of forwarding these outstanding details to your senior management in case we don’t get any support henceforth.\nTo view your invoices and provide feedback please click on the below link.\nClick Here (https://${subdomain}.inebura.ai/intg/customer-link/${InputParams.token})\nBest Regards,\n${Email_PaymentDue.reportData.content[0].agent}\n© Inebura Technologies. All rights reserved.",
+    "notification": ""
+  },
+  {
+    "number": 49,
+    "code": "Total O/S is Past Due(Key Account)",
+    "mode": "Email",
+    "text": "Dear Sir/Madam,\nYou have been a high priority customer for us. It is already past due for the below invoices. There is a total of ${Email_PaymentDue.reportData.content[0].totalDueAmount} ${Email_PaymentDue.reportData.content[0].currency} due from ${Email_PaymentDue.reportData.content[0].customerName}.\nBelow are the invoice details.\nInvoice No. | Invoice Date | Purchase Order Number | Invoice Value | Outstanding Amount\n<#list Email_PaymentDue_InvoiceList.reportData.content as invoiceList>\n${invoiceList.invoiceNo} | ${invoiceList.invoiceDate} | ${invoiceList.poNumber} | ${invoiceList.invoiceValue} ${invoiceList.currency} | ${invoiceList.outstandingAmount} ${invoiceList.currency}\n</#list>\nRequest you make the payments and clear the outstanding immediately.\nIf payments have been made against any of the invoice(s), please share with us the payment advice. In case of any other issues with regards to any of these invoices, please let us know about the same.\nTo view your invoices and provide feedback please click on the below link.\nClick Here (https://${subdomain}.inebura.ai/intg/customer-link/${InputParams.token})\nBest Regards,\n${Email_PaymentDue.reportData.content[0].agent}\n© Inebura Technologies. All rights reserved.",
+    "notification": ""
+  },
+  {
+    "number": 50,
+    "code": "Payment of Total O/S  is still not paid post Due Date after multiple reminders",
+    "mode": "Email",
+    "text": "Dear Sir/Madam,\nWe have been shared several payment reminders to you. There is a total of ${Email_PaymentDue.reportData.content[0].totalDueAmount} ${Email_PaymentDue.reportData.content[0].currency} due from ${Email_PaymentDue.reportData.content[0].customerName}.\nBelow are the invoice details.\nInvoice No. | Invoice Date | Purchase Order Number | Invoice Value | Outstanding Amount\n<#list Email_PaymentDue_InvoiceList.reportData.content as invoiceList>\n${invoiceList.invoiceNo} | ${invoiceList.invoiceDate} | ${invoiceList.poNumber} | ${invoiceList.invoiceValue} ${invoiceList.currency} | ${invoiceList.outstandingAmount} ${invoiceList.currency}\n</#list>\nRequest you make the payments and clear the outstanding immediately.\nIf payments have been made against any of the invoice(s), please share with us the payment advice. In case of any other issues with regards to any of these invoices, please let us know about the same.\nWe are in the process of forwarding these outstanding details to your senior management in case we don’t get any support henceforth.\nTo view your invoices and provide feedback please click on the below link.\nClick Here (https://${subdomain}.inebura.ai/intg/customer-link/${InputParams.token})\nBest Regards,\n${Email_PaymentDue.reportData.content[0].agent}\n© Inebura Technologies. All rights reserved.",
+    "notification": ""
+  },
+  {
+    "number": 51,
+    "code": "Repeat Reminder for Payment of Total O/S",
+    "mode": "Email",
+    "text": "Dear Sir/Madam,\nWe have been following up with you since the date of submission and have already shared reminders in the past on the pending payments. There is a total of ${Email_PaymentDue.reportData.content[0].totalDueAmount} ${Email_PaymentDue.reportData.content[0].currency} due from ${Email_PaymentDue.reportData.content[0].customerName}.\nBelow are the invoice details.\nInvoice No. | Invoice Date | Purchase Order Number | Invoice Value | Outstanding Amount\n<#list Email_PaymentDue_InvoiceList.reportData.content as invoiceList>\n${invoiceList.invoiceNo} | ${invoiceList.invoiceDate} | ${invoiceList.poNumber} | ${invoiceList.invoiceValue} ${invoiceList.currency} | ${invoiceList.outstandingAmount} ${invoiceList.currency}\n</#list>\nRequest you make the payments and clear the outstanding immediately.\nIf payments have been made against any of the invoice(s), please share with us the payment advice. In case of any other issues with regards to any of these invoices, please let us know about the same.\nWe are looking forward to our cooperation. In case of no response, we may have to forward these outstanding details to your senior management for support.\nTo view your invoices and provide feedback please click on the below link.\nClick Here (https://${subdomain}.inebura.ai/intg/customer-link/${InputParams.token})\nBest Regards,\n${Email_PaymentDue.reportData.content[0].agent}\n© Inebura Technologies. All rights reserved.",
+    "notification": ""
+  },
+  {
+    "number": 52,
+    "code": "Reminder for Payment of Total O/S",
+    "mode": "Email",
+    "text": "Dear Sir/Madam,\nWe have been following up with you since the date of submission. There is a total of ${Email_PaymentDue.reportData.content[0].totalDueAmount} ${Email_PaymentDue.reportData.content[0].currency} due from ${Email_PaymentDue.reportData.content[0].customerName}.\nBelow are the invoice details.\nInvoice No. | Invoice Date | Purchase Order Number | Invoice Value | Outstanding Amount\n<#list Email_PaymentDue_InvoiceList.reportData.content as invoiceList>\n${invoiceList.invoiceNo} | ${invoiceList.invoiceDate} | ${invoiceList.poNumber} | ${invoiceList.invoiceValue} ${invoiceList.currency} | ${invoiceList.outstandingAmount} ${invoiceList.currency}\n</#list>\nRequest you make the payments and clear the outstanding immediately.\nIf payments have been made against any of the invoice(s), please share with us the payment advice. In case of any other issues with regards to any of these invoices, please let us know about the same.\nLook forward to our cooperation. In case of no response, we may have to forward these outstanding details to your senior management for support.\nTo view your invoices and provide feedback please click on the below link.\nClick Here (https://${subdomain}.inebura.ai/intg/customer-link/${InputParams.token})\nBest Regards,\n${Email_PaymentDue.reportData.content[0].agent}\n© Inebura Technologies. All rights reserved.",
+    "notification": ""
+  },
+  {
+    "number": 53,
+    "code": "PasswordResetEmail",
+    "mode": "Email",
+    "text": "Dear ${userName},\nPassword Reset. Please login using password ${generatedPassKey} .\nRegards\nAdmin",
+    "notification": "Password Reset"
+  },
+  {
+    "number": 54,
+    "code": "paymentAdviceToClient",
+    "mode": "Email",
+    "text": "Dear ${clientFullName},\nA payment has been credited with the following details. Sharing the details to get the payment accounted for in the system. Do let us know in case of any disconnect.\nA reply to this email with a confirmation will be highly appreciated.\nClient | Cust Code | Cust Name | Invoice No | Assignee | Manager | Invoice Date | Invoice Due Date | Invoice Value | Basic Value | Amount Paid | Amount Paid-TDS | Instrument No | Instrument Date\n<#list listOfInvoices as invoiceList>\n${invoiceList.clientName} | ${invoiceList.customerCode} | ${invoiceList.customerName} | ${invoiceList.invoiceNo} | ${invoiceList.assignee} | ${invoiceList.manager} | ${invoiceList.invoiceDate} | ${invoiceList.invoiceDueDate} | ${invoiceList.invoiceValue} | ${invoiceList.basicValue} | ${invoiceList.AmountPaid} | ${invoiceList.tdsAmount} | ${invoiceList.instrumentNo} | ${invoiceList.instrumentDate}\n</#list>\nRegards\n${userFullName}",
+    "notification": ""
+  },
+  {
+    "number": 55,
+    "code": "UserCreated",
+    "mode": "Email",
+    "text": "Dear ${userName},\nInebura Login created.\nYour Login User Id is ${loginUserId}.\nYour Password is being communicated separately.\nRegards\nAdmin",
+    "notification": "Welcome to Inebura!"
+  },
+  {
+    "number": 56,
+    "code": "DunningLetterThreeEmail",
+    "mode": "Email",
+    "text": "CustomerCode:${userCustomer.customerCode}\nRef:${dunningLetterRefNo}\n<#assign aDateTime = .now> <#assign aDate = aDateTime?date>\nDate:${aDate?string(\"dd-MMM-yyyy\")}\n${'\\n'}\nThe CFO/Finance/Accounts\n${userCustomer.customerName}\nDear Customer,\nSubject: 3rd and Final Reminder - Overdue Invoice(s)\n<#setting date_format=\"dd-MMM-yyyy\"> <#assign bDateTime = firstMailSentDate> <#assign bDate = bDateTime?date(\"yyyy-MM-dd\")> <#assign cDateTime = secondMailSentDate> <#assign cDate = cDateTime?date(\"yyyy-MM-dd\")>\nRef : Our Letter 1 Ref ${dunningLetterOneRefNo} Dated : ${bDate?date}\nRef : Our Letter 2 Ref ${dunningLetterTwoRefNo} Dated : ${cDate?date}\nWe regret to inform you that payment for invoice(s) mentioned in attached annexure 1 are still not paid and as per our Credit Policy, we have been forced to instruct our office to suspend all deliveries of spare parts and services.\nShould this reminder not being kept into consideration, ${userClient} will be forced to initiate appropriate legal action against you at your cost for recovery of due amount along with interest.\nSale Order No | Invoice No | Invoice Date | Invoice Value | Outstanding Amount | PO | Desc\n<#list listOfInvoices as invoiceList>\n${(invoiceList.saleOrderNo)!} | ${invoiceList.invoiceNo} | ${invoiceList.invoiceDate} | ${(invoiceList.invoiceValue)!} | ${invoiceList.totalOutstanding} | ${invoiceList.poNumber} | ${(invoiceList.desc)!}\n</#list>\nPlease feel free to reach the following person, if you wish to discuss any issues.\n${dunningLetterContactInfo!}\nTo view your invoices and provide feedback please click on the below link.\nClick Here (https://${subdomain}.inebura.ai/intg/customer-link/${token})\nYours truly.\n${userClient}\n© Inebura Technologies. All rights reserved.",
+    "notification": ""
+  },
+  {
+    "number": 57,
+    "code": "DunningLetterTwoEmail",
+    "mode": "Email",
+    "text": "CustomerCode:${userCustomer.customerCode}\nRef:${dunningLetterRefNo}\n<#assign aDateTime=.now> <#assign aDate=aDateTime?date>\nDate:${aDate?string(\"dd-MMM-yyyy\")}\n${'\\n'}\nThe CFO/Finance/Accounts\n${userCustomer.customerName}\nDear Customer,\nSubject: 2nd Reminder - Overdue Invoice(s)\n<#setting date_format=\"dd-MMM-yyyy\"> <#assign bDateTime=firstMailSentDate> <#assign bDate=bDateTime?date(\"yyyy-MM-dd\")>\nRef : Our Letter 1 Ref - ${dunningLetterOneRefNo} Dated : ${bDate?date}\nThis is in reference to our reminder 1 with letter ref ${dunningLetterOneRefNo} (copy attached), we regret to inform you that payment for the invoice(s) mentioned in attached annexure 1 are still not paid. We look forward to being paid at the earliest and not later than 5 working days from the receipt of this letter.\nSale Order No | Invoice No | Invoice Date | Invoice Value | Outstanding Amount | PO | Desc\n<#list listOfInvoices as invoiceList>\n${(invoiceList.saleOrderNo)!} | ${invoiceList.invoiceNo} | ${invoiceList.invoiceDate} | ${(invoiceList.invoiceValue)!} | ${invoiceList.totalOutstanding} | ${invoiceList.poNumber} | ${(invoiceList.desc)!}\n</#list>\nPlease feel free to reach the following person, if you wish to discuss any issues.\n${dunningLetterContactInfo!}\nWe would like to inform you that according to our Credit Policy, we will be forced at our regret to instruct our office to suspend all deliveries of spare parts and services to your company in case above dues are not paid.\nTo view your invoices and provide feedback please click on the below link.",
+    "notification": ""
+  },
+  {
+    "number": 58,
+    "code": "DunningLetterOneEmail",
+    "mode": "Email",
+    "text": "CustomerCode: ${userCustomer.customerCode}\nRef: ${dunningLetterRefNo}\n<#assign aDateTime=.now> <#assign aDate=aDateTime?date>\nDate: ${aDate?string(\"dd-MMM-yyyy\")}\nThe CFO/Finance/Accounts\n${userCustomer.customerName}\nDear Customer,\nSubject: Overdue Invoice(s)\nWe would like to bring your kind attention about delay in payment with regard to the below mentioned Invoice(s) in attached annexure 1.\nSale Order No | Invoice No | Invoice Date | Invoice Value | Outstanding Amount | PO | Desc\n<#list listOfInvoices as invoiceList>\n${(invoiceList.saleOrderNo)!} | ${invoiceList.invoiceNo} | ${invoiceList.invoiceDate} | ${(invoiceList.invoiceValue)!} | ${invoiceList.totalOutstanding} | ${invoiceList.poNumber} | ${(invoiceList.desc)!}\n</#list>\nWe look forward to being paid at the earliest and not later than 5 working days from the receipt of this letter.\nPlease feel free to reach the following person, if you wish to discuss any issues.\n${dunningLetterContactInfo!}\nKindly ignore this letter if the dues are already paid by you.\nTo view your invoices and provide feedback please click on the below link.\nClick Here (https://${subdomain}.inebura.ai/intg/customer-link/${token})\nYours truly.\n${userClient}\n© Inebura Technologies. All rights reserved.",
+    "notification": ""
+  },
+  {
+    "number": 59,
+    "code": "SubmissionOfInvoicesEmail",
+    "mode": "Email",
+    "text": "Dear Sir/Madam,\nGreetings from ${userClient}!\nNew invoices are being generated for ${userCustomer.customerName()}! We hereby are attaching copies of invoices for your perusal.\nInvoice No | Invoice Date | Invoice Value | Outstanding Amount | Due Date <#list listOfInvoices as invoiceList>\n${invoiceList.invoiceNo} | ${invoiceList.invoiceDate} | ${invoiceList.invoiceValue} | ${invoiceList.totalOutstanding} | ${invoiceList.invoiceDueDate} </#list>\nLook forward to your cooperation and support to clear the payments before the due date.\nTo view your invoices and provide feedback please click on the below link.\nClick Here (https://${subdomain}.inebura.ai/intg/customer-link/${token})\nRegards\n© Inebura Technologies. All rights reserved.",
+    "notification": ""
+  },
+  {
+    "number": 60,
+    "code": "ChequeBounce",
+    "mode": "Email",
+    "text": "Dear Sir/Madam,\nGreetings from ${Email_PaymentDue.reportData.content[0].clientName}!\nWe would like to inform you that the below cheque issued by you has bounced. Request you to make arrangement of funds and clear the outstanding immediately\nCheque No. | Cheque Date | Amount | Bank\n${Email_PaymentDue.reportData.content[0].instrumentRefNo} | ${Email_PaymentDue.reportData.content[0].instrumentTransferDate} | ${Email_PaymentDue.reportData.content[0].currency} | ${Email_PaymentDue.reportData.content[0].bank}\nTo view your invoices and provide feedback please click on the below link.\nClick Here (https://${subdomain}.inebura.ai/intg/customer-link/${InputParams.token})\nRegards\n© Inebura Technologies. All rights reserved.",
+    "notification": ""
+  },
+  {
+    "number": 61,
+    "code": "AcknowledgementOfInvoiceReceipt",
+    "mode": "Email",
+    "text": "Dear Sir/Madam,\nGreetings from ${Email_PaymentDue.reportData.content[0].clientName}!\nWe are writing to you as the below invoices have been sent to you on. Attached are the acknowledgement /POD for confirmation\nInvoice No. | Invoice Date | Purchase Order Number | Invoice Value | Outstanding Amount\n<#list Email_PaymentDue_InvoiceList.reportData.content as invoiceList>\n${invoiceList.invoiceNo} | ${invoiceList.invoiceDate} | ${invoiceList.poNumber} | ${invoiceList.invoiceValue} ${invoiceList.currency} | ${invoiceList.outstandingAmount} ${invoiceList.currency}\n</#list>\nRequest your support on getting the same processed and clear the payments at the earliest\nTo view your invoices and provide feedback please click on the below link.\nClick Here (https://${subdomain}.inebura.ai/intg/customer-link/${InputParams.token})\nBest Regards,\n${Email_PaymentDue.reportData.content[0].agent}\n© Inebura Technologies. All rights reserved.",
+    "notification": ""
+  },
+  {
+    "number": 62,
+    "code": "InvoiceResubmission",
+    "mode": "Email",
+    "text": "Dear Sir/Madam,\nGreetings from ${Email_PaymentDue.reportData.content[0].clientName}!\nBased on our discussion, we hereby are attaching copies of invoices for your perusal.\nInvoice No. | Invoice Date | Purchase Order Number | Invoice Value | Outstanding Amount\n<#list Email_PaymentDue_InvoiceList.reportData.content as invoiceList>\n${invoiceList.invoiceNo} | ${invoiceList.invoiceDate} | ${invoiceList.poNumber} | ${invoiceList.invoiceValue} ${invoiceList.currency} | ${invoiceList.outstandingAmount} ${invoiceList.currency}\n</#list>\nLook forward to your cooperation and support to clear the payments by time.\nTo view your invoices and provide feedback please click on the below link.\nClick Here (https://${subdomain}.inebura.ai/intg/customer-link/${InputParams.token})\nBest Regards,\n${Email_PaymentDue.reportData.content[0].agent}\n© Inebura Technologies. All rights reserved.",
+    "notification": ""
+  },
+  {
+    "number": 63,
+    "code": "PendingPayments",
+    "mode": "Email",
+    "text": "Dear Sir/Madam,\nWe have been following up with you since the date of submission. There is a total of ${Email_PaymentDue.reportData.content[0].totalDueAmount} ${Email_PaymentDue.reportData.content[0].currency} due from ${Email_PaymentDue.reportData.content[0].customerName}.\nBelow are the invoice details.\nInvoice No. | Invoice Date | Purchase Order Number | Invoice Value | Outstanding Amount\n<#list Email_PaymentDue_InvoiceList.reportData.content as invoiceList>\n${invoiceList.invoiceNo} | ${invoiceList.invoiceDate} | ${invoiceList.poNumber} | ${invoiceList.invoiceValue} ${invoiceList.currency} | ${invoiceList.outstandingAmount} ${invoiceList.currency}\n</#list>\nRequest you make the payments and clear the outstanding immediately.\nIf payments have been made against any of the invoice(s), please share with us the payment advice. In case of any other issues with regards to any of these invoices, please let us know about the same.\nLook forward to our cooperation. In case of no response, we may have to forward these outstanding details to your senior management for support.\nTo view your invoices and provide feedback please click on the below link.\nClick Here (https://${subdomain}.inebura.ai/intg/customer-link/${InputParams.token})\nBest Regards,\n${Email_PaymentDue.reportData.content[0].agent}\n© Inebura Technologies. All rights reserved.",
+    "notification": ""
+  },
+  {
+    "number": 64,
+    "code": "PTPMissedMail",
+    "mode": "Email",
+    "text": "Dear Sir/Madam,\nGreetings from ${Email_PaymentDue.reportData.content[0].clientName}!\nReference our discussion, we have not received any payments from ${Email_PaymentDue.reportData.content[0].customerName} as per commitment. The payment was expected on commit date as mentioned below.\nWe request your kind attention towards the same and clear the payment at the earliest.\nThe total outstanding due is ${Email_PaymentDue.reportData.content[0].totalDueAmount} ${Email_PaymentDue.reportData.content[0].currency}.\nBelow are the outstanding invoice(s) details.\nInvoice No. | Invoice Date | Purchase Order Number | Invoice Value | Outstanding Amount | Commit Date\n<#list Email_PaymentDue_InvoiceList.reportData.content as invoiceList>\n${invoiceList.invoiceNo} | ${invoiceList.invoiceDate} | ${invoiceList.poNumber} | ${invoiceList.invoiceValue} ${invoiceList.currency} | ${invoiceList.outstandingAmount} ${invoiceList.currency} | ${invoiceList.commitDate}\n</#list>\nRequest you to clear the payments at the earliest.\nIf payments have been made against any of the invoice(s), please share with us the payment advice. In case of any other issues with regards to any of these invoices, please let us know about the same.\nTo view your invoices and provide feedback please click on the below link.\nClick Here (https://${subdomain}.inebura.ai/intg/customer-link/${InputParams.token})\nBest Regards,\n${Email_PaymentDue.reportData.content[0].agent}\n© Inebura Technologies. All rights reserved.",
+    "notification": ""
+  },
+  {
+    "number": 65,
+    "code": "PTPConfirmationMail",
+    "mode": "Email",
+    "text": "Dear Sir/Madam,\nGreetings from ${Email_PaymentDue.reportData.content[0].clientName}!\nReference our discussion, we look forward to receiving the payments against the below invoices on commit date. The total outstanding is Rs ${Email_PaymentDue.reportData.content[0].totalDueAmount}.\nBelow are the outstanding invoice details.\nInvoice No. | Invoice Date | Purchase Order Number | Invoice Value | Outstanding Amount | Commit Date\n<#list Email_PaymentDue_InvoiceList.reportData.content as invoiceList>\n${invoiceList.invoiceNo} | ${invoiceList.invoiceDate} | ${invoiceList.poNumber} | ${invoiceList.invoiceValue} ${invoiceList.currency} | ${invoiceList.outstandingAmount} ${invoiceList.currency} | ${invoiceList.commitDate}\n</#list>\nLook forward to your cooperation and support.\nTo view your invoices and provide feedback please click on the below link.\nclick Here (https://${subdomain}.inebura.ai/intg/customer-link/${InputParams.token})\nBest Regards,\n${Email_PaymentDue.reportData.content[0].agent}\n© Inebura Technologies. All rights reserved.",
+    "notification": ""
+  },
+  {
+    "number": 66,
+    "code": "RequestForPaymentAdviceOrDetails",
+    "mode": "Email",
+    "text": "Dear Sir/Madam,\nThank you! We have received Rs. from ${Email_PaymentDue.reportData.content[0].customerName}.\nWe further request you to share the advice. This information is required to adjust the correct invoices in the system.\nBelow are the payment received details.\nInvoice No. | Collected Amount | UTR/Cheque No. | Payment Date\n<#list Email_PaymentDue_InvoiceList.reportData.content as invoiceList>\n${invoiceList.invoiceNo} | Rs. ${invoiceList.collectedAmount} | ${invoiceList.chequeNo} | ${invoiceList.paymentDate}\n</#list>\nTo view your invoices and provide feedback please click on the below link.\nClick Here (https://${subdomain}.inebura.ai/intg/customer-link/${InputParams.token})\nBest Regards,\n${Email_PaymentDue.reportData.content[0].agent}\n© Inebura Technologies. All rights reserved.",
+    "notification": ""
+  },
+  {
+    "number": 67,
+    "code": "ReminderForPaymentDue",
+    "mode": "Email",
+    "text": "Dear Sir/Madam,\nGreetings from ${Email_PaymentDue.reportData.content[0].clientName}!\nReference our discussion on the outstanding due from ${Email_PaymentDue.reportData.content[0].customerName}, as per our books the total outstanding due is ${Email_PaymentDue.reportData.content[0].totalDueAmount} ${Email_PaymentDue.reportData.content[0].currency}.\nBelow are the invoice details.\nInvoice No. | Invoice Date | Purchase Order Number | Invoice Value | Outstanding Amount | Due Date\n<#list Email_PaymentDue_InvoiceList.reportData.content as invoiceList>\n${invoiceList.invoiceNo} | ${invoiceList.invoiceDate} | ${invoiceList.poNumber} | ${invoiceList.invoiceValue} ${invoiceList.currency} | ${invoiceList.outstandingAmount} ${invoiceList.currency} | ${invoiceList.invoiceDueDate}\n</#list>\nRequest you to kindly clear the payments by due date based on our discussion.\nIn case of any other issues with regards to any of these invoices, please let us know about the same.\nTo view your invoices and provide feedback please click on the below link.\nClick Here (https://${subdomain}.inebura.ai/intg/customer-link/${InputParams.token})\nBest Regards,\n${Email_PaymentDue.reportData.content[0].agent}\n© Inebura Technologies. All rights reserved.",
+    "notification": ""
+  },
+  {
+    "number": 68,
+    "code": "NewInvoiceNoO/S",
+    "mode": "Email",
+    "text": "Dear Sir/Madam,\nGreetings from ${Email_PaymentDue.reportData.content[0].clientName}!\nNew invoice(s) have been generated for ${Email_PaymentDue.reportData.content[0].totalDueAmount} ${Email_PaymentDue.reportData.content[0].currency}.\nBelow are the Outstanding invoice details.\nInvoice No. | Invoice Date | Purchase Order Number | Invoice Value | Outstanding Amount\n<#list Email_PaymentDue_InvoiceList.reportData.content as invoiceList>\n${invoiceList.invoiceNo} | ${invoiceList.invoiceDate} | ${invoiceList.poNumber} | ${invoiceList.invoiceValue} ${invoiceList.currency} | ${invoiceList.outstandingAmount} ${invoiceList.currency}\n</#list>\nIn case of any issues with regards to any of these invoices, please let us know about the same.\nTo view your invoices and provide feedback please click on the below link.\nClick Here (https://${subdomain}.inebura.ai/intg/customer-link/${InputParams.token})\nBest Regards,\n${Email_PaymentDue.reportData.content[0].agent}\n© Inebura Technologies. All rights reserved.",
+    "notification": ""
+  },
+  {
+    "number": 69,
+    "code": "NewInvoiceExistingCustomer",
+    "mode": "Email",
+    "text": "Dear Sir/Madam,\nGreetings from ${Email_PaymentDue.reportData.content[0].clientName}!\nNew invoice(s) have been generated for Rs. ${Email_PaymentDue.reportData.content[0].totalOutstanding}.\nBelow are the Outstanding invoice details.\nInvoice No. | Invoice Date | Purchase Order Number | Invoice Value | Outstanding Amount <#list Email_InvoiceList_AllInvoice.reportData.content as invoiceList>\n${invoiceList.invoiceNo} | ${invoiceList.invoiceDate} | ${invoiceList.poNumber} | ${invoiceList.invoiceValue} ${invoiceList.currency} | ${invoiceList.dueAmount} ${invoiceList.currency}\n</#list>\nRequest you to clear the payments at the earliest.\nIf payments have been made against any of the invoice(s), please share with us the payment advice. In case of any other issues with regards to any of these invoices, please let us know about the same.\nTo view your invoices and provide feedback please click on the below link.\nClick Here (https://${subdomain}.inebura.ai/intg/customer-link/${InputParams.token})\nBest Regards,\n${Email_PaymentDue.reportData.content[0].agent}\n© Inebura Technologies. All rights reserved.",
+    "notification": ""
+  },
+  {
+    "number": 70,
+    "code": "PaymentDue",
+    "mode": "Email",
+    "text": "Dear Sir/Madam,\nGreetings from ${Email_PaymentDue.reportData.content[0].clientName}!\nWe would like to bring your kind attention to the outstanding due from ${Email_PaymentDue.reportData.content[0].customerName}. As per our books the total outstanding is ${Email_PaymentDue.reportData.content[0].totalDueAmount} ${Email_PaymentDue.reportData.content[0].currency}.\nBelow are the invoice details.\nInvoice No. | Invoice Date | Purchase Order Number | Invoice Value | Outstanding Amount\n<#list Email_PaymentDue_InvoiceList.reportData.content as invoiceList>\n${invoiceList.invoiceNo} | ${invoiceList.invoiceDate} | ${invoiceList.poNumber} | ${invoiceList.invoiceValue} ${invoiceList.currency} | ${invoiceList.outstandingAmount} ${invoiceList.currency}\n</#list>\nRequest you to clear the payments at the earliest.\nIf payments have been made against any of the invoice(s), please share with us the payment advice. In case of any other issues with regards to any of these invoices, please let us know about the same.\nTo view your invoices and provide feedback please click on the below link.\nClick Here (https://${subdomain}.inebura.ai/intg/customer-link/${InputParams.token})\nBest Regards,\n${Email_PaymentDue.reportData.content[0].agent}\n© Inebura Technologies. All rights reserved.",
+    "notification": ""
+  },
+  {
+    "number": 71,
+    "code": "IssueTrackerEmail",
+    "mode": "Email",
+    "text": "Dear ${clientFullName},\nWhile following up with the below customer(s), the below issues have come up which requires your kind attention.\nClient Name | Customer Name | Customer Code | Assignee | Invoice No | Issue | Remarks | Action Owners\n<#list listOfInvoices as invoiceList>\n${invoiceList.clientName} | ${invoiceList.customerName} | ${invoiceList.customerCode} | ${invoiceList.assignee} | ${invoiceList.invoiceNo} | ${invoiceList.issue} | ${invoiceList.latestRemarks} | ${invoiceList.actionOwners}\n</#list>\nNote: To view the invoices where we need your intervention please click on the below link. You can provide your feedback and attach the concerned documents there\nView & Take Action (https://${subdomain}.inebura.ai/intg/action-owner-link/${token})\nRegards,\nAdmin\n© Inebura Technologies. All rights reserved.",
+    "notification": ""
+  },
+  {
+    "number": 72,
+    "code": "ManagerRemarksInputEmail",
+    "mode": "Email",
+    "text": "Dear ${userFullName},\nYour Manager has put in following remarks.\nClient Name | Customer Name | Customer Code | Invoice No | Manager Remarks <#list listOfInvoices as invoiceList>\n${invoiceList.clientName} | ${invoiceList.customerName} | ${invoiceList.customerCode} | ${invoiceList.invoiceNo} | ${invoiceList.managerRemarks} </#list>\nRegards\nAdmin",
+    "notification": "Your Manager has put in remarks to certain Invoices. Please check your email for details."
+  },
+  {
+    "number": 73,
+    "code": "DunningLetterEmail",
+    "mode": "Email",
+    "text": "Dear ${userFullName},\nPlease find the Dunning letter tracker.\nClient Name | Customer Name | Customer Code | Assignee | Invoice No | Manager | Dunning Letter No | Dunning Letter Ref No\n<#list listOfInvoices as invoiceList>\n${invoiceList.clientName} | ${invoiceList.customerName} | ${invoiceList.customerCode} | ${invoiceList.assignee} | ${invoiceList.invoiceNo} | ${invoiceList.manager} | ${invoiceList.dunningLetterNo} | ${invoiceList.docRefNo}\n</#list>\nRegards\nAdmin",
+    "notification": ""
+  },
+  {
+    "number": 74,
+    "code": "ReAllocationEmail",
+    "mode": "Email",
+    "text": "Dear ${userFullName},\nPlease find the details of Re Allocated Invoices to you.\nClient Name | Customer Name | Customer Code | Assignee | Invoice No | Manager\n<#list listOfInvoices as invoiceList>\n${invoiceList.clientName} | ${invoiceList.customerName} | ${invoiceList.customerCode} | ${invoiceList.assignee} | ${invoiceList.invoiceNo} | ${invoiceList.manager}\n</#list>\nRegards\nAdmin",
+    "notification": "Check ReAllocation!"
+  },
+  {
+    "number": 75,
+    "code": "NewAllocationEmail",
+    "mode": "Email",
+    "text": "Dear ${userFullName},\nPlease find the details of the New Invoices Allocations to you.\nClient Name | Customer Name | Customer Code | Assignee | Invoice No | Manager\n<#list listOfInvoices as invoiceList>\n${invoiceList.clientName} | ${invoiceList.customerName} | ${invoiceList.customerCode} | ${invoiceList.assignee} | ${invoiceList.invoiceNo} | ${invoiceList.manager}\n</#list>\nRegards\nAdmin",
+    "notification": "New Allocations for you!"
+  },
+  {
+    "number": 76,
+    "code": "PTPForTheDayEmail",
+    "mode": "Email",
+    "text": "Dear ${userFullName},\nYour PTPs for the day are as below.\nClient Name | Customer Name | Customer Code | Invoice No | PTP Amount <#list listOfInvoices as invoiceList>\n${invoiceList.clientName} | ${invoiceList.customerName} | ${invoiceList.customerCode} | ${invoiceList.invoiceNo} | ${invoiceList.ptpAmount} </#list>\nRegards\nAdmin",
+    "notification": "PTP for the day is in your mailbox."
+  },
+  {
+    "number": 77,
+    "code": "CallBacksForTheDayEmail",
+    "mode": "Email",
+    "text": "Dear ${userFullName},\nYour Call Backs for the day are as below.\nClient Name | Customer Name | Customer Code | Invoice No <#list listOfInvoices as invoiceList>\n${invoiceList.clientName} | ${invoiceList.customerName} | ${invoiceList.customerCode} | ${invoiceList.invoiceNo} </#list>\nRegards\nAdmin",
+    "notification": "Call Backs for the day is in your mailbox."
+  },
+  {
+    "number": 78,
+    "code": "PasswordGenerationEmail",
+    "mode": "Email",
+    "text": "Dear ${userName},\nYour Password generated successfully. Please login using password ${generatedPassKey} .\nRegards\nAdmin",
+    "notification": "Your Password has been reset"
+  },
+  {
+    "number": 79,
+    "code": "AgentDailyActivityReport",
+    "mode": "WhatsApp",
+    "text": "<#if clientLogo?has_content> </#if>\nAgent Daily Activity Report\nReport Date: ${reportDate}\nHello,\nPlease find below the summary of agent activities recorded for the previous day.\nTotal Activities Recorded: ${totalCount} | Tenants: ${tenantCount}\nThe complete activity breakdown by agent, client, and activity type is available in the attached Excel file.\nRegards,\nInebura System\n© Inebura Technologies. All rights reserved.",
+    "notification": ""
+  },
+  {
+    "number": 80,
+    "code": "VisitPlannedFPRWA",
+    "mode": "WhatsApp",
+    "text": "Hi ${fprName}, ${userFullName} has planned his visits for below customers. The name of the Customers are ${customersAsString} Thanks",
+    "notification": "Hi ${fprName}, ${userFullName} has planned his visits for below customers. The name of the Customers are ${customersAsString} Thanks"
+  },
+  {
+    "number": 81,
+    "code": "reallocationNotification",
+    "mode": "WhatsApp",
+    "text": "${agent} marked invoice ${invoiceNo} as ${substatus}",
+    "notification": "${agent} marked invoice ${invoiceNo} as ${substatus}"
+  },
+  {
+    "number": 82,
+    "code": "ClientDeleteWA",
+    "mode": "WhatsApp",
+    "text": "Dear ${userName},  \r\n\r\nYour OTP token for *deleting* client *${clientName}* is: ${phoneOtp} \r\n\r\nBy providing this OTP, you confirm that you agree to permanently remove the client from Inebura Platform.  \r\n  ⚠️ Please note: This is an *irrevocable* process and cannot be undone.",
+    "notification": "{{1}} is your verification code. For your security, do not share this code."
+  },
+  {
+    "number": 83,
+    "code": "ClientSuspendWA",
+    "mode": "WhatsApp",
+    "text": "Dear ${userName}, Your OTP token for *disabling* client *${clientName}* is: ${phoneOtp}. By providing this OTP, you confirm that you agree to disable the client from the platform.  \r\n⚠️Please note: This action will remove client access from Inebura completely.",
+    "notification": "{{1}} is your verification code. For your security, do not share this code."
+  },
+  {
+    "number": 84,
+    "code": "sas",
+    "mode": "WhatsApp",
+    "text": "sasa",
+    "notification": "sa"
+  },
+  {
+    "number": 85,
+    "code": "ReAllocationWA",
+    "mode": "WhatsApp",
+    "text": "${invoiceList}",
+    "notification": "${invoiceList}"
+  },
+  {
+    "number": 86,
+    "code": "ClientCreationErrorWa",
+    "mode": "WhatsApp",
+    "text": "There has been an error in creation of ${clientFullName}",
+    "notification": ""
+  },
+  {
+    "number": 87,
+    "code": "ClientCreationWA",
+    "mode": "WhatsApp",
+    "text": "Client has been successfully created ${clientFullName},\nCredentials are: Username: admin.user1, Password: Welcome@123",
+    "notification": ""
+  },
+  {
+    "number": 88,
+    "code": "PasswordResetWA",
+    "mode": "WhatsApp",
+    "text": "Dear ${userName}, Password Reset. Please login using password ${generatedPassKey}.",
+    "notification": "Password Reset"
+  },
+  {
+    "number": 89,
+    "code": "UserCreatedWA",
+    "mode": "WhatsApp",
+    "text": "Dear ${userName}, Inebura Login created. Login User Id is ${loginUserId}.",
+    "notification": "Welcome to Inebura!"
+  },
+  {
+    "number": 90,
+    "code": "finalizedAmountForTheMonthManager",
+    "mode": "WhatsApp",
+    "text": "The finalized target for ${agentName} is ${finalizedAmount} as of now for Client ${clientFullName}",
+    "notification": "The finalized target for ${agentName} is ${finalizedAmount} as of now for Client ${clientFullName}"
+  },
+  {
+    "number": 91,
+    "code": "commitAmountForTheMonthManager",
+    "mode": "WhatsApp",
+    "text": "The total committed value by ${agentName} is ${committedAmount} as of now for Client ${clientFullName}",
+    "notification": "The total committed value by ${agentName} is ${committedAmount} as of now for Client ${clientFullName}"
+  },
+  {
+    "number": 92,
+    "code": "ActivityNotSubmitted",
+    "mode": "WhatsApp",
+    "text": "You have done AR activity but not submission activity for ${invoiceNo} under ${clientName} and for ${customerName}, ${customerCode}",
+    "notification": "You have done AR activity but not submission activity for ${invoiceNo} under ${clientName} and for ${customerName}, ${customerCode}"
+  },
+  {
+    "number": 93,
+    "code": "CallBackForTheDay",
+    "mode": "WhatsApp",
+    "text": "Your Call back cases for today is ${callBackForTheDay}",
+    "notification": "Your  Call back cases for today is ${callBackForTheDay}"
+  },
+  {
+    "number": 94,
+    "code": "PTPForTheDay",
+    "mode": "WhatsApp",
+    "text": "Your  PTP cases for today is ${ptpForTheDay}",
+    "notification": "Your  PTP cases for today is ${ptpForTheDay}"
+  },
+  {
+    "number": 95,
+    "code": "NewAllocationCount",
+    "mode": "WhatsApp",
+    "text": "${newAllocationCount} invoices in Client Name ${clientFullName} have been allocated to you",
+    "notification": "${newAllocationCount} invoices in Client Name ${clientFullName} have been allocated to you"
+  },
+  {
+    "number": 96,
+    "code": "PasswordGeneratedWA",
+    "mode": "WhatsApp",
+    "text": "Dear ${userName}, Your Password generated successfully. Please login using password ${generatedPassKey}",
+    "notification": "Welcome to Inebura!"
+  },
+  {
+    "number": 97,
+    "code": "PasswordChangeWA",
+    "mode": "WhatsApp",
+    "text": "Dear ${userName}, Password Reset. Please login using password ${generatedPassKey}",
+    "notification": "Your Password has been reset"
+  },
+  {
+    "number": 98,
+    "code": "visitNotApproved",
+    "mode": "WhatsApp",
+    "text": "Visit Plan has not been approved for ${agentList}",
+    "notification": "Visit Plan has not been approved for ${agentList}"
+  },
+  {
+    "number": 99,
+    "code": "MonthEndConfirmation",
+    "mode": "WhatsApp",
+    "text": "Month end confirmation for ${clientFullName}, Total Uploaded ${totalRecord}, Success ${successRecord}, failure count ${failedRecords}",
+    "notification": "Month end confirmation for ${clientFullName}, Total Uploaded ${totalRecord}, Success ${successRecord}, failure count ${failedRecords}"
+  },
+  {
+    "number": 100,
+    "code": "ManagerVisitApproval",
+    "mode": "WhatsApp",
+    "text": "Your Visit Plan for ${visitDate}, has been ${managerRemarks}",
+    "notification": "Your Visit Plan for ${visitDate}, has been ${managerRemarks}"
+  },
+  {
+    "number": 101,
+    "code": "commitAmountForTheMonth",
+    "mode": "WhatsApp",
+    "text": "The total committed value by ${agentName} is ${committedAmount} as of now for Client ${clientFullName}",
+    "notification": "The total committed value by ${agentName} is ${committedAmount} as of now for Client ${clientFullName}"
+  },
+  {
+    "number": 102,
+    "code": "finalizedAmountForTheMonth",
+    "mode": "WhatsApp",
+    "text": "The finalized target for ${agentName} is ${finalizedAmount} as of now for Client ${clientFullName}",
+    "notification": "The total committed value by ${agentName} is ${finalizedAmount} as of now for Client ${clientFullName}"
+  },
+  {
+    "number": 103,
+    "code": "collectionForTheDayManager",
+    "mode": "WhatsApp",
+    "text": "Your collection  for the day is ${dayCollection}  and cumulative collected amount for the month is ${monthCollection}  for ${clientFullName}",
+    "notification": "Your collection  for the day is ${dayCollection}  and cumulative collected amount for the month is ${monthCollection}  for ${clientFullName}"
+  },
+  {
+    "number": 104,
+    "code": "CollectionMilestone",
+    "mode": "WhatsApp",
+    "text": "${userFullName} you have reached ${collectionPercent}% of the target for ${clientName}",
+    "notification": "${userFullName} you have reached ${collectionPercent}% of the target for ${clientName}"
+  },
+  {
+    "number": 105,
+    "code": "collectionForTheDaySupervisor",
+    "mode": "WhatsApp",
+    "text": "Your collection for the day is ${dayCollection}  and cumulative collected amount for the month is ${monthCollection}  for ${clientFullName}",
+    "notification": "Your collection for the day is ${dayCollection}  and cumulative collected amount for the month is ${monthCollection}  for ${clientFullName}"
+  },
+  {
+    "number": 106,
+    "code": "collectionForTheDayAgent",
+    "mode": "WhatsApp",
+    "text": "Your collection for the day is ${dayCollection} and cumulative collected amount for the month is ${monthCollection} for ${clientFullName}",
+    "notification": "Your collection for the day is ${dayCollection} and cumulative collected amount for the month is ${monthCollection} for ${clientFullName}"
+  },
+  {
+    "number": 107,
+    "code": "visitPlanShortfall",
+    "mode": "WhatsApp",
+    "text": "${userFullName}'s Visit Plan shortfall reason is ${visitRemarks} for ${visitDate}",
+    "notification": "${userFullName}'s Visit Plan shortfall reason is ${visitRemarks} for ${visitDate}"
+  },
+  {
+    "number": 108,
+    "code": "visitDoneShortfall",
+    "mode": "WhatsApp",
+    "text": "${userFullName}'s Visit Done shortfall reason is ${visitRemarks} for ${visitDate}",
+    "notification": "${userFullName}'s Visit Done shortfall reason is ${visitRemarks} for ${visitDate}"
+  },
+  {
+    "number": 109,
+    "code": "visitNotPlanned",
+    "mode": "WhatsApp",
+    "text": "Dear ${userFullName}, You have not yet planned for the day.",
+    "notification": "Dear ${userFullName}, You have not yet planned for the day."
+  },
+  {
+    "number": 110,
+    "code": "VisitPlannedWA",
+    "mode": "WhatsApp",
+    "text": "${userFullName}, has planned his Visits at ${visitTime}, and the name of the Customers are ${customersAsString}",
+    "notification": ""
+  }
+]

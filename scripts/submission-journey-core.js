@@ -38,6 +38,40 @@
     'Docs Sent':['Vendor HelpDesk','Sent To User','Sent To Other Dept']
   };
   const submitted = invoice => ['Submitted','Email Sent','Docs Sent','External Submission','On Premises'].includes(invoice.submissionStatus);
+  function acknowledgementProof(state, invoice, attachments = []) {
+    if (!submitted(invoice)) return null;
+    const submittedAt = Date.parse(invoice.lastSubmittedAt || invoice.submissionRecordedAt || invoice.firstSubmittedAt || invoice.submissionDate || '');
+    const afterSubmission = at => Number.isFinite(Date.parse(at)) && (!Number.isFinite(submittedAt) || Date.parse(at) >= submittedAt);
+    const candidates = [];
+    const recorded = invoice.acknowledgement;
+    if (recorded?.proof && afterSubmission(recorded.at)) candidates.push({ source:'Agent update', proof:recorded.proof, at:recorded.at, on:recorded.on, by:recorded.by || 'Agent', note:recorded.note || '' });
+    [...(state.documents || []), ...attachments].forEach(document => {
+      if (document.scope !== 'invoice' || document.invoiceNo !== invoice.invoiceNo) return;
+      const type = String(document.requirementId || document.requirement || '').trim().toLowerCase();
+      if (!['invoice-acknowledgment','invoice-acknowledgement'].includes(type) && !/^invoice acknowledg(e)?ment$/i.test(String(document.requirement || ''))) return;
+      if (document.name && afterSubmission(document.uploadedAt)) candidates.push({ source:'Attached document', proof:document.name, at:document.uploadedAt, by:document.uploadedBy || 'User' });
+    });
+    (state.events || []).forEach(item => {
+      if (item.type !== 'acknowledgement' || item.source !== 'INTG' || !(item.invoiceNos || []).includes(invoice.invoiceNo)) return;
+      if (item.proof && afterSubmission(item.at)) candidates.push({ source:"Customer's Acknowledgement", proof:item.proof, at:item.at, by:item.by || 'Customer', note:item.remark || '' });
+    });
+    return candidates.sort((a, b) => Date.parse(b.at) - Date.parse(a.at))[0] || null;
+  }
+  function recordAcknowledgement(state, invoiceNo, details, by, actorRole) {
+    if (actorRole !== 'agent') throw new Error('Only an Agent can record customer acknowledgement.');
+    const invoice = state.invoices.find(row => row.invoiceNo === invoiceNo);
+    if (!invoice || !submitted(invoice)) throw new Error('Only submitted invoices can be acknowledged.');
+    const proof = String(details?.proof || '').trim();
+    const on = String(details?.on || '');
+    if (!validPastDate(on)) throw new Error('Choose a valid acknowledgement date that is not in the future.');
+    if (!proof || proof.length > 200) throw new Error('Enter an acknowledgement proof reference of up to 200 characters.');
+    const submittedOn = keyDate(invoice.lastSubmittedAt || invoice.submissionRecordedAt || invoice.firstSubmittedAt || invoice.submissionDate);
+    if (submittedOn && on < submittedOn) throw new Error('Acknowledgement cannot predate submission.');
+    const at = new Date().toISOString();
+    invoice.acknowledgement = { on, at, proof, by, note:String(details.note || '').trim() };
+    event(state, { at, type:'acknowledgement', invoiceNos:[invoiceNo], by, what:'Customer acknowledgement recorded', remark:`${on} · ${proof}${invoice.acknowledgement.note ? ` · ${invoice.acknowledgement.note}` : ''}` });
+    return invoice.acknowledgement;
+  }
   function manualFlow(status, activity, medium = 'Manual') {
     const external = status === 'Submitted' && medium === 'External';
     const activities = medium !== 'Manual' ? [] : status === 'Submitted' ? Object.keys(activitySubStatuses) : status === 'Not Submitted' ? ['No Activity'] : [];
@@ -408,6 +442,20 @@
     state.demoStrategyDocumentsAdded=true;
     return true;
   }
+  function addDemoAcknowledgements(state) {
+    if (state.demoAcknowledgementsAdded) return false;
+    const documentInvoice = state.invoices.find(invoice => invoice.invoiceNo === 'TN200011');
+    if (documentInvoice && submitted(documentInvoice) && !acknowledgementProof(state, documentInvoice)) {
+      state.documents.push({ requirementId:'invoice-acknowledgment', requirement:'Invoice Acknowledgment', scope:'invoice', invoiceNo:'TN200011', customerCode:documentInvoice.code, name:'TN200011-customer-acknowledgement.pdf', uploadedAt:'2026-09-30T08:00:00Z', uploadedBy:'Agent' });
+      state.events.push({ id:'ack-doc-TN200011', type:'document', invoiceNos:['TN200011'], at:'2026-09-30T08:00:00Z', by:'Agent', what:'Invoice acknowledgement attached', remark:'TN200011-customer-acknowledgement.pdf' });
+    }
+    const intgInvoice = state.invoices.find(invoice => invoice.invoiceNo === 'TN200012');
+    if (intgInvoice && submitted(intgInvoice) && !acknowledgementProof(state, intgInvoice)) {
+      state.events.push({ id:'ack-TN200012', type:'acknowledgement', source:'INTG', invoiceNos:['TN200012'], at:'2026-10-01T07:00:00Z', by:'Customer', what:'Customer acknowledgement received', proof:'INTG verification · TN200012', remark:'Customer verification link' });
+    }
+    state.demoAcknowledgementsAdded = true;
+    return true;
+  }
   function seed() {
     const invoices = [], documents = [], events = [];
     const req = (id, name, scope) => ({ id, name, scope });
@@ -426,9 +474,12 @@
     pending.forEach(([invoiceNo,code,name,invoiceDate,value,reason,requirements]) => add({ invoiceNo,code,name,invoiceDate,value,reason,requirements,dueDate:invoiceDate,submissionStatus:'Not Submitted',status:'Not Submitted & Tracking',createdAt:'2026-10-06T04:00:00Z',source:'Admin bulk upload',method:'' },'2026-10-06T04:00:00Z'));
     const done = [ ['TN200009','2026-06-07',134187,'Manual'], ['TN200011','2026-06-03',145100,'Automated'], ['TN200012','2026-06-25',132941,'Automated'] ];
     done.forEach(([invoiceNo,invoiceDate,value,method]) => { add({ invoiceNo,invoiceDate,value,method,code:'94060526',name:'ALLIANCE MEDICAL SYSTEMS',dueDate:'2026-10-01',submissionStatus:'Submitted',submissionSubStatus:method==='Manual'?'On Premises':'Email Sent',activityType:method==='Manual'?'Visited':'Emailed',submissionMedium:method,status:'Submitted & Tracking',submissionDate:'2026-09-29',firstSubmittedAt:'2026-09-29T06:00:00Z',lastSubmittedAt:'2026-09-29T06:00:00Z',createdAt:'2026-09-20T05:00:00Z',documentsReadyAt:'2026-09-28T08:00:00Z',requirements:[],reason:'',automationSuppressed:method==='Manual',source:'SAP API' },'2026-09-20T05:00:00Z'); events.push({ id:`sent-${invoiceNo}`,type:'submission',invoiceNos:[invoiceNo],at:'2026-09-29T06:00:00Z',by:method==='Manual'?'Agent':'System',what:method==='Manual'?'Submission recorded manually':'Invoice submitted automatically by email',remark:'Demonstration history' }); });
+    documents.push({ requirementId:'invoice-acknowledgment', requirement:'Invoice Acknowledgment', scope:'invoice', invoiceNo:'TN200011', customerCode:'94060526', name:'TN200011-customer-acknowledgement.pdf', uploadedAt:'2026-09-30T08:00:00Z', uploadedBy:'Agent' });
+    events.push({ id:'ack-doc-TN200011', type:'document', invoiceNos:['TN200011'], at:'2026-09-30T08:00:00Z', by:'Agent', what:'Invoice acknowledgement attached', remark:'TN200011-customer-acknowledgement.pdf' });
+    events.push({ id:'ack-TN200012', type:'acknowledgement', source:'INTG', invoiceNos:['TN200012'], at:'2026-10-01T07:00:00Z', by:'Customer', what:'Customer acknowledgement received', proof:'INTG verification · TN200012', remark:'Customer verification link' });
     add({ invoiceNo:'INV261000',code:'CUST-READY',name:'Meridian Healthcare',invoiceDate:'2026-10-08',dueDate:'2026-11-08',value:42000,submissionStatus:'Not Submitted',status:'Not Submitted & Untouched',reason:'',requirements:[req('invoice-copy','Invoice Copy','invoice')],createdAt:'2026-10-08T07:00:00Z',source:'SAP API',documentsReadyAt:'2026-10-09T05:00:00Z' },'2026-10-08T07:00:00Z');
     documents.push({ requirementId:'invoice-copy',requirement:'Invoice Copy',scope:'invoice',invoiceNo:'INV261000',name:'INV261000.pdf',uploadedAt:'2026-10-09T05:00:00Z',uploadedBy:'Admin' });
-    const state = { version:1,settings:{ autoSubmission:true,reviewDays:7 },invoices,documents,events,reviews:{},flags:{} };
+    const state = { version:1,settings:{ autoSubmission:true,reviewDays:7 },invoices,documents,events,reviews:{},flags:{},demoAcknowledgementsAdded:true };
     addDispositionExamples(state);
     addDemoStrategyDocuments(state);
     return state;
@@ -444,8 +495,9 @@
       state = renamed.state;
       const addedExamples = state.invoices.some(invoice => invoice.invoiceNo === 'AMS-0001') && state.invoices.some(invoice => invoice.invoiceNo === 'INV261000') && addDispositionExamples(state);
       const addedStrategyDocuments = addDemoStrategyDocuments(state);
+      const addedAcknowledgements = addDemoAcknowledgements(state);
       const normalised = normaliseSubmissionState(state);
-      if (normalised || addedExamples || addedStrategyDocuments || renamed.changed) transaction(storage,{ [KEY]:state, ...renamed.linked });
+      if (normalised || addedExamples || addedStrategyDocuments || addedAcknowledgements || renamed.changed) transaction(storage,{ [KEY]:state, ...renamed.linked });
       return state;
     }
     const state = seed(), updates = JSON.parse(storage.getItem('submissionLiveReplicaUpdates') || '{}');
@@ -455,5 +507,5 @@
     normaliseSubmissionState(state);
     return state;
   }
-  return { KEY,REVIEW_RULES_KEY,issueReasons,issueReasonForGroup,readReviewDays,saveReviewDays,clone,keyDate,today,days,submitted,manualFlow,normaliseSubmission,closed,uid,event,requirements,attachmentMatches,missing,dependencyKey,issueAffects,agentCanView,linkedIssues,blockers,observe,defer,saveManual,eligibleForAutomation,reconcileIssues,reconcileApprovalRequests,impact,issueMetrics,readIssues,issueAttachments,transaction,promote,seed,load };
+  return { KEY,REVIEW_RULES_KEY,issueReasons,issueReasonForGroup,readReviewDays,saveReviewDays,clone,keyDate,today,days,submitted,acknowledgementProof,recordAcknowledgement,manualFlow,normaliseSubmission,closed,uid,event,requirements,attachmentMatches,missing,dependencyKey,issueAffects,agentCanView,linkedIssues,blockers,observe,defer,saveManual,eligibleForAutomation,reconcileIssues,reconcileApprovalRequests,impact,issueMetrics,readIssues,issueAttachments,transaction,promote,seed,load };
 });

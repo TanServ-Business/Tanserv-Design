@@ -1,0 +1,30 @@
+.submissionDashboardCard{height:100%;cursor:default}
+.submissionAgingCard{cursor:pointer}
+.submissionDashboardCard .chartTitle{margin:0}
+.submissionDashboardCard .chartStats{grid-template-columns:repeat(3,minmax(0,1fr));margin-top:auto}
+.submissionDashboardCard .chartStat{min-width:0}
+.submissionDashboardCard .chartStat strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.submissionCardLink{display:inline-flex;align-items:center;gap:5px;white-space:nowrap;color:#5c258d;font-size:11px;font-weight:700;text-decoration:none}
+.submissionCardLink:hover{text-decoration:underline}
+.submissionCardLink:focus-visible{outline:2px solid #7138db;outline-offset:3px}
+.submissionCardNote{display:block;min-height:16px;color:#64748b;font-size:10px;line-height:1.4}
+.submissionCardNote:empty{visibility:hidden}
+.submissionMixRows{display:grid;align-content:space-around;gap:9px;min-height:220px}
+.submissionMixRow{display:grid;gap:5px}
+.submissionMixRowTop{display:flex;justify-content:space-between;gap:10px;color:#475467;font-size:11px;font-weight:600}
+.submissionMixRowTop strong{color:#0f172a;font-size:11px;font-weight:800}
+.submissionMixTrack{height:8px;overflow:hidden;border-radius:99px;background:#f0edf4}
+.submissionMixTrack span{display:block;height:100%;border-radius:inherit;background:#7241a1}
+.submissionMixRow[data-mix="Physical"] .submissionMixTrack span{background:#9975b9}
+.submissionMixRow[data-mix="Email"] .submissionMixTrack span{background:#4d83b8}
+.submissionMixRow[data-mix="Courier"] .submissionMixTrack span{background:#45a590}
+.submissionMixRow[data-mix="Not submitted"] .submissionMixTrack span{background:#d79a38}
+.submissionMixRow[data-mix="Unclassified submitted"] .submissionMixTrack span{background:#8893a3}
+#submissionAgingDetailModal .modal-dialog{max-width:min(1520px,97vw)}
+#submissionAgingDetailModal .modal-content{height:auto;min-height:0;max-height:min(86vh,850px)}
+#submissionAgingDetailModal .modal-body{padding:12px 16px 16px;overflow:auto}
+.submissionAgingDetailTable{min-width:900px}
+.submissionAgingDetailTable th:nth-child(6),.submissionAgingDetailTable td:nth-child(6){text-align:right}
+.submissionAgingDetailTable th:nth-child(7),.submissionAgingDetailTable td:nth-child(7){text-align:center}
+.submissionAgingDetailTable td:nth-child(7) .vintageBucketShareCell{margin:0 auto}
+@media(max-width:520px){.submissionDashboardCard .chartStats{grid-template-columns:repeat(3,minmax(0,1fr))}.submissionDashboardCard .chartStat{padding:7px}.submissionDashboardCard .chartStat strong{font-size:12px}}

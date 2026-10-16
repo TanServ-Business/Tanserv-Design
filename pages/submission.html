@@ -5,7 +5,7 @@
   <title>Inebura | Submission Details</title>
   <link rel="stylesheet" href="../assets/submission-reference/app.css">
   <link rel="stylesheet" href="../css/shared-header.css">
-  <link rel="stylesheet" href="../css/submission.css?v=20261013-manual-issue-v1">
+  <link rel="stylesheet" href="../css/submission.css?v=20261014-table-v2">
 </head>
 <body class="submissionPage dashboard-shell" data-root-path="../" data-relationship-name="TestClient" data-relationship-logo-src="assets/submission-reference/client-logo.jpg" data-relationship-logo-alt="Client logo">
   <div data-shared-header></div>
@@ -21,6 +21,7 @@
         <label class="sjSearch"><i class="bi bi-search" aria-hidden="true"></i><input type="search" id="sjSearch" placeholder="Search invoice, customer or document" aria-label="Search submission records"></label>
         <div class="sjFilterField sjReasonFilter"><label for="sjReason">Reason</label><select id="sjReason"><option value="">All reasons</option><option>Rejected by Customer -Supporting Docs required</option><option>Rejected by Customer -Invoice Not correct</option><option>Not Received By Customer</option><option>Invoice Cancelled</option><option>Docs Pending</option><option value="ready">Scheduled for submission</option></select></div>
         <div class="sjFilterField"><label for="sjReviewFilter">Review / issue</label><select id="sjReviewFilter"><option value="">All states</option><option value="eligible">Needs review</option><option value="deferred">Deferred</option><option value="linked">Issue raised</option><option value="documents">Awaiting documents</option><option value="waiting">Waiting</option></select></div>
+        <div class="sjFilterField"><label for="sjAckFilter">Acknowledgement</label><select id="sjAckFilter"><option value="">All states</option><option value="acknowledged">Acknowledged</option><option value="pending">Pending acknowledgement</option></select></div>
         <div class="sjFilterField sjDateRangeFilter"><label for="sjDateRangeTrigger">Invoice date</label><button id="sjDateRangeTrigger" class="sjDateRangeTrigger" type="button" aria-haspopup="dialog" aria-controls="sjDateRangeDialog" aria-expanded="false"><i class="bi bi-calendar3" aria-hidden="true"></i><span id="sjDateRangeValue">Any date</span><i class="bi bi-chevron-down" aria-hidden="true"></i></button></div>
         <button id="sjClear" class="sjTextButton" type="button">Clear filters</button>
       </div>
@@ -59,7 +60,7 @@
   <dialog class="sjDialog" id="sjRulesDialog" aria-labelledby="sjRulesTitle"><div><header class="sjDialogHead"><h2 id="sjRulesTitle">Review rules</h2><button class="sjIconButton" type="button" data-close="sjRulesDialog" aria-label="Close review rules"><i class="bi bi-x-lg" aria-hidden="true"></i></button></header><p class="sjContext">Rules flag dependencies for a person to review. They never create an issue automatically.</p><div class="sjRuleRow"><i class="bi bi-check-circle" aria-hidden="true"></i><span>Needs Review after <strong id="sjReviewDays">7</strong> calendar days from the invoice date. The client admin configures this threshold.</span></div><div class="sjRuleRow"><i class="bi bi-check-circle" aria-hidden="true"></i><span>A deferred review returns on its chosen date, even if the blocker or affected invoices change.</span></div><div class="sjRuleRow"><i class="bi bi-check-circle" aria-hidden="true"></i><span>Manually submitted invoices are excluded from automatic submission.</span></div><footer class="sjDialogFooter"><button class="sjButton" type="button" data-close="sjRulesDialog">Close</button></footer></div></dialog>
   <script src="../scripts/shared-header.js?v=20261012-index-route-v1"></script>
   <script src="../bin/IssueTracker/js/issue-tracker-config.js?v=20261009-submission-scope-v2"></script>
-  <script src="../scripts/submission-journey-core.js?v=20261013-manual-issue-v1"></script>
+  <script src="../scripts/submission-journey-core.js?v=20261014-acknowledgement-v1"></script>
   <script src="../scripts/submission-strategy-core.js?v=20261013-agent-delivery"></script>
-  <script src="../scripts/submission.js?v=20261013-navigation-v1"></script>
+  <script src="../scripts/submission.js?v=20261014-table-v2"></script>
 </body></html>
