@@ -1,0 +1,29 @@
+{
+  "pass": true,
+  "letters": [
+    {
+      "subject": "Dunning Letter One QA",
+      "stage": 1,
+      "source": "DunningLetterOneEmail",
+      "word": "valid-first.docx",
+      "retainedPdf": true,
+      "reference": "DL-20261020-000001"
+    },
+    {
+      "subject": "Dunning Letter Two",
+      "stage": 2,
+      "source": "DunningLetterTwoEmail",
+      "word": "valid-follow-up.docx",
+      "retainedPdf": true,
+      "reference": "DL-20261027-000002"
+    },
+    {
+      "subject": "Dunning Letter One QA",
+      "stage": 1,
+      "source": "DunningLetterOneEmail",
+      "word": "valid-first.docx",
+      "retainedPdf": true,
+      "reference": "DL-20261027-000003"
+    }
+  ]
+}

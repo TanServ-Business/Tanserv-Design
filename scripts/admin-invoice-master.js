@@ -108,6 +108,12 @@
     if (!selected) { area.innerHTML = empty("Search an invoice", "Enter an invoice number to view its details and timeline."); return; }
     if (!record) { area.innerHTML = empty("Invoice not found", `No invoice ${selected} was found in ${COMPANY}. Check the number or upload new invoice data.`, true); return; }
     const r = live(record), f = r.fields;
+    window.IneburaDunningSelectedInvoice = {
+      customer: { id: f["Customer Code"], customerCode: f["Customer Code"], name: f["Customer Name"] },
+      invoice: { invoiceNo: f["Invoice No"], dueDate: f["Invoice Due Date"],
+        invoiceValue: f["Invoice Value"], netDueAmount: r.netDue ?? f["Total Outstanding"] }
+    };
+    window.dispatchEvent(new CustomEvent("inebura:invoice-selected", { detail: window.IneburaDunningSelectedInvoice }));
     const month = r.month || new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata", year: "numeric", month: "2-digit" }).slice(0, 7);
     const monthLabel = /^\d{4}-\d{2}$/.test(month) ? new Intl.DateTimeFormat("en-IN", { month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(`${month}-01T00:00:00Z`)) : "Current month";
     const timeline = trailEntries(record).map(renderEvent).join("");

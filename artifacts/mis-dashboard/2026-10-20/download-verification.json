@@ -1,0 +1,70 @@
+{
+  "credit-report": {
+    "rows": 7,
+    "invoices": [
+      "MIS-TC-001",
+      "MIS-TC-002",
+      "MIS-TC-003",
+      "MIS-TC-004",
+      "MIS-AP-005",
+      "MIS-AP-006",
+      "MIS-AP-007"
+    ]
+  },
+  "achievement-report": {
+    "rows": 7,
+    "invoices": [
+      "MIS-TC-001",
+      "MIS-TC-002",
+      "MIS-TC-003",
+      "MIS-TC-004",
+      "MIS-AP-005",
+      "MIS-AP-006",
+      "MIS-AP-007"
+    ]
+  },
+  "submission-report": {
+    "rows": 7,
+    "invoices": [
+      "MIS-TC-001",
+      "MIS-TC-002",
+      "MIS-TC-003",
+      "MIS-TC-004",
+      "MIS-AP-005",
+      "MIS-AP-006",
+      "MIS-AP-007"
+    ]
+  },
+  "submission-vs-acknowledgement": {
+    "rows": 7,
+    "invoices": [
+      "MIS-TC-001",
+      "MIS-TC-002",
+      "MIS-TC-003",
+      "MIS-TC-004",
+      "MIS-AP-005",
+      "MIS-AP-006",
+      "MIS-AP-007"
+    ]
+  },
+  "issue-tracker-report": {
+    "rows": 7,
+    "invoices": [
+      "MIS-TC-001",
+      "MIS-TC-002",
+      "MIS-TC-003",
+      "MIS-TC-004",
+      "MIS-AP-005",
+      "MIS-AP-006",
+      "MIS-AP-007"
+    ]
+  },
+  "odm-single-agent": {
+    "rows": 2,
+    "invoices": [
+      "MIS-TC-004",
+      "MIS-AP-007"
+    ],
+    "assignee": "Rajneesh ACM"
+  }
+}

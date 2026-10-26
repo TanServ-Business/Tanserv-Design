@@ -433,6 +433,19 @@
         `
     : "";
 
+  const commitmentContextPath = window.location.pathname.toLowerCase();
+  const commitmentContextRole = commitmentContextPath.endsWith("/lpsupervisor.html") ? "supervisor"
+    : commitmentContextPath.endsWith("/lpmanager.html") ? "manager"
+      : commitmentContextPath.endsWith("/kas.html") ? "kas"
+        : (sessionStorage.getItem("ineburaCommitmentViewRole")
+          || localStorage.getItem("activeUserRole") || "").trim().toLowerCase();
+  const supervisorCommitmentView = new URLSearchParams(window.location.search).get("view") === "supervisor"
+    || commitmentContextRole === "supervisor";
+  const commitmentReviewLabel = supervisorCommitmentView ? "Commitment - Supervisor"
+    : commitmentContextRole === "manager" ? "Commitment - Manager" : "Commitment - Review";
+  const commitmentReviewPath = supervisorCommitmentView
+    ? "pages/CommitmentManager.html?view=supervisor" : "pages/CommitmentManager.html";
+
   const headerMarkup = `
 <header class="shared-header">
   <div class="headerLeft">
@@ -741,7 +754,7 @@
         </a>
         <div class="submenu">
           <a class="submenu-link" href="${resolvePath("pages/commitment.html")}" data-module="commitment-agent">Commitment - Agent</a>
-          <a class="submenu-link" href="${resolvePath("pages/CommitmentManager.html")}" data-module="commitment-manager">Commitment - Manager</a>
+          <a class="submenu-link" href="${resolvePath(commitmentReviewPath)}" data-module="commitment-manager">${commitmentReviewLabel}</a>
         </div>
       </li>
       <li class="menu-item">
@@ -757,6 +770,14 @@
           <span class="link-content">
             <i class="bi bi-diagram-3" aria-hidden="true"></i>
             <span>Strategy Master</span>
+          </span>
+        </a>
+      </li>
+      <li class="menu-item">
+        <a class="nav-link" href="${resolvePath("pages/reports.html")}" data-module="reports">
+          <span class="link-content">
+            <i class="bi bi-bar-chart-line" aria-hidden="true"></i>
+            <span>Reports</span>
           </span>
         </a>
       </li>
@@ -1161,7 +1182,7 @@
             "pdc-agent": "pages/PDCagent.html",
             "pdc-ops": "pages/PDCOps.html",
             "commitment-agent": "pages/commitment.html",
-            "commitment-manager": "pages/CommitmentManager.html",
+            "commitment-manager": commitmentReviewPath,
             "ai-activity-center": "pages/ai-activity-center.html",
             "help-support": "pages/help-support.html",
             "support-admin": "pages/support-admin.html"

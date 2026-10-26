@@ -1,0 +1,14 @@
+{
+  "issueKey": "INEB-136",
+  "url": "https://inebura.atlassian.net/browse/INEB-136",
+  "issueType": "Task",
+  "status": "To Do",
+  "attachmentId": "10534",
+  "attachmentFilename": "Dunning Letters Requirements.docx",
+  "attachmentBytes": 44394,
+  "attachmentSha256": "b630bc9a1dee1a5a62d0338998e5b8946f549c87a25c985659cba5f59a9476e2",
+  "verifiedBy": "getJiraIssue attachment readback",
+  "documentPages": 7,
+  "visualReview": "All seven final rendered pages inspected",
+  "standardWordValidation": "Current shipped DOCX passes required-value validation for DL1, DL2 and DL3"
+}

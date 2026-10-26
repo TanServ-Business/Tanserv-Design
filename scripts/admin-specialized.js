@@ -45,10 +45,14 @@
     modal.classList.add("is-open"); modal.setAttribute("aria-hidden", "false");
   };
   const tabs = [["configurations", "Configurations"], ["visit", "Visit Module *"], ["monthend", "Monthend Activity *"], ["client-confirmation", "Client Confirmation"], ["pdc", "PDC Configuration"], ["escalation", "Escalation Matrix"], ["issue-tracker", "Issue Tracker Configuration"]];
+  const canManageDunning = () => window.IneburaDunning?.getContext().role === "client-admin";
+  if (canManageDunning()) tabs.push(["dunning-letters", "Dunning Letters"]);
+  const reviewRole = new URLSearchParams(location.search).get("role");
+  const roleQuery = reviewRole ? `&role=${encodeURIComponent(reviewRole)}` : "";
   const aliases = { "visit-module": "visit", "monthend-activity": "monthend", "pdc-configuration": "pdc", "escalation-matrix": "escalation", "issue-tracker-configuration": "issue-tracker" };
   state.configView = aliases[state.configView] || state.configView;
   const frame = (body, options = {}) => {
-    const nav = page.module === "module-configuration" ? tabs.map(([key, label]) => `<a href="?module=module-configuration&view=${key}" class="${state.configView === key ? "is-active" : ""}">${esc(label)}</a>`).join("") : "";
+    const nav = page.module === "module-configuration" ? tabs.map(([key, label]) => `<a href="?module=module-configuration&view=${key}${roleQuery}" class="${state.configView === key ? "is-active" : ""}" ${state.configView === key ? 'aria-current="page"' : ''}>${esc(label)}</a>`).join("") : "";
     mount.innerHTML = `<main class="adminPage adminRuntimePage adminSpecialPage ${options.className || ""}" data-admin-module="${page.module}"><section class="adminPageHero"><div><h1>${esc(options.title || definition.title)}</h1><span>${esc(options.description || (page.module === "module-configuration" ? "Configure your modules below." : definition.description))}</span></div>${options.heroAction || ""}</section>${nav ? `<section class="adminSourceWorkspace adminConfigurationWorkspace"><header class="adminWorkspaceHeader"><div class="adminWorkspaceTabs"><nav class="adminRuntimeTabs">${nav}</nav></div></header><div class="adminWorkspaceBody">${body}</div></section>` : body}</main>`;
   };
 
@@ -80,6 +84,7 @@
     if (state.configView === "pdc") body = renderPdc();
     if (state.configView === "escalation") body = renderEscalation();
     if (state.configView === "issue-tracker") body = renderIssueTracker();
+    if (state.configView === "dunning-letters") body = canManageDunning() ? '<div id="dunningManagementMount"></div>' : '<section class="adminSpecialCard" role="alert"><h2>Access restricted</h2><p>Dunning Letters is available to Client Admin only.</p></section>';
     frame(body, { className: `adminModuleConfiguration ${state.configView === "configurations" ? "adminConfigurationsPage" : ""}` });
   }
 

@@ -1,0 +1,152 @@
+{
+  "checkedAt": "2026-10-21T10:57:45.923956+00:00",
+  "runtime": "/Users/devashishrattan/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node",
+  "cwd": "/Users/devashishrattan/Developer/Git/Tanserv-Design",
+  "passed": true,
+  "tests": [
+    {
+      "file": "test-dunning-core.cjs",
+      "exitCode": 0,
+      "passed": true,
+      "durationMs": 102,
+      "stdout": "PASS enabling is idempotent and persistence survives new instances\nPASS daily batches progress independently and repeated runs never resend\nPASS new Letter 1 and earlier Letter 2 on same day remain separate emails\nPASS fully paid invoices excluded; partial payments snapshot remaining balance\nPASS manual exclusions persist, block sends, and reinstatement stays pending\nPASS complete failures retry next day, shift remaining schedule, and have no invented cap\nPASS partial success completes stage and does not retry failed contacts\nPASS all role and client-scope guards reject without any mutation\nPASS overlapping strategies hold invoices until one strategy is selected\nPASS active strategy/template edits apply to unsent stages but preserve sent snapshots\nPASS additional letter stages continue without final escalation\nPASS missed-date resume is blocked; immediate resume allowed; disable prevents runs\nPASS missing contacts hold the batch and template validation rejects unknown calculations\nPASS storage failures do not partially mutate in-memory state\nPASS live invoice synchronization preserves sent history and blocks foreign assignments\nPASS same-day customer invoices consolidate in one letter and exclusion has an accurate empty status\nPASS changed filters apply to unsent stages without altering sent membership\nPASS conflict selection after Letter 1 transfers only remaining stages and preserves sent history\nPASS browser saves the actual PDF bytes and receives state updates from other tabs\nPASS browser roles follow explicit query then Admin shell then user workspace preference\nPASS issued letter snapshots preserve source codes and never substitute internal IDs\nPASS Strategy Master selected invoice IDs and exclusions never widen to the full portfolio\nPASS Strategy Master customer selection and All exclusions use source IDs and reject unlinked records\nPASS editing global target exclusions applies to unsent batch stages and preserves issued letters\nPASS each template uses its current leaf status and key account filters for its own stage\nPASS unknown key accounts and missing or empty status selections cannot satisfy restrictive template filters\nPASS aging filters advance from actual run date and changed stage filters release only matching batch members\nPASS invalid target and aging filter payloads fail before mutating the strategy\n28 Dunning core scenarios passed.\n",
+      "stderr": ""
+    },
+    {
+      "file": "test-dunning-configuration.cjs",
+      "exitCode": 0,
+      "passed": true,
+      "durationMs": 53,
+      "stdout": "PASS one letter is valid, persisted and cannot send without an explicitly configured strategy\nPASS invalid count and toggle values reject atomically\nPASS provisioned standard templates cannot activate or send until the real Word template is loaded\nPASS increasing capacity provisions rows but leaves strategies and active batch schedules unchanged\nPASS count reduction trims all unsent strategy stages and completes batches beyond the new count without changing sent history\nPASS reducing count while a stage has completely failed removes only stages above the count and preserves its retry\nPASS completed batches stay completed after a later count increase and explicit strategy expansion\nPASS strategy length and selected template cannot bypass the configured count\nPASS native selected customer and invoice coverage stays narrow and rejects empty or foreign selections\nPASS eligibility preview only returns the managing client\u2019s invoices\nPASS email edited in Dunning management is not replaced by the old Template Master catalog\nPASS Supervisor, Agent and MIS cannot invoke management actions or mutate configuration\nPASS legacy saved data preserves IDs, custom templates, stages and completed history while inferring capacity\n13 Dunning configuration tests passed.\n",
+      "stderr": ""
+    },
+    {
+      "file": "test-dunning-strategy.cjs",
+      "exitCode": 0,
+      "passed": true,
+      "durationMs": 54,
+      "stdout": "\u2714 catalog preserves core IDs and offers defaults while disabled without mutating state (0.969834ms)\n\u2714 validation enforces sequence, timing, attachment and selected coverage (2.749875ms)\n\u2714 save reuses the same strategy ID, existing customer/invoice IDs and preserves all control settings (1.81ms)\n\u2714 source synchronization preserves zero balances, local dates and missing known amounts (1.533875ms)\n\u2714 unresolved or ambiguous target IDs fail before source or strategy mutation (1.50975ms)\n\u2714 existing projects legacy core strategies and scopes them to the current client (0.495458ms)\n\u2714 normal reminder blocks survive projection alongside Dunning blocks (0.611666ms)\n\u2714 role checks happen before invoice synchronization and core enforces missed-date resume (10.613459ms)\n\u2714 remove stops sending and hides the strategy while preserving sent records (1.216ms)\n\u2714 ordinary deletion is a no-op and switching to reminders detaches the old sequence (1.553041ms)\n\u2139 tests 10\n\u2139 suites 0\n\u2139 pass 10\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 26.084875\n",
+      "stderr": ""
+    },
+    {
+      "file": "test-strategy-master-dunning-migration.cjs",
+      "exitCode": 0,
+      "passed": true,
+      "durationMs": 30,
+      "stdout": "PASS old Strategy Master dropdown contains only regular email templates\nPASS loading filters Dunning blocks and retains mixed strategy IDs and exact target selections without touching Dunning state\nPASS saving and deleting the regular part of a migrated mixed strategy never stops its Dunning batches\nPASS legacy payload-only mixed strategy appears once and ordinary deletion does not resurrect it\n4 Strategy Master Dunning migration scenarios passed.\n",
+      "stderr": ""
+    },
+    {
+      "file": "test-dunning-integrations.cjs",
+      "exitCode": 0,
+      "passed": true,
+      "durationMs": 49,
+      "stdout": "PASS workspace invoice bridge uses invoiceAmount and preserves the calendar due date\nPASS source without contacts preserves the known contact list\nPASS workspace bridge preserves actual email merge values and leaves missing metadata unknown\nPASS agent invoice bridge cannot silently adopt another agent assignment\nPASS old Email and Document Setup surfaces do not expose Dunning controls or accept direct history actions\nPASS invoice screen retains assigned Agent exclusion and exposes management link only to Client Admin\nPASS Module Configuration saves Dunning enabled state and denies unauthorized direct action\nPASS workspace portfolio bridge publishes all invoices and updates amounts independently of table filters\nPASS portfolio events sync unselected invoices, preserve assignment scope and skip unchanged renders\n9 Dunning integration scenarios passed.\n",
+      "stderr": ""
+    },
+    {
+      "file": "test-dunning-template-adapter.cjs",
+      "exitCode": 0,
+      "passed": true,
+      "durationMs": 56,
+      "stdout": "\u2714 immutable catalogue identities select the same three existing email templates (1.521084ms)\n\u2714 uploaded letters require every stage-specific captured value (1.071875ms)\n\u2714 automatic aliases resolve to approved sources without exposing field mapping (0.169792ms)\n\u2714 unsupported and malformed upload values fail visibly instead of remaining unresolved (0.13325ms)\n\u2714 every captured email source validates and renders its existing full message without FreeMarker (11.173958ms)\n\u2714 unsupported email expressions and broken invoice loops block saving (0.544917ms)\n\u2714 runtime values remain escaped and are never reinterpreted as another template expression (0.640666ms)\n\u2714 build preserves strategy-linked IDs and exact email source; only a new upload has strict marker validation (0.498291ms)\n\u2714 built template passes actual core saving without changing configured strategy references (3.353167ms)\n\u2714 known canonical aliases in email source normalize before actual core validation (0.658459ms)\n\u2139 tests 10\n\u2139 suites 0\n\u2139 pass 10\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 22.680792\n",
+      "stderr": ""
+    },
+    {
+      "file": "test-dunning-template-ui.cjs",
+      "exitCode": 0,
+      "passed": true,
+      "durationMs": 273,
+      "stdout": "\u2714 old generic email-popup extension is inert for every Dunning stage (4.866625ms)\n\u2714 generic Template Master filters migrated immutable Dunning identities and preserves catalog sources (4.159208ms)\n\u2139 tests 2\n\u2139 suites 0\n\u2139 pass 2\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 14.02775\n",
+      "stderr": ""
+    },
+    {
+      "file": "test-dunning-template-email-flow.cjs",
+      "exitCode": 0,
+      "passed": true,
+      "durationMs": 138,
+      "stdout": "Passed: actual standard Word, explicit strategy, exact DL1-3 catalog migration, new-tab edits used on send, old catalog override blocked, DL2 prior dates/references, issued immutability, validated custom upload and role guards.\n",
+      "stderr": ""
+    },
+    {
+      "file": "test-dunning-documents.cjs",
+      "exitCode": 0,
+      "passed": true,
+      "durationMs": 187,
+      "stdout": "Passed: safe markup, mapping/calculation validation, escaped customer data, 65-invoice PDF, deterministic snapshots and real DOCX import.\n",
+      "stderr": ""
+    },
+    {
+      "file": "test-dunning-report.cjs",
+      "exitCode": 0,
+      "passed": true,
+      "durationMs": 43,
+      "stdout": "Passed: 10-column contract, immutable invoice snapshots, partial/failed delivery selection, filters, role scope, historical blanks, typed XLSX-ready dataset and safe CSV.\n",
+      "stderr": ""
+    },
+    {
+      "file": "test-reports-dunning.cjs",
+      "exitCode": 0,
+      "passed": true,
+      "durationMs": 125,
+      "stdout": "Passed: 19 preserved reference reports, no Dunning selector/resource, guarded legacy redirects, Client Admin-only live history, date/column filters, disabled history, full/filtered/empty XLSX byte readback, literal text, numeric amounts and timezone-safe Excel dates.\n",
+      "stderr": ""
+    },
+    {
+      "file": "test-reports.cjs",
+      "exitCode": 0,
+      "passed": true,
+      "durationMs": 29,
+      "stdout": "Reports checks passed: 19 preserved layouts, no Dunning entry, row widths, filters, numeric sorts, inclusive date boundaries, missing/zero values and CSV fidelity.\n",
+      "stderr": ""
+    },
+    {
+      "file": "test-dunning-management.cjs",
+      "exitCode": 0,
+      "passed": true,
+      "durationMs": 90,
+      "stdout": "\u2714 management permission requires Client Admin with scope before builders or scope reads (8.42225ms)\n\u2714 one-letter strategy builds without auto-adding stages, survives engine validation and sends one letter (29.029125ms)\n\u2714 timing and template validation rejects invalid sequences without mutating inputs (0.831416ms)\n\u2714 ordinary edits preserve migrated Strategy Master selections, exclusions, stage filters and identity (1.441208ms)\n\u2714 explicit coverage changes replace legacy target rules and validate local selected records (0.649917ms)\n\u2714 selected targets that disappear remain restrictive until coverage is explicitly changed (0.792041ms)\n\u2714 scoped projection isolates customers, invoices, strategies, batches, conflicts and issued history (0.152042ms)\n\u2714 mount denies unauthorized roles before registering handlers or reading state (0.327042ms)\n\u2714 daily cycle handler passes the explicit current actor and reports issued/failed totals (2.014ms)\n\u2714 editing only selected target values in the modal persists the new IDs (7.501833ms)\n\u2139 tests 10\n\u2139 suites 0\n\u2139 pass 10\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 55.357416\n",
+      "stderr": ""
+    },
+    {
+      "file": "test-dunning-management-templates.cjs",
+      "exitCode": 0,
+      "passed": true,
+      "durationMs": 323,
+      "stdout": "\u2714 one letter uses actual standard DOCX and no strategy is automatically created (47.634583ms)\n\u2714 five configured stages retain exact existing DL1 to DL3 email sources and support later stages (25.364459ms)\n\u2714 saved communication email edits migrate exactly while existing custom Word remains intact (16.502708ms)\n\u2714 missing and unsupported uploaded values block saving without mutating the saved template (19.672083ms)\n\u2714 validated custom Word and email changes save to the original template ID and persist (28.020375ms)\n\u2714 only current Client Admin role can manage templates including after an asynchronous load (13.135458ms)\n\u2714 letter count reduction blocks an open removed-stage draft and late upload (19.133417ms)\n\u2714 latest upload wins and closing a draft discards pending import results (27.632334ms)\n\u2714 choosing custom upload requires a newly validated file and a failed standard fetch saves nothing (14.147833ms)\n\u2714 only exact untouched legacy generated defaults migrate to the real Word including DL4 (11.940125ms)\n\u2714 a custom file saved while the legacy default is loading is never replaced (10.296334ms)\n\u2714 validated custom uploads render as validated with Preview enabled even when standardReady is false (12.370042ms)\n\u2714 only a pending standard Word row renders loading and disables its Preview (0.864125ms)\n\u2139 tests 13\n\u2139 suites 0\n\u2139 pass 13\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 250.827291\n",
+      "stderr": ""
+    },
+    {
+      "file": "test-dunning-management-report.cjs",
+      "exitCode": 0,
+      "passed": true,
+      "durationMs": 87,
+      "stdout": "Passed: management report mounting, exact columns, immutable history, historical stages, escaped output, filter validation, all/filtered typed XLSX, fresh role/client guard, saved handler denial, no state mutation and disposal.\n",
+      "stderr": ""
+    },
+    {
+      "file": "test-admin-configurations.js",
+      "exitCode": 0,
+      "passed": true,
+      "durationMs": 38,
+      "stdout": "\u2714 configuration renderer is isolated from other modules and tabs (1.533792ms)\n\u2714 initial design has four read-only modules and exact field choices (0.419833ms)\n\u2714 Apply enables only the selected module controls; empty Apply locks all (0.625125ms)\n\u2714 edit picker starts empty and Cancel does not enable controls (0.349208ms)\n\u2714 Save is a notice only and fresh documents start read-only (0.634959ms)\n\u2139 tests 5\n\u2139 suites 0\n\u2139 pass 5\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 6.665916\n",
+      "stderr": ""
+    },
+    {
+      "file": "test-admin-specialized-parity.js",
+      "exitCode": 0,
+      "passed": true,
+      "durationMs": 41,
+      "stdout": "\u2714 configuration landing remains delegated while all eight Client Admin tabs stay exposed (2.005125ms)\n\u2714 Dunning management tab is exposed only to Client Admin and direct role links stay restricted (1.53225ms)\n\u2714 visit and PDC reproduce current state, required markers and user-management surfaces (0.700667ms)\n\u2714 configuration workflow states include upload gating and dependent process fields (1.292334ms)\n\u2714 bulk documents include guidance, exact file types, populated upload and Limbo states (0.550459ms)\n\u2714 password, client, retention and audit surfaces match their reference contracts (1.01525ms)\n\u2714 specialized renderer does not use network or persistent storage (0.1775ms)\n\u2139 tests 7\n\u2139 suites 0\n\u2139 pass 7\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 10.077792\n",
+      "stderr": ""
+    },
+    {
+      "file": "test-admin-composed-parity.js",
+      "exitCode": 0,
+      "passed": true,
+      "durationMs": 34,
+      "stdout": "\u2714 dashboard parity uses one internally consistent four-session sample state (0.724583ms)\n\u2714 strategy list mirrors running and paused labels, target filters, counts and pagination (0.075917ms)\n\u2714 strategy builder exposes required and selectable reference states (0.129708ms)\n\u2714 email sender selection is a local card flow with visible dirty and saved states (0.069375ms)\n\u2714 help parity restores reference guides and aligns the audited modal state (0.1245ms)\n\u2714 composed parity does not call the network or browser persistent storage (0.126041ms)\n\u2139 tests 6\n\u2139 suites 0\n\u2139 pass 6\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 3.66275\n",
+      "stderr": ""
+    }
+  ]
+}

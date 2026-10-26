@@ -1,0 +1,17 @@
+{
+  "issued-qa-letter.pdf": {
+    "pages": 2,
+    "textCharacters": 812,
+    "bytes": 3476
+  },
+  "long-annexure-65-invoices.pdf": {
+    "pages": 5,
+    "textCharacters": 4040,
+    "bytes": 7189
+  },
+  "prior-reference-regression.pdf": {
+    "pages": 2,
+    "textCharacters": 444,
+    "bytes": 2470
+  }
+}

@@ -1,0 +1,81 @@
+body[data-report-page]{margin:0;background:#f4f6f9;min-height:100vh;overflow-x:hidden}
+body[data-report-page] .shared-header{height:66px;min-height:66px}
+body[data-report-page] .shared-header .brand{padding:0;border:0;border-radius:8px;overflow:hidden}
+body[data-report-page] .shared-header .logoInebura{width:90px;height:42px;object-fit:contain}
+body[data-report-page] .shared-header .relLogo{width:90px;height:42px}
+body[data-report-page] .shared-header .headerAppSwitch,body[data-report-page] .shared-header #clientPickerWrap{display:none}
+.rgPage{min-height:calc(100vh - 66px)}
+.rgPage button,.rgResourcesDialog button{font-family:inherit}
+.rgPage [hidden],.rgResourcesDialog [hidden]{display:none!important}
+.rgDropdownTrigger:focus-visible,.rgPage button:focus-visible,.rgResources a:focus-visible{outline:2px solid #8b5cf6;outline-offset:2px}
+.rgDropdownWrap .dropdown-menu{position:absolute;inset:calc(100% + 4px) 0 auto 0;max-height:240px;overflow-y:auto;min-width:100%;margin:0;z-index:1050;padding:8px 0}
+.rgDropdownWrap .dropdown-menu.show{display:block}
+.rgDropdownWrap .dropdown-item{font-size:10px;padding:4px 16px;white-space:normal;text-align:left;border:0;background:white;width:100%;font-weight:400}
+.rgDropdownWrap .dropdown-item.active{font-weight:600}
+.rgActionsInline{flex-wrap:wrap}
+.rgParamsInline{flex:0 1 auto}
+.rgParamsInline .rgField{min-width:max-content}
+.filterBadge{max-width:280px;overflow:hidden;text-overflow:ellipsis;text-transform:uppercase}
+.rgTableHeaderRow th{background:#5c258d}
+.rgTableHeaderRow th button{border:0;padding:0;color:inherit;background:transparent;font:inherit;display:inline-flex;gap:5px;align-items:center;cursor:pointer}
+.rgTableHeaderRow th button>span:first-child{text-transform:capitalize}
+.rgSortArrows{display:inline-flex;flex-direction:column;line-height:.7;font-size:9px;color:#ffffff59}
+.rgSortArrows .sorted{color:white}
+.rgColPillText{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rgColDropMenu{position:fixed;z-index:1100;min-width:170px}
+.rgColDropItem{width:100%;text-align:left;border:0;background:white;display:block}
+.rgColDropItem.chosen{background:#ede9fe}
+.rgColDropShowAll{background:#fff5f5}
+.rgTableWrap{max-height:calc(100vh - 320px);min-height:80px;overflow:auto}
+.rgResultCard:has(.rgTableEmpty) .rgTableWrap{max-height:none}
+.rgTableHeaderRow th{top:0}
+.rgTableFilterRow th{top:40px}
+.rgDataRow td{max-width:320px;overflow:hidden;text-overflow:ellipsis}
+.rgResultMeta{font-size:11px}
+.rgResources{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-top:18px;color:#7d8494;font-size:11px}
+.rgResources button{padding:3px 0;border:0;background:transparent;color:#5c258d;font-size:11px;text-decoration:underline;text-underline-offset:3px}
+.rgResourcesDialog{border:1px solid #e2e8f4;border-radius:16px;box-shadow:0 20px 80px #0f172a40;width:min(900px,calc(100vw - 32px));max-height:85vh;padding:0;color:#111827;font:13px Arial,Helvetica,sans-serif}
+.rgResourcesDialog::backdrop{background:#0f172a70}
+.rgResourcesDialog>header{display:flex;justify-content:space-between;gap:20px;padding:22px 24px 12px}
+.rgResourcesDialog h2{font-size:18px;font-weight:700;margin:0 0 5px}
+.rgResourcesDialog header p{margin:0;color:#64748b}
+.rgResourcesDialog header button{align-self:flex-start;border:0;background:transparent;color:#64748b;padding:4px}
+.rgResourceNote{padding:0 24px;color:#64748b;font-size:12px;line-height:1.6}
+.rgBundleLinks{display:flex;flex-wrap:wrap;gap:8px;padding:0 24px 18px}
+.rgBundleLinks a{border:1px solid #d7c3ea;background:#f6effb;border-radius:8px;padding:8px 11px;color:#5c258d;font-weight:600;text-decoration:none;font-size:12px}
+.rgResourceTableWrap{overflow:auto;max-height:50vh}
+.rgResourcesDialog table{border-collapse:collapse;width:100%}
+.rgResourcesDialog th{background:#f6effb;color:#5c258d;font-size:11px;position:sticky;top:0}
+.rgResourcesDialog th,.rgResourcesDialog td{padding:11px 15px;border-bottom:1px solid #eee7f5;text-align:left;white-space:nowrap}
+.rgResourcesDialog td a{color:#5c258d;margin-right:9px;font-size:11px}
+.rgResourcesDialog td:nth-child(2),.rgResourcesDialog td:nth-child(3){text-align:center}
+.rgToast{position:fixed;bottom:24px;right:24px;max-width:min(380px,calc(100vw - 32px));border:1px solid #d7c3ea;border-radius:12px;padding:13px 18px;background:white;box-shadow:0 12px 32px #0f172a26;z-index:1200;font:12px Arial,sans-serif;color:#334155}
+.rgToast[hidden]{display:none}
+@media(max-width:640px){
+ body[data-report-page] .shared-header{padding:10px 12px}
+ body[data-report-page] .headerLeft,body[data-report-page] .headerRight{gap:6px;min-width:0}
+ body[data-report-page] .shared-header .brand{padding:0;min-width:0}
+ body[data-report-page] .shared-header .logoInebura{width:78px;height:36px}
+ body[data-report-page] .shared-header .relLogo{width:76px;height:36px}
+ body[data-report-page] .shared-header .divider{display:none}
+ .rgPage{padding:16px 16px 28px}
+ .rgTopBar{padding:16px;gap:16px;align-items:stretch}
+ .rgTopBarLeft,.rgTopBarRight{width:100%;min-width:0}
+ .rgTopBarSub{white-space:normal;line-height:1.5}
+ .rgDropInline{width:100%}
+ .rgParamsInline{flex-basis:100%}
+ .rgParamsInline .rgField{max-width:none;min-width:0}
+ .filterBadge{max-width:calc(100vw - 150px)}
+ .rgActionsInline{gap:8px;width:100%}
+ .rptActions{gap:6px}
+ .rptActionBtn{padding:0 11px;font-size:11px}
+ .rgBtnClear{padding:0 11px}
+ .dateRangePopup{right:auto;left:0;width:min(300px,calc(100vw - 66px))}
+ .rgTableWrap{max-height:60vh}
+ .rgResultHeader{padding:12px;gap:10px}
+ .rgResultTitle{max-width:100%;font-size:13px}
+ .rgBtnDownloadFiltered{padding:6px 12px;font-size:12px}
+ .rgResources{align-items:flex-start;flex-direction:column;gap:6px}
+ .rgResourcesDialog>header{padding:18px 18px 12px}
+ .rgResourceNote,.rgBundleLinks{padding-left:18px;padding-right:18px}
+}

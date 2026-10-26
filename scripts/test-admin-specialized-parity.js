@@ -7,13 +7,16 @@ const vm = require("node:vm");
 
 const source = fs.readFileSync(path.join(__dirname, "admin-specialized.js"), "utf8");
 
-function render(module, view = "") {
+function render(module, view = "", role = "client-admin") {
   const listeners = {};
   const mount = { innerHTML: "", addEventListener(type, handler) { listeners[`mount:${type}`] = handler; } };
   const modal = { innerHTML: "", addEventListener(type, handler) { listeners[`modal:${type}`] = handler; }, classList: { add() {}, remove() {} }, setAttribute() {} };
   const context = {
     console,
+    URLSearchParams,
+    location: {search:`?role=${role}`},
     window: {
+      IneburaDunning: {getContext:()=>({role})},
       IneburaAdminPage: { module, view, renderer: "specialized" },
       IneburaAdminModules: { [module]: { title: module, description: `${module} description` } },
       IneburaAdminAuditEntities: ["Activity Rollback", "Bank Details", "Customer", "Invoice"],
@@ -32,12 +35,21 @@ function render(module, view = "") {
   return { html: mount.innerHTML, modal, listeners, contract: context.window.IneburaAdminSpecializedContract };
 }
 
-test("configuration landing remains delegated while all seven tabs stay exposed", () => {
+test("configuration landing remains delegated while all eight Client Admin tabs stay exposed", () => {
   const result = render("module-configuration", "configurations");
   assert.match(result.html, /data-preserved-configurations/);
   assert.match(result.html, /adminConfigurationsPage/);
-  assert.match(result.html, /class="is-active">Configurations<\/a>/);
-  assert.deepEqual([...result.contract.tabs], ["configurations", "visit", "monthend", "client-confirmation", "pdc", "escalation", "issue-tracker"]);
+  assert.match(result.html, /class="is-active"[^>]*>Configurations<\/a>/);
+  assert.deepEqual([...result.contract.tabs], ["configurations", "visit", "monthend", "client-confirmation", "pdc", "escalation", "issue-tracker", "dunning-letters"]);
+});
+
+test("Dunning management tab is exposed only to Client Admin and direct role links stay restricted",()=>{
+  assert.match(render("module-configuration","dunning-letters").html,/id="dunningManagementMount"/);
+  for(const role of ["supervisor","agent","mis-user"]){
+    const result=render("module-configuration","dunning-letters",role);
+    assert.equal(result.contract.tabs.includes("dunning-letters"),false);
+    assert.match(result.html,/Access restricted/);assert.doesNotMatch(result.html,/id="dunningManagementMount"/);
+  }
 });
 
 test("visit and PDC reproduce current state, required markers and user-management surfaces", () => {

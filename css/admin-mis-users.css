@@ -1,0 +1,86 @@
+.misWorkspace { padding-top:24px!important; }
+.misSampleNote { display:flex; gap:8px; align-items:center; margin-bottom:24px; color:#637086; font-size:13px; }
+.misListTools { display:flex; justify-content:space-between; gap:16px; margin:18px 0 12px; color:#637086; font-size:13px; }
+.misUsersTable { min-width:1540px; }
+.misUsersTable th:nth-child(1) { width:19%; }
+.misUsersTable th:nth-child(5) { width:25%; }
+.misUsersTable td { vertical-align:middle; }
+.misEmail { display:block; margin-top:5px; color:#637086; font-weight:400; font-size:12px; }
+.misTextButton { padding:0; border:0; background:transparent; color:#612795; font:inherit; text-align:left; cursor:pointer; }
+.misTextButton:hover { text-decoration:underline; }
+.misTextButton:focus-visible { outline:2px solid #7434dd; outline-offset:4px; }
+.misScopeCell { white-space:normal!important; line-height:1.5; }
+.misStatus { font-size:12px; color:#846522; background:#fff4d8; padding:4px 9px; border-radius:12px; }
+.misStatus.is-active { color:#246b4b; background:#e8f5ed; }
+.misUsersTable td:last-child { min-width:430px; }
+.misRowActions { gap:6px; flex-wrap:nowrap; }
+.misRowActions button:disabled { opacity:.45; cursor:not-allowed; }
+.misFootnote { font-size:12px; color:#697488; line-height:1.6; margin:20px 0 0; }
+.misHint { color:#657085; font-size:13px; line-height:1.6; margin:0 0 16px; }
+.misDialog { width:min(820px,calc(100vw - 32px)); }
+.misDialog.opUserModal { width:min(800px,calc(100vw - 32px))!important; }
+.misDialog.opUserModal > header { background:#e5daf0!important; }
+.misDialog.opUserModal .opFormGrid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:26px 16px; }
+.misDialog.opUserModal footer > button { min-width:140px; min-height:48px; }
+.misDialog .opModalBody { overflow:auto; max-height:calc(100dvh - 230px); }
+.misDialog .opFormGrid label { min-width:0; }
+.misDialog select { width:100%; }
+.misDialog select:disabled { background:#f7f8fa; color:#8993a1; cursor:not-allowed; }
+.misDialog input,.misDialog select { accent-color:#622c97; }
+.misDialog .is-wide { grid-column:1/-1; }
+.misScopeGrid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; align-items:start; }
+.misAccessFieldset { border:1px solid #e2e0e9; border-radius:10px; padding:18px; margin:4px 0; min-width:0; }
+.misAccessFieldset legend { float:none; width:auto; font-size:15px; font-weight:700; padding:0 6px; margin:0; color:#3e235e; }
+.misAccessFieldset > p { font-size:13px; color:#657085; line-height:1.6; margin:5px 0 12px; }
+.misScopeGrid .misHint { margin:0; }
+.misFieldLabel { display:block; margin-bottom:8px; color:#657184; font-size:12px; font-weight:800; letter-spacing:.03em; }
+.misFieldLabel small { font-size:11px; font-weight:400; letter-spacing:0; text-transform:none; }
+.misMultiSelect.is-disabled { background:#f7f8fa; color:#8993a1; }
+.misMultiSelect.is-disabled summary { pointer-events:none; color:#8993a1; }
+.misMapAll { display:flex!important; flex-direction:row!important; align-items:center; gap:12px!important; padding:11px 3px; border-bottom:1px solid #e2e4eb; margin:0!important; cursor:pointer; font-size:13px; }
+.misMapAll input { width:17px!important; height:17px!important; min-height:0!important; margin:0; flex:none; }
+.misScopeHelp { margin:0; color:#657085; font-size:13px; line-height:1.6; }
+.misAccessReview { background:#f6f2fb; border:1px solid #e5dced; border-radius:8px; padding:12px 14px; font-size:13px; line-height:1.6; overflow-wrap:anywhere; }
+.misAccessReview strong { display:block; color:#4e365f; margin-bottom:3px; }
+.misAccessReview p { margin:0; color:#374151; }
+.misAccessReview > span { display:block; color:#697488; font-size:12px; margin-top:4px; }
+.misOptionStatus:empty { display:none; }
+.misMultiSelect { border:1px solid #dfe3ea; border-radius:10px; background:#fff; min-width:0; }
+.misMultiSelect summary { min-height:41px; padding:10px 11px; display:flex; justify-content:space-between; align-items:center; gap:8px; font-size:13px; color:#1f2937; cursor:pointer; list-style:none; }
+.misMultiSelect summary::-webkit-details-marker { display:none; }
+.misMultiSelect summary > span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.misMultiSelect summary i { font-size:11px; flex:none; }
+.misMultiSelect[open] summary { border-bottom:1px solid #e2e4eb; }
+.misMultiSelect summary:focus-visible { outline:2px solid #7434dd; outline-offset:2px; border-radius:10px; }
+.misMultiMenu { padding:9px; }
+.misMultiMenu .misCheckList { margin-top:8px; border:0; }
+.misMultiMenu .misCheckList label { padding:10px 3px; }
+.misMultiMenu .misCheckList label[hidden] { display:none!important; }
+.misMultiEmpty { margin:12px 4px; font-size:13px; color:#697488; }
+.misCheckList { display:grid; gap:0; margin-top:12px; max-height:185px; overflow:auto; border:1px solid #e2e4eb; border-radius:8px; }
+.misCheckList label { display:flex!important; flex-direction:row!important; align-items:center; gap:12px!important; padding:11px 13px; margin:0!important; border-bottom:1px solid #eee; cursor:pointer; }
+.misCheckList label:last-child { border:0; }
+.misCheckList input { width:17px!important; height:17px!important; min-height:0!important; flex:none; margin:0; }
+.misCheckList small { display:block; margin-top:4px; color:#737e90; font-weight:400; }
+.misPermissionNote { color:#4e365f; background:#f6f2fb; padding:12px; border-radius:8px; line-height:1.7; font-size:13px; margin:0; }
+.misFormError { color:#a22e31; padding:12px 0 0; font-size:13px; line-height:1.5; margin:0; }
+.misPortfolioDialog { width:min(1080px,calc(100vw - 32px)); }
+.misPortfolioTable { min-width:690px; }
+.misPortfolioTable th { white-space:nowrap; }
+.misScopeSummary { color:#5a2c81; font-weight:600; line-height:1.6; }
+.misContactPicker { display:flex; align-items:center; gap:9px; margin-bottom:20px; color:#374151; font-size:13px; }
+.misContactPicker i { color:#6b7280; font-size:17px; }
+.misDialog .opFormGrid .misLoginDetails { display:flex; flex-direction:row-reverse; justify-content:space-between; gap:12px; align-items:center; margin:0; padding:12px 14px; border:1px solid #e2e4eb; border-radius:9px; background:#f9fafb; }
+.misLoginDetails > span { color:#374151!important; font-weight:600!important; letter-spacing:0!important; }
+.misLoginDetails small { display:block; margin-top:4px; font-weight:400; font-size:12px; color:#697488; line-height:1.4; }
+.misDialog .misLoginDetails input { appearance:none; flex:none; width:36px; height:20px; min-height:20px; padding:0; border:0; border-radius:12px; background:#cfd5de; position:relative; cursor:pointer; }
+.misLoginDetails input::after { content:''; position:absolute; top:3px; left:3px; width:14px; height:14px; border-radius:50%; background:#fff; transition:transform .15s; }
+.misDialog .misLoginDetails input:checked { background:#612795; }
+.misLoginDetails input:checked::after { transform:translateX(16px); }
+.misLoginDetails input:focus-visible { outline:2px solid #7434dd; outline-offset:3px; }
+.misContactOption { border:0; border-bottom:1px solid #e2e4eb; background:white; padding:14px; text-align:left; font:inherit; cursor:pointer; }
+.misContactOption:hover { background:#f6f2fb; }
+.misContactOption small { display:block; color:#637086; margin-top:5px; }
+.misDenied { padding:30px; }
+.misDialog button:focus-visible,.misDialog a:focus-visible { outline:2px solid #7434dd; outline-offset:3px; }
+@media(max-width:650px) { .misDialog.opUserModal .opFormGrid,.misScopeGrid { grid-template-columns:1fr; } .misBranchSpacer { display:none; } .misSampleNote,.misListTools { align-items:flex-start; flex-wrap:wrap; } .misDialog footer { flex-wrap:wrap; } .misDialog.opUserModal footer > button { min-width:0; flex:1; } }

@@ -7019,6 +7019,8 @@ function renderCustomerContacts(customer) {
 
 function renderInvoiceDetails(invoice) {
   const customer = customersData.find(c => c.id === selectedCustomerId);
+  window.IneburaDunningSelectedInvoice = invoice ? { customer, invoice } : null;
+  window.dispatchEvent(new CustomEvent("inebura:invoice-selected", { detail: window.IneburaDunningSelectedInvoice }));
   const submissionEl = document.getElementById("invoiceSubmissionStatus");
   const pushSubjectEl = document.getElementById("pushNotificationSubject");
 
@@ -7969,7 +7971,18 @@ function openFloatingMenu(invNo, anchorEl) {
 // ===============================
 // Rendering: Invoice table
 // ===============================
+function publishDunningInvoicePortfolio() {
+  // Publish the full current portfolio, independently of the visible invoice filters.
+  window.IneburaDunningInvoicePortfolio = customersData.map(customer => ({
+    ...customer,
+    contacts: (customer.contacts || []).map(contact => typeof contact === "string" ? contact : { ...contact }),
+    invoices: (customer.invoices || []).map(invoice => ({ ...invoice }))
+  }));
+  window.dispatchEvent(new CustomEvent("inebura:invoice-portfolio", { detail: window.IneburaDunningInvoicePortfolio }));
+}
+
 function renderInvoiceTable(invoices) {
+  publishDunningInvoicePortfolio();
   const tbody = document.getElementById("invoiceTableBody");
   if (!tbody) return;
 

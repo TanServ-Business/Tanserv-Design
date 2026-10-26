@@ -1,0 +1,131 @@
+## test-dunning-core.cjs
+Exit code: 0
+
+PASS enabling is idempotent and persistence survives new instances
+PASS daily batches progress independently and repeated runs never resend
+PASS new Letter 1 and earlier Letter 2 on same day remain separate emails
+PASS fully paid invoices excluded; partial payments snapshot remaining balance
+PASS manual exclusions persist, block sends, and reinstatement stays pending
+PASS complete failures retry next day, shift remaining schedule, and have no invented cap
+PASS partial success completes stage and does not retry failed contacts
+PASS all role and client-scope guards reject without any mutation
+PASS overlapping strategies hold invoices until one strategy is selected
+PASS active strategy/template edits apply to unsent stages but preserve sent snapshots
+PASS additional letter stages continue without final escalation
+PASS missed-date resume is blocked; immediate resume allowed; disable prevents runs
+PASS missing contacts hold the batch and template validation rejects unknown calculations
+PASS storage failures do not partially mutate in-memory state
+PASS live invoice synchronization preserves sent history and blocks foreign assignments
+PASS same-day customer invoices consolidate in one letter and exclusion has an accurate empty status
+PASS changed filters apply to unsent stages without altering sent membership
+PASS conflict selection after Letter 1 transfers only remaining stages and preserves sent history
+PASS browser saves the actual PDF bytes and receives state updates from other tabs
+PASS browser roles follow explicit query then Admin shell then user workspace preference
+PASS issued letter snapshots preserve source codes and never substitute internal IDs
+PASS Strategy Master selected invoice IDs and exclusions never widen to the full portfolio
+PASS Strategy Master customer selection and All exclusions use source IDs and reject unlinked records
+PASS editing global target exclusions applies to unsent batch stages and preserves issued letters
+PASS each template uses its current leaf status and key account filters for its own stage
+PASS unknown key accounts and missing or empty status selections cannot satisfy restrictive template filters
+PASS aging filters advance from actual run date and changed stage filters release only matching batch members
+PASS invalid target and aging filter payloads fail before mutating the strategy
+28 Dunning core scenarios passed.
+
+
+## test-dunning-strategy.cjs
+Exit code: 0
+
+✔ catalog preserves core IDs and offers defaults while disabled without mutating state (6.711083ms)
+✔ validation enforces sequence, timing, attachment and selected coverage (5.505541ms)
+✔ save reuses the same strategy ID, existing customer/invoice IDs and preserves all control settings (5.660541ms)
+✔ source synchronization preserves zero balances, local dates and missing known amounts (2.369792ms)
+✔ unresolved or ambiguous target IDs fail before source or strategy mutation (2.2745ms)
+✔ existing projects legacy core strategies and scopes them to the current client (1.596458ms)
+✔ normal reminder blocks survive projection alongside Dunning blocks (2.217333ms)
+✔ role checks happen before invoice synchronization and core enforces missed-date resume (34.070916ms)
+✔ remove stops sending and hides the strategy while preserving sent records (2.949375ms)
+✔ ordinary deletion is a no-op and switching to reminders detaches the old sequence (4.862ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 80.923875
+
+
+## test-dunning-integrations.cjs
+Exit code: 0
+
+PASS workspace invoice bridge uses invoiceAmount and preserves the calendar due date
+PASS source without contacts preserves the known contact list
+PASS agent invoice bridge cannot silently adopt another agent assignment
+PASS sent history excludes failed letters and foreign or unassigned customer letters
+PASS Module Configuration saves Dunning enabled state and denies unauthorized direct action
+PASS workspace portfolio bridge publishes all invoices and updates amounts independently of table filters
+PASS portfolio events sync unselected invoices, preserve assignment scope and skip unchanged renders
+7 Dunning integration scenarios passed.
+
+
+## test-dunning-documents.cjs
+Exit code: 0
+
+Passed: safe markup, mapping/calculation validation, escaped customer data, 65-invoice PDF, deterministic snapshots and real DOCX import.
+
+
+## test-dunning-report.cjs
+Exit code: 0
+
+Passed: 10-column contract, immutable invoice snapshots, partial/failed delivery selection, filters, role scope, historical blanks, typed XLSX-ready dataset and safe CSV.
+
+
+## test-admin-configurations.js
+Exit code: 0
+
+✔ configuration renderer is isolated from other modules and tabs (4.360167ms)
+✔ initial design has four read-only modules and exact field choices (0.800541ms)
+✔ Apply enables only the selected module controls; empty Apply locks all (2.649875ms)
+✔ edit picker starts empty and Cancel does not enable controls (1.217042ms)
+✔ Save is a notice only and fresh documents start read-only (2.458041ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 21.333542
+
+
+## test-admin-composed-parity.js
+Exit code: 0
+
+✔ dashboard parity uses one internally consistent four-session sample state (2.37125ms)
+✔ strategy list mirrors running and paused labels, target filters, counts and pagination (0.112417ms)
+✔ strategy builder exposes required and selectable reference states (0.164291ms)
+✔ email sender selection is a local card flow with visible dirty and saved states (0.092667ms)
+✔ help parity restores reference guides and aligns the audited modal state (0.159542ms)
+✔ composed parity does not call the network or browser persistent storage (0.161125ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 8.817208
+
+
+## test-template-master-editor.cjs
+Exit code: 0
+
+Passed: 110 source round trips; 84 populated previews; 26 Admin exclusions and direct-open guards; original tokens/settings preserved.
+
+
+## test-reports.cjs
+Exit code: 0
+
+Reports checks passed: 20 layouts, row widths, filters, numeric sorts, inclusive date boundaries, missing/zero values and CSV fidelity.
+
+

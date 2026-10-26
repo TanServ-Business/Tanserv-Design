@@ -15,8 +15,12 @@
     { key: "grn", name: "GRN Module Applicable", choice: "GRN Module", on: true,
       description: "If this module is enabled, the invoice due date can be set based on the GRN captured date once the GRN details are recorded." },
   ];
+  const dunning = window.IneburaDunning;
+  if (dunning?.getContext().role === "client-admin") modules.push({ key: "dunning", name: "Dunning Letters", choice: "Dunning Letters", on: dunning.getState().enabled,
+    description: "Send daily letters for eligible overdue invoices. Manage templates, sending, schedules and reports in the Dunning Letters tab." });
   const references = ["Invoice due date does not change.", "Invoice due date changes as per GRN date."];
   let editable = new Set();
+  let dunningDirty = false;
   let selectedReference = 1;
   let menuOpen = false;
   const button = (text, action, classes = "") => `<button type="button" class="${classes}" data-config-action="${action}">${text}</button>`;
@@ -25,6 +29,7 @@
     ${modules.map(item => `<section class="adminConfigurationCard" aria-labelledby="config-${item.key}-title">
       <div class="adminConfigurationRow"><div class="adminConfigurationCopy">
         <h2 id="config-${item.key}-title">${item.name}</h2><p>${item.description}</p>
+        ${item.key === "dunning" ? `<div class="adminConfigurationField"><label for="config-dunning-count">Number of Dunning Letters <span>*</span></label><input id="config-dunning-count" type="number" min="1" max="1000" step="1" value="${Number(dunning.getState().letterCount || 3)}" data-config-editable="dunning" disabled><small>One or more letters. Changing the count does not configure sending. <a href="?module=module-configuration&view=dunning-letters">Manage Dunning Letters</a></small></div>` : ""}
         ${item.key === "tds" ? `<div class="adminConfigurationField adminConfigurationTDS" data-config-details="tds"><label for="config-tds-percent">% applicable for TDS <span>*</span></label><input id="config-tds-percent" type="text" inputmode="decimal" placeholder="Enter TDS %" value="2" data-config-editable="tds" disabled></div>` : ""}
         ${item.key === "grn" ? `<div class="adminConfigurationField adminConfigurationGRN" data-config-details="grn"><label id="config-grn-label">GRN Date Reference</label><div class="adminConfigurationSelect">
           <button type="button" id="config-grn-reference" role="combobox" aria-labelledby="config-grn-label" aria-haspopup="listbox" aria-expanded="false" aria-controls="config-grn-options" data-config-action="reference" data-config-editable="grn" disabled><span>${references[1]}</span><i class="bi bi-chevron-down" aria-hidden="true"></i></button>
@@ -76,7 +81,21 @@
     const action = event.target.closest("[data-config-action]")?.dataset.configAction;
     if (action === "edit") openEdit();
     if (action === "reference") setMenu(!menuOpen);
-    if (action === "save") window.IneburaAdminPreviewNotice();
+    if (action === "save") {
+      if (dunning && editable.has("dunning")) {
+        try {
+          dunning.saveConfiguration({enabled:Boolean(mount.querySelector('[data-config-toggle="dunning"]')?.checked),letterCount:Number(mount.querySelector('#config-dunning-count')?.value)}, dunning.getContext());
+          dunningDirty = false;
+          const toast = document.getElementById("adminToast");
+          toast.textContent = "Dunning Letters configuration saved. Other configuration changes remain a preview.";
+          toast.classList.add("is-visible");
+          setTimeout(() => toast.classList.remove("is-visible"), 3500);
+        } catch (error) {
+          const toast = document.getElementById("adminToast");
+          toast.textContent = error.message; toast.classList.add("is-visible");
+        }
+      } else window.IneburaAdminPreviewNotice();
+    }
     const option = event.target.closest("[data-config-option]");
     if (option) chooseReference(Number(option.dataset.configOption));
   });
@@ -87,13 +106,16 @@
     editable = new Set([...modal.querySelectorAll("[data-config-choice]:checked")].map(input => input.value));
     mount.querySelectorAll("[data-config-editable]").forEach(control => {
       control.disabled = !editable.has(control.dataset.configEditable);
+      if (control.dataset.configEditable === "dunning" && dunning?.getContext().role !== "client-admin") control.disabled = true;
       control.closest(".adminConfigurationToggle")?.classList.toggle("is-disabled", control.disabled);
     });
     closeModal();
   });
   mount.addEventListener("change", event => {
+    if (event.target.id === "config-dunning-count" && editable.has("dunning")) dunningDirty = true;
     const key = event.target.dataset.configToggle;
     if (!key || !editable.has(key)) return;
+    if (key === "dunning") dunningDirty = true;
     const details = mount.querySelector(`[data-config-details="${key}"]`);
     if (details) details.hidden = !event.target.checked;
     if (key === "grn" && !event.target.checked) setMenu(false);
@@ -113,6 +135,14 @@
       const next = event.key === "Home" ? 0 : event.key === "End" ? 1 : index === undefined ? selectedReference : (Number(index) + 1) % references.length;
       setMenu(true, next);
     } else if (event.key === "Tab") setMenu(false);
+  });
+  dunning?.subscribe(state => {
+    const item = modules.find(row => row.key === "dunning");
+    if (item) item.on = state.enabled;
+    const control = mount.querySelector('[data-config-toggle="dunning"]');
+    if (control && !dunningDirty) control.checked = state.enabled;
+    const count = mount.querySelector('#config-dunning-count');
+    if (count && !dunningDirty) count.value = state.letterCount || 3;
   });
   window.IneburaAdminConfigurations = Object.freeze({ render });
 })();

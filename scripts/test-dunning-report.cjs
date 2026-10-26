@@ -1,0 +1,78 @@
+/* Report contract tests. Does not mount, register or modify the Reports module. */
+const assert = require('node:assert/strict');
+const report = require('./dunning-report-data.js');
+const manager = { role: 'client-admin', clientId: 'client-1', userId: 'manager-1' };
+const agent = { role: 'agent', clientId: 'client-1', userId: 'agent-1' };
+const invoice = { id: 'internal-invoice-1', invoiceNo: 'INV-001', clientId: 'client-1', agentId: 'agent-1', originalAmount: 1000, outstanding: 650, dueDate: '2026-10-05' };
+const snapshot = { clientCode: 'CLIENT-001', customerCode: 'CUST-001', customer: { id: 'internal-customer-1', name: 'Example Customer', clientId: 'client-1', agentId: 'agent-1' }, invoices: [invoice], template: { name: 'Dunning Letter 1' }, stageNumber: 1, date: '2026-10-20', reference: 'DL-20261020-001' };
+const sent = { id: 'email-1', status: 'sent', stage: 1, date: snapshot.date, to: ['accounts@example.test', 'finance@example.test'], letterSnapshot: snapshot };
+const copy = value => JSON.parse(JSON.stringify(value));
+const state = { emails: [copy(sent)], invoices: [{ ...invoice, outstanding: 0, originalAmount: 50 }], customers: [{ id: 'internal-customer-1', name: 'Changed name', contacts: ['changed@example.test'] }] };
+
+assert.deepEqual(report.columns.map(column => column.label), ['Client Code', 'Customer code', 'customer name', 'invoice number', 'invoice amount', 'invoice due date', 'Dunning letter', 'Dunning letter reference no', 'Dunning letter issue date', 'recipients (comma separated)']);
+const first = report.projectRows(state, manager)[0];
+assert.equal(first.invoiceAmount, 1000, 'report uses original invoice amount from the issued snapshot');
+assert.equal(first.customerName, 'Example Customer');
+assert.equal(first.recipients, 'accounts@example.test, finance@example.test');
+assert.equal(first.clientCode, 'CLIENT-001'); assert.equal(first.customerCode, 'CUST-001');
+assert.equal(first.invoiceDueDate, '2026-10-05'); assert.equal(first.dunningLetterIssueDate, '2026-10-20');
+assert.equal(first.dunningLetter, 'DL1');
+const immutable = copy(report.buildDataset(state, manager));
+state.invoices[0].originalAmount = 25000; state.invoices[0].outstanding = 0; state.customers[0].contacts.push('new@example.test');
+assert.deepEqual(report.buildDataset(state, manager), immutable, 'payment, customer and contact changes do not rewrite the issued report');
+
+const second = copy(sent); second.id = 'email-2'; second.status = 'partial'; second.letterSnapshot.stageNumber = 2; second.letterSnapshot.template.name = 'Dunning Letter 2'; second.letterSnapshot.reference = 'DL-20261027-002'; second.letterSnapshot.date = '2026-10-27'; second.recipientResults = [{ email: second.to[0], status: 'sent' }, { email: second.to[1], status: 'failed' }];
+const failed = copy(sent); failed.id = 'email-failed'; failed.status = 'failed';
+state.emails.push(second, failed);
+assert.equal(report.projectRows(state, manager).length, 2, 'partial deliveries count, wholly failed attempts do not');
+assert.equal(report.projectRows(state, manager)[0].recipients, 'accounts@example.test, finance@example.test', 'all To recipients are retained for partial deliveries');
+assert.deepEqual(report.summary(report.projectRows(state, manager)), { invoices: 2, letters: 2, customers: 1 });
+assert.equal(report.projectRows(state, manager, { dateFrom: '2026-10-21', dateTo: '2026-10-27' })[0]._stage, 2);
+assert.equal(report.projectRows(state, manager, { dateFrom: '2026-10-20', dateTo: '2026-10-20' }).length, 1, 'date boundaries inclusive');
+assert.equal(report.projectRows(state, manager, { stage: '1' }).length, 1);
+assert.equal(report.projectRows(state, manager, { customer: 'cust-001' }).length, 2);
+assert.equal(report.projectRows(state, manager, { customer: 'not this customer' }).length, 0);
+assert.throws(() => report.projectRows(state, manager, { dateFrom: '2026-10-30', dateTo: '2026-10-20' }), /on or before/);
+assert.throws(() => report.projectRows(state, manager, { dateFrom: '2026-02-30' }), /valid issue dates/);
+const renamed = copy(sent); renamed.letterSnapshot.stageNumber = 4; renamed.letterSnapshot.template.name = 'Gentle Reminder';
+assert.equal(report.projectRows({ emails: [renamed] }, manager)[0].dunningLetter, 'DL4', 'issued stage wins over a reused or renamed template');
+const noDate = copy(sent); delete noDate.letterSnapshot.date; delete noDate.date;
+assert.equal(report.projectRows({ emails: [noDate] }, manager).length, 1);
+assert.equal(report.projectRows({ emails: [noDate] }, manager, { dateTo: '2026-10-30' }).length, 0, 'unknown issue dates are excluded by either date boundary');
+assert.equal(report.projectRows({ emails: [noDate] }, manager, { dateFrom: '2026-10-01' }).length, 0);
+
+const elsewhere = copy(sent); elsewhere.id = 'other-client'; elsewhere.letterSnapshot.invoices[0].clientId = 'client-2'; elsewhere.letterSnapshot.customer.clientId = 'client-2';
+const colleague = copy(sent); colleague.id = 'other-agent'; colleague.letterSnapshot.invoices[0].agentId = 'agent-2'; colleague.letterSnapshot.customer.agentId = 'agent-2';
+state.emails.push(elsewhere, colleague);
+assert.equal(report.projectRows(state, manager).length, 3, 'manager is client scoped');
+assert.equal(report.projectRows(state, agent).length, 0, 'Agents retain invoice exclusions but cannot access this management report');
+assert.equal(report.projectRows(state, { ...agent, invoiceIds: ['not-assigned'] }).length, 0);
+assert.equal(report.projectRows(state, { ...manager, role: 'supervisor' }).length, 0, 'Supervisor cannot access the Client Admin tab');
+assert.equal(report.projectRows(state, { ...manager, role: 'mis' }).length, 0);
+assert.equal(report.projectRows(state, { ...manager, role: 'mis-manager' }).length, 0);
+assert.equal(report.projectRows(state, { ...manager, role: 'backend' }).length, 0);
+assert.equal(report.buildDataset(state, { ...manager, role: 'backend' }).authorized, false);
+assert.equal(report.projectRows(state, { role: 'client-admin' }).length, 0, 'missing client scope fails closed');
+
+const legacy = copy(sent); legacy.id = 'legacy'; delete legacy.letterSnapshot.clientCode; delete legacy.letterSnapshot.customerCode; delete legacy.letterSnapshot.invoices[0].originalAmount;
+const legacyRows = report.projectRows({ emails: [legacy] }, manager);
+assert.equal(legacyRows[0].clientCode, ''); assert.equal(legacyRows[0].customerCode, '');
+assert.equal(legacyRows[0].invoiceAmount, '', 'missing original amount is blank, never the remaining outstanding amount');
+legacy.letterSnapshot.invoices[0].amount = 1200;
+assert.equal(report.projectRows({ emails: [legacy] }, manager)[0].invoiceAmount, 1200, 'historical amount alias is supported');
+assert.doesNotMatch(report.toCsv(legacyRows), /internal-/);
+
+const dataset = report.buildDataset({ emails: [sent] }, manager);
+assert.equal(dataset.key, 'dunning-letters'); assert.equal(dataset.headers.length, 10); assert.equal(dataset.rows[0].length, 10);
+assert.equal(dataset.columns[4].type, 'number'); assert.equal(typeof dataset.rows[0][4], 'number');
+assert.equal(dataset.columns[5].type, 'date'); assert.equal(dataset.rows[0][5], '2026-10-05');
+assert.equal(dataset.columns[0].type, 'text'); assert.ok(!JSON.stringify(dataset.rows).includes('internal-'));
+const unsafe = { ...first, customerName: '=HYPERLINK("https://example.test")', invoiceNumber: '\t+SUM(1,2)', recipients: 'a@example.test, b@example.test' };
+const csv = report.toCsv([unsafe]);
+assert.ok(csv.startsWith('\uFEFF"Client Code","Customer code"'));
+assert.ok(csv.includes('"\'=HYPERLINK(""https://example.test"")"'));
+assert.ok(csv.includes('"\'\t+SUM(1,2)"'));
+assert.ok(csv.includes('"1000"'));
+assert.ok(csv.includes('"a@example.test, b@example.test"'));
+assert.equal(report.toCsv([]).split('\r\n').filter(Boolean).length, 1, 'empty CSV has only the exact header row');
+console.log('Passed: 10-column contract, immutable invoice snapshots, partial/failed delivery selection, filters, role scope, historical blanks, typed XLSX-ready dataset and safe CSV.');

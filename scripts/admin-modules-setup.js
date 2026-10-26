@@ -16,7 +16,7 @@
   const activeOptions = ["Active", "Inactive"];
   const states = ["Haryana", "Maharashtra", "Karnataka", "Tamil Nadu", "Delhi", "West Bengal"];
   const branches = ["TestClient Gurugram", "TestClient Mumbai", "TestClient Bengaluru"];
-  const roles = ["Collection Agent", "Collection Manager", "Supervisor", "KAM", "KAS", "Finance Controller"];
+  const roles = ["Collection Agent", "Collection Manager", "Supervisor", "KAM", "KAS", "Finance Controller", "MIS", "MIS Manager"];
   const internalContactDepartments = [
     "Biomedical HOD", "Hygiene Associate", "Manager", "Manager - Purchase", "Manager QC",
     "Marketing HOD", "Managing Director", "online upload", "Operation Executive", "Pharmacist",

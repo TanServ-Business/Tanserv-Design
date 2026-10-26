@@ -693,6 +693,17 @@
     return TEMPLATE_MAP[templateId] || null;
   }
 
+  function attachmentOptions(template) {
+    return CUSTOM_ATTACHMENT_OPTIONS;
+  }
+
+  function syncReminderDropdown() {
+    els.reminderType.value = state.form.reminderType;
+    Array.from(els.reminderType.options).forEach(option => {
+      option.disabled = false;
+    });
+  }
+
   function usesPtpTiming(template) {
     return template?.id === "ptp_missed_mail" || template?.id === "ptp_confirmation_mail";
   }
@@ -820,8 +831,7 @@
   }
 
   function getOrderedTemplates() {
-    return TEMPLATE_ORDER
-      .map((id) => TEMPLATE_MAP[id])
+    return TEMPLATE_ORDER.map((id) => TEMPLATE_MAP[id])
       .filter((template) => template && getTemplateSource(template));
   }
 
@@ -1017,7 +1027,7 @@
       uid: step.uid || `step_${Math.random().toString(36).slice(2, 10)}`,
       days: clampInteger(step.days, 1, 1, 365),
       when: allowedTimings.includes(step.when) ? step.when : allowedTimings[0],
-      attachments: normalizeAttachmentSelection(step.attachments || step.attachment, CUSTOM_ATTACHMENT_OPTIONS)
+      attachments: normalizeAttachmentSelection(step.attachments || step.attachment, attachmentOptions(template))
     }));
   }
 
@@ -1176,7 +1186,13 @@
     return match?.id || "";
   }
 
+  function isDunningEntry(entry) {
+    const source = String(entry?.templateId || entry?.template || entry?.notificationTemplate || "").trim();
+    return /^dunning[-_\s]?letter|^dunning-template-/i.test(source) || (window.IneburaDunning?.getState().templates || []).some(template=>template.id===source);
+  }
+
   function normalizeTemplateEntry(entry) {
+    if (isDunningEntry(entry)) return null;
     const templateId = findTemplateId(entry.templateId || entry.template || entry.notificationTemplate);
     if (templateId && !isMappedTemplateId(templateId)) {
       return null;
@@ -1204,14 +1220,14 @@
         uid: step.uid || `step_${Math.random().toString(36).slice(2, 10)}`,
         days: clampInteger(step.days, 1, 1, 365),
         when: step.when || "before",
-        attachments: normalizeAttachmentSelection(step.attachments || step.attachment, CUSTOM_ATTACHMENT_OPTIONS)
+        attachments: normalizeAttachmentSelection(step.attachments || step.attachment, attachmentOptions(getTemplate(templateId)))
       }));
     } else if (Array.isArray(entry.customSteps) && entry.customSteps.length) {
       base.reminderSteps = entry.customSteps.map((step) => ({
         uid: step.uid || `step_${Math.random().toString(36).slice(2, 10)}`,
         days: clampInteger(step.days, 1, 1, 365),
         when: step.trigger === "after" ? "after" : "before",
-        attachments: normalizeAttachmentSelection(step.attachments || step.attachment, CUSTOM_ATTACHMENT_OPTIONS)
+        attachments: normalizeAttachmentSelection(step.attachments || step.attachment, attachmentOptions(getTemplate(templateId)))
       }));
     }
 
@@ -1227,6 +1243,7 @@
       ? strategy.templates.map(normalizeTemplateEntry)
       : [normalizeTemplateEntry(strategy)])
       .filter(Boolean);
+    if (!templates.length) return null;
 
     const targetType = strategy.targetType || strategy.scope || "";
     const selectedTargetIds = dedupe(strategy.selectedTargetIds || strategy.selectedCustomerIds || strategy.selectedInvoiceNos || []);
@@ -1272,7 +1289,11 @@
 
   function loadStrategies() {
     const raw = readStorage(STORAGE_KEY) || readStorage(LEGACY_STORAGE_KEY);
-    state.strategies = Array.isArray(raw) ? raw.map(normalizeStoredStrategy).filter(Boolean) : [];
+    const saved = Array.isArray(raw) ? raw : [];
+    // A migrated sequence may be represented only by its captured legacy payload.
+    // Preserve its regular reminder blocks here; Dunning stages belong to Module Configuration.
+    const captured = raw ? [] : (window.IneburaDunning?.getState().strategies || []).map(item=>item.strategyMasterPayload).filter(Boolean);
+    state.strategies = [...saved, ...captured].map(normalizeStoredStrategy).filter(Boolean);
   }
 
   function clearError() {
@@ -1451,6 +1472,7 @@
   }
 
   function renderTemplates() {
+    syncReminderDropdown();
     ensureActiveTemplateUid();
     els.templateCount.textContent = `${state.form.templates.length} template${state.form.templates.length === 1 ? "" : "s"}`;
     els.templateStack.innerHTML = state.form.templates.map((entry, index) => renderTemplateCard(entry, index)).join("");
@@ -1577,8 +1599,8 @@
                   </select>
                 `}
               <input data-step-field="days" data-template-uid="${escapeHtml(entry.uid)}" data-step-uid="${escapeHtml(step.uid)}" type="number" min="1" max="365" value="${escapeHtml(step.days)}" />
-              <select data-step-field="attachment" data-template-uid="${escapeHtml(entry.uid)}" data-step-uid="${escapeHtml(step.uid)}" multiple size="${Math.max(2, CUSTOM_ATTACHMENT_OPTIONS.length)}">
-                ${CUSTOM_ATTACHMENT_OPTIONS.map((attachment) => `<option value="${escapeHtml(attachment)}" ${(step.attachments || []).includes(attachment) ? "selected" : ""}>${escapeHtml(attachment)}</option>`).join("")}
+              <select data-step-field="attachment" data-template-uid="${escapeHtml(entry.uid)}" data-step-uid="${escapeHtml(step.uid)}" multiple size="${Math.max(2, attachmentOptions(template).length)}">
+                ${attachmentOptions(template).map((attachment) => `<option value="${escapeHtml(attachment)}" ${(step.attachments || []).includes(attachment) ? "selected" : ""}>${escapeHtml(attachment)}</option>`).join("")}
               </select>
               <button class="smTinyBtn is-danger ${entry.reminderSteps.length === 1 ? "hidden" : ""}" type="button" data-remove-step="${escapeHtml(step.uid)}" data-template-uid="${escapeHtml(entry.uid)}">×</button>
             </div>
@@ -1800,7 +1822,7 @@
         return { ...step, when: template.supportedTimings.includes(value) ? value : template.supportedTimings[0] };
       }
       if (field === "attachment") {
-        return { ...step, attachments: normalizeAttachmentSelection(value, CUSTOM_ATTACHMENT_OPTIONS) };
+        return { ...step, attachments: normalizeAttachmentSelection(value, attachmentOptions(template)) };
       }
       return step;
     });

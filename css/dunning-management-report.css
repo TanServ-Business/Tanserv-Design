@@ -1,0 +1,23 @@
+.dlReport { color: #243047; }
+.dlReport h3 { margin: 0 0 5px; font-size: 18px; color: #243047; }
+.dlReportHeader { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; align-items: center; margin-bottom: 18px; }
+.dlReportHeader p { color: #637087; margin: 0; font-size: 13px; }
+.dlReportActions { display: flex; gap: 8px; flex-wrap: wrap; }
+.dlReport button { padding: 8px 12px; border: 1px solid #dcd3ec; border-radius: 8px; background: white; color: #602694; font-size: 13px; font-weight: 600; cursor: pointer; }
+.dlReport button:hover { background: #f6f1fc; }
+.dlReport button:disabled { cursor: default; opacity: .45; }
+.dlReport :is(button,input,select):focus-visible { outline: 2px solid #682a9e; outline-offset: 2px; }
+.dlReportFilters { display: flex; align-items: end; gap: 12px; flex-wrap: wrap; padding: 16px; background: #f8f7fc; border: 1px solid #e8e1f0; border-radius: 10px; }
+.dlReportFilters label { display: flex; flex-direction: column; gap: 5px; font-size: 12px; font-weight: 600; color: #536077; }
+.dlReportFilters input,.dlReportFilters select { min-height: 36px; padding: 7px 9px; border-radius: 7px; border: 1px solid #d8dce6; background: white; color: #243047; font: inherit; min-width: 145px; }
+.dlReportSummary { font-size: 13px; color: #637087; margin: 16px 0 10px; }
+.dlReportTableWrap { overflow: auto; border: 1px solid #e0e3eb; border-radius: 10px; }
+.dlReport table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 1390px; }
+.dlReport th { background: #f5f1fa; font-weight: 600; color: #4f3569; white-space: nowrap; padding: 13px 14px; text-align: left; border-bottom: 1px solid #dfd5ec; }
+.dlReport td { padding: 12px 14px; border-bottom: 1px solid #e9eaf0; vertical-align: top; overflow-wrap: anywhere; max-width: 270px; }
+.dlReport tbody tr:last-child td { border-bottom: 0; }
+.dlReport td.dlReportEmpty { text-align: center; color: #637087; padding: 25px; }
+.dlReportPagination { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-top: 14px; color: #637087; font-size: 12px; }
+.dlReportPagination > div { display: flex; align-items: center; gap: 12px; }
+.dlReportNotice { padding: 16px; border: 1px solid #e5d9ef; border-radius: 10px; background: #faf7fe; color: #513268; }
+@media (max-width: 600px) { .dlReportFilters label { flex: 1 1 100%; } .dlReportActions { width: 100%; } }

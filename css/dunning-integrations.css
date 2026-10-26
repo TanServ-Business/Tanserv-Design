@@ -1,0 +1,39 @@
+.dnIntegration { margin:24px 0; padding:24px; border:1px solid #e2deea; border-radius:12px; background:#fff; color:#292335; font-size:14px; }
+.dnIntegration h2 {font-size:20px;margin:0 0 7px;font-weight:700;}
+.dnIntegration h3 {font-size:16px;margin:0 0 10px;}
+.dnIntegration p {color:#6d6577;line-height:1.55;margin:8px 0 16px;}
+.dnIntegration header {display:flex;justify-content:space-between;gap:16px;align-items:start;margin-bottom:16px;}
+#dnDocumentSetup > header,#dnInvoiceBook > header {background:#fff;color:#292335;padding:0;}
+.dnIntegration a {color:#582b83;text-decoration:underline;text-underline-offset:3px;}
+.dnIntegration button,.dnIntegration input {font:inherit;}
+.dnIntegration button {border:1px solid #d9cfe5;border-radius:6px;background:#fff;color:#562a7d;padding:8px 12px;cursor:pointer;font-weight:600;}
+.dnIntegration button:hover:not(:disabled) {background:#f5effb;}
+.dnIntegration button:disabled {opacity:.55;cursor:not-allowed;}
+.dnIntegration button.dnPrimary {background:#572a82;color:white;border-color:#572a82;}
+.dnIntegration input {padding:9px;border:1px solid #d7d0e1;border-radius:5px;min-width:0;}
+.dnIntegration label {display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+.dnIntegration form {display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+.dnIntegration .dnScroll {overflow:auto;max-height:430px;}
+.dnIntegration table {width:100%;border-collapse:collapse;font-size:13px;}
+.dnIntegration th {background:#f6f3f9;color:#645c70;text-align:left;white-space:nowrap;}
+.dnIntegration th,.dnIntegration td {padding:12px;border-bottom:1px solid #eee8f4;vertical-align:top;}
+.dnIntegration .dnActions {display:flex;gap:8px;flex-wrap:wrap;}
+.dnIntegration .dnBadge {display:inline-block;background:#f0e9f7;color:#59347b;padding:4px 8px;border-radius:5px;font-size:12px;font-weight:600;}
+.dnIntegration .dnNotice {padding:12px;background:#f7f4fb;border-left:3px solid #70419b;border-radius:4px;}
+.dnIntegration .dnMessage {margin:12px 0;min-height:18px;color:#654087;}
+.dnIntegration details {border-bottom:1px solid #e7e0ed;padding:12px 0;}
+.dnIntegration summary {cursor:pointer;line-height:1.5;font-weight:600;}
+.dnIntegration .dnEmailBody {white-space:pre-wrap;overflow-wrap:anywhere;}
+.dnIntegration small {color:#746780;}
+.dnIntegration .dnInvoiceMeta {display:flex;gap:14px;flex-wrap:wrap;margin:12px 0;}
+#dnInvoiceContext {padding:16px;margin:12px 0;}
+#dnEmailHistory {padding:12px;margin:0 0 15px;border:0;border-bottom:1px solid #e6dded;border-radius:0;}
+#dnEmailHistory h2 {font-size:16px;}
+.dnIntegration button:focus-visible,.dnIntegration input:focus-visible,.dnIntegration summary:focus-visible {outline:3px solid #bda5d6;outline-offset:2px;}
+@media(max-width:700px){.dnIntegration{padding:16px}.dnIntegration header{flex-direction:column}.dnIntegration td,.dnIntegration th{padding:9px}.dnIntegration form label{width:100%}}
+.dnIntegration .dnEmailItem{display:block;width:100%;text-align:left;background:#fff;border:1px solid #e4deeb;border-radius:10px;padding:14px;margin:10px 0;color:#282234;white-space:normal;line-height:1.45}
+.dnIntegration .dnEmailItem strong,.dnIntegration .dnEmailItem small,.dnIntegration .dnEmailItem span{display:block}
+.dnIntegration .dnEmailItem small{margin:6px 0;color:#6d6378}
+.dnIntegration .dnEmailItem.is-selected{border-color:#63368a;background:#f7f1fb;box-shadow:0 0 0 1px #63368a}
+.dnEmailDetail h2{font-size:19px!important;line-height:1.4}.dnEmailDetail h3{margin-top:24px!important}.dnEmailDetail .dnEmailBody{padding:20px 0;border-block:1px solid #eee}
+.dnEmailDetail .dnEmailHtml{display:block;width:100%;height:640px;max-height:75vh;min-height:280px;border:1px solid #e7e0ed;border-radius:8px;background:#fff;margin:18px 0}

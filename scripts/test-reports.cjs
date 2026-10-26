@@ -1,0 +1,23 @@
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const vm=require('node:vm');
+const core=require('./reports-core.js');
+const sandbox={window:{}};vm.runInNewContext(fs.readFileSync(__dirname+'/reports-data.js','utf8'),sandbox);
+const reports=JSON.parse(JSON.stringify(sandbox.window.IneburaReportsData));
+assert.equal(reports.length,19);
+assert.ok(!reports.some(report => /dunning/i.test(report.id)), 'Dunning belongs to Module Configuration');
+assert.equal(reports.find(r=>r.name==='ODM Report').headers.length,83);
+assert.equal(reports.find(r=>r.name==='Issue Tracker Report').headers.length,46);
+for(const r of reports){assert(r.headers.every(Boolean));assert(r.rows.every(row=>row.length===r.headers.length));}
+const rows=[['001','₹2,000',''],['002','₹0','x'],['003','—','x'],['004','₹150','x']];
+assert.deepEqual(core.filterRows(rows,{2:'x'}).map(r=>r[0]),['002','003','004']);
+assert.deepEqual(core.sortRows(rows,1,1).map(r=>r[0]),['002','004','001','003']);
+assert.deepEqual(core.sortRows(rows,1,-1).map(r=>r[0]),['001','004','002','003']);
+const activity={name:'Activity Report Full',parameter:'date',headers:['Activity Created Date'],rows:[['31-08-2026'],['01-09-2026'],['30-09-2026'],['01-10-2026'],['—']]};
+assert.deepEqual(core.parameterRows(activity,{start:new Date(2026,8,1),end:new Date(2026,8,30)}),[['01-09-2026'],['30-09-2026']]);
+assert.equal(core.date('31-02-2026'),null);
+assert.equal(core.numeric('—'),null);assert.equal(core.numeric('₹0'),0);
+const csv=core.csv(['Code','Text'],[['001','=1+1'],['002','a,"b"\nline']]);
+assert(csv.includes('"001"'));assert(csv.includes('"\'=1+1"'));assert(csv.includes('"a,""b""\nline"'));
+assert(core.csv(['Amount','Missing'],[['₹1,000','—']]).includes('"1000",""'));
+console.log('Reports checks passed: 19 preserved layouts, no Dunning entry, row widths, filters, numeric sorts, inclusive date boundaries, missing/zero values and CSV fidelity.');

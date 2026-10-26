@@ -1,0 +1,10 @@
+.rgMisScope{margin:0 0 18px;padding:16px 20px;background:#fff;border:1px solid #e5d9ef;border-radius:12px;color:#334155;font:13px Arial,Helvetica,sans-serif}
+.rgMisScope[hidden],body[data-report-page] .rgResourcesDialog[hidden]{display:none!important}
+.rgMisScopeHeader{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:8px}
+.rgMisScopeHeader strong{font-size:14px;color:#40205e}
+.rgMisScopeRole{border-radius:20px;background:#f2eaf8;color:#5c258d;padding:4px 9px;font-size:11px}
+.rgMisScope p{margin:5px 0 0;line-height:1.5}
+.rgMisScopeNote{color:#64748b;font-size:12px}
+.rgMisScopeDenied{border-color:#f1c8be;background:#fff9f6}
+.rgMisScopeDenied strong{color:#8a3520}
+@media(max-width:640px){.rgMisScope{padding:14px 16px}.rgMisScopeHeader{align-items:flex-start;flex-direction:column;gap:6px}}

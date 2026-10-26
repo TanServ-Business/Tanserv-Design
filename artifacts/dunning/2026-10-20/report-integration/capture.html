@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Inebura Reports</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../../../../assets/reports/reference/icons.css">
+  <link rel="stylesheet" href="../../../../css/styles.css">
+  <link rel="stylesheet" href="../../../../css/reports-reference.css">
+  <link rel="stylesheet" href="../../../../css/reports.css">
+</head>
+<body data-root-path="../../../../" data-relationship-name="Xeon" data-relationship-logo-src="assets/reports/reference/xeon-logo.jpg" data-report-page="true">
+  <div data-shared-header></div>
+  <main class="rgPage" id="reportsApp">
+    <section class="rgTopBar" aria-label="Report generation">
+      <div class="rgTopBarLeft">
+        <h1 class="rgTopBarTitle">Report Generation</h1>
+        <p class="rgTopBarSub">Select a report, fill in parameters, and generate the results inline.</p>
+      </div>
+      <div class="rgTopBarRight">
+        <div class="rgDropdownWrap rgDropInline" id="reportSelector">
+          <div class="rgDropdownTrigger" id="reportTrigger" role="combobox" tabindex="0" aria-label="Report" aria-expanded="false" aria-controls="reportOptions"></div>
+          <ul class="dropdown-menu" id="reportOptions" aria-label="Reports" hidden></ul>
+        </div>
+        <div class="rgParamsInline" id="reportParameters"></div>
+        <div class="rgActionsInline" id="reportActions"></div>
+      </div>
+    </section>
+    <div id="reportResults" aria-live="polite"></div>
+    <footer class="rgResources">
+      <span>Reference sample data</span>
+      <button type="button" id="reportResources"><i class="bi bi-paperclip" aria-hidden="true"></i> Excel templates &amp; sample data</button>
+    </footer>
+  </main>
+  <dialog class="rgResourcesDialog" id="resourcesDialog" aria-labelledby="resourcesTitle">
+    <header><div><h2 id="resourcesTitle">Excel templates and sample data</h2><p>Report column layouts and captured sample rows.</p></div><button type="button" id="closeResources" aria-label="Close attachments"><i class="bi bi-x-lg"></i></button></header>
+    <p class="rgResourceNote">Templates contain the report headers. Samples contain up to 30 captured rows. Reference bundles preserve the captured source layouts. Dunning Letters uses issued history and the updated ten-column template below.</p>
+    <div class="rgBundleLinks"><a href="../../../../outputs/reports-module-01a10b0c/Reports Excel Layout Templates.xlsx" download>All Excel templates</a><a href="../../../../outputs/reports-module-01a10b0c/Reports Sample Data.xlsx" download>All sample data</a><a href="../../../../assets/reports/downloads/reports-templates-and-samples.zip" download>Download complete ZIP</a></div>
+    <div class="rgResourceTableWrap"><table><thead><tr><th>Report</th><th>Columns</th><th>Sample rows</th><th>Attachments</th></tr></thead><tbody id="resourcesList"></tbody></table></div>
+  </dialog>
+  <div class="rgToast" id="reportToast" role="status" hidden></div>
+  <script src="../../../../scripts/shared-header.js"></script>
+  <script src="../../../../scripts/vendor/xlsx.full.min.js"></script>
+  <script src="../../../../scripts/reports-data.js"></script>
+  <script src="../../../../scripts/reports-core.js"></script>
+  <script src="../../../../scripts/dunning-core.js"></script>
+  <script src="../../../../scripts/dunning-report-data.js"></script>
+  <script src="../../../../scripts/reports-dunning.js"></script>
+  <script src="../../../../scripts/reports.js"></script>
+<aside style="padding:16px;background:#eef3ff"><h2>QA export capture (test artifact only)</h2><button id="qaDeny">Change context to blocked role</button><button id="qaAdmin">Restore admin context</button><button id="qaZero">Use empty client scope</button><pre id="qaOut"></pre><a id="qaExport" download="dunning-letters.xlsx">Captured XLSX bytes</a></aside><script>
+const realContext=IneburaDunning.getContext;let override=null;
+IneburaDunning.getContext=()=>override||realContext();
+document.getElementById('qaDeny').onclick=()=>{override={role:'backend',clientId:'demo-client',userId:'demo-user'};document.getElementById('qaOut').textContent='Blocked context selected';};
+document.getElementById('qaAdmin').onclick=()=>{override={role:'client-admin',clientId:'demo-client',userId:'demo-user'};document.getElementById('qaOut').textContent='Admin context selected';};
+document.getElementById('qaZero').onclick=()=>{override={role:'client-admin',clientId:'empty-test-client',userId:'demo-user'};document.getElementById('qaOut').textContent='Empty client scope selected';};
+XLSX.writeFile=(book,name)=>{const bytes=XLSX.write(book,{type:'base64',bookType:'xlsx'});const sheet=book.Sheets[book.SheetNames[0]];const rows=XLSX.utils.sheet_to_json(sheet,{header:1,defval:''});document.getElementById('qaExport').href='data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,'+bytes;document.getElementById('qaOut').textContent=JSON.stringify({name,headers:rows[0],rows:rows.length-1,stages:[...new Set(rows.slice(1).map(r=>r[6]))],customers:[...new Set(rows.slice(1).map(r=>r[2]))]},null,2);};
+</script></body>
+</html>

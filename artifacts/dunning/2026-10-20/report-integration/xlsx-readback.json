@@ -1,0 +1,53 @@
+{
+  "full": {
+    "rows": 101,
+    "headers": [
+      "Client Code",
+      "Customer code",
+      "customer name",
+      "invoice number",
+      "invoice amount",
+      "invoice due date",
+      "Dunning letter",
+      "Dunning letter reference no",
+      "Dunning letter issue date",
+      "recipients (comma separated)"
+    ],
+    "amountType": "n",
+    "issueDateFormat": "yyyy-mm-dd"
+  },
+  "filtered": {
+    "rows": 4,
+    "headers": [
+      "Client Code",
+      "Customer code",
+      "customer name",
+      "invoice number",
+      "invoice amount",
+      "invoice due date",
+      "Dunning letter",
+      "Dunning letter reference no",
+      "Dunning letter issue date",
+      "recipients (comma separated)"
+    ],
+    "amountType": "n",
+    "issueDateFormat": "yyyy-mm-dd"
+  },
+  "issue-date": {
+    "rows": 23,
+    "headers": [
+      "Client Code",
+      "Customer code",
+      "customer name",
+      "invoice number",
+      "invoice amount",
+      "invoice due date",
+      "Dunning letter",
+      "Dunning letter reference no",
+      "Dunning letter issue date",
+      "recipients (comma separated)"
+    ],
+    "amountType": "n",
+    "issueDateFormat": "yyyy-mm-dd"
+  }
+}

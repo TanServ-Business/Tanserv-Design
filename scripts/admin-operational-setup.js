@@ -12,6 +12,7 @@
     "notification-manager",
   ]);
   if (!operationalModules.has(moduleId)) return;
+  if (moduleId === "user-setup" && window.IneburaMisAdmin?.handles) return;
 
   const mount = document.getElementById("adminPageContent");
   const modal = document.getElementById("adminModal");
@@ -257,7 +258,7 @@
         </div>
       </div></section>
       ${hierarchyColumn("Support Roles", "is-green", [
-        { role: "MIS", name: "MIS User" }, { role: "BACKEND", name: "Backend User" },
+        { role: "MIS MANAGER", name: "MIS Manager" }, { role: "MIS", name: "MIS User · Reports to one MIS Manager" }, { role: "BACKEND", name: "Backend User" },
         { role: "PDC OPS", name: "PDC Ops" }, { role: "PDC AGENT", name: "PDC Agent" },
       ])}
       ${hierarchyColumn("View Roles", "is-cyan", [
@@ -379,7 +380,7 @@
   const input = (label, name, type = "text", required = false, placeholder = "", value = "") => `<label><span>${escapeHtml(label)}${required ? " *" : ""}</span><input name="${escapeHtml(name)}" type="${escapeHtml(type)}" ${required ? "required" : ""} placeholder="${escapeHtml(placeholder)}" value="${escapeHtml(value)}" /></label>`;
   const userRoleOptions = {
     Admin: ["ADMIN"],
-    "Support Role": ["MIS", "BACKEND", "PDC OPS", "PDC AGENT"],
+    "Support Role": ["MIS", "MIS MANAGER", "BACKEND", "PDC OPS", "PDC AGENT"],
     "Customer Role": ["CUSTOMER"],
     "View Role": ["CLIENT HO", "CLIENT CONTROLLER", "KAS", "KAM", "ACTION OWNER"],
     "Operational Role": ["SUPERVISOR", "MANAGER", "AGENTCUMMANAGER", "AGENT", "TELECALLER"],
@@ -708,7 +709,7 @@
     const submit = document.getElementById("opRoleSubmit");
     if (!type || !role || !display || !submit) return;
     const roleOptions = {
-      Admin: ["ADMIN"], "Support Role": ["MIS", "BACKEND", "PDC OPS", "PDC AGENT"],
+      Admin: ["ADMIN"], "Support Role": ["MIS", "MIS MANAGER", "BACKEND", "PDC OPS", "PDC AGENT"],
       "Customer Role": ["CUSTOMER"], "View Role": ["CLIENT HO", "CLIENT CONTROLLER", "KAS", "KAM", "ACTION OWNER"],
       "Operational Role": ["SUPERVISOR", "MANAGER", "AGENT", "TELECALLER", "AGENTCUMMANAGER"],
     };

@@ -1,0 +1,387 @@
+Decision record for Inebura, updated 20 October 2026. Dunning Letters uses the existing Strategy Master, Template Master, invoice workspace and Email section. The approval flow is deferred. Strategy Master must keep its existing layout, fields and buttons: Dunning is configured through its existing template blocks and dropdown behaviour. Confirmed decisions, superseded proposals and questions pending team confirmation are distinguished below.
+
+# Roles and client scope
+
+**Confirmed:** Only Client Admin and Supervisor can create, edit, activate, pause, resume and stop Dunning Letter strategies, within the applicable client scope. Different strategies and timelines may be configured for different sub-clients. This does not grant cross-client access.
+
+**Confirmed:** Agent and Client Admin can manually exclude an otherwise eligible invoice; Supervisor exclusion permission was not included in this decision. Exclusions remain until an authorised user removes them. **Deferred:** Agent invoice-inclusion requests, their approval flow and an approval-queue page are excluded for now. Invoices enter automatically through daily strategy eligibility. **Confirmed:** When an invoice matches more than one active strategy, flag the conflict and require one strategy to be selected before sending.
+
+# End to end flow and confirmed decisions
+
+## 1 Enable Dunning Letters during onboarding
+
+In Module Configuration > Configuration, the client selects Yes or No for Dunning Letters. This area contains only the opt-in setting, not letter-template editing or a separate template tab.
+
+Selecting Yes creates three default document types: Dunning Letter 1, Dunning Letter 2 and Dunning Letter 3. Three is the product default, not a mandatory industry-wide limit. A client needing another stage can add a document type such as Dunning Letter 4.
+
+## 2 Configure email content and letter templates
+
+Email Setup > Template Master holds both the email content and its associated editable Word letter templates. Clients can customize the wording and language. The client supplies the initial Word template, identifies which data belongs in each location, and specifies calculation rules.
+
+Support both Word document upload and in-application letter editing. Client Admin and Supervisor configure data fields and calculation rules in Template Master. Each letter stage uses its selected email content and associated letter template. Customer output is one PDF containing the letter and its invoice annexure. The supported field catalogue, calculation validation and Word-formatting fidelity still require technical review.
+
+## 3 Set up the existing Strategy Master
+
+Use the existing Strategy Master page and its Create Strategy and Edit actions. Preserve its existing layout, fields, buttons and sections; only adjust dropdown behaviour for Dunning. Select each Dunning Letter separately in the existing Template dropdown. Use the existing Add Template button for later letters and the existing Reminder Steps fields for timing. Do not add a separate Dunning page, workspace, strategy-type field, filter or batch panel.
+
+Dunning uses Post Due and Custom notification behaviour. Letter 1 is scheduled a configured number of days after each invoice due date. Each later letter uses its configured interval after the preceding letter for that daily batch. The existing attachment selection represents one PDF containing the letter and annexure. Three stages are the default; continue through DL4 and further configured stages when unpaid eligible balances remain. Existing target, key-account, invoice-status and aging selections remain in their existing places.
+
+## 4 Determine invoice inclusion through daily eligibility
+
+Invoices enter Dunning Letters automatically through the daily strategy eligibility rules only. The system evaluates each invoice against its own due date, configured duration, scope and filters. The earlier Agent-proposal and approval-queue proposal is superseded for the current scope.
+
+Agent and Client Admin may manually exclude an eligible invoice. A manual exclusion persists until an authorised user removes it. The stage at which a reinstated invoice should restart remains pending team confirmation; restarting at Letter 1 in a new daily batch is a proposal, not a confirmed rule.
+
+## 5 Consolidate invoices for each customer
+
+On each daily run, consolidate the newly eligible invoices for the same customer into one new batch and one Letter 1. For example, ten invoices qualifying on 20 October form that day's batch; five newly qualifying on 21 October form another. Each batch progresses independently through its own letter schedule. The annexure lists the invoices, amounts due and due dates and may continue over multiple pages in the same PDF.
+
+Newly eligible invoices start their own daily batch; they do not join a previous batch at Letter 2 or Letter 3. If Letter 1 for a new batch and Letter 2 for an earlier batch fall due for the same customer on the same day, send separate emails with their respective stage-specific letters. Fully paid invoices are automatically excluded. Partially paid invoices remain with the outstanding balance. If all invoices in a sequence are paid, pause it for possible future overdue invoices and do not send an empty letter. There is currently no invoice dispute workflow to add to this design.
+
+## 6 Generate and send the stage
+
+Generate the customer-specific letter from the selected Word template and current eligible invoice data, then send it with the configured email content through Strategy Master's existing email flow. Add all customer contacts present in the platform to the To field from the first email onward. For example, if the customer has five contacts, all five are recipients of Letter 1.
+
+Later letters reference the previous letter. Send one PDF containing both the letter and annexure. Retain the exact issued PDF so later balance or template changes cannot alter the document available in Email history. Detailed reference formatting and retention duration remain technical/business items for team review.
+
+## 7 Evaluate success and preserve the schedule
+
+A stage is successful when sending succeeds for at least one customer contact. Partial success allows progression on the configured schedule. Do not retry the failed contacts after another contact has succeeded. The production technical success event, such as provider acceptance versus confirmed delivery, and later bounce handling remain to be defined.
+
+## 8 Retry complete failures before progressing
+
+If every recipient fails, retry that stage on the next daily run. Block the batch's later stage until the prerequisite letter succeeds for at least one recipient. Other batches retain their independent schedules.
+
+Complete failure shifts that batch's remaining dates by the sending delay. Example: Letter 1 due on 20 October succeeds on 22 October; Letter 2 originally due on 27 October moves to 29 October. Partial-recipient failure does not cause this shift. The retry cap and permanent-failure cutoff remain pending team confirmation.
+
+## 9 Continue through the configured stages
+
+Repeat generation, sending and success evaluation for the unpaid eligible members of each batch through every configured stage. Evaluate later stages independently of new daily batches and remove fully paid or manually excluded invoices before the next letter.
+
+**Confirmed:** After the final configured letter, Dunning Letters triggers no additional collection activity, escalation or unpaid-balance tracking. With the default three-stage strategy, this is after Letter 3. If Letter 4 or later stages have been configured, send those stages before applying this final-stage rule. Unpaid debt is then handled through a separate process.
+
+## 10 See sent emails in the existing Email section
+
+Once an email is sent, it appears in the platform's existing Email section. This is the confirmed post-send visibility for Dunning Letter emails as well. It does not by itself establish the delivery-success event used for progression.
+
+**Confirmed:** The existing Email section must retain the exact issued PDF, including its letter, invoice annexure and amounts, for later viewing/download. Historical documents are not regenerated using current balances or revised templates. The new invoice-level report uses issued-letter details. Retention duration and the full production audit/access design remain open.
+
+# Questionnaire with answers from the discussion
+
+**1. Is this a standalone Dunning Letter page, feature or module?**
+
+**Confirmed:** Dunning sending and configuration belong within the existing Strategy Master flow. Use existing Template Master, document types, invoice screens and Email history. No separate Dunning page or operational approval queue is included. The later constraint is explicit: preserve Strategy Master's fields, buttons and layout and adjust its dropdown behaviour only.
+
+**2. Where does the client enable the feature, and where are templates edited?**
+
+Module Configuration > Configuration contains only a Yes or No Dunning Letters option, normally configured during onboarding. Email Setup > Template Master contains and allows editing of both email content and associated Word letter templates. This final location supersedes the earlier tentative idea of a separate template page.
+
+**3. How many letters are supported?**
+
+Opt-in creates Letter 1, Letter 2 and Letter 3 by default. Clients can add another document type, such as Letter 4, with the corresponding email content and document. Three is the chosen default, not a universal industry rule.
+
+**4. Who supplies the letter wording, fields and calculations?**
+
+The client supplies the Word letter and specifies wording, data placement and calculation rules. Support upload and in-application editing. Client Admin and Supervisor configure the data fields and calculation rules in Template Master. The supported formula/merge-field catalogue and validation details remain implementation items for team review.
+
+**5. Are letters sent per invoice or per customer?**
+
+Per customer and daily eligibility batch. Newly eligible invoices are consolidated into that day's Letter 1 and annexure. Each day's batch progresses separately. A customer may receive separate stage-specific emails when multiple batches have letters due on the same day.
+
+**6. Are intervals relative to a previous letter or absolute dates?**
+
+Letter 1 uses each invoice's due date plus the configured Post Due duration. Later letters follow that batch's configured intervals. Complete failure shifts the remaining dates by the delay: a 20 October Letter 1 succeeding on 22 October moves a 27 October Letter 2 to 29 October. Partial-recipient failure does not shift the schedule.
+
+**7. What stops or pauses the sequence after full payment, partial payment or an invoice dispute?**
+
+Fully paid invoices are automatically excluded; partially paid invoices remain with their outstanding amount. When the sequence has no unpaid eligible invoices, pause it and send no empty letter. There is no invoice dispute workflow currently, so no dispute-specific behaviour is included.
+
+**8. If another invoice becomes overdue between Letter 1 and Letter 2, should it join Letter 2?**
+
+The earlier Yes is superseded by the daily-batch clarification. Newly eligible invoices form a fresh Letter 1 batch for that customer on that day; they do not enter an older batch at Letter 2.
+
+**9. Who receives the letters, and do recipients change between stages?**
+
+All customer contacts present in the platform are included in To from the first email onward. A separate stage-based escalation contact rule was not requested.
+
+**10. What happens when sending fails or bounces?**
+
+If every recipient fails, retry the stage on the next daily run and block its later stage until at least one recipient succeeds. Shift that batch's remaining dates by the delay. Retry cap, permanent failures, the production success event and later bounces still need confirmation.
+
+**11. If four contacts succeed and the fifth fails, does that block the next letter?**
+
+No. Any successful recipient completes the stage. Failed contacts are not retried after partial success; the batch can progress on its schedule.
+
+**12. Does Letter 2's interval start from Letter 1's actual successful-send time, including a retry delay?**
+
+Keep the configured batch schedule unless complete failure delays sending. The agreed exception is to shift the batch's remaining dates by that delay. The explicit example is Letter 1 due 20 October, successful 22 October, with Letter 2 moving from 27 to 29 October.
+
+**13. Does complete failure mean the previous letter failed for every contact?**
+
+Yes. All recipients failing is the confirmed complete-failure condition.
+
+**14. Which roles can create Dunning Letter strategies?**
+
+Client Admin and Supervisor only. This later decision also covers edit, activate, pause, resume and stop.
+
+**15. Can different strategies be configured for different sub-clients?**
+
+Yes. Different sub-clients can have different strategies and timelines. When an invoice qualifies for multiple active strategies, flag the conflict and require one strategy to be selected before sending. Do not choose an automatic precedence rule.
+
+**16. Can a Manager, Agent-cum-Manager or Agent create a Dunning Letter strategy?**
+
+No additional strategy-management rights are granted. The later decision restricts create, edit, activate, pause, resume and stop to Client Admin and Supervisor only.
+
+**17. Can a Manager, Agent-cum-Manager or Agent edit a Dunning Letter strategy?**
+
+The later decision restricts editing and the other strategy-management actions to Client Admin and Supervisor only. Agent and Client Admin invoice-exclusion permission is a separate decision.
+
+**18. Can an Agent exclude an invoice from a Dunning Letter strategy?**
+
+Yes. Agent and Client Admin can exclude an otherwise eligible invoice, without adding the deferred approval flow. The exclusion persists until an authorised user removes it. Restart behaviour after removal remains pending team confirmation.
+
+**19. What happens when an Agent applies the existing Issue Dunning Letter activity sub-status to an invoice?**
+
+The proposed manual inclusion/approval route is deferred. Applying an activity sub-status must not bypass daily strategy eligibility or trigger an immediate Dunning letter in the current scope.
+
+**20. Who approves an Agent's invoice-inclusion proposal: Supervisor, Client Admin or both?**
+
+Superseded for the current scope. The user corrected the earlier response and said to skip the approval flow. No invoice-inclusion approval route or approval queue should be implemented now.
+
+**21. What happens if an invoice-inclusion proposal remains unapproved for several days?**
+
+Not applicable to the current scope because approval requests and the queue are deferred. No pending-approval ageing, notification or escalation rules are required now.
+
+**22. Once a Dunning Letter email has been sent, where does it appear?**
+
+CONFIRMED: Any sent email appears in the existing Email section, including these Dunning Letter emails.
+
+**23. Is the sent letter and annexure stored immutably, and linked to invoice/customer history?**
+
+Yes. Retain the exact issued PDF, including the letter, annexure and amounts, for later viewing/download from Email history. The report records invoice-to-issued-letter details. Retention duration and detailed production audit fields remain open.
+
+**24. What happens if Letter 3 has been sent but the amount remains unpaid?**
+
+No extra collection activity, escalation or unpaid-balance tracking is triggered after the final configured stage. The default ends at Letter 3; a client with DL4 or further stages continues through those stages while eligible amounts remain unpaid.
+
+**25. If all invoices in a sequence are paid before the next letter, what happens?**
+
+Pause the sequence for possible future overdue invoices. Fully paid invoices are automatically excluded and no empty letter is sent.
+
+**26. How is a partially paid invoice handled?**
+
+Include it with the remaining outstanding amount.
+
+**27. Should a disputed invoice remain in the annexure?**
+
+There is no invoice dispute mechanism currently. Do not introduce a dispute workflow into this scope.
+
+**28. Which due date anchors Letter 1 when a customer has different invoice due dates?**
+
+Evaluate each invoice daily against its own due date and the duration in the strategy. Ten invoices qualifying on 20 October form that day's batch; five qualifying on 21 October form a separate batch.
+
+**29. Does each daily batch follow its own schedule?**
+
+Yes. With a seven-day interval, the 20 October batch reaches Letter 2 on 27 October and the 21 October batch on 28 October.
+
+**30. What if the same customer is due different letter stages on one day?**
+
+Send separate emails, each with its own stage-specific letter and batch annexure.
+
+**31. Should fully paid invoices remain in a paused batch or later letter?**
+
+No. Completely paid invoices are automatically excluded from Dunning letters. New eligibility continues to use the daily-batch rules.
+
+**32. How can clients update a Word template?**
+
+Support both upload and in-application editing in Template Master.
+
+**33. Which outgoing document format should customers receive?**
+
+One PDF containing the letter and invoice annexure.
+
+**34. Should there be a dedicated Dunning page for tracking or approvals?**
+
+No. Use existing Strategy Master and the existing Email section. The later design constraint also prohibits new fields, buttons, filters, sections or layout changes in Strategy Master; adjust dropdown behaviour only.
+
+**35. How do invoices enter Dunning with approvals deferred?**
+
+Automatically through the daily strategy eligibility rules only.
+
+**36. If DL4 or further stages are configured, should the sequence continue?**
+
+Yes. Continue through all configured stages while eligible unpaid amounts remain.
+
+**37. When should a stage that failed for every recipient be retried?**
+
+On the next daily run. Later stages for that batch remain blocked until it succeeds for at least one recipient.
+
+**38. How should a delayed successful retry change later dates?**
+
+Shift that batch's remaining dates by the delay. Letter 1 due 20 October but successful 22 October moves Letter 2 from 27 October to 29 October.
+
+**39. Should daily retries stop after a defined limit?**
+
+Pending team confirmation. No numeric cap has been agreed.
+
+**40. Should failed contacts be retried after another contact succeeded?**
+
+No. Treat the stage as complete once any contact succeeds.
+
+**41. Who may create, edit, activate, pause, resume and stop Dunning strategies?**
+
+Client Admin and Supervisor only.
+
+**42. What if an invoice matches multiple active strategies?**
+
+Flag the conflict and require one strategy to be selected before sending.
+
+**43. Do changes to strategy timing or selected templates apply to existing batches?**
+
+Yes. Apply changes to all unsent stages of existing batches too. Issued content remains unchanged.
+
+**44. Should Email history retain the exact sent PDF?**
+
+Yes. Retain the exact PDF including letter, annexure and amounts for later viewing/download even after templates or balances change.
+
+**45. Who configures template data fields and calculation rules?**
+
+Client Admin and Supervisor in Template Master.
+
+**46. Who can manually exclude an otherwise eligible invoice?**
+
+Agent and Client Admin. This is separate from strategy-management permission.
+
+**47. How long does a manual exclusion last?**
+
+Until an authorised user removes it.
+
+**48. After an invoice excluded after Letter 1 is reinstated, which stage should it enter?**
+
+Pending team confirmation. Restarting at Letter 1 in a new daily batch was proposed and then explicitly moved to team confirmation.
+
+**49. How should invoices with different currencies be handled?**
+
+The user stated that Inebura does not have separate currency handling. Do not add multi-currency grouping or controls in this feature.
+
+**50. What if a strategy is resumed after a scheduled date passed during pause?**
+
+Leave pause/resume scheduling pending team confirmation. Do not invent a catch-up rule.
+
+**51. Which invoice-level Dunning report is required?**
+
+Include the exact ten columns listed below. Capture invoice details for the letters issued, including DL1, DL2, DL3 and further configured stages.
+
+**52. Where should the report be implemented and where should its handoff be kept?**
+
+The separate Reports Module chat owns the report selector, results and XLSX download. Keep the integration handoff in this chat; do not message the other chat.
+
+**53. Which Strategy Master design may be used?**
+
+Use the existing pages/strategy-master.html module. Its fields, buttons and layout must remain; only adjust dropdown behaviour.
+
+**54. Should each letter use a separate existing template block?**
+
+Yes. Select DL1, DL2, DL3 and further letters separately in the existing Template dropdown using the existing Add Template button. Configure timing in the existing Reminder Steps fields.
+
+# Invoice level Dunning report
+
+The required report contains the following headings in this exact order:
+
+1. Client Code
+
+2. Customer code
+
+3. customer name
+
+4. invoice number
+
+5. invoice amount
+
+6. invoice due date
+
+7. Dunning letter
+
+8. Dunning letter reference no
+
+9. Dunning letter issue date
+
+10. recipients (comma separated)
+
+Dunning letter values identify the issued stage as DL1, DL2, DL3 and so on. The report belongs in the Reports Module being built separately. Its integration handoff stays in this chat. The current data adapter projects one row per invoice per issued letter, includes successful and partially successful issues, and excludes wholly failed attempts. Original invoice amount and original To-recipient semantics are current design interpretations for team validation; they were not separate user-approved answers.
+
+# Pending team confirmation and technical questions
+
+The three business decisions below were explicitly left pending. The other items are unresolved details carried forward from the original discussion; they must not be treated as approved requirements.
+
+## Explicit business decisions pending
+
+1. **Retry cap:** What limit should stop repeated complete-failure retries? Daily retries are agreed; a numeric cap and permanent-failure policy are not.
+
+2. **Pause and resume scheduling:** If a strategy is paused and a letter's scheduled date passes, how should dates be handled when it resumes? The user left this for team confirmation.
+
+3. **Invoice reinstatement:** If an invoice is excluded after Letter 1 and its exclusion is removed, which stage should it enter? Restart at Letter 1 in a new daily batch is proposed and explicitly marked for team confirmation.
+
+## Scheduling and invoice data details
+
+- Confirm daily run time, timezone, cutoff, grace-period and non-working-day rules. Eligibility is evaluated daily using each invoice's due date; these operational settings were not agreed.
+
+## Balances and exceptions
+
+- Full and partial payments are resolved above. There is no current dispute workflow. Confirm the treatment of credit notes, adjustments, cancellations and write-offs and how those source changes update eligible balances.
+
+- Confirm the production data-refresh point immediately before generation, sending and retries. Letters must use the remaining outstanding balance; the issued PDF must remain immutable.
+
+- With no unpaid eligible invoices, do not send an empty letter and pause the sequence. Clarify recovery when invoices become eligible again and how new daily batches interact with a previously paused/paid sequence.
+
+## Delivery and failure details
+
+- Define the production event that counts as success and the treatment of a bounce received after an earlier success.
+
+- Daily retry cadence and the failure-driven date shift are agreed. The retry cap, permanent-failure recovery and who acts on it remain pending.
+
+- Confirm operational recovery and notification when customer contacts are missing or every address is invalid. Do not mark an unsent letter successful.
+
+- Partial success is resolved: no retries for failed contacts once any contact succeeds.
+
+- Confirm production idempotency and duplicate prevention during concurrent daily runs, retries and strategy edits. Overlapping eligibility must be flagged until one strategy is selected.
+
+## Template and document details
+
+- Client Admin and Supervisor configure mappings and calculations. Confirm the supported merge-field/calculation catalogue and how invalid mappings or formulas are rejected.
+
+- Both upload and in-application editing are agreed. Changed strategy timing or selected templates apply to all unsent stages of existing batches; exact issued PDFs remain unchanged. Confirm template versioning and Word-formatting fidelity.
+
+- Confirm annexure column formatting, page breaks, totals and long-list layout. Output is one combined PDF containing the letter and annexure, with additional pages as needed.
+
+- One PDF is confirmed. Do not substitute outgoing Word attachments or separate letter/annexure files.
+
+- Later letters reference the preceding letter. Confirm the final reference number format and precisely which prior-letter details must appear in the letter wording.
+
+## Permissions visibility and reporting details
+
+- Strategy create/edit/activate/pause/resume/stop is limited to Client Admin and Supervisor. Agent and Client Admin can exclude invoices. Confirm any remaining role/scope matrix for module enablement, document types and historical access without inferring cross-client permission.
+
+- Preserve client/sub-client boundaries. Flag overlap and require one matching strategy to be selected. Confirm how that conflict is communicated and resolved using the existing design controls.
+
+- Strategy timing and selected-template edits apply to unsent stages of existing batches. Confirm production handling of already queued dispatch when the feature is switched off.
+
+- Exact sent-PDF retention is confirmed. Confirm retention duration, full audit metadata and production access controls. Approval history is outside the current scope.
+
+- The separate Reports Module work owns report selection, results and XLSX download. The Dunning report handoff remains in this chat; no message to the other chat was authorised. Validate the current report-data interpretations: one row per invoice per issued letter, original invoice amount, and all original To recipients including contacts whose delivery partially failed.
+
+# Prototype test status 20 October 2026
+
+The current local Tanserv design was tested from feature enablement and document/template setup through the existing Strategy Master form, simulated daily processing, Email history and report-data generation. All nine automated suites and fourteen browser-driven engine scenario assertions passed. Additional browser checks covered Word import, invalid mappings, save/reload, role restrictions, persistent invoice exclusion, feature disablement and historical access.
+
+Two issues were corrected during testing: newly generated later-letter PDFs now retain the preceding-letter reference even when custom wording omits its placeholder, and the Dunning Document Setup and invoice-participation headers no longer inherit a low-contrast background. Previously issued PDF bytes remain unchanged.
+
+The requested ten-column invoice-level report data passes its tests, but the separate Reports screen still exposes an older nine-column Dunning Letter Tracker with sample/empty results. Its selector, live results and XLSX connection to the new dataset remain an integration gap. The handoff stays in this chat.
+
+A separate language-fidelity probe passed French/Latin accents but failed Hindi: the generated PDF contains incorrect glyphs instead of the expected Hindi text. Non-Latin PDF font/shaping support remains an implementation gap and must be resolved before claiming multilingual letter support.
+
+The local prototype has simulated sending and no production background scheduler. The in-app browser did not provide a native download completion receipt; generated/retained PDF bytes and their page/text content were independently verified. Production email delivery and the operating-system save-file flow are not certified by this test.
+
+# Team review and next step
+
+Review the three explicitly pending business decisions, then resolve the remaining production details above. The Tanserv local prototype uses browser-persisted sample state and simulated sending; it is not evidence of a deployed backend, an automatic background scheduler or real email delivery. The existing Strategy Master layout constraint remains binding during fixes and testing.

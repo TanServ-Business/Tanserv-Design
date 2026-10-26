@@ -886,3 +886,193 @@ No actionable P0, P1, or P2 findings remain.
 - Word catalog: 57 rendered pages reviewed, with all 110 bodies and all stored notification messages verified against the final document (`document-verification.json`).
 
 final result: passed
+
+
+# Reports module reference QA 19 October 2026
+
+## Findings and final comparison
+
+No actionable P0, P1 or P2 findings remain in the implemented report flow.
+
+Source visual truth: `artifacts/reports-module/2026-10-19/source/achievement-desktop.png` and `source/mobile-cdp.png`.
+Implementation: `artifacts/reports-module/2026-10-19/implementation/achievement-desktop-final.png` and `implementation/visit-plan-mobile-v2.png`.
+Full-view comparisons: `desktop-final-comparison.png` and `mobile-comparison-final.png` in the same artifact folder.
+Focused comparisons: `toolbar-final-comparison.png` and `table-final-comparison.png`.
+
+Desktop viewport and both raster sizes: 1066 × 1110 CSS px / pixels, density 1. State: Achievement Details, September and October 2026 selected, four September rows displayed. Mobile viewport and final comparison raster sizes: 390 × 844 CSS px / pixels, density 1. State: Visit Plan, all dates, first report page. Earlier browser screenshots that scaled a background viewport are superseded by the native CDP mobile capture and are not final comparison evidence.
+
+## Comparison history
+
+1. Initial implementation had a month-value overlap with Generate at 1280 px. Fixed parameter flex sizing, badge limits and action wrapping. Post-fix desktop screenshot confirms all controls are separate; source and design top bars both measure 120 px high at the matched viewport.
+2. Local header branding occupied excess vertical space. Matched the source's 66 px header, used the captured source logo and corrected logo-container padding. Shared local profile and notification state remain part of the existing shell.
+3. Initial local mobile header overflowed to 407 px. Reduced only the report-page header spacing and logo sizing. Retest measured the document at exactly 390 px with all right-hand controls visible. The report toolbar deliberately wraps on mobile; the source clipped the subtitle and Clear control. Wide tables retain horizontal scrolling.
+4. Export comparison found formatted currency and missing-value markers in CSV. Normalised currency values to raw numbers and missing values to empty fields; preserved zero and identifiers. Added a regression assertion against these cases.
+
+## Required fidelity surfaces
+
+- Fonts and typography: report content uses the source Arial/Helvetica 12 px table text, 18 px bold title, 12 px subtitle, and matching control hierarchy. Header-case rendering and uppercase period badges match the reference without changing canonical output headers.
+- Spacing and layout rhythm: matched 28 px desktop side padding, 24 px top padding, 16 px cards, 38 px action controls, 40 px table heading row and source table cell padding. Intentional mobile wrapping keeps persistent controls reachable.
+- Colors and tokens: source report styles are retained locally, including #5c258d branding, #f4f6f9 page background, purple table headings, pale filter rows and green filtered-download action.
+- Image quality and asset fidelity: captured Inebura and Xeon logos and the real Bootstrap Icons font are local assets. No report UI assets are hotlinked, hand-drawn or substituted with emoji.
+- Copy and content: all 20 report names, source column counts and sample values are preserved. The attachment catalog and Reference sample data footer are requested additions. Empty source datasets remain empty.
+
+## Browser and export checks
+
+All 20 reports were generated through the local browser; results are in `implementation/browser-checks.json`. Verified month selection, report search, generation/ready/view states, cancellation, column filters, filter clearing, sorting, 15-row pagination, Clear and the attachment dialog. Downloaded filtered CSV and generated XLSX were reopened: CSV contained only Week 1, XLSX contained 21 headers and four rows, with portfolio value 77611681.27. Column counts of ODM and Issue Tracker are 83 and 46 respectively. Browser warning/error log check returned no entries.
+
+All 40 individual Excel files were reopened structurally and checked for exact header order, sample row counts and absence of invented formulas. Both combined workbooks contain 20 sheets. Spreadsheet previews were reviewed for every report; widths were adjusted to fit the supplied sample values. Logic checks pass in `scripts/test-reports.cjs`.
+
+## Expected constraints and follow-up
+
+This is a local frontend using 166 sample rows, not a backend integration or complete tenant export. Financial fields use captured values, without new financial calculations. Server permissions and exact server date inclusion rules are not inferred from visible headers. The shared shell retains the local user's profile and notification state. Reports with no exposed event date keep the available sample rows when a date range is selected. The original live XLSX transfer failed after File ready; supplied template/sample workbooks are authored from captured layouts and data.
+
+## Implementation checklist
+
+- [x] Source captured and compared with rendered implementation.
+- [x] Desktop and mobile controls verified.
+- [x] All 20 layouts generated and checked.
+- [x] CSV and XLSX downloads verified.
+- [x] Templates and samples attached in the report page.
+- [x] Existing unrelated work preserved.
+
+final result: passed
+
+# MIS user hierarchy QA 20 October 2026
+
+The latest visual reference is the live Xeon Admin User Setup popup inspected on 20 October. The implementation retains its 800 px desktop dialog, two-column identity fields, Role Type and Role row, Branch field, full-width MIS Reporting To, lavender header and footer actions. Role stays disabled until Role Type is selected. New MIS controls use Access Mode to reveal the applicable single-select or searchable multi-select dropdown. The three scope modes remain alternatives.
+
+## Evidence
+
+Evidence folder: `/Users/devashishrattan/.codex/visualizations/2026/10/20/01a1580e-a7d6-7183-a352-cd868460d75b/`.
+
+- Source: `xeon-live-step-one-full.jpg`. Implementation: `mis-user-setup-step-one-full.jpg`. Combined view: `mis-user-wizard-live-comparison.jpg`. Both final comparison frames are 1280 × 960 at density 1, Create User step one, empty identity fields and login-details toggle off. Earlier truncated captures are superseded by these frames.
+- New MIS fields: `mis-user-setup-two-column-final.jpg`, the complete 800 px dialog cropped from the 1280 × 1000 desktop capture.
+- Phone: `mis-user-setup-mobile-final.jpg` and `mis-user-setup-mobile-access-final.jpg`, 390 × 844 viewport crops. The second capture accounts for the page scroll offset and shows the scrolled dialog with access controls and all footer actions reachable. The page width measured exactly 390 px; the dialog measured 354 px. The form switches to one column.
+
+## Findings and corrections
+
+No actionable P0, P1 or P2 findings remain in the scoped prototype.
+
+1. Inherited User Setup CSS forced the wizard into one column. Added a dialog-scoped two-column override and matched the live 800 px width. The phone breakpoint keeps a single column.
+2. Always-visible mapping lists did not follow the requested dropdown pattern. Replaced them with searchable multi-select dropdowns; mode changes remove old selections, while search preserves selected items outside the current results.
+3. First-step draft capture originally cleared existing multi-select mappings. Corrected capture to read mapping inputs only on step two. Previous/Next and contact selection now preserve mappings.
+4. Role changes could retain a hidden operational Reporting To value. Both Role Type and Role changes now clear that value, the MIS reporting manager and previous scope.
+5. Restored the existing contact and login-details controls, retained password/credential action affordances as sample simulations, and matched desktop footer action sizes. No emails or credential changes are performed by the prototype.
+
+## Fidelity and intentional additions
+
+The existing Inebura shell, Bootstrap Icons, compact form typography, purple actions, field borders and lavender header are retained. The hierarchy note uses MIS-specific copy. MIS Reporting To is a single dropdown because each MIS user reports to one manager. The new scope fieldset, access review, status and fallback impact are necessary additions to the captured flow. Branch does not become a portfolio filter. Expanded forms scroll within the dialog and keep footer actions visible.
+
+## Verification and limits
+
+The Admin wizard has 12 passing regression checks covering role dependencies, login-toggle boolean persistence, contact/step navigation, searchable multi-selects, role/mode resets, stale writes, write failures and Admin capability loss. The earlier 24 scope/lifecycle checks, seven report adapter checks and five report UI checks passed, along with the existing report/Admin regression suites. Browser checks exercised the new empty/selected/search states, Previous/Next, mapped agent fallback, reactivation, report invalidation and a scoped XLSX download. The handoff document was rendered and visually reviewed at eight pages with zero accessibility-audit findings.
+
+This remains a local frontend prototype with isolated synthetic browser data. Production authentication, server authorization and approved production report schemas require development integration. Upload permissions and the remaining Backend module/action matrix stay pending. The existing MIS default screen is unchanged from the task baseline: SHA-256 `98ea7623aa71438243fd8bfea319ed436de783e074cb2d47490343ec5891d444`. No dashboard, production account or live mapping was changed; the live inspection drafts were cancelled without saving.
+
+final result: passed
+
+# MIS report dashboard QA 20 October 2026
+
+The later approved dashboard build supersedes the earlier unchanged-default-screen decision recorded above. The latest layout instruction places the MIS Dashboard title at the full page's top-left, above both columns, with Quick Actions aligned with the agent-filter container. The report cards occupy the existing right-hand content area.
+
+## Evidence and normalized state
+
+All paths below are under `artifacts/mis-dashboard/2026-10-20/`.
+
+- Source visual truth: `selected-reference.png`, the selected first report-card concept refined to a compact agent dropdown. Source pixels: 1565 × 1005.
+- Implementation: `desktop-final.png`, CSS viewport and screenshot 1565 × 1005 at density 1. Full-view comparison: `comparison-final.png`, both frames at equal pixel dimensions. Focused filter/card comparison: `comparison-focus-final.png`, equal-scale 1200 × 850 content crops.
+- Phone: viewport 390 × 844 at density 1; `mobile-final-page.png` is the complete 390 × 2609 document. `mobile-final.png`, `mobile-middle.png` and `mobile-bottom.png` expose readable viewport-sized regions. Document width measured exactly 390 px.
+- State: MIS Portfolio, all tagged agents, invoice dates 1–20 October 2026. The synthetic hierarchy fixture has two mapped agents and seven invoices after the tested fallback. Source illustrative values of 12 agents and 1,200 invoices are intentionally replaced by scoped fixture values.
+- Latest alignment: Quick Actions panel and filter container have identical browser Y coordinates, 152.140625 at scroll Y 18. The title begins at X 22 and spans above both columns.
+
+## Findings and comparison history
+
+No actionable P0, P1 or P2 findings remain. An independent final visual pass also passed desktop and phone.
+
+1. P2: inherited global header styling painted report headers purple. Added scoped transparent header styling; final captures show the intended neutral card surface.
+2. P2: the local icon stylesheet lacked its font face. Bound the existing bundled Bootstrap Icons WOFF2; real download/calendar/clock icons now render.
+3. P2: supporting card text was too small. Increased card titles to 18 px and supporting text/legends to 13 px, with 12 px percentages and Download buttons. Final comparison confirms readability.
+4. P2: shared header overflowed to 482 px on phone. Page-scoped logo and spacing rules reduced the document to exactly 390 px, retaining persistent controls.
+5. Latest user layout correction: moved the heading to the first full-width grid row and removed the desktop row gap. Final captures and browser bounds verify the requested title and Quick Actions alignment.
+
+## Required fidelity surfaces
+
+- Fonts and typography: existing Arial/Helvetica family, dark bold headings, muted supporting copy, distinct amounts/percentages and readable controls are preserved. The acknowledgement title wraps to two lines without clipping.
+- Spacing and layout rhythm: the three-by-two desktop report grid, compact sidebar, thin borders, rounded cards and consistent gaps follow the reference. The latest title/sidebar placement follows the user's subsequent instruction. Phone stacks title, Quick Actions, filters and six cards.
+- Colors and tokens: existing purple branding, teal success, amber open/pending states and pale neutral/lavender surfaces remain consistent. Chart series and textual legends agree.
+- Image quality and assets: existing Inebura/Apollo logos and bundled Bootstrap Icons are reused. Charts are real Chart.js canvas renderings with accessible labels and textual values.
+- Copy and content: six approved report names and small Download actions are present. "Total credit" describes the fixture allocation total; production credit meaning is pending. Sample data is explicitly labelled. Searchable count dropdowns replace external agent pills.
+
+## Functional verification
+
+- Eighteen model and nine UI regression checks passed. Coverage includes 12+ agent options, scope intersection, unique manager unions, mode/mapping changes, missing facts, date validation, direct download invocation after grant changes, identity denial and scoped navigation.
+- Earlier hierarchy/report regression checks also passed: 24 access/lifecycle, seven report adapter and five report UI checks. JavaScript syntax and `git diff --check` passed.
+- Browser checks exercised all/multiple/single/none selections, option search without losing selections, complete-client/subclient scope, manager union, unknown identity, empty and invalid date ranges, all four Quick Actions and phone layout.
+- Six CSV downloads were reopened. The single-agent ODM export contains its two permitted invoices; the other five exports contain the selected seven invoices. Values reconcile with the charts, with one UTF-8 BOM per file. Evidence: `download-verification.json`.
+- Final browser warning/error log returned no entries.
+- Version 2 development handoff was updated, rendered and visually checked across eight pages, with zero accessibility-audit findings.
+
+## Limits and follow-up
+
+This is a local frontend prototype with isolated synthetic hierarchy data and explicit facts for seven fixture invoices. Production services, server authorization, approved report templates, financial definitions, date bases and submission modes remain development/team inputs. MIS upload permissions and the remaining Backend action matrix are pending. Quick Actions remain; Schedule & Share indicates that its permissions require clarification. No production accounts, mappings or data were changed.
+
+P3 only: the acknowledgement heading wraps on desktop and the second row is slightly taller than the reference. Legend values replace labels inside donut slices, preserving the same information.
+
+## Implementation checklist
+
+- [x] Selected reference compared with browser-rendered desktop and focused views.
+- [x] Latest title and Quick Actions alignment verified.
+- [x] Phone width, six cards and persistent controls verified.
+- [x] Scoped charts, date controls, downloads and navigation checked.
+- [x] Development handoff updated; unrelated working-tree changes preserved.
+
+final result: passed
+
+# MIS two-level access filters QA 23 October 2026
+
+This section covers the later instruction to add dependent Agent/Subclient filters to the existing Admin wizard. It supersedes the earlier single-level access-mode description for these two modes. Complete-client access is unchanged. Dashboard presentation and Jira creation are outside this update.
+
+## Evidence and normalized state
+
+Evidence folder: `artifacts/mis-user-hierarchy/2026-10-23-two-level/`.
+
+- Source visual truth: `approved-two-column-reference.jpg`, the previously approved 800 × 772 popup crop from the 20 October reference.
+- Rendered implementation: `subclients-first-desktop.png`, 1280 × 1000 CSS viewport and PNG at density 1. `updated-popup.png` is its native-size 800 × 900 dialog crop. No images were stretched; the source has blank padding beneath it in the comparison.
+- Full comparison: `comparison-full.png`. Focused form comparison: `comparison-filters.png`. Both source and implementation are together in each image and were opened for review.
+- Matched state: Create User step two, Support Role, MIS User, Gurugram, MIS Manager North and two selected subclients. The implementation adds Agent Two as the optional secondary restriction. The second selector, explanatory copy and access summary intentionally increase the dialog height; its body scrolls independently of the footer.
+- Additional evidence: `agents-first-desktop.png` shows the reverse ordering with Agents/Agent cum Managers first and a subclient restriction. This is an Edit User state scrolled slightly inside the form, so it is interaction evidence rather than the normalized fidelity comparison.
+- Phone: `mobile-top.png` and `mobile-filters.png`, 390 × 844 CSS viewport and PNG at density 1. Live geometry measured the dialog at x18, y43.5, width339, height757, bottom800.5; the footer ends at 799.5. The body has 614 px of visible height and 1199 px of scrollable content. Document width 375 plus its 15 px scrollbar fits the 390 px viewport. No horizontal overflow occurs.
+
+## Findings and comparison history
+
+No actionable P0, P1 or P2 differences were found in the combined final comparison. An independent visual review reached the same result. No visual correction loop was needed after this comparison. A possible footer issue raised during that review was checked against the refreshed phone capture and live bounds; all three footer actions remain inside the viewport while the form body scrolls.
+
+The taller fieldset is an intentional addition required for two-level access, rather than a change to the established form layout. At desktop width the popup remains 800 px wide with two equal columns; the narrow-screen form retains the existing single-column adaptation.
+
+## Required fidelity surfaces
+
+- Fonts and typography: the inherited Calibri, Segoe UI, Arial stack, uppercase field labels, compact body copy, weights and heading hierarchy are retained. The long optional-agent label wraps on phone without overlapping its dropdown. The access summary wraps within its container.
+- Spacing and layout rhythm: existing header, role row, branch, full-width reporting manager, borders, radii and footer button positions are preserved. Access Mode and the primary dropdown occupy the first two-column row. The optional secondary dropdown and its explanation occupy the next row, followed by the full-width summary. The body scroll keeps actions reachable on phone.
+- Colors and tokens: lavender header, purple primary action, neutral field borders and dark/muted text follow the source. The pale lavender review panel uses the existing visual language.
+- Image quality and assets: the existing Inebura shell, logos and bundled icons are reused. No image or icon was replaced with a generated approximation.
+- Copy and content: both orderings explain that filters apply together, and Agent cum Managers contribute personal assignments only. Unrestricted secondary access is explicit. The preview identifies invoice counts as sample data. Previous mappings are cleared only when changing access mode in the draft; saving persists the new scope.
+
+## Functional verification
+
+All 106 scoped checks passed: 34 access/store, 25 Admin wizard, 23 dashboard data, 9 dashboard UI, 10 report adapter and 5 report UI checks. Coverage includes both filter orders, optional unrestricted access, intersections, zero-match saved restrictions, malformed secondary data, dependent options, independent searches, Previous/Next, contact navigation, stale writes, mode resets, manager unions and fallback replacement without removing the subclient restriction.
+
+Browser checks exercised both orderings, disabled secondary controls before primary selection, retained zero-match selections, independent search, explicit All, blocked restricted-empty saves and mobile scrolling. A saved North restriction reduced the sample portfolio to 2 invoices. The downloaded XLSX was reopened and contained exactly MIS-TC-001 and MIS-TC-003, both North, totaling 181,000. The original saved sample mapping was restored afterwards; the final Create User example remains unsaved.
+
+The browser warning/error log was empty. Admin JavaScript syntax and the scoped tracked-file whitespace check passed. The existing unrelated whitespace warning in `css/admin-template-master.css` was left untouched.
+
+## Limits and implementation checklist
+
+This remains a local frontend prototype with synthetic data. Server authorization and production integration are development work. Dashboard presentation, existing module/action permissions and unrelated lifecycle policies were not expanded by this filter update. No Jira ticket was created.
+
+- [x] Existing popup compared against the rendered two-level form at equal scale.
+- [x] Desktop columns, phone scrolling and persistent actions verified.
+- [x] Both filter orders, dependent options and empty-result behavior checked.
+- [x] Manager and report scopes verified, including an actual scoped XLSX download.
+- [x] Existing sample mapping restored; unrelated working-tree changes preserved.
+
+final result: passed

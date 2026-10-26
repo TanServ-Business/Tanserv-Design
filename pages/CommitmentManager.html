@@ -63,6 +63,11 @@
       font-weight: 700;
     }
 
+    body[data-commitment-view="readonly"] .managerActionBar,
+    body[data-commitment-view="readonly"] .colChk {
+      display: none !important;
+    }
+
     .commitmentCard {
       background: #ffffff;
       border: 1px solid #e2e8f4;
@@ -528,6 +533,19 @@
 <script src="../scripts/shared-header.js?v=20261012-index-route-v1"></script>
 <script>
   (() => {
+    const storedViewRole = sessionStorage.getItem("ineburaCommitmentViewRole")
+      || localStorage.getItem("activeUserRole") || "";
+    const canManage = storedViewRole.trim().toLowerCase() === "manager"
+      && new URLSearchParams(window.location.search).get("view") !== "supervisor";
+    document.body.dataset.commitmentView = canManage ? "manager" : "readonly";
+    if (!canManage) {
+      const readOnlyRole = new URLSearchParams(window.location.search).get("view") === "supervisor"
+        || storedViewRole.trim().toLowerCase() === "supervisor" ? "Supervisor"
+        : storedViewRole.trim().toLowerCase() === "kas" ? "KAS" : "Read-only";
+      document.title = `Inebura Ops UI - Commitment Module (${readOnlyRole})`;
+      document.querySelector(".commitmentHeader p").textContent = "Review commitment plans submitted by your agents.";
+      document.querySelector(".commitmentRolePill").textContent = `${readOnlyRole} view · read-only`;
+    }
     const submitStorageKey = "ineburaCommitmentSubmissions";
     const loadStorage = (key, fallback) => {
       try {
@@ -663,6 +681,7 @@
     };
 
     const updateSubmissionItem = (agent, invoiceNo, changes) => {
+      if (!canManage) return;
       submissions.forEach((submission) => {
         (submission.items || []).forEach((item) => {
           if ((item.agentName || "Unknown Agent") !== agent) return;
@@ -676,6 +695,7 @@
     };
 
     const applyBulkUpdate = (rows, changes) => {
+      if (!canManage) return;
       rows.forEach((row) => {
         updateSubmissionItem(row.agentName || "Unknown Agent", row.invoiceNo, changes);
       });
@@ -686,6 +706,7 @@
     );
 
     const updateActionButtonsState = () => {
+      if (!canManage) return;
       const hasAgent = Boolean(activeAgent);
       const hasRows = getRowsForAgent().length > 0;
       const hasSelection = getSelectedRows().length > 0;
@@ -791,12 +812,12 @@
       }
 
       if (!activeAgent) {
-        tableBody.innerHTML = "<tr><td colspan=\"11\" style=\"color:#94a3b8;\">Select an agent to review commitments.</td></tr>";
+        tableBody.innerHTML = `<tr><td colspan="${canManage ? 11 : 10}" style="color:#94a3b8;">Select an agent to review commitments.</td></tr>`;
         return;
       }
 
       if (!currentRows.length) {
-        tableBody.innerHTML = "<tr><td colspan=\"11\" style=\"color:#94a3b8;\">No commitments found for this agent.</td></tr>";
+        tableBody.innerHTML = `<tr><td colspan="${canManage ? 11 : 10}" style="color:#94a3b8;">No commitments found for this agent.</td></tr>`;
         return;
       }
 
@@ -808,9 +829,9 @@
         tr.dataset.invoiceNo = row.invoiceNo || "";
         tr.dataset.agentName = row.agentName || "Unknown Agent";
         tr.innerHTML = `
-          <td class="cellCenter">
+          ${canManage ? `<td class="cellCenter">
             <input class="managerSelect" type="checkbox" aria-label="Select invoice ${row.invoiceNo}" ${isSelected ? "checked" : ""} />
-          </td>
+          </td>` : ""}
           <td>${row.customerName || "-"}</td>
           <td>${row.customerCode || "-"}</td>
           <td>${row.invoiceNo || "-"}</td>
@@ -821,12 +842,13 @@
             <span class="commitmentAmountText">${formatCurrency(row.amountForMonth)}</span>
           </td>
           <td><span class="approvalPill ${status}">${status}</span></td>
-          <td>
+          <td>${canManage ? `
             <select class="managerWeekSelect">
               ${buildWeekOptions(row.week || "")}
-            </select>
+            </select>` : (row.week || "-")}
           </td>
           <td class="colAmtRight colAmount">
+            ${canManage ? `
             <input
               class="managerTargetInput"
               type="number"
@@ -834,7 +856,7 @@
               max="${row.invoiceValue || 0}"
               step="0.01"
               value="${row.targetAmount || 0}"
-            />
+            />` : formatCurrency(row.targetAmount)}
           </td>
         `;
         tableBody.appendChild(tr);
@@ -896,6 +918,7 @@
 
     if (tableBody) {
       tableBody.addEventListener("change", (event) => {
+        if (!canManage) return;
         const rowEl = event.target.closest("tr");
         if (!rowEl) return;
         const invoiceNo = rowEl.dataset.invoiceNo;
@@ -917,6 +940,7 @@
       });
 
       tableBody.addEventListener("input", (event) => {
+        if (!canManage) return;
         if (!event.target.classList.contains("managerTargetInput")) return;
         const rowEl = event.target.closest("tr");
         if (!rowEl) return;
@@ -930,6 +954,7 @@
 
     if (selectAll) {
       selectAll.addEventListener("change", () => {
+        if (!canManage) return;
         const checked = selectAll.checked;
         currentRows.forEach((row) => {
           const rowKey = getRowKey(row);
@@ -944,6 +969,7 @@
 
     if (approveAllBtn) {
       approveAllBtn.addEventListener("click", () => {
+        if (!canManage) return;
         if (!activeAgent) return;
         const rows = getRowsForAgent();
         applyBulkUpdate(rows, { approvalStatus: "approved" });
@@ -955,6 +981,7 @@
 
     if (approveSelectedBtn) {
       approveSelectedBtn.addEventListener("click", () => {
+        if (!canManage) return;
         if (!activeAgent) return;
         const rows = getSelectedRows();
         if (!rows.length) return;
@@ -968,6 +995,7 @@
 
     if (rejectSelectedBtn) {
       rejectSelectedBtn.addEventListener("click", () => {
+        if (!canManage) return;
         if (!activeAgent) return;
         const rows = getSelectedRows();
         if (!rows.length) return;

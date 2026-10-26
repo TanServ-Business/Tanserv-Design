@@ -1,0 +1,36 @@
+{
+  "date": "2026-10-21",
+  "change": "DL4 and later use the current DL3 email subject and message.",
+  "automated": {
+    "result": "passed",
+    "suites": [
+      "test-dunning-core.cjs",
+      "test-dunning-configuration.cjs",
+      "test-dunning-management-templates.cjs",
+      "test-dunning-management.cjs",
+      "test-dunning-template-adapter.cjs",
+      "test-dunning-template-email-flow.cjs"
+    ],
+    "coverage": [
+      "DL4 and DL5 actual standard-Word sending flows",
+      "Managed and legacy saved DL3 source resolution",
+      "Later DL3 edits apply to unsent stages",
+      "Independent stage Word templates and schedules",
+      "Immutable issued email and PDF snapshots",
+      "Role guards and validation"
+    ]
+  },
+  "browser": {
+    "origin": "http://127.0.0.1:8773",
+    "result": "passed",
+    "checks": [
+      "DL4 and DL5 list the DL3 subject and shared-template label",
+      "DL4 subject and email message are read-only",
+      "DL3 email stays editable",
+      "Editing and saving DL3 immediately updates DL4 and DL5 subjects",
+      "QA DL3 subject restored after check"
+    ],
+    "screenshot": "dl3-shared-email.jpg"
+  },
+  "diff_check": "passed"
+}

@@ -1,0 +1,35 @@
+{
+  "date": "2026-10-21",
+  "change": "Word source dropdown with conditional upload controls",
+  "browser": {
+    "origin": "http://127.0.0.1:8773",
+    "checks_passed": [
+      "Standard choice opens with upload controls hidden",
+      "Upload choice shows enabled upload control",
+      "Selecting Upload blocks Save and Preview pending valid import",
+      "Selecting Standard hides upload controls again",
+      "Existing custom template opens with Upload selected, filename visible and Save/Preview available"
+    ],
+    "screenshots": [
+      "word-template-dropdown-standard.jpg",
+      "word-template-dropdown-upload.jpg"
+    ],
+    "saved_templates_changed": false
+  },
+  "template_suite": {
+    "passed": 15,
+    "failed": 0,
+    "note": "Passed before the standard Word asset was changed during verification."
+  },
+  "current_word_asset": {
+    "modified_local": "2026-10-21 18:39:26",
+    "size_bytes": 25026,
+    "valid": false,
+    "errors": [
+      "Missing required values: Invoice annexure."
+    ],
+    "note": "Confirmed by current Word import and validation, independently of the dropdown. Asset was not edited by this change."
+  },
+  "syntax_check": "passed",
+  "diff_check": "passed"
+}

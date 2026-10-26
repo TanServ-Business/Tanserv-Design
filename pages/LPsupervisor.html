@@ -505,6 +505,7 @@
 <script src="../scripts/shared-header.js?v=20261012-index-route-v1"></script>
 <script>
   (() => {
+    sessionStorage.setItem("ineburaCommitmentViewRole", "supervisor");
     const agentData = [
       { name: "Mukesh Mishra", portfolio: 26850000, target: 1250000, achievement: 910000, avgVisit: 10, ptpToday: 4, untouched: 18, aging30: 16, callbacks: 3, newBilling: 5 },
       { name: "Neha Kapoor", portfolio: 24000000, target: 1120000, achievement: 840000, avgVisit: 9, ptpToday: 3, untouched: 22, aging30: 14, callbacks: 2, newBilling: 4 },
@@ -760,7 +761,7 @@
 
     if (commitmentReviewBtn) {
       commitmentReviewBtn.addEventListener("click", () => {
-        window.location.href = "CommitmentManager.html";
+        window.location.href = "CommitmentManager.html?view=supervisor";
       });
     }
 

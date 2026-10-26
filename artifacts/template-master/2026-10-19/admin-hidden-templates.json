@@ -1,0 +1,110 @@
+{
+  "source": "/Users/devashishrattan/Downloads/Email and WhatsApp templates.docx",
+  "marking": "Red font EE0000 in template index",
+  "templates": [
+    {
+      "number": "001",
+      "code": "CcProcessingInterrupted"
+    },
+    {
+      "number": "002",
+      "code": "CcClosedNoImpactedInvoices"
+    },
+    {
+      "number": "003",
+      "code": "CcStillPending"
+    },
+    {
+      "number": "004",
+      "code": "CcExecutedWithErrors"
+    },
+    {
+      "number": "005",
+      "code": "CcExecuted"
+    },
+    {
+      "number": "006",
+      "code": "CcHeldMonthEndFailed"
+    },
+    {
+      "number": "007",
+      "code": "CcPendingEscalation"
+    },
+    {
+      "number": "008",
+      "code": "CcPendingReminder"
+    },
+    {
+      "number": "009",
+      "code": "MonthEndAgentCollectionReminder"
+    },
+    {
+      "number": "010",
+      "code": "MonthEndConfigChanged"
+    },
+    {
+      "number": "011",
+      "code": "MonthEndUpcomingNotice"
+    },
+    {
+      "number": "012",
+      "code": "MonthEndCycleFailure"
+    },
+    {
+      "number": "013",
+      "code": "SuperAdminAttendanceReport"
+    },
+    {
+      "number": "029",
+      "code": "MonthlyVisitHrReport"
+    },
+    {
+      "number": "033",
+      "code": "TestEmail"
+    },
+    {
+      "number": "034",
+      "code": "ClientDeleteEmail"
+    },
+    {
+      "number": "035",
+      "code": "ClientSuspendEmail"
+    },
+    {
+      "number": "036",
+      "code": "ActivityReportMail"
+    },
+    {
+      "number": "037",
+      "code": "UserCreatedAdmin"
+    },
+    {
+      "number": "038",
+      "code": "OnBoardingLinkExpired"
+    },
+    {
+      "number": "039",
+      "code": "ClientCreationError"
+    },
+    {
+      "number": "040",
+      "code": "ClientCreation"
+    },
+    {
+      "number": "041",
+      "code": "ODMReportMail"
+    },
+    {
+      "number": "053",
+      "code": "PasswordResetEmail"
+    },
+    {
+      "number": "055",
+      "code": "UserCreated"
+    },
+    {
+      "number": "078",
+      "code": "PasswordGenerationEmail"
+    }
+  ]
+}

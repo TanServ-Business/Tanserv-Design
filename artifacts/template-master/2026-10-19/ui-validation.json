@@ -1,0 +1,50 @@
+{
+  "date": "2026-10-19",
+  "module": "pages/admin.html?module=template-master",
+  "adminTemplateCount": 84,
+  "adminEmailCount": 52,
+  "adminWhatsAppCount": 32,
+  "redTemplatesExcluded": 26,
+  "sourceCatalogModified": false,
+  "removedPopupFields": [
+    "Disabled"
+  ],
+  "editor": "One full-width editable Notification Preview; message text is editable, sample values are locked",
+  "preview": "Single message view with locked sample data, one representative invoice row for list expressions",
+  "automatedChecks": [
+    "All 110 captured bodies and subjects round-trip without changes",
+    "Copy edits preserve original tokens and conditional/list expressions",
+    "All 84 available templates render previews without unresolved variables or NULL placeholders",
+    "All 26 hidden source IDs are excluded from pagination and direct editor entry",
+    "Saved overrides that renamed a hidden code cannot restore Admin availability",
+    "Hidden records and delivery settings survive local persistence",
+    "Edited HTML text is escaped, and preview frames block scripts and remote embeds"
+  ],
+  "browserChecks": [
+    "Formatted email editor and populated invoice table",
+    "WhatsApp editor and sample preview at 390 by 844",
+    "PDC subject, cheque number, amount and bank sample values",
+    "Select All and Delete in an editable region leaves locked values intact",
+    "Direct Delete on a sample value leaves the value intact",
+    "Cleared text remains editable and can be restored",
+    "Text edit saved and persisted after reload, then original copy restored",
+    "Cancel discards edits",
+    "No browser console errors observed",
+    "Temporary viewport override reset",
+    "Single editable Notification Preview confirmed for email and WhatsApp; no duplicate message panel",
+    "Copy saved through the single preview persists after reload; original greeting restored",
+    "All five template details are displayed as native readonly inputs",
+    "Select All, Backspace and typing in Code leaves its value unchanged",
+    "Verified Safari initially had the obsolete two-panel layout loaded",
+    "Reloaded Safari from origin and reopened IssueTrackerYourTurn: all five readonly details and one Notification Preview editor are present",
+    "Template CSS and both editor scripts use content-hash version URLs"
+  ],
+  "testCommand": "node scripts/test-template-master-editor.cjs",
+  "readOnlyPopupFields": [
+    "Event Type",
+    "Recipient Role",
+    "Communication Mode",
+    "Scheduled Sending",
+    "Code"
+  ]
+}

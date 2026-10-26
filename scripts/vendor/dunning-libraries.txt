@@ -1,0 +1,19 @@
+Dunning Letters browser dependencies (bundled locally; no runtime CDN requests)
+
+Mammoth 1.11.0
+Source: https://registry.npmjs.org/mammoth/-/mammoth-1.11.0.tgz
+Upstream: https://github.com/mwilliamson/mammoth.js
+License: BSD-2-Clause (mammoth.LICENSE)
+Purpose: Convert uploaded Word .docx text and semantic formatting into safe editable HTML.
+
+jsPDF 3.0.3
+Source: https://registry.npmjs.org/jspdf/-/jspdf-3.0.3.tgz
+Upstream: https://github.com/parallax/jsPDF
+License: MIT (jspdf.LICENSE)
+Purpose: Generate the combined letter and paginated invoice annexure PDF locally.
+
+PDF.js 5.4.296 (legacy browser build and standard fonts)
+Source: https://registry.npmjs.org/pdfjs-dist/-/pdfjs-dist-5.4.296.tgz
+Upstream: https://github.com/mozilla/pdf.js
+License: Apache-2.0 (pdfjs/LICENSE); font licenses are retained under pdfjs/standard_fonts.
+Purpose: Render the exact generated or retained PDF bytes in browsers without native PDF previews.

@@ -597,6 +597,10 @@
     id, cat: "issue-tracker", title, meta: `Issue Tracker · ${minutes} min read`, roles,
     body: `<h4>Purpose</h4><p>${purpose}</p><h4>Prerequisites</h4><ul>${prerequisites.map(item => `<li>${item}</li>`).join("")}</ul><h4>Steps</h4><ol>${steps.map(item => `<li>${item}</li>`).join("")}</ol><div class="kbArticleNote" role="note"><strong>Important note</strong><p>${note}</p></div><h4>Validation</h4><ul>${validation.map(item => `<li>${item}</li>`).join("")}</ul><h4>Common issues</h4><ul>${commonIssues.map(item => `<li>${item}</li>`).join("")}</ul>`
   });
+  const commitmentGuide = ({ id, title, roles, purpose, prerequisites, steps, note, validation, commonIssues, minutes = 2 }) => ({
+    id, cat: "commitments-targets", title, meta: `Commitments & Targets · ${minutes} min read`, roles,
+    body: `<h4>Purpose</h4><p>${purpose}</p><h4>Prerequisites</h4><ul>${prerequisites.map(item => `<li>${item}</li>`).join("")}</ul><h4>Steps</h4><ol>${steps.map(item => `<li>${item}</li>`).join("")}</ol><div class="kbArticleNote" role="note"><strong>Important note</strong><p>${note}</p></div><h4>Validation</h4><ul>${validation.map(item => `<li>${item}</li>`).join("")}</ul><h4>Common issues</h4><ul>${commonIssues.map(item => `<li>${item}</li>`).join("")}</ul>`
+  });
   const kbArticles = [
     {
       id: "kb-001", cat: "invoice-billing",
@@ -867,18 +871,40 @@
       body: `<h4>When A PDC Bounces</h4><p>Immediately update status so downstream risk and follow-up tasks are triggered.</p><h4>Steps</h4><ol><li>Open PDC record and change status to <strong>Bounced</strong>.</li><li>Capture bounce reason and bank memo details.</li><li>Create follow-up task for collection owner with due date.</li><li>Notify manager/action owner via system communication.</li><li>Update linked invoice collection status and remarks.</li></ol><h4>Documents To Attach</h4><ul><li>Bank return memo</li><li>Cheque image/reference</li><li>Customer communication proof</li></ul>`
     },
 
-    {
-      id: "kb-041", cat: "commitments-targets",
-      title: "How to prepare commitment draft by invoice and week",
-      meta: "Commitments & Targets · 2 min read",
-      body: `<h4>Purpose</h4><p>Follow this SOP to complete prepare commitment draft by invoice and week in a consistent and auditable way.</p><h4>Prerequisites</h4><ul><li>Open Commitment Module in the portal.</li><li>Keep relevant invoice, customer, or issue reference ready.</li><li>Confirm your role has update permission for this action.</li></ul><h4>Steps</h4><ol><li>Open <strong>Commitment Module</strong> and locate the target record.</li><li>Use search and filters to narrow to the correct invoice, issue, customer, or task.</li><li>Perform the action for <em>prepare commitment draft by invoice and week</em> and add required remarks.</li><li>Save or submit using the available workflow button.</li><li>Review post-action status, trail entries, and dependent module updates.</li></ol><h4>Validation</h4><ul><li>Status and sub-status are updated as expected.</li><li>Action trail captures user, timestamp, and remark.</li><li>Linked dashboards, notifications, or task queues show the latest state.</li></ul><h4>Common issues</h4><ul><li>Submitting without validating current status and ownership.</li><li>Forgetting mandatory remark or recipient details.</li><li>Assuming save was successful without checking trail or counters.</li></ul>`
-    },
-    {
-      id: "kb-042", cat: "commitments-targets",
-      title: "How to submit commitment plan and track manager approval status",
-      meta: "Commitments & Targets · 2 min read",
-      body: `<h4>Purpose</h4><p>Follow this SOP to complete submit commitment plan and track manager approval status in a consistent and auditable way.</p><h4>Prerequisites</h4><ul><li>Open Commitment Module in the portal.</li><li>Keep relevant invoice, customer, or issue reference ready.</li><li>Confirm your role has update permission for this action.</li></ul><h4>Steps</h4><ol><li>Open <strong>Commitment Module</strong> and locate the target record.</li><li>Use search and filters to narrow to the correct invoice, issue, customer, or task.</li><li>Perform the action for <em>submit commitment plan and track manager approval status</em> and add required remarks.</li><li>Save or submit using the available workflow button.</li><li>Review post-action status, trail entries, and dependent module updates.</li></ol><h4>Validation</h4><ul><li>Status and sub-status are updated as expected.</li><li>Action trail captures user, timestamp, and remark.</li><li>Linked dashboards, notifications, or task queues show the latest state.</li></ul><h4>Common issues</h4><ul><li>Submitting without validating current status and ownership.</li><li>Forgetting mandatory remark or recipient details.</li><li>Assuming save was successful without checking trail or counters.</li></ul>`
-    },
+    commitmentGuide({
+      id: "kb-041", title: "How to prepare a commitment draft by invoice and week", roles: ["Agent"],
+      purpose: "Record the amount you expect to collect against an invoice and the planned collection week. Save the entries as a draft when they need further review.",
+      prerequisites: ["Open the <strong>Commitment</strong> module.", "Have the customer and invoice details available.", "Know the expected collection week and amount."],
+      steps: [
+        "Find the invoice using search or the available filters.",
+        "Confirm its customer code, invoice number and due date.",
+        "Review <strong>Invoice Value</strong> and <strong>Amount For The Month</strong>.",
+        "Select the expected collection <strong>Week</strong> for that invoice.",
+        "Enter or verify <strong>Target Amount Committed</strong>. Check it against the monthly amount and the collection you expect.",
+        "Repeat for any other invoices you are preparing.",
+        "Click <strong>Save Draft</strong> when the entries need more review.",
+        "Check the save confirmation and review the week and amount shown against each invoice."
+      ],
+      note: "<strong>Save Draft</strong> retains your entries for later review. It does not submit them for Manager approval.",
+      validation: ["A draft-save confirmation appears.", "The intended invoices show the weeks and target amounts you entered."],
+      commonIssues: ["Working on the wrong invoice because a search or filter remains active.", "Confusing <strong>Invoice Value</strong> with <strong>Amount For The Month</strong>.", "Leaving an intended invoice without a week or target amount.", "Assuming that saving a draft submits it for approval."]
+    }),
+    commitmentGuide({
+      id: "kb-042", title: "How to submit invoice commitments and check their status", roles: ["Agent"],
+      purpose: "Submit prepared invoice commitments for Manager review and confirm that the submission was recorded.",
+      prerequisites: ["Open the <strong>Commitment</strong> module.", "Have the intended invoices’ collection weeks and target amounts ready."],
+      steps: [
+        "Find each invoice you intend to submit. Confirm its customer code and invoice number.",
+        "Review <strong>Due Date</strong>, <strong>Amount For The Month</strong>, the selected <strong>Week</strong> and <strong>Target Amount Committed</strong>.",
+        "Correct any missing or incorrect week or amount before submitting.",
+        "Click <strong>Save And Submit</strong>.",
+        "Read the confirmation message and check the number of commitments it says were submitted.",
+        "Find the invoices again using search or the available filters. Review their week, committed amount and updated status."
+      ],
+      note: "<strong>Save And Submit</strong> sends the prepared commitments for Manager review. <strong>Save Draft</strong> only retains entries for later; it does not submit them.",
+      validation: ["A submission confirmation appears.", "Its submitted count matches the commitments you intended to send.", "The intended invoices show their submitted commitment details and status."],
+      commonIssues: ["Trying to submit an invoice without both a week and a target amount.", "Submitting the wrong invoice or amount without checking the row first.", "Mistaking a saved draft for a submitted commitment.", "Missing an invoice because an earlier search or filter is still active."]
+    }),
     {
       id: "kb-043", cat: "commitments-targets",
       title: "Commitment submission windows, shortfalls, and rejection causes explained",
@@ -1028,22 +1054,10 @@
       body: `<h4>Purpose</h4><p>Use this guide to diagnose holiday, leave, and rejection markers in Visit Calendar using configured holiday mapping rules.</p><h4>Prerequisites</h4><ul><li>Open Visit Module and Visit Module Review in the portal.</li><li>Access logged-in user's branch mapping.</li><li>Holiday calendar configured state-wise in admin master.</li></ul><h4>Steps to diagnose and fix</h4><ol><li>Fetch branch of the logged-in user.</li><li>Fetch state mapped to that branch.</li><li>Load holiday calendar for the mapped state and verify selected day.</li><li>Check whether day is marked as leave by user action or rejected by manager review.</li><li>Re-open the day status trail and confirm final status source (holiday, leave, accepted/rejected).</li></ol><h4>Validation</h4><ul><li>Holiday markers match state-level holiday calendar.</li><li>Leave and rejection markers map to correct user action trail.</li><li>Calendar status is consistent across agent and manager screens.</li></ul><h4>Common issues</h4><ul><li>Branch-state mapping not updated for user profile.</li><li>Holiday calendar loaded from wrong state.</li><li>Confusing rejected status with holiday/leave markers.</li></ul>`
     },
     {
-      id: "kb-067", cat: "commitments-targets",
-      title: "How to use Save Draft vs Save And Submit in commitment module",
-      meta: "Commitments & Targets · 2 min read",
-      body: `<h4>Purpose</h4><p>Follow this SOP to complete use save draft vs save and submit in commitment module in a consistent and auditable way.</p><h4>Prerequisites</h4><ul><li>Open Commitment Module in the portal.</li><li>Keep relevant invoice, customer, or issue reference ready.</li><li>Confirm your role has update permission for this action.</li></ul><h4>Steps</h4><ol><li>Open <strong>Commitment Module</strong> and locate the target record.</li><li>Use search and filters to narrow to the correct invoice, issue, customer, or task.</li><li>Perform the action for <em>use Save Draft vs Save And Submit in commitment module</em> and add required remarks.</li><li>Save or submit using the available workflow button.</li><li>Review post-action status, trail entries, and dependent module updates.</li></ol><h4>Validation</h4><ul><li>Status and sub-status are updated as expected.</li><li>Action trail captures user, timestamp, and remark.</li><li>Linked dashboards, notifications, or task queues show the latest state.</li></ul><h4>Common issues</h4><ul><li>Submitting without validating current status and ownership.</li><li>Forgetting mandatory remark or recipient details.</li><li>Assuming save was successful without checking trail or counters.</li></ul>`
-    },
-    {
       id: "kb-068", cat: "commitments-targets",
       title: "How to update week and target amount after draft save",
       meta: "Commitments & Targets · 2 min read",
       body: `<h4>Purpose</h4><p>Follow this SOP to complete update week and target amount after draft save in a consistent and auditable way.</p><h4>Prerequisites</h4><ul><li>Open Commitment Module in the portal.</li><li>Keep relevant invoice, customer, or issue reference ready.</li><li>Confirm your role has update permission for this action.</li></ul><h4>Steps</h4><ol><li>Open <strong>Commitment Module</strong> and locate the target record.</li><li>Use search and filters to narrow to the correct invoice, issue, customer, or task.</li><li>Perform the action for <em>update week and target amount after draft save</em> and add required remarks.</li><li>Save or submit using the available workflow button.</li><li>Review post-action status, trail entries, and dependent module updates.</li></ol><h4>Validation</h4><ul><li>Status and sub-status are updated as expected.</li><li>Action trail captures user, timestamp, and remark.</li><li>Linked dashboards, notifications, or task queues show the latest state.</li></ul><h4>Common issues</h4><ul><li>Submitting without validating current status and ownership.</li><li>Forgetting mandatory remark or recipient details.</li><li>Assuming save was successful without checking trail or counters.</li></ul>`
-    },
-    {
-      id: "kb-069", cat: "commitments-targets",
-      title: "Why commitment submit is blocked (missing week/target/filter confusion)",
-      meta: "Commitments & Targets · 3 min read",
-      body: `<h4>Purpose</h4><p>Use this guide to diagnose and resolve cases where commitment submit is blocked (missing week/target/filter confusion).</p><h4>Prerequisites</h4><ul><li>Open Commitment Module in the portal.</li><li>Keep relevant invoice, customer, or issue reference ready.</li><li>Confirm your role has update permission for this action.</li></ul><h4>Steps to diagnose and fix</h4><ol><li>Capture the exact screen, filters, and record identifiers where the issue appears.</li><li>Reproduce the behavior in <strong>Commitment Module</strong> with the same role and date context.</li><li>Verify required fields (status, remark, owner, dates, and references) are populated correctly.</li><li>Apply corrective action from the relevant panel and save changes.</li><li>Recheck activity trail, counters, and linked notifications to confirm resolution.</li></ol><h4>Validation</h4><ul><li>Issue is no longer reproducible using the same inputs.</li><li>Correct status and remarks are visible in the action trail.</li><li>Dependent alerts, counters, or lists reflect the corrected state.</li></ul><h4>Common issues</h4><ul><li>Working on the wrong record after filters changed silently.</li><li>Mandatory remarks or recipients were skipped.</li><li>User role does not allow the target action in the current status.</li></ul>`
     },
     {
       id: "kb-070", cat: "issue-tracker",
@@ -1105,12 +1119,22 @@
       meta: "Commitments & Targets · 2 min read",
       body: `<h4>Purpose</h4><p>Follow this SOP to complete set realistic weekly targets from due-date buckets in a consistent and auditable way.</p><h4>Prerequisites</h4><ul><li>Open commitment dashboards and target views in the portal.</li><li>Keep relevant invoice, customer, or issue reference ready.</li><li>Confirm your role has update permission for this action.</li></ul><h4>Steps</h4><ol><li>Open <strong>commitment dashboards and target views</strong> and locate the target record.</li><li>Use search and filters to narrow to the correct invoice, issue, customer, or task.</li><li>Perform the action for <em>set realistic weekly targets from due-date buckets</em> and add required remarks.</li><li>Save or submit using the available workflow button.</li><li>Review post-action status, trail entries, and dependent module updates.</li></ol><h4>Validation</h4><ul><li>Status and sub-status are updated as expected.</li><li>Action trail captures user, timestamp, and remark.</li><li>Linked dashboards, notifications, or task queues show the latest state.</li></ul><h4>Common issues</h4><ul><li>Submitting without validating current status and ownership.</li><li>Forgetting mandatory remark or recipient details.</li><li>Assuming save was successful without checking trail or counters.</li></ul>`
     },
-    {
-      id: "kb-080", cat: "commitments-targets",
-      title: "How to monitor approved vs rejected commitments by agent",
-      meta: "Commitments & Targets · 2 min read",
-      body: `<h4>Purpose</h4><p>Follow this SOP to complete monitor approved vs rejected commitments by agent in a consistent and auditable way.</p><h4>Prerequisites</h4><ul><li>Open commitment dashboards and target views in the portal.</li><li>Keep relevant invoice, customer, or issue reference ready.</li><li>Confirm your role has update permission for this action.</li></ul><h4>Steps</h4><ol><li>Open <strong>commitment dashboards and target views</strong> and locate the target record.</li><li>Use search and filters to narrow to the correct invoice, issue, customer, or task.</li><li>Perform the action for <em>monitor approved vs rejected commitments by agent</em> and add required remarks.</li><li>Save or submit using the available workflow button.</li><li>Review post-action status, trail entries, and dependent module updates.</li></ol><h4>Validation</h4><ul><li>Status and sub-status are updated as expected.</li><li>Action trail captures user, timestamp, and remark.</li><li>Linked dashboards, notifications, or task queues show the latest state.</li></ul><h4>Common issues</h4><ul><li>Submitting without validating current status and ownership.</li><li>Forgetting mandatory remark or recipient details.</li><li>Assuming save was successful without checking trail or counters.</li></ul>`
-    },
+    commitmentGuide({
+      id: "kb-080", title: "How to approve or reject invoice commitments", roles: ["Manager"],
+      purpose: "Review an Agent’s submitted invoice commitments and approve valid entries or reject entries that need revision.",
+      prerequisites: ["The Agent has submitted commitments.", "Open <strong>Commitment Review</strong>."],
+      steps: [
+        "Select the Agent whose commitments you need to review.",
+        "Find the relevant invoices using search or the available filters. Confirm each customer code and invoice number.",
+        "Review the <strong>Due Date</strong>, <strong>Invoice Value</strong>, <strong>Amount For The Month</strong>, selected <strong>Week</strong> and <strong>Target Amount Committed</strong>.",
+        "Check the box beside each commitment on which you want to decide.",
+        "Click <strong>Approve selected</strong> for valid commitments or <strong>Reject selected</strong> for commitments requiring revision.",
+        "Check that each selected invoice shows the intended updated status."
+      ],
+      note: "A selected action applies to every checked invoice. Verify the Agent, invoices, weeks and amounts before making a bulk decision.",
+      validation: ["Each selected invoice shows <strong>Approved</strong> or <strong>Rejected</strong>, as intended.", "The updated status belongs to the correct Agent and invoice."],
+      commonIssues: ["Reviewing the wrong Agent’s portfolio.", "Leaving a filter active and overlooking an invoice.", "Selecting an invoice without checking its week and committed amount.", "Attempting a selected action without checking any rows."]
+    }),
     {
       id: "kb-081", cat: "commitments-targets",
       title: "Why committed total and collected total do not match",
@@ -1497,7 +1521,7 @@
       title: "How to open operational modules from portfolio Quick Actions",
       meta: "Dashboards · 2 min read",
       roles: ["Manager","Supervisor","KAS"],
-      body: `<h4>Purpose</h4><p>Open the visit, issue, or commitment module from a portfolio dashboard.</p><h4>Prerequisites</h4><ul><li>Sign in with a Manager, Supervisor, or KAS account.</li><li>Open the corresponding portfolio dashboard.</li></ul><h4>Steps</h4><ol><li>Locate Quick Actions on the dashboard.</li><li>Click Open Visit Review to open Visit Module Review.</li><li>Click Issue Tracker to open the issue board.</li><li>Click Commitment Review to open the manager commitment view.</li><li>Confirm the destination heading before searching for a record or taking action.</li></ol><h4>Validation</h4><ul><li>Each button opens the named module.</li><li>The destination module is visible before any record is changed.</li></ul><h4>Common issues</h4><ul><li>Choosing Commitment Review when you need to review a visit plan.</li><li>Assuming the Quick Actions panel performs an approval automatically.</li><li>Continuing in a destination module without confirming its heading.</li></ul>`
+      body: `<h4>Purpose</h4><p>Open the visit, issue, or commitment module from a portfolio dashboard.</p><h4>Prerequisites</h4><ul><li>Sign in with a Manager, Supervisor, or KAS account.</li><li>Open the corresponding portfolio dashboard.</li></ul><h4>Steps</h4><ol><li>Locate Quick Actions on the dashboard.</li><li>Click Open Visit Review to open Visit Module Review.</li><li>Click Issue Tracker to open the issue board.</li><li>Click Commitment Review to open the commitment view for your role.</li><li>Confirm the destination heading before searching for a record or taking action.</li></ol><h4>Validation</h4><ul><li>Each button opens the named module.</li><li>The destination module is visible before any record is changed.</li></ul><h4>Common issues</h4><ul><li>Choosing Commitment Review when you need to review a visit plan.</li><li>Assuming the Quick Actions panel performs an approval automatically.</li><li>Continuing in a destination module without confirming its heading.</li></ul>`
     },
     {
       id: "kb-139", cat: "dashboards",
@@ -1711,6 +1735,22 @@
       note: "Reopening keeps the same <strong>Issue ID</strong> and history. When the Agent reopens an issue, it follows the configured review route. When the Manager reopens it, it goes to the Action Owner.",
       validation: ["The issue status is <strong>Open</strong>.", "The <strong>Action trail</strong> records the reopening remark.", "<strong>Current assignee</strong> shows who acts next."],
       commonIssues: ["Leaving the required reopening remark blank.", "Reopening the wrong issue without checking its ID and invoice.", "Assuming reopening creates a new <strong>Issue ID</strong>."]
+    }),
+    commitmentGuide({
+      id: "kb-155", title: "How to review invoice commitment status", roles: ["Supervisor"],
+      purpose: "Monitor an Agent’s invoice commitments, planned collection weeks and current statuses without changing them.",
+      prerequisites: ["Open <strong>Commitment Review</strong> from the Supervisor Dashboard.", "Know which Agent or invoice you want to review."],
+      steps: [
+        "Select the Agent whose commitments you want to review. Confirm the selected Agent’s name.",
+        "Review the summary figures for total invoices, committed invoices, net due and target amount committed.",
+        "Search for a customer or invoice, or use the available due-date and status filters.",
+        "Confirm the customer code and invoice number in the matching row.",
+        "Review <strong>Status</strong>, <strong>Week</strong> and <strong>Target Amount Committed</strong> alongside <strong>Invoice Value</strong> and <strong>Amount For The Month</strong>.",
+        "Use <strong>Clear filters</strong> when you need to return to the broader invoice list."
+      ],
+      note: "Supervisor access is <strong>view-only</strong>. Supervisors can review commitments but cannot enter amounts, change weeks, submit, approve or reject them.",
+      validation: ["The selected Agent and invoice match the records you intended to review.", "The commitment status, week and amount are visible.", "Reviewing the record has not changed its details."],
+      commonIssues: ["Reviewing the wrong Agent’s invoices.", "Overlooking an active filter.", "Confusing <strong>Invoice Value</strong> or <strong>Amount For The Month</strong> with <strong>Target Amount Committed</strong>."]
     })
   ];
 

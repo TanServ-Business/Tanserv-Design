@@ -1,0 +1,838 @@
+{
+  "enabled": true,
+  "strategy": {
+    "id": "SM-1792435531506-FUXH",
+    "status": "active",
+    "firstStageDays": 15,
+    "stages": [
+      {
+        "templateId": "dunning-template-1",
+        "intervalDays": 0,
+        "filters": {
+          "keyAccountFilter": "all",
+          "invoiceStatuses": [
+            "Within Credit Period/Days",
+            "LC Payment",
+            "As Per Payment Terms",
+            "Retention Amount",
+            "SD Amount",
+            "Part Payment through LC done",
+            "Part Payment Made",
+            "PTP",
+            "Funds Issue",
+            "PDC Given",
+            "Call Back",
+            "Cold Call",
+            "Issue With Address Mentioned",
+            "Recon Required",
+            "Not my Invoice",
+            "Call Back/Email Follow up",
+            "Assign the Invoice to Others",
+            "Company Closed/Shut down",
+            "Recommended For Legal",
+            "Office Closed/Shut Down",
+            "Shifted - Address Not Found",
+            "Fix Dunning letter strategy",
+            "Send Pre-Legal Letter",
+            "Invoice Copy Required",
+            "PO (Purchase Order) Copy Required",
+            "Service/PM Report Required",
+            "Compliance Docs (Salary, PF, Attendance & ESI) required",
+            "Indeminity Bond Required",
+            "BG/PBG Required",
+            "GST Challan/ GST Certifcate by CA Required",
+            "Delivery Challan Required",
+            "Statutory Docs(PAN, GST Registration, Turnover Certifcate ) Required",
+            "Wrong/Incorrect Billing",
+            "Payment Wrongly Adjusted",
+            "PO Cancelled/Contract Terminated",
+            "Proposed For Write-Off",
+            "Credit Note To Be Issued",
+            "Vendor Portal Issue",
+            "Reversal & Re-Bill",
+            "Tax Issue On The Invoice",
+            "Customized Invoice Required",
+            "Discount Required",
+            "Customer deduction",
+            "Proposed for Cancellation",
+            "Material Not Received",
+            "Partial Material Received",
+            "Damaged Material Received",
+            "Late Shipment",
+            "Wrong Material Delivered",
+            "Material Delivered To Wrong Site",
+            "Material Recalled/Returned",
+            "PM Pending",
+            "Equipment Not Working",
+            "Call Not Attended",
+            "Turnkey Project Issues",
+            "Unsatisfactory Service Report By Customer",
+            "Installation Pending",
+            "Commissioning Pending",
+            "Inspection Pending",
+            "Collected"
+          ],
+          "invoiceBroadSelections": [],
+          "invoicePrimarySelections": [],
+          "agingBuckets": [
+            "1-30",
+            "31-45",
+            "46-60",
+            "61-90",
+            "91-120",
+            "121-150",
+            "151-180",
+            "181-210",
+            "211-240",
+            "241-270",
+            "271-300",
+            "301-330",
+            "331-365",
+            "1-2 yrs",
+            "2-3 yrs",
+            "3-4 yrs",
+            "4-5 yrs",
+            "5+ yrs"
+          ],
+          "dispositionGroups": [
+            "due_reminder"
+          ],
+          "subStatuses": [
+            "Funds Issue",
+            "Part Payment Made",
+            "Call Back/Email"
+          ]
+        }
+      },
+      {
+        "templateId": "dunning-template-2",
+        "intervalDays": 7,
+        "filters": {
+          "keyAccountFilter": "all",
+          "invoiceStatuses": [
+            "Within Credit Period/Days",
+            "LC Payment",
+            "As Per Payment Terms",
+            "Retention Amount",
+            "SD Amount",
+            "Part Payment through LC done",
+            "Part Payment Made",
+            "PTP",
+            "Funds Issue",
+            "PDC Given",
+            "Call Back",
+            "Cold Call",
+            "Issue With Address Mentioned",
+            "Recon Required",
+            "Not my Invoice",
+            "Call Back/Email Follow up",
+            "Assign the Invoice to Others",
+            "Company Closed/Shut down",
+            "Recommended For Legal",
+            "Office Closed/Shut Down",
+            "Shifted - Address Not Found",
+            "Fix Dunning letter strategy",
+            "Send Pre-Legal Letter",
+            "Invoice Copy Required",
+            "PO (Purchase Order) Copy Required",
+            "Service/PM Report Required",
+            "Compliance Docs (Salary, PF, Attendance & ESI) required",
+            "Indeminity Bond Required",
+            "BG/PBG Required",
+            "GST Challan/ GST Certifcate by CA Required",
+            "Delivery Challan Required",
+            "Statutory Docs(PAN, GST Registration, Turnover Certifcate ) Required",
+            "Wrong/Incorrect Billing",
+            "Payment Wrongly Adjusted",
+            "PO Cancelled/Contract Terminated",
+            "Proposed For Write-Off",
+            "Credit Note To Be Issued",
+            "Vendor Portal Issue",
+            "Reversal & Re-Bill",
+            "Tax Issue On The Invoice",
+            "Customized Invoice Required",
+            "Discount Required",
+            "Customer deduction",
+            "Proposed for Cancellation",
+            "Material Not Received",
+            "Partial Material Received",
+            "Damaged Material Received",
+            "Late Shipment",
+            "Wrong Material Delivered",
+            "Material Delivered To Wrong Site",
+            "Material Recalled/Returned",
+            "PM Pending",
+            "Equipment Not Working",
+            "Call Not Attended",
+            "Turnkey Project Issues",
+            "Unsatisfactory Service Report By Customer",
+            "Installation Pending",
+            "Commissioning Pending",
+            "Inspection Pending",
+            "Collected"
+          ],
+          "invoiceBroadSelections": [],
+          "invoicePrimarySelections": [],
+          "agingBuckets": [
+            "1-30",
+            "31-45",
+            "46-60",
+            "61-90",
+            "91-120",
+            "121-150",
+            "151-180",
+            "181-210",
+            "211-240",
+            "241-270",
+            "271-300",
+            "301-330",
+            "331-365",
+            "1-2 yrs",
+            "2-3 yrs",
+            "3-4 yrs",
+            "4-5 yrs",
+            "5+ yrs"
+          ],
+          "dispositionGroups": [
+            "due_reminder"
+          ],
+          "subStatuses": [
+            "Funds Issue",
+            "Part Payment Made",
+            "Call Back/Email"
+          ]
+        }
+      },
+      {
+        "templateId": "dunning-template-3",
+        "intervalDays": 7,
+        "filters": {
+          "keyAccountFilter": "all",
+          "invoiceStatuses": [
+            "Within Credit Period/Days",
+            "LC Payment",
+            "As Per Payment Terms",
+            "Retention Amount",
+            "SD Amount",
+            "Part Payment through LC done",
+            "Part Payment Made",
+            "PTP",
+            "Funds Issue",
+            "PDC Given",
+            "Call Back",
+            "Cold Call",
+            "Issue With Address Mentioned",
+            "Recon Required",
+            "Not my Invoice",
+            "Call Back/Email Follow up",
+            "Assign the Invoice to Others",
+            "Company Closed/Shut down",
+            "Recommended For Legal",
+            "Office Closed/Shut Down",
+            "Shifted - Address Not Found",
+            "Fix Dunning letter strategy",
+            "Send Pre-Legal Letter",
+            "Invoice Copy Required",
+            "PO (Purchase Order) Copy Required",
+            "Service/PM Report Required",
+            "Compliance Docs (Salary, PF, Attendance & ESI) required",
+            "Indeminity Bond Required",
+            "BG/PBG Required",
+            "GST Challan/ GST Certifcate by CA Required",
+            "Delivery Challan Required",
+            "Statutory Docs(PAN, GST Registration, Turnover Certifcate ) Required",
+            "Wrong/Incorrect Billing",
+            "Payment Wrongly Adjusted",
+            "PO Cancelled/Contract Terminated",
+            "Proposed For Write-Off",
+            "Credit Note To Be Issued",
+            "Vendor Portal Issue",
+            "Reversal & Re-Bill",
+            "Tax Issue On The Invoice",
+            "Customized Invoice Required",
+            "Discount Required",
+            "Customer deduction",
+            "Proposed for Cancellation",
+            "Material Not Received",
+            "Partial Material Received",
+            "Damaged Material Received",
+            "Late Shipment",
+            "Wrong Material Delivered",
+            "Material Delivered To Wrong Site",
+            "Material Recalled/Returned",
+            "PM Pending",
+            "Equipment Not Working",
+            "Call Not Attended",
+            "Turnkey Project Issues",
+            "Unsatisfactory Service Report By Customer",
+            "Installation Pending",
+            "Commissioning Pending",
+            "Inspection Pending",
+            "Collected"
+          ],
+          "invoiceBroadSelections": [],
+          "invoicePrimarySelections": [],
+          "agingBuckets": [
+            "1-30",
+            "31-45",
+            "46-60",
+            "61-90",
+            "91-120",
+            "121-150",
+            "151-180",
+            "181-210",
+            "211-240",
+            "241-270",
+            "271-300",
+            "301-330",
+            "331-365",
+            "1-2 yrs",
+            "2-3 yrs",
+            "3-4 yrs",
+            "4-5 yrs",
+            "5+ yrs"
+          ],
+          "dispositionGroups": [
+            "due_reminder"
+          ],
+          "subStatuses": [
+            "Funds Issue",
+            "Part Payment Made",
+            "Call Back/Email"
+          ]
+        }
+      },
+      {
+        "templateId": "dunning-template-4",
+        "intervalDays": 7,
+        "filters": {
+          "keyAccountFilter": "all",
+          "invoiceStatuses": [
+            "Within Credit Period/Days",
+            "LC Payment",
+            "As Per Payment Terms",
+            "Retention Amount",
+            "SD Amount",
+            "Part Payment through LC done",
+            "Part Payment Made",
+            "PTP",
+            "Funds Issue",
+            "PDC Given",
+            "Call Back",
+            "Cold Call",
+            "Issue With Address Mentioned",
+            "Recon Required",
+            "Not my Invoice",
+            "Call Back/Email Follow up",
+            "Assign the Invoice to Others",
+            "Company Closed/Shut down",
+            "Recommended For Legal",
+            "Office Closed/Shut Down",
+            "Shifted - Address Not Found",
+            "Fix Dunning letter strategy",
+            "Send Pre-Legal Letter",
+            "Invoice Copy Required",
+            "PO (Purchase Order) Copy Required",
+            "Service/PM Report Required",
+            "Compliance Docs (Salary, PF, Attendance & ESI) required",
+            "Indeminity Bond Required",
+            "BG/PBG Required",
+            "GST Challan/ GST Certifcate by CA Required",
+            "Delivery Challan Required",
+            "Statutory Docs(PAN, GST Registration, Turnover Certifcate ) Required",
+            "Wrong/Incorrect Billing",
+            "Payment Wrongly Adjusted",
+            "PO Cancelled/Contract Terminated",
+            "Proposed For Write-Off",
+            "Credit Note To Be Issued",
+            "Vendor Portal Issue",
+            "Reversal & Re-Bill",
+            "Tax Issue On The Invoice",
+            "Customized Invoice Required",
+            "Discount Required",
+            "Customer deduction",
+            "Proposed for Cancellation",
+            "Material Not Received",
+            "Partial Material Received",
+            "Damaged Material Received",
+            "Late Shipment",
+            "Wrong Material Delivered",
+            "Material Delivered To Wrong Site",
+            "Material Recalled/Returned",
+            "PM Pending",
+            "Equipment Not Working",
+            "Call Not Attended",
+            "Turnkey Project Issues",
+            "Unsatisfactory Service Report By Customer",
+            "Installation Pending",
+            "Commissioning Pending",
+            "Inspection Pending",
+            "Collected"
+          ],
+          "invoiceBroadSelections": [],
+          "invoicePrimarySelections": [],
+          "agingBuckets": [
+            "1-30",
+            "31-45",
+            "46-60",
+            "61-90",
+            "91-120",
+            "121-150",
+            "151-180",
+            "181-210",
+            "211-240",
+            "241-270",
+            "271-300",
+            "301-330",
+            "331-365",
+            "1-2 yrs",
+            "2-3 yrs",
+            "3-4 yrs",
+            "4-5 yrs",
+            "5+ yrs"
+          ],
+          "dispositionGroups": [
+            "due_reminder"
+          ],
+          "subStatuses": [
+            "Funds Issue",
+            "Part Payment Made",
+            "Call Back/Email"
+          ]
+        }
+      }
+    ]
+  },
+  "batches": [
+    {
+      "date": "2026-10-20",
+      "stage": 5,
+      "status": "completed",
+      "nextDate": null,
+      "invoices": [
+        "qa-invoice-A1",
+        "qa-invoice-A2"
+      ]
+    },
+    {
+      "date": "2026-10-21",
+      "stage": 5,
+      "status": "completed",
+      "nextDate": null,
+      "invoices": [
+        "qa-invoice-B1"
+      ]
+    },
+    {
+      "date": "2026-10-22",
+      "stage": 5,
+      "status": "completed",
+      "nextDate": null,
+      "invoices": [
+        "qa-invoice-C1"
+      ]
+    },
+    {
+      "date": "2026-10-27",
+      "stage": 5,
+      "status": "completed",
+      "nextDate": null,
+      "invoices": [
+        "qa-invoice-D1"
+      ]
+    }
+  ],
+  "emails": [
+    {
+      "id": "dunning-email-8-4",
+      "stage": 1,
+      "date": "2026-10-20",
+      "status": "sent",
+      "to": [
+        "qa.accounts@example.test",
+        "qa.finance@example.test"
+      ],
+      "reference": "DL-20261020-000004",
+      "invoices": [
+        {
+          "number": "QA-A1",
+          "original": 10000,
+          "outstanding": 10000
+        },
+        {
+          "number": "QA-A2",
+          "original": 10000,
+          "outstanding": 10000
+        }
+      ],
+      "retainedPdf": true
+    },
+    {
+      "id": "dunning-email-9-5",
+      "stage": 1,
+      "date": "2026-10-21",
+      "status": "failed",
+      "to": [
+        "qa.accounts@example.test",
+        "qa.finance@example.test"
+      ],
+      "reference": "DL-20261021-000005",
+      "invoices": [
+        {
+          "number": "QA-B1",
+          "original": 12000,
+          "outstanding": 12000
+        }
+      ],
+      "retainedPdf": true
+    },
+    {
+      "id": "dunning-email-10-6",
+      "stage": 1,
+      "date": "2026-10-22",
+      "status": "partial",
+      "to": [
+        "qa.accounts@example.test",
+        "qa.finance@example.test"
+      ],
+      "reference": "DL-20261022-000006",
+      "invoices": [
+        {
+          "number": "QA-B1",
+          "original": 12000,
+          "outstanding": 12000
+        }
+      ],
+      "retainedPdf": true
+    },
+    {
+      "id": "dunning-email-10-7",
+      "stage": 1,
+      "date": "2026-10-22",
+      "status": "partial",
+      "to": [
+        "qa.accounts@example.test",
+        "qa.finance@example.test"
+      ],
+      "reference": "DL-20261022-000007",
+      "invoices": [
+        {
+          "number": "QA-C1",
+          "original": 13000,
+          "outstanding": 13000
+        }
+      ],
+      "retainedPdf": true
+    },
+    {
+      "id": "dunning-email-13-11",
+      "stage": 2,
+      "date": "2026-10-27",
+      "status": "sent",
+      "to": [
+        "qa.accounts@example.test",
+        "qa.finance@example.test"
+      ],
+      "reference": "DL-20261027-000011",
+      "invoices": [
+        {
+          "number": "QA-A2",
+          "original": 10000,
+          "outstanding": 3000
+        }
+      ],
+      "retainedPdf": true
+    },
+    {
+      "id": "dunning-email-13-12",
+      "stage": 1,
+      "date": "2026-10-27",
+      "status": "sent",
+      "to": [
+        "qa.accounts@example.test",
+        "qa.finance@example.test"
+      ],
+      "reference": "DL-20261027-000012",
+      "invoices": [
+        {
+          "number": "QA-D1",
+          "original": 14000,
+          "outstanding": 14000
+        }
+      ],
+      "retainedPdf": true
+    },
+    {
+      "id": "dunning-email-15-13",
+      "stage": 2,
+      "date": "2026-10-29",
+      "status": "sent",
+      "to": [
+        "qa.accounts@example.test",
+        "qa.finance@example.test"
+      ],
+      "reference": "DL-20261029-000013",
+      "invoices": [
+        {
+          "number": "QA-B1",
+          "original": 12000,
+          "outstanding": 12000
+        }
+      ],
+      "retainedPdf": true
+    },
+    {
+      "id": "dunning-email-15-14",
+      "stage": 2,
+      "date": "2026-10-29",
+      "status": "sent",
+      "to": [
+        "qa.accounts@example.test",
+        "qa.finance@example.test"
+      ],
+      "reference": "DL-20261029-000014",
+      "invoices": [
+        {
+          "number": "QA-C1",
+          "original": 13000,
+          "outstanding": 13000
+        }
+      ],
+      "retainedPdf": true
+    },
+    {
+      "id": "dunning-email-16-18",
+      "stage": 3,
+      "date": "2026-11-03",
+      "status": "sent",
+      "to": [
+        "qa.accounts@example.test",
+        "qa.finance@example.test"
+      ],
+      "reference": "DL-20261103-000018",
+      "invoices": [
+        {
+          "number": "QA-A2",
+          "original": 10000,
+          "outstanding": 3000
+        }
+      ],
+      "retainedPdf": true
+    },
+    {
+      "id": "dunning-email-16-19",
+      "stage": 2,
+      "date": "2026-11-03",
+      "status": "sent",
+      "to": [
+        "qa.accounts@example.test",
+        "qa.finance@example.test"
+      ],
+      "reference": "DL-20261103-000019",
+      "invoices": [
+        {
+          "number": "QA-D1",
+          "original": 14000,
+          "outstanding": 14000
+        }
+      ],
+      "retainedPdf": true
+    },
+    {
+      "id": "dunning-email-17-20",
+      "stage": 3,
+      "date": "2026-11-05",
+      "status": "sent",
+      "to": [
+        "qa.accounts@example.test",
+        "qa.finance@example.test"
+      ],
+      "reference": "DL-20261105-000020",
+      "invoices": [
+        {
+          "number": "QA-B1",
+          "original": 12000,
+          "outstanding": 12000
+        }
+      ],
+      "retainedPdf": true
+    },
+    {
+      "id": "dunning-email-17-21",
+      "stage": 3,
+      "date": "2026-11-05",
+      "status": "sent",
+      "to": [
+        "qa.accounts@example.test",
+        "qa.finance@example.test"
+      ],
+      "reference": "DL-20261105-000021",
+      "invoices": [
+        {
+          "number": "QA-C1",
+          "original": 13000,
+          "outstanding": 13000
+        }
+      ],
+      "retainedPdf": true
+    },
+    {
+      "id": "dunning-email-18-25",
+      "stage": 4,
+      "date": "2026-11-10",
+      "status": "sent",
+      "to": [
+        "qa.accounts@example.test",
+        "qa.finance@example.test"
+      ],
+      "reference": "DL-20261110-000025",
+      "invoices": [
+        {
+          "number": "QA-A2",
+          "original": 10000,
+          "outstanding": 3000
+        }
+      ],
+      "retainedPdf": true
+    },
+    {
+      "id": "dunning-email-18-26",
+      "stage": 3,
+      "date": "2026-11-10",
+      "status": "sent",
+      "to": [
+        "qa.accounts@example.test",
+        "qa.finance@example.test"
+      ],
+      "reference": "DL-20261110-000026",
+      "invoices": [
+        {
+          "number": "QA-D1",
+          "original": 14000,
+          "outstanding": 14000
+        }
+      ],
+      "retainedPdf": true
+    },
+    {
+      "id": "dunning-email-19-27",
+      "stage": 4,
+      "date": "2026-11-12",
+      "status": "sent",
+      "to": [
+        "qa.accounts@example.test",
+        "qa.finance@example.test"
+      ],
+      "reference": "DL-20261112-000027",
+      "invoices": [
+        {
+          "number": "QA-B1",
+          "original": 12000,
+          "outstanding": 12000
+        }
+      ],
+      "retainedPdf": true
+    },
+    {
+      "id": "dunning-email-19-28",
+      "stage": 4,
+      "date": "2026-11-12",
+      "status": "sent",
+      "to": [
+        "qa.accounts@example.test",
+        "qa.finance@example.test"
+      ],
+      "reference": "DL-20261112-000028",
+      "invoices": [
+        {
+          "number": "QA-C1",
+          "original": 13000,
+          "outstanding": 13000
+        }
+      ],
+      "retainedPdf": true
+    },
+    {
+      "id": "dunning-email-20-29",
+      "stage": 4,
+      "date": "2026-11-17",
+      "status": "sent",
+      "to": [
+        "qa.accounts@example.test",
+        "qa.finance@example.test"
+      ],
+      "reference": "DL-20261117-000029",
+      "invoices": [
+        {
+          "number": "QA-D1",
+          "original": 14000,
+          "outstanding": 14000
+        }
+      ],
+      "retainedPdf": true
+    }
+  ],
+  "reportSummary": {
+    "invoices": 17,
+    "letters": 16,
+    "customers": 1
+  },
+  "checks": [
+    {
+      "name": "UI-saved strategy has four configured stages",
+      "pass": true
+    },
+    {
+      "name": "First daily batch consolidates two invoices in one letter",
+      "pass": true
+    },
+    {
+      "name": "Every customer contact is included in To",
+      "pass": true
+    },
+    {
+      "name": "Actual PDF bytes are retained",
+      "pass": true
+    },
+    {
+      "name": "Complete failure blocks next stage and retries next day",
+      "pass": true
+    },
+    {
+      "name": "Successful partial retry shifts Letter 2 to 29 October",
+      "pass": true
+    },
+    {
+      "name": "New daily batch remains independent",
+      "pass": true
+    },
+    {
+      "name": "Same customer receives separate DL1 and DL2 emails on one day",
+      "pass": true
+    },
+    {
+      "name": "Fully paid invoice excluded and partial balance refreshed",
+      "pass": true
+    },
+    {
+      "name": "Earlier issued PDF is unchanged after payments",
+      "pass": true
+    },
+    {
+      "name": "Report has exact ten columns and excludes failed attempts",
+      "pass": true
+    },
+    {
+      "name": "Same daily run does not duplicate sending",
+      "pass": true
+    },
+    {
+      "name": "All daily batches complete through configured Letter 4",
+      "pass": true
+    },
+    {
+      "name": "No extra escalation or letter after final configured stage",
+      "pass": true
+    }
+  ]
+}

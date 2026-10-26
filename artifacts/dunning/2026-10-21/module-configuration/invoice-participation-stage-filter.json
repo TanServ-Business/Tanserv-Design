@@ -1,0 +1,30 @@
+{
+  "date": "2026-10-21",
+  "decision": "Filter Invoice Participation by latest successfully sent letter; partial delivery counts as successful.",
+  "filter_options": [
+    "All letters",
+    "Not sent",
+    "DL1 through configured count",
+    "Historical sent stages above current count"
+  ],
+  "automated": {
+    "result": "passed",
+    "participation_tests": 14,
+    "existing_management_tests": 10,
+    "existing_core_scenarios": 30,
+    "syntax_check": "passed",
+    "diff_check": "passed"
+  },
+  "browser": {
+    "origin": "http://127.0.0.1:8773",
+    "result": "passed",
+    "checks": [
+      "All invoices show last-sent stages independently per invoice",
+      "DL2 shows SAMPLE-102 only",
+      "DL2 combined with Meridian search shows no matches",
+      "Not sent combined with Meridian search shows four invoices",
+      "Clearing filters restores all eight invoices"
+    ],
+    "screenshot": "invoice-participation-stage-filter.jpg"
+  }
+}

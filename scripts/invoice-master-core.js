@@ -7,6 +7,9 @@
   const required = new Set(["Customer Code", "Customer Name", "Invoice No", "Invoice Date", "Invoice Due Date", "Invoice Value", "Currency"]);
   const normalize = (s) => String(s ?? "").replace(/^\uFEFF/, "").trim().toLowerCase().replace(/[\s_-]/g, "");
   const locked = new Set(["invoicestatus", "broadstatus", "primarystatus", "substatus"]);
+  // Requirements v2 §5: 8 template fields are view only on existing invoices; the other 34 stay editable.
+  const protectedFields = new Set(["Customer Code", "Customer Name", "Invoice No", "Invoice Date", "Invoice Due Date", "Invoice Value", "Tax Value", "Base Value"]);
+  const editable = headers.filter((h) => !protectedFields.has(h));
   const clone = (v) => JSON.parse(JSON.stringify(v));
   const identity = (record) => `${record.company}\u0000${record.fields["Invoice No"]}`;
   const dateValue = (v) => {
@@ -85,7 +88,7 @@
       const no = String(row[invoiceIndex] ?? "").trim();
       const existing = records.find((r) => r.company === company && r.fields["Invoice No"] === no);
       const next = existing ? clone(existing) : { company, fields: Object.fromEntries(headers.map((h) => [h, ""])) };
-      const errors = [], changes = [];
+      const errors = [], changes = [], warnings = [];
       if (!no) errors.push("Invoice No is required");
       if ((counts.get(no) || 0) > 1) errors.push("Duplicate Invoice No in this file");
       if (row.length > matrix[0].length) errors.push("More values than column headers");
@@ -95,7 +98,12 @@
         const value = row[column];
         if (value == null || String(value).trim() === "") return;
         const normalized = normalize(rawHeader), header = lookup.get(normalized);
-        if (locked.has(normalized)) { errors.push(`${rawHeader} is view only`); return; }
+        if (locked.has(normalized)) { warnings.push(`${rawHeader} is view only; change ignored`); return; }
+        if (existing && protectedFields.has(header)) {
+          let converted; try { converted = convert(header, value); } catch (_) { converted = null; }
+          if (header !== "Invoice No" && next.fields[header] !== converted) warnings.push(`${header} is view only; change ignored`);
+          return;
+        }
         try {
           const converted = convert(header, value);
           if (next.fields[header] !== converted) changes.push({ field: header, before: next.fields[header] ?? "", after: converted });
@@ -103,7 +111,7 @@
         } catch (error) { errors.push(`${header}: ${error.message}`); }
       });
       errors.push(...validate(next.fields));
-      results.push({ row: index + 2, invoiceNo: no, existing: existing ? clone(existing) : null, next, changes, errors, kind: errors.length ? "error" : existing ? (changes.length ? "update" : "unchanged") : "add" });
+      results.push({ row: index + 2, invoiceNo: no, existing: existing ? clone(existing) : null, next, changes, errors, warnings, kind: errors.length ? "error" : existing ? (changes.length ? "update" : "unchanged") : "add" });
     });
     if (!results.length) throw new Error("The file contains headers but no invoice rows");
     return results;
@@ -135,7 +143,7 @@
     if (!changes.length) throw new Error("The selected invoices have no missing assignments for the chosen role");
     return { next, changes };
   };
-  const api = { headers, dates, numbers, required, normalize, locked, convert, validate, parseCSV, preview, apply, identity, clone, missingAssignments, allocate };
+  const api = { headers, dates, numbers, required, normalize, locked, protectedFields, editable, convert, validate, parseCSV, preview, apply, identity, clone, missingAssignments, allocate };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   else root.IneburaInvoiceCore = api;
 })(typeof window === "undefined" ? globalThis : window);

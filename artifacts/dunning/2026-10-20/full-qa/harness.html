@@ -1,0 +1,49 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><title>Dunning QA harness</title><style>body{font:15px system-ui;margin:28px;color:#253148}button,a{padding:9px 13px;margin:4px}pre{white-space:pre-wrap;background:#f4f5f8;padding:16px;border-radius:8px}table{border-collapse:collapse}td,th{padding:8px;border:1px solid #ddd}.pass{color:#146b39}.fail{color:#a12525}</style>
+<h1>Dunning end to end QA harness</h1><p>Test controls only. This page is kept under QA artifacts and does not change the Strategy Master layout. It uses the actual browser-persisted engine, templates and generated PDF bytes. All sending is simulated.</p>
+<button id="seed">Load fictional QA invoices</button><button id="day20">20 October success</button><button id="day21">21 October all fail</button><button id="day22">22 October partial success</button><button id="day27">27 October payments and separate stages</button><button id="repeat">Repeat 27 October</button><button id="finish">Continue to final Letter 4</button><button id="refresh">Refresh evidence</button><button id="preview">Preview retained QA PDF</button><a id="qaPdf" download="qa-issued-letter.pdf">Retained PDF bytes</a>
+<pre id="out" role="status"></pre><div id="checks"></div><div id="report"></div><pre id="state"></pre>
+<script src="../../../../scripts/dunning-core.js"></script><script src="../../../../scripts/vendor/jspdf.umd.min.js"></script><script src="../../../../scripts/dunning-documents.js"></script><script src="../../../../scripts/dunning-report-data.js"></script>
+<script>
+'use strict';
+const core=window.IneburaDunning; const actor={role:'client-admin',userId:'demo-user',clientId:'demo-client'};const results=JSON.parse(sessionStorage.getItem('dunningQaChecks')||'[]');
+const esc=v=>String(v??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const check=(name,value)=>{results.push({name,pass:!!value});sessionStorage.setItem('dunningQaChecks',JSON.stringify(results));};
+const strategy=()=>core.getState().strategies.find(s=>s.name==='QA complete Dunning flow');
+const qaEmails=()=>core.getState().emails.filter(e=>e.customerId==='qa-customer');
+function evidence(){
+ const s=core.getState(), emails=qaEmails(), batches=s.batches.filter(b=>b.customerId==='qa-customer');
+ const report=window.IneburaDunningReport.buildDataset(s,actor,{customer:'QA Customer'});
+ document.getElementById('state').textContent=JSON.stringify({enabled:s.enabled,strategy:strategy()&&{id:strategy().id,status:strategy().status,firstStageDays:strategy().firstStageDays,stages:strategy().stages},batches:batches.map(b=>({date:b.createdDate,stage:b.stage,status:b.status,nextDate:b.nextDate,invoices:b.invoiceIds})),emails:emails.map(e=>({id:e.id,stage:e.stage,date:e.date,status:e.status,to:e.to,reference:e.reference,invoices:e.letterSnapshot.invoices.map(i=>({number:i.invoiceNo,original:i.originalAmount,outstanding:i.outstanding})),retainedPdf:e.letterSnapshot.pdfDataUri?.startsWith('data:application/pdf')})),reportSummary:report.summary,checks:results},null,2);
+ document.getElementById('checks').innerHTML=results.map(r=>'<p class="'+(r.pass?'pass':'fail')+'">'+(r.pass?'PASS ':'FAIL ')+esc(r.name)+'</p>').join('');
+ document.getElementById('report').innerHTML='<h2>Issued invoice report projection</h2><div style="overflow:auto"><table><thead><tr>'+report.headers.map(v=>'<th>'+esc(v)+'</th>').join('')+'</tr></thead><tbody>'+report.rows.map(row=>'<tr>'+row.map(v=>'<td>'+esc(v)+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>';
+ const issued=emails.find(e=>e.status!=='failed');if(issued)document.getElementById('qaPdf').href=issued.letterSnapshot.pdfDataUri;
+}
+function run(date,outcome){return core.runDaily(date,{outcome,actor});}
+document.addEventListener('click',event=>{
+ const id=event.target.id;if(!id||id==='qaPdf')return;
+ try{
+  let result;
+  if(id==='seed'){
+   if(!strategy())throw Error('Create QA complete Dunning flow through Strategy Master first.');
+   core.syncInvoices([{id:'qa-customer',name:'QA Customer',customerCode:'QA-CUSTOMER-001',clientCode:'QA-CLIENT-001',clientId:'demo-client',strategyMasterCustomerId:'qa-source-customer',strategyMasterKeyAccount:true,agentId:'demo-agent',contacts:['qa.accounts@example.test','qa.finance@example.test'],invoices:[['A1','2026-10-05',10000],['A2','2026-10-05',10000],['B1','2026-10-06',12000],['C1','2026-10-07',13000],['D1','2026-10-12',14000]].map(([suffix,dueDate,amount])=>({id:'qa-invoice-'+suffix,invoiceNo:'QA-'+suffix,dueDate,originalAmount:amount,outstanding:amount,strategyMasterInvoiceId:'QA-'+suffix,strategyMasterCustomerId:'qa-source-customer',strategyMasterSubStatus:'Funds Issue'}))}],actor);
+   check('UI-saved strategy has four configured stages',strategy().stages.length===4);result='Fictional fixtures loaded';
+  }
+  if(id==='day20'){result=run('2026-10-20','success');const e=qaEmails();check('First daily batch consolidates two invoices in one letter',e.length===1&&e[0].letterSnapshot.invoices.length===2);check('Every customer contact is included in To',e[0].to.length===2);check('Actual PDF bytes are retained',e[0].letterSnapshot.pdfDataUri.startsWith('data:application/pdf'));sessionStorage.setItem('dunningQaFirstPdf',e[0].letterSnapshot.pdfDataUri);}
+  if(id==='day21'){result=run('2026-10-21','failure');const b=core.getState().batches.find(b=>b.customerId==='qa-customer'&&b.createdDate==='2026-10-21');check('Complete failure blocks next stage and retries next day',b.status==='retry'&&b.stage===1&&b.nextDate==='2026-10-22');}
+  if(id==='day22'){result=run('2026-10-22','partial');const s=core.getState(),b=s.batches.find(b=>b.customerId==='qa-customer'&&b.createdDate==='2026-10-21');check('Successful partial retry shifts Letter 2 to 29 October',b.stage===2&&b.nextDate==='2026-10-29');check('New daily batch remains independent',s.batches.filter(b=>b.customerId==='qa-customer').length===3);}
+  if(id==='day27'){
+   core.updateInvoice('qa-invoice-A1',{outstanding:0},actor);core.updateInvoice('qa-invoice-A2',{outstanding:3000},actor);
+   result=run('2026-10-27','success');const sent=qaEmails().filter(e=>e.date==='2026-10-27');
+   check('Same customer receives separate DL1 and DL2 emails on one day',sent.length===2&&sent.some(e=>e.stage===1)&&sent.some(e=>e.stage===2));
+   const dl2=sent.find(e=>e.stage===2);check('Fully paid invoice excluded and partial balance refreshed',dl2.letterSnapshot.invoices.length===1&&dl2.letterSnapshot.invoices[0].invoiceNo==='QA-A2'&&dl2.letterSnapshot.invoices[0].outstanding===3000);
+   check('Earlier issued PDF is unchanged after payments',qaEmails()[0].letterSnapshot.pdfDataUri===sessionStorage.getItem('dunningQaFirstPdf'));
+   const report=window.IneburaDunningReport.buildDataset(core.getState(),actor,{customer:'QA Customer'});check('Report has exact ten columns and excludes failed attempts',report.headers.length===10&&report.rows.length===6);
+  }
+  if(id==='repeat'){const before=qaEmails().length;result=run('2026-10-27','success');check('Same daily run does not duplicate sending',qaEmails().length===before);}
+  if(id==='finish'){for(const date of ['2026-10-29','2026-11-03','2026-11-05','2026-11-10','2026-11-12','2026-11-17'])run(date,'success');const batches=core.getState().batches.filter(b=>b.customerId==='qa-customer');check('All daily batches complete through configured Letter 4',batches.length===4&&batches.every(b=>b.status==='completed'));const count=qaEmails().length;run('2026-11-18','success');check('No extra escalation or letter after final configured stage',qaEmails().length===count);}
+  if(id==='preview'){window.IneburaDunningDocuments.preview(qaEmails().find(e=>e.status!=='failed').letterSnapshot);}
+  document.getElementById('out').textContent=JSON.stringify({action:id,result},null,2);evidence();
+ }catch(error){document.getElementById('out').textContent='ERROR '+error.message;}
+});
+evidence();
+</script></html>

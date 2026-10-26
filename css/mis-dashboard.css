@@ -1,0 +1,127 @@
+@font-face { font-family:bootstrap-icons; src:url('../assets/admin-reference/bootstrap-icons.woff2') format('woff2'); font-display:block; }
+body[data-mis-dashboard] { height:auto; min-height:100%; overflow-x:hidden; overflow-y:auto; }
+.managerMain[hidden] { display:none!important; }
+.misDashboardApp { --mis-purple:#5c258d; --mis-teal:#1ca58e; --mis-amber:#e8ad43; --mis-muted:#6c7c9b; display:grid; grid-template-columns:270px minmax(0,1fr); column-gap:22px; row-gap:0; padding:14px 20px 40px; color:#111b36; font-family:Arial,Helvetica,sans-serif; }
+.misDashboardApp * { box-sizing:border-box; }
+.misDashboardContent { min-width:0; }
+.misQuickActions .panelCard { box-shadow:none; padding:15px; border-color:#e0e6f1; }
+.misQuickActions .panelTitle { margin-bottom:12px; color:#576c8b; font-size:13px; letter-spacing:0; }
+.misQuickActions .actionBtn { min-height:44px; padding:11px 14px; font-family:inherit; font-size:13px; color:#111b36; }
+.misQuickActions .actionBtn.is-active { color:var(--mis-purple); background:#f8f4fd; border-color:#d6c4e8; }
+.misQuickActions .actionBtn:hover { background:#f8f4fd; }
+.misDashboardHeading { grid-column:1/-1; min-height:72px; display:flex; align-items:flex-start; justify-content:space-between; gap:16px; padding:9px 2px 16px; background:transparent; color:#111b36; }
+.misDashboardHeading h1 { margin:0; color:#111b36; font-size:29px; line-height:1.2; font-weight:750; letter-spacing:-.6px; }
+.misDashboardHeading p { margin:4px 0 0; color:var(--mis-muted); font-size:15px; line-height:1.4; }
+.misDashboardSample { align-self:flex-end; margin-bottom:3px; color:var(--mis-muted); font-size:11px; text-align:right; max-width:240px; }
+.misDashboardFilters { display:grid; grid-template-columns:minmax(230px,1.1fr) minmax(215px,.95fr) minmax(255px,1.3fr); gap:20px; align-items:center; margin:0 0 16px; padding:15px 20px; border:1px solid #dde4f0; border-radius:12px; background:#fafbff; }
+.misControlLabel { display:block; margin-bottom:5px; color:#17213c; font-weight:600; font-size:13px; }
+.misScopeControl,.misPeriodControl { min-width:0; }
+.misScopeDropdown,.misPeriodDropdown { position:relative; }
+.misScopeDropdown summary,.misPeriodDropdown summary { display:flex; gap:10px; justify-content:space-between; align-items:center; min-height:42px; padding:9px 13px; background:white; border:1px solid #ced8e9; border-radius:9px; color:#131e3b; font-size:14px; cursor:pointer; list-style:none; }
+.misScopeDropdown summary::-webkit-details-marker,.misPeriodDropdown summary::-webkit-details-marker { display:none; }
+.misScopeDropdown summary > span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.misScopeDropdown summary .bi,.misPeriodDropdown summary .bi-chevron-down { font-size:12px; flex:none; }
+.misPeriodDropdown summary { justify-content:flex-start; }
+.misPeriodDropdown summary > span { flex:1; white-space:nowrap; }
+.misScopeMenu,.misPeriodMenu { position:absolute; top:calc(100% + 7px); left:0; width:max(100%,310px); padding:12px; background:#fff; border:1px solid #dbe1ed; border-radius:11px; box-shadow:0 14px 34px #19213e22; z-index:30; }
+.misScopeSearch { display:flex; gap:8px; align-items:center; padding:9px 11px; border:1px solid #d8deea; border-radius:7px; color:#7e88a0; }
+.misScopeSearch input { width:100%; min-width:0; border:0; outline:none; font:inherit; font-size:13px; background:transparent; }
+.misScopeSearch:focus-within { outline:2px solid #b18ad6; }
+.misSelectAll,.misScopeOption { display:flex; align-items:flex-start; gap:10px; padding:11px 5px; font-size:13px; cursor:pointer; margin:0; }
+.misSelectAll { margin-top:5px; font-weight:600; border-bottom:1px solid #e9edf3; }
+.misScopeOptions { max-height:250px; overflow:auto; overscroll-behavior:contain; }
+.misScopeOption:hover { background:#f8f4fd; border-radius:6px; }
+.misScopeOption input,.misSelectAll input { flex:none; width:16px; height:16px; margin:1px 0 0; accent-color:var(--mis-purple); }
+.misScopeOption small { display:block; color:var(--mis-muted); margin-top:3px; font-size:11px; }
+.misScopeOption[hidden] { display:none; }
+.misScopeNoResults { color:var(--mis-muted); font-size:13px; padding:12px 4px; margin:0; }
+.misScopeMenuFooter { display:flex; justify-content:space-between; align-items:center; gap:14px; border-top:1px solid #e9edf3; padding-top:10px; }
+.misScopeMenuFooter button,.misPeriodMenu button { border:0; background:transparent; color:var(--mis-purple); padding:6px 4px; font:inherit; font-size:13px; cursor:pointer; }
+.misScopeMenuFooter button:last-child,.misPeriodMenu button[type=submit] { background:var(--mis-purple); border-radius:6px; color:white; padding:7px 15px; }
+.misPeriodMenu { width:290px; }
+.misPeriodMenu label { display:block; font-size:12px; color:#53627b; margin-bottom:11px; }
+.misPeriodMenu input { display:block; width:100%; height:37px; margin-top:5px; border:1px solid #d6deea; border-radius:6px; padding:6px 10px; font:inherit; color:#17213c; }
+.misPeriodMenu > div { display:flex; justify-content:space-between; }
+.misPeriodMenu p { color:#aa3636; font-size:12px; margin:6px 0; }
+.misCumulativeNote { border-left:1px solid #d3dceb; padding-left:20px; min-width:0; }
+.misCumulativeNote strong { display:block; font-size:13px; font-weight:600; line-height:1.45; }
+.misCumulativeNote span { display:block; font-size:12px; color:var(--mis-muted); line-height:1.5; margin-top:4px; }
+.misReportGrid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; align-items:stretch; }
+.misReportCard { min-width:0; min-height:306px; padding:17px 18px; border:1px solid #e0e6f1; border-radius:12px; background:#fff; display:flex; flex-direction:column; }
+.misReportCard > header { display:flex; gap:8px; align-items:flex-start; justify-content:space-between; padding:0; background:transparent; color:#111b36; }
+.misReportCard h2 { margin:0; font-size:18px; line-height:1.25; font-weight:700; color:#111b36; letter-spacing:-.3px; }
+.misDownload { display:inline-flex; align-items:center; justify-content:center; gap:7px; flex:none; min-height:33px; padding:6px 10px; background:white; color:var(--mis-purple); border:1px solid #bc99df; border-radius:7px; font:inherit; font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap; }
+.misDownload .bi { font-size:15px; }
+.misDownload:hover { background:#f7f1fd; }
+.misDownload:disabled { color:#9da5b5; border-color:#e0e4ed; cursor:not-allowed; background:#fafbfc; }
+.misCardSubtitle { color:var(--mis-muted); font-size:13px; line-height:1.45; margin:6px 0 14px; }
+.misCardBody { flex:1; display:flex; flex-direction:column; justify-content:center; min-width:0; }
+.misDoughnutLayout { display:grid; grid-template-columns:minmax(130px,1.05fr) minmax(110px,1fr); align-items:center; gap:12px; }
+.misDonut { position:relative; width:100%; aspect-ratio:1; max-width:215px; margin:auto; }
+.misDonut canvas { position:absolute; inset:0; width:100%!important; height:100%!important; }
+.misDonutCenter { position:absolute; inset:22%; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; pointer-events:none; }
+.misDonutCenter strong { font-size:24px; font-weight:700; line-height:1.15; letter-spacing:-.5px; }
+.misDonutCenter span { margin-top:4px; font-size:12px; color:#53617e; line-height:1.3; }
+.misLegend { display:flex; flex-direction:column; gap:19px; min-width:0; }
+.misLegendRow { display:grid; grid-template-columns:11px minmax(0,1fr) auto; align-items:center; gap:7px; font-size:13px; }
+.misLegendDot { width:10px; height:10px; border-radius:50%; }
+.misLegendText { color:#465577; line-height:1.3; }
+.misLegendValue { color:#16213d; font-weight:600; text-align:right; white-space:nowrap; }
+.misLegendPercent { display:block; font-weight:400; font-size:12px; color:#6f7b97; margin-top:4px; }
+.misCommitment { border-top:1px solid #e2e6ef; padding-top:13px; display:flex; justify-content:space-between; align-items:center; color:#677591; font-size:12px; gap:8px; }
+.misCommitment strong { font-size:13px; color:#14203c; }
+.misMetricRow { display:flex; justify-content:space-between; gap:12px; align-items:center; color:#17213c; font-size:14px; margin-bottom:8px; }
+.misMetricRow strong { font-size:14px; font-weight:650; white-space:nowrap; }
+.misCreditTotal { padding-bottom:14px; border-bottom:1px solid #e2e6ef; margin-bottom:15px; }
+.misProgressCanvas { height:31px; position:relative; margin-bottom:20px; }
+.misProgressCanvas:last-child { margin-bottom:0; }
+.misProgressCanvas canvas { width:100%!important; height:31px!important; }
+.misSubmissionChart { position:relative; height:150px; width:100%; }
+.misSubmissionLegend { display:flex; align-items:center; justify-content:center; gap:14px; margin-top:10px; font-size:12px; color:#667494; }
+.misSubmissionLegend span { display:inline-flex; align-items:center; gap:6px; }
+.misSubmissionSummary { display:grid; grid-template-columns:1fr 1fr; margin-top:14px; padding:13px 10px; border-radius:10px; background:#f6f2fc; text-align:center; }
+.misSubmissionSummary > div + div { border-left:1px solid #d6cde7; }
+.misSubmissionSummary span { display:block; color:#64718f; font-size:12px; margin-bottom:5px; }
+.misSubmissionSummary strong { font-size:21px; font-weight:650; }
+.misSubmissionSummary small { font-size:12px; color:#64718f; }
+.misAcknowledgement { justify-content:flex-start; padding-top:6px; }
+.misAcknowledgement .misProgressCanvas { margin-bottom:19px; }
+.misPending { display:flex; align-items:center; gap:12px; margin-top:4px; padding:14px; border-radius:10px; background:#fff8ea; }
+.misPending .bi { font-size:27px; color:#dfa331; }
+.misPending span { display:block; font-size:12px; line-height:1.5; }
+.misPending strong { font-size:21px; margin-right:8px; }
+.misPending small { font-size:12px; color:#64718f; }
+.misCoverage { font-size:11px; color:#91733b; border-top:1px solid #eee7d9; padding-top:8px; margin:12px 0 0; line-height:1.5; }
+.misCardEmpty { padding:30px 12px; text-align:center; color:#78849a; font-size:13px; line-height:1.65; }
+.misCardEmpty .bi { display:block; font-size:26px; color:#b6a4cf; margin-bottom:12px; }
+.misDashboardNotice { margin:0 0 16px; padding:13px 16px; border:1px solid #e3d7bc; background:#fffaf0; border-radius:9px; color:#756039; font-size:13px; line-height:1.55; }
+.misDashboardDetail { border:1px solid #e0e6f1; border-radius:12px; background:#fff; padding:22px; min-width:0; }
+.misDashboardDetail h2 { margin:0 0 8px; font-size:19px; }
+.misDashboardDetail > p { margin:0 0 20px; color:#697896; font-size:13px; line-height:1.65; }
+.misDetailToolbar { display:flex; justify-content:space-between; gap:16px; align-items:center; margin-bottom:18px; flex-wrap:wrap; }
+.misDetailToolbar input { min-width:200px; border:1px solid #d3dbe9; border-radius:7px; font:inherit; font-size:13px; padding:9px 11px; }
+.misTableWrap { overflow:auto; width:100%; border:1px solid #e3e8f1; border-radius:8px; }
+.misDataTable { border-collapse:collapse; width:100%; min-width:650px; color:#1b2943; font-size:12px; }
+.misDataTable th { background:#f6f3fc; padding:12px; text-align:left; font-weight:650; white-space:nowrap; }
+.misDataTable td { padding:13px 12px; border-top:1px solid #e7ebf2; white-space:nowrap; }
+.misDenied { grid-column:1/-1; border:1px solid #e0e6f1; border-radius:12px; padding:28px; background:#fff; }
+.misDenied h2 { font-size:20px; margin:0 0 10px; }
+.misDenied p { color:#6c7c9b; font-size:14px; line-height:1.6; }
+.misDenied a { display:inline-block; margin:10px 16px 0 0; color:var(--mis-purple); font-size:13px; }
+.misDashboardToast { position:fixed; right:24px; bottom:24px; z-index:1000; max-width:calc(100vw - 48px); padding:13px 18px; background:#332046; color:white; border-radius:9px; box-shadow:0 8px 25px #16203922; font-size:13px; line-height:1.5; }
+.misDashboardApp [hidden],.misDashboardToast[hidden] { display:none!important; }
+.misDashboardApp button:focus-visible,.misDashboardApp summary:focus-visible,.misDashboardApp a:focus-visible { outline:3px solid #b495d1; outline-offset:3px; }
+.misDashboardApp input:focus-visible { outline:2px solid #b495d1; outline-offset:2px; }
+@media(min-width:1700px) { .misDashboardApp { grid-template-columns:300px minmax(0,1fr); column-gap:24px; padding:18px 28px 40px; } .misReportCard { min-height:335px; padding:20px; } }
+@media(max-width:1430px) { .misDashboardApp { grid-template-columns:240px minmax(0,1fr); column-gap:18px; } .misDashboardFilters { grid-template-columns:minmax(190px,1fr) minmax(190px,1fr); gap:12px 20px; padding:14px 16px; } .misCumulativeNote { grid-column:1/-1; border:0; padding:0; display:flex; gap:14px; align-items:baseline; } .misCumulativeNote span { margin:0; } .misReportGrid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media(max-width:980px) { .misDashboardApp { grid-template-columns:1fr; padding:16px; gap:18px; } .misQuickActions .panelCard { padding:12px; } .misQuickActions .panelTitle { margin-bottom:10px; } .misQuickActions .actionPanel { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; } .misQuickActions .panelTitle { grid-column:1/-1; margin-bottom:0; } .misQuickActions .actionBtn { margin:0; padding:10px; text-align:center; } .misDashboardHeading { min-height:72px; } .misPeriodMenu { right:0; left:auto; } }
+@media(max-width:620px) { .misDashboardApp { padding:12px; gap:14px; } .misQuickActions .actionPanel { grid-template-columns:repeat(2,minmax(0,1fr)); } .misDashboardHeading h1 { font-size:25px; } .misDashboardHeading p { font-size:13px; } .misDashboardSample { font-size:10px; max-width:115px; line-height:1.5; } .misDashboardFilters { grid-template-columns:1fr; gap:14px; } .misCumulativeNote { display:block; } .misCumulativeNote span { margin-top:4px; } .misScopeMenu,.misPeriodMenu { width:100%; max-width:calc(100vw - 58px); } .misReportGrid { grid-template-columns:1fr; } .misReportCard { min-height:300px; padding:17px; } .misDashboardDetail { padding:17px; } .misReportCard h2 { font-size:16px; } .misDoughnutLayout { grid-template-columns:minmax(130px,1.05fr) minmax(110px,1fr); } }
+@media(max-width:620px) {
+  body[data-mis-dashboard] .shared-header { padding:10px 12px; }
+  body[data-mis-dashboard] .shared-header .headerLeft,body[data-mis-dashboard] .shared-header .headerRight { gap:5px; min-width:0; }
+  body[data-mis-dashboard] .shared-header .brand { padding:0; border:0; min-width:0; }
+  body[data-mis-dashboard] .shared-header .logoInebura { width:72px; height:34px; object-fit:contain; }
+  body[data-mis-dashboard] .shared-header .relLogo { width:66px; height:34px; }
+  body[data-mis-dashboard] .shared-header .divider,body[data-mis-dashboard] .shared-header .headerAppSwitch { display:none; }
+}
+@media(prefers-reduced-motion:reduce) { .misDashboardApp * { scroll-behavior:auto!important; } }
