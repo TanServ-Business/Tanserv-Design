@@ -1,3 +1,5 @@
+@import url("./form-controls.css?v=20261112");
+
 * { box-sizing: border-box; }
 
 html, body {
@@ -3989,6 +3991,15 @@ textarea { min-height: 70px; resize: vertical; }
   padding: 8px;
   border-radius: 8px;
   font-size: 12px;
+}
+
+/* Inputs retain the earlier, more specific 10px padding. Match their 40px
+   border box in activity/collection forms, including native date/time fields. */
+.disposition input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]),
+.disposition select:not([multiple]):not([size]),
+.disposition select:not([multiple])[size="0"],
+.disposition select:not([multiple])[size="1"] {
+  height: 40px;
 }
 
 .deliveryChallanFields {

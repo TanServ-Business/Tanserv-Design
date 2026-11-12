@@ -1,0 +1,43 @@
+/*
+ * Use the same CSS box model as text fields. Safari's native menulist ignores
+ * vertical padding, even when a module styles its inputs and selects together.
+ * Keep module heights/fonts/padding: compact filters stay compact, while form
+ * selects grow to the size of their companion inputs. Listboxes are untouched.
+ * The explicit selector also keeps the caret when a module sets background:#fff.
+ */
+select:not([multiple]):not([size]):not(.stuckOwnerCardSelect):not([hidden]),
+select:not([multiple])[size="0"]:not(.stuckOwnerCardSelect):not([hidden]),
+select:not([multiple])[size="1"]:not(.stuckOwnerCardSelect):not([hidden]) {
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='m4 6 4 4 4-4' fill='none' stroke='%2364748b' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 12px 12px;
+  padding-inline-end: 30px;
+}
+
+select:not([multiple]):not([size]):not(.stuckOwnerCardSelect):dir(rtl),
+select:not([multiple])[size="0"]:not(.stuckOwnerCardSelect):dir(rtl),
+select:not([multiple])[size="1"]:not(.stuckOwnerCardSelect):dir(rtl) {
+  background-position: left 10px center;
+}
+
+/* Compact search/filter pairs use the outer control's border box. A count badge
+ * must not make a custom dropdown one pixel taller than the adjacent search. */
+body :is(.filterRow, .activityTableFilters, .mtdCollectionModal) :is(.tableFilterSearch, .filterDropdown > summary),
+body .supportAdminPage :is(.saSearch, .filterDropdown > summary) {
+  box-sizing: border-box;
+  height: 38px;
+  padding-block: 0;
+}
+
+@media (forced-colors: active) {
+  select:not([multiple]):not([size]):not(.stuckOwnerCardSelect):not([hidden]),
+  select:not([multiple])[size="0"]:not(.stuckOwnerCardSelect):not([hidden]),
+  select:not([multiple])[size="1"]:not(.stuckOwnerCardSelect):not([hidden]) {
+    -webkit-appearance: auto;
+    appearance: auto;
+    background-image: none;
+  }
+}

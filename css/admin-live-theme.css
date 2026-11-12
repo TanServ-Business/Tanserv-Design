@@ -389,6 +389,7 @@ body:has(.adminRuntimePage[data-admin-module="bank-master"])::-webkit-scrollbar 
 
 .adminTableSearch {
   min-width: 250px;
+  min-height: 42px;
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -1071,6 +1072,7 @@ body:has(.adminRuntimePage[data-admin-module="bank-master"])::-webkit-scrollbar 
 
 .adminSearchSelectControl {
   min-width: 0;
+  height: 40px;
   display: flex;
   align-items: center;
   overflow: hidden;
@@ -1080,7 +1082,10 @@ body:has(.adminRuntimePage[data-admin-module="bank-master"])::-webkit-scrollbar 
 
 .adminSearchSelectControl input[type="text"] {
   min-width: 0;
+  min-height: 0;
+  height: 100%;
   flex: 1;
+  align-self: stretch;
   border: 0;
   background: transparent;
   box-shadow: none;
@@ -1331,7 +1336,7 @@ body:has(.adminRuntimePage[data-admin-module="bank-master"])::-webkit-scrollbar 
 }
 
 .adminTagSelectControl {
-  min-height: 42px;
+  min-height: 40px;
   display: flex;
   align-items: center;
   gap: 6px;

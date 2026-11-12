@@ -46,7 +46,7 @@
 .misAccessReview > span { display:block; color:#697488; font-size:12px; margin-top:4px; }
 .misOptionStatus:empty { display:none; }
 .misMultiSelect { border:1px solid #dfe3ea; border-radius:10px; background:#fff; min-width:0; }
-.misMultiSelect summary { min-height:41px; padding:10px 11px; display:flex; justify-content:space-between; align-items:center; gap:8px; font-size:13px; color:#1f2937; cursor:pointer; list-style:none; }
+.misMultiSelect summary { min-height:39px; padding:9px 11px; display:flex; justify-content:space-between; align-items:center; gap:8px; font-size:13px; color:#1f2937; cursor:pointer; list-style:none; }
 .misMultiSelect summary::-webkit-details-marker { display:none; }
 .misMultiSelect summary > span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .misMultiSelect summary i { font-size:11px; flex:none; }
