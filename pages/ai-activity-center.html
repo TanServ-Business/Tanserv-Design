@@ -33,6 +33,18 @@
     </div>
   </section>
 
+  <section class="aiServerSample" id="aiServerSample" aria-labelledby="aiServerSampleTitle" aria-busy="false" data-state="idle">
+    <div class="aiServerSampleHeader">
+      <div>
+        <h2 id="aiServerSampleTitle">AI server connection test</h2>
+        <p>Fetch the current contents of sample.txt from the AI server.</p>
+      </div>
+      <button type="button" class="aiGhostBtn" id="aiServerSampleFetch">Fetch AI Server Sample</button>
+    </div>
+    <p class="aiServerSampleStatus" id="aiServerSampleStatus" role="status" aria-live="polite" aria-atomic="true">Waiting for the AI server address.</p>
+    <pre class="aiServerSampleContent" id="aiServerSampleContent" aria-label="Sample file content" hidden></pre>
+  </section>
+
   <section class="aiTableCard">
     <div class="aiTableToolbar">
       <div>
@@ -97,5 +109,7 @@
 
 <script src="../scripts/shared-header.js?v=20261012-index-route-v1"></script>
 <script src="../scripts/ai-activity-center.js"></script>
+<script src="../scripts/ai-server-config.js"></script>
+<script src="../scripts/ai-server-sample.js"></script>
 </body>
 </html>
