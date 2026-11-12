@@ -1,0 +1,16 @@
+{
+  "scope": "System generated sender account selection in Create/Edit Dunning strategy",
+  "sender_tests": 19,
+  "management_tests": 10,
+  "core_scenarios": 30,
+  "configuration_tests": 13,
+  "result": "passed",
+  "browser": [
+    "System sender displays required Sender email dropdown",
+    "Blank selection reports valueMissing",
+    "Configured system account can be selected and saved",
+    "Edit restores selected account"
+  ],
+  "screenshot": "edit-strategy.png",
+  "boundary": "Design prototype stores sender preference; delivery remains simulated."
+}

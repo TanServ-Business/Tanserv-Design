@@ -8,6 +8,7 @@
 .dmParticipationFilters{display:flex;align-items:flex-end;gap:18px;flex-wrap:wrap;margin:16px 0}.dmParticipationFilters .dmSearch{flex:1 1 280px;margin:0}.dmParticipationFilters>label:last-child{min-width:180px}
 
 .dmSending>label{max-width:420px}.dmSending .dmHelp{margin-top:10px;line-height:1.6}
+.dmSending :is([data-dm-agent-fallback],[data-dm-system-sender]){margin-top:14px}.dmSending :is([data-dm-agent-fallback],[data-dm-system-sender])>label{max-width:420px}.dmSending [hidden]{display:none!important}
 
 /* Preserve the existing modal/toolbar densities, but use one border-box height
    for each input/select pair (including Safari's taller native date field). */

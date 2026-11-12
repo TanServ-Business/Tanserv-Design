@@ -37,9 +37,13 @@ The standard file contains neutral placeholders for payment days, payment instru
 
 Create and Edit Dunning strategy both include a **Sending** section with **Agent's email**, **System generated email** and **arservices@tanserv.com**. The selected sender is saved per strategy; existing strategies without a sender selection open with System generated email selected.
 
-When Agent's email is selected and the agent has not configured it, use the system generated email. When the system generated email is not configured, use **arservices@tanserv.com** only when fallback is toggled on. The form shows the applicable guidance for the selected option. This Dunning choice does not rename the existing global failover address in other modules.
+Selecting **System generated email** reveals a required **Sender email** dropdown listing the available System Generated accounts. Client Admin chooses which account sends this strategy's emails; the selection is retained on Edit. An unavailable saved account requires a replacement before saving. Agent and AR services sender choices hide this dropdown and clear its stored selection when saved.
 
-The local design saves and validates the sender preference. Actual mailbox readiness and sender fallback must be resolved by production email integration; the prototype's daily cycle continues to simulate delivery.
+Selecting Agent's email reveals a required **Fallback email** dropdown using the System Generated accounts from Email Sender Account Setup. Listener, inactive and other-client accounts are excluded. The selected account is saved with the strategy and restored on Edit; an unavailable account must be replaced before saving. Other sender choices hide this dropdown and clear the stored fallback selection when saved.
+
+When Agent's email is selected and the agent has not configured it, use the selected system generated email. When the system generated email is not configured, use **arservices@tanserv.com** only when fallback is toggled on. The form shows the applicable guidance for the selected option. This Dunning choice does not rename the existing global failover address in other modules.
+
+The local design saves and validates the sender preference. Its generic Admin sender-account list uses per-page preview memory; account edits across page navigation and actual mailbox readiness require production email integration. The prototype's daily cycle continues to simulate delivery.
 
 ## Confirmed sending behaviour
 

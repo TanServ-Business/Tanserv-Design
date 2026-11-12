@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-12",
+  "scope": "Dunning Agent sender fallback account dropdown",
+  "automated": {
+    "sender_tests": 17,
+    "management_tests": 10,
+    "participation_tests": 14,
+    "core_scenarios": 30,
+    "configuration_tests": 13,
+    "result": "passed",
+    "javascript_syntax": "passed",
+    "asset_cache_versions": "verified",
+    "diff_check": "passed"
+  },
+  "browser": {
+    "origin": "http://127.0.0.1:8774",
+    "checks": [
+      "Fallback hidden and disabled for System generated sender",
+      "Selecting Agent reveals a required fallback dropdown",
+      "Dropdown uses System Generated accounts and excludes Listener",
+      "Blank fallback reports valueMissing",
+      "Selected sender-0 saves with the draft strategy",
+      "Edit restores selected fallback",
+      "Switching to System hides the field and removes required status",
+      "Full page reload and Edit retain the saved Agent fallback"
+    ],
+    "result": "passed",
+    "screenshot": "edit-strategy.png"
+  },
+  "boundary": "Sender account source is the existing Admin preview list; actual email sending remains simulated."
+}

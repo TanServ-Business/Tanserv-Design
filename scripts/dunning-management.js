@@ -15,11 +15,27 @@
   const senderChoices = [['agent', "Agent's email"], ['system', 'System generated email'], ['arservices', 'arservices@tanserv.com']];
   function senderHelp(senderType) {
     const systemFallback = 'If the system generated email is not configured, the email will be sent using arservices@tanserv.com when fallback is toggled on.';
-    if (senderType === 'agent') return "If the agent has not configured their email, the email will be sent using the system generated email. " + systemFallback;
+    if (senderType === 'agent') return "If the agent has not configured their email, the email will be sent using the selected system generated email. " + systemFallback;
     if (senderType === 'system') return systemFallback;
     return 'Dunning letters will be sent using arservices@tanserv.com.';
   }
   function guard(context) { if (!canManage(context)) throw new Error('Dunning Letters is available to Client Admin only.'); }
+  function systemSenderAccounts(context, definition = root.IneburaAdminModules?.['sender-account'], storage = root.IneburaAdminPreviewStorage) {
+    guard(context);
+    let saved;
+    try { saved = JSON.parse(storage?.getItem('ineburaAdminDemoState:v1') || 'null'); } catch (_) { /* Use the same definition fallback as the sender-account screen. */ }
+    const currentVersion = definition?.dataVersion == null || String(saved?._dataVersions?.['sender-account'] ?? '') === String(definition.dataVersion);
+    const rows = currentVersion && Array.isArray(saved?.['sender-account']) ? saved['sender-account'] : Array.isArray(definition?.seedRows) ? definition.seedRows : [];
+    const seen = new Set();
+    return rows.filter(row => {
+      if (!row || typeof row.id !== 'string' || !row.id.trim() || row.id !== row.id.trim() || row.id.length > 200 || seen.has(row.id)) return false;
+      if (String(row.accountType || '').trim().toLowerCase() !== 'system generated') return false;
+      if (row.clientId ? row.clientId !== context.clientId : context.clientId !== 'demo-client') return false;
+      if (row.status != null && !['active','true'].includes(String(row.status).trim().toLowerCase())) return false;
+      if (typeof row.senderEmail !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(row.senderEmail)) return false;
+      seen.add(row.id); return true;
+    }).map(row => clone(row));
+  }
   function scoped(state, context) {
     guard(context);
     const customers = state.customers.filter(row => row.clientId === context.clientId);
@@ -57,11 +73,15 @@
     }).filter(row => (!query || `${row.invoice.invoiceNo} ${row.customer.name || ''} ${row.customer.customerCode || row.customer.code || ''}`.toLowerCase().includes(query)) && (!selected || (selected === 'not-sent' ? row.lastSentStage === null : row.lastSentStage === Number(selected))));
     return {rows,stages:[...stages].sort((a,b) => a-b)};
   }
-  function buildStrategy(input, existing, state, context) {
+  function buildStrategy(input, existing, state, context, senderAccounts = []) {
     guard(context);
     if (existing && existing.clientId !== context.clientId) throw new Error('This strategy is outside your client scope.');
     const senderType = input.senderType ?? existing?.senderType ?? 'system';
     if (!senderChoices.some(([value]) => value === senderType)) throw new Error('Choose a valid email sender.');
+    const fallbackSenderAccountId = senderType === 'agent' ? input.fallbackSenderAccountId === undefined ? existing?.fallbackSenderAccountId ?? '' : input.fallbackSenderAccountId : '';
+    if (senderType === 'agent' && !systemSenderAccounts(context, {seedRows:senderAccounts}, null).some(row => row.id === fallbackSenderAccountId)) throw new Error('Select an available system generated fallback email.');
+    const systemSenderAccountId = senderType === 'system' ? input.systemSenderAccountId === undefined ? existing?.systemSenderAccountId : input.systemSenderAccountId : '';
+    if (senderType === 'system' && (input.systemSenderAccountId !== undefined || existing?.systemSenderAccountId !== undefined) && !systemSenderAccounts(context, {seedRows:senderAccounts}, null).some(row => row.id === systemSenderAccountId)) throw new Error('Select an available system generated sender email.');
     const count = Number(state.letterCount || 3);
     if (!Number.isInteger(input.firstStageDays) || input.firstStageDays < 0 || input.firstStageDays > 3650) throw new Error('Enter whole days from 0 to 3650 for the first letter.');
     if (!String(input.name || '').trim()) throw new Error('Enter a strategy name.');
@@ -86,7 +106,7 @@
       if (coverage.targetMode === 'selected') filters[coverage.targetType === 'invoice' ? 'invoiceIds' : 'customerIds'] = selected;
     }
     delete filters.minOutstanding;
-    return {...clone(existing || {}),...(existing?.id ? {id:existing.id}:{}),clientId:context.clientId,name:input.name.trim(),status:input.status || 'draft',senderType,firstStageDays:input.firstStageDays,subClientId:input.subClientId || '',filters,stages:clone(input.stages)};
+    return {...clone(existing || {}),...(existing?.id ? {id:existing.id}:{}),clientId:context.clientId,name:input.name.trim(),status:input.status || 'draft',senderType,fallbackSenderAccountId,...(systemSenderAccountId===undefined?{}:{systemSenderAccountId}),firstStageDays:input.firstStageDays,subClientId:input.subClientId || '',filters,stages:clone(input.stages)};
   }
   function mount(container, options = {}) {
     const api = options.api || root.IneburaDunning;
@@ -178,6 +198,23 @@
       if(f.strategyMaster)return {...f.strategyMaster,legacy:true,ids:[]};
       return {targetType:f.invoiceIds?.length?'invoice':'customer',targetMode:f.invoiceIds?.length||f.customerIds?.length?'selected':'all',ids:f.invoiceIds||f.customerIds||[]};
     }
+    function senderAccountHtml(senderType, kind, selectedId = '') {
+      const accounts = systemSenderAccounts(context());
+      const active = senderType === kind, agent = kind === 'agent';
+      const field = agent ? 'fallbackSenderAccountId' : 'systemSenderAccountId';
+      const helpId = agent ? 'dmFallbackHelp' : 'dmSystemSenderHelp';
+      const unavailable = selectedId && !accounts.some(row => row.id === selectedId);
+      return `<div ${agent?'data-dm-agent-fallback':'data-dm-system-sender'} ${active?'':'hidden'}><label>${agent?'Fallback email':'Sender email'}<select name="${field}" aria-describedby="${helpId}" ${active?'required':'disabled'}><option value="" ${!selectedId?'selected':''}>Select system generated email</option>${unavailable?`<option value="${escape(selectedId)}" disabled selected>Previously selected email is unavailable</option>`:''}${accounts.map(row=>`<option value="${escape(row.id)}" ${row.id===selectedId?'selected':''}>${escape(row.senderEmail)}</option>`).join('')}</select></label><p class="dmHelp" id="${helpId}">${accounts.length?(agent?'Choose the system generated email to use when the agent has not configured their email.':'Choose the system generated email to send Dunning letters from.'):'No system generated email accounts are available.'} <a href="?module=sender-account">Configure sender accounts</a>.</p></div>`;
+    }
+    function syncSenderFields(senderType) {
+      for (const [kind, wrapper, field] of [['agent','data-dm-agent-fallback','fallbackSenderAccountId'],['system','data-dm-system-sender','systemSenderAccountId']]) {
+        const panel = modal.querySelector(`[${wrapper}]`), select = modal.querySelector(`[name="${field}"]`);
+        if (panel) panel.hidden = senderType !== kind;
+        if (select) { select.disabled = senderType !== kind; select.required = senderType === kind; }
+      }
+      const help = modal.querySelector('[data-dm-sender-help]');
+      if (help) help.textContent = senderHelp(senderType);
+    }
     function openStrategy(id) {
       const state=scoped(api.getState(),context());
       formStrategy=id?clone(state.strategies.find(s=>s.id===id)):null;
@@ -186,7 +223,7 @@
       formStages=clone(formStrategy?.stages||[{templateId:state.templates.find(t=>Number(t.stageNumber)===1)?.id,intervalDays:0}]);
       const coverage=coverageValues(formStrategy);
       const senderType=formStrategy?.senderType || 'system';
-      openModal(formStrategy?'Edit Dunning strategy':'Add Dunning strategy',`<form data-dm-strategy><div class="dmModalBody"><p class="dmFormError" role="alert" hidden></p><div class="dmFormGrid"><label>Strategy name<input name="name" value="${escape(formStrategy?.name||'')}" maxlength="120" required></label><label>Status<select name="status">${['draft','active','paused','stopped'].map(s=>`<option ${s===(formStrategy?.status||'draft')?'selected':''}>${s}</option>`).join('')}</select></label><label>Sub-client<select name="subClient"><option value="">All sub-clients</option>${[...new Set([...state.customers.map(c=>c.subClientId),formStrategy?.subClientId].filter(Boolean))].map(value=>`<option value="${escape(value)}" ${value===formStrategy?.subClientId?'selected':''}>${escape(value)}</option>`).join('')}</select></label><label>Target type<select name="targetType" data-dm-coverage><option value="customer" ${coverage.targetType==='customer'?'selected':''}>Customers</option><option value="invoice" ${coverage.targetType==='invoice'?'selected':''}>Invoices</option></select></label><label>Coverage<select name="targetMode" data-dm-coverage><option value="all" ${coverage.targetMode==='all'?'selected':''}>All eligible records</option><option value="selected" ${coverage.targetMode==='selected'?'selected':''}>Selected records</option></select></label></div>${coverage.legacy?'<p class="dmHelp">Existing target selections and exclusions are retained. Change coverage explicitly to replace them.</p>':''}<div data-dm-targets></div><fieldset class="dmStage dmSending"><legend>Sending</legend><label>Send emails from<select name="senderType" aria-describedby="dmSenderHelp" required>${senderChoices.map(([value,label])=>`<option value="${value}" ${value===senderType?'selected':''}>${escape(label)}</option>`).join('')}</select></label><p class="dmHelp" id="dmSenderHelp" data-dm-sender-help>${escape(senderHelp(senderType))}</p></fieldset><div data-dm-stages>${formStages.map((s,i)=>stageHtml(s,i,state)).join('')}</div><div class="dmActions">${button('Add letter stage','add-stage','',formStages.length>=state.letterCount)}${button('Remove last stage','remove-stage','',formStages.length<=1)}</div><p class="dmHelp">Available stages: ${state.letterCount}. New stages send only after they are added to an active strategy. Changes apply to unsent stages; sent letters stay unchanged.</p></div><footer>${button('Cancel','close-modal')}<button type="submit" class="dmButton is-primary">Save strategy</button></footer></form>`);
+      openModal(formStrategy?'Edit Dunning strategy':'Add Dunning strategy',`<form data-dm-strategy><div class="dmModalBody"><p class="dmFormError" role="alert" hidden></p><div class="dmFormGrid"><label>Strategy name<input name="name" value="${escape(formStrategy?.name||'')}" maxlength="120" required></label><label>Status<select name="status">${['draft','active','paused','stopped'].map(s=>`<option ${s===(formStrategy?.status||'draft')?'selected':''}>${s}</option>`).join('')}</select></label><label>Sub-client<select name="subClient"><option value="">All sub-clients</option>${[...new Set([...state.customers.map(c=>c.subClientId),formStrategy?.subClientId].filter(Boolean))].map(value=>`<option value="${escape(value)}" ${value===formStrategy?.subClientId?'selected':''}>${escape(value)}</option>`).join('')}</select></label><label>Target type<select name="targetType" data-dm-coverage><option value="customer" ${coverage.targetType==='customer'?'selected':''}>Customers</option><option value="invoice" ${coverage.targetType==='invoice'?'selected':''}>Invoices</option></select></label><label>Coverage<select name="targetMode" data-dm-coverage><option value="all" ${coverage.targetMode==='all'?'selected':''}>All eligible records</option><option value="selected" ${coverage.targetMode==='selected'?'selected':''}>Selected records</option></select></label></div>${coverage.legacy?'<p class="dmHelp">Existing target selections and exclusions are retained. Change coverage explicitly to replace them.</p>':''}<div data-dm-targets></div><fieldset class="dmStage dmSending"><legend>Sending</legend><label>Send emails from<select name="senderType" aria-describedby="dmSenderHelp" required>${senderChoices.map(([value,label])=>`<option value="${value}" ${value===senderType?'selected':''}>${escape(label)}</option>`).join('')}</select></label>${senderAccountHtml(senderType,'agent',formStrategy?.fallbackSenderAccountId)}${senderAccountHtml(senderType,'system',formStrategy?.systemSenderAccountId)}<p class="dmHelp" id="dmSenderHelp" data-dm-sender-help>${escape(senderHelp(senderType))}</p></fieldset><div data-dm-stages>${formStages.map((s,i)=>stageHtml(s,i,state)).join('')}</div><div class="dmActions">${button('Add letter stage','add-stage','',formStages.length>=state.letterCount)}${button('Remove last stage','remove-stage','',formStages.length<=1)}</div><p class="dmHelp">Available stages: ${state.letterCount}. New stages send only after they are added to an active strategy. Changes apply to unsent stages; sent letters stay unchanged.</p></div><footer>${button('Cancel','close-modal')}<button type="submit" class="dmButton is-primary">Save strategy</button></footer></form>`);
       renderTargets(coverage.ids);
     }
     function renderTargets(selectedIds=[]) {
@@ -274,8 +311,8 @@
         if(!authorized())return;
         if(form.matches('[data-dm-strategy]')) {
           await templates?.ready;if(!authorized())return;
-          const input={name:form.elements.name.value,status:form.elements.status.value,senderType:form.elements.senderType?.value,firstStageDays:Number(form.elements['days-0'].value),subClientId:form.elements.subClient.value,coverageChanged,coverage:{targetType:form.elements.targetType.value,targetMode:form.elements.targetMode.value},selectedIds:[...(form.elements.selectedTargets?.selectedOptions||[])].map(o=>o.value),stages:readStages(form)};
-          const payload=buildStrategy(input,formStrategy,scoped(api.getState(),context()),context());
+          const input={name:form.elements.name.value,status:form.elements.status.value,senderType:form.elements.senderType?.value,fallbackSenderAccountId:form.elements.fallbackSenderAccountId?.value,systemSenderAccountId:form.elements.systemSenderAccountId?.value,firstStageDays:Number(form.elements['days-0'].value),subClientId:form.elements.subClient.value,coverageChanged,coverage:{targetType:form.elements.targetType.value,targetMode:form.elements.targetMode.value},selectedIds:[...(form.elements.selectedTargets?.selectedOptions||[])].map(o=>o.value),stages:readStages(form)};
+          const payload=buildStrategy(input,formStrategy,scoped(api.getState(),context()),context(),systemSenderAccounts(context()));
           api.saveStrategy(payload,{...context(),date:today()});closeModal();notify('Dunning strategy saved. Only active strategies send letters.');
         } else if(form.matches('[data-dm-run]')) {
           await templates?.ready;if(!authorized())return;
@@ -290,8 +327,7 @@
     function change(event) {
       if(event.target.name==='senderType'){
         if(!authorized())return;
-        const help=modal.querySelector('[data-dm-sender-help]');
-        if(help)help.textContent=senderHelp(event.target.value);
+        syncSenderFields(event.target.value);
         return;
       }
       if(event.target.matches('[data-dm-invoice-stage]')){
@@ -326,5 +362,5 @@
     return {refresh,destroy(){destroyed=true;unsubscribe();templates?.destroy();report?.destroy();clearTimeout(noticeTimer);container.removeEventListener('click',action);container.removeEventListener('submit',submit);container.removeEventListener('input',input);container.removeEventListener('keydown',keyboard);container.removeEventListener('change',change);modal.removeEventListener('click',action);modal.removeEventListener('submit',submit);modal.removeEventListener('change',change);},templates,report};
   }
   function autoMount() { const container=root.document?.getElementById('dunningManagementMount');if(container)mount(container); }
-  return {canManage,scoped,participationView,buildStrategy,mount,autoMount};
+  return {canManage,systemSenderAccounts,scoped,participationView,buildStrategy,mount,autoMount};
 });
