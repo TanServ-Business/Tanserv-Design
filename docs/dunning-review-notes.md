@@ -29,9 +29,17 @@ The default file is `assets/dunning/standard-dunning-letter.docx`. It uses the a
 
 Use the Word letter template dropdown to choose **Standard Word Template** or **Upload my Word Template**. The upload/replace control appears only for the upload choice. Users can download the standard Word file, edit it externally, and upload their own version. There is **no in-application Word editor**. Uploaded Word files are checked for supported customer, letter and invoice values; missing, unknown or malformed values block saving. Required values include customer name, issue date, reference, outstanding total and invoice table. Follow-up letters also require previous-letter references. Validation failures, cancelled edits and late upload responses cannot replace a saved template.
 
-DL1–DL3 reuse the existing captured email templates and previously saved email edits. DL4 and later use the current DL3 email subject and message. Edit the email in DL3 to apply changes to future DL3 and later sends; additional stages display that shared email for review and retain their own Word template and schedule. Existing issued emails and PDFs remain frozen. New-tab email edits are not overwritten by the old Template Master catalog.
+DL1–DL3 use the reviewed versions of the existing email templates. A new copy revision replaces stale saved email copy while preserving edits made against the current revision and each stage's Word letter. DL4 and later use the current DL3 email subject and message. Edit the email in DL3 to apply changes to future DL3 and later sends; additional stages display that shared email for review and retain their own Word template and schedule. Existing issued emails and PDFs remain frozen. New-tab email edits are not overwritten by the old Template Master catalog.
 
 The standard file contains neutral placeholders for payment days, payment instructions and sender details. Client Admin should set those in the Word file and upload it before client use.
+
+## Strategy sender selection
+
+Create and Edit Dunning strategy both include a **Sending** section with **Agent's email**, **System generated email** and **arservices@tanserv.com**. The selected sender is saved per strategy; existing strategies without a sender selection open with System generated email selected.
+
+When Agent's email is selected and the agent has not configured it, use the system generated email. When the system generated email is not configured, use **arservices@tanserv.com** only when fallback is toggled on. The form shows the applicable guidance for the selected option. This Dunning choice does not rename the existing global failover address in other modules.
+
+The local design saves and validates the sender preference. Actual mailbox readiness and sender fallback must be resolved by production email integration; the prototype's daily cycle continues to simulate delivery.
 
 ## Confirmed sending behaviour
 
@@ -75,7 +83,7 @@ This is a local HTML design prototype, with shared browser state under `inebura:
 
 Mammoth imports Word text and basic paragraph/table formatting; the local PDF renderer is not Microsoft's Word layout engine. The supplied Word document and generated PDF can differ in pagination, fonts and complex formatting. Letter and annexure are combined into one generated PDF; each simulated issue retains its exact PDF bytes. Non-Latin PDF rendering remains a production limitation to resolve.
 
-The captured DL2 email source ends with an incomplete link tag. Its saved source is preserved; runtime drops the unfinished tag without inventing missing content. Production needs the complete DL2 email source.
+The reviewed DL1–DL3 email sources contain complete HTML and a customer link labelled **Review Invoices and Share Updates**. The previously truncated DL2 link has been completed.
 
 Verification includes `scripts/test-dunning-core.cjs`, `test-dunning-management.cjs`, `test-dunning-management-templates.cjs`, `test-dunning-management-report.cjs`, `test-dunning-integrations.cjs`, `test-dunning-documents.cjs`, `test-dunning-report.cjs`, `test-dunning-template-adapter.cjs`, `test-dunning-template-email-flow.cjs`, `test-dunning-strategy.cjs`, `test-reports-dunning.cjs`, `test-reports.cjs` and MIS report regression suites. Run each with the bundled Node runtime. Checks cover count limits, a complete one-letter cycle, batch scheduling, immutable history, migration/coverage preservation, upload validation, pending transitions, role/client changes during asynchronous work, saved-handler guards and typed XLSX readback.
 

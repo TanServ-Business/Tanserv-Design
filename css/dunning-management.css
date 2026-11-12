@@ -6,3 +6,16 @@
 
 .dmSharedEmail{color:#667085;font-size:12px;line-height:1.5}
 .dmParticipationFilters{display:flex;align-items:flex-end;gap:18px;flex-wrap:wrap;margin:16px 0}.dmParticipationFilters .dmSearch{flex:1 1 280px;margin:0}.dmParticipationFilters>label:last-child{min-width:180px}
+
+.dmSending>label{max-width:420px}.dmSending .dmHelp{margin-top:10px;line-height:1.6}
+
+/* Preserve the existing modal/toolbar densities, but use one border-box height
+   for each input/select pair (including Safari's taller native date field). */
+.dmWorkspace { --dm-control-height:40px; }
+.dmModal { --dm-control-height:35px; }
+:is(.dmWorkspace,.dmModal) :where(
+  input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]),
+  select:not([multiple]):not([size]),
+  select:not([multiple])[size="0"],
+  select:not([multiple])[size="1"]
+) { height:var(--dm-control-height); }

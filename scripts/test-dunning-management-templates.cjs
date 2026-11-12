@@ -25,6 +25,25 @@ function fixture({count=3,storage,documents={}}={}){
  const controller=createController({api,documents:documentApi,adapter,source,storage:store,canManage:()=>actor.role==='client-admin'});
  return {actor,api,controller,store};
 }
+test('reviewed email copy replaces stale saved catalog and managed copy while retaining current edits and Word letters',async()=>{
+ const app=fixture({count:5});await app.controller.provision();
+ const revised=JSON.parse(JSON.stringify(source));
+ for(const row of revised.templates.filter(item=>adapter.stageFor(item)))Object.assign(row,{copyRevision:'reviewed-copy',subject:'Reviewed subject',body:'<p>Hello {{customerName}}, reviewed message.</p>'});
+ const controller=createController({api:app.api,documents:{...docs,loadStandardTemplate:actualStandard},adapter,source:revised,storage:app.store});
+ const before=app.api.getState(),first=before.templates.find(row=>row.stageNumber===1),third=before.templates.find(row=>row.stageNumber===3),fourth=before.templates.find(row=>row.stageNumber===4);
+ assert.equal(controller.session(1).draft.email.subject,'Reviewed subject');
+ assert.equal(adapter.resolveEmailTemplate(before,fourth,{sourceTemplates:revised}).emailTemplateSource.subject,'Reviewed subject');
+ const session=controller.session(1);session.setEmail({subject:'Current local edit'});session.save();
+ assert.equal(controller.session(1).draft.email.subject,'Current local edit');
+ assert.equal(app.api.getState().templates.find(row=>row.stageNumber===1).letterHtml,first.letterHtml);
+ assert.equal(app.api.getState().templates.find(row=>row.stageNumber===3).letterHtml,third.letterHtml);
+ const original=revised.templates.find(row=>adapter.stageFor(row)===2),legacy=app.api.getState().templates.find(row=>row.stageNumber===2);
+ app.store.setItem('ineburaTemplateMaster:xeon:20261015:v1',JSON.stringify({templates:[{id:original.id,subject:'Old catalog subject',body:'Old catalog message'}]}));
+ const withoutManaged={...legacy};delete withoutManaged.emailTemplateSource;
+ assert.equal(controller.emailFor(withoutManaged).subject,'Reviewed subject');
+ app.store.setItem('ineburaTemplateMaster:xeon:20261015:v1',JSON.stringify({templates:[{...original,subject:'Current catalog edit'}]}));
+ assert.equal(controller.emailFor(withoutManaged).subject,'Current catalog edit');
+});
 test('one letter uses actual standard DOCX and no strategy is automatically created',async()=>{
  const {api,controller,store}=fixture({count:1});await controller.provision();
  const state=api.getState();assert.equal(state.templates.length,1);assert.equal(state.strategies.length,0);

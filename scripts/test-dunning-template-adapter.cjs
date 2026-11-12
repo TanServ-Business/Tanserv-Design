@@ -61,19 +61,15 @@ test('every captured email source validates and renders its existing full messag
     const before=JSON.stringify(row),result=adapter.renderEmail({emailTemplateSource:row},snapshot);
     assert.equal(result.subject,row.subject);assert.equal(JSON.stringify(row),before);
     assert.doesNotMatch(result.body,/\$\{|\{\{|<\/?#/);
-    assert.match(result.body,/Actual &amp; Customer/);assert.match(result.body,/CustomerCode:\s*00042/);
+    assert.match(result.body,/Actual &amp; Customer/);assert.match(result.body,/Customer\s*code:\s*00042/i);
     assert.match(result.body,/DL3-027/);assert.match(result.body,/27-Oct-2026/);
     assert.match(result.body,/INV-0001/);assert.match(result.body,/INV-0002/);
     assert.match(result.body,/3,500\.00/);assert.match(result.body,/20,000\.00/);
     assert.match(result.body,/Parts/);assert.match(result.body,/accounts@example\.test/);
     if(row.body.includes('${userClient}')) assert.match(result.body,/Actual Client/);
-    if(row.body.includes('Click Here')) {
-      assert.match(result.body,/https:\/\/tenant\.inebura\.ai\/intg\/customer-link\/customer%2Ftoken/);
-      assert.match(result.body,/Click Here/);
-    } else {
-      assert.match(row.body,/text-decoration: none; bor$/,'the pre-existing truncated capture is retained');
-      assert.doesNotMatch(result.body,/text-decoration: none; bor$/,'only the incomplete trailing tag is omitted at render time');
-    }
+    assert.match(result.body,/https:\/\/tenant\.inebura\.ai\/intg\/customer-link\/customer%2Ftoken/);
+    assert.match(result.body,/Review Invoices and Share Updates/);
+    assert.match(row.body,/<\/html>\s*$/i,'all email sources include complete closing markup');
     assert.match(result.body,/Sale Order No/);
     if(row.stageNumber>1) {assert.match(result.body,/DL1-020/);assert.match(result.body,/20-Oct-2026/);}
     if(row.stageNumber>2) {assert.match(result.body,/DL2-024/);assert.match(result.body,/24-Oct-2026/);}
@@ -152,7 +148,7 @@ test('DL4+ prefer the strategy-selected DL3, then saved or captured DL3 catalog 
   const data={templates:[third,alternate,fifth]};
   assert.equal(adapter.resolveEmailTemplate(data,fifth,{stage3TemplateId:third.id}).emailTemplateSource.subject,'Captured third');
   assert.equal(adapter.resolveEmailTemplate(data,fifth,{stage3TemplateId:alternate.id,sourceTemplates:source}).emailTemplateSource.subject,'Strategy third');
-  const legacy={templates:[third,fifth]},savedRows={templates:[{id:emails[2].id,subject:'Saved catalog DL3',body:'<p>Saved {{customerName}}</p>'},{id:'unrelated',subject:'Never selected'}]};
+  const legacy={templates:[third,fifth]},savedRows={templates:[{id:emails[2].id,copyRevision:emails[2].copyRevision,subject:'Saved catalog DL3',body:'<p>Saved {{customerName}}</p>'},{id:'unrelated',subject:'Never selected'}]};
   const saved=adapter.resolveEmailTemplate(legacy,fifth,{sourceTemplates:source,savedRows});
   assert.equal(saved.emailTemplateSource.subject,'Saved catalog DL3');assert.equal(saved.emailTemplateSource.id,emails[2].id);
   assert.equal(adapter.resolveEmailTemplate(legacy,fifth,{sourceTemplates:source}).emailTemplateSource.body,emails[2].body);

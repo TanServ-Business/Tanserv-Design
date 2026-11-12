@@ -1,0 +1,37 @@
+{
+  "date": "2026-11-12",
+  "scope": "Dunning strategy sender selection UI, guidance and persisted preference",
+  "sender_choices": [
+    "Agent's email",
+    "System generated email",
+    "arservices@tanserv.com"
+  ],
+  "fallback_guidance": [
+    "Unconfigured agent email falls back to system generated email",
+    "Unconfigured system generated email falls back to arservices@tanserv.com only when fallback is on"
+  ],
+  "automated": {
+    "sender_tests": 9,
+    "management_tests": 10,
+    "participation_tests": 14,
+    "core_scenarios": 30,
+    "configuration_tests": 13,
+    "result": "passed",
+    "diff_check": "passed",
+    "cache_versions": "verified"
+  },
+  "browser": {
+    "origin": "http://127.0.0.1:8773",
+    "checks": [
+      "Create form contains all choices",
+      "Agent guidance includes both fallback steps",
+      "Saved agent choice reopens in Edit",
+      "System guidance changes on selection",
+      "AR services option displays exact requested address",
+      "Edited AR services choice persists after reopening"
+    ],
+    "result": "passed",
+    "screenshot": "edit-strategy.jpg"
+  },
+  "integration_boundary": "No real email delivery or mailbox-readiness resolver exists in this design prototype; global communication settings are unchanged."
+}

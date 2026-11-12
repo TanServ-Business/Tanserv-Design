@@ -209,13 +209,15 @@
     } else {
       const original=catalogRows(settings.sourceTemplates || []).find(row=>row.stageNumber===sourceStage);
       if(original) {
-        const saved=rowsOf(settings.savedRows).find(row=>row.id===original.id);
+        const saved=rowsOf(settings.savedRows).find(row=>row.id===original.id && (!original.copyRevision || row.copyRevision===original.copyRevision));
         emailSource={...original,subject:saved?.subject ?? original.subject,body:saved?.body ?? original.body};
       } else if(emailTemplate) {
         if(stage<4 && !emailTemplate.emailTemplateSource)return clone(template);
         emailSource=emailTemplate.emailTemplateSource || {id:emailTemplate.sourceTemplateId || `dunning-email-${sourceStage}`,subject:emailTemplate.emailSubject,body:emailTemplate.emailBody};
       }
     }
+    const currentSource=catalogRows(settings.sourceTemplates || []).find(row=>row.stageNumber===sourceStage);
+    if(currentSource?.copyRevision && emailSource?.id===currentSource.id && emailSource.copyRevision!==currentSource.copyRevision)emailSource=clone(currentSource);
     if(!emailSource) {
       if(stage>=4)throw new Error('The DL3 email template is unavailable. Configure DL3 before sending additional Dunning letters.');
       return clone(template);
@@ -231,7 +233,7 @@
     if(!textOf(letterHtml).trim() && settings.letterHtml===undefined) throw new Error('Upload a Word letter template before saving this Dunning stage.');
     const validation=validateUpload(letterHtml,stage,existing?.fieldMappings || existing?.mappings);
     if(settings.letterHtml !== undefined && !validation.valid) throw new Error(validation.errors.join(' '));
-    const source={id:row.id,sourceId:row.sourceId,code:row.code,eventType:row.eventType,subject:settings.subject ?? row.subject,body:settings.body ?? row.body};
+    const source={id:row.id,sourceId:row.sourceId,code:row.code,eventType:row.eventType,...(row.copyRevision?{copyRevision:row.copyRevision}:{}),subject:settings.subject ?? row.subject,body:settings.body ?? row.body};
     const emailCheck=validateEmail(source.subject,source.body);if(!emailCheck.valid) throw new Error(emailCheck.errors.join(' '));
     const normalizedLetter=validation.unknown.length || validation.errors.some(error=>/incomplete|active content|FreeMarker/.test(error))?letterHtml:validation.html;
     return {...clone(existing || {}),id:existing?.id || `dunning-template-${stage}`,documentTypeId:existing?.documentTypeId || type?.id || `dunning-document-${stage}`,stageNumber:existing?.stageNumber || stage,name:existing?.name || `Dunning Letter ${stage}`,body:normalizedLetter,letterHtml:normalizedLetter,mappings:{...DEFAULT_MAPPINGS,...validation.mappings},fieldMappings:{...DEFAULT_MAPPINGS,...validation.mappings},calculation:{totalOutstanding:'sumOutstanding'},emailSubject:canonicalEmail(source.subject),emailBody:canonicalEmail(source.body),emailTemplateSource:source,emailRenderer:'existing-template-master',sourceTemplateId:row.id,...(settings.sourceFileName !== undefined?{sourceFileName:settings.sourceFileName,sourceType:'docx'}:{}),...(settings.letterHtml !== undefined?{uploadValidation:{valid:true,fields:validation.fields,stageNumber:stage}}:{})};

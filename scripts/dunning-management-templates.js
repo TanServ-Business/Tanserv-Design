@@ -29,10 +29,14 @@
         const effective=adapter.resolveEmailTemplate(state,row,{sourceTemplates:source,savedRows});
         return clone(effective.emailTemplateSource||{subject:effective.emailSubject,body:effective.emailBody});
       }
-      if(row.emailTemplateSource)return clone(row.emailTemplateSource);
       const original=(source?.templates||source||[]).find(item=>adapter.stageFor(item)===Number(row.stageNumber));
+      if(row.emailTemplateSource){
+        const currentCopy=!original?.copyRevision || row.emailTemplateSource.id!==original.id || row.emailTemplateSource.copyRevision===original.copyRevision;
+        return clone(currentCopy?row.emailTemplateSource:original);
+      }
       if(original){
         let saved;try{saved=JSON.parse(storage?.getItem(key)||'null')?.templates?.find(item=>item.id===original.id);}catch(_){/* Preserve the captured source if the old catalog cannot be read. */}
+        if(original.copyRevision && saved?.copyRevision!==original.copyRevision)saved=undefined;
         return {...clone(original),subject:saved?.subject??original.subject,body:saved?.body??original.body};
       }
       return {id:`dunning-email-${row.stageNumber}`,code:`DunningLetter${row.stageNumber}Email`,eventType:`DunningLetter${row.stageNumber}`,subject:row.emailSubject||`Payment reminder — DL${row.stageNumber} — {{customerName}}`,body:row.emailBody||'<p>Dear {{customerName}},</p><p>Please find your Dunning Letter and invoice annexure attached.</p>'};

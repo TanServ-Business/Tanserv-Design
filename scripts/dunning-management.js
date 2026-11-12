@@ -12,6 +12,13 @@
   const money = value => Number(value || 0).toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2});
   const today = () => new Intl.DateTimeFormat('en-CA', {timeZone:'Asia/Kolkata',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
   const aging = ['Not Due','1-30','31-45','46-60','61-90','91-120','121-150','151-180','181-210','211-240','241-270','271-300','301-330','331-365','1-2 yrs','2-3 yrs','3-4 yrs','4-5 yrs','5+ yrs'];
+  const senderChoices = [['agent', "Agent's email"], ['system', 'System generated email'], ['arservices', 'arservices@tanserv.com']];
+  function senderHelp(senderType) {
+    const systemFallback = 'If the system generated email is not configured, the email will be sent using arservices@tanserv.com when fallback is toggled on.';
+    if (senderType === 'agent') return "If the agent has not configured their email, the email will be sent using the system generated email. " + systemFallback;
+    if (senderType === 'system') return systemFallback;
+    return 'Dunning letters will be sent using arservices@tanserv.com.';
+  }
   function guard(context) { if (!canManage(context)) throw new Error('Dunning Letters is available to Client Admin only.'); }
   function scoped(state, context) {
     guard(context);
@@ -53,6 +60,8 @@
   function buildStrategy(input, existing, state, context) {
     guard(context);
     if (existing && existing.clientId !== context.clientId) throw new Error('This strategy is outside your client scope.');
+    const senderType = input.senderType ?? existing?.senderType ?? 'system';
+    if (!senderChoices.some(([value]) => value === senderType)) throw new Error('Choose a valid email sender.');
     const count = Number(state.letterCount || 3);
     if (!Number.isInteger(input.firstStageDays) || input.firstStageDays < 0 || input.firstStageDays > 3650) throw new Error('Enter whole days from 0 to 3650 for the first letter.');
     if (!String(input.name || '').trim()) throw new Error('Enter a strategy name.');
@@ -77,7 +86,7 @@
       if (coverage.targetMode === 'selected') filters[coverage.targetType === 'invoice' ? 'invoiceIds' : 'customerIds'] = selected;
     }
     delete filters.minOutstanding;
-    return {...clone(existing || {}),...(existing?.id ? {id:existing.id}:{}),clientId:context.clientId,name:input.name.trim(),status:input.status || 'draft',firstStageDays:input.firstStageDays,subClientId:input.subClientId || '',filters,stages:clone(input.stages)};
+    return {...clone(existing || {}),...(existing?.id ? {id:existing.id}:{}),clientId:context.clientId,name:input.name.trim(),status:input.status || 'draft',senderType,firstStageDays:input.firstStageDays,subClientId:input.subClientId || '',filters,stages:clone(input.stages)};
   }
   function mount(container, options = {}) {
     const api = options.api || root.IneburaDunning;
@@ -176,7 +185,8 @@
       coverageChanged=false;
       formStages=clone(formStrategy?.stages||[{templateId:state.templates.find(t=>Number(t.stageNumber)===1)?.id,intervalDays:0}]);
       const coverage=coverageValues(formStrategy);
-      openModal(formStrategy?'Edit Dunning strategy':'Add Dunning strategy',`<form data-dm-strategy><div class="dmModalBody"><p class="dmFormError" role="alert" hidden></p><div class="dmFormGrid"><label>Strategy name<input name="name" value="${escape(formStrategy?.name||'')}" maxlength="120" required></label><label>Status<select name="status">${['draft','active','paused','stopped'].map(s=>`<option ${s===(formStrategy?.status||'draft')?'selected':''}>${s}</option>`).join('')}</select></label><label>Sub-client<select name="subClient"><option value="">All sub-clients</option>${[...new Set([...state.customers.map(c=>c.subClientId),formStrategy?.subClientId].filter(Boolean))].map(value=>`<option value="${escape(value)}" ${value===formStrategy?.subClientId?'selected':''}>${escape(value)}</option>`).join('')}</select></label><label>Target type<select name="targetType" data-dm-coverage><option value="customer" ${coverage.targetType==='customer'?'selected':''}>Customers</option><option value="invoice" ${coverage.targetType==='invoice'?'selected':''}>Invoices</option></select></label><label>Coverage<select name="targetMode" data-dm-coverage><option value="all" ${coverage.targetMode==='all'?'selected':''}>All eligible records</option><option value="selected" ${coverage.targetMode==='selected'?'selected':''}>Selected records</option></select></label></div>${coverage.legacy?'<p class="dmHelp">Existing target selections and exclusions are retained. Change coverage explicitly to replace them.</p>':''}<div data-dm-targets></div><div data-dm-stages>${formStages.map((s,i)=>stageHtml(s,i,state)).join('')}</div><div class="dmActions">${button('Add letter stage','add-stage','',formStages.length>=state.letterCount)}${button('Remove last stage','remove-stage','',formStages.length<=1)}</div><p class="dmHelp">Available stages: ${state.letterCount}. New stages send only after they are added to an active strategy. Changes apply to unsent stages; sent letters stay unchanged.</p></div><footer>${button('Cancel','close-modal')}<button type="submit" class="dmButton is-primary">Save strategy</button></footer></form>`);
+      const senderType=formStrategy?.senderType || 'system';
+      openModal(formStrategy?'Edit Dunning strategy':'Add Dunning strategy',`<form data-dm-strategy><div class="dmModalBody"><p class="dmFormError" role="alert" hidden></p><div class="dmFormGrid"><label>Strategy name<input name="name" value="${escape(formStrategy?.name||'')}" maxlength="120" required></label><label>Status<select name="status">${['draft','active','paused','stopped'].map(s=>`<option ${s===(formStrategy?.status||'draft')?'selected':''}>${s}</option>`).join('')}</select></label><label>Sub-client<select name="subClient"><option value="">All sub-clients</option>${[...new Set([...state.customers.map(c=>c.subClientId),formStrategy?.subClientId].filter(Boolean))].map(value=>`<option value="${escape(value)}" ${value===formStrategy?.subClientId?'selected':''}>${escape(value)}</option>`).join('')}</select></label><label>Target type<select name="targetType" data-dm-coverage><option value="customer" ${coverage.targetType==='customer'?'selected':''}>Customers</option><option value="invoice" ${coverage.targetType==='invoice'?'selected':''}>Invoices</option></select></label><label>Coverage<select name="targetMode" data-dm-coverage><option value="all" ${coverage.targetMode==='all'?'selected':''}>All eligible records</option><option value="selected" ${coverage.targetMode==='selected'?'selected':''}>Selected records</option></select></label></div>${coverage.legacy?'<p class="dmHelp">Existing target selections and exclusions are retained. Change coverage explicitly to replace them.</p>':''}<div data-dm-targets></div><fieldset class="dmStage dmSending"><legend>Sending</legend><label>Send emails from<select name="senderType" aria-describedby="dmSenderHelp" required>${senderChoices.map(([value,label])=>`<option value="${value}" ${value===senderType?'selected':''}>${escape(label)}</option>`).join('')}</select></label><p class="dmHelp" id="dmSenderHelp" data-dm-sender-help>${escape(senderHelp(senderType))}</p></fieldset><div data-dm-stages>${formStages.map((s,i)=>stageHtml(s,i,state)).join('')}</div><div class="dmActions">${button('Add letter stage','add-stage','',formStages.length>=state.letterCount)}${button('Remove last stage','remove-stage','',formStages.length<=1)}</div><p class="dmHelp">Available stages: ${state.letterCount}. New stages send only after they are added to an active strategy. Changes apply to unsent stages; sent letters stay unchanged.</p></div><footer>${button('Cancel','close-modal')}<button type="submit" class="dmButton is-primary">Save strategy</button></footer></form>`);
       renderTargets(coverage.ids);
     }
     function renderTargets(selectedIds=[]) {
@@ -264,7 +274,7 @@
         if(!authorized())return;
         if(form.matches('[data-dm-strategy]')) {
           await templates?.ready;if(!authorized())return;
-          const input={name:form.elements.name.value,status:form.elements.status.value,firstStageDays:Number(form.elements['days-0'].value),subClientId:form.elements.subClient.value,coverageChanged,coverage:{targetType:form.elements.targetType.value,targetMode:form.elements.targetMode.value},selectedIds:[...(form.elements.selectedTargets?.selectedOptions||[])].map(o=>o.value),stages:readStages(form)};
+          const input={name:form.elements.name.value,status:form.elements.status.value,senderType:form.elements.senderType?.value,firstStageDays:Number(form.elements['days-0'].value),subClientId:form.elements.subClient.value,coverageChanged,coverage:{targetType:form.elements.targetType.value,targetMode:form.elements.targetMode.value},selectedIds:[...(form.elements.selectedTargets?.selectedOptions||[])].map(o=>o.value),stages:readStages(form)};
           const payload=buildStrategy(input,formStrategy,scoped(api.getState(),context()),context());
           api.saveStrategy(payload,{...context(),date:today()});closeModal();notify('Dunning strategy saved. Only active strategies send letters.');
         } else if(form.matches('[data-dm-run]')) {
@@ -278,6 +288,12 @@
       }
     }
     function change(event) {
+      if(event.target.name==='senderType'){
+        if(!authorized())return;
+        const help=modal.querySelector('[data-dm-sender-help]');
+        if(help)help.textContent=senderHelp(event.target.value);
+        return;
+      }
       if(event.target.matches('[data-dm-invoice-stage]')){
         if(!authorized())return;
         const selected=event.target.value;

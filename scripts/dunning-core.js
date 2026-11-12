@@ -235,6 +235,7 @@
     }
     function strategyValidate(strategy, state, active) {
       if (!String(strategy.name || '').trim()) fail('Enter a strategy name.');
+      if (strategy.senderType !== undefined && !['agent','system','arservices'].includes(strategy.senderType)) fail('Choose a valid Dunning email sender.');
       if (!Number.isInteger(strategy.firstStageDays) || strategy.firstStageDays < 0 || strategy.firstStageDays > 3650) fail('First-letter duration must be a whole number between 0 and 3650 days.');
       if (!Array.isArray(strategy.stages) || !strategy.stages.length) fail('Add at least one letter stage.');
       if (strategy.stages.length > state.letterCount) fail(`Configure no more than ${state.letterCount} Dunning letter stage${state.letterCount === 1 ? '' : 's'}.`);
