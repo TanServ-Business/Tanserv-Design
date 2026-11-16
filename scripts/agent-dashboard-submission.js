@@ -16,17 +16,109 @@
   const detailSummary = document.getElementById('submissionAgingDetailSummary');
   const detailLegend = document.getElementById('submissionAgingDetailLegend');
   const detailCanvas = document.getElementById('submissionAgingDetailCanvas');
+  const acknowledgedCard = document.querySelector('.submissionAcknowledgedCard');
+  const acknowledgedModal = document.getElementById('submissionAcknowledgedModal');
+  const acknowledgedSearch = document.getElementById('submissionAcknowledgedSearch');
+  const acknowledgedBody = document.getElementById('submissionAcknowledgedTableBody');
+  const acknowledgedSummary = document.getElementById('submissionAcknowledgedSummary');
+  const acknowledgedSubtotal = document.getElementById('submissionAcknowledgedSubtotal');
+  const acknowledgedModeFilter = document.getElementById('submissionAcknowledgedModeFilter');
+  const acknowledgedModeValue = document.getElementById('submissionAcknowledgedModeValue');
   const detailColors = ['#8757b0','#ad86cd','#5a8ac4','#54aebb','#39a78f','#d8a154','#db8191','#a6aad7','#897bc8','#87b3a1','#b9a5cf'];
   let agingChart = null;
   let detailChart = null;
   let currentInvoices = [];
   let currentAgingConfig = { thresholds:insights.DEFAULT_THRESHOLDS, groups:[] };
   let detailRows = [];
+  let acknowledgedRows = [];
+  let acknowledgedMode = 'all';
+  let recordsUnavailable = false;
+
+  function asDate(value) {
+    const key = journey.keyDate(value);
+    const date = new Date(`${key}T00:00:00Z`);
+    return /^\d{4}-\d{2}-\d{2}$/.test(key) && Number.isFinite(date.getTime())
+      ? new Intl.DateTimeFormat('en-GB', { day:'2-digit', month:'short', year:'numeric', timeZone:'UTC' }).format(date)
+      : 'Not recorded';
+  }
+
+  function submissionMode(invoice) {
+    const medium = String(invoice.submissionMedium || invoice.method || '').toLowerCase();
+    if (medium === 'automated') return 'Automated';
+    if (medium === 'manual' || medium === 'external' || invoice.submissionStatus === 'External Submission') return 'Manual';
+    return 'Not recorded';
+  }
+
+  const acknowledgementMode = proof => proof.source === "Customer's Acknowledgement" ? 'Online' : 'Manual';
+
+  function renderAcknowledgedTable() {
+    if (!acknowledgedBody) return;
+    const query = acknowledgedSearch.value.trim().toLowerCase();
+    const rows = acknowledgedRows.filter(({ invoice, proof }) => (acknowledgedMode === 'all' || submissionMode(invoice) === acknowledgedMode) && (!query || [
+      invoice.invoiceNo, invoice.code, invoice.name, asDate(invoice.invoiceDate), invoice.value,
+      asDate(invoice.lastSubmittedAt || invoice.submissionDate || invoice.firstSubmittedAt),
+      submissionMode(invoice), asDate(proof.on || proof.at), acknowledgementMode(proof)
+    ].some(value => String(value || '').toLowerCase().includes(query))));
+    acknowledgedBody.replaceChildren();
+    acknowledgedSummary.textContent = recordsUnavailable ? 'Submission records unavailable'
+      : `${asCount(rows.length)}${query || acknowledgedMode !== 'all' ? ` of ${acknowledgedRows.length}` : ''}`;
+    acknowledgedSubtotal.textContent = recordsUnavailable ? '—'
+      : asCurrency(rows.reduce((sum, row) => sum + (Number(row.invoice.value) || 0), 0));
+    document.getElementById('submissionAcknowledgedModalMeta').textContent = `Submitted invoices with acknowledgement proof · ${scope.textContent}`;
+    rows.forEach(({ invoice, proof }) => {
+      const tr = document.createElement('tr');
+      const addCell = value => {
+        const td = document.createElement('td');
+        if (value != null) td.textContent = value;
+        tr.append(td);
+        return td;
+      };
+      addCell(invoice.code || 'Not recorded');
+      addCell(invoice.name || 'Not recorded');
+      const link = document.createElement('a');
+      link.textContent = invoice.invoiceNo;
+      link.href = `submission.html?${new URLSearchParams({ invoice:invoice.invoiceNo })}`;
+      link.setAttribute('aria-label', `View submission details for invoice ${invoice.invoiceNo}`);
+      addCell().append(link);
+      addCell(asDate(invoice.invoiceDate));
+      addCell(asCurrency(Number(invoice.value) || 0));
+      addCell(asDate(invoice.lastSubmittedAt || invoice.submissionDate || invoice.firstSubmittedAt));
+      addCell(submissionMode(invoice));
+      addCell(asDate(proof.on || proof.at));
+      addCell(acknowledgementMode(proof));
+      acknowledgedBody.append(tr);
+    });
+    if (!rows.length) {
+      const tr = document.createElement('tr');
+      const td = document.createElement('td');
+      td.colSpan = 9;
+      td.className = 'submissionAcknowledgedEmpty';
+      td.textContent = recordsUnavailable ? 'Submission records could not be loaded. Close this popup and try again.'
+        : query || acknowledgedMode !== 'all' ? 'No acknowledged invoices match your search or submission mode.'
+          : 'No acknowledged invoices in this portfolio. Invoices appear here once submission acknowledgement is recorded.';
+      tr.append(td);
+      acknowledgedBody.append(tr);
+    }
+  }
+
+  function openAcknowledged() {
+    if (!acknowledgedModal || !window.bootstrap?.Modal) return;
+    acknowledgedSearch.value = '';
+    acknowledgedMode = 'all';
+    if (acknowledgedModeValue) acknowledgedModeValue.textContent = 'All';
+    if (acknowledgedModeFilter) acknowledgedModeFilter.open = false;
+    render();
+    bootstrap.Modal.getOrCreateInstance(acknowledgedModal).show();
+  }
 
   function renderDetailTable() {
     if (!detailBody) return;
     const search = detailSearch.value.trim().toLowerCase();
-    const visible = search ? detailRows.filter(row => row.label.toLowerCase().includes(search)) : detailRows;
+    const invoices = search ? currentInvoices.filter(invoice => [
+      invoice.code, invoice.customerCode, invoice.name, invoice.customerName
+    ].some(value => String(value || '').toLowerCase().includes(search))) : currentInvoices;
+    detailRows = insights.detailRows(invoices, currentAgingConfig, journey);
+    const visible = detailRows;
     detailBody.replaceChildren();
     visible.forEach(row => {
       const sourceIndex = detailRows.indexOf(row);
@@ -71,15 +163,19 @@
       detailBody.append(tr);
     });
     const total = detailRows.reduce((sum, row) => sum + row.count, 0);
-    detailSummary.textContent = `${visible.length} of ${detailRows.length} ranges · ${asCount(total)}`;
+    detailSummary.textContent = `${detailRows.length} ranges · ${asCount(total)}${search ? ' matching customers' : ''}`;
+    renderDetailComposition(invoices);
   }
 
   function openDetail() {
     if (!detailModal || !window.bootstrap?.Modal) return;
     render();
-    detailRows = insights.detailRows(currentInvoices, currentAgingConfig, journey);
     detailSearch.value = '';
     renderDetailTable();
+    bootstrap.Modal.getOrCreateInstance(detailModal).show();
+  }
+
+  function renderDetailComposition(invoices) {
     detailLegend.replaceChildren();
     detailRows.forEach((row, index) => {
       const legendItem = document.createElement('span');
@@ -90,11 +186,18 @@
       legendItem.append(dot, document.createTextNode(row.label));
       detailLegend.append(legendItem);
     });
-    const unavailable = currentInvoices.length - detailRows.reduce((sum, row) => sum + row.count, 0);
+    const unavailable = invoices.length - detailRows.reduce((sum, row) => sum + row.count, 0);
     document.getElementById('submissionAgingDetailMeta').textContent = unavailable
       ? `Invoice date to submission date, or today when pending · ${asCount(unavailable)} without a usable date`
       : 'Invoice date to submission date, or today when pending';
-    if (detailChart) detailChart.destroy();
+    detailCanvas.setAttribute('aria-label', detailRows.map(row => `${row.label}: ${asCount(row.count)}`).join('; '));
+    if (detailChart) {
+      detailChart.data.labels = detailRows.map(row => row.label);
+      detailChart.data.datasets[0].data = detailRows.map(row => row.count);
+      detailChart.data.datasets[0].backgroundColor = detailRows.map((row, index) => row.color || detailColors[index % detailColors.length]);
+      detailChart.update();
+      return;
+    }
     detailChart = new Chart(detailCanvas.getContext('2d'), {
       type:'doughnut',
       data:{ labels:detailRows.map(row => row.label), datasets:[{
@@ -106,7 +209,6 @@
         tooltip:{ callbacks:{ label:context => `${context.label}: ${asCount(context.parsed)}` } }
       } }
     });
-    bootstrap.Modal.getOrCreateInstance(detailModal).show();
   }
 
   function renderAgingChart(ranges) {
@@ -148,6 +250,7 @@
 
   function render() {
     try {
+      recordsUnavailable = false;
       const state = journey.load(localStorage);
       const allInvoices = state.invoices || [];
       const agentName = document.querySelector('.heroTitleRow h1')?.textContent.trim() || '';
@@ -162,7 +265,9 @@
       const summary = insights.summarize(invoices, agingConfig, journey);
       const attachments = journey.issueAttachments(journey.readIssues(localStorage));
       const submittedInvoices = invoices.filter(journey.submitted);
-      const acknowledged = submittedInvoices.filter(invoice => journey.acknowledgementProof(state, invoice, attachments)).length;
+      acknowledgedRows = submittedInvoices.map(invoice => ({ invoice, proof:journey.acknowledgementProof(state, invoice, attachments) }))
+        .filter(row => row.proof).sort((a, b) => Date.parse(b.proof.at) - Date.parse(a.proof.at));
+      const acknowledged = acknowledgedRows.length;
       document.getElementById('submissionAcknowledgedCount').textContent = acknowledged.toLocaleString('en-IN');
       document.getElementById('submissionAcknowledgedPending').textContent = `${asCount(submittedInvoices.length - acknowledged)} pending acknowledgement`;
       currentInvoices = invoices;
@@ -203,6 +308,8 @@
         mixRows.append(row);
       });
     } catch (error) {
+      recordsUnavailable = true;
+      acknowledgedRows = [];
       scope.textContent = 'Submission records could not be loaded.';
       document.getElementById('submissionAcknowledgedCount').textContent = '—';
       document.getElementById('submissionAcknowledgedPending').textContent = 'Submission records unavailable';
@@ -210,6 +317,7 @@
       if (agingChart) { agingChart.destroy(); agingChart = null; }
       mixRows.textContent = '';
     }
+    renderAcknowledgedTable();
   }
   render();
   document.querySelector('.submissionAgingCard')?.addEventListener('click', openDetail);
@@ -217,6 +325,20 @@
     if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openDetail(); }
   });
   detailSearch?.addEventListener('input', renderDetailTable);
+  acknowledgedCard?.addEventListener('click', openAcknowledged);
+  acknowledgedCard?.addEventListener('keydown', event => {
+    if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openAcknowledged(); }
+  });
+  acknowledgedSearch?.addEventListener('input', renderAcknowledgedTable);
+  for (const mode of ['all', 'Automated', 'Manual']) {
+    document.getElementById(`submissionAcknowledgedMode-${mode}`)?.addEventListener('click', () => {
+      acknowledgedMode = mode;
+      acknowledgedModeValue.textContent = mode === 'all' ? 'All' : mode;
+      acknowledgedModeFilter.open = false;
+      renderAcknowledgedTable();
+    });
+  }
+  acknowledgedModal?.addEventListener('hidden.bs.modal', () => acknowledgedCard?.focus());
   detailModal?.addEventListener('hidden.bs.modal', () => {
     if (detailChart) { detailChart.destroy(); detailChart = null; }
   });
