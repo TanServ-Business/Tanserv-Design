@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
 
-  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="css/styles.css?v=20261116-submission-dropdown-2" />
   <style>
     .panel.right,
     .right .tabPanel[data-tab="invoice"],
@@ -2605,7 +2605,7 @@
   <script defer src="bin/IssueTracker/js/issue-tracker-config.js?v=20260805-approved-flow-v1"></script>
   <script defer src="scripts/app.js?v=20261019-7fce6f8b0b"></script>
   <script defer src="scripts/submission-strategy-core.js?v=20261013-agent-delivery"></script>
-  <script defer src="scripts/index-bulk-submission.js"></script>
+  <script defer src="scripts/index-bulk-submission.js?v=20261116-submit-notification"></script>
   <script defer src="scripts/customer-notes.js"></script>
   <link rel="stylesheet" href="css/dunning-integrations.css?v=20261021-37e5b6e063" />
   <link rel="stylesheet" href="css/dunning-templates.css?v=20261021-c5fd90285f" />
@@ -2615,6 +2615,8 @@
   <script defer src="scripts/vendor/jspdf.umd.min.js"></script>
   <script defer src="scripts/dunning-documents.js?v=20261021-4f003c5e12"></script>
   <script defer src="scripts/dunning-integrations.js?v=20261021-69f01463d1"></script>
+  <link rel="stylesheet" href="css/ui-library.css?v=20261113-71f1f2d5a7" />
+  <script defer src="scripts/ui-dropdown-filters.js?v=20261113"></script>
 </head>
 <body data-root-path="" data-relationship-name="Apollo" data-relationship-badge="AP" data-relationship-logo-src="assets/apollo-sharkfin-logo.jpeg">
 
@@ -2910,23 +2912,63 @@
       <div class="modal-content">
         <div class="modal-header">
           <h2 class="modal-title" id="bulkSubmitInvoicesTitle">Submit invoices</h2>
-          <button type="button" class="bulkSubmitClose" data-bs-dismiss="modal" aria-label="Close dialog"><i class="bi bi-x-lg" aria-hidden="true"></i></button>
+          <button type="button" class="bulkSubmitClose closeBtn" data-bs-dismiss="modal" aria-label="Close dialog"><i class="bi bi-x-lg" aria-hidden="true"></i></button>
         </div>
         <div class="modal-body">
           <p id="bulkSubmitSummary" class="bulkSubmitSummary"></p>
           <div class="bulkSubmitCounts" aria-label="Invoice submission eligibility">
-            <div class="bulkSubmitCount bulkSubmitCountReady"><strong id="bulkSubmitReadyCount">0</strong><span>Ready to submit</span></div>
-            <div class="bulkSubmitCount bulkSubmitCountPending"><strong id="bulkSubmitPendingCount">0</strong><span>Missing documents</span></div>
-            <div class="bulkSubmitCount"><strong id="bulkSubmitSubmittedCount">0</strong><span>Already submitted</span></div>
+            <section class="bulkSubmitCount bulkSubmitCountReady" aria-labelledby="bulkSubmitProcessLabel">
+              <strong class="bulkSubmitTotal" id="bulkSubmitProcessCount">0</strong>
+              <h3 id="bulkSubmitProcessLabel">Can be processed</h3>
+              <ul class="bulkSubmitBreakdown">
+                <li><b id="bulkSubmitReadyCount">0</b> Ready to submit</li>
+                <li><b id="bulkSubmitDocumentsCount">0</b> Documents only</li>
+                <li><b id="bulkSubmitSequentialCount">0</b> Documents + submit</li>
+              </ul>
+            </section>
+            <section class="bulkSubmitCount" aria-labelledby="bulkSubmitSubmittedLabel">
+              <strong class="bulkSubmitTotal" id="bulkSubmitSubmittedCount">0</strong>
+              <h3 id="bulkSubmitSubmittedLabel">Already submitted</h3>
+              <p class="bulkSubmitBreakdown">Available to resend</p>
+            </section>
+            <section class="bulkSubmitCount bulkSubmitCountPending" aria-labelledby="bulkSubmitAttentionLabel">
+              <strong class="bulkSubmitTotal" id="bulkSubmitAttentionCount">0</strong>
+              <h3 id="bulkSubmitAttentionLabel">Needs attention</h3>
+              <ul class="bulkSubmitBreakdown">
+                <li><b id="bulkSubmitPendingCount">0</b> Missing documents</li>
+                <li><b id="bulkSubmitNoProcessCount">0</b> No submission process</li>
+              </ul>
+            </section>
           </div>
-          <p id="bulkSubmitMissing" class="bulkSubmitMissing" role="status"></p>
-          <p class="bulkSubmitHint">Submit ready invoices only, or include invoices that were already submitted. Invoices missing documents stay pending.</p>
+          <div class="bulkSubmitActionField formField">
+            <span class="form-label" id="bulkSubmitActionLabel">Choose action</span>
+            <details class="filterDropdown bulkSubmitActionDropdown" id="bulkSubmitActionDropdown">
+              <summary id="bulkSubmitActionTrigger" aria-labelledby="bulkSubmitActionLabel bulkSubmitActionValue" aria-describedby="bulkSubmitActionHint" aria-haspopup="listbox" aria-controls="bulkSubmitActionMenu">
+                <span id="bulkSubmitActionValue">Select an action</span>
+                <i class="bi bi-chevron-down" aria-hidden="true"></i>
+              </summary>
+              <div class="filterMenu" id="bulkSubmitActionMenu" role="listbox" aria-label="Submission action">
+                <button class="filterItem" id="bulkSubmitOption-submit" type="button" role="option" aria-selected="false" data-filter-value="submit">Submit ready invoices</button>
+                <button class="filterItem" id="bulkSubmitOption-resend" type="button" role="option" aria-selected="false" data-filter-value="resend">Resend submitted invoices</button>
+                <button class="filterItem" id="bulkSubmitOption-documents" type="button" role="option" aria-selected="false" data-filter-value="documents">Send sequential documents only</button>
+                <button class="filterItem" id="bulkSubmitOption-sequential" type="button" role="option" aria-selected="false" data-filter-value="sequential">Send sequential documents and submit</button>
+              </div>
+            </details>
+            <select id="bulkSubmitAction" hidden aria-hidden="true" tabindex="-1">
+              <option value="" disabled selected>Select an action</option>
+              <option value="submit">Submit ready invoices</option>
+              <option value="resend">Resend submitted invoices</option>
+              <option value="documents">Send sequential documents only</option>
+              <option value="sequential">Send sequential documents and submit</option>
+            </select>
+            <p id="bulkSubmitActionHint" class="bulkSubmitHint" aria-live="polite"></p>
+          </div>
+          <p id="bulkSubmitMissing" class="bulkSubmitHint"></p>
           <div id="bulkSubmitResult" class="bulkSubmitResult" hidden role="status"></div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btnDanger" data-bs-dismiss="modal">Cancel submission</button>
-          <button type="button" class="btnSecondary" id="bulkSubmitAll">Submit all eligible invoices</button>
-          <button type="button" class="btnPrimary" id="bulkSubmitReady">Submit ready invoices</button>
+          <button type="button" class="btnPrimary" id="bulkSubmitConfirm" disabled>Select an action</button>
         </div>
       </div>
     </div>

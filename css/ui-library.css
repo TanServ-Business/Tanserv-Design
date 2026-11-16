@@ -1,0 +1,392 @@
+/* Application component contract. The visual reference is pages/ui-elements.html.
+ * Reuse its approved patterns; keep screen layout and interaction state local.
+ * Presentation declarations are important because legacy modules append scoped
+ * styles at runtime. Do not add new component variants here without approval.
+ */
+@import url("./form-controls.css?v=20261112");
+@import url("./ui-library-components.css?v=20261113-a87369bb30");
+@import url("./ui-library-tables.css?v=20261113-polish-2");
+
+:root {
+  --ui-font: Calibri, "Segoe UI", Arial, sans-serif;
+  --ui-brand: #5c258d;
+  --ui-brand-dark: #4b1f73;
+  --ui-border: #e2e8f4;
+}
+
+body { font-family: var(--ui-font) !important; }
+
+/* Standard text fields: the library's 13px/19.5px line plus 8px padding
+ * and a 1px border makes both textboxes and single selects 37.5px tall.
+ * Checkbox/radio/toggle, color, range, file and hidden controls retain their
+ * own interaction geometry. Native listboxes retain their multiple rows.
+ */
+body input:where(:not([type]), [type="text"], [type="email"], [type="password"], [type="search"], [type="tel"], [type="url"], [type="number"], [type="date"], [type="time"], [type="datetime-local"], [type="month"], [type="week"]),
+body select,
+body textarea,
+body :is(.adminConfigurationSelect > button, .adminEntityControl, .sjDateRangeTrigger) {
+  box-sizing: border-box !important;
+  border: 1px solid var(--ui-border) !important;
+  border-radius: 10px !important;
+  padding: 8px 10px !important;
+  font: 400 13px/19.5px var(--ui-font) !important;
+  color: #000 !important;
+  background-color: #fff !important;
+  box-shadow: none !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+}
+
+body input:where(:not([type]), [type="text"], [type="email"], [type="password"], [type="search"], [type="tel"], [type="url"], [type="number"], [type="date"], [type="time"], [type="datetime-local"], [type="month"], [type="week"]),
+body select:not([multiple]):not([size]),
+body select:not([multiple]):is([size="0"], [size="1"]),
+body :is(.adminConfigurationSelect > button, .adminEntityControl, .sjDateRangeTrigger) {
+  height: 37.5px !important;
+  min-height: 37.5px !important;
+}
+
+body select:not([multiple]):not([size]),
+body select:not([multiple]):is([size="0"], [size="1"]),
+body .adminConfigurationSelect > button {
+  padding-inline-end: 30px !important;
+}
+
+body textarea { height: auto !important; min-height: 70px !important; }
+/* The reference uses the native focus ring. Restore it where older modules
+ * suppressed the outline in favor of a shadow that the contract replaces. */
+body :is(input, select, textarea):focus-visible:not(:where(
+  .tableFilterSearch input, .opSearch input, .saSearch input, .sjSearch input,
+  .searchWidget input, .adminTagSelectControl input, .adminSearchSelectControl input,
+  .smSearchField input, .imLiveSearch input, .adminTableSearch input, .kbSearchBar input
+)) { outline: revert !important; outline-offset: 0 !important; }
+body :is(.inputWithIcon, .inputWithClear, .misMultiControl) input {
+  padding-inline-end: 38px !important;
+}
+body .misMultiControl { height: 37.5px !important; }
+body .misMultiControl > button { height: 37.5px !important; }
+
+/* A compound search/tag field has a single outer border. Styling its inner
+ * input as another textbox would introduce a double outline and misalign icons.
+ */
+body :is(
+  .adminTagSelectControl, .adminSearchSelectControl,
+  .tableFilterSearch, .opSearch, .saSearch, .sjSearch, .smSearchField,
+  .imLiveSearch, .adminHeaderSearch, .adminTableSearch, .aiSearchField,
+  .directorySearchRow, .adminDirectorySearch, .adminSubmissionDocumentSearch,
+  .vintageDetailSearch, .vintageCustomerSearch, .misScopeSearch,
+  .clCustSearchInner, .searchField, .rgUserSearchTrigger, .rgDropSearch,
+  .kbSearchBar, .opRoleFilter
+) {
+  box-sizing: border-box !important;
+  border: 1px solid var(--ui-border) !important;
+  border-radius: 10px !important;
+  background-color: #fff !important;
+  font: 400 12px/18px var(--ui-font) !important;
+}
+body .adminTagSelectControl { height: 37.5px !important; min-height: 37.5px !important; padding: 0 10px !important; }
+body :is(
+  .adminTagSelectControl, .adminSearchSelectControl,
+  .tableFilterSearch, .opSearch, .saSearch, .sjSearch, .smSearchField,
+  .imLiveSearch, .adminHeaderSearch, .adminTableSearch, .aiSearchField,
+  .directorySearchRow, .adminDirectorySearch, .adminSubmissionDocumentSearch,
+  .vintageDetailSearch, .vintageCustomerSearch, .misScopeSearch,
+  .clCustSearchInner, .searchField, .rgUserSearchTrigger, .rgDropSearch,
+  .kbSearchBar, .searchWidget
+) input {
+  border: 0 !important;
+  border-radius: 0 !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  min-height: 0 !important;
+}
+body .adminTagSelectControl input { height: 35.5px !important; padding: 8px 0 !important; }
+body :is(
+  .tableFilterSearch, .opSearch, .saSearch, .sjSearch, .smSearchField,
+  .imLiveSearch, .adminHeaderSearch, .adminTableSearch, .aiSearchField,
+  .directorySearchRow, .adminDirectorySearch, .adminSubmissionDocumentSearch,
+  .vintageDetailSearch, .vintageCustomerSearch, .misScopeSearch,
+  .clCustSearchInner, .searchField, .rgUserSearchTrigger, .rgDropSearch,
+  .kbSearchBar, .opRoleFilter
+) {
+  height: 38px !important;
+  min-height: 38px !important;
+  padding: 0 12px !important;
+}
+body :is(
+  .tableFilterSearch, .opSearch, .saSearch, .sjSearch, .smSearchField,
+  .imLiveSearch, .adminHeaderSearch, .adminTableSearch, .aiSearchField,
+  .directorySearchRow, .adminDirectorySearch, .adminSubmissionDocumentSearch,
+  .vintageDetailSearch, .vintageCustomerSearch, .misScopeSearch,
+  .clCustSearchInner, .searchField, .rgUserSearchTrigger, .rgDropSearch,
+  .kbSearchBar
+) input {
+  height: 36px !important;
+  padding: 0 !important;
+  font: 400 12px/18px var(--ui-font) !important;
+}
+body .searchWidget input { height: 30px !important; padding: 8px 6px 8px 0 !important; }
+/* Help search includes a full text action button. Let that existing button
+ * determine the row height instead of clipping it to a compact filter's 38px.
+ */
+body .kbSearchBar { height: auto !important; min-height: 46px !important; padding: 0 !important; }
+body .kbSearchBar input { height: auto !important; padding: 8px 10px !important; }
+
+/* Searchable selects keep one textbox border around the input and search
+ * icon. The icon button is not another textbox or an action-button variant.
+ */
+body .adminSearchSelectControl {
+  height: 37.5px !important;
+  min-height: 37.5px !important;
+  padding: 0 !important;
+}
+body .adminSearchSelectControl input[type="text"] {
+  height: 35.5px !important;
+  padding: 8px 10px !important;
+  font: 400 13px/19.5px var(--ui-font) !important;
+}
+body .adminSearchSelectControl > button {
+  min-height: 0 !important;
+  height: 35.5px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+body .opRoleFilter select {
+  height: 36px !important;
+  min-height: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  padding-block: 0 !important;
+  padding-inline-start: 0 !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+/* These existing fields place an icon over the input rather than beside it. */
+body :is(.customerNotesFilterSearch, .cpSearch, .adminEscalationToolbar) input {
+  padding-inline-start: 34px !important;
+}
+body .imHasSearch > input { padding-inline-start: 38px !important; }
+body .imLiveInput > input[maxlength="10"] { padding-inline-end: 36px !important; }
+body .imHasSearch > input:not(:disabled) { padding-inline-end: 30px !important; }
+
+/* Labels are restricted to field wrappers, so option labels, navigation and
+ * explanatory text do not accidentally acquire uppercase form-label styling.
+ */
+body :is(.formField, .adminConfigurationField, .adminSpecialField, .todoField) > label,
+body :is(label.adminRuntimeField, label.adminSpecialField),
+body :is(.opFormGrid, .opRoleForm, .imForm, .sjFormGrid, .dmFormGrid, .smFormGrid) > label,
+body :is(.form-label, .misFieldLabel, .userUpdateLabel) {
+  color: #64748b !important;
+  font: 600 12px/18px var(--ui-font) !important;
+  letter-spacing: .04em !important;
+  text-transform: uppercase !important;
+}
+body .dmModal label:has(> :is(select, textarea, input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]))) {
+  color: #64748b !important;
+  font: 600 12px/18px var(--ui-font) !important;
+  letter-spacing: .04em !important;
+  text-transform: uppercase !important;
+}
+
+/* Existing invalid/disabled signals must survive the default field contract. */
+body :is(input, select, textarea):is(:disabled, [readonly]),
+body :is(.adminConfigurationSelect, .adminSearchSelectControl) > button:disabled {
+  background-color: #f1f5f9 !important;
+  color: #64748b !important;
+}
+body :is(.formField.invalid, .is-invalid) :is(input, select, textarea):not(:where(.adminSearchSelectControl input, .adminTagSelectControl input)),
+body :is(input, select, textarea):is(.is-invalid, [aria-invalid="true"]) {
+  border-color: #fca5a5 !important;
+  box-shadow: 0 0 0 2px rgba(248,113,113,.2) !important;
+}
+body :is(.adminTagSelectField.is-invalid .adminTagSelectControl, .adminSearchSelectField.is-invalid .adminSearchSelectControl) {
+  border-color: #fca5a5 !important;
+  box-shadow: 0 0 0 2px rgba(248,113,113,.2) !important;
+}
+
+/* Existing compact filter pattern; checkbox options use the same menu rows. */
+body :is(.filterDropdown, .adminFilterDropdown) > summary {
+  box-sizing: border-box !important;
+  height: 38px !important;
+  min-height: 38px !important;
+  padding: 0 12px !important;
+  border: 1px solid var(--ui-border) !important;
+  border-radius: 10px !important;
+  background: #fff !important;
+  color: #111827 !important;
+  font: 700 12px/18px var(--ui-font) !important;
+}
+body :is(.filterMenu, .adminFilterMenu, .suggestionBox, .adminConfigurationSelect [role="listbox"]) {
+  border: 1px solid var(--ui-border) !important;
+  border-radius: 12px !important;
+  padding: 6px !important;
+  background: #fff !important;
+  box-shadow: 0 16px 32px rgba(15,23,42,.12) !important;
+}
+body :is(.filterItem, .adminFilterMenu button, .adminConfigurationSelect [role="option"]) {
+  border: 0 !important;
+  border-radius: 8px !important;
+  padding: 8px 10px !important;
+  color: #111827 !important;
+  font: 400 12px/18px var(--ui-font) !important;
+}
+body :is(.filterItem, .adminFilterMenu button, .adminConfigurationSelect [role="option"]):hover {
+  background: #f8fafc !important;
+}
+body .filterMultiItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 !important;
+  font-weight: 400 !important;
+}
+body .filterMultiItem input[type="checkbox"] {
+  flex: 0 0 auto !important;
+  margin: 0 !important;
+  accent-color: var(--ui-brand) !important;
+}
+
+/* Native choices use the library's 13px checkbox/radio controls. Exclude the
+ * known switches, including transparent inputs that operate a sibling track;
+ * their visibility and hit targets must remain owned by those implementations.
+ * The explicit MIS alias also outranks its existing important 17px rule.
+ */
+html body input[type="checkbox"]:not(:where(
+    .toggleSwitch input, .smStatusToggle input, .adminConfigurationToggle input,
+    .adminSubmissionAgent input, .adminSubmissionBulkToggle input,
+    .misLoginDetails input, .imApiToggle input,
+    .opSwitch input, .tmSwitch input, .adminSpecialToggleCard input
+  )),
+html body input[type="radio"],
+html body .misCheckList input[type="checkbox"],
+html body .misMapAll input[type="checkbox"],
+html body .misDialog .opFormGrid .misPostingChoice input[type="radio"] {
+  box-sizing: border-box !important;
+  appearance: auto !important;
+  -webkit-appearance: auto !important;
+  flex: 0 0 13px !important;
+  width: 13px !important;
+  min-width: 13px !important;
+  max-width: 13px !important;
+  height: 13px !important;
+  min-height: 13px !important;
+  max-height: 13px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+  accent-color: auto !important;
+}
+
+/* The approved switch is 44x24 with an 18px thumb. These implementations
+ * draw their track on the input itself; use one ::after thumb for all of them.
+ */
+html body :is(
+  .toggleSwitch, .smStatusToggle, .adminConfigurationToggle,
+  .adminSubmissionAgent, .adminSubmissionBulkToggle,
+  .misDialog .misLoginDetails, .imApiToggle
+) input[type="checkbox"] {
+  box-sizing: border-box !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  position: relative;
+  flex: 0 0 44px !important;
+  width: 44px !important;
+  min-width: 44px !important;
+  height: 24px !important;
+  min-height: 24px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 1px solid #cbd5f5 !important;
+  border-radius: 999px !important;
+  background: #e2e8f4 !important;
+  box-shadow: none !important;
+}
+html body :is(
+  .toggleSwitch, .smStatusToggle, .adminConfigurationToggle,
+  .adminSubmissionAgent, .adminSubmissionBulkToggle,
+  .misDialog .misLoginDetails, .imApiToggle
+) input[type="checkbox"]::before { content: none !important; }
+html body :is(
+  .toggleSwitch, .smStatusToggle, .adminConfigurationToggle,
+  .adminSubmissionAgent, .adminSubmissionBulkToggle,
+  .misDialog .misLoginDetails, .imApiToggle
+) input[type="checkbox"]::after {
+  content: "" !important;
+  position: absolute !important;
+  top: 2px !important;
+  left: 2px !important;
+  width: 18px !important;
+  height: 18px !important;
+  border-radius: 50% !important;
+  background: #fff !important;
+  box-shadow: 0 2px 6px rgba(15,23,42,.15) !important;
+  transform: translateX(0) !important;
+  transition: transform .2s ease !important;
+}
+html body :is(
+  .toggleSwitch, .smStatusToggle, .adminConfigurationToggle,
+  .adminSubmissionAgent, .adminSubmissionBulkToggle,
+  .misDialog .misLoginDetails, .imApiToggle
+) input[type="checkbox"]:checked {
+  background: #5c258d !important;
+  border-color: #4b1f73 !important;
+}
+html body :is(
+  .toggleSwitch, .smStatusToggle, .adminConfigurationToggle,
+  .adminSubmissionAgent, .adminSubmissionBulkToggle,
+  .misDialog .misLoginDetails, .imApiToggle
+) input[type="checkbox"]:checked::after { transform: translateX(20px) !important; }
+
+/* Sibling-track switches keep their transparent native input intact. */
+body .opSwitch { width: 44px !important; height: 24px !important; }
+html body :is(.opSwitch > input + span, .tmSwitchTrack, .adminSpecialToggleCard > input + i) {
+  box-sizing: border-box !important;
+  position: relative;
+  flex: 0 0 44px !important;
+  width: 44px !important;
+  height: 24px !important;
+  border: 1px solid #cbd5f5 !important;
+  border-radius: 999px !important;
+  background: #e2e8f4 !important;
+}
+html body :is(.opSwitch > input + span, .tmSwitchTrack, .adminSpecialToggleCard > input + i)::after {
+  content: "" !important;
+  position: absolute !important;
+  top: 2px !important;
+  left: 2px !important;
+  width: 18px !important;
+  height: 18px !important;
+  border-radius: 50% !important;
+  background: #fff !important;
+  box-shadow: 0 2px 6px rgba(15,23,42,.15) !important;
+  transform: translateX(0) !important;
+  transition: transform .2s ease !important;
+}
+html body :is(
+  .opSwitch > input:checked + span,
+  .tmSwitch > input:checked + .tmSwitchTrack,
+  .adminSpecialToggleCard > input:checked + i
+) {
+  border-color: #4b1f73 !important;
+  background: #5c258d !important;
+}
+html body :is(
+  .opSwitch > input:checked + span,
+  .tmSwitch > input:checked + .tmSwitchTrack,
+  .adminSpecialToggleCard > input:checked + i
+)::after { transform: translateX(20px) !important; }
+
+/* UI Elements uses a stronger red and pale background on invalid text input;
+ * invalid selects and textareas retain the generic validation outline above.
+ */
+body :is(.formField.invalid, .is-invalid) input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not(:where(.adminTagSelectControl input, .adminSearchSelectControl input)),
+body input[aria-invalid="true"]:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]) {
+  background-color: #fff1f2 !important;
+  border-color: #b91c1c !important;
+}

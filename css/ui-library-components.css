@@ -1,0 +1,550 @@
+/*
+ * Existing UI Elements component contract.
+ * Source: pages/ui-elements.html. No new visual variants are defined here.
+ * Explicit aliases keep existing event handlers and page structure intact.
+ * Presentation declarations are important because legacy modules also use
+ * important overrides and Admin can append its component CSS at runtime.
+ * Width, display, position, overflow and visibility remain module-owned.
+ * Selector groups below are intentionally named for parity-test inventory.
+ */
+
+/* UI-LIBRARY: BUTTON-SECONDARY (base for semantic button variants below) */
+:is(
+  .btnPrimary, .btnSecondary, .btnGhost, .btnDanger, .btnCTA,
+  .adminPrimary, .adminSecondary, .adminGhostButton, .adminDangerButton,
+  .adminConfigurationCTA, .adminConfigurationSave, .adminConfigurationCancel,
+  .adminRuntimeRowActions > button,
+  .adminSubmissionRowActions > button, .opAddSub,
+  .adminSpecialButton:not(.is-link), .opDangerButton, .opPasswordButton,
+  .primaryButton, .outlineButton, .dangerButton, .currentActionButton,
+  .payActionBtn, .remarkActionBtn,
+  .myTeamBtn, .dashboardTrendToggleBtn, .kbSearchBtn,
+  .smPrimaryBtn, .smGhostBtn, .smTinyBtn,
+  .sjPrimary, .sjButton, .dmButton, .cpButton,
+  .aiGhostBtn, .aiReviewBtn, .aiDecisionBtn, .aiCallButton,
+  .clChangeLimitBtn, .clSaveBtn, .clSaveDirectBtn, .clSubmitApprovalBtn,
+  .clModalCancelBtn, .clModalConfirmBtn,
+  .rgBtnClear, .rgBtnDownloadFiltered, .rgClearFiltersBtn, .rptActionBtn,
+  .pdcActionBtn, .kbTicketActionBtn,
+  .btnSmall, .btnSmallPrimary, .ghostBtn, .todoAddBtn,
+  .emailNewBtn, .emailSendBtn, .customerNotesActionBtn:not(.customerNotesIconAction),
+  .primaryBtn, .defaultBtn, .btn--primary, .btn--ghost,
+  .actionBtn, .actionBtnSecondary, .filterActionBtn,
+  .btn-primary, .btn-outline-primary, .btn-outline-secondary, .btn-danger,
+  [id="reportResources"],
+  button.pill.primary, button.pill.secondary,
+  .add-btn, .save-btn, .add-level,
+  .dtActions > button, .dtCustomField > button, .dtModalFooter button,
+  .dunningDocumentPreview > section > footer button,
+  .dnActions > button,
+  .dlReportActions > button, .dlReportFilters > button
+) {
+  box-sizing: border-box !important;
+  min-height: var(--ui-action-height, 46px) !important;
+  height: auto !important;
+  padding: 10px 16px !important;
+  border: 1px solid #d7c3ea !important;
+  border-radius: 10px !important;
+  background: #fff !important;
+  color: #4b1f73 !important;
+  font-family: Calibri, "Segoe UI", Arial, sans-serif !important;
+  font-size: var(--ui-action-font-size, 16px) !important;
+  line-height: var(--ui-action-line-height, 24px) !important;
+  font-weight: 700 !important;
+  letter-spacing: normal !important;
+  text-transform: none !important;
+  text-decoration: none !important;
+  box-shadow: none !important;
+}
+
+/* UI-LIBRARY: BUTTON-PRIMARY */
+:is(
+  .btnPrimary, .adminPrimary, .adminSpecialButton.is-primary, .adminConfigurationSave,
+  .primaryButton, .smPrimaryBtn, .sjPrimary, .dmButton.is-primary,
+  .dmWorkspace button.is-primary, .cpPrimary,
+  .aiDecisionBtn.approve, .aiCallButton--primary, .clSaveBtn, .clSaveDirectBtn,
+  .clChangeLimitBtn:not(.is-active), .clModalConfirmBtn.approve,
+  .rptActionBtnGenerate, .kbTicketActionBtn.primary,
+  .btnSmallPrimary, .todoAddBtn, .emailNewBtn, .emailSendBtn,
+  .customerNotesActionSave, .primaryBtn, .btn--primary,
+  .btn-primary, button.pill.primary, .save-btn, .dtPrimary,
+  .dnIntegration button.dnPrimary,
+  .actionBtn:not(.actionBtnSecondary), .filterActionBtn.primary, .kbSearchBtn
+) {
+  border: 1px solid #3b1759 !important;
+  background: #4b1f73 !important;
+  color: #fff !important;
+}
+
+/* UI-LIBRARY: BUTTON-GHOST */
+:is(.btnGhost, .adminGhostButton, .ghostBtn, .btn--ghost, button.adminSpecialButton.is-dashed) {
+  border: 1px dashed #cbd5f5 !important;
+  background: transparent !important;
+  color: #0f172a !important;
+  font-weight: 600 !important;
+}
+
+/* UI-LIBRARY: BUTTON-DANGER */
+:is(
+  .btnDanger, .adminDangerButton, .adminSpecialButton.is-danger,
+  .opDangerButton, .dangerButton, .smTinyBtn.is-danger,
+  body .adminRuntimePage .adminRuntimeRowActions > button.is-danger,
+  .adminSubmissionRowActions > button.is-danger,
+  .adminSubmissionRowActions > button[data-submission-action="delete"],
+  .cpDanger, .aiDecisionBtn.reject, .aiCallButton--end, .clModalConfirmBtn.reject,
+  .rgBtnClear, .rgClearFiltersBtn, .customerNotesActionDanger, .btn-danger
+) {
+  border: 1px solid #fecaca !important;
+  background: #fee2e2 !important;
+  color: #991b1b !important;
+}
+
+/* UI-LIBRARY: BUTTON-CTA */
+:is(.btnCTA, .currentActionButton, #smCreateNewBtn, .adminConfigurationCTA) {
+  min-height: 48px !important;
+  padding: 12px 20px !important;
+  border: 0 !important;
+  border-radius: 14px !important;
+  background: linear-gradient(135deg, #5c258d 0%, #7c3aed 100%) !important;
+  color: #fff !important;
+  font-weight: 800 !important;
+  letter-spacing: .02em !important;
+  box-shadow: 0 10px 22px rgba(92, 37, 141, .25) !important;
+}
+
+/* The existing library table naturally inherits 12px/18px typography.
+ * Preserve that approved context rather than making table actions taller. */
+.ui-table {
+  --ui-action-font-size: 12px;
+  --ui-action-line-height: 18px;
+  --ui-action-height: 40px;
+}
+
+/* UI-LIBRARY: PILL-BASE. Buttons called .pill in the legacy rule builder
+ * are buttons, not status badges, and are covered by the button aliases. */
+:is(
+  .pill:not(button), .aiPill, .adminStatus, .dmBadge, .cpBadge,
+  .sjPill, .pdcStatus, .smStatusPill, .imStatus, .misStatus,
+  .imPill, .imPending, .sessionPill, .tmSampleBadge, .opRolePill, .opCategory,
+  .opBucketPicker > button, .adminStateBadge, .adminRuntimeTags i, .adminRuntimeChips span
+) {
+  border-radius: 999px !important;
+  padding: 6px 10px !important;
+  font-family: Calibri, "Segoe UI", Arial, sans-serif !important;
+  font-size: 11px !important;
+  line-height: 16.5px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: .04em !important;
+}
+
+/* Unclassified status badges use the existing neutral Filter Pill pattern. */
+:is(
+  .pill:not(button), .aiPill, .adminStatus, .dmBadge, .cpBadge,
+  .sjPill, .pdcStatus, .smStatusPill, .imStatus, .misStatus,
+  .imPill, .imPending, .sessionPill, .tmSampleBadge, .opRolePill, .opCategory,
+  .opBucketPicker > button, .adminStateBadge, .adminRuntimeTags i, .adminRuntimeChips span
+) {
+  border: 1px solid #e2e8f4 !important;
+  background: #f1f5f9 !important;
+  color: #334155 !important;
+}
+
+/* UI-LIBRARY: PILL-FILTER */
+:root :is(.pillFilter, .aiPill.pending, .cpBadge.Closed, .cpBadge.Reconciled, .smStatusPill.is-inactive, .sessionPill.offline, .tmSampleBadge) {
+  border: 1px solid #e2e8f4 !important;
+  background: #f1f5f9 !important;
+  color: #334155 !important;
+}
+
+/* UI-LIBRARY: PILL-ACTIVE */
+:root :is(.pillActive, .dmBadge, .opBucketPicker > button.is-selected) {
+  border: 1px solid #4b1f73 !important;
+  background: #5c258d !important;
+  color: #fff !important;
+}
+.opBucketPicker > button { min-height: 30.5px !important; height: auto !important; }
+.opBucketPicker > button:disabled { opacity: .5 !important; cursor: not-allowed !important; }
+
+/* UI-LIBRARY: PILL-APPROVED */
+:root :is(
+  .pillApproved, .pill.collected, .pill.work-in-progress, .pill.predue,
+  .aiPill.approved, .aiPill.scheduled, .aiPill.low, .aiPill.visit,
+  .adminStatus.is-success, .cpBadge.Confirmed, .cpBadge.Open,
+  .imPill.imSuccess, .smStatusPill.is-active, .misStatus.is-active, .sessionPill.online,
+  .pdcStatus.received, .pdcStatus.banked, .pdcStatus.cleared
+) {
+  border: 1px solid #86efac !important;
+  background: #dcfce7 !important;
+  color: #166534 !important;
+}
+
+/* UI-LIBRARY: PILL-PENDING */
+:root :is(
+  .pillPending, .pill.ptp, .pill.external-dependency,
+  .aiPill.medium, .aiPill.reminder, .adminStatus.is-warning,
+  .imPending,
+  .cpBadge.Pending, .pdcStatus.logged, .pdcStatus.dispatched
+) {
+  border: 1px solid #fde68a !important;
+  background: #fef9c3 !important;
+  color: #a16207 !important;
+}
+
+/* UI-LIBRARY: PILL-REJECTED */
+:root :is(
+  .pillRejected, .pill.overdue, .pill.guidance,
+  .aiPill.rejected, .aiPill.revoked, .aiPill.high,
+  .cpBadge.Invalid, .cpBadge.Rejected, .pdcStatus.incorrect, .pdcStatus.bounced
+) {
+  border: 1px solid #fecaca !important;
+  background: #fee2e2 !important;
+  color: #991b1b !important;
+}
+
+/* UI-LIBRARY: PILL-INFO */
+:root :is(
+  .pillInfo, .pill.pdc, .pill.ptp-primary, .pill.dispute, .aiPill.email, .aiPill.reply,
+  .aiPill.status, .aiPill.activity, .adminStatus.is-info, .opRolePill, .opCategory,
+  .adminStateBadge, .adminRuntimeTags i, .adminRuntimeChips span
+) {
+  border: 1px solid #bae6fd !important;
+  background: #e0f2fe !important;
+  color: #0c4a6e !important;
+}
+
+/* UI-LIBRARY: TABS. This is the existing pill-tab component. Module
+ * navigation, underline tabs and their count badges keep their own surfaces. */
+.tabBtn {
+  box-sizing: border-box !important;
+  min-height: 32px !important;
+  height: 32px !important;
+  align-self: center !important;
+  padding: 6px 12px !important;
+  border: 1px solid #e2e8f4 !important;
+  border-radius: 999px !important;
+  background: #fff !important;
+  color: #000 !important;
+  font-family: Calibri, "Segoe UI", Arial, sans-serif !important;
+  font-size: 12px !important;
+  line-height: 18px !important;
+  font-weight: 700 !important;
+  letter-spacing: normal !important;
+  text-transform: none !important;
+  text-decoration: none !important;
+  box-shadow: none !important;
+}
+
+.tabBtn:is(.active, .is-active, [aria-selected="true"], [aria-pressed="true"]) {
+  border-color: #4b1f73 !important;
+  background: #5c258d !important;
+  color: #fff !important;
+}
+
+/* Reuse the library's Filter Badge for nested counts. An active parent tab
+ * must never turn a number white while its own badge remains pale lavender. */
+:root :is(.filterBadge, .sjTabs button > span, .cpTabs button > span,
+  .workTab > span, .hsTab > .hsBadge, .saFilterTab > .saTabCount) {
+  background: #f1f5f9 !important;
+  border: 1px solid #e2e8f4 !important;
+  color: #334155 !important;
+  border-radius: 999px !important;
+  padding: 2px 8px !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  line-height: 15px !important;
+  text-transform: uppercase !important;
+  letter-spacing: .03em !important;
+}
+
+/* UI-LIBRARY: PAGINATION. Numeric and icon controls are 32px square.
+ * Existing text-label previous/next controls retain their intrinsic width. */
+:is(
+  .pageBtn, .rgPageBtn, .mtdPageBtn, .runningStrategyPagerBtn,
+  .unappliedPageBtn, .adminPager button, .adminSpecialPager button,
+  .adminStrategyPager button, .tmPager button, .imPagination button,
+  .paginationControls button, .sjPagination .sjButton
+) {
+  box-sizing: border-box !important;
+  min-width: 32px !important;
+  min-height: 32px !important;
+  height: 32px !important;
+  padding: 1px 6px !important;
+  border: 1px solid #e2e8f4 !important;
+  border-radius: 10px !important;
+  background: #fff !important;
+  color: #111827 !important;
+  font-family: Calibri, "Segoe UI", Arial, sans-serif !important;
+  font-size: 12px !important;
+  line-height: 18px !important;
+  font-weight: 400 !important;
+  box-shadow: none !important;
+}
+
+:is(.pageBtn, .rgPageBtn, .mtdPageBtn, .adminPager button, .adminSpecialPager button, .tmPager button) {
+  width: 32px !important;
+  padding: 1px 6px !important;
+}
+
+:is(
+  .pageBtn, .rgPageBtn, .mtdPageBtn, .adminPager button,
+  .adminSpecialPager button, .adminStrategyPager button, .tmPager button,
+  .imPagination button, .paginationControls button
+):is(.active, .is-active, .is-current, [aria-current="page"], [aria-current="true"]) {
+  border-color: #4b1f73 !important;
+  background: #5c258d !important;
+  color: #fff !important;
+}
+
+:is(.pageBtn, .rgPageBtn, .adminPager button, .adminSpecialPager button, .tmPager button, .imPagination button):is(:disabled, .disabled) {
+  opacity: .5 !important;
+  cursor: default !important;
+}
+
+/* UI-LIBRARY: MODAL-CARD. Shared typography applies to the controls and
+ * modal content; each module owns its existing surfaces, spacing and layout.
+ * The canonical modal defaults already live in css/styles.css and remain
+ * overridable by the module's richer header/body/footer variants. */
+:is(
+  .modalCard, .adminModalCard, .adminConfigurationModal, .issueModal,
+  .dmModal, .cpDialog, .sjDialog:not(.sjUpdateSection), .imDialog,
+  .dtEditorModal, .clModalBox, .rgResourcesDialog, .dunningDocumentPreview > section
+) {
+  font-family: Calibri, "Segoe UI", Arial, sans-serif !important;
+}
+
+/* UI-LIBRARY: CLOSE-BUTTON. Only modal close controls are 32px icons;
+ * navigation, date picker and editor toolbar controls are not included. */
+:is(
+  .closeBtn, .modalCloseBtn, .adminModalClose, .adminConfigurationClose,
+  .cpClose, .quickActionClose,
+  .modalHeader > button[aria-label*="Close"],
+  .dtModalHeader > button, .dunningDocumentPreview > section > header > button,
+  .dmModal > header > button[data-dm-action="close-modal"],
+  .imDialogHeader > button[aria-label*="Close"],
+  .sjDialogHead > .sjIconButton,
+  body .adminRuntimePage .adminRuntimeRowActions > button[data-ui-icon-only="true"]
+) {
+  box-sizing: border-box !important;
+  width: 32px !important;
+  min-width: 32px !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  padding: 0 !important;
+  border: 1px solid #e2e8f4 !important;
+  border-radius: 10px !important;
+  background: #fff !important;
+  color: #222 !important;
+  font-family: Calibri, "Segoe UI", Arial, sans-serif !important;
+  font-size: 16px !important;
+  line-height: 24px !important;
+  box-shadow: none !important;
+}
+
+/* UI-LIBRARY: BOOTSTRAP-CLOSE-BUTTON. Reuse the approved close control while
+ * retaining Bootstrap's existing SVG glyph; a background shorthand erases it. */
+body .btn-close {
+  box-sizing: border-box !important;
+  width: 32px !important;
+  min-width: 32px !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  padding: 0 !important;
+  border: 1px solid #e2e8f4 !important;
+  border-radius: 10px !important;
+  background-color: #fff !important;
+  color: #222 !important;
+  font-family: Calibri, "Segoe UI", Arial, sans-serif !important;
+  font-size: 16px !important;
+  line-height: 24px !important;
+  box-shadow: none !important;
+  opacity: 1 !important;
+}
+
+/* UI-LIBRARY: ICON-ACTION. Approved 13 November 2026 for named compact
+ * actions; separate from text actions and modal-close semantics. */
+.iconAction {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+  width: 32px !important;
+  min-width: 32px !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  padding: 0 !important;
+  border: 1px solid #e2e8f4 !important;
+  border-radius: 10px !important;
+  background: #fff !important;
+  color: #222 !important;
+  font-size: 16px !important;
+  line-height: 24px !important;
+  box-shadow: none !important;
+  cursor: pointer;
+}
+.iconAction:focus-visible {
+  outline: 2px solid #5c258d;
+  outline-offset: 2px;
+}
+.iconAction:is(:disabled, [aria-disabled="true"]) {
+  background: #f1f5f9 !important;
+  color: #475569 !important;
+  opacity: 1 !important;
+  cursor: not-allowed;
+}
+
+/* UI-LIBRARY: LOCKED-VALUE. Approved read-only inline template value. */
+:is(.lockedValue, .tmSubjectEditor .tmValue) {
+  display: inline;
+  white-space: normal;
+  background: #f0e8f8 !important;
+  color: #583184 !important;
+  border: 1px solid #d9c7e9 !important;
+  border-radius: 4px !important;
+  padding: 1px 5px !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  cursor: default;
+}
+.lockedValue .bi {
+  font-size: 10px;
+  margin-right: 3px;
+}
+.lockedValue:focus-visible {
+  outline: 2px solid #5c258d;
+  outline-offset: 2px;
+}
+
+/* UI-LIBRARY: RATING. Approved existing five-star feedback pattern. */
+.rating {
+  display: flex;
+  gap: 4px;
+}
+:is(.rating .ratingStar, .feedbackStar) {
+  background: none !important;
+  border: none !important;
+  padding: 4px 6px !important;
+  color: #cbd5e1 !important;
+  font-size: 26px !important;
+  line-height: 1 !important;
+  cursor: pointer;
+}
+:is(.rating .ratingStar.selected, .feedbackStar.active),
+:is(.rating button.ratingStar, .feedbackStar):not(:disabled):hover {
+  color: #f59e0b !important;
+}
+:is(.rating button.ratingStar, .feedbackStar):focus-visible {
+  outline: 2px solid #5c258d;
+  outline-offset: 2px;
+}
+.rating .ratingStar:disabled {
+  cursor: not-allowed;
+}
+.rating span.ratingStar {
+  cursor: default;
+}
+
+/* UI-LIBRARY: CARDS. Only explicit library components use these surfaces.
+ * Dashboard, KPI, PDC and module cards retain paired semantic colors. */
+.cardPrimary {
+  padding: 16px !important;
+  border: 1px solid #e2e8f4 !important;
+  border-radius: 16px !important;
+  background: #f3f0ff !important;
+}
+
+.cardSecondary {
+  border: 1px solid #e2e8f4 !important;
+  border-radius: 14px !important;
+  background: #fff !important;
+}
+
+.cardSecondary { padding: 14px !important; }
+.cardTitle { font-size: 12px !important; color: #64748b !important; text-transform: uppercase !important; letter-spacing: .06em !important; }
+.cardValue { font-size: 20px !important; font-weight: 700 !important; color: #111827 !important; }
+
+/* UI-LIBRARY: DROPZONE */
+:is(.dropzone, .adminDropzone, .opDropzone, .imDropzone) {
+  padding: 18px !important;
+  border: 2px dashed #cbd5f5 !important;
+  border-radius: 14px !important;
+  background: #f8fafc !important;
+  color: #64748b !important;
+  font-family: Calibri, "Segoe UI", Arial, sans-serif !important;
+  font-size: 12px !important;
+  line-height: 18px !important;
+  text-align: center !important;
+}
+
+:is(.dropzone, .adminDropzone, .opDropzone, .imDropzone) strong { color: #0f172a !important; }
+
+/* UI-LIBRARY: PROGRESS. Value, transform and animation remain data-owned. */
+.progressTrack {
+  height: 10px !important;
+  border: 1px solid #e2e8f4 !important;
+  border-radius: 999px !important;
+  background: #eef2f7 !important;
+}
+
+.progressTrack > .progressFill { border-radius: 999px !important; background: linear-gradient(90deg, #5c258d 0%, #7c3aed 100%) !important; }
+.progressTrack > .progressFill.success { background: linear-gradient(90deg, #16a34a 0%, #22c55e 100%) !important; }
+.progressTrack > .progressFill.warning { background: linear-gradient(90deg, #f59e0b 0%, #f97316 100%) !important; }
+
+/* UI-LIBRARY: NOTIFICATIONS. Placement, lifecycle and dismissal remain
+ * controlled by the existing notification implementations. */
+.notifyPopup {
+  border: 1px solid #fecaca !important;
+  border-radius: 14px !important;
+  padding: 12px 14px !important;
+  background: #fff !important;
+  box-shadow: 0 20px 34px rgba(15, 23, 42, .18) !important;
+  font-family: Calibri, "Segoe UI", Arial, sans-serif !important;
+}
+.notifyPopup.error { border-color: #fecaca !important; background: #fff1f2 !important; color: #7f1d1d !important; }
+.notifyPopup.success { border-color: #bbf7d0 !important; background: #f0fdf4 !important; color: #166534 !important; }
+.notifyPopup.warning { border-color: #fde68a !important; background: #fffbeb !important; color: #92400e !important; }
+.notifyPopup.general { border-color: #cbd5f5 !important; background: #f8fafc !important; color: #1e293b !important; }
+.notifyPopup strong { font-size: 13px !important; }
+.notifyPopup span { font-size: 12px !important; color: inherit !important; }
+.toast {
+  padding: 10px 12px 10px 14px !important;
+  border: 1px solid #e2e8f4 !important;
+  border-radius: 12px !important;
+  background: #fff !important;
+  color: #0f172a !important;
+  font-family: Calibri, "Segoe UI", Arial, sans-serif !important;
+  font-size: 12px !important;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, .08) !important;
+}
+.toast.success { border-color: #bbf7d0 !important; background: #f0fdf4 !important; color: #166534 !important; }
+.toast.warning { border-color: #fde68a !important; background: #fffbeb !important; color: #92400e !important; }
+.toast.info { border-color: #bfdbfe !important; background: #eff6ff !important; color: #1e3a8a !important; }
+
+/* Disabled action controls use the existing neutral palette at full opacity.
+ * Fading a white label together with a purple fill makes both blend into the
+ * page. Keep disabled state apparent without sacrificing label contrast.
+ * Pagination retains its separate, existing disabled treatment above. */
+:is(
+  .btnPrimary, .btnSecondary, .btnGhost, .btnDanger, .btnCTA,
+  .adminPrimary, .adminSecondary, .adminGhostButton, .adminDangerButton,
+  .adminConfigurationCTA, .adminConfigurationSave, .adminConfigurationCancel,
+  .adminSpecialButton:not(.is-link), .opDangerButton, .opPasswordButton,
+  .primaryButton, .outlineButton, .dangerButton, .currentActionButton,
+  .smPrimaryBtn, .smGhostBtn, .smTinyBtn, #smCreateNewBtn,
+  .sjPrimary, .sjButton, .dmButton, .cpButton,
+  .aiGhostBtn, .aiReviewBtn, .aiDecisionBtn, .aiCallButton,
+  .clChangeLimitBtn, .clSaveBtn, .clSaveDirectBtn, .clSubmitApprovalBtn,
+  .clModalCancelBtn, .clModalConfirmBtn, .rptActionBtn,
+  .btnSmall, .btnSmallPrimary, .btn--primary, .btn--ghost,
+  .primaryBtn, .defaultBtn, .save-btn, button.pill.primary, button.pill.secondary,
+  .dtModalFooter button, .opBucketPicker > button
+):is(:disabled, [aria-disabled="true"], .is-disabled, .disabled) {
+  opacity: 1 !important;
+  border-color: #e2e8f4 !important;
+  background: #f1f5f9 !important;
+  color: #475569 !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+}

@@ -1,0 +1,265 @@
+/* Existing data-table typography and header palette from pages/ui-elements.html.
+ * Legacy modules retain table layout, cell spacing, wrapping, alignment,
+ * empty states, totals/group borders, sticky coordinates and row-state colors.
+ * The exact library table geometry applies only to the explicit .ui-table.
+ */
+
+html body :is(
+  table.ui-table,
+  table.adminTable,
+  table.adminSpecialTable,
+  table.adminPlatformTable,
+  table.adminSubmissionStrategyTable,
+  table.imDataTable,
+  table.imPreviewTable,
+  table.tmTable,
+  table.smTable,
+  table.smReminderTable,
+  table.dtTable,
+  table.dmTemplateTable,
+  .dmTableScroll > table,
+  .dnIntegration .dnScroll > table,
+  .dlReportTableWrap > table,
+  table.misDataTable,
+  table.userSessionTable,
+  table.invoiceTable,
+  table.cnAdvTable,
+  table.agentTable,
+  table.uploadTable,
+  table.pdcTable,
+  table.planTable,
+  table.planTableSmall,
+  table.visitDetailsTable,
+  table.activityDetailTable,
+  table.cashflowDetailTable,
+  table.vintageDetailTable,
+  table.dsoDetailTable,
+  table.unifiedIssueTable,
+  table.sjTable,
+  table.clTable,
+  table.clApprovalQueueTable,
+  table.clCompareTable,
+  table.aiInvoiceTable,
+  table.cpTable,
+  table.rgTable,
+  .rgResourceTableWrap > table,
+  table.notificationDetailTable,
+  table[aria-label="Approval processes table"],
+  table[aria-label="Approval matrices table"],
+  table[aria-label="Customer summary table"],
+  table[aria-label="Invoices of selected customer"]
+) {
+  --ui-action-font-size: 12px;
+  --ui-action-line-height: 18px;
+  --ui-action-height: 40px;
+  font-family: Calibri, "Segoe UI", Arial, sans-serif !important;
+  font-size: 12px !important;
+  line-height: 18px !important;
+}
+
+/* Exact canonical component: keep independent from legacy table layout. */
+html body table.ui-table {
+  width: 100% !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  border-radius: 12px 12px 0 0 !important;
+  overflow: hidden !important;
+  border-left: 1px solid rgba(15, 23, 42, 0.06) !important;
+  border-right: 1px solid rgba(15, 23, 42, 0.06) !important;
+}
+
+html body table.ui-table > :is(thead, tbody, tfoot) > tr > :is(th, td) {
+  padding: 12px 10px !important;
+  border-bottom: 1px solid #e2e8f4 !important;
+  font-family: inherit !important;
+  font-size: 12px !important;
+  line-height: 18px !important;
+  text-align: left !important;
+  vertical-align: middle !important;
+  white-space: nowrap !important;
+}
+
+html body table.ui-table > thead > tr > th {
+  background: #5c258d !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.04em !important;
+  text-transform: capitalize !important;
+  border-bottom: 2px solid #4c1d95 !important;
+}
+
+html body table.ui-table > thead > tr > th:first-child {
+  border-top-left-radius: 12px !important;
+}
+
+html body table.ui-table > thead > tr > th:last-child {
+  border-top-right-radius: 12px !important;
+}
+
+html body table.ui-table > tbody > tr > td {
+  border-bottom: 1px solid rgba(15, 23, 42, 0.12) !important;
+}
+
+html body table.ui-table > tbody > tr:last-child > td {
+  border-bottom: none !important;
+}
+
+/* Shared typography does not replace page-owned cell geometry or state. */
+html body :is(
+  table.ui-table,
+  table.adminTable,
+  table.adminSpecialTable,
+  table.adminPlatformTable,
+  table.adminSubmissionStrategyTable,
+  table.imDataTable,
+  table.imPreviewTable,
+  table.tmTable,
+  table.smTable,
+  table.smReminderTable,
+  table.dtTable,
+  table.dmTemplateTable,
+  .dmTableScroll > table,
+  .dnIntegration .dnScroll > table,
+  .dlReportTableWrap > table,
+  table.misDataTable,
+  table.userSessionTable,
+  table.invoiceTable,
+  table.cnAdvTable,
+  table.agentTable,
+  table.uploadTable,
+  table.pdcTable,
+  table.planTable,
+  table.planTableSmall,
+  table.visitDetailsTable,
+  table.activityDetailTable,
+  table.cashflowDetailTable,
+  table.vintageDetailTable,
+  table.dsoDetailTable,
+  table.unifiedIssueTable,
+  table.sjTable,
+  table.clTable,
+  table.clApprovalQueueTable,
+  table.clCompareTable,
+  table.aiInvoiceTable,
+  table.cpTable,
+  table.rgTable,
+  .rgResourceTableWrap > table,
+  table.notificationDetailTable,
+  table[aria-label="Approval processes table"],
+  table[aria-label="Approval matrices table"],
+  table[aria-label="Customer summary table"],
+  table[aria-label="Invoices of selected customer"]
+) > :is(thead, tbody, tfoot) > tr:not(.submissionAcknowledgedSubtotalRow):not(.rgTableFilterRow):not(.invoiceGroupRow) > :is(th, td) {
+  font-family: inherit !important;
+  font-size: 12px !important;
+  line-height: 18px !important;
+}
+
+/* Keep foreground and background together for ordinary column headings.
+ * Filter controls and subtotal rows retain their existing semantic surfaces.
+ */
+html body :is(
+  table.ui-table,
+  table.adminTable,
+  table.adminSpecialTable,
+  table.adminPlatformTable,
+  table.adminSubmissionStrategyTable,
+  table.imDataTable,
+  table.imPreviewTable,
+  table.tmTable,
+  table.smTable,
+  table.smReminderTable,
+  table.dtTable,
+  table.dmTemplateTable,
+  .dmTableScroll > table,
+  .dnIntegration .dnScroll > table,
+  .dlReportTableWrap > table,
+  table.misDataTable,
+  table.userSessionTable,
+  table.invoiceTable,
+  table.cnAdvTable,
+  table.agentTable,
+  table.uploadTable,
+  table.pdcTable,
+  table.planTable,
+  table.planTableSmall,
+  table.visitDetailsTable,
+  table.activityDetailTable,
+  table.cashflowDetailTable,
+  table.vintageDetailTable,
+  table.dsoDetailTable,
+  table.unifiedIssueTable,
+  table.sjTable,
+  table.clTable,
+  table.clApprovalQueueTable,
+  table.clCompareTable,
+  table.aiInvoiceTable,
+  table.cpTable,
+  table.rgTable,
+  .rgResourceTableWrap > table,
+  table.notificationDetailTable,
+  table[aria-label="Approval processes table"],
+  table[aria-label="Approval matrices table"],
+  table[aria-label="Customer summary table"],
+  table[aria-label="Invoices of selected customer"]
+) > thead > tr:not(.submissionAcknowledgedSubtotalRow):not(.rgTableFilterRow) > th {
+  background: #5c258d !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.04em !important;
+  text-transform: capitalize !important;
+}
+
+/* Existing sort labels inherit the column-heading typography and color.
+ * Their border, padding and alignment remain owned by each implementation.
+ */
+html body :is(
+  table.ui-table,
+  table.adminTable,
+  table.adminSpecialTable,
+  table.adminPlatformTable,
+  table.adminSubmissionStrategyTable,
+  table.imDataTable,
+  table.imPreviewTable,
+  table.tmTable,
+  table.smTable,
+  table.smReminderTable,
+  table.dtTable,
+  table.dmTemplateTable,
+  .dmTableScroll > table,
+  .dnIntegration .dnScroll > table,
+  .dlReportTableWrap > table,
+  table.misDataTable,
+  table.userSessionTable,
+  table.invoiceTable,
+  table.cnAdvTable,
+  table.agentTable,
+  table.uploadTable,
+  table.pdcTable,
+  table.planTable,
+  table.planTableSmall,
+  table.visitDetailsTable,
+  table.activityDetailTable,
+  table.cashflowDetailTable,
+  table.vintageDetailTable,
+  table.dsoDetailTable,
+  table.unifiedIssueTable,
+  table.sjTable,
+  table.clTable,
+  table.clApprovalQueueTable,
+  table.clCompareTable,
+  table.aiInvoiceTable,
+  table.cpTable,
+  table.rgTable,
+  .rgResourceTableWrap > table,
+  table.notificationDetailTable,
+  table[aria-label="Approval processes table"],
+  table[aria-label="Approval matrices table"],
+  table[aria-label="Customer summary table"],
+  table[aria-label="Invoices of selected customer"]
+) > thead > tr:not(.submissionAcknowledgedSubtotalRow):not(.rgTableFilterRow) > th > button {
+  color: inherit !important;
+  font: inherit !important;
+}
+
+/* Reports' filter-row offset is page-owned, matching its own header height. */
