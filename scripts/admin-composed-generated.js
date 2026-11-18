@@ -633,6 +633,10 @@ window.IneburaAdminComposed["help-support"] = {html:"\n\n\n\n<main class=\"helpS
     id, cat: "commitments-targets", title, meta: `Commitments & Targets · ${minutes} min read`, roles,
     body: `<h4>Purpose</h4><p>${purpose}</p><h4>Prerequisites</h4><ul>${prerequisites.map(item => `<li>${item}</li>`).join("")}</ul><h4>Steps</h4><ol>${steps.map(item => `<li>${item}</li>`).join("")}</ol><div class="kbArticleNote" role="note"><strong>Important note</strong><p>${note}</p></div><h4>Validation</h4><ul>${validation.map(item => `<li>${item}</li>`).join("")}</ul><h4>Common issues</h4><ul>${commonIssues.map(item => `<li>${item}</li>`).join("")}</ul>`
   });
+  const visitGuide = ({ id, title, roles, purpose, prerequisites, steps, note, validation, commonIssues, minutes = 2 }) => ({
+    id, cat: "visit-module", title, meta: `Visit Module · ${minutes} min read`, roles,
+    body: `<h4>Purpose</h4><p>${purpose}</p><h4>Prerequisites</h4><ul>${prerequisites.map(item => `<li>${item}</li>`).join("")}</ul><h4>Steps</h4><ol>${steps.map(item => `<li>${item}</li>`).join("")}</ol><div class="kbArticleNote" role="note"><strong>Important note</strong><p>${note}</p></div><h4>Validation</h4><ul>${validation.map(item => `<li>${item}</li>`).join("")}</ul><h4>Common issues</h4><ul>${commonIssues.map(item => `<li>${item}</li>`).join("")}</ul>`
+  });
   const kbArticles = [
     {
       id: "kb-001", cat: "invoice-billing",
@@ -832,20 +836,65 @@ window.IneburaAdminComposed["help-support"] = {html:"\n\n\n\n<main class=\"helpS
       meta: "Technical · 2 min read",
       body: `<h4>Troubleshooting Steps</h4><ol><li><strong>Hard refresh:</strong> Press <code>Ctrl + Shift + R</code> (Windows) or <code>Cmd + Shift + R</code> (Mac) to reload without cache.</li><li><strong>Clear browser cache:</strong> Go to browser settings → Clear browsing data → Cached images and files.</li><li><strong>Try incognito mode:</strong> Opens a clean session without extensions or cached data.</li><li><strong>Disable extensions:</strong> Ad blockers or script blockers can interfere with the portal.</li><li><strong>Check browser version:</strong> Ensure you are on a supported browser (Chrome/Edge/Firefox latest).</li></ol><p>If the issue persists, raise a <strong>Technical</strong> support ticket with a screenshot and your browser version.</p>`
     },
-    {
-      id: "kb-031", cat: "visit-module",
-      title: "How to plan a customer visit",
-      meta: "Visit Module · 2 min read",
-      roles: ["Agent", "Manager", "Supervisor"],
-      body: `<h4>Purpose</h4><p>Use Visit Planning to schedule customer visits and submit plans within the allowed cut-off windows.</p><h4>Steps</h4><ol><li>Open <strong>Visit Planning</strong> from Main App and select the target date.</li><li>Add planned customers, visit objective, and remarks.</li><li>Use <strong>Save</strong> to keep draft updates for future dates and for next-day planning during the configured evening-to-morning window.</li><li>Use <strong>Submit</strong> when the next-day planning window is open (after evening cut-off).</li><li>If you submit after morning cut-off, the plan is marked as <strong>Deviation</strong> and shortfall reason is mandatory.</li><li>Track manager review status and complete activity updates for planned customers before end-of-day.</li></ol><h4>Required Inputs</h4><ul><li>Planned date and customer list</li><li>Visit objective and visit reason</li><li>Shortfall reason (mandatory in deviation cases)</li><li>Daily visit target configured in admin</li><li>Monthly approval cut-off reference: <strong>20th, 7:30 PM</strong></li></ul>`
-    },
-    {
-      id: "kb-032", cat: "visit-module",
-      title: "How to capture visit outcomes and communication notes",
-      meta: "Visit Module · 2 min read",
-      roles: ["Agent", "Manager", "Supervisor", "KAM", "KAS"],
-      body: `<h4>When to Update</h4><p>Update outcomes on the same day and complete activity update for all planned customers before <strong>12:00 AM</strong>.</p><h4>Steps</h4><ol><li>Open the planned visit entry.</li><li>Mark status (completed, rescheduled, absent, or leave as applicable).</li><li>Add discussion summary and outcome notes.</li><li>Save the activity update for each planned customer.</li><li>Review that no planned customer is left without activity update before day close.</li></ol><h4>Best Practice</h4><p>If activity update is missing for planned customers before 12:00 AM, the day can be marked as deviation.</p>`
-    },
+    visitGuide({
+      "id": "kb-031",
+      "title": "How to create and save a visit plan draft",
+      "roles": [
+        "Agent"
+      ],
+      "purpose": "Prepare a daily visit plan and save it for later review or submission.",
+      "prerequisites": [
+        "Open <strong>Visit Planner</strong> with your Agent account.",
+        "Have the intended date, customers and visit reasons ready."
+      ],
+      "steps": [
+        "Open <strong>Visit → Visit Module</strong> and select the required calendar date.",
+        "Select <strong>Plan</strong> and confirm the date shown in the planning form.",
+        "Choose <strong>Visit</strong>, <strong>Calling</strong> or <strong>Both</strong> according to your planned work.",
+        "For Visit or Both, search for each customer, add the intended customer and select a visit reason for each entry.",
+        "Review the selected customers and reasons against the Admin-configured visit target. Calling and Both use the Admin-configured RPC target, with RPCs calculated from <strong>Called</strong> activities.",
+        "Add any relevant remark and select <strong>Save plan</strong>. Check that the plan is shown as <strong>Draft</strong>."
+      ],
+      "note": "You can prepare and save a draft for any future date before its submission window opens. Manager, Supervisor and KAS can view saved drafts. Submit the draft through the configured submission window when it is ready for review.",
+      "validation": [
+        "The plan shows the intended date and selected plan type.",
+        "The draft contains the correct customers and visit reasons."
+      ],
+      "commonIssues": [
+        "Selecting the wrong date or customer.",
+        "Leaving a visit reason incomplete.",
+        "Treating a saved draft as a submitted plan."
+      ]
+    }),
+    visitGuide({
+      "id": "kb-032",
+      "title": "How to record completed visits and RPC activities",
+      "roles": [
+        "Agent"
+      ],
+      "purpose": "Record completed customer visits and calling activities so they contribute to the daily activity counts.",
+      "prerequisites": [
+        "Have the correct customer and invoice available.",
+        "Keep the activity outcome and required supporting details ready."
+      ],
+      "steps": [
+        "Open the relevant invoice and its <strong>Activity</strong> form.",
+        "Confirm that the invoice belongs to the customer for whom you are recording the activity.",
+        "Select activity type <strong>Visited</strong> for a completed customer visit, or <strong>Called</strong> for a calling activity that contributes to the RPC count.",
+        "Complete the applicable activity fields, sub-status and remarks, then save the activity.",
+        "Return to <strong>Visit Planner</strong> and review the relevant date and customer in the plan or Visit Details summary."
+      ],
+      "note": "<strong>Visited</strong> activities count as completed visits. RPCs are calculated from activities with type <strong>Called</strong>. The Visit Details summary shows completed planned visits and unplanned visits separately.",
+      "validation": [
+        "The saved activity has the intended customer and activity type.",
+        "The relevant visit or calling activity is available for the daily review."
+      ],
+      "commonIssues": [
+        "Recording an activity against the wrong customer or invoice.",
+        "Selecting a different activity type when recording a completed visit or RPC.",
+        "Combining the Visited and Unplanned summary counts."
+      ]
+    }),
     {
       id: "kb-033", cat: "pdc-management",
       title: "How to update PDC status after bank clearance",
@@ -979,18 +1028,66 @@ window.IneburaAdminComposed["help-support"] = {html:"\n\n\n\n<main class=\"helpS
       meta: "Notifications · 3 min read",
       body: `<h4>Purpose</h4><p>This article explains the logic behind how notification tags and detail cards map to workflow events so teams can make consistent decisions.</p><h4>Prerequisites</h4><ul><li>Open Notification Center in the portal.</li><li>Keep relevant invoice, customer, or issue reference ready.</li><li>Confirm your role has update permission for this action.</li></ul><h4>How it works</h4><ol><li>Identify the event source in <strong>Notification Center</strong>.</li><li>Review how status, remarks, and ownership fields are captured.</li><li>Check how downstream modules consume the same event data.</li><li>Confirm alerts, counters, and activity trail are updated from the same source.</li></ol><h4>Validation</h4><ul><li>Expected labels are visible and consistent across related screens.</li><li>Audit trail shows a timestamped record for key transitions.</li><li>Users in valid roles see the right controls and summaries.</li></ul><h4>Common issues</h4><ul><li>Different teams use different definitions for the same status.</li><li>Actions are recorded without remarks, reducing traceability.</li><li>Users interpret notification tags without checking detail rows.</li></ul>`
     },
-    {
-      id: "kb-050", cat: "visit-module",
-      title: "How to submit daily visit plans within allowed submission windows",
-      meta: "Visit Module · 2 min read",
-      body: `<h4>Purpose</h4><p>Follow this SOP to submit visit plans only within configured planning windows and avoid deviation flags.</p><h4>Prerequisites</h4><ul><li>Open Visit Module and Visit Module Review in the portal.</li><li>Know configured <strong>morning cut-off</strong> and <strong>evening start</strong> times for planning window.</li><li>Keep next-day customer plan ready before submission.</li></ul><h4>Steps</h4><ol><li>Use <strong>Save</strong> for all future days.</li><li>For current day, <strong>Save</strong> is hidden after morning cut-off.</li><li>For next day, <strong>Save</strong> is visible from evening start time to next day before morning cut-off.</li><li><strong>Submit</strong> is shown when next-day planning window opens (after evening cut-off).</li><li>Once next-day window opens, submit moves from current day to next day view.</li><li>If submit happens after morning cut-off, the plan is accepted with <strong>Deviation</strong> and shortfall reason prompt.</li></ol><h4>Validation</h4><ul><li>Submitted plan is visible in manager review queue.</li><li>Deviation tag is shown when submitted after morning cut-off.</li><li>Shortfall reason is captured in deviation cases.</li></ul><h4>Common issues</h4><ul><li>Confusing current-day and next-day planning windows.</li><li>Trying to submit when next-day window has not opened yet.</li><li>Skipping shortfall reason when deviation is triggered.</li></ul>`
-    },
-    {
-      id: "kb-051", cat: "visit-module",
-      title: "Why visit plans fail validation (reason, leave, customer selection)",
-      meta: "Visit Module · 3 min read",
-      body: `<h4>Purpose</h4><p>Use this guide to diagnose why visit plans are rejected, flagged as deviation, or blocked during submit.</p><h4>Prerequisites</h4><ul><li>Open Visit Module and Visit Module Review in the portal.</li><li>Check daily visit target configured in admin.</li><li>Review the day-wise plan and activity update completion status.</li></ul><h4>Steps to diagnose and fix</h4><ol><li>Verify required fields (visit reason, leave mark, and customer selection) are filled correctly.</li><li>Check whether planned visit count is below admin-configured visits-per-day target.</li><li>Confirm activity update is completed for all planned customers before 12:00 AM.</li><li>Confirm plan was submitted before configured cut-off; late submission can mark deviation.</li><li>If deviation is triggered, provide shortfall reason and resubmit.</li></ol><h4>Validation</h4><ul><li>Plan moves to manager queue without validation errors.</li><li>Deviation reason is saved wherever applicable.</li><li>No planned customer remains without activity update by day close.</li></ul><h4>Common issues</h4><ul><li>Submitting with fewer visits than target without shortfall reason.</li><li>Missing activity updates for one or more planned customers.</li><li>Submitting after cut-off and assuming no deviation will be applied.</li></ul>`
-    },
+    visitGuide({
+      "id": "kb-050",
+      "title": "How to submit a daily plan within the configured planning window",
+      "roles": [
+        "Agent"
+      ],
+      "purpose": "Submit a prepared daily plan for Manager review using the Admin-configured planning window.",
+      "prerequisites": [
+        "Have a prepared plan for the intended date.",
+        "Know the configured planning window, morning cut-off and final window-closing limit."
+      ],
+      "steps": [
+        "Open <strong>Visit Planner</strong>, select the intended date and open its plan.",
+        "Check the plan type, selected customers, each visit reason and the relevant Admin-configured targets.",
+        "Provide a shortfall reason if the planned visit count is below the configured visit target.",
+        "If submitting after the morning cut-off while the window is still open, enter the mandatory reason. One combined reason can explain both a visit shortfall and late submission.",
+        "If any planned visit from the previous working day is incomplete, provide one reason covering those incomplete visits before submitting the new plan.",
+        "Review the plan and required reasons, then select <strong>Submit plan</strong>. Check that the plan shows <strong>Submitted</strong>."
+      ],
+      "note": "The morning cut-off and final window-closing limit are separate. Same-day submission after the morning cut-off requires a reason and is marked <strong>Deviation</strong>. Once the submission window closes, the Agent can submit only the next day’s plan. Use the Admin-configured times for your client.",
+      "validation": [
+        "The correct date shows a submitted plan.",
+        "Any late submission made while the window was open has the required reason and Deviation marking."
+      ],
+      "commonIssues": [
+        "Confusing the morning cut-off with final window closing.",
+        "Attempting same-day submission after the window has closed.",
+        "Leaving required reasons incomplete.",
+        "Checking only the plan type without reviewing the customers and date."
+      ]
+    }),
+    visitGuide({
+      "id": "kb-051",
+      "title": "How to provide a visit shortfall or late-submission reason",
+      "roles": [
+        "Agent"
+      ],
+      "purpose": "Explain a visit-target shortfall or a submission made after the configured morning cut-off.",
+      "prerequisites": [
+        "The plan is a Visit or Both plan with fewer planned visits than the configured target, or submission is after the morning cut-off.",
+        "The submission window is still open."
+      ],
+      "steps": [
+        "Open the intended day’s plan and confirm its date and type.",
+        "Compare the selected customer visits with the Admin-configured visit target.",
+        "When a shortfall or late-submission reason is required, enter a clear explanation in the reason field.",
+        "If the plan is both below target and late, provide one combined reason explaining both conditions.",
+        "Review the reason and select <strong>Submit plan</strong> while the submission window remains open."
+      ],
+      "note": "An Agent can submit a Visit or Both plan below the configured visit target by providing a mandatory shortfall reason. Submission after the morning cut-off is marked <strong>Deviation</strong>. A reason does not extend the submission window beyond its closing limit.",
+      "validation": [
+        "The required explanation has been entered for the intended date.",
+        "A late submission is marked as Deviation."
+      ],
+      "commonIssues": [
+        "Using a fixed target or time instead of the Admin configuration.",
+        "Explaining only one condition when both a shortfall and delay apply.",
+        "Attempting submission after the window has closed."
+      ]
+    }),
     {
       id: "kb-052", cat: "task-assignments",
       title: "How to assign and reassign client action owners from issue detail",
@@ -1067,24 +1164,95 @@ window.IneburaAdminComposed["help-support"] = {html:"\n\n\n\n<main class=\"helpS
       roles: ["Agent", "Agent cum Manager"],
       body: `<h4>Purpose</h4><p>Use this guide to diagnose and resolve cases where invoice aging bucket looks incorrect and how to verify due-date logic.</p><h4>Prerequisites</h4><ul><li>Open Dashboard invoice activity in the portal.</li><li>Keep relevant invoice, customer, or issue reference ready.</li><li>Confirm your role has update permission for this action.</li></ul><h4>Steps to diagnose and fix</h4><ol><li>Capture the exact screen, filters, and record identifiers where the issue appears.</li><li>Reproduce the behavior in <strong>Dashboard invoice activity</strong> with the same role and date context.</li><li>Verify required fields (status, remark, owner, dates, and references) are populated correctly.</li><li>Apply corrective action from the relevant panel and save changes.</li><li>Recheck activity trail, counters, and linked notifications to confirm resolution.</li></ol><h4>Validation</h4><ul><li>Issue is no longer reproducible using the same inputs.</li><li>Correct status and remarks are visible in the action trail.</li><li>Dependent alerts, counters, or lists reflect the corrected state.</li></ul><h4>Common issues</h4><ul><li>Working on the wrong record after filters changed silently.</li><li>Mandatory remarks or recipients were skipped.</li><li>User role does not allow the target action in the current status.</li></ul>`
     },
-    {
-      id: "kb-064", cat: "visit-module",
-      title: "How to edit or reschedule a submitted visit plan",
-      meta: "Visit Module · 2 min read",
-      body: `<h4>Purpose</h4><p>Follow this SOP to edit or reschedule visit plans using day-based access rules.</p><h4>Prerequisites</h4><ul><li>Open Visit Module and Visit Module Review in the portal.</li><li>Know whether selected day is future or current/past relative to today.</li><li>Confirm role permissions for edit/review actions.</li></ul><h4>Steps</h4><ol><li>Open the target day plan and check current status (saved, submitted, accepted, rejected).</li><li>For days greater than current-day plus one, agents cannot change the plan.</li><li>For days less than or equal to current day, show planned customers and update allowed fields only.</li><li>For future context (greater than current-day plus one), system can show visited/planned/unplanned customer states for review.</li><li>Save or resubmit after valid edits and track manager action history.</li></ol><h4>Validation</h4><ul><li>Edit controls follow day-based role rules.</li><li>Locked days do not allow agent changes.</li><li>Resubmitted plan appears with updated timestamp and status.</li></ul><h4>Common issues</h4><ul><li>Trying to edit a locked day as agent.</li><li>Using wrong day context while checking editable records.</li><li>Not rechecking status after manager action.</li></ul>`
-    },
-    {
-      id: "kb-065", cat: "visit-module",
-      title: "How managers review and mark visit plans as Accepted/Rejected",
-      meta: "Visit Module · 2 min read",
-      body: `<h4>Purpose</h4><p>Follow this SOP for manager review of visit plans and ensure approvals complete before monthly cut-off.</p><h4>Prerequisites</h4><ul><li>Open Visit Module Review in the portal.</li><li>Monthly cut-off for approvals is <strong>20th at 7:30 PM</strong>.</li><li>Pending plan queue available for your reporting agents.</li></ul><h4>Steps</h4><ol><li>Review submitted plans and mark each as <strong>Accepted</strong> or <strong>Rejected</strong> with remarks.</li><li>Managers can reverse decisions on any day (reject an accepted plan or accept a rejected plan) based on latest review.</li><li>Complete all pending approvals before the monthly cut-off date/time.</li><li>Reminder emails are sent to managers on last day minus 2, last day minus 1, and every 2 hours on the last day until all pending approvals are closed.</li><li>Once every pending item is accepted/rejected, reminder emails stop automatically.</li></ol><h4>Validation</h4><ul><li>No pending approvals remain by cut-off.</li><li>Decision changes are visible in review trail with timestamp.</li><li>Reminder emails stop when pending queue becomes zero.</li></ul><h4>Common issues</h4><ul><li>Leaving plans pending past 20th 7:30 PM cut-off.</li><li>Changing decision without entering review remark.</li><li>Expecting reminders to stop while pending approvals still exist.</li></ul>`
-    },
-    {
-      id: "kb-066", cat: "visit-module",
-      title: "Why a day is marked holiday/on-leave/rejected in visit calendar",
-      meta: "Visit Module · 3 min read",
-      body: `<h4>Purpose</h4><p>Use this guide to diagnose holiday, leave, and rejection markers in Visit Calendar using configured holiday mapping rules.</p><h4>Prerequisites</h4><ul><li>Open Visit Module and Visit Module Review in the portal.</li><li>Access logged-in user's branch mapping.</li><li>Holiday calendar configured state-wise in admin master.</li></ul><h4>Steps to diagnose and fix</h4><ol><li>Fetch branch of the logged-in user.</li><li>Fetch state mapped to that branch.</li><li>Load holiday calendar for the mapped state and verify selected day.</li><li>Check whether day is marked as leave by user action or rejected by manager review.</li><li>Re-open the day status trail and confirm final status source (holiday, leave, accepted/rejected).</li></ol><h4>Validation</h4><ul><li>Holiday markers match state-level holiday calendar.</li><li>Leave and rejection markers map to correct user action trail.</li><li>Calendar status is consistent across agent and manager screens.</li></ul><h4>Common issues</h4><ul><li>Branch-state mapping not updated for user profile.</li><li>Holiday calendar loaded from wrong state.</li><li>Confusing rejected status with holiday/leave markers.</li></ul>`
-    },
+    visitGuide({
+      "id": "kb-064",
+      "title": "How to edit and resubmit a visit plan",
+      "roles": [
+        "Agent"
+      ],
+      "purpose": "Update an existing plan and send the revised version for a fresh Manager decision.",
+      "prerequisites": [
+        "Have an existing plan for the intended date.",
+        "The submission window for that plan must be open."
+      ],
+      "steps": [
+        "Open <strong>Visit Planner</strong> and select the plan date.",
+        "Open the plan and review its current customers, type, reasons and submission state.",
+        "Update the required plan details. When changing from Leave or Office Work to Visit, Calling or Both, check the relevant Admin-configured targets again.",
+        "Provide any required shortfall, late-submission or previous-working-day explanation.",
+        "Select <strong>Submit plan</strong> to resubmit and verify the revised details and Activity Trail."
+      ],
+      "note": "An Agent can edit and resubmit while the submission window is open, including after a Manager has recorded a decision. Once the Agent updates the plan, the Manager must submit a fresh decision on the revised plan.",
+      "validation": [
+        "The plan shows the intended revised details.",
+        "The Activity Trail records the update or resubmission.",
+        "The revised plan is available for a fresh Manager decision."
+      ],
+      "commonIssues": [
+        "Assuming an earlier Manager decision completes review of the revised plan.",
+        "Resubmitting without checking the date or configured window.",
+        "Overlooking targets after changing an exempt plan type."
+      ]
+    }),
+    visitGuide({
+      "id": "kb-065",
+      "title": "How to accept or reject a submitted visit plan",
+      "roles": [
+        "Manager"
+      ],
+      "purpose": "Review an Agent’s submitted daily plan and record the Manager’s decision.",
+      "prerequisites": [
+        "Open <strong>Visit Module Review</strong> with your Manager account.",
+        "Have the Agent’s submitted plan available."
+      ],
+      "steps": [
+        "Select the required date and Agent. Confirm both before reviewing the plan.",
+        "Open <strong>Review Plan</strong> and review the customer-wise entries, visit reasons and available visit summary.",
+        "Check any shortfall or deviation explanations, remarks and Activity Trail.",
+        "Select <strong>Accepted</strong> or <strong>Rejected</strong> in <strong>Visit decision</strong> and add relevant feedback in the remark field.",
+        "Select <strong>Submit</strong>. Verify that the decision and available trail belong to the intended Agent and date.",
+        "If the Agent later updates and resubmits the plan, review the revised details and submit a fresh decision."
+      ],
+      "note": "Only the Manager accepts or rejects plans. Supervisor and KAS can view and suggest changes. Approved / Rejected Plans counts each Agent’s daily plan once, regardless of the number of customers in it.",
+      "validation": [
+        "The intended daily plan shows the submitted decision.",
+        "The decision and feedback correspond to the selected Agent and date."
+      ],
+      "commonIssues": [
+        "Recording a decision for the wrong Agent or date.",
+        "Leaving the decision unsubmitted.",
+        "Relying on a previous decision after the Agent changes the plan."
+      ]
+    }),
+    visitGuide({
+      "id": "kb-066",
+      "title": "How to submit a Leave or Office Work plan",
+      "roles": [
+        "Agent"
+      ],
+      "purpose": "Record a Leave or Office Work day and submit it for Manager review.",
+      "prerequisites": [
+        "Know the relevant date and reason for Leave or Office Work.",
+        "Use the Admin-configured submission window."
+      ],
+      "steps": [
+        "Open <strong>Visit Planner</strong>, select the date and open <strong>Plan</strong>.",
+        "Choose <strong>Leave</strong> or <strong>Office Work</strong> as the plan type.",
+        "Enter the applicable leave or office-work reason and relevant remarks.",
+        "Review the date and plan type, then select <strong>Submit plan</strong> for Manager review.",
+        "Check the plan’s submitted state and review the Manager’s decision when available."
+      ],
+      "note": "Visit and RPC targets do not apply to Leave or Office Work. If you change the plan to Visit, Calling or Both, the relevant Admin-configured targets apply again. Submit the plan for Manager review.",
+      "validation": [
+        "The plan shows the correct date and Leave or Office Work type.",
+        "The plan has been submitted for Manager review."
+      ],
+      "commonIssues": [
+        "Selecting the wrong date or exempt plan type.",
+        "Saving a draft without submitting it for review.",
+        "Assuming the exemption still applies after changing the plan type."
+      ]
+    }),
     {
       id: "kb-068", cat: "commitments-targets",
       title: "How to update week and target amount after draft save",
@@ -1274,20 +1442,6 @@ window.IneburaAdminComposed["help-support"] = {html:"\n\n\n\n<main class=\"helpS
       title: "How to audit email actions from action trail and support tickets",
       meta: "Emails · 2 min read",
       body: `<h4>Purpose</h4><p>Follow this SOP to complete audit email actions from action trail and support tickets in a consistent and auditable way.</p><h4>Prerequisites</h4><ul><li>Open issue email action panel in the portal.</li><li>Keep relevant invoice, customer, or issue reference ready.</li><li>Confirm your role has update permission for this action.</li></ul><h4>Steps</h4><ol><li>Open <strong>issue email action panel</strong> and locate the target record.</li><li>Use search and filters to narrow to the correct invoice, issue, customer, or task.</li><li>Perform the action for <em>audit email actions from action trail and support tickets</em> and add required remarks.</li><li>Save or submit using the available workflow button.</li><li>Review post-action status, trail entries, and dependent module updates.</li></ol><h4>Validation</h4><ul><li>Status and sub-status are updated as expected.</li><li>Action trail captures user, timestamp, and remark.</li><li>Linked dashboards, notifications, or task queues show the latest state.</li></ul><h4>Common issues</h4><ul><li>Submitting without validating current status and ownership.</li><li>Forgetting mandatory remark or recipient details.</li><li>Assuming save was successful without checking trail or counters.</li></ul>`
-    },
-    {
-      id: "kb-099", cat: "visit-module",
-      title: "How manager reminder emails are scheduled for pending visit approvals",
-      meta: "Visit Module · 2 min read",
-      roles: ["Manager", "Supervisor", "HO"],
-      body: `<h4>Purpose</h4><p>Follow this SOP to understand reminder email schedule and stop rules for pending visit-plan approvals.</p><h4>Prerequisites</h4><ul><li>Open Visit Module Review and confirm pending approval queue.</li><li>Monthly cycle and last day logic configured in system scheduler.</li><li>Manager recipient email mapping is active.</li></ul><h4>Steps</h4><ol><li>System sends one reminder on <strong>last day -2</strong>.</li><li>System sends one reminder on <strong>last day -1</strong>.</li><li>On the last day, reminders are sent every <strong>2 hours</strong>.</li><li>Managers review and close pending approvals as accepted/rejected.</li><li>Once all pending approvals are closed, reminder emails stop automatically.</li></ol><h4>Validation</h4><ul><li>Reminder cadence follows -2 day, -1 day, and 2-hour last-day schedule.</li><li>No reminder is sent after pending queue reaches zero.</li><li>Email audit trail shows send timestamps and recipient manager.</li></ul><h4>Common issues</h4><ul><li>Expecting reminders when no pending approvals exist.</li><li>Manager email mapping missing or invalid.</li><li>Approvals updated in UI but not saved, so reminders continue.</li></ul>`
-    },
-    {
-      id: "kb-100", cat: "visit-module",
-      title: "How monthly visit attendance summary is sent to HR",
-      meta: "Visit Module · 2 min read",
-      roles: ["Manager", "Supervisor", "HO", "Backend User"],
-      body: `<h4>Purpose</h4><p>Follow this SOP to verify monthly Visit Module attendance summary dispatch to HR.</p><h4>Prerequisites</h4><ul><li>Visit records and approval statuses are finalized for the month.</li><li>HR recipient mailbox <strong>hr@tanserv.com</strong> is configured.</li><li>Month-end scheduler is active.</li></ul><h4>Steps</h4><ol><li>At <strong>12:00 AM on the last day of the month</strong>, system compiles relationship-wise visit attendance.</li><li>Report output is prepared in <strong>agent-wise summary</strong> format.</li><li>Only present/absent/leave details are included.</li><li>Customer details and visit reasons are excluded from this report.</li><li>System sends the report to <strong>hr@tanserv.com</strong>.</li></ol><h4>Validation</h4><ul><li>Report is generated at month-end schedule time.</li><li>Output contains only agent-wise present/absent/leave fields.</li><li>No customer details or visit-reason columns are present.</li></ul><h4>Common issues</h4><ul><li>Pending approvals at month-end causing incomplete attendance totals.</li><li>Incorrect scheduler timezone configuration.</li><li>Recipient mailbox mapping missing or outdated.</li></ul>`
     },
     {
       id: "kb-101", cat: "submissions",
@@ -1576,13 +1730,37 @@ window.IneburaAdminComposed["help-support"] = {html:"\n\n\n\n<main class=\"helpS
       roles: ["Manager","Supervisor","KAS"],
       body: `<h4>Purpose</h4><p>Find an agent’s submitted commitment and review its invoice-level details.</p><h4>Prerequisites</h4><ul><li>Sign in with a Manager, Supervisor, or KAS account.</li><li>Open Commitment Review from Quick Actions.</li></ul><h4>Steps</h4><ol><li>Review the summary cards for Total Invoice, Committed invoices, Total Net Due, and Target amount committed.</li><li>Select the agent whose commitments you need to review.</li><li>Enter an invoice number or customer name in Search invoice no or customer name.</li><li>Use Due Date or Approval Status to narrow the list if needed.</li><li>Read the matching row’s customer, invoice, dates, invoice value, amount for the month, status, week, and target amount committed.</li><li>Click Clear filters to remove search and filter restrictions when finished.</li></ol><p><strong>Important note:</strong> If the screen says “No submissions yet,” there is no submitted agent commitment to review in the current data.</p><h4>Validation</h4><ul><li>The selected agent matches the intended owner.</li><li>Any visible row matches the invoice or customer being searched.</li><li>Clear filters removes the active search and filter selections.</li></ul><h4>Common issues</h4><ul><li>Searching before selecting the intended agent.</li><li>Confusing the invoice value with the target amount committed.</li><li>Treating the empty state as a failed search when no submissions exist.</li></ul>`
     },
-    {
-      id: "kb-142", cat: "visit-module",
-      title: "How to review an agent’s plan for a selected day",
-      meta: "Visit Module · 2 min read",
-      roles: ["Manager","Supervisor","KAS"],
-      body: `<h4>Purpose</h4><p>Check an agent’s planned visits and activity for a selected date.</p><h4>Prerequisites</h4><ul><li>Sign in with a Manager, Supervisor, or KAS account.</li><li>Open Visit Module Review from Open Visit Review.</li></ul><h4>Steps</h4><ol><li>Review Unique Visits This Month, Agent on Field Visit, and Approval Pending at the top of Visit Planner.</li><li>Use the calendar arrows or view selector to locate the required date.</li><li>Select the date in the calendar.</li><li>Select the intended agent in the Agents list or search for that agent.</li><li>Confirm the date and agent shown in the Review plan panel.</li><li>Review the plan table for customer code, customer name, visit reason, agent, KAM, KAS, and visit status.</li><li>Check Remarks and Activity Trail for that date and agent.</li></ol><p><strong>Important note:</strong> The review panel may show “No visits scheduled for this agent” when the selected date has no plan records.</p><h4>Validation</h4><ul><li>The Review plan heading shows the intended date.</li><li>The selected agent’s name appears above the plan table.</li><li>Any plan rows and trail entries belong to the selected date and agent.</li></ul><h4>Common issues</h4><ul><li>Reviewing the correct agent on the wrong date.</li><li>Mistaking an empty plan for a loading failure.</li><li>Reading another agent’s activity trail without checking the selected name.</li></ul>`
-    },
+    visitGuide({
+      "id": "kb-142",
+      "title": "How to review an Agent’s plan for a selected day",
+      "roles": [
+        "Manager",
+        "Supervisor",
+        "KAS"
+      ],
+      "purpose": "Find an Agent’s draft or submitted plan and inspect its details and history.",
+      "prerequisites": [
+        "Open <strong>Visit Module Review</strong> from the menu or <strong>Open Visit Review</strong> on your dashboard.",
+        "Know the Agent and date you want to review."
+      ],
+      "steps": [
+        "Use the calendar navigation or view selector to locate the required date.",
+        "Select the date, then select or search for the intended Agent.",
+        "Confirm the Agent and date shown in the review panel.",
+        "Review the customer code, customer name, visit reason, team information and available visit status.",
+        "Check <strong>Remarks</strong> and <strong>Activity Trail</strong>. Open <strong>Review Plan</strong> to inspect the available Visit Details summary."
+      ],
+      "note": "Manager, Supervisor and KAS can view saved drafts and submitted plans, and can suggest changes. Only the Manager can accept or reject a plan.",
+      "validation": [
+        "The review panel shows the intended Agent and date.",
+        "The plan entries, remarks and trail belong to that selection."
+      ],
+      "commonIssues": [
+        "Reviewing the correct Agent on the wrong date.",
+        "Mistaking a saved draft for a submitted plan.",
+        "Assuming Supervisor or KAS can record an approval decision."
+      ]
+    }),
     issueGuide({
       id: "kb-143", title: "How to find and track an issue in Issue Tracker", roles: ["Agent", "Manager", "Action Owner", "Approver"],
       purpose: "Find an invoice issue, check who is responsible for it, and open its details.",
@@ -1783,6 +1961,131 @@ window.IneburaAdminComposed["help-support"] = {html:"\n\n\n\n<main class=\"helpS
       note: "Supervisor access is <strong>view-only</strong>. Supervisors can review commitments but cannot enter amounts, change weeks, submit, approve or reject them.",
       validation: ["The selected Agent and invoice match the records you intended to review.", "The commitment status, week and amount are visible.", "Reviewing the record has not changed its details."],
       commonIssues: ["Reviewing the wrong Agent’s invoices.", "Overlooking an active filter.", "Confusing <strong>Invoice Value</strong> or <strong>Amount For The Month</strong> with <strong>Target Amount Committed</strong>."]
+    }),
+    visitGuide({
+      "id": "kb-156",
+      "title": "How to view your daily visit plan",
+      "roles": [
+        "Agent"
+      ],
+      "purpose": "Find your visit plan for a selected date and review its customers, visit reasons and statuses.",
+      "prerequisites": [
+        "Sign in with your Agent account.",
+        "Have the date you want to review ready."
+      ],
+      "steps": [
+        "Open <strong>Visit → Visit Module</strong> to access <strong>Visit Planner</strong>.",
+        "Use the calendar arrows to find the required date. Switch between <strong>Month view</strong>, <strong>Weekly view</strong> and <strong>Work week</strong> as needed.",
+        "Select the date on the calendar and confirm the <strong>Plans for</strong> heading.",
+        "Review the customer code, customer name, visit reason and <strong>Visit status</strong> for each entry.",
+        "Check the <strong>Draft</strong> or <strong>Submitted</strong> badge, where displayed.",
+        "Review <strong>Remarks</strong> and <strong>Activity Trail</strong> for notes and updates relating to that day."
+      ],
+      "note": "Saved drafts are visible to Manager, Supervisor and KAS. Check the plan’s Draft or Submitted badge to confirm its submission state.",
+      "validation": [
+        "The Plans for heading shows the correct date.",
+        "The customer entries and available history belong to the selected day."
+      ],
+      "commonIssues": [
+        "Reviewing a plan for the wrong date.",
+        "Leaving a customer search active.",
+        "Selecting Plan, which opens the planning form, when intending to view the day’s details."
+      ]
+    }),
+    visitGuide({
+      "id": "kb-157",
+      "title": "How to explain incomplete visits from the previous working day",
+      "roles": [
+        "Agent"
+      ],
+      "purpose": "Provide the required explanation for incomplete planned visits before submitting a new plan.",
+      "prerequisites": [
+        "Review the previous <strong>working day’s</strong> plan.",
+        "Have a reason ready for any planned visits that remain incomplete."
+      ],
+      "steps": [
+        "Open the previous working day in <strong>Visit Planner</strong> and review its planned customers.",
+        "Identify planned visits that remain incomplete. A completed visit is recorded through activity type <strong>Visited</strong>.",
+        "Prepare the new plan for the intended date.",
+        "Provide the required previous-working-day explanation when submitting the new plan. One reason can cover all incomplete visits from that working day.",
+        "Review the explanation and the new plan, then complete submission within the applicable window."
+      ],
+      "note": "A reason is mandatory if <strong>any planned visit</strong> from the previous working day is incomplete. Meeting the daily visit target does not remove the need to explain an incomplete planned visit. One reason is sufficient for all those incomplete visits.",
+      "validation": [
+        "The explanation relates to the previous working day.",
+        "All incomplete planned visits are covered by the explanation.",
+        "The new plan is submitted after the required explanation is provided."
+      ],
+      "commonIssues": [
+        "Checking the previous calendar day instead of the previous working day.",
+        "Assuming a reason is needed only when the visit target was missed.",
+        "Entering separate reasons per customer when one explanation can cover them."
+      ]
+    }),
+    visitGuide({
+      "id": "kb-158",
+      "title": "How to read visit counts and monthly planning indicators",
+      "roles": [
+        "Agent",
+        "Manager",
+        "Supervisor",
+        "KAS"
+      ],
+      "purpose": "Understand the daily visit summary and the selected month’s planning indicators.",
+      "prerequisites": [
+        "Open <strong>Visit Planner</strong>.",
+        "Select the intended date and, for a team review, the intended Agent."
+      ],
+      "steps": [
+        "Open the available <strong>Visit Details</strong> summary for the selected plan.",
+        "Review <strong>Planned</strong> for the planned visit entries and <strong>Visited</strong> for completed planned visits.",
+        "Review <strong>Not Visited</strong> for incomplete planned visits and <strong>Unplanned</strong> for completed visits outside the plan. Keep Visited and Unplanned separate.",
+        "Review <strong>On Time Planning %</strong> for the selected month. It is on-time daily plans divided by total submitted daily plans, multiplied by 100.",
+        "Review <strong>Approved / Rejected Plans</strong>. Each Agent’s daily plan counts once, regardless of its customer count.",
+        "Review <strong>Most Visited Customer</strong> for the customer with the highest number of completed visits during the selected month."
+      ],
+      "note": "Activity type <strong>Visited</strong> counts as a completed visit. Activity type <strong>Called</strong> contributes to the RPC count. Use the Admin-configured visit and RPC targets when assessing daily activity. The Visited and Unplanned figures are shown separately.",
+      "validation": [
+        "The summary belongs to the intended date and Agent.",
+        "Monthly indicators refer to the selected month.",
+        "Daily plans and customer-visit entries are interpreted as different units."
+      ],
+      "commonIssues": [
+        "Adding unplanned visits into the displayed Visited figure.",
+        "Counting customers instead of daily plans when reading planning or approval indicators.",
+        "Using fixed targets instead of the Admin configuration."
+      ]
+    }),
+    visitGuide({
+      "id": "kb-159",
+      "title": "How to suggest customers and changes to a visit plan",
+      "roles": [
+        "Manager",
+        "Supervisor",
+        "KAS"
+      ],
+      "purpose": "Send customer suggestions and feedback for an Agent’s daily plan.",
+      "prerequisites": [
+        "Open <strong>Visit Module Review</strong> with a Manager, Supervisor or KAS account.",
+        "Know the intended Agent, date and customers."
+      ],
+      "steps": [
+        "Select the required date and Agent, then confirm the review context.",
+        "Open <strong>Review Plan</strong> and inspect the existing customers and visit details.",
+        "Use the suggested-customer search to find and select the customers you want to suggest.",
+        "Review the selected suggestions and enter relevant feedback in the available remark field.",
+        "Select <strong>Submit</strong> and verify the saved suggestions and available Activity Trail for the intended Agent and date."
+      ],
+      "note": "Manager, Supervisor and KAS can suggest changes. Only the Manager accepts or rejects plans. Saved drafts are visible to all three roles.",
+      "validation": [
+        "The saved suggestions relate to the intended Agent and date.",
+        "The selected customers and feedback match the changes you intended to suggest."
+      ],
+      "commonIssues": [
+        "Suggesting a customer for the wrong Agent or date.",
+        "Leaving suggestions unsubmitted.",
+        "Treating a suggestion as a Manager approval decision."
+      ]
     })
   ];
 
