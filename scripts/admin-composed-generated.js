@@ -786,13 +786,6 @@ window.IneburaAdminComposed["help-support"] = {html:"\n\n\n\n<main class=\"helpS
       body: `<h4>Steps</h4><ul><li>Click the <strong>Bell icon</strong> in the top navigation bar.</li><li>Click <strong>Enable Notifications</strong> when prompted.</li><li>Allow notifications in your browser's permission dialog.</li></ul><p>You will now receive alerts for new invoice assignments, PTP reminders, and system updates.</p>`
     },
     {
-      id: "kb-022", cat: "issue-tracker",
-      title: "How to handle unassigned invoices",
-      meta: "Issue Tracker · 2 min read",
-      roles: ["Manager", "Supervisor", "Action Owner", "HO"],
-      body: `<h4>What Are Unassigned Invoices?</h4><p>An invoice is <strong>Unassigned</strong> when it is uploaded successfully but not mapped to an owner for follow-up.</p><h4>Information Needed Before Assignment</h4><ul><li>Customer account and region</li><li>Team ownership rule</li><li>Target agent workload availability</li></ul><h4>Steps To Assign</h4><ol><li>Open <strong>Admin Dashboard → Unassigned Invoices</strong>.</li><li>Select the invoice row to open assignment panel.</li><li>Choose the right <strong>Agent</strong> and <strong>Team</strong>.</li><li>Verify customer mapping and due amount.</li><li>Click <strong>Assign</strong> to push it into the agent queue.</li></ol><h4>Bulk Assignment</h4><p>For multiple invoices, select rows and use <strong>Bulk Assign</strong> after validating that all selected invoices belong to the same routing criteria.</p>`
-    },
-    {
       id: "kb-024", cat: "account-users",
       title: "How to change a user's role",
       meta: "Account & Users · 2 min read",
