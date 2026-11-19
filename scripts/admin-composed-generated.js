@@ -1922,23 +1922,6 @@ window.IneburaAdminComposed["help-support"] = {html:"\n\n\n\n<main class=\"helpS
       validation: ["The issue appears under <strong>Closed</strong>.", "The <strong>Action trail</strong> records the closure and remark.", "The issue has no current assignee."],
       commonIssues: ["Leaving the required closure remark blank.", "Closing before checking the latest resolution or supporting documents.", "Trying to close an issue that is already closed."]
     }),
-    issueGuide({
-      id: "kb-153", title: "How to reopen a closed issue", roles: ["Agent", "Manager"],
-      purpose: "Return a closed issue to active work when further action is required.",
-      prerequisites: ["The issue must be <strong>Closed</strong>.", "Keep the reason for reopening ready."],
-      steps: [
-        "Open <strong>Issue Tracker → Closed</strong> and locate the issue.",
-        "Select <strong>View</strong> and confirm the <strong>Issue ID</strong> and invoice.",
-        "Review the closure remark and recent <strong>Action trail</strong>.",
-        "Expand <strong>Actions</strong> and select <strong>Reopen issue</strong>.",
-        "Enter the required remark explaining what further work is needed.",
-        "Select <strong>Reopen issue</strong> to confirm.",
-        "Check the issue status, <strong>Current assignee</strong>, and <strong>Action trail</strong>."
-      ],
-      note: "Reopening keeps the same <strong>Issue ID</strong> and history. When the Agent reopens an issue, it follows the configured review route. When the Manager reopens it, it goes to the Action Owner.",
-      validation: ["The issue status is <strong>Open</strong>.", "The <strong>Action trail</strong> records the reopening remark.", "<strong>Current assignee</strong> shows who acts next."],
-      commonIssues: ["Leaving the required reopening remark blank.", "Reopening the wrong issue without checking its ID and invoice.", "Assuming reopening creates a new <strong>Issue ID</strong>."]
-    }),
     commitmentGuide({
       id: "kb-155", title: "How to review invoice commitment status", roles: ["Supervisor"],
       purpose: "Monitor an Agent’s invoice commitments, planned collection weeks and current statuses without changing them.",
